@@ -80,51 +80,95 @@ def _auto_size_canvas(diagram: Diagram, margin: int = 30) -> None:
     """Compute canvas dimensions from resolved geometry when not specified.
 
     Walks all components (icon + label extents), regions (rect bounds),
-    and edge via points / explicit label positions. Picks the maximum
-    right/bottom extent and adds `margin` for breathing room. Only
-    overwrites `diagram.width` / `diagram.height` if they are 0
-    (sentinel) — explicit sizes set in the DSL win."""
+    and edge via points / explicit label positions. Computes both min and
+    max extents — if the leftmost/topmost extent sits closer to the canvas
+    edge than `margin`, every element is shifted to give it that margin.
+    This lets orphan components (no region/layout) render correctly at
+    their default `(0, 0)` position. Only overwrites `diagram.width` /
+    `diagram.height` if they are 0 (sentinel)."""
     if diagram.width > 0 and diagram.height > 0:
         return
 
-    max_x = 0
-    max_y = 0
+    min_x = min_y =  10**9
+    max_x = max_y = -10**9
 
     for c in diagram.components:
         eff_hw = max(c.half[0], _label_half_width(c))
+        lh     = LABEL_HEIGHT.get(c.shape, 0) if (c.name or c.subtitle) else 0
+        left   = c.pos[0] - eff_hw
         right  = c.pos[0] + eff_hw
-        bottom = c.pos[1] + c.half[1] + LABEL_HEIGHT.get(c.shape, 0)
-        if right > max_x:
-            max_x = right
-        if bottom > max_y:
-            max_y = bottom
+        top    = c.pos[1] - c.half[1]
+        bottom = c.pos[1] + c.half[1] + lh
+        if left   < min_x: min_x = left
+        if top    < min_y: min_y = top
+        if right  > max_x: max_x = right
+        if bottom > max_y: max_y = bottom
 
     for r in diagram.regions:
         if r.bounds == (0, 0, 0, 0):
             continue                                 # invisible layout-only
         x, y, w, h = r.bounds
-        if x + w > max_x:
-            max_x = x + w
-        if y + h > max_y:
-            max_y = y + h
+        if x     < min_x: min_x = x
+        if y     < min_y: min_y = y
+        if x + w > max_x: max_x = x + w
+        if y + h > max_y: max_y = y + h
 
     for e in diagram.edges:
         for vx, vy in e.via:
-            if vx > max_x:
-                max_x = vx
-            if vy > max_y:
-                max_y = vy
+            if vx < min_x: min_x = vx
+            if vy < min_y: min_y = vy
+            if vx > max_x: max_x = vx
+            if vy > max_y: max_y = vy
         if e.label_pos is not None:
             lx, ly = e.label_pos
-            if lx > max_x:
-                max_x = lx
-            if ly > max_y:
-                max_y = ly
+            if lx < min_x: min_x = lx
+            if ly < min_y: min_y = ly
+            if lx > max_x: max_x = lx
+            if ly > max_y: max_y = ly
+
+    if min_x > max_x:                                # nothing to size against
+        return
+
+    dx = margin - min_x if min_x < margin else 0
+    dy = margin - min_y if min_y < margin else 0
+    if dx or dy:
+        for c in diagram.components:
+            c.pos = (c.pos[0] + dx, c.pos[1] + dy)
+        for r in diagram.regions:
+            if r.bounds == (0, 0, 0, 0):
+                continue
+            x, y, w, h = r.bounds
+            r.bounds = (x + dx, y + dy, w, h)
+        for e in diagram.edges:
+            e.via = [(vx + dx, vy + dy) for vx, vy in e.via]
+            if e.label_pos is not None:
+                e.label_pos = (e.label_pos[0] + dx, e.label_pos[1] + dy)
+        max_x += dx
+        max_y += dy
 
     if diagram.width == 0:
         diagram.width = max_x + margin
     if diagram.height == 0:
         diagram.height = max_y + margin
+
+    # Enforce min 4:3 (landscape) aspect: pad width and re-center
+    # horizontally so a tall vertical stack doesn't look like a column.
+    # Wide canvases are left untouched.
+    if diagram.width * 3 < diagram.height * 4:
+        new_w = (diagram.height * 4) // 3
+        shift = (new_w - diagram.width) // 2
+        for c in diagram.components:
+            c.pos = (c.pos[0] + shift, c.pos[1])
+        for r in diagram.regions:
+            if r.bounds == (0, 0, 0, 0):
+                continue
+            x, y, w, h = r.bounds
+            r.bounds = (x + shift, y, w, h)
+        for e in diagram.edges:
+            e.via = [(vx + shift, vy) for vx, vy in e.via]
+            if e.label_pos is not None:
+                e.label_pos = (e.label_pos[0] + shift, e.label_pos[1])
+        diagram.width = new_w
 
 
 def _resolve_auto_layouts(diagram: Diagram) -> None:

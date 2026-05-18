@@ -10,7 +10,7 @@ import re
 from html import escape as _xml_escape
 
 from icons import ICONS
-from model import Component, Diagram, Edge, Region
+from model import Component, Diagram, Edge, Region, resolve_anchors
 
 
 _WS_RE = re.compile(r"\s+")
@@ -301,29 +301,32 @@ def _region_label_clearance(r: Region, side: str) -> int:
 def route_edge(e: Edge, d: Diagram) -> list[tuple[int, int]]:
     src = d.get_node(e.src)         # accepts Component or Region
     dst = d.get_node(e.dst)
-    sp = _anchor_pos(src, e.src_anchor, e.src_offset)
-    dp = _anchor_pos(dst, e.dst_anchor, e.dst_offset)
+    src_anchor, dst_anchor = resolve_anchors(e, src, dst)
+    sp = _anchor_pos(src, src_anchor, e.src_offset)
+    dp = _anchor_pos(dst, dst_anchor, e.dst_offset)
 
     # Auto label-clearance: when targeting a region's top, push the
     # endpoint deeper into the rect so the arrowhead doesn't get hidden
     # behind the label halo. Only triggers if the user hasn't already
     # set a y-offset (respect explicit positioning).
-    if isinstance(dst, Region) and e.dst_anchor == "top" and e.dst_offset[1] == 0:
+    if isinstance(dst, Region) and dst_anchor == "top" and e.dst_offset[1] == 0:
         dp = (dp[0], dp[1] + _region_label_clearance(dst, "top"))
 
     if e.via:
         return [sp, *e.via, dp]
 
-    # Auto elbow — single bend when src and dst aren't axis-aligned.
+    # Already axis-aligned — single straight segment.
     if sp[0] == dp[0] or sp[1] == dp[1]:
         return [sp, dp]
 
-    # Bend direction depends on src anchor: side-anchor → horizontal-first,
-    # top/bottom-anchor → vertical-first. Produces a clean L-shape.
-    if e.src_anchor in ("left", "right"):
-        return [sp, (dp[0], sp[1]), dp]
+    # Z-shape with the perpendicular cross-segment at the midpoint between
+    # src and dst. Side anchors → H-V-H; top/bottom anchors → V-H-V.
+    if src_anchor in ("left", "right"):
+        mid_x = (sp[0] + dp[0]) // 2
+        return [sp, (mid_x, sp[1]), (mid_x, dp[1]), dp]
     else:  # top, bottom
-        return [sp, (sp[0], dp[1]), dp]
+        mid_y = (sp[1] + dp[1]) // 2
+        return [sp, (sp[0], mid_y), (dp[0], mid_y), dp]
 
 
 def smooth_curve(sp, dp, src_anchor, dst_anchor) -> str:
@@ -445,16 +448,17 @@ def render_region(r: Region) -> str:
 def render_edge(e: Edge, d: Diagram) -> str:
     src = d.get_node(e.src)         # accepts Component or Region
     dst = d.get_node(e.dst)
-    sp = _anchor_pos(src, e.src_anchor, e.src_offset)
-    dp = _anchor_pos(dst, e.dst_anchor, e.dst_offset)
+    src_anchor, dst_anchor = resolve_anchors(e, src, dst)
+    sp = _anchor_pos(src, src_anchor, e.src_offset)
+    dp = _anchor_pos(dst, dst_anchor, e.dst_offset)
 
     # Same label-clearance auto-push as route_edge — keeps the curve and
     # orthogonal renderers consistent on where the arrowhead lands.
-    if isinstance(dst, Region) and e.dst_anchor == "top" and e.dst_offset[1] == 0:
+    if isinstance(dst, Region) and dst_anchor == "top" and e.dst_offset[1] == 0:
         dp = (dp[0], dp[1] + _region_label_clearance(dst, "top"))
 
     if e.route == "curve":
-        path = smooth_curve(sp, dp, e.src_anchor, e.dst_anchor)
+        path = smooth_curve(sp, dp, src_anchor, dst_anchor)
         pts = [sp, dp]  # for label midpoint
     else:
         pts = route_edge(e, d)
@@ -523,6 +527,31 @@ def render_component(c: Component) -> str:
 </g>'''
 
 
+def component_svg_snippet(c: Component) -> str:
+    """Standalone SVG containing just this component's glyph + labels,
+    centered inside its viewBox. Used by `to_figma.render()` for the
+    auto-layout hybrid path: each leaf component gets imported into
+    Figma via `figma.createNodeFromSvg(snippet)`, then placed by an
+    enclosing Figma auto-layout frame.
+
+    Width = icon.w; height = icon.h + label_band. The component is
+    centered horizontally; the icon sits at y=hh (top of icon at 0)."""
+    from model import LABEL_HEIGHT
+    hw, hh = c.half
+    label_h = LABEL_HEIGHT.get(c.shape, 0) if (c.name or c.subtitle) else 0
+    w = 2 * hw
+    h = 2 * hh + label_h
+    saved_pos = c.pos
+    c.pos = (hw, hh)         # icon center inside the snippet
+    body = render_component(c)
+    c.pos = saved_pos
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'viewBox="0 0 {w} {h}" width="{w}" height="{h}">'
+        f'<defs>{DEFS}</defs><style>{STYLE}</style>{body}</svg>'
+    )
+
+
 # ── Top-level render ─────────────────────────────────────────────────
 def _title_block(d: Diagram) -> tuple[str, int]:
     """Render the title + subtitle block at top-center. Returns the SVG
@@ -586,7 +615,8 @@ def render(d: Diagram, animate: bool = False) -> str:
     #      "RAG KNOWLEDGE LAYER")
     svg = f'''<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {d.width} {total_height}"
-     width="100%" height="auto"
+     width="{d.width}" height="{total_height}"
+     style="max-width: 100%; height: auto"
      font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
   <style>{style}</style>
   <defs>{DEFS}</defs>

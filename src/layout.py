@@ -23,7 +23,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from model import Component, Diagram, Edge, LABEL_HEIGHT
+from model import Component, Diagram, Edge, LABEL_HEIGHT, resolve_anchors
 
 
 # ── Sizing ─────────────────────────────────────────────────────────────
@@ -171,6 +171,80 @@ def layout(
     diagram.height = max(c.pos[1] + sizes[c.id].h // 2 for c in diagram.components) + canvas_margin
 
 
+# ── Anonymous layout-tree (Figma-style auto-layout) ────────────────────
+def apply_layout_tree(
+    by_id: dict[str, Component],
+    tree,
+    *,
+    gap: int = 40,
+    origin: tuple[int, int] = (0, 0),
+) -> tuple[int, int]:
+    """Position every component referenced in `tree` according to a
+    Figma-style auto-layout: each frame *hugs* its contents, children are
+    laid out along the frame's axis with a fixed `gap`, and the
+    cross-axis is *center-aligned*. Returns the (width, height) of the
+    laid-out block; the block's top-left starts at `origin`.
+
+    `tree` shape (recursive):
+      ("id", "<component_id>")
+      ("group", "horizontal"|"vertical", [child, …])
+
+    Component icon centers (`c.pos`) are written in place. The auto-canvas
+    pass shifts everything later if `origin` is closer to the canvas edge
+    than the configured margin."""
+    def cell(c: Component) -> tuple[int, int]:
+        iw, ih = _ICON_DIMS[c.shape]
+        lh = LABEL_HEIGHT.get(c.shape, 0) if (c.name or c.subtitle) else 0
+        return (iw, ih + lh)
+
+    def measure(node) -> tuple[int, int]:
+        if node[0] == "id":
+            return cell(_lookup(by_id, node[1]))
+        _, direction, children = node
+        sizes = [measure(ch) for ch in children]
+        if direction == "horizontal":
+            return (
+                sum(s[0] for s in sizes) + (len(sizes) - 1) * gap,
+                max(s[1] for s in sizes),
+            )
+        return (
+            max(s[0] for s in sizes),
+            sum(s[1] for s in sizes) + (len(sizes) - 1) * gap,
+        )
+
+    def place(node, cx: int, cy: int) -> None:
+        if node[0] == "id":
+            c = _lookup(by_id, node[1])
+            _, ih = _ICON_DIMS[c.shape]
+            lh = LABEL_HEIGHT.get(c.shape, 0) if (c.name or c.subtitle) else 0
+            # cell center → icon center: shift up by half the label band.
+            c.pos = (cx, cy - lh // 2)
+            return
+        _, direction, children = node
+        sizes = [measure(ch) for ch in children]
+        w, h = measure(node)
+        if direction == "horizontal":
+            cursor = cx - w // 2
+            for ch, (cw, _) in zip(children, sizes):
+                place(ch, cursor + cw // 2, cy)
+                cursor += cw + gap
+        else:
+            cursor = cy - h // 2
+            for ch, (_, ch_h) in zip(children, sizes):
+                place(ch, cx, cursor + ch_h // 2)
+                cursor += ch_h + gap
+
+    w, h = measure(tree)
+    place(tree, origin[0] + w // 2, origin[1] + h // 2)
+    return (w, h)
+
+
+def _lookup(by_id: dict[str, Component], cid: str) -> Component:
+    if cid not in by_id:
+        raise KeyError(f"layout tree references unknown component {cid!r}")
+    return by_id[cid]
+
+
 # ── Edge routing helpers ───────────────────────────────────────────────
 def _route_edges(diagram: Diagram, row_ys: list[int], row_heights: list[int]) -> None:
     for e in diagram.edges:
@@ -189,8 +263,9 @@ def _route_over(diagram: Diagram, e: Edge, row_ys: list[int],
     the source row — accounting for label area below row above's icons."""
     src = diagram.get(e.src)
     dst = diagram.get(e.dst)
-    sp = src.anchor(e.src_anchor)
-    dp = dst.anchor(e.dst_anchor)
+    src_anchor, dst_anchor = resolve_anchors(e, src, dst)
+    sp = src.anchor(src_anchor)
+    dp = dst.anchor(dst_anchor)
 
     # Locate source row.
     src_y = src.pos[1]
@@ -223,8 +298,9 @@ def _route_under(diagram: Diagram, e: Edge, row_ys: list[int],
     the source row — accounting for label area which extends below the icon."""
     src = diagram.get(e.src)
     dst = diagram.get(e.dst)
-    sp = src.anchor(e.src_anchor)
-    dp = dst.anchor(e.dst_anchor)
+    src_anchor, dst_anchor = resolve_anchors(e, src, dst)
+    sp = src.anchor(src_anchor)
+    dp = dst.anchor(dst_anchor)
 
     # Locate source row.
     src_y = src.pos[1]

@@ -53,6 +53,11 @@ LAYOUT_RE = re.compile(
 )
 CLOSE_RE = re.compile(r'^\s*\}\s*$')
 
+# Anonymous layout tree:  layout { EXPR }
+# EXPR := ATOM ((`|` | `,`) ATOM)*    — `|` = horizontal, `,` = vertical
+# ATOM := ID | `{` EXPR `}`           — can't mix separators at same level
+LAYOUT_TREE_RE = re.compile(r'^layout\s*\{(.+)\}\s*$')
+
 # Region option tokens (any order, each ≤ 1 occurrence).
 PADDING_OPT_RE     = re.compile(r'\bpadding\s+\(\s*(\d+)\s*,\s*(\d+)\s*\)')
 PADDING_BOT_OPT_RE = re.compile(r'\bpadding-bottom\s+(\d+)')
@@ -63,12 +68,12 @@ LABEL_POS_RE       = re.compile(r'\blabel-position\s+(above|inside)')
 ICON_OPT_RE        = re.compile(r'\bicon\s+([\w-]+)')
 
 # ── Leaf component ────────────────────────────────────────────────────
-# <id> <shape>/<icon>/<accent> "Name" "Subtitle" [@ <pos|parent-ref>]
+# <id> <shape>/<icon>/<accent> ["Name" ["Subtitle"]] [@ <pos|parent-ref>]
 LEAF_RE = re.compile(
     r'^(\w+)\s+'
-    r'([\w-]+)/([\w-]+)/(\w+)\s+'
-    r'"([^"]*)"\s+'
-    r'"([^"]*)"'
+    r'([\w-]+)/([\w-]+)/(\w+)'
+    r'(?:\s+"([^"]*)")?'
+    r'(?:\s+"([^"]*)")?'
     r'(?:\s+@\s+(.+?))?'
     r'\s*$'
 )
@@ -130,6 +135,7 @@ class _State:
         self.edges:      list[Edge]      = []
         self.layout_dict: dict[str, list[list[str]]] = {}
         self.external_dict: dict[str, dict] = {}
+        self.layout_trees: list = []        # anonymous `layout { … }` blocks
         # (0, 0) sentinel → render-time auto-sizing (alignment._auto_size_canvas).
         self.canvas: tuple[int, int] = (0, 0)
         self.title: str = ""
@@ -140,7 +146,15 @@ class _State:
             width=self.canvas[0], height=self.canvas[1],
             title=self.title, subtitle=self.subtitle,
             components=self.components, regions=self.regions, edges=self.edges,
+            layout_trees=self.layout_trees,
         )
+        if self.layout_trees:
+            from layout import apply_layout_tree
+            by_id = {c.id: c for c in self.components}
+            cursor_y = 0
+            for tree in self.layout_trees:
+                _, h = apply_layout_tree(by_id, tree, origin=(0, cursor_y))
+                cursor_y += h + 40
         return (
             diagram,
             self.layout_dict or None,
@@ -199,6 +213,12 @@ def _parse_block(
                 state.external_dict[eid] = {
                     "above": par, "gap": int(gap) if gap else 60,
                 }
+                i += 1
+                continue
+            if (m := LAYOUT_TREE_RE.match(line)):
+                state.layout_trees.append(
+                    _parse_layout_tree(m.group(1), line_no=i + 1)
+                )
                 i += 1
                 continue
 
@@ -365,7 +385,7 @@ def _make_component(m: re.Match, line_no: int) -> Component:
         else:
             raise SyntaxError(f"line {line_no}: bad @-ref {ref!r}")
     return Component(
-        id=cid, name=name, subtitle=subtitle,
+        id=cid, name=name or "", subtitle=subtitle or "",
         icon=icon, shape=shape, accent=accent,
         pos=pos, parent=parent, align=align, align_gap=align_gap,
     )
@@ -375,8 +395,8 @@ def _make_edge(m: re.Match, line_no: int) -> Edge:
     src, arrow, dst, label, opts = m.groups()
     style = "orange" if arrow == "==>" else "gray"
     kw: dict = {
-        "src_anchor": "right",
-        "dst_anchor": "left",
+        "src_anchor": None,    # None → resolve_anchors picks from geometry
+        "dst_anchor": None,
         "src_offset": (0, 0),
         "dst_offset": (0, 0),
         "label_offset": (0, 0),
@@ -493,3 +513,73 @@ def _set_flag(kw: dict, flag: str, line_no: int) -> None:
         kw["route"] = flag
     else:
         raise SyntaxError(f"line {line_no}: unknown edge flag {flag!r}")
+
+
+# ── Layout tree (Figma-style auto-layout) ─────────────────────────────
+# Tokens: `{` `}` `|` `,` IDENT. Tree node:
+#   ("id", "<id>")
+#   ("group", "horizontal"|"vertical", [child, …])
+def _parse_layout_tree(expr: str, line_no: int):
+    tokens = _tokenize_layout(expr, line_no)
+    pos = [0]
+    node = _parse_layout_node(tokens, pos, line_no)
+    if pos[0] < len(tokens):
+        raise SyntaxError(f"line {line_no}: trailing token {tokens[pos[0]]!r} in layout")
+    return node
+
+
+def _tokenize_layout(s: str, line_no: int) -> list[str]:
+    out: list[str] = []
+    i = 0
+    while i < len(s):
+        ch = s[i]
+        if ch in "{}|,":
+            out.append(ch)
+            i += 1
+        elif ch.isspace():
+            i += 1
+        elif ch.isalnum() or ch == "_":
+            j = i
+            while j < len(s) and (s[j].isalnum() or s[j] == "_"):
+                j += 1
+            out.append(s[i:j])
+            i = j
+        else:
+            raise SyntaxError(f"line {line_no}: bad char {ch!r} in layout expr")
+    return out
+
+
+def _parse_layout_node(tokens: list[str], pos: list[int], line_no: int):
+    items = [_parse_layout_atom(tokens, pos, line_no)]
+    sep: str | None = None
+    while pos[0] < len(tokens) and tokens[pos[0]] in "|,":
+        cur = tokens[pos[0]]
+        if sep is None:
+            sep = cur
+        elif sep != cur:
+            raise SyntaxError(
+                f"line {line_no}: cannot mix `|` and `,` at same level — use {{}} to group"
+            )
+        pos[0] += 1
+        items.append(_parse_layout_atom(tokens, pos, line_no))
+    if sep is None:
+        return items[0]
+    direction = "horizontal" if sep == "|" else "vertical"
+    return ("group", direction, items)
+
+
+def _parse_layout_atom(tokens: list[str], pos: list[int], line_no: int):
+    if pos[0] >= len(tokens):
+        raise SyntaxError(f"line {line_no}: expected id or `{{` in layout expr")
+    tok = tokens[pos[0]]
+    if tok == "{":
+        pos[0] += 1
+        node = _parse_layout_node(tokens, pos, line_no)
+        if pos[0] >= len(tokens) or tokens[pos[0]] != "}":
+            raise SyntaxError(f"line {line_no}: missing `}}` in layout expr")
+        pos[0] += 1
+        return node
+    if tok in "|,}":
+        raise SyntaxError(f"line {line_no}: unexpected {tok!r} in layout expr")
+    pos[0] += 1
+    return ("id", tok)

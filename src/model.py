@@ -202,8 +202,8 @@ class Edge:
     dst: str
     label: str
     style: Style = "gray"
-    src_anchor: Anchor = "right"
-    dst_anchor: Anchor = "left"
+    src_anchor: Anchor | None = None    # None → auto-pick from geometry
+    dst_anchor: Anchor | None = None    # (see resolve_anchors below)
     route: Route = "auto"
     via: list[tuple[int, int]] = field(default_factory=list)  # explicit override
     src_offset: tuple[int, int] = (0, 0)  # nudge the source attach point
@@ -215,6 +215,31 @@ class Edge:
     dashed: bool = False         # render with stroke-dasharray (eg. async fan-out)
 
 
+def resolve_anchors(e: Edge, src, dst) -> tuple[Anchor, Anchor]:
+    """Return the effective (src_anchor, dst_anchor) for an edge.
+
+    An anchor left as `None` is auto-picked from the geometry: whichever
+    side of the source faces the destination's center (and vice versa).
+    Strongly biased toward horizontal — vertical only wins when the
+    target is more than twice as far vertically as horizontally
+    (`|dy| > 2·|dx|`). This keeps fan-out edges from a single parent to
+    a stack of siblings consistent (all exit the parent's right side),
+    even when outermost siblings are far above or below. Explicit
+    anchors set by the user always take precedence; only the `None`
+    slots are filled."""
+    sa, da = e.src_anchor, e.dst_anchor
+    if sa is not None and da is not None:
+        return sa, da
+    sc = src.anchor("center")
+    dc = dst.anchor("center")
+    dx, dy = dc[0] - sc[0], dc[1] - sc[1]
+    if abs(dy) > 2 * abs(dx):
+        auto_sa, auto_da = ("bottom", "top") if dy >= 0 else ("top", "bottom")
+    else:
+        auto_sa, auto_da = ("right", "left") if dx >= 0 else ("left", "right")
+    return (sa or auto_sa, da or auto_da)
+
+
 @dataclass
 class Diagram:
     width: int
@@ -224,6 +249,11 @@ class Diagram:
     components: list[Component] = field(default_factory=list)
     regions: list[Region] = field(default_factory=list)
     edges: list[Edge] = field(default_factory=list)
+    # Layout trees from the DSL `layout { … }` blocks. Each tree is a
+    # tuple `("id", cid)` or `("group", "horizontal"|"vertical", [children])`.
+    # Consumed by `to_figma.render()` to emit nested Figma auto-layout
+    # frames that mirror the user's `|`/`,` grouping. Empty → flat layout.
+    layout_trees: list = field(default_factory=list)
 
     def get(self, id: str) -> Component:
         for c in self.components:

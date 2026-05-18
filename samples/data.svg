@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 658"
-width="100%" height="auto"
+width="1080" height="658"
+style="max-width: 100%; height: auto"
 font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"><style> text { fill: #1f2937; }
 .bg-grid { fill: url(#dot-grid); }
 .region-rect {

@@ -4,6 +4,7 @@ __pycache__/
 .DS_Store
 # transient build artefacts
 out/
+tmp/
 # transient screenshots from validation runs
 samples/_*.jpeg
 samples/_*.png

@@ -1,14 +1,24 @@
-"""Entry point: `axo <path> [--animate]`
+"""Entry point: `axo <path> [--animate] [--figma] [--excalidraw]`
 
 Argument is a path to a `.diagram` (DSL) or `.py` (Python form) source.
-Output is a SVG written next to the input file:
+Output is a SVG (or Figma Plugin JS / Excalidraw scene) written next to
+the input file:
 
-    axo samples/aws_1.diagram             → samples/aws_1.svg
-    axo samples/aws_1.diagram --animate   → samples/aws_1-animated.svg
+    axo samples/aws_1.diagram                → samples/aws_1.svg
+    axo samples/aws_1.diagram --animate      → samples/aws_1-animated.svg
+    axo samples/aws_1.diagram --figma        → samples/aws_1.figma.js
+    axo samples/aws_1.diagram --excalidraw   → samples/aws_1.excalidraw
 
 `--animate` emits a `-animated.svg` companion with flowing edge dashes
 (CSS `stroke-dashoffset` animation). Static SVG (no JS); animation runs
 in any modern browser.
+
+`--figma` emits Figma Plugin API JavaScript. Pass it as the `code`
+argument to the `use_figma` MCP tool, OR paste it into Figma's plugin
+dev console (Plugins menu → Development → Open console).
+
+`--excalidraw` emits an Excalidraw scene v2 JSON; open it directly in
+excalidraw.com (Menu → Open) or the Excalidraw desktop app.
 """
 import sys
 from importlib import import_module
@@ -17,6 +27,8 @@ from pathlib import Path
 from alignment import resolve_alignments
 from dsl import parse as parse_dsl
 from layout import layout
+from to_excalidraw import render as render_excalidraw
+from to_figma import render as render_figma
 from to_svg import render
 
 
@@ -47,12 +59,30 @@ def main() -> None:
         print(f"unsupported source: {src} (expected .diagram or .py)")
         sys.exit(1)
 
-    animate = "--animate" in flags
+    animate    = "--animate"    in flags
+    figma      = "--figma"      in flags
+    excalidraw = "--excalidraw" in flags
 
     diagram, layout_spec, external_layout = load(src)
     if layout_spec:
         layout(diagram, layout_spec, external_layout)
     resolve_alignments(diagram)
+
+    if excalidraw:
+        payload = render_excalidraw(diagram)
+        out = src.with_suffix(".excalidraw")
+        out.write_text(payload, encoding="utf-8")
+        rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
+        print(f"✓ wrote {rel} (excalidraw)  ({diagram.width}×{diagram.height}, {len(payload):,} bytes)")
+        return
+
+    if figma:
+        payload = render_figma(diagram)
+        out = src.with_suffix(".figma.js")
+        out.write_text(payload, encoding="utf-8")
+        rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
+        print(f"✓ wrote {rel} (figma plugin js)  ({diagram.width}×{diagram.height}, {len(payload):,} bytes)")
+        return
 
     svg = render(diagram, animate=animate)
 
