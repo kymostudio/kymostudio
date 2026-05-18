@@ -1,11 +1,20 @@
-"""Mermaid-like DSL parser for diagrams.
+"""D2-style DSL parser for diagrams.
 
-A textual surface for `model.Diagram`. Same expressive power as the
-Python dataclass form (Components, Regions, Auto-layouts, Edges with
-anchors/offsets/waypoints) but line-based and brace-delimited so it
-reads like Mermaid.
+Line-based, brace-delimited surface for `model.Diagram`. There is no
+`component` or `region` keyword — the parser disambiguates by line
+shape (see `docs/DSL.md` §6):
 
-See ../docs/BEST_PRACTICE_DIAGRAMS.md §5.5 for the language grammar.
+  • line ending in `{` and second token ∈ outer|inner → region container
+  • line ending in `{` and second token ∈ horizontal|vertical → layout container
+  • `id arrow id …`                                    → edge
+  • `id shape/icon/accent "Name" "Sub" [@ ...]`        → leaf component
+  • bare ids (only inside a container body)            → membership refs
+  • `row id1 id2 …` (only inside a region body)        → grid row
+
+Containers nest — a region's body may contain inline leaves, bare-id
+references, AND nested containers. Leaves declared transitively inside
+a nested container are also appended to the outer container's
+`contains` so auto-bounds enclose them.
 """
 from __future__ import annotations
 
@@ -14,18 +23,49 @@ import re
 from model import Component, Diagram, Edge, Region
 
 
-# ── Line patterns ─────────────────────────────────────────────────────
-# Metadata directives use `key:` style (yaml-like). `:` is optional on
-# `canvas:` for backward compat; `title:`/`subtitle:` require it.
-# The output file path is NOT a diagram property — it's a render config
-# in cli.py's TARGETS dict.
+# ── Top-level directives (file scope only) ────────────────────────────
+# `:` is optional on `canvas:` for back-compat; title/subtitle require it.
 CANVAS_RE   = re.compile(r'^canvas\s*:?\s+(\d+)\s*x\s*(\d+)\s*$')
 TITLE_RE    = re.compile(r'^title\s*:\s*"([^"]*)"\s*$')
 SUBTITLE_RE = re.compile(r'^subtitle\s*:\s*"([^"]*)"\s*$')
 
-# component <id> <shape>/<icon>/<accent> "Name" "Subtitle" [@ <pos|parent-ref>]
-COMP_RE = re.compile(
-    r'^component\s+(\w+)\s+'
+# external <id> above <parent> [gap N] — pushes canvas margin to leave
+# room for a component placed above a grid cell (only "above" implemented).
+EXTERNAL_RE = re.compile(
+    r'^external\s+(\w+)\s+above\s+(\w+)(?:\s+gap\s+(\d+))?\s*$'
+)
+
+# ── Containers (region or layout) ─────────────────────────────────────
+# Region:  <id> (outer|inner) "Label" [opts ...] {
+# Layout:  <id> (horizontal|vertical) pos (X,Y) gap N [align ...] {
+# The label is required for regions, omitted for layouts.
+REGION_RE = re.compile(
+    r'^(\w+)\s+(outer|inner)\s+"([^"]*)"'
+    r'(?:\s+(.+?))?'                               # trailing opts blob
+    r'\s*\{\s*$'
+)
+LAYOUT_RE = re.compile(
+    r'^(\w+)\s+(horizontal|vertical)\s+'
+    r'pos\s+\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)\s+'
+    r'gap\s+(\d+)'
+    r'(?:\s+align\s+(start|center|end))?'
+    r'\s*\{\s*$'
+)
+CLOSE_RE = re.compile(r'^\s*\}\s*$')
+
+# Region option tokens (any order, each ≤ 1 occurrence).
+PADDING_OPT_RE     = re.compile(r'\bpadding\s+\(\s*(\d+)\s*,\s*(\d+)\s*\)')
+PADDING_BOT_OPT_RE = re.compile(r'\bpadding-bottom\s+(\d+)')
+DASH_OPT_RE        = re.compile(r'\bdash\s+\(\s*(\d+)\s*,\s*(\d+)\s*\)')
+STROKE_OPT_RE      = re.compile(r'\bstroke\s+(#[0-9a-fA-F]{3,8})')
+LABEL_ANCHOR_RE    = re.compile(r'\blabel-anchor\s+(start|middle|end)')
+LABEL_POS_RE       = re.compile(r'\blabel-position\s+(above|inside)')
+ICON_OPT_RE        = re.compile(r'\bicon\s+([\w-]+)')
+
+# ── Leaf component ────────────────────────────────────────────────────
+# <id> <shape>/<icon>/<accent> "Name" "Subtitle" [@ <pos|parent-ref>]
+LEAF_RE = re.compile(
+    r'^(\w+)\s+'
     r'([\w-]+)/([\w-]+)/(\w+)\s+'
     r'"([^"]*)"\s+'
     r'"([^"]*)"'
@@ -37,185 +77,275 @@ PARENT_REF_RE  = re.compile(
     r'^(\w+)\s+(top|right|bottom|left)(?:\s+(-?\d+))?$'
 )
 
-# region <id> <style> "Label" [opt opt opt …] {
-#
-# Trailing options are parsed individually so they can appear in any order
-# and the set is open for extension. Currently recognised:
-#   padding (h, v)           — region inner padding
-#   dash    (X, Y)           — stroke-dasharray override; (0, 0) = solid
-#   stroke  #hex             — stroke colour override
-REGION_RE = re.compile(
-    r'^region\s+(\w+)\s+(outer|inner)\s+"([^"]*)"'
-    r'(?:\s+(.+?))?'                               # trailing options blob
-    r'\s*\{\s*$'
-)
-
-PADDING_OPT_RE     = re.compile(r'\bpadding\s+\(\s*(\d+)\s*,\s*(\d+)\s*\)')
-PADDING_BOT_OPT_RE = re.compile(r'\bpadding-bottom\s+(\d+)')
-DASH_OPT_RE        = re.compile(r'\bdash\s+\(\s*(\d+)\s*,\s*(\d+)\s*\)')
-STROKE_OPT_RE      = re.compile(r'\bstroke\s+(#[0-9a-fA-F]{3,8})')
-LABEL_ANCHOR_RE    = re.compile(r'\blabel-anchor\s+(start|middle|end)')
-LABEL_POS_RE       = re.compile(r'\blabel-position\s+(above|inside)')
-ICON_OPT_RE        = re.compile(r'\bicon\s+([\w-]+)')
-
-# layout <id> <horizontal|vertical> pos (x, y) gap N [align <start|center|end>] {
-LAYOUT_RE = re.compile(
-    r'^layout\s+(\w+)\s+(horizontal|vertical)\s+'
-    r'pos\s+\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)\s+'
-    r'gap\s+(\d+)'
-    r'(?:\s+align\s+(start|center|end))?'
-    r'\s*\{\s*$'
-)
-
-CLOSE_RE = re.compile(r'^\s*\}\s*$')
-
-# external <id> above <parent> [gap N]
-# Pushes the canvas top-margin down to leave room for an external component
-# placed above a grid cell. Only "above" is implemented (matches layout.py).
-EXTERNAL_RE = re.compile(
-    r'^external\s+(\w+)\s+above\s+(\w+)(?:\s+gap\s+(\d+))?\s*$'
-)
-
-# `row id1 id2 …` inside a region body switches that region to GRID mode:
-# children flow across rows that align horizontally ACROSS all grid regions
-# (row 0 of every region shares one Y, row 1 another, etc — that's the
-# whole point of `LAYOUT` in layout.py).
-ROW_RE = re.compile(r'^row(?:\s+(.+))?$')
-
-# Edge: <src> --> <dst> [: "label"] [{ options }]
-#       <src> ==> <dst> [: "label"] [{ options }]    ← orange style
+# ── Edge ──────────────────────────────────────────────────────────────
 EDGE_RE = re.compile(
     r'^(\w+)\s+(-->|==>)\s+(\w+)'
     r'(?:\s+:\s+"([^"]*)")?'
     r'(?:\s+\{(.*)\})?'
     r'\s*$'
 )
-
-# Anchor with optional offset: right, right(0,-10)
 ANCHOR_SPEC_RE = re.compile(
     r'^(top|right|bottom|left|center)'
     r'(?:\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\))?$'
 )
-TUPLE_RE = re.compile(r'^\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)$')
+TUPLE_RE  = re.compile(r'^\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)$')
 VIA_PT_RE = re.compile(r'\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)')
+
+# ── Grid rows (region body only) ──────────────────────────────────────
+ROW_RE = re.compile(r'^row(?:\s+(.+))?$')
+
+# Bare-id reference list (whitespace-separated identifiers) — only valid
+# inside a container body. Used to declare membership without redefining.
+BARE_IDS_RE = re.compile(r'^[A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*\s*$')
 
 
 # ── Public API ────────────────────────────────────────────────────────
 def parse(dsl: str) -> tuple[Diagram, dict | None, dict | None]:
-    """Parse a Mermaid-like diagram DSL.
+    """Parse a D2-style diagram DSL.
 
     Returns `(diagram, layout, external)`:
-      - `layout` is a `{region_id: [[cell_id, ...], ...]}` dict when any
-        region uses grid-style `row …` syntax; `None` otherwise.
-      - `external` is `{component_id: {"above": parent_id, "gap": N}}` when
-        any `external …` directive appears; `None` otherwise.
+      - `layout`   — `{region_id: [[cell_id, ...], ...]}` for regions using
+        grid-style `row …` syntax; `None` if no region uses grid mode.
+      - `external` — `{component_id: {"above": parent_id, "gap": N}}` for
+        any `external …` directive; `None` otherwise.
 
-    `layout` and `external` flow into `layout.layout(diagram, layout, external)`
-    in the CLI pipeline; when both are None the layout pass is skipped.
+    Both flow into `layout.layout(diagram, layout, external)` in the CLI
+    pipeline; when both are None the layout pass is skipped.
     """
-    components: list[Component] = []
-    regions:    list[Region]    = []
-    edges:      list[Edge]      = []
-    layout_dict: dict[str, list[list[str]]] = {}
-    external_dict: dict[str, dict] = {}
-    # (0, 0) sentinel → render-time auto-sizing kicks in (see
-    # alignment._auto_size_canvas). Explicit `canvas W x H` overrides.
-    canvas: tuple[int, int] = (0, 0)
-    title: str = ""
-    subtitle: str = ""
-
+    state = _State()
     lines = dsl.splitlines()
-    i = 0
+    consumed = _parse_block(state, lines, 0, parent=None)
+    if consumed != len(lines):
+        # _parse_block returned before EOF without a parent — that means
+        # it hit a stray `}`. Surface the line number.
+        raise SyntaxError(f"line {consumed + 1}: unexpected `}}` at file scope")
+    return state.finalize()
+
+
+# ── Internal state ────────────────────────────────────────────────────
+class _State:
+    def __init__(self) -> None:
+        self.components: list[Component] = []
+        self.regions:    list[Region]    = []
+        self.edges:      list[Edge]      = []
+        self.layout_dict: dict[str, list[list[str]]] = {}
+        self.external_dict: dict[str, dict] = {}
+        # (0, 0) sentinel → render-time auto-sizing (alignment._auto_size_canvas).
+        self.canvas: tuple[int, int] = (0, 0)
+        self.title: str = ""
+        self.subtitle: str = ""
+
+    def finalize(self) -> tuple[Diagram, dict | None, dict | None]:
+        diagram = Diagram(
+            width=self.canvas[0], height=self.canvas[1],
+            title=self.title, subtitle=self.subtitle,
+            components=self.components, regions=self.regions, edges=self.edges,
+        )
+        return (
+            diagram,
+            self.layout_dict or None,
+            self.external_dict or None,
+        )
+
+
+# ── Block parser (recursive: file scope + each container body) ────────
+def _parse_block(
+    state: _State, lines: list[str], start: int, parent: Region | None,
+) -> int:
+    """Parse lines from `start`. If `parent` is set, stop at the matching `}`
+    and return the index AFTER the `}`. If `parent` is None, parse to EOF.
+
+    Inside a container body, every leaf created here AND every leaf created
+    transitively by nested containers is appended to `parent.contains` so
+    `_resolve_region_bounds` envelops the lot.
+
+    Returns the index of the first line NOT consumed by this block."""
+    grid_rows: list[list[str]] | None = None
+    i = start
     while i < len(lines):
-        line = _strip_comment(lines[i]).strip()
+        raw = lines[i]
+        line = _strip_comment(raw).strip()
         if not line:
             i += 1
             continue
 
-        if (m := CANVAS_RE.match(line)):
-            canvas = (int(m.group(1)), int(m.group(2)))
-            i += 1
-            continue
+        # Closing brace ends a container body.
+        if CLOSE_RE.match(line):
+            if parent is None:
+                return i        # caller will report the unexpected `}`
+            if grid_rows is not None:
+                state.layout_dict[parent.id] = grid_rows
+                # Grid mode: layout.layout() owns bounds — leave contains
+                # empty so _resolve_region_bounds skips this region.
+                parent.contains = []
+            return i + 1
 
-        if (m := TITLE_RE.match(line)):
-            title = m.group(1)
-            i += 1
-            continue
+        # File-scope-only directives.
+        if parent is None:
+            if (m := CANVAS_RE.match(line)):
+                state.canvas = (int(m.group(1)), int(m.group(2)))
+                i += 1
+                continue
+            if (m := TITLE_RE.match(line)):
+                state.title = m.group(1)
+                i += 1
+                continue
+            if (m := SUBTITLE_RE.match(line)):
+                state.subtitle = m.group(1)
+                i += 1
+                continue
+            if (m := EXTERNAL_RE.match(line)):
+                eid, par, gap = m.groups()
+                state.external_dict[eid] = {
+                    "above": par, "gap": int(gap) if gap else 60,
+                }
+                i += 1
+                continue
 
-        if (m := SUBTITLE_RE.match(line)):
-            subtitle = m.group(1)
-            i += 1
-            continue
-
-        if (m := EXTERNAL_RE.match(line)):
-            eid, parent, gap = m.groups()
-            external_dict[eid] = {"above": parent, "gap": int(gap) if gap else 60}
-            i += 1
-            continue
-
-        if (m := COMP_RE.match(line)):
-            components.append(_make_component(m, line_no=i + 1))
-            i += 1
-            continue
-
-        if (m := REGION_RE.match(line)):
-            region, rows, consumed = _make_region(m, lines, i)
-            regions.append(region)
-            if rows is not None:
-                layout_dict[region.id] = rows
-            i += consumed
-            continue
-
-        if (m := LAYOUT_RE.match(line)):
-            region, consumed = _make_layout(m, lines, i)
-            regions.append(region)
-            i += consumed
-            continue
-
+        # Edges (file scope only — nesting an edge inside a container is
+        # not meaningful; edges connect arbitrary IDs regardless of scope).
         if (m := EDGE_RE.match(line)):
-            edges.append(_make_edge(m, line_no=i + 1))
+            if parent is not None:
+                raise SyntaxError(
+                    f"line {i + 1}: edges must live at file scope, "
+                    f"not inside container {parent.id!r}",
+                )
+            state.edges.append(_make_edge(m, line_no=i + 1))
+            i += 1
+            continue
+
+        # Grid row — region body only, not layout body.
+        if (m := ROW_RE.match(line)):
+            if parent is None:
+                raise SyntaxError(
+                    f"line {i + 1}: `row` only valid inside a region body",
+                )
+            if parent.layout is not None:
+                raise SyntaxError(
+                    f"line {i + 1}: `row` not allowed in layout body "
+                    f"({parent.id!r} is a {parent.layout} layout)",
+                )
+            if grid_rows is None:
+                grid_rows = []
+            grid_rows.append((m.group(1) or "").split())
+            i += 1
+            continue
+
+        # Container (region or layout). Must come before LEAF_RE — a region
+        # opening line never matches LEAF_RE (no shape/icon/accent triple),
+        # but we check explicit `{` ending first for clarity.
+        if line.endswith("{"):
+            i = _consume_container(state, lines, i, parent, grid_rows)
+            continue
+
+        # Leaf component definition (file scope OR container body).
+        if (m := LEAF_RE.match(line)):
+            comp = _make_component(m, line_no=i + 1)
+            state.components.append(comp)
+            if parent is not None:
+                if parent.layout is not None:
+                    raise SyntaxError(
+                        f"line {i + 1}: inline leaf definitions not allowed "
+                        f"in layout body — define {comp.id!r} at file scope "
+                        f"or in a region body, then reference by bare id",
+                    )
+                parent.contains.append(comp.id)
+            i += 1
+            continue
+
+        # Bare-id reference list — only inside a container body.
+        if parent is not None and BARE_IDS_RE.match(line):
+            if grid_rows is not None:
+                raise SyntaxError(
+                    f"line {i + 1}: region {parent.id!r} mixes `row` and bare ids — pick one",
+                )
+            parent.contains.extend(line.split())
             i += 1
             continue
 
         raise SyntaxError(f"line {i + 1}: unrecognised — {line!r}")
 
-    diagram = Diagram(
-        width=canvas[0], height=canvas[1],
-        title=title, subtitle=subtitle,
-        components=components, regions=regions, edges=edges,
+    if parent is not None:
+        raise SyntaxError(f"line {start}: unclosed block (no matching `}}`)")
+    return i
+
+
+def _consume_container(
+    state: _State, lines: list[str], i: int,
+    parent: Region | None, parent_grid: list[list[str]] | None,
+) -> int:
+    """Parse a region/layout opening line at `lines[i]`, recurse into its
+    body, then thread the new container's leaf IDs back into `parent.contains`
+    so outer-region bounds enclose nested leaves.
+
+    Returns the index of the first line after the closing `}`."""
+    line = _strip_comment(lines[i]).strip()
+
+    if (rm := REGION_RE.match(line)):
+        region = _make_region(rm)
+    elif (lm := LAYOUT_RE.match(line)):
+        region = _make_layout(lm)
+    else:
+        raise SyntaxError(f"line {i + 1}: bad container header — {line!r}")
+
+    state.regions.append(region)
+    next_i = _parse_block(state, lines, i + 1, parent=region)
+
+    # Propagate this container's leaves up so the outer region's bounds
+    # envelop nested leaves. Layouts don't propagate — they aren't part
+    # of any outer container's visual bounds.
+    if parent is not None and region.layout is None:
+        if parent_grid is not None:
+            raise SyntaxError(
+                f"line {i + 1}: region {parent.id!r} mixes `row` and nested "
+                f"containers — pick one",
+            )
+        parent.contains.extend(region.contains)
+    return next_i
+
+
+# ── Per-kind builders ─────────────────────────────────────────────────
+def _make_region(m: re.Match) -> Region:
+    rid, style, label, opts = m.group(1), m.group(2), m.group(3), m.group(4)
+    padding = (24, 24)
+    padding_bottom: int | None = None
+    border_dash: tuple[int, int] | None = None
+    border_stroke: str | None = None
+    label_anchor = "middle"
+    label_position: str | None = None
+    icon: str | None = None
+    if opts:
+        if (pm := PADDING_OPT_RE.search(opts)):
+            padding = (int(pm.group(1)), int(pm.group(2)))
+        if (pbm := PADDING_BOT_OPT_RE.search(opts)):
+            padding_bottom = int(pbm.group(1))
+        if (dm := DASH_OPT_RE.search(opts)):
+            border_dash = (int(dm.group(1)), int(dm.group(2)))
+        if (sm := STROKE_OPT_RE.search(opts)):
+            border_stroke = sm.group(1)
+        if (lam := LABEL_ANCHOR_RE.search(opts)):
+            label_anchor = lam.group(1)
+        if (lpm := LABEL_POS_RE.search(opts)):
+            label_position = lpm.group(1)
+        if (im := ICON_OPT_RE.search(opts)):
+            icon = im.group(1)
+    return Region(
+        id=rid, label=label, style=style,
+        padding=padding, padding_bottom=padding_bottom,
+        border_dash=border_dash, border_stroke=border_stroke,
+        label_anchor=label_anchor, label_position=label_position,
+        icon=icon, contains=[],
     )
-    return (
-        diagram,
-        layout_dict or None,
-        external_dict or None,
+
+
+def _make_layout(m: re.Match) -> Region:
+    lid, direction, x, y, gap, align = m.groups()
+    return Region(
+        id=lid, label="",
+        pos=(int(x), int(y)), layout=direction, gap=int(gap),
+        align=align or "center",
+        padding=(0, 0), visible=False, contains=[],
     )
-
-
-# ── Helpers ───────────────────────────────────────────────────────────
-def _strip_comment(line: str) -> str:
-    """Strip `#` comments outside of double-quoted strings.
-
-    A `#` immediately followed by a hex digit (`#76b900`, `#abc`) is treated
-    as a colour literal, not a comment — so `stroke #94a3b8` works inline.
-    To start a colour token at a line position that *would* otherwise be a
-    comment, ensure the `#` is followed by a hex digit (which all real CSS
-    colours do anyway)."""
-    out, in_quote, i = [], False, 0
-    while i < len(line):
-        ch = line[i]
-        if ch == '"':
-            in_quote = not in_quote
-            out.append(ch)
-        elif ch == '#' and not in_quote:
-            nxt = line[i + 1] if i + 1 < len(line) else ''
-            if nxt and nxt in '0123456789abcdefABCDEF':
-                out.append(ch)                      # hex colour, not a comment
-            else:
-                break                                # actual comment — stop here
-        else:
-            out.append(ch)
-        i += 1
-    return "".join(out)
 
 
 def _make_component(m: re.Match, line_no: int) -> Component:
@@ -241,117 +371,6 @@ def _make_component(m: re.Match, line_no: int) -> Component:
     )
 
 
-def _make_region(
-    m: re.Match, lines: list[str], i: int,
-) -> tuple[Region, list[list[str]] | None, int]:
-    """Return `(region, rows, consumed)`. `rows` is non-None only when the
-    body uses grid-style `row …` lines — caller registers it in the
-    top-level LAYOUT dict so `layout.layout()` can run."""
-    rid, style, label, opts = m.group(1), m.group(2), m.group(3), m.group(4)
-    padding = (24, 24)
-    padding_bottom: int | None = None
-    border_dash: tuple[int, int] | None = None
-    border_stroke: str | None = None
-    label_anchor = "middle"
-    label_position: str | None = None
-    icon: str | None = None
-    if opts:
-        if (pm := PADDING_OPT_RE.search(opts)):
-            padding = (int(pm.group(1)), int(pm.group(2)))
-        if (pbm := PADDING_BOT_OPT_RE.search(opts)):
-            padding_bottom = int(pbm.group(1))
-        if (dm := DASH_OPT_RE.search(opts)):
-            border_dash = (int(dm.group(1)), int(dm.group(2)))
-        if (sm := STROKE_OPT_RE.search(opts)):
-            border_stroke = sm.group(1)
-        if (lam := LABEL_ANCHOR_RE.search(opts)):
-            label_anchor = lam.group(1)
-        if (lpm := LABEL_POS_RE.search(opts)):
-            label_position = lpm.group(1)
-        if (im := ICON_OPT_RE.search(opts)):
-            icon = im.group(1)
-
-    body, consumed = _read_body(lines, i + 1)
-    rows = _parse_rows(body, rid, line_no=i + 1)
-    if rows is not None:
-        # Grid mode: bounds + positions are computed by layout.layout() from
-        # the rows. Leave `contains=[]` so _resolve_region_bounds skips this
-        # region (it would otherwise recompute bounds and clobber layout's).
-        contains: list[str] = []
-    else:
-        contains = [tok for line in body for tok in line.split()]
-
-    return (
-        Region(id=rid, label=label, style=style,
-               padding=padding, padding_bottom=padding_bottom,
-               border_dash=border_dash, border_stroke=border_stroke,
-               label_anchor=label_anchor, label_position=label_position,
-               icon=icon, contains=contains),
-        rows,
-        consumed + 1,                              # +1 for the opening line
-    )
-
-
-def _read_body(lines: list[str], start: int) -> tuple[list[str], int]:
-    """Read non-empty, comment-stripped body lines until the matching `}`.
-    Returns (lines, lines_consumed including the closing brace)."""
-    body: list[str] = []
-    j = start
-    while j < len(lines):
-        if CLOSE_RE.match(lines[j]):
-            return body, j - start + 1
-        text = _strip_comment(lines[j]).strip()
-        if text:
-            body.append(text)
-        j += 1
-    raise SyntaxError(f"line {start}: unclosed block (no matching `}}`)")
-
-
-def _parse_rows(body: list[str], rid: str, line_no: int) -> list[list[str]] | None:
-    """If any body line starts with `row`, parse the whole body as grid
-    rows. An all-flat body returns None (caller treats it as a `contains` list)."""
-    if not any(ROW_RE.match(line) for line in body):
-        return None
-    rows: list[list[str]] = []
-    for line in body:
-        rm = ROW_RE.match(line)
-        if not rm:
-            raise SyntaxError(
-                f"line {line_no}: region {rid!r} mixes `row` and bare ids — pick one"
-            )
-        ids = (rm.group(1) or "").split()
-        rows.append(ids)
-    return rows
-
-
-def _make_layout(m: re.Match, lines: list[str], i: int) -> tuple[Region, int]:
-    lid, direction, x, y, gap, align = m.groups()
-    contains, consumed = _read_id_block(lines, i + 1)
-    return (
-        Region(id=lid, label="",
-               pos=(int(x), int(y)), layout=direction, gap=int(gap),
-               align=align or "center",
-               padding=(0, 0), visible=False,
-               contains=contains),
-        consumed + 1,
-    )
-
-
-def _read_id_block(lines: list[str], start: int) -> tuple[list[str], int]:
-    """Read space-separated component ids until the matching `}`.
-    Returns (ids, lines_consumed including the closing brace)."""
-    ids: list[str] = []
-    j = start
-    while j < len(lines):
-        if CLOSE_RE.match(lines[j]):
-            return ids, j - start + 1            # incl. closing brace
-        text = _strip_comment(lines[j]).strip()
-        if text:
-            ids.extend(text.split())
-        j += 1
-    raise SyntaxError(f"line {start}: unclosed block (no matching `}}`)")
-
-
 def _make_edge(m: re.Match, line_no: int) -> Edge:
     src, arrow, dst, label, opts = m.groups()
     style = "orange" if arrow == "==>" else "gray"
@@ -371,6 +390,33 @@ def _make_edge(m: re.Match, line_no: int) -> Edge:
     if opts:
         _parse_edge_options(opts.strip(), kw, line_no)
     return Edge(src=src, dst=dst, label=label or "", style=style, **kw)
+
+
+# ── Helpers ───────────────────────────────────────────────────────────
+def _strip_comment(line: str) -> str:
+    """Strip `#` comments outside of double-quoted strings.
+
+    A `#` immediately followed by a hex digit (`#76b900`, `#abc`) is treated
+    as a colour literal, not a comment — so `stroke #94a3b8` works inline.
+    To start a colour token at a line position that *would* otherwise be a
+    comment, ensure the `#` is followed by a hex digit (all real CSS colours
+    do anyway)."""
+    out, in_quote, i = [], False, 0
+    while i < len(line):
+        ch = line[i]
+        if ch == '"':
+            in_quote = not in_quote
+            out.append(ch)
+        elif ch == '#' and not in_quote:
+            nxt = line[i + 1] if i + 1 < len(line) else ''
+            if nxt and nxt in '0123456789abcdefABCDEF':
+                out.append(ch)                      # hex colour, not a comment
+            else:
+                break                                # actual comment — stop here
+        else:
+            out.append(ch)
+        i += 1
+    return "".join(out)
 
 
 def _parse_edge_options(s: str, kw: dict, line_no: int) -> None:

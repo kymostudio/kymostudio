@@ -1,14 +1,14 @@
 ---
 title: Diagram DSL — Language Specification
 document_id: DSL-LANG-001
-version: "1.0"
+version: "2.0"
 issue_date: 2026-05-18
 status: Released
 classification: Internal
 owner: diagrams/ project
 audience: Engineers authoring or parsing `.diagram` files
 review_cycle: On grammar change, or annually (whichever first)
-supersedes: null
+supersedes: "1.0"
 related_documents:
   - BEST_PRACTICE_DIAGRAMS.md
   - dsl.py
@@ -36,14 +36,14 @@ iso_compliance:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | DSL-LANG-001                                                   |
-| Version           | 1.0                                                            |
+| Version           | 2.0                                                            |
 | Issue Date        | 2026-05-18                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
 | Owner             | `diagrams/` project                                            |
 | Audience          | Engineers authoring or parsing `.diagram` files                |
 | Review Cycle      | On grammar change, or annually (whichever first)               |
-| Supersedes        | —                                                              |
+| Supersedes        | v1.0                                                           |
 | Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), [`dsl.py`](../src/dsl.py), [`model.py`](../src/model.py) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar productions follow ISO/IEC 14977:1996 (Extended Backus–Naur Form).
@@ -71,7 +71,7 @@ Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar produ
 
 ### 1.1 Purpose
 
-This document specifies the **Diagram DSL** — a textual surface language for declaring architecture diagrams. A conforming source file (`.diagram`) declares the components, regions, layouts, and edges of a single diagram. A conforming parser produces an in-memory `model.Diagram` value semantically equivalent to the source.
+This document specifies the **Diagram DSL** — a textual surface language for declaring architecture diagrams. A conforming source file (`.diagram`) declares the leaves, containers (region and layout), and edges of a single diagram. A conforming parser produces an in-memory `model.Diagram` value semantically equivalent to the source.
 
 ### 1.2 Applicability
 
@@ -112,15 +112,19 @@ The following documents are indispensable for the application of this specificat
 For the purposes of this specification, the following terms apply:
 
 - **3.1 Diagram** — the top-level entity declared by a single `.diagram` file; corresponds to one instance of `model.Diagram`.
-- **3.2 Component** — a single rendered element (icon + name + subtitle) within a diagram.
-- **3.3 Region** — a labelled rectangular grouping that contains one or more components; renders as a dashed (or solid) bordered box.
-- **3.4 Layout** — an invisible region whose `layout` direction (`horizontal` or `vertical`) determines the position of its children; equivalent to a Figma auto-layout frame.
-- **3.5 Edge** — a directed arrow connecting two nodes (components, regions, or a mix).
-- **3.6 Anchor** — a named attachment point on a node's bounding box (`top` / `right` / `bottom` / `left` / `center`).
-- **3.7 Via** — an explicit waypoint coordinate forcing an edge through a specific point.
-- **3.8 Directive** — a metadata declaration (`canvas:`, `title:`, `subtitle:`) at file scope.
-- **3.9 Resolver** — the post-parse pass (`alignment.resolve_alignments`) that computes positions from parent/align relationships and layout regions.
-- **3.10 Auto-canvas** — render-time computation of canvas dimensions when `canvas:` is omitted.
+- **3.2 Leaf** — a single rendered element (icon + name + subtitle); the surface form for a `model.Component`. Declared as `id shape/icon/accent "Name" "Sub" [@ placement]`.
+- **3.3 Container** — a brace-delimited block (`id kind … { … }`). Two flavours, distinguished by the kind keyword on the opening line:
+  - **Region container** — kind ∈ `outer | inner`. Visible rectangle with a label; bounds auto-fit to its members.
+  - **Layout container** — kind ∈ `horizontal | vertical`. Invisible Figma-style auto-layout frame; positions its members along the named axis.
+- **3.4 Body** — the lines between a container's `{` and its matching `}`. May contain nested containers, inline leaf definitions (region body only), bare-id membership references, and grid rows (region body only).
+- **3.5 Bare-id reference** — one or more whitespace-separated identifiers on a body line; declares membership without (re-)defining a leaf. The leaf must be defined elsewhere in the file.
+- **3.6 Edge** — a directed arrow connecting two nodes (leaves, regions, or a mix). Always declared at file scope.
+- **3.7 Anchor** — a named attachment point on a node's bounding box (`top` / `right` / `bottom` / `left` / `center`).
+- **3.8 Via** — an explicit waypoint coordinate forcing an edge through a specific point.
+- **3.9 Directive** — a metadata declaration (`canvas:`, `title:`, `subtitle:`) or the `external …` placement statement; file scope only.
+- **3.10 Resolver** — the post-parse pass (`alignment.resolve_alignments`) that computes positions from parent/align relationships and layout containers.
+- **3.11 Auto-canvas** — render-time computation of canvas dimensions when `canvas:` is omitted.
+- **3.12 Contains flattening** — when a region container is nested inside another region container, the inner region's leaf members are also appended to the outer region's `contains` list so its auto-bounds envelop nested leaves. Layout containers do NOT propagate.
 
 ---
 
@@ -169,7 +173,7 @@ letter       = "A" | … | "Z" | "a" | … | "z" ;
 digit        = "0" | … | "9" ;
 ```
 
-Identifiers SHALL be unique within their kind (component IDs unique among components, region IDs unique among regions). The parser MAY accept a component and a region sharing an ID, but edge resolution treats components as winning in lookups.
+Identifiers SHALL be unique within their kind (leaf IDs unique among leaves, container IDs unique among containers). The parser MAY accept a leaf and a container sharing an ID, but edge resolution treats leaves as winning in lookups.
 
 ### 5.7 Numeric Literals
 
@@ -190,32 +194,33 @@ hexdigit     = digit | "a" | … | "f" | "A" | … | "F" ;
 
 ### 6.1 Notation
 
-EBNF per ISO/IEC 14977:1996. Italicised terms in examples are non-terminals; literal tokens are quoted.
+EBNF per ISO/IEC 14977:1996. Italicised terms in examples are non-terminals; literal tokens are quoted. The grammar is **line-oriented**: each production matches a single logical line unless it opens a brace-delimited body.
 
 ### 6.2 Top-Level Production
 
 ```
-file         = { line } ;
-line         = directive | block | statement | comment | blank ;
-directive    = canvas | title | subtitle ;
-block        = region_block | layout_block ;
-statement    = component | edge ;
+file             = { file_line } ;
+file_line        = directive | container | leaf | edge | comment | blank ;
+directive        = canvas | title | subtitle | external ;
 ```
+
+There is no `component` or `region` or `layout` keyword. Containers and leaves are distinguished by line shape (see clauses 6.4–6.5).
 
 ### 6.3 Metadata Directives
 
 ```
-canvas       = "canvas" , [ ":" ] , INT , "x" , INT ;
-title        = "title"    , ":" , STRING ;
-subtitle     = "subtitle" , ":" , STRING ;
+canvas           = "canvas" , [ ":" ] , INT , "x" , INT ;
+title            = "title"    , ":" , STRING ;
+subtitle         = "subtitle" , ":" , STRING ;
+external         = "external" , id , "above" , id , [ "gap" , INT ] ;
 ```
 
-`canvas:` is OPTIONAL. When absent, dimensions are auto-computed (see clause 7.4). `title:` and `subtitle:` are OPTIONAL; each MAY appear at most once per file.
+`canvas:` is OPTIONAL. When absent, dimensions are auto-computed (see clause 7.4). `title:` and `subtitle:` are OPTIONAL; each MAY appear at most once per file. `external` reserves vertical space above a target leaf (see `src/layout.py`).
 
-### 6.4 Components
+### 6.4 Leaf Components
 
 ```
-component        = "component" , id , shape , "/" , icon , "/" , accent ,
+leaf             = id , shape , "/" , icon , "/" , accent ,
                    STRING , STRING , [ "@" , placement ] ;
 placement        = absolute_pos | parent_ref ;
 absolute_pos     = "(" , INT , "," , INT , ")" ;
@@ -224,23 +229,66 @@ side             = "top" | "right" | "bottom" | "left" ;
 shape            = "circle" | "cube" | "cube-big" | "box" | "cylinder" |
                    "hex" | "annotation" | "aws-tile" | "aws-tile-hero" | "badge" ;
 icon             = identifier_with_hyphens ;
-accent           = "green" | "orange" | "blue" ;
+accent           = "green" | "orange" | "blue" | "red" ;
 ```
 
-When `@` is omitted, `pos` defaults to `(0, 0)` and the component is expected to be positioned by a layout region containing its ID.
+A line is a leaf if its second whitespace-separated token contains a `/` (the `shape/icon/accent` triple). When `@` is omitted, `pos` defaults to `(0, 0)` and the leaf is expected to be positioned by a layout container that references its ID.
 
-### 6.5 Regions
+Leaves MAY appear at file scope OR inside a region container body (see clause 6.5.1). They MUST NOT appear inside a layout container body — layout bodies accept bare-id references only.
+
+### 6.5 Containers
+
+A container is a line ending with `{`. The kind keyword (second token) selects the container flavour:
 
 ```
-region_block     = "region" , id , region_style , STRING ,
-                   { region_opt } , "{" , { id } , "}" ;
-region_style     = "outer" | "inner" ;
+container        = region_open , body , "}"
+                 | layout_open , body , "}" ;
+
+region_open      = id , region_kind , STRING , { region_opt } , "{" ;
+region_kind      = "outer" | "inner" ;
+
+layout_open      = id , layout_kind ,
+                   "pos" , "(" , INT , "," , INT , ")" ,
+                   "gap" , INT ,
+                   [ "align" , ( "start" | "center" | "end" ) ] , "{" ;
+layout_kind      = "horizontal" | "vertical" ;
+```
+
+#### 6.5.1 Region Body
+
+```
+region_body      = { region_body_line } ;
+region_body_line = container | leaf | bare_ids | row | comment | blank ;
+bare_ids         = id , { id } ;
+row              = "row" , [ id , { id } ] ;
+```
+
+Within a region body:
+
+- **Inline leaf** — adds the leaf to the diagram AND appends its id to this region's `contains` list.
+- **Bare-id reference** — appends each id to this region's `contains` list. The id MUST be defined elsewhere in the file (no forward-only references; the reference itself does not create a leaf).
+- **Nested container** — when the nested container is itself a region, its `contains` list is flattened into this region's `contains` (depth-first), so the outer region's auto-bounds envelop nested leaves. Layout containers do NOT propagate.
+- **Grid `row`** — switches the region to grid mode. All non-empty body lines MUST be `row` lines once any `row` appears. In grid mode, `_resolve_region_bounds` is skipped and `layout.layout()` computes both positions and bounds from the grid.
+
+#### 6.5.2 Layout Body
+
+```
+layout_body      = { layout_body_line } ;
+layout_body_line = bare_ids | comment | blank ;
+```
+
+A layout body accepts **only** bare-id references. Inline leaf definitions and nested containers are rejected with a diagnostic — a layout is a positioning rule, not an ownership scope.
+
+#### 6.5.3 Region Options
+
+```
 region_opt       = "padding"        , "(" , INT , "," , INT , ")"
                  | "padding-bottom" , INT
                  | "dash"           , "(" , INT , "," , INT , ")"
                  | "stroke"         , hexcolour
                  | "label-position" , ( "above" | "inside" )
-                 | "label-anchor"   , ( "start" | "middle" | "end" ) ;
+                 | "label-anchor"   , ( "start" | "middle" | "end" )
+                 | "icon"           , identifier_with_hyphens ;
 ```
 
 Region option order is insignificant. Each option SHALL appear at most once per region.
@@ -255,19 +303,23 @@ Default values:
 | stroke          | `#cbd5e1` via CSS     | `#94a3b8` via CSS      |
 | label-position  | `above`               | `inside`               |
 | label-anchor    | `middle`              | `middle`               |
+| icon            | none                  | none                   |
 
-### 6.6 Layouts
+### 6.6 Line Discriminator
 
-```
-layout_block     = "layout" , id , direction , "pos" , "(" , INT , "," , INT , ")" ,
-                   "gap" , INT , [ "align" , ( "start" | "middle" | "end" ) ] ,
-                   "{" , { id } , "}" ;
-direction        = "horizontal" | "vertical" ;
-```
+A conforming parser MUST discriminate body lines in this order (first match wins):
 
-A layout block declares an INVISIBLE region (no border or label rendered) whose sole purpose is to position the components named in its body.
+1. `}` alone (possibly with whitespace) — closes the current container.
+2. `row` followed by zero or more ids — grid row (region body only; rejected in layout body or at file scope).
+3. Line ending with `{` — container opener; kind selects region vs layout.
+4. Match against the arrow forms `-->` or `==>` — edge (file scope only).
+5. Second token contains `/` — leaf component.
+6. All tokens match the `id` production — bare-id reference list (container body only).
+7. Otherwise — syntax error.
 
 ### 6.7 Edges
+
+Edges are file-scope only. Nesting an edge inside a container is rejected with a diagnostic.
 
 ```
 edge             = id , arrow , id , [ ":" , STRING ] , [ "{" , edge_opts , "}" ] ;
@@ -280,8 +332,10 @@ edge_opt         = "src"          , "=" , anchor_spec
                  | "via"          , "=" , point , { ";" , point }
                  | "label_offset" , "=" , point
                  | "label_pos"    , "=" , point
+                 | "label_at"     , "=" , ( "src" | "dst" | "mid" )
                  | "route"        , "=" , ( "auto" | "over" | "under" | "curve" )
                  | "small"
+                 | "dashed"
                  | "curve" | "over" | "under"      (* route shorthand *)
                  ;
 anchor_spec      = side_or_centre , [ "(" , INT , "," , INT , ")" ] ;
@@ -292,20 +346,21 @@ point            = "(" , INT , "," , INT , ")" ;
 ### 6.8 Reserved Keywords
 
 ```
-canvas    title       subtitle
-component region      layout
+canvas    title       subtitle    external   above
 outer     inner       horizontal  vertical
-padding   padding-bottom  dash    stroke
+padding   padding-bottom  dash    stroke     icon
 label-position label-anchor
 above     inside
-top       right       bottom      left      center
+pos       gap         align
+row
+top       right       bottom      left       center
 start     middle      end
 src       dst         via         route
-label_offset  label_pos  small
+label_offset  label_pos  label_at  small  dashed
 auto      over        under       curve
 ```
 
-These tokens SHALL NOT be used as component, region, layout, or icon identifiers.
+These tokens SHALL NOT be used as user-defined leaf, container, or icon identifiers. Removed in v2.0: `component`, `region`, `layout` (no longer keywords — the parser distinguishes by line shape).
 
 ---
 
@@ -313,20 +368,26 @@ These tokens SHALL NOT be used as component, region, layout, or icon identifiers
 
 ### 7.1 Parse-time vs Resolve-time
 
-The parser is **declarative**: it collects all components, regions, edges, and directives into a `model.Diagram` value WITHOUT validating cross-references or computing positions. The following are deferred to `alignment.resolve_alignments`:
+The parser is **declarative**: it collects all leaves, containers, edges, and directives into a `model.Diagram` value WITHOUT validating cross-references or computing positions. The following are deferred to `alignment.resolve_alignments`:
 
-1. **Auto-layouts** — components named in `layout` regions receive computed positions.
-2. **Parent/child alignment** — components with `@ parent side gap` placements are positioned relative to their resolved parents.
-3. **Region bounds** — visible regions with non-empty `contains` lists compute their bounding rectangles from the positions of their members.
+1. **Auto-layouts** — leaves referenced by a layout container receive computed positions.
+2. **Parent/child alignment** — leaves with `@ parent side gap` placements are positioned relative to their resolved parents.
+3. **Region bounds** — region containers with non-empty `contains` lists (including IDs flattened from nested regions; see clause 3.12) compute their bounding rectangles from the positions of their members.
 4. **Canvas auto-sizing** — when `canvas:` is omitted, dimensions derive from the resolved geometry plus a margin.
 
 ### 7.2 ID Resolution
 
-Each `id` referenced (in region/layout `contains`, edge `src`/`dst`, component `@ parent`) SHALL be defined elsewhere in the file. The parser does not enforce this; `alignment.resolve_alignments` raises `KeyError` on unresolved references.
+Each `id` referenced (in a container body's bare-id list, edge `src`/`dst`, leaf `@ parent`) SHALL be defined elsewhere in the file. The parser does not enforce this; `alignment.resolve_alignments` raises `KeyError` on unresolved references.
 
 ### 7.3 Forward References
 
 References MAY appear before the referenced entity is defined. The parser is order-independent for resolution purposes.
+
+### 7.3.1 Contains Flattening
+
+When a region container `R_inner` is nested inside another region container `R_outer`, every id in `R_inner.contains` is appended to `R_outer.contains` after the inner body closes. This is depth-first and transitive: an inner-inner region's leaves propagate up through every enclosing region. Layout containers do NOT propagate — their `contains` exists purely for positioning, not bounds.
+
+The flattened `contains` list is consumed by `_resolve_region_bounds` (`src/alignment.py`) to compute the outer rectangle's envelope. Without flattening, the outer rect would only hug its directly-declared leaves and clip the nested region's contents.
 
 ### 7.4 Auto-Canvas
 
@@ -368,28 +429,40 @@ The DSL describes **what** to draw; the renderer decides **how** and **where**.
 
 ```
 1. Metadata           title, subtitle, canvas (optional)
-2. Regions            outer/inner groupings (scaffolding)
-3. Layouts            auto-positioning rules
-4. Components         members of the diagram
-5. Edges              connections
+2. Region containers  outer/inner groupings, with leaves defined inline
+                      where they semantically belong
+3. Layout containers  positioning rules; reference leaves by bare id
+4. Loose leaves       leaves not owned by any region (free-floating actors,
+                      badges, annotations)
+5. external           if a leaf sits above a grid cell
+6. Edges              connections
 ```
 
 This order matches the conceptual reading flow (where → how-positioned → what → how-connected). The parser is order-independent, so this is purely a stylistic recommendation.
 
-### 8.2 Whitespace and Alignment
+### 8.2 Where to Define a Leaf
+
+A leaf may be declared either at file scope or inside a region body. The guideline:
+
+- **Inside the region** when the leaf belongs to exactly one semantic group (most common case). Vertical alignment of `id shape/icon/accent "Name" "Sub"` columns stays tight because the surrounding indentation is constant.
+- **At file scope** when the leaf is a free-floating actor (e.g., end user, badge, annotation), or when it participates in multiple containers via bare-id references.
+
+A leaf is defined **once**. To express membership in multiple containers, define the leaf in one place and reference it by bare id elsewhere. The auto-bounds resolver handles the rest.
+
+### 8.3 Whitespace and Alignment
 
 Authors SHOULD vertically align fields within a section for readability. The parser ignores extra whitespace.
 
 ```text
-component user        circle/user/blue          "Agent/User"          "Bootcamp participant"
-component router      hex/hex-agent/green       "Intent Router"       "Shallow / Deep"
+user      circle/user/blue       "Agent/User"     "Bootcamp participant"
+router    hex/hex-agent/green    "Intent Router"  "Shallow / Deep"
 ```
 
-### 8.3 Block vs Single-Line Form
+### 8.4 Block Form
 
-`region` and `layout` blocks always use the multi-line `{ … }` form. Inline `{ id1 id2 … }` is NOT supported (see clause 9.2).
+Containers always use the multi-line `{ … }` form. Inline `{ id1 id2 … }` on a single line is NOT supported (see clause 9.2).
 
-### 8.4 Comment Density
+### 8.5 Comment Density
 
 Inline comments SHOULD explain **why** a non-obvious offset or via point exists, NOT what the line does. Self-evident assignments need no comments.
 
@@ -434,30 +507,46 @@ Renderer conformance is outside the scope of this specification. See `to_svg.py`
 ```text
 title: "Hello"
 
-region world outer "Hello, World" { greeter }
-
-component greeter box/files/orange "Greeter" "" @ (100, 100)
+world outer "Hello, World" {
+  greeter box/files/orange "Greeter" "" @ (100, 100)
+}
 ```
 
-### 10.2 Component With Parent Alignment
+### 10.2 Leaf With Parent Alignment
 
 ```text
-component orch      hex/hex-agent/green   "Orchestrator" "" @ (200, 200)
-component child     hex/hex-agent/green   "Child"        "" @ orch right 60
+orch  hex/hex-agent/green "Orchestrator" "" @ (200, 200)
+child hex/hex-agent/green "Child"        "" @ orch right 60
 ```
 
 ### 10.3 Layout-Positioned Row
 
 ```text
-layout row horizontal pos (50, 100) gap 40 {
+row_layout horizontal pos (50, 100) gap 40 {
   one two three
 }
-component one   box/files/orange  "One"   ""
-component two   box/files/orange  "Two"   ""
-component three box/files/orange  "Three" ""
+one   box/files/orange "One"   ""
+two   box/files/orange "Two"   ""
+three box/files/orange "Three" ""
 ```
 
-### 10.4 Edge With Anchors and Waypoints
+### 10.4 Nested Regions (auto-bounds enclose nested leaves)
+
+```text
+adr outer "Autonomous Deep Researcher" padding (40, 32) {
+  orch       hex/hex-agent/green "Orchestrator" ""
+  researcher hex/hex-agent/green "Researcher"   "Sub-Agents" @ orch right 60
+
+  svfs inner "Shared Virtual File System" {
+    fs   box/folder/orange    "File System" "Workspace" @ researcher right 100
+    todo box/checklist/orange "ToDo List"   ""          @ fs right 50
+  }
+}
+```
+
+After parsing: `svfs.contains = ["fs", "todo"]` and `adr.contains = ["orch", "researcher", "fs", "todo"]` — the outer rect's auto-bounds envelop the inner region's leaves (clause 7.3.1).
+
+### 10.5 Edge With Anchors and Waypoints
 
 ```text
 src --> dst : "label" {
@@ -467,10 +556,10 @@ src --> dst : "label" {
 }
 ```
 
-### 10.5 Region With Style Overrides
+### 10.6 Region With Style Overrides
 
 ```text
-region critical inner "Critical Path"
+critical inner "Critical Path"
   padding (20, 16) padding-bottom 24
   dash (0, 0) stroke #76b900
   label-position inside label-anchor middle
@@ -479,7 +568,7 @@ region critical inner "Critical Path"
 }
 ```
 
-For a full real-world example, see [`aiq.diagram`](./aiq.diagram).
+For full real-world examples, see [`aiq.diagram`](../samples/aiq.diagram), [`aws_1.diagram`](../samples/aws_1.diagram), and [`data.diagram`](../samples/data.diagram).
 
 ---
 
@@ -490,6 +579,7 @@ For a full real-world example, see [`aiq.diagram`](./aiq.diagram).
 | Version | Date       | Author      | Changes              |
 |---------|------------|-------------|----------------------|
 | 1.0     | 2026-05-18 | Vũ Anh      | Initial specification. |
+| 2.0     | 2026-05-18 | Vũ Anh      | **Breaking grammar change.** Removed `component`, `region`, `layout` keywords — the parser now disambiguates by line shape (clause 6.6). Containers nest; a region body may hold inline leaves, bare-id references, and nested containers; an outer region's `contains` is flattened from nested regions (clause 7.3.1). Added `icon` region option (was implementation-only). Reserved tokens updated (clause 6.8). |
 
 ---
 

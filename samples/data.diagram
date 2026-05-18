@@ -2,36 +2,36 @@
 # 3 regions stacked horizontally; rows align across regions so cross-region
 # same-row edges run straight horizontal.
 
-# ── Components ────────────────────────────────────────────────────────
-component user         circle/user/blue          "Agent / User"      "Bootcamp participant"
-component jupyter      cube/notebook/green       "Jupyter Notebook"  "Python 3.13  ·  điều phối 2 luồng"
-component http_client  box/send/orange           "HTTP Client"       "requests  →  API Catalog"
-component chat_nvidia  box/zap/orange            "ChatNVIDIA"        "langchain-nvidia  ·  luồng LOCAL"
-component docker       cube/boxes/green          "Docker Engine"     "daemon  ·  quản lý NIM"
-component nim          cube-big/neural/green     "NIM Microservice"  "Uvicorn  ·  llama-3.2-3b  ·  :8000"
-component cache        cylinder/cylinder/orange  "NIM Cache"         "~/.cache/nim → /opt/nim/.cache"
-component nvcr         box/archive/orange        "nvcr.io"           "Container Registry"
-component api_catalog  box/cloud/orange          "API Catalog"       "integrate.api.nvidia.com  ←  HTTP"
-component auth         annotation/key/orange     "Auth"              "NVIDIA_API_KEY  ·  NGC_API_KEY"
-
 # ── Regions (grid mode: each `row` lines up at the same Y across regions) ─
 # Rows align horizontally ACROSS regions, so cross-region same-row edges
 # run straight horizontal. HTTP+Chat side-by-side at row 1 (both are
 # alternate clients invoked from Jupyter — visually parallel paths).
-region code_server outer "code-server (IDE)" {
+code_server outer "code-server (IDE)" {
   row jupyter                       # row 0 — same Y as docker, nvcr (setup path)
   row http_client chat_nvidia       # row 1 — same Y as nim, api_catalog (inference)
 }
-region brev outer "NVIDIA Brev (GPU pod)" {
+brev outer "NVIDIA Brev (GPU pod)" {
   row docker
   row nim
   row cache
 }
-region cloud outer "NVIDIA Cloud (SaaS)" {
+cloud outer "NVIDIA Cloud (SaaS)" {
   row nvcr
   row api_catalog
   row auth
 }
+
+# ── Leaves (positioned by the grid above) ─────────────────────────────
+user         circle/user/blue          "Agent / User"      "Bootcamp participant"
+jupyter      cube/notebook/green       "Jupyter Notebook"  "Python 3.13  ·  điều phối 2 luồng"
+http_client  box/send/orange           "HTTP Client"       "requests  →  API Catalog"
+chat_nvidia  box/zap/orange            "ChatNVIDIA"        "langchain-nvidia  ·  luồng LOCAL"
+docker       cube/boxes/green          "Docker Engine"     "daemon  ·  quản lý NIM"
+nim          cube-big/neural/green     "NIM Microservice"  "Uvicorn  ·  llama-3.2-3b  ·  :8000"
+cache        cylinder/cylinder/orange  "NIM Cache"         "~/.cache/nim → /opt/nim/.cache"
+nvcr         box/archive/orange        "nvcr.io"           "Container Registry"
+api_catalog  box/cloud/orange          "API Catalog"       "integrate.api.nvidia.com  ←  HTTP"
+auth         annotation/key/orange     "Auth"              "NVIDIA_API_KEY  ·  NGC_API_KEY"
 
 # External — user sits above the grid, anchored to jupyter.
 external user above jupyter gap 32

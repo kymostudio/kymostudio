@@ -3,53 +3,54 @@
 title:    "Autonomous Deep Researcher — Reference Architecture"
 subtitle: "NVIDIA AIQ • Vietnam Agentic AI Bootcamp 2026"
 
-# ── Regions ────────────────────────────────────────────────────────
-region adr   outer "Autonomous Deep Researcher" padding (40, 32) padding-bottom 40 label-anchor start {
-  orch researcher planner fs todo
-}
-region svfs  inner "Shared Virtual File System" {
-  fs todo
-}
-region tools outer "Data Source Tools" padding-bottom 32 {
-  web papers kbapi
-}
-region rag   outer "RAG Knowledge Layer" padding-bottom 32 {
-  extract embed vecdb rerank gen
+# ── Regions (leaves defined where they semantically live) ─────────────
+adr outer "Autonomous Deep Researcher" padding (40, 32) padding-bottom 40 label-anchor start {
+  orch       hex/hex-agent/green   "Orchestrator"  ""
+  researcher hex/hex-agent/green   "Researcher"    "Sub-Agents"  @ orch right 60
+  planner    hex/hex-agent/green   "Planning"      "Sub-Agents"  @ orch bottom 76
+
+  # SVFS is a sub-area inside ADR; fs/todo belong to it, but adr.bounds
+  # still envelops them via depth-first contains flattening.
+  svfs inner "Shared Virtual File System" {
+    fs   box/folder/orange    "File System" "Workspace"  @ researcher right 100
+    todo box/checklist/orange "ToDo List"   ""           @ fs right 50
+  }
 }
 
-# ── Layouts (auto-position routing chain, tools row, RAG pipeline) ─
-layout routing_chain horizontal pos (32, 162)  gap 50 {
+tools outer "Data Source Tools" padding-bottom 32 {
+  web    box/magnifier/orange   "Web Search"      "Tavily API"
+  papers hex/hex-agent/green    "Academic Papers" "Serper API"
+  kbapi  hex/hex-agent/green    "Knowledge Layer" "API"
+}
+
+rag outer "RAG Knowledge Layer" padding-bottom 32 {
+  extract cube/neural-sm/green     "Extraction"      "NeMo Retriever"
+  embed   cube/neural-sm/green     "Embedding"       "NeMo Retriever"
+  vecdb   cylinder/cylinder/orange "Vector Database" "NVIDIA cuVS"
+  rerank  cube/neural-sm/green     "Reranking"       "NeMo Retriever"
+  gen     cube/neural-sm/green     "Generate"        "Nemotron 3 Nano"
+}
+
+# ── Layouts (positioning only — reference leaves by bare id) ──────────
+routing_chain horizontal pos (32, 162)  gap 50 {
   user router shallow escalate hitl orch
 }
-layout tools_layout  horizontal pos (250, 345) gap 45 {
+tools_layout horizontal pos (250, 345) gap 45 {
   web papers kbapi
 }
-layout rag_layout    horizontal pos (250, 575) gap 50 {
+rag_layout horizontal pos (250, 575) gap 50 {
   extract embed vecdb rerank gen
 }
 
-# ── Components ─────────────────────────────────────────────────────
-component user        circle/user/blue          "Agent/User"          "Bootcamp participant"
-component router      hex/hex-agent/green       "Intent Router"       "Shallow / Deep"
-component shallow     hex/hex-agent/green       "Shallow Research"    "Single-tool answer"
-component escalate    box/gear/orange           "Escalation"          "needs HITL?"
-component hitl        hex/hex-agent/red         "HITL Clarification"  "and Planning"
-component orch        hex/hex-agent/green       "Orchestrator"        ""
-component researcher  hex/hex-agent/green       "Researcher"          "Sub-Agents"          @ orch right 60
-component planner     hex/hex-agent/green       "Planning"            "Sub-Agents"          @ orch bottom 76
-component fs          box/folder/orange         "File System"         "Workspace"           @ researcher right 100
-component todo        box/checklist/orange      "ToDo List"           ""                    @ fs right 50
-component web         box/magnifier/orange      "Web Search"          "Tavily API"
-component papers      hex/hex-agent/green       "Academic Papers"     "Serper API"
-component kbapi       hex/hex-agent/green       "Knowledge Layer"     "API"
-component extract     cube/neural-sm/green      "Extraction"          "NeMo Retriever"
-component embed       cube/neural-sm/green      "Embedding"           "NeMo Retriever"
-component vecdb       cylinder/cylinder/orange  "Vector Database"     "NVIDIA cuVS"
-component rerank      cube/neural-sm/green      "Reranking"           "NeMo Retriever"
-component gen         cube/neural-sm/green      "Generate"            "Nemotron 3 Nano"
-component entdata     box/files/orange          "Enterprise Data"     ""                    @ user bottom 304
+# ── Leaves not owned by any outer region ──────────────────────────────
+user     circle/user/blue      "Agent/User"          "Bootcamp participant"
+router   hex/hex-agent/green   "Intent Router"       "Shallow / Deep"
+shallow  hex/hex-agent/green   "Shallow Research"    "Single-tool answer"
+escalate box/gear/orange       "Escalation"          "needs HITL?"
+hitl     hex/hex-agent/red     "HITL Clarification"  "and Planning"
+entdata  box/files/orange      "Enterprise Data"     ""                     @ user bottom 304
 
-# ── Edges ──────────────────────────────────────────────────────────
+# ── Edges ─────────────────────────────────────────────────────────────
 # Routing chain
 user   --> router  : "Query"          { src=right(0,-10), dst=left(0,-10), label_offset=(0,-8), small }
 router --> user    : "Chat Response"  { src=left(0,10),   dst=right(0,10), label_offset=(0,14), small }

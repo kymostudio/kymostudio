@@ -224,7 +224,7 @@ A `uv` project with the following module separation:
 To relocate a Component: edit `LAYOUT` in `samples/data.py` and regenerate.
 To add a connection: append an `Edge` to the `EDGES` list and regenerate.
 
-### 5.5 Diagram DSL (Mermaid-like)
+### 5.5 Diagram DSL (D2-style)
 
 A textual surface for the same `Diagram` dataclasses §5.4 produces.
 Defined in `dsl.py`; parses `.diagram` files into `Diagram` objects.
@@ -235,32 +235,50 @@ syntax + arrows read as a flat declaration without Python boilerplate.
 form: every field on `Component`, `Region`, and `Edge` can be expressed
 in DSL, and the round-trip produces byte-identical SVG.
 
-#### 5.5.1 Grammar
+#### 5.5.1 Grammar (synopsis — full spec in [`DSL.md`](./DSL.md) clause 6)
+
+The DSL has **no `component`, `region`, or `layout` keywords**. Each
+line's shape determines its kind:
+
+| Line shape                                | Production         |
+|-------------------------------------------|--------------------|
+| `}` alone                                 | container close    |
+| `row id1 id2 …` (region body only)        | grid row           |
+| `… {` (ends with `{`)                     | container open     |
+| `id arrow id …`                           | edge (file scope)  |
+| second token contains `/`                 | leaf component     |
+| whitespace-separated ids (body only)      | bare-id reference  |
 
 ```
-file        := metadata? statement*
-metadata    := "canvas" INT "x" INT     /  "output" PATH
-statement   := component  /  region  /  layout  /  edge
+file        := file_line*
+file_line   := directive | container | leaf | edge | comment | blank
+directive   := canvas | title | subtitle | external
 
-component   := "component" id  shape "/" icon "/" accent
+leaf        := id  shape "/" icon "/" accent
                   '"' name '"'  '"' subtitle '"'
                   ( "@" placement )?
 placement   := "(" INT "," INT ")"                              ; absolute pos
             |  id  side  INT?                                   ; parent/child align
 side        := "top" | "right" | "bottom" | "left"
 
-region      := "region" id  ("outer"|"inner")  '"' label '"'
-                  region_opt*  "{"  id*  "}"
+container   := region_open body "}"  |  layout_open body "}"
+region_open := id ("outer"|"inner") '"' label '"' region_opt* "{"
+layout_open := id ("horizontal"|"vertical")
+                  "pos" "(" INT "," INT ")" "gap" INT
+                  ( "align" ("start"|"center"|"end") )? "{"
 region_opt  := "padding"        "(" INT "," INT ")"   ; symmetric (h, v) inner padding
-            |  "padding-bottom" INT                   ; override bottom only — see note below
+            |  "padding-bottom" INT                   ; override bottom only
             |  "dash"           "(" INT "," INT ")"   ; stroke-dasharray override; (0,0) = solid
-            |  "stroke"         HEXCOLOUR             ; stroke colour override; `#RGB`/`#RRGGBB`
+            |  "stroke"         HEXCOLOUR             ; stroke colour override
+            |  "label-position" ("above"|"inside")
+            |  "label-anchor"   ("start"|"middle"|"end")
+            |  "icon"           identifier_with_hyphens
 
-layout      := "layout" id  ("horizontal"|"vertical")
-                  "pos" "(" INT "," INT ")"
-                  "gap" INT
-                  ( "align" ("start"|"center"|"end") )?
-                  "{"  id*  "}"
+body        := region_body | layout_body
+region_body := ( container | leaf | bare_ids | row | comment | blank )*
+layout_body := ( bare_ids | comment | blank )*
+bare_ids    := id+
+row         := "row" id*
 
 edge        := id  arrow  id  ( ":" '"' label '"' )?  ( "{" opts "}" )?
 arrow       := "-->"          ; gray (default)
@@ -272,18 +290,25 @@ opt         :=  "src"="anchor"
             |   "via"="(" INT "," INT ")" ( ";" "(" INT "," INT ")" )*
             |   "label_offset"="(" INT "," INT ")"
             |   "label_pos"="(" INT "," INT ")"
+            |   "label_at"=("src"|"dst"|"mid")
             |   "route"=("auto"|"over"|"under"|"curve")
-            |   "small"                                           ; flag
+            |   "small"  |  "dashed"                              ; flags
             |   "curve" | "over" | "under"                        ; route shorthand
 anchor      := ("top"|"right"|"bottom"|"left"|"center") ( "(" INT "," INT ")" )?
                   ; optional (dx, dy) offset
 ```
 
+Region containers nest. When an inner region is nested inside an outer
+region, the inner region's leaf ids flatten into the outer region's
+`contains` so its auto-bounds envelop the nested leaves (DSL.md §7.3.1).
+Layout containers do NOT propagate — they're positioning rules, not
+ownership.
+
 Comments: `#` to end-of-line (outside double-quoted strings). A `#`
 immediately followed by a hex digit is treated as a colour literal, not
 a comment — so `stroke #94a3b8` works inline. Whitespace within lines is
-insignificant; line breaks separate statements. Blocks (`{ … }`) may
-span multiple lines and contain space-separated ids.
+insignificant; line breaks separate statements. Blocks (`{ … }`) MUST
+span multiple lines.
 
 ##### 5.5.1.1 Region Border Defaults and Overrides
 
@@ -302,13 +327,16 @@ Examples:
 
 ```text
 # Default inner — dashed slate-400, 4 4
-region svfs inner "Shared Virtual File System" { fs todo }
+svfs inner "Shared Virtual File System" {
+  fs   box/folder/orange    "FS"   ""
+  todo box/checklist/orange "Todo" ""
+}
 
 # Solid green border on an inner region (highlight)
-region critical inner "Critical Path" dash (0, 0) stroke #76b900 { ... }
+critical inner "Critical Path" dash (0, 0) stroke #76b900 { alpha beta gamma }
 
 # Custom looser dash with brand orange
-region staging outer "Staging Env" dash (8, 4) stroke #ea580c { ... }
+staging outer "Staging Env" dash (8, 4) stroke #ea580c { ... }
 ```
 
 The override is emitted as an inline `style="…"` attribute on the
@@ -329,7 +357,7 @@ practical rule:
 …matching the extra visual weight of the label. Example:
 
 ```text
-region rag outer "RAG Knowledge Layer" padding (24, 24) padding-bottom 32 dash (0, 0) {
+rag outer "RAG Knowledge Layer" padding (24, 24) padding-bottom 32 dash (0, 0) {
   extract embed vecdb rerank gen
 }
 ```
@@ -341,43 +369,48 @@ only. When unset, bottom falls back to `padding[1]` (symmetric).
 #### 5.5.2 Example (full diagram, condensed)
 
 ```text
-canvas 1240 x 800
-output samples/nvidia-aiq.svg
+title:    "Hello"
+subtitle: "Quick tour of the syntax"
 
-component user        circle/user/blue          "Agent / User"        "Bootcamp participant"
-component orch        hex/hex-agent/green       "Orchestrator"        "Spawns sub-agents"
-component researcher  hex/hex-agent/green       "Researcher"          "Parallel search"    @ orch right 60
-component planner     hex/hex-agent/green       "Planning"            "Step decomposition" @ orch bottom 76
-component entdata     box/files/orange          "Enterprise Data"     "uploaded files"     @ (70, 700)
+# Region with leaves defined inline AND a nested inner region.
+adr outer "Autonomous Deep Researcher" padding (40, 32) {
+  orch       hex/hex-agent/green   "Orchestrator" ""
+  researcher hex/hex-agent/green   "Researcher"   "Sub-Agents" @ orch right 60
+  planner    hex/hex-agent/green   "Planning"     "Sub-Agents" @ orch bottom 76
 
-region adr  outer "Autonomous Deep Researcher" padding (40, 32) { orch researcher planner }
-region rag  outer "RAG Knowledge Layer"                          { extract embed vecdb rerank gen }
+  svfs inner "Shared Virtual File System" {
+    fs   box/folder/orange    "File System" "Workspace" @ researcher right 100
+    todo box/checklist/orange "ToDo List"   ""          @ fs right 50
+  }
+}
 
-layout routing_chain horizontal pos (32, 162) gap 60 {
+# Layout — positioning rule, references leaves by bare id.
+routing_chain horizontal pos (32, 162) gap 60 {
   user chat router shallow escalate hitl orch
 }
+
+# Free-floating leaves (not owned by any region).
+user    circle/user/blue   "Agent / User"   "Bootcamp participant"
+chat    box/zap/orange     "Chat"           ""
+router  hex/hex-agent/green "Intent Router" ""
+entdata box/files/orange   "Enterprise Data" "" @ (70, 700)
 
 user --> chat : "Query"   { src=right(0,-10), dst=left(0,-10), label_offset=(0,-8), small }
 chat --> router
 orch --> planner          { src=bottom, dst=top }
-entdata --> rag : "File Upload"
 researcher --> user : "Deep Research Report"  { src=top, dst=top, via=(990,45);(70,45), label_pos=(530,38), small }
 ```
 
 #### 5.5.3 Wiring into the build
 
-Add a thin Python loader and dispatch via `src/cli.py`:
+`.diagram` files are loaded directly by `src/cli.py`:
 
-```python
-# aiq.py
-from pathlib import Path
-from dsl import parse
-DIAGRAM = parse(Path(__file__).with_suffix(".diagram").read_text("utf-8"))
-LAYOUT = None    # auto-layout regions in the DSL position everything
+```bash
+uv run src/cli.py samples/aiq.diagram           # → samples/aiq.svg
+uv run src/cli.py samples/aiq.diagram --animate # → samples/aiq-animated.svg
 ```
 
-`src/cli.py` calls `resolve_alignments(DIAGRAM)` then `render(DIAGRAM)`
-unchanged — the DSL is upstream of the existing pipeline.
+`cli.py` calls `parse_dsl(...)` → `layout(...)` → `resolve_alignments(...)` → `render(...)`.
 
 #### 5.5.4 When NOT to use the DSL
 

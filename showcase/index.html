@@ -424,7 +424,11 @@
   const previewEl  = document.getElementById('modal-preview');
   const ghEl       = modal.querySelector('.modal-gh');
 
-  const KEYWORDS = /^(\s*)(component|region|layout|row|external|canvas:|title:|subtitle:)\b/;
+  // Container kinds (`outer`/`inner`/`horizontal`/`vertical`) + container
+  // options (`padding`, `dash`, `pos`, `gap`, etc) + `row` + `external`/`above`.
+  // The DSL has no `component`/`region`/`layout` keywords (v2.0+).
+  const KEYWORDS_INLINE = /\b(outer|inner|horizontal|vertical|row|external|above|pos|gap|align|padding-bottom|padding|dash|stroke|icon|label-position|label-anchor)\b/g;
+  const DIRECTIVES_LINE_START = /^(\s*)(canvas:|title:|subtitle:)/;
 
   function escapeHtml(s) {
     return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -438,7 +442,8 @@
       let s = escapeHtml(line);
       s = s.replace(/"([^"]*)"/g, '<span class="tok-str">"$1"</span>');
       s = s.replace(/(--&gt;|==&gt;)/g, '<span class="tok-op">$1</span>');
-      s = s.replace(KEYWORDS, '$1<span class="tok-kw">$2</span>');
+      s = s.replace(DIRECTIVES_LINE_START, '$1<span class="tok-kw">$2</span>');
+      s = s.replace(KEYWORDS_INLINE, '<span class="tok-kw">$1</span>');
       return s;
     }).join('\n');
   }
