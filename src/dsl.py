@@ -5,7 +5,7 @@ Python dataclass form (Components, Regions, Auto-layouts, Edges with
 anchors/offsets/waypoints) but line-based and brace-delimited so it
 reads like Mermaid.
 
-See BEST_PRACTICE_DIAGRAMS.md §5.5 for the language grammar.
+See ../docs/BEST_PRACTICE_DIAGRAMS.md §5.5 for the language grammar.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from model import Component, Diagram, Edge, Region
 # Metadata directives use `key:` style (yaml-like). `:` is optional on
 # `canvas:` for backward compat; `title:`/`subtitle:` require it.
 # The output file path is NOT a diagram property — it's a render config
-# in generate.py's TARGETS dict.
+# in cli.py's TARGETS dict.
 CANVAS_RE   = re.compile(r'^canvas\s*:?\s+(\d+)\s*x\s*(\d+)\s*$')
 TITLE_RE    = re.compile(r'^title\s*:\s*"([^"]*)"\s*$')
 SUBTITLE_RE = re.compile(r'^subtitle\s*:\s*"([^"]*)"\s*$')
@@ -56,6 +56,7 @@ DASH_OPT_RE        = re.compile(r'\bdash\s+\(\s*(\d+)\s*,\s*(\d+)\s*\)')
 STROKE_OPT_RE      = re.compile(r'\bstroke\s+(#[0-9a-fA-F]{3,8})')
 LABEL_ANCHOR_RE    = re.compile(r'\blabel-anchor\s+(start|middle|end)')
 LABEL_POS_RE       = re.compile(r'\blabel-position\s+(above|inside)')
+ICON_OPT_RE        = re.compile(r'\bicon\s+([\w-]+)')
 
 # layout <id> <horizontal|vertical> pos (x, y) gap N [align <start|center|end>] {
 LAYOUT_RE = re.compile(
@@ -67,6 +68,19 @@ LAYOUT_RE = re.compile(
 )
 
 CLOSE_RE = re.compile(r'^\s*\}\s*$')
+
+# external <id> above <parent> [gap N]
+# Pushes the canvas top-margin down to leave room for an external component
+# placed above a grid cell. Only "above" is implemented (matches layout.py).
+EXTERNAL_RE = re.compile(
+    r'^external\s+(\w+)\s+above\s+(\w+)(?:\s+gap\s+(\d+))?\s*$'
+)
+
+# `row id1 id2 …` inside a region body switches that region to GRID mode:
+# children flow across rows that align horizontally ACROSS all grid regions
+# (row 0 of every region shares one Y, row 1 another, etc — that's the
+# whole point of `LAYOUT` in layout.py).
+ROW_RE = re.compile(r'^row(?:\s+(.+))?$')
 
 # Edge: <src> --> <dst> [: "label"] [{ options }]
 #       <src> ==> <dst> [: "label"] [{ options }]    ← orange style
@@ -87,11 +101,23 @@ VIA_PT_RE = re.compile(r'\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)')
 
 
 # ── Public API ────────────────────────────────────────────────────────
-def parse(dsl: str) -> Diagram:
-    """Parse a Mermaid-like diagram DSL into a `Diagram` object."""
+def parse(dsl: str) -> tuple[Diagram, dict | None, dict | None]:
+    """Parse a Mermaid-like diagram DSL.
+
+    Returns `(diagram, layout, external)`:
+      - `layout` is a `{region_id: [[cell_id, ...], ...]}` dict when any
+        region uses grid-style `row …` syntax; `None` otherwise.
+      - `external` is `{component_id: {"above": parent_id, "gap": N}}` when
+        any `external …` directive appears; `None` otherwise.
+
+    `layout` and `external` flow into `layout.layout(diagram, layout, external)`
+    in the CLI pipeline; when both are None the layout pass is skipped.
+    """
     components: list[Component] = []
     regions:    list[Region]    = []
     edges:      list[Edge]      = []
+    layout_dict: dict[str, list[list[str]]] = {}
+    external_dict: dict[str, dict] = {}
     # (0, 0) sentinel → render-time auto-sizing kicks in (see
     # alignment._auto_size_canvas). Explicit `canvas W x H` overrides.
     canvas: tuple[int, int] = (0, 0)
@@ -103,44 +129,65 @@ def parse(dsl: str) -> Diagram:
     while i < len(lines):
         line = _strip_comment(lines[i]).strip()
         if not line:
-            i += 1; continue
+            i += 1
+            continue
 
         if (m := CANVAS_RE.match(line)):
             canvas = (int(m.group(1)), int(m.group(2)))
-            i += 1; continue
+            i += 1
+            continue
 
         if (m := TITLE_RE.match(line)):
             title = m.group(1)
-            i += 1; continue
+            i += 1
+            continue
 
         if (m := SUBTITLE_RE.match(line)):
             subtitle = m.group(1)
-            i += 1; continue
+            i += 1
+            continue
+
+        if (m := EXTERNAL_RE.match(line)):
+            eid, parent, gap = m.groups()
+            external_dict[eid] = {"above": parent, "gap": int(gap) if gap else 60}
+            i += 1
+            continue
 
         if (m := COMP_RE.match(line)):
             components.append(_make_component(m, line_no=i + 1))
-            i += 1; continue
+            i += 1
+            continue
 
         if (m := REGION_RE.match(line)):
-            region, consumed = _make_region(m, lines, i)
+            region, rows, consumed = _make_region(m, lines, i)
             regions.append(region)
-            i += consumed; continue
+            if rows is not None:
+                layout_dict[region.id] = rows
+            i += consumed
+            continue
 
         if (m := LAYOUT_RE.match(line)):
             region, consumed = _make_layout(m, lines, i)
             regions.append(region)
-            i += consumed; continue
+            i += consumed
+            continue
 
         if (m := EDGE_RE.match(line)):
             edges.append(_make_edge(m, line_no=i + 1))
-            i += 1; continue
+            i += 1
+            continue
 
         raise SyntaxError(f"line {i + 1}: unrecognised — {line!r}")
 
-    return Diagram(
+    diagram = Diagram(
         width=canvas[0], height=canvas[1],
         title=title, subtitle=subtitle,
         components=components, regions=regions, edges=edges,
+    )
+    return (
+        diagram,
+        layout_dict or None,
+        external_dict or None,
     )
 
 
@@ -194,7 +241,12 @@ def _make_component(m: re.Match, line_no: int) -> Component:
     )
 
 
-def _make_region(m: re.Match, lines: list[str], i: int) -> tuple[Region, int]:
+def _make_region(
+    m: re.Match, lines: list[str], i: int,
+) -> tuple[Region, list[list[str]] | None, int]:
+    """Return `(region, rows, consumed)`. `rows` is non-None only when the
+    body uses grid-style `row …` lines — caller registers it in the
+    top-level LAYOUT dict so `layout.layout()` can run."""
     rid, style, label, opts = m.group(1), m.group(2), m.group(3), m.group(4)
     padding = (24, 24)
     padding_bottom: int | None = None
@@ -202,6 +254,7 @@ def _make_region(m: re.Match, lines: list[str], i: int) -> tuple[Region, int]:
     border_stroke: str | None = None
     label_anchor = "middle"
     label_position: str | None = None
+    icon: str | None = None
     if opts:
         if (pm := PADDING_OPT_RE.search(opts)):
             padding = (int(pm.group(1)), int(pm.group(2)))
@@ -215,15 +268,60 @@ def _make_region(m: re.Match, lines: list[str], i: int) -> tuple[Region, int]:
             label_anchor = lam.group(1)
         if (lpm := LABEL_POS_RE.search(opts)):
             label_position = lpm.group(1)
-    contains, consumed = _read_id_block(lines, i + 1)
+        if (im := ICON_OPT_RE.search(opts)):
+            icon = im.group(1)
+
+    body, consumed = _read_body(lines, i + 1)
+    rows = _parse_rows(body, rid, line_no=i + 1)
+    if rows is not None:
+        # Grid mode: bounds + positions are computed by layout.layout() from
+        # the rows. Leave `contains=[]` so _resolve_region_bounds skips this
+        # region (it would otherwise recompute bounds and clobber layout's).
+        contains: list[str] = []
+    else:
+        contains = [tok for line in body for tok in line.split()]
+
     return (
         Region(id=rid, label=label, style=style,
                padding=padding, padding_bottom=padding_bottom,
                border_dash=border_dash, border_stroke=border_stroke,
                label_anchor=label_anchor, label_position=label_position,
-               contains=contains),
+               icon=icon, contains=contains),
+        rows,
         consumed + 1,                              # +1 for the opening line
     )
+
+
+def _read_body(lines: list[str], start: int) -> tuple[list[str], int]:
+    """Read non-empty, comment-stripped body lines until the matching `}`.
+    Returns (lines, lines_consumed including the closing brace)."""
+    body: list[str] = []
+    j = start
+    while j < len(lines):
+        if CLOSE_RE.match(lines[j]):
+            return body, j - start + 1
+        text = _strip_comment(lines[j]).strip()
+        if text:
+            body.append(text)
+        j += 1
+    raise SyntaxError(f"line {start}: unclosed block (no matching `}}`)")
+
+
+def _parse_rows(body: list[str], rid: str, line_no: int) -> list[list[str]] | None:
+    """If any body line starts with `row`, parse the whole body as grid
+    rows. An all-flat body returns None (caller treats it as a `contains` list)."""
+    if not any(ROW_RE.match(line) for line in body):
+        return None
+    rows: list[list[str]] = []
+    for line in body:
+        rm = ROW_RE.match(line)
+        if not rm:
+            raise SyntaxError(
+                f"line {line_no}: region {rid!r} mixes `row` and bare ids — pick one"
+            )
+        ids = (rm.group(1) or "").split()
+        rows.append(ids)
+    return rows
 
 
 def _make_layout(m: re.Match, lines: list[str], i: int) -> tuple[Region, int]:
@@ -265,8 +363,10 @@ def _make_edge(m: re.Match, line_no: int) -> Edge:
         "label_offset": (0, 0),
         "label_small": False,
         "label_pos": None,
+        "label_anchor": "mid",
         "via": [],
         "route": "auto",
+        "dashed": False,
     }
     if opts:
         _parse_edge_options(opts.strip(), kw, line_no)
@@ -288,10 +388,15 @@ def _parse_edge_options(s: str, kw: dict, line_no: int) -> None:
 def _split_outside_parens(s: str, sep: str) -> list[str]:
     out, cur, depth = [], [], 0
     for ch in s:
-        if ch == '(': depth += 1; cur.append(ch)
-        elif ch == ')': depth -= 1; cur.append(ch)
+        if ch == '(':
+            depth += 1
+            cur.append(ch)
+        elif ch == ')':
+            depth -= 1
+            cur.append(ch)
         elif ch == sep and depth == 0:
-            out.append(''.join(cur)); cur = []
+            out.append(''.join(cur))
+            cur = []
         else:
             cur.append(ch)
     if cur:
@@ -325,12 +430,19 @@ def _set_kv_option(kw: dict, key: str, value: str, line_no: int) -> None:
             raise SyntaxError(f"line {line_no}: bad route {value!r}")
         kw["route"] = value
         return
+    if key == "label_at":
+        if value not in ("src", "dst", "mid"):
+            raise SyntaxError(f"line {line_no}: label_at expects src|dst|mid — got {value!r}")
+        kw["label_anchor"] = value
+        return
     raise SyntaxError(f"line {line_no}: unknown edge option {key!r}")
 
 
 def _set_flag(kw: dict, flag: str, line_no: int) -> None:
     if flag == "small":
         kw["label_small"] = True
+    elif flag == "dashed":
+        kw["dashed"] = True
     elif flag in ("curve", "over", "under"):
         kw["route"] = flag
     else:

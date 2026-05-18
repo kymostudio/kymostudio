@@ -333,11 +333,16 @@ def smooth_curve(sp, dp, src_anchor, dst_anchor) -> str:
 
     def cp(point, anchor):
         match anchor:
-            case "top":    return (point[0], point[1] - dist)
-            case "bottom": return (point[0], point[1] + dist)
-            case "left":   return (point[0] - dist, point[1])
-            case "right":  return (point[0] + dist, point[1])
-            case _:        return point
+            case "top":
+                return (point[0], point[1] - dist)
+            case "bottom":
+                return (point[0], point[1] + dist)
+            case "left":
+                return (point[0] - dist, point[1])
+            case "right":
+                return (point[0] + dist, point[1])
+            case _:
+                return point
 
     c1 = cp(sp, src_anchor)
     c2 = cp(dp, dst_anchor)
@@ -492,11 +497,16 @@ def render_component(c: Component) -> str:
 
     # Standard: icon + name + subtitle below.
     # Name offset depends on shape (cube-big has a halo so name sits lower).
-    if   c.shape == "cube-big":      name_y, name_size = 73, 15
-    elif c.shape == "cube":          name_y, name_size = 60, 14
-    elif c.shape == "aws-tile-hero": name_y, name_size = 58, 14
-    elif c.shape == "aws-tile":      name_y, name_size = 50, 14
-    else:                            name_y, name_size = 55, 14
+    if c.shape == "cube-big":
+        name_y, name_size = 73, 15
+    elif c.shape == "cube":
+        name_y, name_size = 60, 14
+    elif c.shape == "aws-tile-hero":
+        name_y, name_size = 58, 14
+    elif c.shape == "aws-tile":
+        name_y, name_size = 50, 14
+    else:
+        name_y, name_size = 55, 14
     sub_y  = name_y + 17
 
     # Accent "red" — semantic marker for human-intervention / alert nodes.

@@ -105,13 +105,18 @@ directory:
 
 ```
 diagrams/
-├── model.py       Component, Region, Edge dataclasses
-├── icons.py       SVG icon library
-├── data.py        Diagram instance + LAYOUT spec + edges
-├── layout.py      Auto-layout + edge routing
-├── render.py      Diagram → SVG renderer
-├── generate.py    Entry point — `uv run generate.py`
-└── out/container-diagram.svg     Build artefact (~12 KB, 1080 × 658)
+├── src/
+│   ├── model.py       Component, Region, Edge dataclasses
+│   ├── icons.py       SVG icon library
+│   ├── layout.py      Auto-layout + edge routing
+│   ├── to_svg.py      Diagram → SVG renderer
+│   └── cli.py         Entry point — `uv run src/cli.py`
+├── samples/
+│   ├── data.py                       Diagram instance + LAYOUT spec + edges
+│   ├── aiq.diagram                   DSL form
+│   └── *.svg / *.webp / *.png        Rendered outputs + reference images
+├── docs/                             Spec docs (this file, DSL.md)
+└── out/container-diagram.svg         Transient build artefact (~12 KB, 1080 × 658)
 ```
 
 ---
@@ -207,16 +212,16 @@ re-tracing every Edge.
 
 A `uv` project with the following module separation:
 
-| 5.4.x | Module       | Responsibility                                       |
-|-------|--------------|------------------------------------------------------|
-| 5.4.1 | `model.py`   | Dataclasses; no rendering.                           |
-| 5.4.2 | `icons.py`   | SVG icon library; no layout knowledge.               |
-| 5.4.3 | `data.py`    | The diagram instance + LAYOUT spec + edges.          |
-| 5.4.4 | `layout.py`  | Position computation; edge route waypoints.          |
-| 5.4.5 | `render.py`  | Diagram → SVG string; no positioning logic.          |
-| 5.4.6 | `generate.py`| Entry script. `uv run generate.py`. ~30 ms per cycle.|
+| 5.4.x | Module               | Responsibility                                       |
+|-------|----------------------|------------------------------------------------------|
+| 5.4.1 | `src/model.py`       | Dataclasses; no rendering.                           |
+| 5.4.2 | `src/icons.py`       | SVG icon library; no layout knowledge.               |
+| 5.4.3 | `samples/data.py`    | The diagram instance + LAYOUT spec + edges.          |
+| 5.4.4 | `src/layout.py`      | Position computation; edge route waypoints.          |
+| 5.4.5 | `src/to_svg.py`      | Diagram → SVG string; no positioning logic.          |
+| 5.4.6 | `src/cli.py`         | Entry script. `uv run src/cli.py`. ~30 ms/cycle.     |
 
-To relocate a Component: edit `LAYOUT` in `data.py` and regenerate.
+To relocate a Component: edit `LAYOUT` in `samples/data.py` and regenerate.
 To add a connection: append an `Edge` to the `EDGES` list and regenerate.
 
 ### 5.5 Diagram DSL (Mermaid-like)
@@ -337,7 +342,7 @@ only. When unset, bottom falls back to `padding[1]` (symmetric).
 
 ```text
 canvas 1240 x 800
-output references/nvidia-aiq.svg
+output samples/nvidia-aiq.svg
 
 component user        circle/user/blue          "Agent / User"        "Bootcamp participant"
 component orch        hex/hex-agent/green       "Orchestrator"        "Spawns sub-agents"
@@ -361,7 +366,7 @@ researcher --> user : "Deep Research Report"  { src=top, dst=top, via=(990,45);(
 
 #### 5.5.3 Wiring into the build
 
-Add a thin Python loader and dispatch via `generate.py`:
+Add a thin Python loader and dispatch via `src/cli.py`:
 
 ```python
 # aiq.py
@@ -371,14 +376,14 @@ DIAGRAM = parse(Path(__file__).with_suffix(".diagram").read_text("utf-8"))
 LAYOUT = None    # auto-layout regions in the DSL position everything
 ```
 
-`generate.py` calls `resolve_alignments(DIAGRAM)` then `render(DIAGRAM)`
+`src/cli.py` calls `resolve_alignments(DIAGRAM)` then `render(DIAGRAM)`
 unchanged — the DSL is upstream of the existing pipeline.
 
 #### 5.5.4 When NOT to use the DSL
 
 | Scenario                                            | Prefer                                              |
 |-----------------------------------------------------|-----------------------------------------------------|
-| Diagram with computed positions (e.g., grid layout) | Python (`data.py` with `LAYOUT` dict)               |
+| Diagram with computed positions (e.g., grid layout) | Python (`samples/data.py` with `LAYOUT` dict)       |
 | One-off diagrams shared inline in a Python notebook | Python literals                                     |
 | Tool-generated diagrams (CI scripts, autodoc)       | Python — easier to programmatically construct       |
 | Hand-authored, hand-reviewed architecture diagrams  | **DSL** — flat, readable, diff-friendly             |
@@ -792,7 +797,7 @@ inside, so it does not steal content space from the components within.
 #### 6.7.6 Region-to-Region Label Clearance
 
 A region's label is rendered ABOVE its rectangle at `y = rect.y - 10`
-(see `render.py::render_region`). This means the label's visible glyphs
+(see `to_svg.py::render_region`). This means the label's visible glyphs
 occupy a vertical band roughly `[rect.y - 22, rect.y - 4]` — and this
 band is OUTSIDE the rect, in the "between regions" whitespace.
 
@@ -1136,7 +1141,7 @@ This groups Cells without dominating them.
 ## 11. Iteration Process
 
 A single generate-render-review cycle takes approximately 30 ms
-(`uv run generate.py`) plus the browser-reload time. This permits 20+
+(`uv run src/cli.py`) plus the browser-reload time. This permits 20+
 revisions per session at acceptable cost.
 
 The five revisions that produced the greatest visual quality gain were:
@@ -1151,13 +1156,13 @@ The five revisions that produced the greatest visual quality gain were:
 
 ## 12. References
 
-- `model.py` — `Component`, `Region`, `Edge`, `Diagram` definitions.
-- `layout.py` — `_route_over`, `_route_under`, `cell_size`, layout entry point.
-- `render.py` — `points_to_rounded_path`, `smooth_curve`, `edge_label_pos`.
-- `icons.py` — `_cube`, `_box`, glyph library, isometric matrix.
-- `data.py` — current diagram instance.
+- `src/model.py` — `Component`, `Region`, `Edge`, `Diagram` definitions.
+- `src/layout.py` — `_route_over`, `_route_under`, `cell_size`, layout entry point.
+- `src/to_svg.py` — `points_to_rounded_path`, `smooth_curve`, `edge_label_pos`.
+- `src/icons.py` — `_cube`, `_box`, glyph library, isometric matrix.
+- `samples/data.py` — current diagram instance.
 - `out/container-diagram.svg` — current build artefact.
-- `references/AIQ-arch-light.png` — external reference (NVIDIA AIQ).
+- `samples/AIQ-arch-light.png` — external reference (NVIDIA AIQ).
 
 ---
 
@@ -1184,7 +1189,7 @@ The five revisions that produced the greatest visual quality gain were:
 ### B.1 Storage and Retrieval
 
 This document is version-controlled within the project repository at
-`diagrams/BEST_PRACTICE_DIAGRAMS.md`. Authoritative source is the
+`diagrams/docs/BEST_PRACTICE_DIAGRAMS.md`. Authoritative source is the
 working tree of the main branch; archived versions are accessible via
 the repository history (`git log`).
 
@@ -1207,7 +1212,7 @@ A new revision MUST:
 2. Update the **Issue Date** field.
 3. Append a row to **Annex A — Revision History**.
 4. Bump the major version on breaking changes to interfaces in
-   `model.py` / `layout.py` / `render.py`.
+   `src/model.py` / `src/layout.py` / `src/to_svg.py`.
 
 ### B.4 Review
 

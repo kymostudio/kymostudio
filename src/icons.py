@@ -30,8 +30,11 @@ def _cube(inner_unit: str, size: int = 80) -> str:
     """
     s = size
     h = s // 2
-    a = _r(s * 0.44); b = _r(s * 0.21); d = _r(s * 0.44)
-    e = _r(s * 0.06); f = _r(s * 0.28)
+    a = _r(s * 0.44)
+    b = _r(s * 0.21)
+    d = _r(s * 0.44)
+    e = _r(s * 0.06)
+    f = _r(s * 0.28)
     # Face vertices (rounded for tidy output)
     p = {k: _r(s * v) for k, v in [
         ("06", 0.06), ("28", 0.28), ("49", 0.49), ("72", 0.72),

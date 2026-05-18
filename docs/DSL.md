@@ -44,7 +44,7 @@ iso_compliance:
 | Audience          | Engineers authoring or parsing `.diagram` files                |
 | Review Cycle      | On grammar change, or annually (whichever first)               |
 | Supersedes        | —                                                              |
-| Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), [`dsl.py`](./dsl.py), [`model.py`](./model.py) |
+| Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), [`dsl.py`](../src/dsl.py), [`model.py`](../src/model.py) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar productions follow ISO/IEC 14977:1996 (Extended Backus–Naur Form).
 
@@ -78,18 +78,18 @@ This document specifies the **Diagram DSL** — a textual surface language for d
 This specification applies to:
 
 - Source files with extension `.diagram` in this repository
-- The reference parser implementation [`dsl.py`](./dsl.py)
+- The reference parser implementation [`dsl.py`](../src/dsl.py)
 - Any future tooling (linters, formatters, IDE plug-ins) operating on `.diagram` files
 
 It does **not** specify:
 
-- The SVG renderer (see [`render.py`](./render.py) and BEST_PRACTICE_DIAGRAMS.md)
-- The build/dispatch system (see [`generate.py`](./generate.py))
+- The SVG renderer (see [`to_svg.py`](../src/to_svg.py) and BEST_PRACTICE_DIAGRAMS.md)
+- The build/dispatch system (see [`cli.py`](../src/cli.py))
 - The graphical conventions for diagram aesthetics (see BEST_PRACTICE_DIAGRAMS.md)
 
 ### 1.3 Reference Implementation
 
-[`dsl.py`](./dsl.py) is the normative reference implementation. Where this document and the reference implementation disagree, the implementation is authoritative for behaviour; this document SHALL be updated to match.
+[`dsl.py`](../src/dsl.py) is the normative reference implementation. Where this document and the reference implementation disagree, the implementation is authoritative for behaviour; this document SHALL be updated to match.
 
 ---
 
@@ -354,8 +354,8 @@ DSL coordinates therefore remain in the **content coordinate space**; the title 
 
 The following SHALL NOT appear in `.diagram` files:
 
-- Output file path (controlled by `generate.py` → `TARGETS`)
-- Stylesheet or icon definitions (controlled by `render.py` → `STYLE`, `DEFS`)
+- Output file path (controlled by `cli.py` → `TARGETS`)
+- Stylesheet or icon definitions (controlled by `to_svg.py` → `STYLE`, `DEFS`)
 - Target dispatch logic
 
 The DSL describes **what** to draw; the renderer decides **how** and **where**.
@@ -423,7 +423,7 @@ A conforming parser MAY:
 
 ### 9.3 Conforming Renderer
 
-Renderer conformance is outside the scope of this specification. See `render.py` and BEST_PRACTICE_DIAGRAMS.md.
+Renderer conformance is outside the scope of this specification. See `to_svg.py` and BEST_PRACTICE_DIAGRAMS.md.
 
 ---
 
@@ -497,7 +497,7 @@ For a full real-world example, see [`aiq.diagram`](./aiq.diagram).
 
 ### B.1 Storage and Retrieval
 
-This document is version-controlled within the project repository at `diagrams/DSL.md`. The authoritative source is the working tree of the main branch; archived versions are accessible via repository history (`git log`).
+This document is version-controlled within the project repository at `diagrams/docs/DSL.md`. The authoritative source is the working tree of the main branch; archived versions are accessible via repository history (`git log`).
 
 ### B.2 Distribution
 

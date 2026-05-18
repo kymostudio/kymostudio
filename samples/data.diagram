@@ -1,0 +1,68 @@
+# Container architecture — Tutorial 01 NIM inference endpoint.
+# 3 regions stacked horizontally; rows align across regions so cross-region
+# same-row edges run straight horizontal.
+
+# ── Components ────────────────────────────────────────────────────────
+component user         circle/user/blue          "Agent / User"      "Bootcamp participant"
+component jupyter      cube/notebook/green       "Jupyter Notebook"  "Python 3.13  ·  điều phối 2 luồng"
+component http_client  box/send/orange           "HTTP Client"       "requests  →  API Catalog"
+component chat_nvidia  box/zap/orange            "ChatNVIDIA"        "langchain-nvidia  ·  luồng LOCAL"
+component docker       cube/boxes/green          "Docker Engine"     "daemon  ·  quản lý NIM"
+component nim          cube-big/neural/green     "NIM Microservice"  "Uvicorn  ·  llama-3.2-3b  ·  :8000"
+component cache        cylinder/cylinder/orange  "NIM Cache"         "~/.cache/nim → /opt/nim/.cache"
+component nvcr         box/archive/orange        "nvcr.io"           "Container Registry"
+component api_catalog  box/cloud/orange          "API Catalog"       "integrate.api.nvidia.com  ←  HTTP"
+component auth         annotation/key/orange     "Auth"              "NVIDIA_API_KEY  ·  NGC_API_KEY"
+
+# ── Regions (grid mode: each `row` lines up at the same Y across regions) ─
+# Rows align horizontally ACROSS regions, so cross-region same-row edges
+# run straight horizontal. HTTP+Chat side-by-side at row 1 (both are
+# alternate clients invoked from Jupyter — visually parallel paths).
+region code_server outer "code-server (IDE)" {
+  row jupyter                       # row 0 — same Y as docker, nvcr (setup path)
+  row http_client chat_nvidia       # row 1 — same Y as nim, api_catalog (inference)
+}
+region brev outer "NVIDIA Brev (GPU pod)" {
+  row docker
+  row nim
+  row cache
+}
+region cloud outer "NVIDIA Cloud (SaaS)" {
+  row nvcr
+  row api_catalog
+  row auth
+}
+
+# External — user sits above the grid, anchored to jupyter.
+external user above jupyter gap 32
+
+# ── Edges (mostly auto-routed; only the divergent S-curves need hints) ──
+# User → Jupyter (vertical, auto)
+user --> jupyter : "Mở browser"                 { src=bottom, dst=top, label_offset=(60,-8) }
+
+# Jupyter → Docker (horizontal same-row, auto)
+jupyter --> docker : "docker run  ·  SSH"       { label_offset=(0,-8) }
+
+# Docker → nvcr.io (horizontal same-row, orange)
+docker ==> nvcr : "Pull image"                  { label_offset=(0,-8) }
+
+# Jupyter → HTTP Client (S-curve, diverges LEFT from Jupyter bottom)
+jupyter --> http_client : "Cloud cell"  { src=bottom(-22,0), dst=top, curve, label_at=dst, label_offset=(0,-14), small }
+
+# Jupyter → ChatNVIDIA (S-curve, diverges RIGHT from Jupyter bottom)
+jupyter --> chat_nvidia : "Local cell"  { src=bottom(22,0), dst=top, curve, label_at=dst, label_offset=(0,-14), small }
+
+# ChatNVIDIA → NIM (right→left, same row 1, straight horizontal)
+chat_nvidia --> nim : "POST  ·  local"          { label_offset=(0,-8), small }
+
+# NOTE: HTTP Client → API Catalog cloud-inference call is NOT drawn as
+# an arrow — a single long arc spanning 3 regions would dominate the
+# diagram. Instead, the connection is expressed in the components'
+# subtitles ("requests → API Catalog" and "← HTTP") and reinforced by
+# the shared external-orange box styling.
+
+# Docker → NIM (vertical same-col, auto)
+docker --> nim : "Khởi tạo pod"                 { src=bottom, dst=top, label_offset=(48,0), small }
+
+# NIM → Cache (vertical same-col, auto)
+nim --> cache : "Mount weights"                 { src=bottom, dst=top, label_offset=(50,0), small }

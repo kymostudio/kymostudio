@@ -1,0 +1,71 @@
+# AWS reference-architecture replica — Lex chatbot + Bedrock RAG.
+# Mirrors aws-1.png (sibling). Exercises §6.6 (Grid) and §6.7 (Hierarchy)
+# of ../docs/BEST_PRACTICE_DIAGRAMS.md.
+
+canvas:   1280 x 680
+
+# ── Regions ───────────────────────────────────────────────────────────
+# outer = administrative boundary (AWS region, navy + AWS logo).
+# inner = logical subgroup (the company's app domain, purple + site glyph).
+region useast1 outer "us-east-1" padding (40, 56) icon aws-logo {
+  amplify lex lambda connect
+  dynamodb bedrock s3 kendra
+}
+region yourcompany inner "<your-company>.com" padding (24, 24) icon site-globe {
+  amplify lex lambda connect
+}
+
+# ── Components (absolute positions; centres snap to 8 px, §6.6.2) ─────
+# Actors outside AWS
+component customer  circle/customer-person/blue  "Customer"  ""  @ (72, 344)
+component internet  circle/internet-cloud/blue   "Internet"  ""  @ (1200, 424)
+
+# Inside <your-company>.com container
+component amplify  aws-tile/aws-amplify/orange       "AWS Amplify"     "Website"                  @ (320, 176)
+component lex      aws-tile/aws-lex/orange           "Amazon Lex"      "Natural Language Chatbot" @ (320, 344)
+component lambda   aws-tile-hero/aws-lambda/orange   "AWS Lambda"      "Lex Bot Logic Handler"    @ (568, 344)
+component connect  aws-tile/aws-connect/orange       "Amazon Connect"  "Contact Center"           @ (448, 512)
+
+# Inside us-east-1 but outside the inner container
+component dynamodb  aws-tile/aws-dynamodb/blue    "Amazon DynamoDB"  "User Account Info"        @ (832, 176)
+component bedrock   aws-tile/aws-bedrock/green    "Amazon Bedrock"   "Anthropic Claude 2.1 FM"  @ (832, 344)
+component s3        aws-tile/aws-s3/green         "Amazon S3"        "Customer Data"            @ (1064, 344)
+component kendra    aws-tile/aws-kendra/orange    "Amazon Kendra"    "FAQ Search"               @ (1024, 520)
+
+# Slack badge beside Connect (icon-only annotation)
+component slack  badge/slack/blue  ""  ""  @ (560, 512)
+
+# Numbered step badges (§6.7.3)
+component step1  badge/step-1/orange  ""  ""  @ (184, 296)
+component step2  badge/step-2/orange  ""  ""  @ (440, 160)
+component step3  badge/step-3/orange  ""  ""  @ (704, 160)
+
+# ── Edges ─────────────────────────────────────────────────────────────
+# Customer → entry channels (three rails from Customer's right edge)
+customer --> amplify  : "Web"    { src=right(0,-24), dst=left, label_offset=(-40,-8), small }
+customer --> lex      : "SMS"    { src=right, dst=left, label_offset=(-50,-8), small }
+customer --> connect  : "Voice"  { src=bottom, dst=left, via=(72,512), label_pos=(232,504), small }
+
+# Main numbered flow: Amplify → Lambda → DynamoDB
+amplify --> lambda
+# Lambda → DynamoDB is part of the request flow AND a Lambda fan-out — draw dashed.
+lambda  --> dynamodb  { src=top, dst=left, dashed }
+
+# Lex ↔ Lambda (bidirectional, parallel rails)
+lex    --> lambda  { src=right(0,-12), dst=left(0,-12) }
+lambda --> lex     { src=left(0,12), dst=right(0,12) }
+
+# Lambda fan-out to data services (dashed = async/parallel)
+lambda --> bedrock  { dashed }
+
+# Bedrock → S3 (fine-tuning data, solid — direct dependency)
+bedrock --> s3  : "fine-tunable"  { label_offset=(0,-10), small }
+
+# Lambda → Kendra (fan-out to FAQ search)
+lambda --> kendra  { src=bottom, dst=left, via=(568,520), dashed }
+
+# Internet → Kendra (Web Crawler from outside)
+internet --> kendra  : "Web Crawler"  { src=bottom, dst=right, via=(1200,520), label_pos=(1136,512), small }
+
+# Connect → Lambda (Voice channel meets Lex logic)
+connect --> lambda  { src=top, dst=bottom }

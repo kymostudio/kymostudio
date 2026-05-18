@@ -84,11 +84,16 @@ class Component:
         hw, hh = self.half
         lh = LABEL_HEIGHT.get(self.shape, 0)
         match side:
-            case "top":    return (cx, cy - hh)
-            case "right":  return (cx + hw, cy)
-            case "bottom": return (cx, cy + hh + lh)
-            case "left":   return (cx - hw, cy)
-            case "center": return (cx, cy)
+            case "top":
+                return (cx, cy - hh)
+            case "right":
+                return (cx + hw, cy)
+            case "bottom":
+                return (cx, cy + hh + lh)
+            case "left":
+                return (cx - hw, cy)
+            case "center":
+                return (cx, cy)
 
 
 RegionStyle = Literal["outer", "inner"]
@@ -172,11 +177,16 @@ class Region:
         transparently. Requires `bounds` to be resolved beforehand."""
         x, y, w, h = self.bounds
         match side:
-            case "top":    return (x + w // 2, y)
-            case "right":  return (x + w,     y + h // 2)
-            case "bottom": return (x + w // 2, y + h)
-            case "left":   return (x,         y + h // 2)
-            case "center": return (x + w // 2, y + h // 2)
+            case "top":
+                return (x + w // 2, y)
+            case "right":
+                return (x + w, y + h // 2)
+            case "bottom":
+                return (x + w // 2, y + h)
+            case "left":
+                return (x, y + h // 2)
+            case "center":
+                return (x + w // 2, y + h // 2)
 
 
 Route = Literal["auto", "over", "under", "curve"]

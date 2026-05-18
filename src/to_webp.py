@@ -44,7 +44,7 @@ from PIL import Image
 
 import math
 
-# Match the constants in render.py ANIM_PRESETS["flow"].
+# Match the constants in to_svg.py ANIM_PRESETS["flow"].
 DASH_LEN           = 16          # @keyframes edge-flow { from: 16 → to: 0 }
 GRAY_PERIOD_MS     = 1200        # .edge-path animation-duration
 ORANGE_PERIOD_MS   = 800         # .edge-path--orange animation-duration
@@ -170,15 +170,20 @@ def main() -> None:
     while i < len(argv):
         a = argv[i]
         if a == "--frames":
-            n_frames = int(argv[i + 1]); i += 2
+            n_frames = int(argv[i + 1])
+            i += 2
         elif a == "--width":
-            width = int(argv[i + 1]); i += 2
+            width = int(argv[i + 1])
+            i += 2
         elif a == "--quality":
-            quality = int(argv[i + 1]); i += 2
+            quality = int(argv[i + 1])
+            i += 2
         elif not a.startswith("--") and dst is None:
-            dst = Path(a); i += 1
+            dst = Path(a)
+            i += 1
         else:
-            print(f"unknown arg: {a}"); sys.exit(1)
+            print(f"unknown arg: {a}")
+            sys.exit(1)
 
     if dst is None:
         dst = src.with_suffix(".webp")

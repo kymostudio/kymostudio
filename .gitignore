@@ -2,8 +2,8 @@
 __pycache__/
 *.pyc
 .DS_Store
+# transient build artefacts
+out/
 # transient screenshots from validation runs
-references/_*.jpeg
-references/_*.png
-out/_*.jpeg
-out/_*.png
+samples/_*.jpeg
+samples/_*.png

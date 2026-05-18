@@ -22,7 +22,6 @@ Whitespace minimisation principles:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
 
 from model import Component, Diagram, Edge, LABEL_HEIGHT
 
@@ -120,7 +119,6 @@ def layout(
         y += h // 2
         row_ys.append(y)
         y += h // 2 + row_gap
-    last_y_after_rows = y - row_gap + region_padding_y // 2  # for canvas height
 
     # Region centre-X, cumulative.
     region_xs: dict[str, int] = {}

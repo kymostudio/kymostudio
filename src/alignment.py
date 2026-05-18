@@ -94,24 +94,32 @@ def _auto_size_canvas(diagram: Diagram, margin: int = 30) -> None:
         eff_hw = max(c.half[0], _label_half_width(c))
         right  = c.pos[0] + eff_hw
         bottom = c.pos[1] + c.half[1] + LABEL_HEIGHT.get(c.shape, 0)
-        if right > max_x: max_x = right
-        if bottom > max_y: max_y = bottom
+        if right > max_x:
+            max_x = right
+        if bottom > max_y:
+            max_y = bottom
 
     for r in diagram.regions:
         if r.bounds == (0, 0, 0, 0):
             continue                                 # invisible layout-only
         x, y, w, h = r.bounds
-        if x + w > max_x: max_x = x + w
-        if y + h > max_y: max_y = y + h
+        if x + w > max_x:
+            max_x = x + w
+        if y + h > max_y:
+            max_y = y + h
 
     for e in diagram.edges:
         for vx, vy in e.via:
-            if vx > max_x: max_x = vx
-            if vy > max_y: max_y = vy
+            if vx > max_x:
+                max_x = vx
+            if vy > max_y:
+                max_y = vy
         if e.label_pos is not None:
             lx, ly = e.label_pos
-            if lx > max_x: max_x = lx
-            if ly > max_y: max_y = ly
+            if lx > max_x:
+                max_x = lx
+            if ly > max_y:
+                max_y = ly
 
     if diagram.width == 0:
         diagram.width = max_x + margin
