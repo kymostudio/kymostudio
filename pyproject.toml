@@ -1,0 +1,9 @@
+[project]
+name = "nim-diagram"
+version = "0.1.0"
+description = "Generate the container architecture SVG for Tutorial 01 NIM inference endpoint"
+requires-python = ">=3.13"
+dependencies = []
+
+[tool.uv]
+package = false

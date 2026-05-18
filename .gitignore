@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# transient screenshots from validation runs
+references/_*.jpeg
+references/_*.png
+out/_*.jpeg
+out/_*.png
