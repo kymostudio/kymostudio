@@ -2,6 +2,9 @@
 name = "axo"
 version = "0.1.0"
 description = "Diagram-as-code DSL — declarative architecture diagrams to animated SVG/WebP"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.13"
 dependencies = []
 

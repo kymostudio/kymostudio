@@ -1,6 +1,5 @@
 # AWS reference-architecture replica — Lex chatbot + Bedrock RAG.
-# Mirrors aws-1.png (sibling). Exercises §6.6 (Grid) and §6.7 (Hierarchy)
-# of ../docs/BEST_PRACTICE_DIAGRAMS.md.
+# Mirrors aws-1.png (sibling).
 
 canvas:   1280 x 680
 
