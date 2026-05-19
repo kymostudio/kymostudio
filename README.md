@@ -41,11 +41,11 @@ A browser/Node port of the shared **data model + icon library** (the DSL
 parser, layout engine and SVG renderer remain Python-only):
 
 ```bash
-npm install kymo
+npm install kymostudio
 ```
 
 ```js
-import { makeComponent, makeEdge, anchor, ICONS, getIcon } from "kymo";
+import { makeComponent, makeEdge, anchor, ICONS, getIcon } from "kymostudio";
 ```
 
 ## License
