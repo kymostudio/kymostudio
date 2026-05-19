@@ -1,0 +1,16 @@
+# Variant of cluster_inline using curved edges (cubic Bezier with
+# horizontal tangents). Same layout topology — parent fan-out into 2
+# children inside a vertical cluster — but the line shape is curve so
+# trunk_offset doesn't apply (only elbow uses lane assignment).
+parent hex/hex-agent/green
+a      hex/hex-agent/green
+b      hex/hex-agent/green
+
+services cluster "Services" vertical {
+  a b
+}
+
+layout { parent | services }
+
+parent --> a { curve }
+parent --> b { curve }

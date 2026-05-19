@@ -1,0 +1,15 @@
+# Cluster region with explicit `vertical` direction inlines into the layout
+# tree — layout references the cluster id, region declares membership +
+# direction, no duplication of leaf ids.
+parent hex/hex-agent/green
+a      hex/hex-agent/green
+b      hex/hex-agent/green
+
+services cluster "Services" vertical {
+  a b
+}
+
+layout { parent | services }
+
+parent --> a
+parent --> b

@@ -1,0 +1,20 @@
+{
+  "name": "axo",
+  "version": "0.1.0",
+  "description": "Diagram-as-code DSL — browser/Node port mirroring the Python source-of-truth at src/python/",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "src/js/index.js",
+  "exports": {
+    ".": "./src/js/index.js",
+    "./icons-manifest.json": "./icons-manifest.json"
+  },
+  "scripts": {
+    "build-manifest": "node scripts/build-manifest.mjs",
+    "test": "node --test tests/js/"
+  },
+  "files": [
+    "src/js/",
+    "icons-manifest.json"
+  ]
+}

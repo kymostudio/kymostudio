@@ -1,0 +1,11 @@
+# 1 src → 3 dsts (all on the right). Each arrow should be distinct.
+src hex/hex-agent/green
+d1  hex/hex-agent/green
+d2  hex/hex-agent/green
+d3  hex/hex-agent/green
+
+layout { src | { d1 , d2 , d3 } }
+
+src --> d1
+src --> d2
+src --> d3

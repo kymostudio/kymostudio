@@ -1,0 +1,14 @@
+# `{ shared }` flag: every edge opts out of fan-out port distribution
+# → all 3 arrows depart from orch's centre right port, forming a
+# star-fan from one point. Best for straight lines emanating from a
+# single source.
+orch hex/hex-agent/green
+a    hex/hex-agent/green
+b    hex/hex-agent/green
+c    hex/hex-agent/green
+
+layout { orch | { a , b , c } }
+
+orch --> a { straight, shared }
+orch --> b { straight, shared }
+orch --> c { straight, shared }

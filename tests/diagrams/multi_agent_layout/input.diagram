@@ -1,0 +1,8 @@
+orch hex/hex-agent/green
+a1   hex/hex-agent/green
+a2   hex/hex-agent/green
+
+layout { orch | { a1, a2 } }
+
+orch --> a1
+orch --> a2
