@@ -116,8 +116,8 @@ wheels = [
 ]
 
 [[package]]
-name = "kymo"
-version = "0.1.0"
+name = "kymostudio"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "cairosvg" },

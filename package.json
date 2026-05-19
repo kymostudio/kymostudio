@@ -1,6 +1,6 @@
 {
   "name": "kymostudio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Diagram-as-code DSL — browser/Node port (data model + icon library) mirroring the Python source-of-truth at src/python/kymo/",
   "type": "module",
   "license": "Apache-2.0",

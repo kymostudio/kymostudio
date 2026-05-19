@@ -7,9 +7,9 @@ Diagram-as-code DSL — declarative architecture diagrams to **animated SVG / We
 ## Install
 
 ```bash
-pip install kymo
+pip install kymostudio
 # or
-uv tool install kymo
+uv tool install kymostudio
 ```
 
 ## Usage

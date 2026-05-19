@@ -18,7 +18,7 @@ from .layout import layout
 from .model import Component, Diagram, Edge, Region
 from .to_svg import render
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "parse",
