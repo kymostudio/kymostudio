@@ -6,13 +6,13 @@
   "license": "Apache-2.0",
   "author": "rain1024",
   "keywords": ["diagram", "diagram-as-code", "svg", "architecture", "icons"],
-  "homepage": "https://github.com/rain1024/kymo#readme",
+  "homepage": "https://github.com/kymostudio/kymostudio#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rain1024/kymo.git"
+    "url": "git+https://github.com/kymostudio/kymostudio.git"
   },
   "bugs": {
-    "url": "https://github.com/rain1024/kymo/issues"
+    "url": "https://github.com/kymostudio/kymostudio/issues"
   },
   "main": "src/js/index.js",
   "exports": {

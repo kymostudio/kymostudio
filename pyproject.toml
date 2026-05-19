@@ -23,9 +23,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rain1024/kymo"
-Repository = "https://github.com/rain1024/kymo"
-Issues = "https://github.com/rain1024/kymo/issues"
+Homepage = "https://github.com/kymostudio/kymostudio"
+Repository = "https://github.com/kymostudio/kymostudio"
+Issues = "https://github.com/kymostudio/kymostudio/issues"
 
 [project.optional-dependencies]
 webp = ["pillow>=10.0"]
