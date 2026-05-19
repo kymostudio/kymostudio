@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from dsl import (
+from kymo.dsl import (
     _inline_region_leaves,
     _parse_layout_tree,
     parse,

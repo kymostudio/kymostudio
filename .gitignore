@@ -5,6 +5,9 @@ __pycache__/
 # transient build artefacts
 out/
 tmp/
+dist/
+*.egg-info/
+node_modules/
 # transient screenshots from validation runs
 samples/_*.jpeg
 samples/_*.png

@@ -5,7 +5,7 @@ output matches the committed golden byte-for-byte.
 
 When something changes the renderer on purpose, regenerate goldens:
 
-    AXO_UPDATE_GOLDEN=1 uv run pytest tests/test_diagrams.py
+    KYMO_UPDATE_GOLDEN=1 uv run pytest tests/test_diagrams.py
 """
 from __future__ import annotations
 
@@ -14,14 +14,14 @@ from pathlib import Path
 
 import pytest
 
-from alignment import resolve_alignments
-from dsl import parse as parse_dsl
-from layout import layout as apply_grid_layout
-from to_svg import render
+from kymo.alignment import resolve_alignments
+from kymo.dsl import parse as parse_dsl
+from kymo.layout import layout as apply_grid_layout
+from kymo.to_svg import render
 
 
 CASES_DIR = Path(__file__).parent.parent / "diagrams"
-UPDATE = os.environ.get("AXO_UPDATE_GOLDEN") == "1"
+UPDATE = os.environ.get("KYMO_UPDATE_GOLDEN") == "1"
 
 
 def _discover_cases() -> list[str]:
@@ -49,5 +49,5 @@ def test_diagram_matches_golden(case: str) -> None:
     expected = golden_path.read_text(encoding="utf-8")
     assert actual == expected, (
         f"Rendered SVG for {case!r} differs from {golden_path.name}.\n"
-        f"Re-run with AXO_UPDATE_GOLDEN=1 if the change is intentional."
+        f"Re-run with KYMO_UPDATE_GOLDEN=1 if the change is intentional."
     )

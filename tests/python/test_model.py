@@ -1,7 +1,7 @@
 """Model helpers: resolve_anchors geometry pick + Component.anchor sides."""
 from __future__ import annotations
 
-from model import Component, Edge, resolve_anchors
+from kymo.model import Component, Edge, resolve_anchors
 
 
 def _c(x: int, y: int, shape: str = "image") -> Component:

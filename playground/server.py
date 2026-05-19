@@ -1,4 +1,4 @@
-"""axo showcase + playground — single-file HTTP server.
+"""kymo showcase + playground — single-file HTTP server.
 
 Serves both the static landing page (`showcase/index.html`) at `/` and
 the interactive playground at `/play`. The playground auto-renders the
@@ -35,7 +35,7 @@ HTML = r"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>axo playground</title>
+<title>kymo playground</title>
 <style>
   :root {
     --bg: #0d1117;
@@ -102,7 +102,7 @@ HTML = r"""<!doctype html>
 </head>
 <body>
 <header>
-  <span class="title">axo</span>
+  <span class="title">kymo</span>
   <span class="tag">playground</span>
   <select class="btn" id="examples" title="Load example">
     <option value="">examples…</option>
@@ -128,7 +128,7 @@ const status = document.getElementById('status');
 const copyBtn = document.getElementById('copy');
 const examplesSel = document.getElementById('examples');
 
-const DEFAULT = `# axo playground — edit on the left, see the SVG on the right.
+const DEFAULT = `# kymo playground — edit on the left, see the SVG on the right.
 # URL updates with each edit so links stay shareable.
 
 orch hex/hex-agent/green
@@ -281,7 +281,7 @@ def load_example(name: str) -> str | None:
 
 # ── HTTP handler ──────────────────────────────────────────────────────
 class Handler(BaseHTTPRequestHandler):
-    server_version = "axo-playground/0.1"
+    server_version = "kymo-playground/0.1"
 
     def log_message(self, fmt, *args):  # quieter logs
         sys.stderr.write(f"  {self.address_string()} {fmt % args}\n")
@@ -380,13 +380,13 @@ class Handler(BaseHTTPRequestHandler):
 
 # ── Entry point ───────────────────────────────────────────────────────
 def main() -> None:
-    ap = argparse.ArgumentParser(description="axo playground")
+    ap = argparse.ArgumentParser(description="kymo playground")
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--host", default="127.0.0.1")
     args = ap.parse_args()
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)
-    print(f"axo playground → http://{args.host}:{args.port}")
+    print(f"kymo playground → http://{args.host}:{args.port}")
     print(f"  {len(list_examples())} examples available")
     try:
         server.serve_forever()

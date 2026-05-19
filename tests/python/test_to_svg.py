@@ -1,8 +1,8 @@
 """SVG renderer: route_edge Z-shape, no-arrow rendering."""
 from __future__ import annotations
 
-from model import Component, Diagram, Edge
-from to_svg import render, route_edge
+from kymo.model import Component, Diagram, Edge
+from kymo.to_svg import render, route_edge
 
 
 def _c(cid: str, x: int, y: int, shape: str = "image") -> Component:

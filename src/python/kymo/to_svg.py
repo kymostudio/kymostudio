@@ -9,8 +9,8 @@ from __future__ import annotations
 import re
 from html import escape as _xml_escape
 
-from icons import ICONS, get_icon
-from model import Component, Diagram, Edge, Region, resolve_anchors
+from .icons import ICONS, get_icon
+from .model import Component, Diagram, Edge, Region, resolve_anchors
 
 
 _WS_RE = re.compile(r"\s+")
@@ -572,7 +572,7 @@ def component_svg_snippet(c: Component) -> str:
 
     Width = icon.w; height = icon.h + label_band. The component is
     centered horizontally; the icon sits at y=hh (top of icon at 0)."""
-    from model import LABEL_HEIGHT
+    from .model import LABEL_HEIGHT
     hw, hh = c.half
     label_h = LABEL_HEIGHT.get(c.shape, 0) if (c.name or c.subtitle) else 0
     w = 2 * hw

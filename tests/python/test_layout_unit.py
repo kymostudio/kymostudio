@@ -1,8 +1,8 @@
 """apply_layout_tree: Figma-style auto-layout with padding-aware groups."""
 from __future__ import annotations
 
-from layout import apply_layout_tree
-from model import Component
+from kymo.layout import apply_layout_tree
+from kymo.model import Component
 
 
 def _c(cid: str, shape: str = "image") -> Component:

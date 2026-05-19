@@ -1,9 +1,19 @@
 {
-  "name": "axo",
+  "name": "kymo",
   "version": "0.1.0",
-  "description": "Diagram-as-code DSL — browser/Node port mirroring the Python source-of-truth at src/python/",
+  "description": "Diagram-as-code DSL — browser/Node port (data model + icon library) mirroring the Python source-of-truth at src/python/kymo/",
   "type": "module",
   "license": "Apache-2.0",
+  "author": "rain1024",
+  "keywords": ["diagram", "diagram-as-code", "svg", "architecture", "icons"],
+  "homepage": "https://github.com/rain1024/kymo#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rain1024/kymo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rain1024/kymo/issues"
+  },
   "main": "src/js/index.js",
   "exports": {
     ".": "./src/js/index.js",

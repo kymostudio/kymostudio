@@ -1,4 +1,4 @@
-# axo
+# kymo
 
 Diagram-as-code DSL — declarative architecture diagrams to **animated SVG / WebP**.
 
@@ -7,17 +7,46 @@ Diagram-as-code DSL — declarative architecture diagrams to **animated SVG / We
 ## Install
 
 ```bash
-uv tool install git+https://github.com/rain1024/axo
+pip install kymo
+# or
+uv tool install kymo
 ```
 
 ## Usage
 
 ```bash
-axo path/to/diagram.diagram             # → path/to/diagram.svg
-axo path/to/diagram.diagram --animate   # → path/to/diagram-animated.svg
+kymo path/to/diagram.diagram             # → path/to/diagram.svg
+kymo path/to/diagram.diagram --animate   # → path/to/diagram-animated.svg
+kymo path/to/diagram.diagram --figma     # → path/to/diagram.figma.js
+kymo path/to/diagram.diagram --excalidraw # → path/to/diagram.excalidraw
 ```
 
 See [`samples/`](./samples/) for complete example `.diagram` files.
+
+### Python API
+
+```python
+from kymo import parse, layout, resolve_alignments, render
+
+diagram, layout_spec, external = parse(open("diagram.diagram").read())
+if layout_spec:
+    layout(diagram, layout_spec, external)
+resolve_alignments(diagram)
+svg = render(diagram, animate=True)
+```
+
+## JavaScript / npm
+
+A browser/Node port of the shared **data model + icon library** (the DSL
+parser, layout engine and SVG renderer remain Python-only):
+
+```bash
+npm install kymo
+```
+
+```js
+import { makeComponent, makeEdge, anchor, ICONS, getIcon } from "kymo";
+```
 
 ## License
 

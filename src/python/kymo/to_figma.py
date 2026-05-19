@@ -31,8 +31,8 @@ from __future__ import annotations
 
 import json
 
-from model import Component, Diagram, Edge, Region
-from to_svg import component_svg_snippet, route_edge
+from .model import Component, Diagram, Edge, Region
+from .to_svg import component_svg_snippet, route_edge
 
 
 # ── Palette (Figma 0..1 normalised RGB) ────────────────────────────────
@@ -203,8 +203,8 @@ def _render_hybrid(d: Diagram) -> str:
         tree_leaves.update(_collect_leaves(t))
 
     out: list[str] = []
-    title_lit = repr(d.title or "axo-diagram")
-    out.append(f"""// axo diagram → Figma Plugin API (hybrid auto-layout)
+    title_lit = repr(d.title or "kymo-diagram")
+    out.append(f"""// kymo diagram → Figma Plugin API (hybrid auto-layout)
 // Pass as `code` to the use_figma MCP tool, OR paste into
 // Figma → Plugins menu → Development → Open console.
 
@@ -277,8 +277,8 @@ const {var} = figma.createNodeFromSvg({_jstr(snippet)})
 
 def _render_flat(d: Diagram) -> str:
     out: list[str] = []
-    title_lit = repr(d.title or "axo-diagram")
-    out.append(f"""// axo diagram → Figma Plugin API (flat)
+    title_lit = repr(d.title or "kymo-diagram")
+    out.append(f"""// kymo diagram → Figma Plugin API (flat)
 // Pass as `code` to the use_figma MCP tool, OR paste into
 // Figma → Plugins menu → Development → Open console.
 

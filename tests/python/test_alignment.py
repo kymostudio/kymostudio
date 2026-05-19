@@ -1,8 +1,8 @@
 """Alignment passes: snap to grid, stagger fan-in, auto-size canvas."""
 from __future__ import annotations
 
-from alignment import _auto_size_canvas, _snap_to_grid, _stagger_fanin_edges
-from model import Component, Diagram, Edge
+from kymo.alignment import _auto_size_canvas, _snap_to_grid, _stagger_fanin_edges
+from kymo.model import Component, Diagram, Edge
 
 
 def _c(cid: str, x: int, y: int, shape: str = "image") -> Component:

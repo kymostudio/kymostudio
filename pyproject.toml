@@ -1,14 +1,37 @@
 [project]
-name = "axo"
+name = "kymo"
 version = "0.1.0"
 description = "Diagram-as-code DSL — declarative architecture diagrams to animated SVG/WebP"
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.13"
+authors = [
+    { name = "rain1024", email = "brother.rain.1024@gmail.com" },
+]
+keywords = ["diagram", "diagram-as-code", "svg", "architecture", "dsl", "animation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Multimedia :: Graphics :: Presentation",
+    "Topic :: Software Development :: Documentation",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = [
     "cairosvg>=2.9.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/rain1024/kymo"
+Repository = "https://github.com/rain1024/kymo"
+Issues = "https://github.com/rain1024/kymo/issues"
+
+[project.optional-dependencies]
+webp = ["pillow>=10.0"]
+
+[project.scripts]
+kymo = "kymo.cli:main"
 
 [dependency-groups]
 dev = [
@@ -19,15 +42,9 @@ dev = [
 testpaths = ["tests/python"]
 pythonpath = ["src/python"]
 
-[project.scripts]
-axo = "cli:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-include = ["src/python/*.py"]
-
-[tool.hatch.build.targets.wheel.sources]
-"src/python" = ""
+packages = ["src/python/kymo"]

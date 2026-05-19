@@ -1,13 +1,13 @@
-"""Entry point: `axo <path> [--animate] [--figma] [--excalidraw]`
+"""Entry point: `kymo <path> [--animate] [--figma] [--excalidraw]`
 
 Argument is a path to a `.diagram` (DSL) or `.py` (Python form) source.
 Output is a SVG (or Figma Plugin JS / Excalidraw scene) written next to
 the input file:
 
-    axo samples/aws_1.diagram                → samples/aws_1.svg
-    axo samples/aws_1.diagram --animate      → samples/aws_1-animated.svg
-    axo samples/aws_1.diagram --figma        → samples/aws_1.figma.js
-    axo samples/aws_1.diagram --excalidraw   → samples/aws_1.excalidraw
+    kymo samples/aws_1.diagram                → samples/aws_1.svg
+    kymo samples/aws_1.diagram --animate      → samples/aws_1-animated.svg
+    kymo samples/aws_1.diagram --figma        → samples/aws_1.figma.js
+    kymo samples/aws_1.diagram --excalidraw   → samples/aws_1.excalidraw
 
 `--animate` emits a `-animated.svg` companion with flowing edge dashes
 (CSS `stroke-dashoffset` animation). Static SVG (no JS); animation runs
@@ -24,12 +24,12 @@ import sys
 from importlib import import_module
 from pathlib import Path
 
-from alignment import resolve_alignments
-from dsl import parse as parse_dsl
-from layout import layout
-from to_excalidraw import render as render_excalidraw
-from to_figma import render as render_figma
-from to_svg import render
+from .alignment import resolve_alignments
+from .dsl import parse as parse_dsl
+from .layout import layout
+from .to_excalidraw import render as render_excalidraw
+from .to_figma import render as render_figma
+from .to_svg import render
 
 
 def load(source: Path) -> tuple[object, object | None, object | None]:

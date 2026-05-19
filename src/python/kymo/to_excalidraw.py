@@ -33,9 +33,9 @@ import json
 
 import cairosvg
 
-from icons import ICONS
-from model import SHAPE_HALF, Component, Diagram, Edge, Region
-from to_svg import route_edge
+from .icons import ICONS
+from .model import SHAPE_HALF, Component, Diagram, Edge, Region
+from .to_svg import route_edge
 
 
 # ── Palette (Excalidraw uses CSS hex strings) ─────────────────────────
@@ -229,7 +229,7 @@ _bound_arrows: dict[str, list[str]] = {}
 
 def _eid() -> str:
     _ids[0] += 1
-    return f"axo-{_ids[0]}"
+    return f"kymo-{_ids[0]}"
 
 
 def _seed() -> int:

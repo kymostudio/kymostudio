@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import re
 
-from model import Component, Diagram, Edge, Region
+from .model import Component, Diagram, Edge, Region
 
 
 # ── Top-level directives (file scope only) ────────────────────────────
@@ -150,7 +150,7 @@ class _State:
             layout_trees=self.layout_trees,
         )
         if self.layout_trees:
-            from layout import apply_layout_tree, minimize_crossings
+            from .layout import apply_layout_tree, minimize_crossings
             by_id = {c.id: c for c in self.components}
             regions_by_id = {r.id: r for r in self.regions}
             edge_pairs = [(e.src, e.dst) for e in self.edges]

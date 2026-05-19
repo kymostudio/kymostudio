@@ -23,7 +23,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from model import Component, Diagram, Edge, LABEL_HEIGHT, SHAPE_HALF, resolve_anchors
+from .model import Component, Diagram, Edge, LABEL_HEIGHT, SHAPE_HALF, resolve_anchors
 
 
 # ── Sizing ─────────────────────────────────────────────────────────────
