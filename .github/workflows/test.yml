@@ -35,5 +35,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Install deps
+        run: npm ci
       - name: Run tests
-        run: npm test
+        run: npm test   # builds TS to dist/, then `node --test`
