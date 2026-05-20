@@ -1,11 +1,17 @@
 {
   "name": "kymostudio",
   "version": "0.1.1",
-  "description": "Diagram-as-code DSL — browser/Node port (data model + icon library) mirroring the Python source-of-truth at packages/python/src/kymo/",
+  "description": "Diagram-as-code DSL — browser/Node port (data model, icon library + SVG renderer) mirroring the Python source-of-truth at packages/python/src/kymo/",
   "type": "module",
   "license": "Apache-2.0",
   "author": "rain1024",
-  "keywords": ["diagram", "diagram-as-code", "svg", "architecture", "icons"],
+  "keywords": [
+    "diagram",
+    "diagram-as-code",
+    "svg",
+    "architecture",
+    "icons"
+  ],
   "homepage": "https://github.com/kymostudio/kymostudio#readme",
   "repository": {
     "type": "git",
@@ -15,17 +21,28 @@
   "bugs": {
     "url": "https://github.com/kymostudio/kymostudio/issues"
   },
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
-    ".": "./src/index.js",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "./icons-manifest.json": "./icons-manifest.json"
   },
   "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "build-manifest": "node scripts/build-manifest.mjs",
-    "test": "node --test"
+    "prepack": "npm run build",
+    "test": "npm run build && node --test"
   },
   "files": [
-    "src/",
+    "dist/",
     "icons-manifest.json"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3"
+  }
 }

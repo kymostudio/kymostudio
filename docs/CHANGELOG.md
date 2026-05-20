@@ -9,7 +9,19 @@ packages share a version number.
 
 ## [Unreleased]
 
+### Added
+
+- **`renderSVG(diagram)`** in the JS/TS package — a standalone SVG renderer
+  (background, cubic-Bézier edges with arrowheads, icon glyphs + labels, and
+  auto-computed canvas bounds). It is an original TypeScript implementation,
+  not a port of the Python renderer.
+
 ### Changed
+
+- **`packages/js` migrated to TypeScript.** `model`, `icons-builtin`,
+  `icons-loader` and `index` are now `.ts`; the package compiles with `tsc`
+  to `dist/` (JS + `.d.ts`) and publishes type declarations. `main`/`exports`
+  point at `dist/`, and the npm release workflow builds before publishing.
 
 - **Monorepo restructure** mirroring [Remotion](https://github.com/remotion-dev/remotion):
   the two publishable libraries now live under `packages/`.

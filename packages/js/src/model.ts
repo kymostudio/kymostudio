@@ -1,13 +1,21 @@
 /**
- * Data model for the container diagram — JS mirror of `src/model.py`.
+ * Data model for the container diagram — JS mirror of
+ * `packages/python/src/kymo/model.py`.
  *
  * Components, regions and edges are plain object literals (no classes).
  * `anchor(node, side)` and `resolveAnchors(edge, src, dst)` mimic the
  * Python implementations 1:1.
  */
 
-/** @type {Record<string, [number, number]>} */
-export const SHAPE_HALF = {
+export type Point = [number, number];
+
+export type Shape =
+  | "circle" | "cube" | "cube-big" | "box" | "cylinder" | "hex"
+  | "annotation" | "aws-tile" | "aws-tile-hero" | "badge" | "image";
+
+export type Side = "top" | "right" | "bottom" | "left" | "center";
+
+export const SHAPE_HALF: Record<Shape, Point> = {
   "circle":        [38, 38],
   "cube":          [40, 40],
   "cube-big":      [50, 50],
@@ -21,8 +29,7 @@ export const SHAPE_HALF = {
   "image":         [32, 32],
 };
 
-/** @type {Record<string, number>} */
-export const LABEL_HEIGHT = {
+export const LABEL_HEIGHT: Record<Shape, number> = {
   "circle":        38,
   "cube":          42,
   "cube-big":      48,
@@ -36,13 +43,87 @@ export const LABEL_HEIGHT = {
   "image":         26,
 };
 
+// ── Types ─────────────────────────────────────────────────────────────
+
+export interface Component {
+  id: string;
+  name: string;
+  subtitle: string;
+  icon: string;
+  shape: Shape;
+  accent: string;
+  pos: Point;
+  parent: string | null;
+  align: string | null;
+  alignGap: number;
+  alignOffset: Point;
+}
+
+export type RegionStyle = "outer" | "inner" | string;
+
+export interface Region {
+  id: string;
+  label: string;
+  bounds: [number, number, number, number];
+  contains: string[];
+  padding: [number, number];
+  paddingBottom: number | null;
+  style: RegionStyle;
+  icon: string | null;
+  layout: unknown;
+  pos: Point | null;
+  gap: number;
+  align: string;
+  visible: boolean;
+  borderDash: string | null;
+  borderStroke: string | null;
+  labelAnchor: string;
+  labelPosition: string | null;
+}
+
+export interface Edge {
+  src: string;
+  dst: string;
+  label: string;
+  style: string;
+  srcAnchor: Side | null;
+  dstAnchor: Side | null;
+  route: string;
+  via: Point[];
+  srcOffset: Point;
+  dstOffset: Point;
+  labelOffset: Point;
+  labelAnchor: string;
+  labelSmall: boolean;
+  labelPos: Point | null;
+  dashed: boolean;
+  noArrow: boolean;
+  trunkOffset: number;
+  sharedPort: boolean;
+}
+
+export interface Diagram {
+  width: number;
+  height: number;
+  title: string;
+  subtitle: string;
+  components: Component[];
+  regions: Region[];
+  edges: Edge[];
+  layoutTrees: unknown[];
+}
+
 // ── Factories (mirror Python @dataclass with defaults) ────────────────
 
 export function makeComponent({
   id, name = "", subtitle = "", icon = "", shape = "box", accent = "green",
   pos = [0, 0],
   parent = null, align = null, alignGap = 24, alignOffset = [0, 0],
-}) {
+}: {
+  id: string; name?: string; subtitle?: string; icon?: string;
+  shape?: Shape; accent?: string; pos?: Point;
+  parent?: string | null; align?: string | null; alignGap?: number; alignOffset?: Point;
+}): Component {
   return {
     id, name, subtitle, icon, shape, accent, pos,
     parent, align, alignGap, alignOffset,
@@ -55,7 +136,13 @@ export function makeRegion({
   icon = null, layout = null, pos = null, gap = 24, align = "center",
   visible = true, borderDash = null, borderStroke = null,
   labelAnchor = "middle", labelPosition = null,
-}) {
+}: {
+  id: string; label?: string; bounds?: [number, number, number, number]; contains?: string[];
+  padding?: [number, number]; paddingBottom?: number | null; style?: RegionStyle;
+  icon?: string | null; layout?: unknown; pos?: Point | null; gap?: number; align?: string;
+  visible?: boolean; borderDash?: string | null; borderStroke?: string | null;
+  labelAnchor?: string; labelPosition?: string | null;
+}): Region {
   return {
     id, label, bounds, contains, padding, paddingBottom, style, icon,
     layout, pos, gap, align, visible, borderDash, borderStroke,
@@ -72,7 +159,16 @@ export function makeEdge({
   labelSmall = false, labelPos = null,
   dashed = false, noArrow = false,
   trunkOffset = 0, sharedPort = false,
-}) {
+}: {
+  src: string; dst: string; label?: string; style?: string;
+  srcAnchor?: Side | null; dstAnchor?: Side | null;
+  route?: string; via?: Point[];
+  srcOffset?: Point; dstOffset?: Point;
+  labelOffset?: Point; labelAnchor?: string;
+  labelSmall?: boolean; labelPos?: Point | null;
+  dashed?: boolean; noArrow?: boolean;
+  trunkOffset?: number; sharedPort?: boolean;
+}): Edge {
   return {
     src, dst, label, style, srcAnchor, dstAnchor, route, via,
     srcOffset, dstOffset, labelOffset, labelAnchor, labelSmall, labelPos,
@@ -83,17 +179,20 @@ export function makeEdge({
 export function makeDiagram({
   width = 0, height = 0, title = "", subtitle = "",
   components = [], regions = [], edges = [], layoutTrees = [],
-} = {}) {
+}: {
+  width?: number; height?: number; title?: string; subtitle?: string;
+  components?: Component[]; regions?: Region[]; edges?: Edge[]; layoutTrees?: unknown[];
+} = {}): Diagram {
   return { width, height, title, subtitle, components, regions, edges, layoutTrees };
 }
 
 // ── Lookups & geometry helpers ────────────────────────────────────────
 
-export function componentHalf(c) {
+export function componentHalf(c: Component): Point {
   return SHAPE_HALF[c.shape];
 }
 
-export function regionHalf(r) {
+export function regionHalf(r: Region): Point {
   const [, , w, h] = r.bounds;
   return [(w / 2) | 0, (h / 2) | 0];
 }
@@ -103,16 +202,15 @@ export function regionHalf(r) {
  * For a Component, `bottom` pushes past `LABEL_HEIGHT` when the
  * component actually has a name or subtitle.
  */
-export function anchor(node, side) {
-  // Region path — has `bounds`, no `pos`.
-  if (node.bounds !== undefined && node.pos === undefined) {
+export function anchor(node: Component | Region, side: Side): Point {
+  // Region path — has `bounds`, no `pos`-as-Point.
+  if ("bounds" in node) {
     return regionAnchor(node, side);
   }
-  // Component path — has `pos`.
   return componentAnchor(node, side);
 }
 
-function componentAnchor(c, side) {
+function componentAnchor(c: Component, side: Side): Point {
   const [cx, cy] = c.pos;
   const [hw, hh] = SHAPE_HALF[c.shape];
   const labelled = (c.name && c.name.length > 0) || (c.subtitle && c.subtitle.length > 0);
@@ -127,7 +225,7 @@ function componentAnchor(c, side) {
   throw new Error(`anchor: bad side ${side}`);
 }
 
-function regionAnchor(r, side) {
+function regionAnchor(r: Region, side: Side): Point {
   const [x, y, w, h] = r.bounds;
   switch (side) {
     case "top":    return [x + ((w / 2) | 0), y];
@@ -144,33 +242,33 @@ function regionAnchor(r, side) {
  * filled from geometry: horizontal-biased — vertical wins only when
  * `|dy| > 2·|dx|`.
  */
-export function resolveAnchors(e, src, dst) {
-  let { srcAnchor: sa, dstAnchor: da } = e;
+export function resolveAnchors(e: Edge, src: Component | Region, dst: Component | Region): [Side, Side] {
+  const { srcAnchor: sa, dstAnchor: da } = e;
   if (sa !== null && da !== null) return [sa, da];
   const [scx, scy] = anchor(src, "center");
   const [dcx, dcy] = anchor(dst, "center");
   const dx = dcx - scx, dy = dcy - scy;
-  let autoSa, autoDa;
+  let autoSa: Side, autoDa: Side;
   if (Math.abs(dy) > 2 * Math.abs(dx)) {
-    [autoSa, autoDa] = dy >= 0 ? ["bottom", "top"] : ["top", "bottom"];
+    [autoSa, autoDa] = dy >= 0 ? (["bottom", "top"] as const) : (["top", "bottom"] as const);
   } else {
-    [autoSa, autoDa] = dx >= 0 ? ["right", "left"] : ["left", "right"];
+    [autoSa, autoDa] = dx >= 0 ? (["right", "left"] as const) : (["left", "right"] as const);
   }
-  return [sa || autoSa, da || autoDa];
+  return [sa ?? autoSa, da ?? autoDa];
 }
 
 // ── Diagram node lookups ──────────────────────────────────────────────
 
-export function getComponent(d, id) {
-  const c = d.components.find(c => c.id === id);
+export function getComponent(d: Diagram, id: string): Component {
+  const c = d.components.find((c) => c.id === id);
   if (!c) throw new Error(`component ${JSON.stringify(id)} not in diagram`);
   return c;
 }
 
-export function getNode(d, id) {
-  const c = d.components.find(c => c.id === id);
+export function getNode(d: Diagram, id: string): Component | Region {
+  const c = d.components.find((c) => c.id === id);
   if (c) return c;
-  const r = d.regions.find(r => r.id === id);
+  const r = d.regions.find((r) => r.id === id);
   if (r) return r;
   throw new Error(`node ${JSON.stringify(id)} not in diagram (checked components + regions)`);
 }

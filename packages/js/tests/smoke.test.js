@@ -1,6 +1,6 @@
 /**
- * Smoke tests for the public entry point. Keep these dependency-free so
- * `node --test tests/` runs them with no build step.
+ * Smoke tests for the public entry point. Run via `npm test`, which builds
+ * the TypeScript sources to dist/ first, so these import the built output.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -11,7 +11,7 @@ import {
   makeComponent,
   makeEdge,
   anchor,
-} from "../src/index.js";
+} from "../dist/index.js";
 
 test("model + icon exports are wired up", () => {
   assert.equal(typeof makeComponent, "function");
