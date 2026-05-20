@@ -1,0 +1,15 @@
+The *.bpmn files in this directory are a curated subset of the BPMN Model
+Interchange Working Group (BPMN MIWG) test suite, used here as read-only
+render-regression fixtures.
+
+Source:  https://github.com/bpmn-miwg/bpmn-miwg-test-suite
+Commit:  cb2629519cee6280ab521f99dc46a9815a221a35
+License: see the upstream repository (OMG BPMN MIWG).
+
+They are real BPMN 2.0 exports from ~35 modeling tools (filename =
+<source>_<case>-<export|roundtrip>). Each is paired with an expected kymo
+render snapshot in baseline.json; the full 840-file baseline is in
+baseline_full.json (used by the nightly CI sweep). To refresh after an
+intentional renderer change:
+
+    KYMO_UPDATE_BPMN_BASELINE=1 uv run --group dev python -m pytest tests/test_bpmn_corpus.py

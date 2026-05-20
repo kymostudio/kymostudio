@@ -1,0 +1,5882 @@
+{
+ "ADONIS_17.0_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "124ef93a24bd",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "494d6d4e6898",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "362c31b6a4bc",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "0c4aa8514ad3",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "31098f970640",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "7a1b4ad811d6",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "d29d0ee981bc",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "27e324f41aa0",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "1b1651aaacf6",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "0bee698ce5ef",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "086d55307fee",
+  "status": "ok"
+ },
+ "ADONIS_17.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "f2de603540de",
+  "status": "ok"
+ },
+ "ADONIS_17.0_B.1.0-export": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 30,
+  "sha": "061893b1ff51",
+  "status": "ok"
+ },
+ "ADONIS_17.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 27,
+  "sha": "e5a46044876f",
+  "status": "ok"
+ },
+ "ADONIS_17.0_B.2.0-export": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 92,
+  "sha": "2e4810f52fe1",
+  "status": "ok"
+ },
+ "ADONIS_17.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 89,
+  "sha": "c676737f0475",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.1.0-export": {
+  "err": "",
+  "n_edges": 23,
+  "n_nodes": 21,
+  "sha": "e46a8f06d18e",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "40bf49dfdb8a",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "9367ef57684b",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "b17ac3e815ce",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "8a9f98e38c51",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 27,
+  "n_nodes": 28,
+  "sha": "d45725897478",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 13,
+  "sha": "ebc7f2ff12a8",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 13,
+  "sha": "4f7d1aa27dad",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.4.0-export": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 24,
+  "sha": "17ff99fb1291",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 24,
+  "sha": "97393311533d",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.5.0-export": {
+  "err": "",
+  "n_edges": 64,
+  "n_nodes": 46,
+  "sha": "1a5de5fc409f",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "ab79588224d2",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "2c7ffed1137d",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "9e50ea90ac63",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.7.0-export": {
+  "err": "",
+  "n_edges": 19,
+  "n_nodes": 16,
+  "sha": "1ed454d4f5e4",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "254b826b68e3",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "6ec19500f2a1",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "30a00a60b7b3",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.8.1-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "4d6c97c6c6d0",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "8296b315a6de",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.9.0-export": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "e1120f753f84",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.9.0-roundtrip": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "13c90e1d779a",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.9.1-export": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "202bf1950092",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.9.1-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "994d96024da6",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.9.2-export": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "42357dc1a4d7",
+  "status": "ok"
+ },
+ "ADONIS_17.0_C.9.2-roundtrip": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "d26f4be1ab63",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "5b5d77aea347",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "aa8f82aad357",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "0405c7fd4422",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "8f98b654d361",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "4d17af374758",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "99f2b29e0f41",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "e2b0e0c9f0ac",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "93152c5a175b",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "c284937c0a45",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "800756b8b293",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "ea19b98886ef",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "66e1e1a44b67",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_B.1.0-export": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "636196716219",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "d6b2a620b695",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_B.2.0-export": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "356825638fd6",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "bdfd251e940c",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "9fb77e33b08d",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "2b6a89f2ea9d",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "0609ddf8530c",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "e2cde23df54c",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "0f9d15f74c17",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "04cd0b203e9a",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "bb2a360de66b",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "0d7228595ea5",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.4.0-export": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "116bdf603842",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "7458a65eb4bd",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.5.0-export": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "13cf8f30bbb7",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "52634fcb6516",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "565795515cc3",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "c88b074c97c7",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.7.0-export": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "2808070bc03b",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "4f251dc467ef",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "17b279ebf92f",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "3551af388aed",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.8.1-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "0e5d886db774",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "cbb0a25f257a",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.9.0-export": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "69f0caa97a44",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.9.0-roundtrip": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "519f5585b69c",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.9.1-export": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "f689b52e8b5a",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.9.1-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "a7aa1103d800",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.9.2-export": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "a42b496f156f",
+  "status": "ok"
+ },
+ "ARIS_10.2025.07_C.9.2-roundtrip": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "cfa8c3634613",
+  "status": "ok"
+ },
+ "Activiti_Designer_5.14.1_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 6,
+  "sha": "9aac3cf35da3",
+  "status": "ok"
+ },
+ "Activiti_Designer_5.14.1_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "9176614023d5",
+  "status": "ok"
+ },
+ "Activiti_Designer_5.14.1_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 9,
+  "sha": "24c311a57dba",
+  "status": "ok"
+ },
+ "Activiti_Designer_5.14.1_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "54157c615540",
+  "status": "ok"
+ },
+ "Activiti_Designer_5.14.1_A.3.0-export": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 9,
+  "sha": "50133fa4dd10",
+  "status": "ok"
+ },
+ "Activiti_Designer_5.14.1_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1da7bb05dd24",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "3113d4441b18",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "c3c197675436",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "a4f55600f25c",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "c07a0c59e176",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "e240505f5996",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "0f387fb5a851",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "0d9836745626",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "a231ed276e4e",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "b069588ed695",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "734367bbaf69",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_B.1.0-export": {
+  "err": "",
+  "n_edges": 27,
+  "n_nodes": 23,
+  "sha": "559f7567c611",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 23,
+  "sha": "81f5853777d6",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_B.2.0-export": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 88,
+  "sha": "6afc59dc23cc",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 79,
+  "n_nodes": 80,
+  "sha": "c5694a73847e",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "84c595f42564",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "ae078918bef0",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 10,
+  "sha": "19658ef845bc",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 10,
+  "n_nodes": 10,
+  "sha": "4e4b62d98b97",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "b9d147db7bad",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "6c116424ffd7",
+  "status": "ok"
+ },
+ "Aeneis_5.7.89.2400_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "256c6308d92a",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "51452466f415",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "7224d7d58cc5",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "1d9f09852ff6",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "4089db65f3a5",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "0b274ee0ce09",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "3ffefd52ee31",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "44040b95fee7",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "3f15f677c3ca",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.4.0-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 15,
+  "sha": "08deb1666d9d",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 3,
+  "n_nodes": 4,
+  "sha": "fa50066ef6e7",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.4.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 15,
+  "sha": "814ef7940804",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 15,
+  "sha": "cf3afb7ca9f4",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_B.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 27,
+  "sha": "c3e57465f2c7",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 25,
+  "sha": "966543a8921f",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 73,
+  "n_nodes": 82,
+  "sha": "99c440aa8178",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "08051b4cd568",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "fe479cdacd48",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "6d2f41bc47a6",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.2.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 26,
+  "sha": "96ebb0f5151a",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 26,
+  "sha": "d085f45f91a9",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "bf9a665f71df",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "542b1abdbc8b",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.4.0.1-export": {
+  "err": "",
+  "n_edges": 27,
+  "n_nodes": 24,
+  "sha": "c3554e05fe7d",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.4.0.2-export": {
+  "err": "",
+  "n_edges": 10,
+  "n_nodes": 10,
+  "sha": "6c18909da5e7",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.4.0.3-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 8,
+  "sha": "a74111e06a1f",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.4.0.4-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "051b28208f0d",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 59,
+  "n_nodes": 40,
+  "sha": "9ac2cdc5827e",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.5.0.1-export": {
+  "err": "",
+  "n_edges": 59,
+  "n_nodes": 40,
+  "sha": "f4ad1a8bc94d",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.5.0.2-export": {
+  "err": "",
+  "n_edges": 6,
+  "n_nodes": 6,
+  "sha": "777f0dc167ce",
+  "status": "ok"
+ },
+ "BIC_Cloud_Design_6.2.0_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 27,
+  "sha": "231b09195f75",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "6c98b83d68d6",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "8731275cc17c",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "6e7d2a4d2011",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "cb04cb69472d",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "49a0e20adcde",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "dcdb8854ed22",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1fefd21490f0",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "b99256059674",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "610fe9cb2e21",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "07d4ca8a9ce0",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "28d5901cc92a",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "3a1a855641db",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_B.1.0-export": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 27,
+  "sha": "270739829802",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 27,
+  "n_nodes": 25,
+  "sha": "24a0b8ca4ff4",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_B.2.0-export": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 90,
+  "sha": "489e1be50338",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 81,
+  "n_nodes": 83,
+  "sha": "86ed6c611551",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "cb56b88eb37d",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "46bf2fd8f588",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "bbcf968582e3",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "52731c32b23e",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "94b76a43d491",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "49a42e019260",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "2e5a1f681802",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "bdfa0157f83f",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-export.1": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 24,
+  "sha": "43118fcf7f46",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-export.2": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 10,
+  "sha": "1d7f6eb5e860",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-export.3": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "b402f47d28a4",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-export.4": {
+  "err": "",
+  "n_edges": 5,
+  "n_nodes": 5,
+  "sha": "4fc6c912ad27",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "27cfc7ebfa19",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.5.0-export.1": {
+  "err": "",
+  "n_edges": 6,
+  "n_nodes": 6,
+  "sha": "8bcaac57d1cf",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.5.0-export.2": {
+  "err": "",
+  "n_edges": 6,
+  "n_nodes": 6,
+  "sha": "c7d6f3b8eef2",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "3ca85fa96474",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "e7aece6d36c8",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "53904bbd5997",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.7.0-export": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "458c7199f69a",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "33bcf2fee6db",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "ecf41391bbca",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "80f2a4dca25a",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.8.1-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "3783624f16fb",
+  "status": "ok"
+ },
+ "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "92aee202754e",
+  "status": "ok"
+ },
+ "Bizagi_Modeler_2.8.0.8_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "6e4e790c5c6f",
+  "status": "ok"
+ },
+ "Bizagi_Modeler_2.8.0.8_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "ba520c34db4c",
+  "status": "ok"
+ },
+ "Bizagi_Modeler_2.8.0.8_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "85110a0b34c3",
+  "status": "ok"
+ },
+ "Bizagi_Modeler_2.8.0.8_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "f21f42ad25a1",
+  "status": "ok"
+ },
+ "Bizagi_Modeler_2.8.0.8_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "c6e86014f284",
+  "status": "ok"
+ },
+ "Bizagi_Modeler_2.8.0.8_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 31,
+  "sha": "8e036c0edaaa",
+  "status": "ok"
+ },
+ "Bizagi_Modeler_2.8.0.8_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 94,
+  "sha": "b733b4ada997",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "1dc0949c1546",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "026f07cff81d",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "1a896f5d130b",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "dd03ce689fc7",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "e02239db37c2",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "ef53c8c286ca",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.3.0-export": {
+  "err": "",
+  "n_edges": 6,
+  "n_nodes": 7,
+  "sha": "2d520757d5ac",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 9,
+  "sha": "d0a7b6068f6a",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.4.0-export": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 16,
+  "sha": "e8e1f395ee8e",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 17,
+  "sha": "ab7db0e46262",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 17,
+  "sha": "aeefe44c37fd",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 26,
+  "n_nodes": 29,
+  "sha": "8fc00d4e895f",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_B.2.0-export": {
+  "err": "",
+  "n_edges": 20,
+  "n_nodes": 20,
+  "sha": "d7c9589eb07f",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 81,
+  "n_nodes": 90,
+  "sha": "933e589a57bc",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_C.1.0-export": {
+  "err": "",
+  "n_edges": 20,
+  "n_nodes": 21,
+  "sha": "49477def5688",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 20,
+  "n_nodes": 21,
+  "sha": "14ca23259a11",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_C.1.1-export": {
+  "err": "",
+  "n_edges": 10,
+  "n_nodes": 10,
+  "sha": "4ecb9daaa929",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 10,
+  "n_nodes": 10,
+  "sha": "a53388b29025",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 29,
+  "sha": "bab194f3c224",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "cbe94d7ec4bb",
+  "status": "ok"
+ },
+ "Bonita_BPM_7.2.3_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "36d3895c909f",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "b9a1a56034df",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "9176614023d5",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "4e74078aa8df",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "54157c615540",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "142a0c58e0e9",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1da7bb05dd24",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.4.0-export": {
+  "err": "",
+  "n_edges": 3,
+  "n_nodes": 4,
+  "sha": "1a8d66e15a97",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "e71b809ae8f0",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.4.1-export": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "b18c85ae7bcb",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_B.1.0-export": {
+  "err": "",
+  "n_edges": 27,
+  "n_nodes": 25,
+  "sha": "78500990da78",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "3eba2fbb1580",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_B.2.0-export": {
+  "err": "",
+  "n_edges": 82,
+  "n_nodes": 83,
+  "sha": "58dc22cd9172",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 94,
+  "sha": "890fbc5a0b2d",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "ffa49ca24897",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "181e70aa880c",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "935edb416aab",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "759ed9a0dd90",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "99ecfb2c843a",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "d31cae3e178b",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "f25b3cde97af",
+  "status": "ok"
+ },
+ "Camunda_Eclipse_Plugin_3.0.0_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "540e55c5bdf7",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "1cd7c83826b4",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "2b3668ebe6d4",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "a79f31666691",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "4f1da303caa5",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "880e2f771d65",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "dc80fa988aa4",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "b320aaacd5e7",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "76c46b58f152",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "c321019cf6ca",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "23c77da087ca",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "16207d864b55",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "567c1110e71a",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "6da375e8bef5",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "c655f39a9b4b",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "75ed16682225",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "719dd9836f98",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.4.0-export": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "22dc6d8d59ae",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "ce5682f9909b",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.5.0-export": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 48,
+  "sha": "be240ec89c73",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "dc507702c7e8",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "27885b0288e5",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 34,
+  "n_nodes": 38,
+  "sha": "48875d041031",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.7.0-export": {
+  "err": "",
+  "n_edges": 19,
+  "n_nodes": 16,
+  "sha": "1fa276950952",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "b0b6a5c5c421",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "a0df5631de49",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.8.1-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "a0df5631de49",
+  "status": "ok"
+ },
+ "Cardanit_prev._BeePMN_4.9.1_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 16,
+  "sha": "9c6c5006a32e",
+  "status": "ok"
+ },
+ "Enterprise_Architect_12.0.1207_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "3ae6d2b59a22",
+  "status": "ok"
+ },
+ "Enterprise_Architect_12.0.1207_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "ad46fef58c37",
+  "status": "ok"
+ },
+ "Enterprise_Architect_12.0.1207_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "4214bd202b2b",
+  "status": "ok"
+ },
+ "Enterprise_Architect_12.0.1207_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "4c04fba1bdf8",
+  "status": "ok"
+ },
+ "Enterprise_Architect_12.0.1207_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "9f1a0fca5f47",
+  "status": "ok"
+ },
+ "Enterprise_Architect_12.0.1207_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "4766608615f2",
+  "status": "ok"
+ },
+ "Enterprise_Architect_12.0.1207_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 94,
+  "sha": "bf2329ff1292",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "959122b3bd72",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "959122b3bd72",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "203d93337cfe",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "72980bed2bce",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "4f399cef68a3",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "22b85fd22b58",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "245a60d19460",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "f4127d410f99",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "dd14f41350b6",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "293f25b3a3c4",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "9ce8670d355b",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "2a90e8d6bf90",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_B.1.0-export": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "35e875b758ef",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 31,
+  "sha": "a68c6134c548",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 86,
+  "n_nodes": 93,
+  "sha": "24d504a7173a",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "a13e94c63c1f",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "3816cb71d2d2",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "14176001a73d",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "8eb9047cf826",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "f4a4f1cd7961",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "4e60d21dc1fb",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "6a89e395df4b",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "643f96814a1e",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.4.0-export": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 41,
+  "sha": "5373f6ced4e3",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 41,
+  "sha": "5373f6ced4e3",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.5.0-export": {
+  "err": "",
+  "n_edges": 59,
+  "n_nodes": 46,
+  "sha": "4e8e8763cf5a",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.5.0-roundrip": {
+  "err": "",
+  "n_edges": 59,
+  "n_nodes": 46,
+  "sha": "70f1d95a07d2",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "e8199f4986cd",
+  "status": "ok"
+ },
+ "Enterprise_Explorer_1.0.0_C.6.0-roundrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "f180c11659fd",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 0,
+  "sha": "82a6f8f0c851",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "7433c0a58fcf",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 0,
+  "sha": "3612fd4dc84e",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "753fb7daa9b3",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 0,
+  "sha": "b2cfdb05e860",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "48b566b7d41c",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 0,
+  "sha": "8d5df9a495ab",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "cc7afd1ee5a7",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_B.1.0-export": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 0,
+  "sha": "811dc3da694e",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "93fd51fd0ffd",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_B.2.0-export": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 0,
+  "sha": "b59266e8deb8",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 94,
+  "sha": "68c0d0bea2d7",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 0,
+  "sha": "147e9495d6b2",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "45091b31c4e7",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 0,
+  "sha": "b2049ae8bf2c",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 0,
+  "sha": "7027290132eb",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 0,
+  "sha": "94a608f48f79",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "5fe5f3808fcf",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 0,
+  "sha": "254068c8086f",
+  "status": "ok"
+ },
+ "GenMyModel_0.47_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "cfdba8e809e5",
+  "status": "ok"
+ },
+ "IBM_BlueWorks_Live_April_2014_A.1.0-export": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_BlueWorks_Live_April_2014_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_BlueWorks_Live_April_2014_A.2.0-export": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_BlueWorks_Live_April_2014_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_Process_Designer_8.0.1_A.1.0-export": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_Process_Designer_8.0.1_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_Process_Designer_8.0.1_A.2.0-export": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_Process_Designer_8.0.1_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_Process_Designer_8.0.1_A.3.0-export": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "IBM_Process_Designer_8.0.1_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 0,
+  "n_nodes": 0,
+  "sha": "",
+  "status": "empty-output"
+ },
+ "MID_Innovator_16.1.1.31016_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "5b0dbcd52eba",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "5b0dbcd52eba",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "a9e3747b6ef5",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "a9e3747b6ef5",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "2c16948f7653",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "2c16948f7653",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "365d626ce99b",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "365d626ce99b",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "2b7b31553936",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "2b7b31553936",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "38198b2f59d4",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "38198b2f59d4",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_B.1.0-export": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 30,
+  "sha": "493fe7a51687",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 30,
+  "sha": "493fe7a51687",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_B.2.0-export": {
+  "err": "",
+  "n_edges": 89,
+  "n_nodes": 92,
+  "sha": "ed6b1839b0d4",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 89,
+  "n_nodes": 92,
+  "sha": "ed6b1839b0d4",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "0e7ae021fc65",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "0e7ae021fc65",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "b72ef2b965b2",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "b72ef2b965b2",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "d33cff616afc",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "d33cff616afc",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 13,
+  "sha": "d17a98c1a331",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 13,
+  "sha": "d17a98c1a331",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.4.0-export": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "bb4087371913",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 24,
+  "sha": "eceb23fbd515",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.5.0-export": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 48,
+  "sha": "bf3541070bae",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 48,
+  "sha": "bf3541070bae",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "d9a7bd6931a1",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "d9a7bd6931a1",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.7.0-export": {
+  "err": "",
+  "n_edges": 19,
+  "n_nodes": 16,
+  "sha": "53b023a35a24",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 19,
+  "n_nodes": 16,
+  "sha": "53b023a35a24",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "23b6faebc813",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "23b6faebc813",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.8.1-export": {
+  "err": "",
+  "n_edges": 63,
+  "n_nodes": 51,
+  "sha": "dc4f5cf5d399",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 63,
+  "n_nodes": 51,
+  "sha": "dc4f5cf5d399",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.9.0-export": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "907fc7fbd923",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.9.0-roundtrip": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "907fc7fbd923",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.9.1-export": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "ec48012593e8",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.9.1-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "ec48012593e8",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.9.2-export": {
+  "err": "",
+  "n_edges": 19,
+  "n_nodes": 27,
+  "sha": "197aa3cf59bc",
+  "status": "ok"
+ },
+ "MID_Innovator_16.1.1.31016_C.9.2-roundtrip": {
+  "err": "",
+  "n_edges": 19,
+  "n_nodes": 27,
+  "sha": "197aa3cf59bc",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "b9a1a56034df",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "9176614023d5",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "c9be0363cd0a",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "cfe464d2e2b6",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "6df8078d4f96",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "dcdb8854ed22",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "f7a5f5205939",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1da7bb05dd24",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "f7922ef1c53d",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "e71b809ae8f0",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "68d372fc09e0",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "b18c85ae7bcb",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_B.1.0-export": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 90,
+  "sha": "2fe6f49ae573",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "d94a2401a06b",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_B.2.0-export": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 90,
+  "sha": "4ee8523da114",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "1df92da3c9ef",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "57b2da293362",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "632257a3d84b",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "8da9653211fa",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "aae838fe48ab",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "477710dfc4b8",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "d31cae3e178b",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "a4afa5f8114b",
+  "status": "ok"
+ },
+ "MID_bpanda_2019.05.0.8393_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "8d6fec551d48",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "9176614023d5",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "54157c615540",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "fd5204dbbadb",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1da7bb05dd24",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "bc721e95043f",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "a5979dd3fe1d",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "09232058103b",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 89,
+  "sha": "77e6ef48e2b7",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "a43f181ee798",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "dda996354282",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 27,
+  "sha": "790308ea01f4",
+  "status": "ok"
+ },
+ "ModelFoundry_1.1.1_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "024c7415f1e0",
+  "status": "ok"
+ },
+ "Modelio_3.5_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "73dae79603f5",
+  "status": "ok"
+ },
+ "Modelio_3.5_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "3f3ca446e1c4",
+  "status": "ok"
+ },
+ "Modelio_3.5_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "8026ba16694b",
+  "status": "ok"
+ },
+ "Modelio_3.5_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "55fa9cbe92a4",
+  "status": "ok"
+ },
+ "Modelio_3.5_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "546b19770ac2",
+  "status": "ok"
+ },
+ "Modelio_3.5_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "5a1969f14482",
+  "status": "ok"
+ },
+ "Modelio_3.5_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "3c7cb60c0a56",
+  "status": "ok"
+ },
+ "Modelio_3.5_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "705c94242f4a",
+  "status": "ok"
+ },
+ "Modelio_3.5_B.1.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 30,
+  "sha": "203f0b22362f",
+  "status": "ok"
+ },
+ "Modelio_3.5_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 30,
+  "sha": "55710933cdae",
+  "status": "ok"
+ },
+ "Modelio_3.5_B.2.0-export": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 93,
+  "sha": "c8e2072211c4",
+  "status": "ok"
+ },
+ "Modelio_3.5_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 93,
+  "sha": "09964f2e781a",
+  "status": "ok"
+ },
+ "Modelio_3.5_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "dc071dacce0a",
+  "status": "ok"
+ },
+ "Modelio_3.5_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "20b09c2f6bbe",
+  "status": "ok"
+ },
+ "Modelio_3.5_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "7a9e29f4bcfb",
+  "status": "ok"
+ },
+ "Modelio_3.5_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "1248be009589",
+  "status": "ok"
+ },
+ "Modelio_3.5_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "e7bf7aa064e6",
+  "status": "ok"
+ },
+ "Modelio_3.5_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "874d0eeba61e",
+  "status": "ok"
+ },
+ "Modelio_3.5_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "517d638bce0f",
+  "status": "ok"
+ },
+ "Modelio_3.5_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "fcdf3c4b698c",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "43422ad2ee9d",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "43422ad2ee9d",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "5aaacaa10da5",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "599d3b16df20",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "6221c85c782d",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "ac2131eb3e85",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "943a7ae27d9b",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "98ed6cf185d1",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "db0d05e8e07c",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "831a9a18be24",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 17,
+  "sha": "caa76a863741",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "e80303afaccc",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_B.1.0-export": {
+  "err": "",
+  "n_edges": 58,
+  "n_nodes": 56,
+  "sha": "1e079d5ed05d",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "1a0662145f74",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_B.2.0-export": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "d0a9dd4deb2b",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "9ac54e40f0b1",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "e72289d5b788",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "9e80dd282de2",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "7d249520daa5",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "7696c0cc4c62",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "6bbd3e81015c",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "3a8c8ee68246",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "17643a14df12",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "9162192cb022",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.4.0-export": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "51d6c575aa0a",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "98f30f5b851e",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.5.0-export": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "096a156085dc",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "01fc4458df85",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "1fb396dfd05b",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "e4541d0923eb",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.7.0-export": {
+  "err": "",
+  "n_edges": 18,
+  "n_nodes": 16,
+  "sha": "939fb5eb9dcb",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "9270d250f63c",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "a62bad25808e",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "a3b54a4d8ca4",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.8.1-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "d0976a56cee2",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "605106b382ed",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.9.0-export": {
+  "err": "",
+  "n_edges": 40,
+  "n_nodes": 50,
+  "sha": "174b6409c7aa",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.9.0-roundtrip": {
+  "err": "",
+  "n_edges": 19,
+  "n_nodes": 21,
+  "sha": "4345180ce087",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.9.1-export": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "d18cac900768",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.9.1-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "a2eb94d756e8",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.9.2-export": {
+  "err": "",
+  "n_edges": 19,
+  "n_nodes": 27,
+  "sha": "3d02d15e9d99",
+  "status": "ok"
+ },
+ "OMNITRACKER_BPMN_12.3_C.9.2-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 16,
+  "sha": "0838abee2be9",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.1.0": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "9176614023d5",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "394523f18a0f",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.2.0": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "54157c615540",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "a7013c095f57",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.2.1": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "2a9b20fad5ef",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "92684d2e9759",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.3.0": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1da7bb05dd24",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "444967ac248c",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.4.0": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "e71b809ae8f0",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "f029e1be90f0",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.4.1": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "b18c85ae7bcb",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "1f13523a4022",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_B.1.0": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "d00623511e8b",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 31,
+  "sha": "a74a6879511f",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_B.2.0": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "1df92da3c9ef",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 94,
+  "sha": "7f7cfe2e8fe6",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.1.0": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "181e70aa880c",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "0288ae4573c8",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.1.1": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "43f3cf610f59",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "3860ef695c5b",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.2.0": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "d31cae3e178b",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "077d9a9499bd",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.2.0_copy": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "d31cae3e178b",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.3.0": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "540e55c5bdf7",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "f85836a67092",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.4.0": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "fbb3ddbeebb7",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 70,
+  "sha": "215ca308aff0",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.5.0": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "d318a50ac06f",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 52,
+  "sha": "7981daba4ddd",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.6.0": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "885a0640dbf4",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 42,
+  "n_nodes": 46,
+  "sha": "16a1158af3a4",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.7.0": {
+  "err": "",
+  "n_edges": 18,
+  "n_nodes": 16,
+  "sha": "07b6de6888ec",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 18,
+  "n_nodes": 16,
+  "sha": "1745121f3c04",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.8.0": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "884721cbe7fc",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "884721cbe7fc",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.8.1": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "b5e0bb2d93d0",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "b471a0d88670",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.9.0": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "7704715dae2e",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.9.0-roundtrip": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "75cc8a7fc446",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.9.1": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "a7aa1103d800",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.9.1-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "92e1bc4c8684",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.9.2": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "cfa8c3634613",
+  "status": "ok"
+ },
+ "Open-BPMN_1.2.8_2_C.9.2-roundtrip": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "4192eb54039a",
+  "status": "ok"
+ },
+ "Reference_A.1.0": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "9176614023d5",
+  "status": "ok"
+ },
+ "Reference_A.2.0": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "54157c615540",
+  "status": "ok"
+ },
+ "Reference_A.2.1": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "2a9b20fad5ef",
+  "status": "ok"
+ },
+ "Reference_A.3.0": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1da7bb05dd24",
+  "status": "ok"
+ },
+ "Reference_A.4.0": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "e71b809ae8f0",
+  "status": "ok"
+ },
+ "Reference_A.4.1": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "b18c85ae7bcb",
+  "status": "ok"
+ },
+ "Reference_B.1.0": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "d00623511e8b",
+  "status": "ok"
+ },
+ "Reference_B.2.0": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "1df92da3c9ef",
+  "status": "ok"
+ },
+ "Reference_C.1.0": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "181e70aa880c",
+  "status": "ok"
+ },
+ "Reference_C.1.1": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "43f3cf610f59",
+  "status": "ok"
+ },
+ "Reference_C.2.0": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "d31cae3e178b",
+  "status": "ok"
+ },
+ "Reference_C.3.0": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "540e55c5bdf7",
+  "status": "ok"
+ },
+ "Reference_C.4.0": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "fbb3ddbeebb7",
+  "status": "ok"
+ },
+ "Reference_C.5.0": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "d318a50ac06f",
+  "status": "ok"
+ },
+ "Reference_C.6.0": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "885a0640dbf4",
+  "status": "ok"
+ },
+ "Reference_C.7.0": {
+  "err": "",
+  "n_edges": 18,
+  "n_nodes": 16,
+  "sha": "07b6de6888ec",
+  "status": "ok"
+ },
+ "Reference_C.8.0": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "884721cbe7fc",
+  "status": "ok"
+ },
+ "Reference_C.8.1": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "b5e0bb2d93d0",
+  "status": "ok"
+ },
+ "Reference_C.9.0": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "7704715dae2e",
+  "status": "ok"
+ },
+ "Reference_C.9.1": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "a7aa1103d800",
+  "status": "ok"
+ },
+ "Reference_C.9.2": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "cfa8c3634613",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "b60d976ae254",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "2ce61522c342",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "8b3ec43dec54",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "c339089e0f10",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "7ce7d42d7420",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "5ed8a1a0fb5d",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "135f317a8522",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "7c8ce696c1b5",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "9ba6430aa6da",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "76d31370b772",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "e4351aa9df6b",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "be9bcb387813",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_B.1.0-export": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 25,
+  "sha": "14b62eb32405",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "562c26c22084",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_B.2.0-export": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 83,
+  "sha": "db2479a52ee3",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "84e3a4e2a54b",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "20e01fe409bf",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "8812303ac655",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "6dbed3f09fe4",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "e75412db0466",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "a64919b29c31",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "9b2a894b2e54",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "636e2aa37457",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "9751cdd8e305",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.4.0-export.1": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 24,
+  "sha": "d79f64fd4b22",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.4.0-export.2": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 10,
+  "sha": "432801f963b5",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.4.0-export.3": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "1e6225bf6966",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.4.0-export.4": {
+  "err": "",
+  "n_edges": 5,
+  "n_nodes": 5,
+  "sha": "8a3a1cc735e8",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.4.0-roundtrip.1": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 24,
+  "sha": "c6378abe9aee",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.4.0-roundtrip.2": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 10,
+  "sha": "244b73b5e5ba",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.4.0-roundtrip.3": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "c0cb826c7d7a",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.4.0-roundtrip.4": {
+  "err": "",
+  "n_edges": 5,
+  "n_nodes": 5,
+  "sha": "8768ad3a7d7c",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.5.0-export.1": {
+  "err": "",
+  "n_edges": 59,
+  "n_nodes": 40,
+  "sha": "467f96c3dc84",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.5.0-export.2": {
+  "err": "",
+  "n_edges": 6,
+  "n_nodes": 6,
+  "sha": "3a123312b814",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.5.0-roundtrip.1": {
+  "err": "",
+  "n_edges": 59,
+  "n_nodes": 40,
+  "sha": "3ed177dcdc66",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.5.0-roundtrip.2": {
+  "err": "",
+  "n_edges": 6,
+  "n_nodes": 6,
+  "sha": "3e8b7df975da",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "4a5a56bdb49f",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "d38fdcab5d86",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.7.0-export": {
+  "err": "",
+  "n_edges": 18,
+  "n_nodes": 16,
+  "sha": "9268be84e232",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "4600e3d6fd1c",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "84fd39258bd5",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "f643faa69477",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.8.1-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "15f2c2191f6d",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "f0ef3a61b1b7",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.9.0-export": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "344ba566a2df",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.9.0-roundtrip": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "ddc65ba9d55f",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.9.1-export": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "e8e902266d16",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.9.1-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "e8e902266d16",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.9.2-export": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "4a98e9c59135",
+  "status": "ok"
+ },
+ "SAP_Signavio_Process_Manager_19.9.0_C.9.2-roundtrip": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "61a7bbda62b8",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "05238b08db2c",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "e6a471578c05",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "4eeb51579520",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "a72db5c390b0",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "f012350f6a51",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "91c74ebac143",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "08b2e2e95007",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "cba017ecce93",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "e66dc09ecae2",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "963ab1a77ee1",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_B.1.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 31,
+  "sha": "d3903687ef52",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "c106a2290190",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_B.2.0-export": {
+  "err": "",
+  "n_edges": 79,
+  "n_nodes": 85,
+  "sha": "e27155bcbdbd",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 94,
+  "sha": "e1e86c0dcd33",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "0ac8a7fe31b5",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "350848fc7287",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "bceaf51b8b29",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "b973304b6e2c",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "b1d03f818a40",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "c488f28f6ade",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_C.3.0-export": {
+  "err": "",
+  "n_edges": 14,
+  "n_nodes": 14,
+  "sha": "54282ed02deb",
+  "status": "ok"
+ },
+ "Trisotech_BPMN_Visio_Add_in_5.0.1_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "f225ecd34935",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "2f05158e8ccb",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "9176614023d5",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "82246f927a1b",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "54157c615540",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "49c98900e439",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "5ce882030162",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "8ce83fc5584f",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1da7bb05dd24",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "2d58099366da",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "c0d144fe7a67",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "c0ca102b5c52",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "fbf5cdc22bac",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_B.1.0-export": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 28,
+  "sha": "dbd96081ba5f",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 28,
+  "sha": "41c3c68ccb14",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_B.2.0-export": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "04b0bae10db1",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 91,
+  "sha": "6c6d030934d2",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "2c01686ad0fb",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "086db93a0e8f",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "d0cabe2a0bbf",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "521cdb3aae34",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "fdfe352b0a75",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "041ec52a56a7",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "3e0485673724",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "a2fe467dc493",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.4.0-export": {
+  "err": "",
+  "n_edges": 53,
+  "n_nodes": 47,
+  "sha": "a5ef4ce33b10",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "4d3711fd1bb9",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.5.0-export": {
+  "err": "",
+  "n_edges": 64,
+  "n_nodes": 46,
+  "sha": "336aee931f50",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "fa485459237c",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "9ee1538e64fe",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "885a0640dbf4",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.7.0-export": {
+  "err": "",
+  "n_edges": 18,
+  "n_nodes": 16,
+  "sha": "a454e7fa91cc",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 18,
+  "n_nodes": 16,
+  "sha": "92eebd60f926",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "a4511854095b",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "884721cbe7fc",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.8.1-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "2995caed238a",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "b5e0bb2d93d0",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.9.0-export": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "05fe861f0fd4",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.9.0-roundtrip": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "88a9be99258e",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.9.1-export": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "b20a0fbab2f8",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.9.1-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "a7aa1103d800",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.9.2-export": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "0d1a50f37dc2",
+  "status": "ok"
+ },
+ "Trisotech_Workflow_Modeler_12.13.0_C.9.2-roundtrip": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "d67cdd5b8f92",
+  "status": "ok"
+ },
+ "Visual_Paradigm_11.1_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "1058d8bc7ffa",
+  "status": "ok"
+ },
+ "Visual_Paradigm_11.1_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "09d6cc03c797",
+  "status": "ok"
+ },
+ "Visual_Paradigm_11.1_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "7f6fcc2c8eb0",
+  "status": "ok"
+ },
+ "Visual_Paradigm_11.1_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "6ecd2672dab3",
+  "status": "ok"
+ },
+ "Visual_Paradigm_11.1_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "53c17e9e8667",
+  "status": "ok"
+ },
+ "Visual_Paradigm_11.1_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 30,
+  "sha": "96dc8b1f5ddd",
+  "status": "ok"
+ },
+ "Visual_Paradigm_11.1_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 93,
+  "sha": "0aa400ed2e0d",
+  "status": "ok"
+ },
+ "Visual_Paradigm_11.1_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "ea24f4fe5ca8",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "601c5dcb3195",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "9601ee7d93f0",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "87f2fc1284a0",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "a27f783e9226",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "2125a25c0024",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "f4b964b92d04",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "8423be823c2d",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1b45b548b673",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "c8b05eb330c1",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "091b2d9efc50",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "b7bfd6014eb5",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "dde9fe23e6f6",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_B.1.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 31,
+  "sha": "4ad6cb62cfad",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "bc87c62d5fc5",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_B.2.0-export": {
+  "err": "",
+  "n_edges": 84,
+  "n_nodes": 90,
+  "sha": "bf37a0c04846",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 89,
+  "n_nodes": 94,
+  "sha": "974e24cf7130",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "cebaa37e4a5f",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "f2431ddf707a",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 10,
+  "sha": "bf3e797d47a1",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "3043a4865f14",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "9c5b0249c30a",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "5ebb5b98ca12",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "5a8398e2ce6a",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 13,
+  "sha": "d0e0e54a9d0e",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.4.0-export": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "f749a59c50e7",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "3eb7c2691083",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.5.0-export": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 43,
+  "sha": "d08fae55516c",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.10.4_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "8d8497adb65f",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "33aba16b6dcc",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "0f4d7e7854a6",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "932db536c4da",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "972499bc6c6d",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "2a9b20fad5ef",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "2a9b20fad5ef",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "88071ce98864",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1da7bb05dd24",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "f3cdf8f7794d",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "e71b809ae8f0",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "9a630e7737eb",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "58b29f74d65e",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_B.1.0-export": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 30,
+  "sha": "6208399c6617",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "3eba2fbb1580",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_B.2.0-export": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 90,
+  "sha": "aac9c9e30667",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 94,
+  "sha": "890fbc5a0b2d",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "181e70aa880c",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "181e70aa880c",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "43f3cf610f59",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "43f3cf610f59",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "c6c3b55c6905",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "6c62497aff75",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "d448698b4ec8",
+  "status": "ok"
+ },
+ "W4_BPMN_Composer_V.9.4_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "d448698b4ec8",
+  "status": "ok"
+ },
+ "Work_in_Progress_A.1.1": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "2711ca419dd5",
+  "status": "ok"
+ },
+ "Work_in_Progress_A.1.2": {
+  "err": "",
+  "n_edges": 10,
+  "n_nodes": 9,
+  "sha": "a852e9c4506e",
+  "status": "ok"
+ },
+ "Work_in_Progress_Imports-BPMN_ModelD_1_1.0_modeld.1": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 12,
+  "sha": "fce8b71a7027",
+  "status": "ok"
+ },
+ "Work_in_Progress_Imports-BPMN_ModelD_2_1.0_modeld.2": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "d2c4cb1a50ab",
+  "status": "ok"
+ },
+ "Work_in_Progress_Imports-BPMN_ModelD_3_1.0_modeld.3": {
+  "err": "",
+  "n_edges": 2,
+  "n_nodes": 0,
+  "sha": "06523ea5263c",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "6bd4c68b1769",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "6601cf08f7d3",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "9135b2460e3c",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "90349534e025",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.2.1-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "ffbd09969db3",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "bbdbb3947621",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "9a8acfd7cb6d",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "b98d4a98bb44",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "52ea8f8728fd",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "bd9fc1ac54bb",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "668418952480",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "7fdc750344db",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_B.1.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 30,
+  "sha": "1e98df76b21f",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "7f69fc04aad5",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_B.2.0-export": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 91,
+  "sha": "06817218e6d3",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 94,
+  "sha": "9b03fe960b78",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "74a977f5fc3f",
+  "status": "ok"
+ },
+ "Yaoqiang_BPMN_Editor_4.0_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "181e70aa880c",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "8a0cec08adff",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "81e959514abc",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "24a52e8c709a",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "bcc06c87bc74",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 7,
+  "sha": "b978ad2534a3",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "ba3823c91fd8",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "54ceff2831f1",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "775764b7c9f5",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "a488d6d69d5a",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_B.1.0-export": {
+  "err": "",
+  "n_edges": 26,
+  "n_nodes": 26,
+  "sha": "b4fbf173e766",
+  "status": "ok"
+ },
+ "actiBPM_3.E-8_B.2.0-export": {
+  "err": "",
+  "n_edges": 85,
+  "n_nodes": 89,
+  "sha": "3f2c93b4f34c",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "6c98b83d68d6",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "8731275cc17c",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "a131dc5aaf13",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "e4ba1671af8a",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.2.0-rountrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "54157c615540",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.2.1-export": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "360423ee9b05",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.2.1-roundtrip": {
+  "err": "",
+  "n_edges": 11,
+  "n_nodes": 8,
+  "sha": "dcdb8854ed22",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "8180ce810a82",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "b99256059674",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "2612b2444e7d",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "07d4ca8a9ce0",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "085add008944",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "3a1a855641db",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_B.1.0-export": {
+  "err": "",
+  "n_edges": 29,
+  "n_nodes": 27,
+  "sha": "3fd188d238f7",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 27,
+  "n_nodes": 25,
+  "sha": "6d2107fbfc67",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_B.2.0-export": {
+  "err": "",
+  "n_edges": 87,
+  "n_nodes": 90,
+  "sha": "769183a44a02",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 81,
+  "n_nodes": 83,
+  "sha": "86ed6c611551",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.1.0-export": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "1b31304243f2",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "6dfbbe229378",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.1.1-export": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "cead411a3093",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "d3e499a0afa0",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.2.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "dd1998e3ba50",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "49a42e019260",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.3.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "d2b5e57b09a6",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "bdfa0157f83f",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.4.0-export": {
+  "err": "",
+  "n_edges": 28,
+  "n_nodes": 24,
+  "sha": "51d6dada1257",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 54,
+  "n_nodes": 47,
+  "sha": "341868c4a0e9",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.5.0-export": {
+  "err": "",
+  "n_edges": 58,
+  "n_nodes": 40,
+  "sha": "dafbba6a3de0",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.5.0-roundtrip": {
+  "err": "",
+  "n_edges": 65,
+  "n_nodes": 46,
+  "sha": "3ca85fa96474",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.6.0-export": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "2706274d5747",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.6.0-roundtrip": {
+  "err": "",
+  "n_edges": 36,
+  "n_nodes": 40,
+  "sha": "53904bbd5997",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.7.0-export": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "dd2006edd8e2",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.7.0-roundtrip": {
+  "err": "",
+  "n_edges": 17,
+  "n_nodes": 16,
+  "sha": "33bcf2fee6db",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.8.0-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "aed4d6051892",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.8.0-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "80f2a4dca25a",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.8.1-export": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "a01a63dbe562",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.8.1-roundtrip": {
+  "err": "",
+  "n_edges": 22,
+  "n_nodes": 24,
+  "sha": "92aee202754e",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.9.0-export": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "00b8460968d6",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.9.0-roundtrip": {
+  "err": "",
+  "n_edges": 21,
+  "n_nodes": 23,
+  "sha": "7704715dae2e",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.9.1-export": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "38fef70158ab",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.9.1-roundtrip": {
+  "err": "",
+  "n_edges": 7,
+  "n_nodes": 10,
+  "sha": "a7aa1103d800",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.9.2-export": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "a9cd8b4e113c",
+  "status": "ok"
+ },
+ "bpmn.io_Camunda_Modeler_18.6.1_C.9.2-roundtrip": {
+  "err": "",
+  "n_edges": 12,
+  "n_nodes": 17,
+  "sha": "cfa8c3634613",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "ea6da6ee5fe6",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "37ec2e007d35",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.1.1-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "596895e821bc",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "d333ae72179f",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.1.2-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 7,
+  "sha": "3dd46ee3741e",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.1.2-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 5,
+  "sha": "0493cfa89f2b",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "4b583237b1f6",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "6ae8b936bb09",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.3.0-export": {
+  "err": "",
+  "n_edges": 10,
+  "n_nodes": 10,
+  "sha": "89780422220a",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "97187a481f03",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 16,
+  "sha": "219e50c38d3f",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "dab73708d806",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "53af8b3cc99c",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "d088d72f41ae",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_B.1.0-export": {
+  "err": "",
+  "n_edges": 33,
+  "n_nodes": 34,
+  "sha": "47fe5ff32430",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "65b0a72f7fc9",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_B.2.0-export": {
+  "err": "",
+  "n_edges": 102,
+  "n_nodes": 95,
+  "sha": "cd76bce08417",
+  "status": "ok"
+ },
+ "iGrafx_FlowCharter_2013_15.1.1.1580_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 0,
+  "sha": "6c40cd56c67a",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "b91bebdd2a3b",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "37ec2e007d35",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "aeb5ce332e9a",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "6ae8b936bb09",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.3.0-export": {
+  "err": "",
+  "n_edges": 10,
+  "n_nodes": 10,
+  "sha": "57183b2c4ef7",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "97187a481f03",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "a8e6a76b27f1",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "1e56de593f42",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "9c468b5ddafc",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_B.1.0-export": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 29,
+  "sha": "c228eb4bdfcc",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 30,
+  "sha": "6b2e5c312b39",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_B.2.0-export": {
+  "err": "",
+  "n_edges": 88,
+  "n_nodes": 95,
+  "sha": "50b27c9bbf3b",
+  "status": "ok"
+ },
+ "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 0,
+  "sha": "0d4f585e9072",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "fda3105fbbe0",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "ccc457ced2e6",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "c6983ef1ada8",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 5,
+  "n_nodes": 4,
+  "sha": "3b7195230ebf",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "7bb70f5a90ab",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 27,
+  "n_nodes": 25,
+  "sha": "58f4065c2e4a",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 82,
+  "n_nodes": 83,
+  "sha": "ff6e667f7dc9",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "d43e7dd589f5",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_C.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 13,
+  "n_nodes": 13,
+  "sha": "18f65cc6c802",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_C.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 30,
+  "n_nodes": 28,
+  "sha": "0d8f55f9daea",
+  "status": "ok"
+ },
+ "ibo_Prometheus_3.9.0.0_C.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 14,
+  "sha": "6d348205645d",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.0-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "991ca3c797d5",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "050dcf889e88",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.1-export": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "98318bd7e795",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.1-roundtrip": {
+  "err": "",
+  "n_edges": 4,
+  "n_nodes": 5,
+  "sha": "4a826142d4f5",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.2-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "d95724b30a2f",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.2-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 9,
+  "sha": "ac013055b013",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.2.0-export": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "0d313f285c08",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 9,
+  "n_nodes": 8,
+  "sha": "da21732e68ed",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.3.0-export": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "ad6f5a188ee7",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.3.0-roundtrip": {
+  "err": "",
+  "n_edges": 8,
+  "n_nodes": 10,
+  "sha": "1bdc165d422c",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.4.0-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "9b4912cd53cc",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.4.0-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "a48ccc707c78",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.4.1-export": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "4c4c7709d5c9",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.4.1-roundtrip": {
+  "err": "",
+  "n_edges": 15,
+  "n_nodes": 15,
+  "sha": "07c4ce5e093b",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_B.1.0-export": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "6fbaa4bc0a9d",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_B.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 31,
+  "n_nodes": 31,
+  "sha": "5ae693f89636",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_B.2.0-export": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 94,
+  "sha": "4ef2f6579e21",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_B.2.0-roundtrip": {
+  "err": "",
+  "n_edges": 90,
+  "n_nodes": 94,
+  "sha": "f8e6571ac4b5",
+  "status": "ok"
+ },
+ "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_C.1.0-roundtrip": {
+  "err": "",
+  "n_edges": 25,
+  "n_nodes": 21,
+  "sha": "a98a81255356",
+  "status": "ok"
+ }
+}

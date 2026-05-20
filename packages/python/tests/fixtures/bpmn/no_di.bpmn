@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Semantic model only, NO <bpmndi:BPMNDiagram> section. kymo needs
+     authored coordinates, so this must parse to an EMPTY diagram. -->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="d_nodi">
+  <bpmn:process id="P" isExecutable="false">
+    <bpmn:startEvent id="S" name="Start"/>
+    <bpmn:task id="T" name="Do work"/>
+    <bpmn:endEvent id="E" name="End"/>
+    <bpmn:sequenceFlow id="F0" sourceRef="S" targetRef="T"/>
+    <bpmn:sequenceFlow id="F1" sourceRef="T" targetRef="E"/>
+  </bpmn:process>
+</bpmn:definitions>

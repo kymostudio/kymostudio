@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="d_gw">
+  <bpmn:process id="P" isExecutable="false">
+    <bpmn:startEvent id="S"/>
+    <bpmn:exclusiveGateway id="X" name="X?"/>
+    <bpmn:parallelGateway id="P1"/>
+    <bpmn:inclusiveGateway id="O"/>
+    <bpmn:endEvent id="E"/>
+    <bpmn:sequenceFlow id="F0" sourceRef="S" targetRef="X"/>
+    <bpmn:sequenceFlow id="F1" sourceRef="X" targetRef="P1"/>
+    <bpmn:sequenceFlow id="F2" sourceRef="P1" targetRef="O"/>
+    <bpmn:sequenceFlow id="F3" sourceRef="O" targetRef="E"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram><bpmndi:BPMNPlane bpmnElement="P">
+    <bpmndi:BPMNShape bpmnElement="S"><dc:Bounds x="100" y="105" width="36" height="36"/></bpmndi:BPMNShape>
+    <!-- isMarkerVisible exercises the exclusive-gateway X marker path -->
+    <bpmndi:BPMNShape bpmnElement="X" isMarkerVisible="true"><dc:Bounds x="180" y="98" width="50" height="50"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="P1"><dc:Bounds x="280" y="98" width="50" height="50"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="O"><dc:Bounds x="380" y="98" width="50" height="50"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="E"><dc:Bounds x="480" y="105" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge bpmnElement="F0"><di:waypoint x="136" y="123"/><di:waypoint x="180" y="123"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge bpmnElement="F1"><di:waypoint x="230" y="123"/><di:waypoint x="280" y="123"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge bpmnElement="F2"><di:waypoint x="330" y="123"/><di:waypoint x="380" y="123"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge bpmnElement="F3"><di:waypoint x="430" y="123"/><di:waypoint x="480" y="123"/></bpmndi:BPMNEdge>
+  </bpmndi:BPMNPlane></bpmndi:BPMNDiagram>
+</bpmn:definitions>
