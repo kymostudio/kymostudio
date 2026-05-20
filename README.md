@@ -4,12 +4,25 @@ Diagram-as-code DSL — declarative architecture diagrams to **animated SVG / We
 
 ![NVIDIA AIQ replica — animated](samples/nvidia-aiq-animated.webp)
 
+## Packages
+
+This is a monorepo (layout mirrors [Remotion](https://github.com/remotion-dev/remotion)).
+The two publishable libraries live under [`packages/`](./packages):
+
+| Package | Path | Registry |
+| --- | --- | --- |
+| Python (source-of-truth: DSL parser, layout, SVG renderer) | [`packages/python`](./packages/python) | [`kymostudio`](https://pypi.org/project/kymostudio/) on PyPI |
+| JavaScript (browser/Node port of the data model + icon library) | [`packages/js`](./packages/js) | [`kymostudio`](https://www.npmjs.com/package/kymostudio) on npm |
+
+Shared, repo-level assets stay at the root: `icons/` (the icon set consumed by
+both packages), `samples/`, `showcase/` (GitHub Pages), `playground/`, and
+`docs/`.
+
 ## Install
 
 ```bash
-pip install kymostudio
-# or
-uv tool install kymostudio
+pip install kymostudio        # Python  (CLI: `kymo`)
+npm  install kymostudio       # JavaScript
 ```
 
 ## Usage
@@ -21,7 +34,9 @@ kymo path/to/diagram.diagram --figma     # → path/to/diagram.figma.js
 kymo path/to/diagram.diagram --excalidraw # → path/to/diagram.excalidraw
 ```
 
-See [`samples/`](./samples/) for complete example `.diagram` files.
+See [`samples/`](./samples/) for complete example `.diagram` files, and the
+per-package READMEs ([Python](./packages/python/README.md),
+[JavaScript](./packages/js/README.md)) for API details.
 
 ### Python API
 
@@ -35,18 +50,31 @@ resolve_alignments(diagram)
 svg = render(diagram, animate=True)
 ```
 
-## JavaScript / npm
+### JavaScript / npm
 
 A browser/Node port of the shared **data model + icon library** (the DSL
 parser, layout engine and SVG renderer remain Python-only):
 
-```bash
-npm install kymostudio
-```
-
 ```js
 import { makeComponent, makeEdge, anchor, ICONS, getIcon } from "kymostudio";
 ```
+
+## Develop
+
+```bash
+# Python
+cd packages/python && uv run --group dev python -m pytest -q
+
+# JavaScript
+cd packages/js && npm test && npm run build-manifest
+
+# Local showcase + playground (renders via the Python package)
+uv run --project packages/python playground/server.py
+```
+
+## Changelog
+
+See [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 
 ## License
 

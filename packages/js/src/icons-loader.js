@@ -1,5 +1,5 @@
 /**
- * Icon loader — JS mirror of `src/icons.py:get_icon`.
+ * Icon loader — JS mirror of `packages/python/src/kymo/icons.py:get_icon`.
  *
  * Built-in glyphs (from `icons-builtin.js`) are returned synchronously
  * wrapped in `Promise.resolve()`. File-backed PNG icons are resolved

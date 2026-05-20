@@ -1,5 +1,5 @@
 /**
- * Hand-coded SVG icon library — JS mirror of `src/icons.py`.
+ * Hand-coded SVG icon library — JS mirror of `packages/python/src/kymo/icons.py`.
  *
  * Each entry in `ICONS` is an SVG fragment centred at (0, 0). The
  * renderer wraps it in a `<g transform="translate(cx, cy)">`. Helper

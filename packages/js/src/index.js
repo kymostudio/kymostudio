@@ -1,7 +1,7 @@
 /**
  * kymo — browser/Node port of the diagram-as-code model + icon library.
  *
- * Mirrors the Python source-of-truth at `src/python/kymo/`. This entry
+ * Mirrors the Python source-of-truth at `packages/python/src/kymo/`. This entry
  * point re-exports the data model (`makeComponent`, `makeEdge`, `anchor`,
  * `resolveAnchors`, …) and the icon registry/loader (`ICONS`, `getIcon`,
  * `setIconBaseURL`, …).
