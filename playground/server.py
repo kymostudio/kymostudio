@@ -21,13 +21,13 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
-# Make src/python importable without needing to install the package.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src" / "python"))
+# Make the kymo package importable without installing it.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "packages" / "python" / "src"))
 
-from alignment import resolve_alignments       # noqa: E402
-from dsl import parse as parse_dsl              # noqa: E402
-from layout import layout as apply_grid_layout  # noqa: E402
-from to_svg import render as render_svg         # noqa: E402
+from kymo.alignment import resolve_alignments       # noqa: E402
+from kymo.dsl import parse as parse_dsl              # noqa: E402
+from kymo.layout import layout as apply_grid_layout  # noqa: E402
+from kymo.to_svg import render as render_svg         # noqa: E402
 
 
 # ── Embedded UI ───────────────────────────────────────────────────────
@@ -241,11 +241,12 @@ render();
 
 
 # ── Examples discovery (lazy) ─────────────────────────────────────────
+_ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES_ROOTS = (
-    Path(__file__).resolve().parent.parent / "tests" / "diagrams",
-    Path(__file__).resolve().parent.parent / "tests" / "edges",
-    Path(__file__).resolve().parent.parent / "tests" / "layout",
-    Path(__file__).resolve().parent.parent / "samples",
+    _ROOT / "packages" / "python" / "tests" / "diagrams",
+    _ROOT / "packages" / "python" / "tests" / "edges",
+    _ROOT / "packages" / "python" / "tests" / "layout",
+    _ROOT / "samples",
 )
 
 

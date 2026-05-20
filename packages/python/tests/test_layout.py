@@ -1,18 +1,21 @@
-"""Golden-file tests focused on edge behaviour: each subdirectory
-under ``tests/edges/`` exercises one routing or styling rule and
-compares the rendered SVG byte-for-byte against ``output.svg``.
+"""Golden-file tests focused on layout-tree behaviour: each subdirectory
+under ``tests/layout/`` exercises one layout-resolution rule and compares
+the rendered SVG byte-for-byte against ``output.svg``.
 
 Cases:
-  - horizontal_straight  — same-row src/dst, default `-->`
-  - vertical_straight    — same-column src/dst, default `-->`
-  - z_shape_horizontal   — off-axis dst, horizontal anchors → H-V-H Z
-  - undirected           — `---` drops the arrowhead
-  - fan_out              — 1 src → N dsts
-  - fan_in_stagger       — N srcs → 1 dst (stagger spreads endpoints)
+  - horizontal        — `layout { a | b | c }` → horizontal row
+  - vertical          — `layout { a , b , c }` → vertical stack
+  - nested            — `layout { orch | { a, b, c } }` → mixed nesting
+  - cluster_inline    — cluster region with `vertical` direction inlines
+                        into the layout tree (layout references the
+                        cluster id, no leaf duplication)
+  - cluster_padding   — adjacent clusters with default padding don't
+                        overlap (regression for the padding-aware layout
+                        fix that adds cluster padding into the outer gap)
 
 Regenerate goldens after intentional renderer changes:
 
-    KYMO_UPDATE_GOLDEN=1 uv run pytest tests/test_edges.py
+    KYMO_UPDATE_GOLDEN=1 uv run pytest tests/test_layout.py
 """
 from __future__ import annotations
 
@@ -27,7 +30,7 @@ from kymo.layout import layout as apply_grid_layout
 from kymo.to_svg import render
 
 
-CASES_DIR = Path(__file__).parent.parent / "edges"
+CASES_DIR = Path(__file__).parent / "layout"
 UPDATE = os.environ.get("KYMO_UPDATE_GOLDEN") == "1"
 
 
@@ -45,7 +48,7 @@ def _render_case(case: str) -> str:
 
 
 @pytest.mark.parametrize("case", _discover_cases())
-def test_edge_matches_golden(case: str) -> None:
+def test_layout_matches_golden(case: str) -> None:
     actual = _render_case(case)
     golden_path = CASES_DIR / case / "output.svg"
 
@@ -55,6 +58,6 @@ def test_edge_matches_golden(case: str) -> None:
 
     expected = golden_path.read_text(encoding="utf-8")
     assert actual == expected, (
-        f"Rendered SVG for edge case {case!r} differs from {golden_path.name}.\n"
+        f"Rendered SVG for layout case {case!r} differs from {golden_path.name}.\n"
         f"Re-run with KYMO_UPDATE_GOLDEN=1 if the change is intentional."
     )

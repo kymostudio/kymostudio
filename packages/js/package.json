@@ -1,7 +1,7 @@
 {
   "name": "kymostudio",
   "version": "0.1.1",
-  "description": "Diagram-as-code DSL — browser/Node port (data model + icon library) mirroring the Python source-of-truth at src/python/kymo/",
+  "description": "Diagram-as-code DSL — browser/Node port (data model + icon library) mirroring the Python source-of-truth at packages/python/src/kymo/",
   "type": "module",
   "license": "Apache-2.0",
   "author": "rain1024",
@@ -9,22 +9,23 @@
   "homepage": "https://github.com/kymostudio/kymostudio#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kymostudio/kymostudio.git"
+    "url": "git+https://github.com/kymostudio/kymostudio.git",
+    "directory": "packages/js"
   },
   "bugs": {
     "url": "https://github.com/kymostudio/kymostudio/issues"
   },
-  "main": "src/js/index.js",
+  "main": "src/index.js",
   "exports": {
-    ".": "./src/js/index.js",
+    ".": "./src/index.js",
     "./icons-manifest.json": "./icons-manifest.json"
   },
   "scripts": {
     "build-manifest": "node scripts/build-manifest.mjs",
-    "test": "node --test tests/js/"
+    "test": "node --test"
   },
   "files": [
-    "src/js/",
+    "src/",
     "icons-manifest.json"
   ]
 }

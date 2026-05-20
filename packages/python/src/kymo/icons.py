@@ -476,7 +476,13 @@ import base64
 from pathlib import Path
 
 
-_ICONS_DIR = Path(__file__).parent.parent / "icons"
+# Repo-root `icons/` is shared by both packages and lives outside this
+# package. In the dev tree it sits 4 levels up from this file
+# (packages/python/src/kymo/icons.py → repo root). When kymo is pip-installed
+# the folder is absent, so `_scan_icons_dir()` finds nothing and only the
+# hand-coded ICONS above are available — file-backed icons are a dev-tree
+# (and static-host) convenience.
+_ICONS_DIR = Path(__file__).resolve().parents[4] / "icons"
 _IMAGE_SIZE = 64
 _FILE_ICONS: dict[str, Path] = {}
 
