@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - camunda.comparision.md
   - ../diagrams/bpmn/README.md
   - ./bpmn-io.md
   - ../DSL.md
@@ -47,7 +48,7 @@ upstream:
 | License           | C7 CE: Apache-2.0 (EoL) · C8: source-available + proprietary  |
 | Version Reviewed  | Camunda 8 (current); Camunda 7 CE (EoL)                       |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`bpmn-io.md`](./bpmn-io.md), [`DSL.md`](../DSL.md) |
+| Related Documents | [`camunda.comparision.md`](./camunda.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`bpmn-io.md`](./bpmn-io.md), [`DSL.md`](../DSL.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Camunda's design choices so the team can consult them when reasoning about process notation and model interchange. No code or behaviour in this repository depends on Camunda. Camunda is a **process-execution platform**, a different category from kymo (a static diagram DSL); it is included because it authored bpmn.io and exemplifies BPMN's "executable model" ambition.
 
@@ -86,25 +87,9 @@ Camunda is one of the most widely deployed BPMN engines in enterprise process au
 
 ## 6. Comparison vs `kymo`
 
-| Axis                  | Camunda                                                  | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | **Execute** BPMN processes (orchestration runtime)       | Render static architecture diagrams                               |
-| Artifact              | Executable BPMN 2.0 XML model                           | `.diagram` DSL source → SVG                                       |
-| Semantics             | Full token/execution semantics                          | None — purely visual                                             |
-| Implementation        | Java (C7) / Zeebe distributed engine (C8)               | Python renderer + JS data-model port                              |
-| Output                | Running process instances, audit history                | SVG / animated SVG / WebP                                         |
-| Licence               | C7 CE Apache-2.0 (EoL); C8 source-available + paid       | Apache-2.0                                                       |
-| Relation              | Author of bpmn.io (kymo's nearest renderer analogue)    | —                                                                |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of Camunda against kymo, and open questions for kymo — lives in [`camunda.comparision.md`](camunda.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream Camunda has not moved).
 
-## 7. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **Separate the model from the picture.** Camunda's model is executable data; the diagram is a view (BPMN DI). kymo's value is the picture, but the same discipline — a stable data model, with rendering as one consumer — keeps options open (e.g. exporting to other targets, as `to_figma.py`/`to_excalidraw.py` already hint).
-- **Licensing as a first-class decision.** The Camunda 7→8 relicensing is a cautionary tale: kymo's Apache-2.0 stance is an asset worth protecting deliberately.
-- **A modeler that teaches the notation.** bpmn.io's role in spreading BPMN literacy suggests that an approachable authoring surface is itself a distribution strategy.
-
-## 8. References
+## 7. References
 
 All accessed 2026-05-20.
 

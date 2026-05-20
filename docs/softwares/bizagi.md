@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - bizagi.comparision.md
   - ../diagrams/bpmn/README.md
   - ../DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
@@ -47,7 +48,7 @@ upstream:
 | License           | Free (proprietary freeware)                                   |
 | Version Reviewed  | Bizagi Modeler (desktop, 2026)                               |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`bizagi.comparision.md`](./bizagi.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Bizagi Modeler's design choices so the team can consult them when reasoning about approachable BPMN authoring. No code or behaviour in this repository depends on Bizagi. Bizagi Modeler is a **process-modelling tool** — a different category from kymo (a static diagram DSL).
 
@@ -78,22 +79,9 @@ This is a **reference note on prior art**, not a specification of kymo. It captu
 
 ## 5. Comparison vs `kymo`
 
-| Axis                  | Bizagi Modeler                                           | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | Free BPMN modelling + documentation                      | Render static architecture diagrams                               |
-| Notation              | BPMN 2.0                                                 | kymo `.diagram` DSL                                             |
-| Authoring             | WYSIWYG desktop editor                                   | Local text DSL                                                   |
-| Standout feature      | One-click process documentation export                   | Animated SVG / WebP output                                        |
-| Cost                  | Free (freeware); commercial upsell platform              | Apache-2.0, free                                                 |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of Bizagi Modeler against kymo, and open questions for kymo — lives in [`bizagi.comparision.md`](bizagi.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream Bizagi Modeler has not moved).
 
-## 6. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **Generated documentation from the model.** Bizagi's "export the diagram as a documented spec" is a compelling pattern; kymo could emit a structured description (component list, edges, regions) alongside the SVG for accessibility and review.
-- **Free tool as an on-ramp.** Bizagi's freeware Modeler funnels users to a paid platform; the lesson for an Apache-2.0 project is subtler — a frictionless free core builds the audience that any future tooling would serve.
-
-## 7. References
+## 6. References
 
 All accessed 2026-05-20.
 

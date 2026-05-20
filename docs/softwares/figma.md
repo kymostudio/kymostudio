@@ -1,15 +1,16 @@
 ---
 title: Figma — External Reference
 document_id: REF-FIGMA-001
-version: "1.0"
-issue_date: 2026-05-18
+version: "1.1"
+issue_date: 2026-05-21
 status: Released
 classification: Internal
 owner: diagrams/ project
-audience: Engineers evolving the `axo` DSL, layout engine, or render pipeline
+audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
 review_cycle: On upstream Plugin API or REST API breaking change, or annually (whichever first)
 supersedes: null
 related_documents:
+  - figma.comparision.md
   - ../DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
   - d2.md
@@ -40,19 +41,19 @@ upstream:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | REF-FIGMA-001                                                  |
-| Version           | 1.0                                                            |
-| Issue Date        | 2026-05-18                                                     |
+| Version           | 1.1                                                            |
+| Issue Date        | 2026-05-21                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
 | Owner             | `diagrams/` project                                            |
-| Audience          | Engineers evolving the `axo` DSL, layout, or render pipeline   |
+| Audience          | Engineers evolving the `kymo` DSL, layout, or render pipeline   |
 | Upstream          | [`figma.com`](https://www.figma.com/) · [developers.figma.com](https://developers.figma.com/) |
 | License           | Proprietary (SaaS) — Plugin typings package `@figma/plugin-typings` is MIT |
 | Version Reviewed  | REST v1 · Plugin API as of access date                         |
 | Access Date       | 2026-05-18                                                     |
-| Related Documents | [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), [`d2.md`](./d2.md) |
+| Related Documents | [`figma.comparision.md`](./figma.comparision.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), [`d2.md`](./d2.md) |
 
-This is a **reference note on prior art**, not a specification of axo. It captures Figma's programmatic surfaces so the team can consult them when evolving axo's DSL, layout, and render pipeline. axo already targets Figma as an output format via `src/to_figma.py` (emitted by `axo <src> --figma`, see `src/cli.py:79`); this doc describes the surface that file writes against. No behavior in this repository depends on Figma — the generated JS is consumed externally.
+This is a **reference note on prior art**, not a specification of kymo. It captures Figma's programmatic surfaces so the team can consult them when evolving kymo's DSL, layout, and render pipeline. kymo already targets Figma as an output format via `packages/python/src/kymo/to_figma.py` (emitted by `kymo <src> --figma`, see `packages/python/src/kymo/cli.py:79`); this doc describes the surface that file writes against. No behavior in this repository depends on Figma — the generated JS is consumed externally.
 
 ## 1. Overview
 
@@ -67,17 +68,17 @@ Figma's product family covers four canvases that share the same underlying file 
 
 Figma's pricing tiers gate API access: REST endpoints generally require a paid seat, Variables API requires Enterprise + Full seat, and Dev Mode MCP tool calls are rate-limited to 6/month on Starter (per Figma's MCP guide at <https://help.figma.com/hc/en-us/articles/32132100833559>).
 
-axo targets Figma for one reason: handoff. The animated SVG/WebP pipeline produces final artifacts, but designers often want the diagram landed inside an existing Figma file as editable frames they can re-style. The Plugin API path satisfies that.
+kymo targets Figma for one reason: handoff. The animated SVG/WebP pipeline produces final artifacts, but designers often want the diagram landed inside an existing Figma file as editable frames they can re-style. The Plugin API path satisfies that.
 
 ## 2. Programmatic surfaces
 
-| Surface | Where it runs | Typical caller | Used by `axo`? |
+| Surface | Where it runs | Typical caller | Used by `kymo`? |
 |---------|---------------|----------------|----------------|
-| **Plugin API** (JavaScript sandbox)  | Inside the Figma editor (browser/desktop), as a plugin or via the dev console | Plugin authors, MCP `use_figma` tool | **Yes** — `src/to_figma.py` emits this |
+| **Plugin API** (JavaScript sandbox)  | Inside the Figma editor (browser/desktop), as a plugin or via the dev console | Plugin authors, MCP `use_figma` tool | **Yes** — `packages/python/src/kymo/to_figma.py` emits this |
 | **REST API v1**                       | External HTTP against `https://api.figma.com`             | CI/CD, exporters, sync scripts | No |
 | **Variables REST API**                | External HTTP (subset of REST API, scoped separately)     | Design-token pipelines | No |
 | **Webhooks v2**                       | Figma → your callback URL                                 | Notify external systems on file events | No |
-| **Dev Mode MCP server (remote)**      | Hosted by Figma, brokered by Anthropic / claude.ai        | AI coding assistants (Claude, Cursor, Copilot) | **Yes** — `use_figma` is invoked from `src/to_figma.py` output |
+| **Dev Mode MCP server (remote)**      | Hosted by Figma, brokered by Anthropic / claude.ai        | AI coding assistants (Claude, Cursor, Copilot) | **Yes** — `use_figma` is invoked from `packages/python/src/kymo/to_figma.py` output |
 | **Dev Mode MCP server (local)**       | Figma desktop app, `localhost:3845`                       | IDE plugins that want a local socket | No |
 | **Code Connect**                      | Codebase-side TypeScript files + `figma connect publish`  | Component libraries linking design ↔ code | No |
 | **OAuth 2.0 / PATs**                  | Token issuance for REST + Variables + Webhooks            | All non-plugin callers | Indirectly (via MCP server's OAuth) |
@@ -86,7 +87,7 @@ The Plugin API is sandboxed JavaScript with a synchronous mutation model; the RE
 
 ## 3. Plugin API at a glance
 
-The Plugin API is the API axo writes against. Documentation lives under <https://developers.figma.com/docs/plugins/api/api-reference/>; the canonical TypeScript declarations ship as the `@figma/plugin-typings` npm package.
+The Plugin API is the API kymo writes against. Documentation lives under <https://developers.figma.com/docs/plugins/api/api-reference/>; the canonical TypeScript declarations ship as the `@figma/plugin-typings` npm package.
 
 ### 3.1 The `figma` global
 
@@ -119,7 +120,7 @@ Per the Global Objects reference, the node-creation surface includes:
 | `createVideoAsync(bytes)`       | `Promise<VideoNode>`     |
 | `createNodeFromSvg(svgString)`  | `FrameNode` (parsed SVG) |
 
-`createNodeFromSvg` is load-bearing for axo's hybrid path: each leaf component is rendered to an SVG snippet by `component_svg_snippet()` (`src/to_svg.py`) and re-parented into a Figma frame, preserving full glyph fidelity (hex outline + head + collar V for `hex-agent`, etc) rather than reducing to a coloured primitive. See `src/to_figma.py:161` (`_tree_to_js`) and `:261` (`_component_flat_js`).
+`createNodeFromSvg` is load-bearing for kymo's hybrid path: each leaf component is rendered to an SVG snippet by `component_svg_snippet()` (`packages/python/src/kymo/to_svg.py`) and re-parented into a Figma frame, preserving full glyph fidelity (hex outline + head + collar V for `hex-agent`, etc) rather than reducing to a coloured primitive. See `packages/python/src/kymo/to_figma.py:161` (`_tree_to_js`) and `:261` (`_component_flat_js`).
 
 ### 3.2 Fonts
 
@@ -132,11 +133,11 @@ t.fontName = {family: 'Inter', style: 'Medium'}
 t.characters = 'hello'
 ```
 
-axo loads Inter Regular/Medium/Bold up front in both render paths (`src/to_figma.py:212`, `:286`). Forgetting `loadFontAsync` is the #1 source of "Cannot set property 'characters'" failures.
+kymo loads Inter Regular/Medium/Bold up front in both render paths (`packages/python/src/kymo/to_figma.py:212`, `:286`). Forgetting `loadFontAsync` is the #1 source of "Cannot set property 'characters'" failures.
 
 ### 3.3 Parenting
 
-The scene graph is mutated by `parent.appendChild(child)` / `insertChild(index, child)`. Nodes start parentless after creation; appending them to `figma.currentPage` or another frame is what makes them visible. axo always parents new nodes to a single `root` frame that wraps the diagram (`src/to_figma.py:217`).
+The scene graph is mutated by `parent.appendChild(child)` / `insertChild(index, child)`. Nodes start parentless after creation; appending them to `figma.currentPage` or another frame is what makes them visible. kymo always parents new nodes to a single `root` frame that wraps the diagram (`packages/python/src/kymo/to_figma.py:217`).
 
 ### 3.4 Fills, strokes, paints
 
@@ -146,7 +147,7 @@ The scene graph is mutated by `parent.appendChild(child)` / `insertChild(index, 
 node.fills = [{type: 'SOLID', color: {r: 0.918, g: 0.345, b: 0.047}}]
 ```
 
-**RGB is 0..1, not 0..255.** axo's palette in `src/to_figma.py:39` is pre-normalised for this reason. Other paint types: `GRADIENT_LINEAR`, `GRADIENT_RADIAL`, `GRADIENT_ANGULAR`, `GRADIENT_DIAMOND`, `IMAGE`, `VIDEO`, `PATTERN`.
+**RGB is 0..1, not 0..255.** kymo's palette in `packages/python/src/kymo/to_figma.py:39` is pre-normalised for this reason. Other paint types: `GRADIENT_LINEAR`, `GRADIENT_RADIAL`, `GRADIENT_ANGULAR`, `GRADIENT_DIAMOND`, `IMAGE`, `VIDEO`, `PATTERN`.
 
 ### 3.5 Vector networks
 
@@ -160,7 +161,7 @@ await v.setVectorNetworkAsync({
 })
 ```
 
-axo uses this for edges (`src/to_figma.py:104`): every routed waypoint becomes a vertex, consecutive vertices become a segment, and the resulting polyline is stroked with `strokeCap = 'ARROW_LINES'`. The `regions: []` is required even when empty — omit it and the call rejects.
+kymo uses this for edges (`packages/python/src/kymo/to_figma.py:104`): every routed waypoint becomes a vertex, consecutive vertices become a segment, and the resulting polyline is stroked with `strokeCap = 'ARROW_LINES'`. The `regions: []` is required even when empty — omit it and the call rejects.
 
 ## 4. Auto-layout
 
@@ -182,9 +183,9 @@ Auto-layout is Figma's flex-equivalent — set `layoutMode` on a frame and its c
 
 Per-child sizing is controlled by `layoutSizingHorizontal` / `layoutSizingVertical` (`'FIXED' \| 'HUG' \| 'FILL'`). Hug-content vs fill-container is Figma's most distinctive layout primitive — it expresses "this column grows with its children" vs "this column fills the remaining space" without resorting to absolute coordinates.
 
-axo's hybrid render path (`src/to_figma.py:161`, `_tree_to_js`) maps a `.diagram` layout tree onto nested auto-layout frames: each `|` becomes `layoutMode: 'HORIZONTAL'`, each `,` becomes `layoutMode: 'VERTICAL'`, `itemSpacing` is uniformly `DEFAULT_GAP = 40`, and sizing is `AUTO/AUTO` so the frame hugs its children. Because Python's `apply_layout_tree` and Figma's auto-layout share the same spacing + alignment rules, component positions match — which lets axo keep edges as top-level absolute vectors and still have them connect.
+kymo's hybrid render path (`packages/python/src/kymo/to_figma.py:161`, `_tree_to_js`) maps a `.diagram` layout tree onto nested auto-layout frames: each `|` becomes `layoutMode: 'HORIZONTAL'`, each `,` becomes `layoutMode: 'VERTICAL'`, `itemSpacing` is uniformly `DEFAULT_GAP = 40`, and sizing is `AUTO/AUTO` so the frame hugs its children. Because Python's `apply_layout_tree` and Figma's auto-layout share the same spacing + alignment rules, component positions match — which lets kymo keep edges as top-level absolute vectors and still have them connect.
 
-A subtle gotcha: `clipsContent` defaults to `true` on auto-layout frames in newer Figma versions; axo explicitly disables it (`src/to_figma.py:191`) so edges that extend past the frame bounds remain visible.
+A subtle gotcha: `clipsContent` defaults to `true` on auto-layout frames in newer Figma versions; kymo explicitly disables it (`packages/python/src/kymo/to_figma.py:191`) so edges that extend past the frame bounds remain visible.
 
 ## 5. File model
 
@@ -211,7 +212,7 @@ Figma's reuse primitive is the **main component** (`ComponentNode`) and its **in
 - **Component properties** — attached to a main component and exposed on every instance. Four types: `BOOLEAN`, `TEXT`, `INSTANCE_SWAP`, `VARIANT`.
 - **Instance swap** — `instance.swapComponent(target)` replaces the underlying main while preserving properties whose names match.
 
-axo does not currently emit Figma components — every diagram is laid down as one-off frames. A future enhancement: emit `Component` for repeated icons (`hex-agent`, `cylinder`) so a single edit propagates, mirroring axo's `samples/` reuse pattern.
+kymo does not currently emit Figma components — every diagram is laid down as one-off frames. A future enhancement: emit `Component` for repeated icons (`hex-agent`, `cylinder`) so a single edit propagates, mirroring kymo's `samples/` reuse pattern.
 
 ## 7. Variables and styles
 
@@ -234,7 +235,7 @@ REST endpoints (require `file_variables:read` / `file_variables:write` scopes, E
 | GET  | `/v1/files/:file_key/variables/published` | Read variables exposed to consumer files             |
 | POST | `/v1/files/:file_key/variables`           | Bulk create/update/delete variables and collections  |
 
-axo's `ACCENTS` palette (`src/to_figma.py:39`) is currently hardcoded as 0..1 RGB literals. A Figma-native rewrite would map each accent to a `COLOR` variable so designers can re-theme without editing axo source.
+kymo's `ACCENTS` palette (`packages/python/src/kymo/to_figma.py:39`) is currently hardcoded as 0..1 RGB literals. A Figma-native rewrite would map each accent to a `COLOR` variable so designers can re-theme without editing kymo source.
 
 ## 8. REST API
 
@@ -272,7 +273,7 @@ Event types: `PING`, `FILE_UPDATE` (debounced ~30 min of editing inactivity), `F
 
 ### 8.4 Rate limits
 
-REST API rate limits are tiered by plan (Tier 1 / Tier 2 / Tier 3) and counted per-minute, per-token. The Dev Mode MCP server inherits the same tiering. Public docs do not enumerate exact RPM numbers; the official guidance is "exponential backoff on 429". axo emits no REST calls today, so this is informational only.
+REST API rate limits are tiered by plan (Tier 1 / Tier 2 / Tier 3) and counted per-minute, per-token. The Dev Mode MCP server inherits the same tiering. Public docs do not enumerate exact RPM numbers; the official guidance is "exponential backoff on 429". kymo emits no REST calls today, so this is informational only.
 
 ## 9. Dev Mode MCP server
 
@@ -303,9 +304,9 @@ Per <https://developers.figma.com/docs/figma-mcp-server/tools-and-prompts/>, the
 | `upload_assets`               | Upload PNG/JPG/GIF/WebP as fills or new frames                               |
 | `whoami`                      | Authenticated user identity + seat type                                      |
 
-`use_figma` is what consumes axo's `--figma` output: the JS string emitted by `src/to_figma.py` is passed as the `code` argument. **The `/figma-use` skill is mandatory** before any `use_figma` call (declared in the MCP server's `instructions` block); skipping it has produced silent malformed-input errors in practice.
+`use_figma` is what consumes kymo's `--figma` output: the JS string emitted by `packages/python/src/kymo/to_figma.py` is passed as the `code` argument. **The `/figma-use` skill is mandatory** before any `use_figma` call (declared in the MCP server's `instructions` block); skipping it has produced silent malformed-input errors in practice.
 
-The recommended workflow from Figma's own docs is `get_design_context` → (if too big) `get_metadata` then re-call `get_design_context` on narrower IDs → `get_screenshot` → only then start writing code. For axo specifically the direction is reversed — we generate Figma content from a `.diagram` source — so the relevant tools are `use_figma`, `create_new_file`, and `upload_assets`.
+The recommended workflow from Figma's own docs is `get_design_context` → (if too big) `get_metadata` then re-call `get_design_context` on narrower IDs → `get_screenshot` → only then start writing code. For kymo specifically the direction is reversed — we generate Figma content from a `.diagram` source — so the relevant tools are `use_figma`, `create_new_file`, and `upload_assets`.
 
 Rate-limit caveat: Starter plan + View/Collab seats are capped at **6 tool calls per month**; Dev/Full seats on paid plans share the Tier 1 REST rate limit. The cap bites quickly during iteration.
 
@@ -327,14 +328,14 @@ Two authoring styles:
   ```
 - **Legacy per-framework adapters** for React/React Native, HTML (Web Components, Angular, Vue), SwiftUI, Jetpack Compose.
 
-For axo, the relevance is conceptual: Code Connect ties a *visual* Figma node to a *symbolic* code identifier. axo's `src/icons.py` symbols (`hex-agent`, `cube-orange`, `cylinder`) are the moral equivalent on the diagram side — a future direction would be exposing them as Figma components so a single Code Connect mapping covers every appearance in a generated diagram.
+For kymo, the relevance is conceptual: Code Connect ties a *visual* Figma node to a *symbolic* code identifier. kymo's `packages/python/src/kymo/icons.py` symbols (`hex-agent`, `cube-orange`, `cylinder`) are the moral equivalent on the diagram side — a future direction would be exposing them as Figma components so a single Code Connect mapping covers every appearance in a generated diagram.
 
 ## 11. FigJam, Slides, Make
 
 Brief, since none of these is what `--figma` currently targets:
 
-- **FigJam** — whiteboard. Adds `STICKY`, `STAMP`, `SHAPE_WITH_TEXT` node types and **connectors with magnet anchors** that re-route automatically when endpoints move. `generate_diagram` (MCP) renders Mermaid or NL into a FigJam board — a possible alternative path if axo wanted "drop into a brainstorming board" instead of "drop into a design file".
-- **Figma Slides** — same node model as Design, with slide-level navigation. Not currently a useful target for axo (no animation primitive that maps to flowing-dash edges).
+- **FigJam** — whiteboard. Adds `STICKY`, `STAMP`, `SHAPE_WITH_TEXT` node types and **connectors with magnet anchors** that re-route automatically when endpoints move. `generate_diagram` (MCP) renders Mermaid or NL into a FigJam board — a possible alternative path if kymo wanted "drop into a brainstorming board" instead of "drop into a design file".
+- **Figma Slides** — same node model as Design, with slide-level navigation. Not currently a useful target for kymo (no animation primitive that maps to flowing-dash edges).
 - **Figma Make** — prompt-to-app code generation. Out of scope: it accepts intent, not Plugin API JS.
 
 ## 12. Authentication
@@ -343,7 +344,7 @@ Brief, since none of these is what `--figma` currently targets:
 - **Plan Access Tokens** — issued by org/enterprise admins. Sent the same way as PATs but tied to a plan rather than a user; appropriate for CI/CD.
 - **OAuth 2.0** — required for Activity Logs, Discovery, and Embed APIs, and for any third-party app acting on behalf of users. The Figma MCP server uses OAuth. Tokens are issued against a published list of scopes — the modern, narrow scopes (`file_content:read`, `file_comments:read`, `file_variables:read`, `file_variables:write`) are preferred over the legacy catch-all `files:read`.
 
-axo itself holds no Figma credentials — auth is delegated to whoever runs the generated JS (Plugin sandbox = no auth needed; `use_figma` over MCP = the MCP server's OAuth session).
+kymo itself holds no Figma credentials — auth is delegated to whoever runs the generated JS (Plugin sandbox = no auth needed; `use_figma` over MCP = the MCP server's OAuth session).
 
 ## 13. Output formats and export
 
@@ -357,45 +358,13 @@ SVG export has two well-known quirks worth noting:
 1. IDs are auto-prefixed with a session-scoped string to avoid collisions when multiple SVGs are inlined into one HTML page — round-tripping requires care.
 2. Text falls back to outlines unless `svg_outline_text=false` is supplied; the fallback exists because not every consumer ships the Figma font set.
 
-axo never imports from Figma — only emits — so these matter only if a future axo workflow ingests Figma-exported SVGs.
+kymo never imports from Figma — only emits — so these matter only if a future kymo workflow ingests Figma-exported SVGs.
 
-## 14. Comparison vs `axo`
+## 14. Comparison vs `kymo`
 
-| Axis        | Figma                                                                | axo (this repo)                                                        |
-|-------------|----------------------------------------------------------------------|------------------------------------------------------------------------|
-| Implementation language | TypeScript + Rust (closed source); Plugin sandbox is JavaScript | Python 3                                                       |
-| License     | Proprietary SaaS (typings package MIT)                               | Internal (unpublished)                                                 |
-| Authoring surface | WYSIWYG canvas; no first-party DSL                             | `.diagram` declarative DSL with `→` edges and `|`/`,` grouping         |
-| Container model | Frames, optionally with auto-layout; pages above frames          | Implicit grouping via `|`/`,`; no explicit container blocks (post #4)  |
-| Layout      | Auto-layout (flex-like) + grid mode + absolute                       | Single algorithm: grid pack + per-row height sync (`src/layout.py`)    |
-| Sizing model | `FIXED` / `HUG` / `FILL` per axis, per child                        | Implicit from icon dimensions and `apply_layout_tree`                  |
-| Grid layouts | First-class (`layoutMode: 'GRID'` + `layoutGrids`)                  | Emergent from layout algorithm, not declared                           |
-| Edge routing | Manual (Design) or magnet connectors (FigJam)                       | Bespoke orthogonal Z-router with rounded corners (`src/to_svg.py`)     |
-| Diagram types | Anything you can draw (UI, illustration, slides, whiteboard)       | Block / architecture diagrams only                                     |
-| Composition | Multi-page files; component sets with variants                       | Single-board per source file                                           |
-| Animation   | None in core; Smart Animate transitions in prototypes only           | Animated SVG **plus** frame-synthesized WebP (`src/to_webp.py`)        |
-| Output      | PNG, JPG, PDF, SVG via REST or Plugin                                | SVG, animated SVG, animated WebP, Figma Plugin JS, Excalidraw          |
-| Themes      | Variable **modes** (light/dark/print/…) with alias chains            | None — accents hand-coded per component                                |
-| Icons       | Imported via `createNodeFromSvg` or as Components                    | Bundled SVG library in `src/icons.py`                                  |
-| Interactivity | Prototype links (in Design); hyperlinks; comments                  | None (static output)                                                   |
-| Embedding   | REST API + iframe Embed API; Plugin sandbox                          | Python module (`src/cli.py` as CLI entry)                              |
-| Token system | Variables (typed, moded, aliased) + legacy Styles                    | Hand-coded constants in `src/to_figma.py:39`                           |
-| MCP exposure | First-party Figma MCP server (remote + local desktop)                | None — axo is a CLI, not a service                                     |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of Figma against kymo, and open questions for kymo — lives in [`figma.comparision.md`](figma.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream Figma has not moved).
 
-## 15. Lessons we may consider borrowing
-
-Listed without commitment — observations, not roadmap items.
-
-- **Auto-layout sizing model.** `FIXED` / `HUG` / `FILL` per axis per child is more expressive than axo's current implicit row-sync heuristic. Even adopting just `HUG` semantics (cell hugs its glyph) and `FILL` semantics (cell fills its row) at the layout-tree level would clean up edge cases where icons of different aspect ratios sit awkwardly in the same row.
-- **Variable modes as axo's theme primitive.** A `mode: dark` switch at the `Diagram` level cascading to every accent reference would beat the current per-component literal colours, and would map cleanly to D2's theme system (see [d2.md §6](./d2.md)) as well.
-- **Component / instance split.** Repeated icons in `samples/` (every `hex-agent` is currently re-rendered SVG) could be emitted as a single Figma component + N instances, dropping the size of `--figma` output considerably for diagrams that reuse glyphs.
-- **Vector networks for edges.** Figma's vertex/segment/region model is strictly richer than the polyline axo emits today. If axo ever wanted to render a single edge with multiple endpoints (e.g. fan-in / fan-out), the data model is already what we'd want.
-- **Code Connect as inspiration.** Tying axo's `src/icons.py` symbols to source-code identifiers (so a diagram component `compute:invoice` links back to the actual invoice handler module) would mirror Code Connect's design ↔ code bridge. Useful for engineering-doc diagrams where the reader wants to "click through" to the code.
-- **MCP as a distribution channel.** Figma exposes itself as an MCP server; axo currently exposes itself only as a CLI. A thin axo MCP server wrapping `render()` would let agentic tools generate diagrams without invoking `uv run axo` via shell.
-- **Named-version webhooks.** `FILE_VERSION_UPDATE` is a useful pattern: tag a diagram source, get a webhook, regenerate exports. Not directly applicable, but worth noting that Figma's eventing model is more granular than "file changed".
-- **Auto-layout `clipsContent` defaults.** When emitting auto-layout frames, always explicitly set `clipsContent = false` (as axo does) — the silent default flipped in a past Plugin API revision and is the kind of breakage worth a code comment.
-
-## 16. References
+## 15. References
 
 All accessed 2026-05-18.
 
@@ -420,5 +389,5 @@ All accessed 2026-05-18.
 ### Cross-references within this repo
 
 - `docs/softwares/d2.md` — sibling reference doc on the D2 text-to-diagram language (same template).
-- `src/to_figma.py` — axo's Figma Plugin API emitter; hybrid auto-layout path at `:161` (`_tree_to_js`), flat fallback at `:261` (`_component_flat_js`), edge vector-network emission at `:77` (`edge_to_js`).
-- `src/cli.py:79` — `--figma` flag handling.
+- `packages/python/src/kymo/to_figma.py` — kymo's Figma Plugin API emitter; hybrid auto-layout path at `:161` (`_tree_to_js`), flat fallback at `:261` (`_component_flat_js`), edge vector-network emission at `:77` (`edge_to_js`).
+- `packages/python/src/kymo/cli.py:79` — `--figma` flag handling.

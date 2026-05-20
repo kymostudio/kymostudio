@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - sparx-enterprise-architect.comparision.md
   - ../diagrams/bpmn/README.md
   - ../DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
@@ -48,7 +49,7 @@ upstream:
 | License           | Commercial proprietary                                        |
 | Version Reviewed  | Enterprise Architect 16/17 line (2026)                       |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`sparx-enterprise-architect.comparision.md`](./sparx-enterprise-architect.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Enterprise Architect's design choices so the team can consult them when reasoning about multi-notation modelling. No code or behaviour in this repository depends on it. Enterprise Architect is a broad **modelling tool** — a different category from kymo (a static diagram DSL); BPMN is one of many notations it supports.
 
@@ -77,24 +78,9 @@ This is a **reference note on prior art**, not a specification of kymo. It captu
 
 ## 5. Comparison vs `kymo`
 
-| Axis                  | Enterprise Architect                                     | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | Multi-notation enterprise/systems modelling              | Render static architecture diagrams                               |
-| Notations             | UML, SysML, ArchiMate, BPMN                              | kymo `.diagram` DSL                                             |
-| Model                 | Shared repository, cross-model traceability             | Single-file `.diagram` per diagram                               |
-| Authoring             | WYSIWYG desktop, repository-backed                       | Local text DSL                                                   |
-| Cost                  | Commercial per-seat                                      | Apache-2.0, free                                                 |
-| Scope                 | Heavyweight, enterprise                                  | Lightweight, single-purpose                                      |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of Enterprise Architect against kymo, and open questions for kymo — lives in [`sparx-enterprise-architect.comparision.md`](sparx-enterprise-architect.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream Enterprise Architect has not moved).
 
-## 6. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **Traceability across diagrams.** EA's value is linking elements across models. kymo is single-file today; even a lightweight notion of "the same component appears in diagram A and B" could help large doc sets stay consistent.
-- **A shared model behind many views.** EA renders many diagram types from one repository — a reminder that kymo's clean `model.Diagram` is the asset, and additional renderers (already: Figma, Excalidraw) are cheap views over it.
-- **A caution on weight.** EA shows the opposite end of the spectrum from kymo: enormous capability at the cost of approachability. kymo's terseness is a feature to protect.
-
-## 7. References
+## 6. References
 
 All accessed 2026-05-20.
 

@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - flowable.comparision.md
   - ../diagrams/bpmn/README.md
   - ./activiti.md
   - ./camunda.md
@@ -48,7 +49,7 @@ upstream:
 | License           | Apache-2.0 (+ commercial Enterprise)                          |
 | Version Reviewed  | Flowable 7.x line (2026)                                      |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`activiti.md`](./activiti.md), [`camunda.md`](./camunda.md) |
+| Related Documents | [`flowable.comparision.md`](./flowable.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`activiti.md`](./activiti.md), [`camunda.md`](./camunda.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Flowable's design choices so the team can consult them when reasoning about BPMN execution and model interchange. No code or behaviour in this repository depends on Flowable. Flowable is a **process-execution engine**, a different category from kymo (a static diagram DSL).
 
@@ -82,24 +83,9 @@ Flowable was created in **2017** when **Joram Barrez** and **Tijs Rademakers** �
 
 ## 6. Comparison vs `kymo`
 
-| Axis                  | Flowable                                                 | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | Embeddable BPMN/CMMN/DMN **execution** engine            | Render static architecture diagrams                               |
-| Notation              | BPMN 2.0 (+ CMMN, DMN)                                   | kymo `.diagram` DSL                                              |
-| Implementation        | Java (Spring-friendly)                                   | Python renderer + JS data-model port                              |
-| Semantics             | Full execution semantics                                 | None — visual only                                               |
-| Output                | Running instances, history                               | SVG / animated SVG / WebP                                        |
-| Licence               | Apache-2.0 (+ commercial)                                | Apache-2.0                                                        |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of Flowable against kymo, and open questions for kymo — lives in [`flowable.comparision.md`](flowable.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream Flowable has not moved).
 
-## 7. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **Embeddability as a design goal.** Flowable's "drop the engine into your app" ethos parallels kymo's "import the library or call the CLI" model; keeping the core a clean library (not a service) is worth preserving.
-- **One core, several notations.** Flowable supports BPMN/CMMN/DMN on one engine. kymo similarly serves several output targets (SVG/WebP/Figma/Excalidraw) from one model — the analogy reinforces keeping the model neutral and the back-ends thin.
-- **Healthy forks signal a healthy data format.** That Activiti could be forked into Camunda and Flowable is largely because the BPMN XML interchange is standardised. A stable, documented kymo model/format would similarly de-risk downstream tooling.
-
-## 8. References
+## 7. References
 
 All accessed 2026-05-20.
 

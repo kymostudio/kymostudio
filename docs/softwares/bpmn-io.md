@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - bpmn-io.comparision.md
   - ../diagrams/bpmn/README.md
   - ../DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
@@ -48,7 +49,7 @@ upstream:
 | License           | bpmn.io license (core libs MIT + attribution)                 |
 | Version Reviewed  | bpmn-js 18.16.1 (2026-05-05)                                  |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`bpmn-io.comparision.md`](./bpmn-io.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures bpmn.io's design choices so the team can consult them when evolving kymo's render pipeline and any future web-embeddable output. No code or behaviour in this repository depends on bpmn.io. Of all the BPMN tools surveyed, bpmn-js is the **closest analogue to kymo's renderer**: a client-side, SVG-based engine that turns a notation model into an interactive diagram in the browser.
 
@@ -104,29 +105,9 @@ bpmn.io is the de-facto standard web BPMN renderer. It powers the Camunda Modele
 
 ## 8. Comparison vs `kymo`
 
-| Axis                  | bpmn-js                                                  | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | View **and edit** BPMN process models in the browser     | Render static architecture diagrams from a text DSL               |
-| Notation              | BPMN 2.0 (fixed, standardised)                           | kymo's own `.diagram` DSL (architecture leaves/regions/edges)     |
-| Input                 | BPMN 2.0 XML (`+` DI)                                    | `.diagram` source text                                            |
-| Implementation        | JavaScript (browser-first)                              | Python renderer (`src/python`) + a JS data-model port (`src/js`)  |
-| Interactivity         | Full: drag, edit, undo/redo, palette                    | None — static SVG / animated SVG / WebP                           |
-| Layout                | Manual (author-placed), preserved via DI                | Computed by kymo's layout engine (`layout.py`)                    |
-| Extensibility         | DI module system (diagram-js)                           | Hand-coded renderer; no plugin surface                            |
-| Model/diagram split   | Explicit (`bpmn-moddle` model + BPMN DI layout)         | Single in-memory `model.Diagram`; layout derived, not stored      |
-| Licence               | bpmn.io license (MIT + attribution)                     | Apache-2.0                                                        |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of bpmn-js against kymo, and open questions for kymo — lives in [`bpmn-io.comparision.md`](bpmn-io.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream bpmn-js has not moved).
 
-## 9. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **A notation-agnostic core (the diagram-js split).** kymo's renderer mixes shape geometry, layout, and BPMN-free architecture semantics in one place; isolating a "draw shapes + route edges on a canvas" core from the kymo-specific mapping would make alternate front-ends (e.g. a future web editor) feasible.
-- **Viewer vs Modeler separation.** A read-only path that ships less code is worth keeping in mind if kymo ever gains an interactive web target.
-- **Model ↔ layout separation (BPMN DI).** Storing computed layout as a sidecar (rather than recomputing every render) would let users hand-tune positions without editing the DSL — the same payoff DI gives BPMN tools.
-- **Headless SVG via a DOM shim.** bpmn-js's "same engine, no browser" snapshot path is a clean model for deterministic CI rendering.
-- **DI/module extensibility.** Even a modest hook system (custom renderers per shape) would let kymo grow icon/shape families without renderer edits.
-
-## 10. References
+## 9. References
 
 All accessed 2026-05-20.
 

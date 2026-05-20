@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - jbpm.comparision.md
   - ../diagrams/bpmn/README.md
   - ./activiti.md
   - ../DSL.md
@@ -48,7 +49,7 @@ upstream:
 | License           | Apache-2.0                                                    |
 | Version Reviewed  | jBPM 7.x (KIE); Kogito successor                             |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`activiti.md`](./activiti.md), [`DSL.md`](../DSL.md) |
+| Related Documents | [`jbpm.comparision.md`](./jbpm.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`activiti.md`](./activiti.md), [`DSL.md`](../DSL.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures jBPM's design choices and its place in the history of open-source BPM. No code or behaviour in this repository depends on jBPM. jBPM is a **process-execution toolkit**, a different category from kymo (a static diagram DSL).
 
@@ -80,23 +81,9 @@ jBPM launched in **2003** and was, for roughly seven years, the **only** open-so
 
 ## 6. Comparison vs `kymo`
 
-| Axis                  | jBPM                                                     | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | BPMN **execution** + rules (with Drools)                 | Render static architecture diagrams                               |
-| Notation              | BPMN 2.0 (+ DMN/DRL rules)                              | kymo `.diagram` DSL                                             |
-| Implementation        | Java (KIE platform)                                     | Python renderer + JS data-model port                              |
-| Semantics             | Full execution semantics                                 | None — visual only                                               |
-| Licence               | Apache-2.0                                               | Apache-2.0                                                        |
-| Distinctive trait     | Process + business-rules integration                     | Architecture-diagram rendering                                   |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of jBPM against kymo, and open questions for kymo — lives in [`jbpm.comparision.md`](jbpm.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream jBPM has not moved).
 
-## 7. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **Separate concerns that change at different rates.** jBPM keeps *flow* (process) and *decisions* (rules) in distinct engines that share a session. kymo's analogue is keeping *structure* (the DSL/model) separate from *appearance* (renderer) and *layout* — a separation already present and worth guarding.
-- **Longevity through a stable core.** jBPM has survived 20+ years by keeping a clean engine and letting tooling churn around it; the lesson for kymo is to keep `model.py` stable and let the back-ends (SVG/WebP/Figma/Excalidraw) evolve.
-
-## 8. References
+## 7. References
 
 All accessed 2026-05-20.
 
