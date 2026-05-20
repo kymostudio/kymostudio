@@ -11,7 +11,14 @@ export type Point = [number, number];
 
 export type Shape =
   | "circle" | "cube" | "cube-big" | "box" | "cylinder" | "hex"
-  | "annotation" | "aws-tile" | "aws-tile-hero" | "badge" | "image";
+  | "annotation" | "aws-tile" | "aws-tile-hero" | "badge" | "image"
+  // ── BPMN 2.0 glyphs (see bpmn-shapes.ts) ──────────────────────────
+  // Imported from .bpmn files; size comes from the file's Diagram-
+  // Interchange bounds (Component.size), not SHAPE_HALF. The sub-type
+  // marker (event-def / task-type / gateway-type) rides in Component.icon.
+  | "bpmn-start" | "bpmn-end" | "bpmn-intermediate" | "bpmn-boundary"
+  | "bpmn-task" | "bpmn-subprocess" | "bpmn-gateway"
+  | "bpmn-data-object" | "bpmn-data-store" | "bpmn-annotation";
 
 export type Side = "top" | "right" | "bottom" | "left" | "center";
 
@@ -27,6 +34,17 @@ export const SHAPE_HALF: Record<Shape, Point> = {
   "aws-tile-hero": [40, 40],
   "badge":         [14, 14],
   "image":         [32, 32],
+  // BPMN — fallbacks only; real sizes arrive via Component.size from DI.
+  "bpmn-start":        [18, 18],
+  "bpmn-end":          [18, 18],
+  "bpmn-intermediate": [18, 18],
+  "bpmn-boundary":     [18, 18],
+  "bpmn-task":         [50, 40],
+  "bpmn-subprocess":   [50, 40],
+  "bpmn-gateway":      [25, 25],
+  "bpmn-data-object":  [18, 25],
+  "bpmn-data-store":   [25, 25],
+  "bpmn-annotation":   [0, 0],
 };
 
 export const LABEL_HEIGHT: Record<Shape, number> = {
@@ -41,6 +59,17 @@ export const LABEL_HEIGHT: Record<Shape, number> = {
   "aws-tile-hero": 48,
   "badge":         0,
   "image":         26,
+  // BPMN edges carry explicit waypoints, so no label clearance needed.
+  "bpmn-start":        0,
+  "bpmn-end":          0,
+  "bpmn-intermediate": 0,
+  "bpmn-boundary":     0,
+  "bpmn-task":         0,
+  "bpmn-subprocess":   0,
+  "bpmn-gateway":      0,
+  "bpmn-data-object":  0,
+  "bpmn-data-store":   0,
+  "bpmn-annotation":   0,
 };
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -53,13 +82,17 @@ export interface Component {
   shape: Shape;
   accent: string;
   pos: Point;
+  /** Explicit (width, height) box overriding SHAPE_HALF — set by the BPMN
+   *  importer from each element's Diagram-Interchange bounds. */
+  size: Point | null;
   parent: string | null;
   align: string | null;
   alignGap: number;
   alignOffset: Point;
 }
 
-export type RegionStyle = "outer" | "inner" | string;
+// "pool" / "lane" are BPMN swimlanes (label band down the left edge).
+export type RegionStyle = "outer" | "inner" | "pool" | "lane" | string;
 
 export interface Region {
   id: string;
@@ -100,6 +133,11 @@ export interface Edge {
   noArrow: boolean;
   trunkOffset: number;
   sharedPort: boolean;
+  /** BPMN flow: explicit polyline (the file's DI waypoints) drawn as-is,
+   *  bypassing anchor resolution. `bpmnFlow` selects the marker/dash
+   *  convention: sequence | default | conditional | message | association. */
+  points: Point[] | null;
+  bpmnFlow: string | null;
 }
 
 export interface Diagram {
@@ -117,15 +155,15 @@ export interface Diagram {
 
 export function makeComponent({
   id, name = "", subtitle = "", icon = "", shape = "box", accent = "green",
-  pos = [0, 0],
+  pos = [0, 0], size = null,
   parent = null, align = null, alignGap = 24, alignOffset = [0, 0],
 }: {
   id: string; name?: string; subtitle?: string; icon?: string;
-  shape?: Shape; accent?: string; pos?: Point;
+  shape?: Shape; accent?: string; pos?: Point; size?: Point | null;
   parent?: string | null; align?: string | null; alignGap?: number; alignOffset?: Point;
 }): Component {
   return {
-    id, name, subtitle, icon, shape, accent, pos,
+    id, name, subtitle, icon, shape, accent, pos, size,
     parent, align, alignGap, alignOffset,
   };
 }
@@ -159,6 +197,7 @@ export function makeEdge({
   labelSmall = false, labelPos = null,
   dashed = false, noArrow = false,
   trunkOffset = 0, sharedPort = false,
+  points = null, bpmnFlow = null,
 }: {
   src: string; dst: string; label?: string; style?: string;
   srcAnchor?: Side | null; dstAnchor?: Side | null;
@@ -168,11 +207,12 @@ export function makeEdge({
   labelSmall?: boolean; labelPos?: Point | null;
   dashed?: boolean; noArrow?: boolean;
   trunkOffset?: number; sharedPort?: boolean;
+  points?: Point[] | null; bpmnFlow?: string | null;
 }): Edge {
   return {
     src, dst, label, style, srcAnchor, dstAnchor, route, via,
     srcOffset, dstOffset, labelOffset, labelAnchor, labelSmall, labelPos,
-    dashed, noArrow, trunkOffset, sharedPort,
+    dashed, noArrow, trunkOffset, sharedPort, points, bpmnFlow,
   };
 }
 
@@ -189,6 +229,7 @@ export function makeDiagram({
 // ── Lookups & geometry helpers ────────────────────────────────────────
 
 export function componentHalf(c: Component): Point {
+  if (c.size) return [(c.size[0] / 2) | 0, (c.size[1] / 2) | 0];
   return SHAPE_HALF[c.shape];
 }
 
@@ -212,7 +253,7 @@ export function anchor(node: Component | Region, side: Side): Point {
 
 function componentAnchor(c: Component, side: Side): Point {
   const [cx, cy] = c.pos;
-  const [hw, hh] = SHAPE_HALF[c.shape];
+  const [hw, hh] = componentHalf(c);
   const labelled = (c.name && c.name.length > 0) || (c.subtitle && c.subtitle.length > 0);
   const lh = labelled ? (LABEL_HEIGHT[c.shape] || 0) : 0;
   switch (side) {

@@ -4,20 +4,6 @@ Diagram-as-code DSL — declarative architecture diagrams to **animated SVG / We
 
 ![NVIDIA AIQ replica — animated](samples/nvidia-aiq-animated.webp)
 
-## Packages
-
-This is a monorepo (layout mirrors [Remotion](https://github.com/remotion-dev/remotion)).
-The two publishable libraries live under [`packages/`](./packages):
-
-| Package | Path | Registry |
-| --- | --- | --- |
-| Python (source-of-truth: DSL parser, layout, SVG renderer) | [`packages/python`](./packages/python) | [`kymostudio`](https://pypi.org/project/kymostudio/) on PyPI |
-| JavaScript (browser/Node port of the data model + icon library) | [`packages/js`](./packages/js) | [`kymostudio`](https://www.npmjs.com/package/kymostudio) on npm |
-
-Shared, repo-level assets stay at the root: `icons/` (the icon set consumed by
-both packages), `samples/`, `showcase/` (GitHub Pages), `playground/`, and
-`docs/`.
-
 ## Install
 
 ```bash
@@ -78,10 +64,6 @@ cd packages/js && npm test && npm run build-manifest
 # Local showcase + playground (renders via the Python package)
 uv run --project packages/python playground/server.py
 ```
-
-## Changelog
-
-See [`docs/CHANGELOG.md`](./docs/CHANGELOG.md).
 
 ## License
 

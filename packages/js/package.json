@@ -1,7 +1,7 @@
 {
   "name": "kymostudio",
   "version": "0.1.1",
-  "description": "Diagram-as-code DSL — browser/Node port (data model, icon library + SVG renderer) mirroring the Python source-of-truth at packages/python/src/kymo/",
+  "description": "Diagram-as-code for browser/Node — data model, icon library, SVG renderer, and BPMN 2.0 importer. Independent, dependency-free TypeScript implementation.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "rain1024",
