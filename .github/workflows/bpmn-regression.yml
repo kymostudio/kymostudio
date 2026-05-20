@@ -1,0 +1,42 @@
+name: BPMN regression (full MIWG)
+
+# Tier-3 of the BPMN test strategy: kymo render-regression over the FULL
+# BPMN MIWG corpus (~840 files). Runs nightly + on demand — NOT on every PR
+# (the vendored ~120-file subset in tests/corpus_bpmn/ gates PRs via the
+# normal pytest job). Diffs against tests/corpus_bpmn/baseline_full.json.
+
+on:
+  schedule:
+    - cron: '17 2 * * *'      # nightly ~02:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: bpmn-regression
+  cancel-in-progress: true
+
+jobs:
+  full-corpus:
+    name: kymo vs full MIWG corpus
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/python
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Fetch BPMN MIWG corpus (pinned, .bpmn only)
+        run: |
+          git clone --filter=blob:none --no-checkout \
+            https://github.com/bpmn-miwg/bpmn-miwg-test-suite.git /tmp/miwg
+          cd /tmp/miwg
+          git sparse-checkout set --no-cone '**/*.bpmn'
+          git checkout cb2629519cee6280ab521f99dc46a9815a221a35
+          echo "fetched $(find . -name '*.bpmn' | wc -l) .bpmn files"
+
+      - name: Run full-corpus render regression
+        run: |
+          uv run python tests/_bpmn_regress.py \
+            --corpus /tmp/miwg \
+            --baseline tests/corpus_bpmn/baseline_full.json

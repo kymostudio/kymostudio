@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .DS_Store
 .claude/
+CLAUDE.md
 # transient build artefacts
 out/
 tmp/
