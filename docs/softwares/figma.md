@@ -419,6 +419,6 @@ All accessed 2026-05-18.
 
 ### Cross-references within this repo
 
-- `docs/references/d2.md` — sibling reference doc on the D2 text-to-diagram language (same template).
+- `docs/softwares/d2.md` — sibling reference doc on the D2 text-to-diagram language (same template).
 - `src/to_figma.py` — axo's Figma Plugin API emitter; hybrid auto-layout path at `:161` (`_tree_to_js`), flat fallback at `:261` (`_component_flat_js`), edge vector-network emission at `:77` (`edge_to_js`).
 - `src/cli.py:79` — `--figma` flag handling.
