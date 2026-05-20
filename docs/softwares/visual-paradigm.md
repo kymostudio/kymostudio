@@ -1,0 +1,102 @@
+---
+title: Visual Paradigm — External Reference
+document_id: REF-VISUAL-PARADIGM-001
+version: "1.0"
+issue_date: 2026-05-20
+status: Released
+classification: Internal
+owner: diagrams/ project
+audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
+review_cycle: On upstream major release, or annually (whichever first)
+supersedes: null
+related_documents:
+  - ../diagrams/bpmn/README.md
+  - ../DSL.md
+  - ../BEST_PRACTICE_DIAGRAMS.md
+authors:
+  - Vũ Anh
+language: en
+keywords:
+  - visual-paradigm
+  - uml
+  - bpmn
+  - archimate
+  - modeling-tool
+  - prior-art
+upstream:
+  project: Visual Paradigm
+  homepage: https://www.visual-paradigm.com/
+  developer_site: https://www.visual-paradigm.com/features/bpmn-tool/
+  license: Commercial (per-edition); free non-commercial Community Edition
+  version_reviewed: "Visual Paradigm 17 line (2026)"
+  access_date: 2026-05-20
+---
+
+# Visual Paradigm — External Reference
+
+| Field             | Value                                                          |
+|-------------------|----------------------------------------------------------------|
+| Document ID       | REF-VISUAL-PARADIGM-001                                     |
+| Version           | 1.0                                                            |
+| Issue Date        | 2026-05-20                                                     |
+| Status            | Released                                                       |
+| Classification    | Internal                                                       |
+| Owner             | `diagrams/` project                                            |
+| Audience          | Engineers evolving the kymo DSL, layout engine, or render pipeline |
+| Upstream          | [Visual Paradigm](https://www.visual-paradigm.com/)           |
+| License           | Commercial (+ free Community Edition)                         |
+| Version Reviewed  | Visual Paradigm 17 line (2026)                               |
+| Access Date       | 2026-05-20                                                     |
+| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+
+This is a **reference note on prior art**, not a specification of kymo. It captures Visual Paradigm's design choices so the team can consult them when reasoning about multi-notation modelling and authoring UX. No code or behaviour in this repository depends on it. Visual Paradigm is a broad **modelling toolset** — a different category from kymo (a static diagram DSL).
+
+## 1. Overview
+
+**Visual Paradigm** is a commercial, full-featured modelling toolset supporting **BPMN, UML, ArchiMate**, ERD, and more, with team collaboration and round-trip engineering between models and code. It targets analysts, architects, and developers who want one tool across software design and business-process modelling. Much of the widely cited online BPMN tutorial material (gateway types, orchestration vs choreography) comes from Visual Paradigm's guides.
+
+- Homepage: <https://www.visual-paradigm.com/>
+- BPMN tool: <https://www.visual-paradigm.com/features/bpmn-tool/>
+
+## 2. Editions and licensing
+
+- **Commercial** — sold across editions (Modeler → Standard → Professional → Enterprise) unlocking more notations and team features.
+- A free, non-commercial **Community Edition** is available for personal/educational use.
+
+## 3. Capabilities
+
+- Multi-notation modelling with **round-trip engineering** (model ↔ source code).
+- Team collaboration, a model repository, and document generation.
+- Extensive built-in **guidance content** (the "BPMN guide" tutorials) integrated with the tool.
+
+## 4. BPMN support and conformance
+
+- Full BPMN 2.0 Process Modeling, with pools/lanes, events, gateways, sub-processes; also choreography/conversation views.
+- Standard **BPMN 2.0 XML** interchange.
+- Modelling and design focus; not a process-execution engine.
+
+## 5. Comparison vs `kymo`
+
+| Axis                  | Visual Paradigm                                          | kymo (this repo)                                                  |
+|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
+| Primary purpose       | Multi-notation modelling + round-trip engineering        | Render static architecture diagrams                               |
+| Notations             | BPMN, UML, ArchiMate, ERD …                             | kymo `.diagram` DSL                                             |
+| Authoring             | WYSIWYG desktop/web, repository-backed                   | Local text DSL                                                   |
+| Code link             | Round-trip model ↔ code                                  | None                                                             |
+| Cost                  | Commercial (+ free Community Edition)                    | Apache-2.0, free                                                 |
+
+## 6. Lessons we may consider borrowing
+
+Listed without commitment — these are observations, not roadmap items.
+
+- **Guidance embedded with the tool.** Visual Paradigm couples authoring with teaching content; kymo's docs (`DSL.md`, `BEST_PRACTICE_DIAGRAMS.md`) play that role and benefit from staying close to the tool's behaviour.
+- **Round-trip thinking.** Model↔code round-tripping is out of scope for kymo, but the *idea* — that a representation can be regenerated rather than hand-maintained — supports keeping the `.diagram` source as the single source of truth and never hand-editing generated SVG.
+- **Tiered editions vs one free tool.** A useful contrast: kymo's single Apache-2.0 surface avoids the edition-matrix complexity that commercial modellers carry.
+
+## 7. References
+
+All accessed 2026-05-20.
+
+- Visual Paradigm homepage — <https://www.visual-paradigm.com/>
+- BPMN tool — <https://www.visual-paradigm.com/features/bpmn-tool/>
+- BPMN guides — <https://www.visual-paradigm.com/guide/bpmn/>
