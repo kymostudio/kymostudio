@@ -12,13 +12,13 @@
  */
 
 // ── Numeric formatter ─────────────────────────────────────────────────
-function r(x) {
+function r(x: number): string {
   const s = x.toFixed(2);
   return s.replace(/\.?0+$/, "");
 }
 
 // ── Isometric cube (NVIDIA green) ─────────────────────────────────────
-function _cube(innerUnit, size = 80) {
+function _cube(innerUnit: string, size = 80): string {
   const s = size;
   const h = (s / 2) | 0;
   const a = r(s * 0.44);
@@ -26,9 +26,9 @@ function _cube(innerUnit, size = 80) {
   const d = r(s * 0.44);
   const e = r(s * 0.06);
   const f = r(s * 0.28);
-  const p = Object.fromEntries(
-    [["06", 0.06], ["28", 0.28], ["49", 0.49], ["72", 0.72], ["94", 0.94], ["50", 0.50]]
-      .map(([k, v]) => [k, r(s * v)])
+  const p: Record<string, string> = Object.fromEntries(
+    ([["06", 0.06], ["28", 0.28], ["49", 0.49], ["72", 0.72], ["94", 0.94], ["50", 0.50]] as [string, number][])
+      .map(([k, v]) => [k, r(s * v)] as [string, string])
   );
   return (
     `<g class="icon-shadow" transform="translate(-${h},-${h})">` +
@@ -91,7 +91,7 @@ const _HEX_NET_GLYPH = `
 `;
 
 // ── Flat orange box wrapper ───────────────────────────────────────────
-function _box(inner) {
+function _box(inner: string): string {
   return (
     `<g class="icon-shadow">` +
       `<rect x="-35" y="-35" width="70" height="70" rx="8" ` +
@@ -214,7 +214,7 @@ const _MAGNIFIER_GLYPH = `
 `;
 
 // ── Halo wrapper ──────────────────────────────────────────────────────
-function _halo(inner, size = 124) {
+function _halo(inner: string, size = 124): string {
   const s = (size / 2) | 0;
   return `<circle r="${s}" fill="#76b900" opacity="0.10"/>` +
          `<circle r="${s - 6}" fill="#76b900" opacity="0.08"/>` +
@@ -222,7 +222,7 @@ function _halo(inner, size = 124) {
 }
 
 // ── AWS-style coloured tile ───────────────────────────────────────────
-function _awsTile(color, dark, glyph, hero = false) {
+function _awsTile(color: string, dark: string, glyph: string, hero = false): string {
   const size = hero ? 80 : 64;
   const h = (size / 2) | 0;
   return (
@@ -354,14 +354,14 @@ const _SITE_GLOBE = `
   </g>
 `;
 
-function _stepBadge(n) {
+function _stepBadge(n: number): string {
   return `<circle r="14" fill="#fff4e0" stroke="#d97706" stroke-width="1.8"/>` +
          `<text x="0" y="4.5" text-anchor="middle" ` +
          `style="font-size:14px;font-weight:700;fill:#92400e">${n}</text>`;
 }
 
 // ── Public registry ───────────────────────────────────────────────────
-export const ICONS = {
+export const ICONS: Record<string, string> = {
   "user":      _USER_CIRCLE,
   "notebook":  _cube(_NOTEBOOK_GLYPH),
   "boxes":     _cube(_DOCKER_GLYPH),
