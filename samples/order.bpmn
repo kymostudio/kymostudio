@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_order">
+  <bpmn:process id="OrderProcess" isExecutable="false">
+    <bpmn:startEvent id="Start" name="Order received">
+      <bpmn:messageEventDefinition/>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Check" name="Check order details"/>
+    <bpmn:exclusiveGateway id="GW" name="In stock?" default="F_no"/>
+    <bpmn:serviceTask id="Ship" name="Ship goods"/>
+    <bpmn:scriptTask id="Refund" name="Issue refund"/>
+    <bpmn:endEvent id="EndOk" name="Order fulfilled"/>
+    <bpmn:endEvent id="EndNo" name="Order cancelled">
+      <bpmn:terminateEventDefinition/>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F0" sourceRef="Start"  targetRef="Check"/>
+    <bpmn:sequenceFlow id="F1" sourceRef="Check"  targetRef="GW"/>
+    <bpmn:sequenceFlow id="F_yes" name="yes" sourceRef="GW" targetRef="Ship">
+      <bpmn:conditionExpression>${inStock}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_no" name="no" sourceRef="GW" targetRef="Refund"/>
+    <bpmn:sequenceFlow id="F2" sourceRef="Ship"   targetRef="EndOk"/>
+    <bpmn:sequenceFlow id="F3" sourceRef="Refund" targetRef="EndNo"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane bpmnElement="OrderProcess">
+      <bpmndi:BPMNShape bpmnElement="Start"><dc:Bounds x="160" y="100" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Check"><dc:Bounds x="250" y="78" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="GW"  ><dc:Bounds x="410" y="93" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Ship"><dc:Bounds x="520" y="78" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Refund"><dc:Bounds x="410" y="230" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EndOk"><dc:Bounds x="690" y="100" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EndNo"><dc:Bounds x="560" y="252" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="F0"><di:waypoint x="196" y="118"/><di:waypoint x="250" y="118"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F1"><di:waypoint x="350" y="118"/><di:waypoint x="410" y="118"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_yes"><di:waypoint x="460" y="118"/><di:waypoint x="520" y="118"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="478" y="96" width="22" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_no"><di:waypoint x="435" y="143"/><di:waypoint x="435" y="230"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="442" y="178" width="16" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F2"><di:waypoint x="620" y="118"/><di:waypoint x="690" y="118"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F3"><di:waypoint x="460" y="270"/><di:waypoint x="560" y="270"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

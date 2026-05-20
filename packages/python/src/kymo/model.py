@@ -10,7 +10,17 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 Shape   = Literal["circle", "cube", "cube-big", "box", "cylinder", "hex", "annotation",
-                  "aws-tile", "aws-tile-hero", "badge", "image"]
+                  "aws-tile", "aws-tile-hero", "badge", "image",
+                  # ── BPMN 2.0 glyphs (see bpmn_shapes.py) ─────────────────
+                  # Imported from .bpmn files; positions/sizes come from the
+                  # file's Diagram-Interchange bounds (Component.size), not
+                  # SHAPE_HALF. The trailing marker (event-definition / task
+                  # type / gateway type) is carried in Component.icon.
+                  "bpmn-start", "bpmn-end", "bpmn-intermediate", "bpmn-boundary",
+                  "bpmn-task", "bpmn-subprocess",
+                  "bpmn-gateway",
+                  "bpmn-data-object", "bpmn-data-store",
+                  "bpmn-annotation"]
 Accent  = Literal["green", "orange", "blue", "red"]
 Anchor  = Literal["top", "right", "bottom", "left", "center"]
 Style   = Literal["gray", "orange"]
@@ -29,6 +39,17 @@ SHAPE_HALF: dict[Shape, tuple[int, int]] = {
     "aws-tile-hero": (40, 40),  # +25% over aws-tile — visual weight for orchestrator (§6.7.2)
     "badge":      (14, 14),     # numbered step circle (§6.7.3)
     "image":      (32, 32),     # file-backed PNG/SVG icon (mingrammer-style)
+    # BPMN — fallbacks only; real sizes arrive via Component.size from DI.
+    "bpmn-start":        (18, 18),
+    "bpmn-end":          (18, 18),
+    "bpmn-intermediate": (18, 18),
+    "bpmn-boundary":     (18, 18),
+    "bpmn-task":         (50, 40),
+    "bpmn-subprocess":   (50, 40),
+    "bpmn-gateway":      (25, 25),
+    "bpmn-data-object":  (18, 25),
+    "bpmn-data-store":   (25, 25),
+    "bpmn-annotation":   (0, 0),
 }
 
 # How much space the name+subtitle take BELOW the icon — used to push
@@ -46,6 +67,18 @@ LABEL_HEIGHT: dict[Shape, int] = {
     "aws-tile-hero": 48,
     "badge":      0,
     "image":      26,           # 1 label line + small clearance for bottom-anchored edges
+    # BPMN edges always carry explicit waypoints (Edge.points), so no
+    # label clearance is needed — anchors sit flush with the glyph box.
+    "bpmn-start":        0,
+    "bpmn-end":          0,
+    "bpmn-intermediate": 0,
+    "bpmn-boundary":     0,
+    "bpmn-task":         0,
+    "bpmn-subprocess":   0,
+    "bpmn-gateway":      0,
+    "bpmn-data-object":  0,
+    "bpmn-data-store":   0,
+    "bpmn-annotation":   0,
 }
 
 
@@ -75,8 +108,15 @@ class Component:
     align_gap: int = 24
     align_offset: tuple[int, int] = (0, 0)
 
+    # Explicit box size (width, height) overriding the per-shape SHAPE_HALF
+    # default. Set by the BPMN importer (`from_bpmn.py`) from each element's
+    # Diagram-Interchange bounds so glyphs render at their authored size.
+    size: tuple[int, int] | None = None
+
     @property
     def half(self) -> tuple[int, int]:
+        if self.size is not None:
+            return (self.size[0] // 2, self.size[1] // 2)
         return SHAPE_HALF[self.shape]
 
     def anchor(self, side: Anchor) -> tuple[int, int]:
@@ -102,11 +142,15 @@ class Component:
                 return (cx, cy)
 
 
-RegionStyle = Literal["outer", "inner", "cluster"]
+RegionStyle = Literal["outer", "inner", "cluster", "pool", "lane"]
 # outer   — gray dashed (admin boundary: account, VPC, region)        — §6.7.4
 # inner   — coloured solid (logical subgroup: subnet, namespace, app) — §6.7.4
 # cluster — light-blue filled rounded box, label inside top-left
 #           (mingrammer/graphviz cluster look)
+# pool    — BPMN participant: solid rectangle with a label band running
+#           down the left edge (label text rotated 90°). See bpmn_shapes /
+#           to_svg.render_region_*.
+# lane    — BPMN lane: like pool but a lighter inner subdivision.
 
 AutoLayout = Literal["horizontal", "vertical"]
 # Figma-style auto-layout: stack contained components in the given direction
@@ -232,6 +276,19 @@ class Edge:
     shared_port: bool = False    # opt-out of fan-out src_offset stagger — keep
                                  # this edge anchored to the source's centre
                                  # port (used to draw star-fan from one point)
+
+    # ── Explicit polyline (BPMN import) ─────────────────────────────
+    # When set, the edge is drawn through exactly these absolute points
+    # (the file's Diagram-Interchange waypoints), bypassing anchor
+    # resolution and Z-routing entirely. `bpmn_flow` selects the
+    # arrowhead / dash convention:
+    #   "sequence"    — solid line, filled arrowhead (default flow)
+    #   "default"     — sequence flow with a slash tick at the source
+    #   "conditional" — sequence flow with a small diamond at the source
+    #   "message"     — dashed line, hollow circle at src + open arrowhead
+    #   "association" — dotted line, no arrowhead (or open, for data assoc)
+    points: list[tuple[int, int]] | None = None
+    bpmn_flow: str | None = None
 
 
 def resolve_anchors(e: Edge, src, dst) -> tuple[Anchor, Anchor]:

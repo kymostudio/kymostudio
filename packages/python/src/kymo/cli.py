@@ -1,13 +1,18 @@
 """Entry point: `kymo <path> [--animate] [--figma] [--excalidraw]`
 
-Argument is a path to a `.diagram` (DSL) or `.py` (Python form) source.
-Output is a SVG (or Figma Plugin JS / Excalidraw scene) written next to
-the input file:
+Argument is a path to a `.diagram` (DSL), `.bpmn` (BPMN 2.0 XML), or
+`.py` (Python form) source. Output is a SVG (or Figma Plugin JS /
+Excalidraw scene) written next to the input file:
 
     kymo samples/aws_1.diagram                → samples/aws_1.svg
     kymo samples/aws_1.diagram --animate      → samples/aws_1-animated.svg
     kymo samples/aws_1.diagram --figma        → samples/aws_1.figma.js
     kymo samples/aws_1.diagram --excalidraw   → samples/aws_1.excalidraw
+    kymo samples/order.bpmn                    → samples/order.svg
+
+`.bpmn` files are imported via their Diagram-Interchange geometry
+(`from_bpmn.py`), so positions come straight from the file — no layout
+pass is run.
 
 `--animate` emits a `-animated.svg` companion with flowing edge dashes
 (CSS `stroke-dashoffset` animation). Static SVG (no JS); animation runs
@@ -34,6 +39,10 @@ from .to_svg import render
 
 def load(source: Path) -> tuple[object, object | None, object | None]:
     """Load a diagram source. Returns (DIAGRAM, LAYOUT, EXTERNAL_LAYOUT)."""
+    if source.suffix == ".bpmn":
+        from .from_bpmn import parse as parse_bpmn
+        # BPMN files carry their own geometry — already resolved, no layout.
+        return parse_bpmn(source.read_text(encoding="utf-8")), None, None
     if source.suffix == ".diagram":
         return parse_dsl(source.read_text(encoding="utf-8"))
     # For .py sources, the file's parent directory must be on sys.path so the
@@ -55,8 +64,8 @@ def main() -> None:
     if not src.exists():
         print(f"not found: {src}")
         sys.exit(1)
-    if src.suffix not in (".diagram", ".py"):
-        print(f"unsupported source: {src} (expected .diagram or .py)")
+    if src.suffix not in (".diagram", ".py", ".bpmn"):
+        print(f"unsupported source: {src} (expected .diagram, .bpmn or .py)")
         sys.exit(1)
 
     animate    = "--animate"    in flags
@@ -66,7 +75,11 @@ def main() -> None:
     diagram, layout_spec, external_layout = load(src)
     if layout_spec:
         layout(diagram, layout_spec, external_layout)
-    resolve_alignments(diagram)
+    # BPMN diagrams arrive fully positioned from their DI geometry; the
+    # alignment/auto-size passes assume DSL-authored nodes and would choke
+    # on flow endpoints that aren't drawn nodes (data objects, etc.).
+    if src.suffix != ".bpmn":
+        resolve_alignments(diagram)
 
     if excalidraw:
         payload = render_excalidraw(diagram)

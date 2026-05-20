@@ -32,7 +32,14 @@ kymo path/to/diagram.diagram             # → path/to/diagram.svg
 kymo path/to/diagram.diagram --animate   # → path/to/diagram-animated.svg
 kymo path/to/diagram.diagram --figma     # → path/to/diagram.figma.js
 kymo path/to/diagram.diagram --excalidraw # → path/to/diagram.excalidraw
+kymo path/to/process.bpmn                 # → path/to/process.svg (BPMN 2.0 import)
 ```
+
+kymo also imports standard **BPMN 2.0 XML** (`.bpmn` from bpmn.io / Camunda
+Modeler / Signavio) and renders it to SVG using the file's own geometry —
+see [`docs/BPMN.md`](./docs/BPMN.md) and the
+[`samples/order.bpmn`](./samples/order.bpmn) /
+[`samples/collaboration.bpmn`](./samples/collaboration.bpmn) examples.
 
 See [`samples/`](./samples/) for complete example `.diagram` files, and the
 per-package READMEs ([Python](./packages/python/README.md),

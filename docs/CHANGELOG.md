@@ -11,6 +11,22 @@ packages share a version number.
 
 ### Added
 
+- **BPMN 2.0 import** (Python). `kymo path/to/process.bpmn → process.svg`
+  renders a standard `.bpmn` file (Camunda Modeler, bpmn.io, Signavio …)
+  to SVG. Geometry comes straight from the file's Diagram-Interchange
+  section (`BPMNShape`/`dc:Bounds`, `BPMNEdge`/`di:waypoint`), so no layout
+  pass runs. The mapped subset covers events (start/end/intermediate/
+  boundary, with message/timer/error/signal/terminate/… definitions),
+  tasks (user/service/script/send/receive/manual/business-rule) and
+  collapsed sub-processes, gateways (exclusive/parallel/inclusive/event/
+  complex), sequence flows (incl. default & conditional markers), message
+  flows, associations, data objects/stores, text annotations, and pools/
+  lanes. New modules `from_bpmn.py` (parser) + `bpmn_shapes.py` (glyphs);
+  public API `from kymo import parse_bpmn`. See
+  [`samples/order.bpmn`](../samples/order.bpmn),
+  [`samples/collaboration.bpmn`](../samples/collaboration.bpmn) and
+  [`docs/BPMN.md`](./BPMN.md).
+
 - **`renderSVG(diagram)`** in the JS/TS package — a standalone SVG renderer
   (background, cubic-Bézier edges with arrowheads, icon glyphs + labels, and
   auto-computed canvas bounds). It is an original TypeScript implementation,
