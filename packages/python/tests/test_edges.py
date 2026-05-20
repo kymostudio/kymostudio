@@ -1,11 +1,18 @@
-"""Golden-file tests: each subdirectory under ``tests/diagrams/`` is a
-case with ``input.diagram`` and ``output.svg``. We re-render the input
-through the full pipeline (parse → layout → align → SVG) and assert the
-output matches the committed golden byte-for-byte.
+"""Golden-file tests focused on edge behaviour: each subdirectory
+under ``tests/edges/`` exercises one routing or styling rule and
+compares the rendered SVG byte-for-byte against ``output.svg``.
 
-When something changes the renderer on purpose, regenerate goldens:
+Cases:
+  - horizontal_straight  — same-row src/dst, default `-->`
+  - vertical_straight    — same-column src/dst, default `-->`
+  - z_shape_horizontal   — off-axis dst, horizontal anchors → H-V-H Z
+  - undirected           — `---` drops the arrowhead
+  - fan_out              — 1 src → N dsts
+  - fan_in_stagger       — N srcs → 1 dst (stagger spreads endpoints)
 
-    KYMO_UPDATE_GOLDEN=1 uv run pytest tests/test_diagrams.py
+Regenerate goldens after intentional renderer changes:
+
+    KYMO_UPDATE_GOLDEN=1 uv run pytest tests/test_edges.py
 """
 from __future__ import annotations
 
@@ -20,7 +27,7 @@ from kymo.layout import layout as apply_grid_layout
 from kymo.to_svg import render
 
 
-CASES_DIR = Path(__file__).parent.parent / "diagrams"
+CASES_DIR = Path(__file__).parent / "edges"
 UPDATE = os.environ.get("KYMO_UPDATE_GOLDEN") == "1"
 
 
@@ -38,7 +45,7 @@ def _render_case(case: str) -> str:
 
 
 @pytest.mark.parametrize("case", _discover_cases())
-def test_diagram_matches_golden(case: str) -> None:
+def test_edge_matches_golden(case: str) -> None:
     actual = _render_case(case)
     golden_path = CASES_DIR / case / "output.svg"
 
@@ -48,6 +55,6 @@ def test_diagram_matches_golden(case: str) -> None:
 
     expected = golden_path.read_text(encoding="utf-8")
     assert actual == expected, (
-        f"Rendered SVG for {case!r} differs from {golden_path.name}.\n"
+        f"Rendered SVG for edge case {case!r} differs from {golden_path.name}.\n"
         f"Re-run with KYMO_UPDATE_GOLDEN=1 if the change is intentional."
     )

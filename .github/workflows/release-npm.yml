@@ -6,11 +6,15 @@ on:
       - 'v*'  # Trigger on tags like v0.1.0
   workflow_dispatch:
 
+# JS package lives in packages/js/ — run all shell steps there.
 jobs:
   verify-version:
     name: Verify Version
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
+    defaults:
+      run:
+        working-directory: packages/js
     steps:
       - uses: actions/checkout@v4
       - name: Verify tag matches package.json version
@@ -35,6 +39,9 @@ jobs:
     permissions:
       id-token: write   # for npm provenance attestation
       contents: read
+    defaults:
+      run:
+        working-directory: packages/js
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
