@@ -27,10 +27,17 @@ packages share a version number.
   [`samples/collaboration.bpmn`](../samples/collaboration.bpmn) and
   [`docs/BPMN.md`](./BPMN.md).
 
+- **BPMN 2.0 import in the JS/TS package** — `parseBpmn(xml)` brings the same
+  feature to `packages/js` at parity with Python: a dependency-free XML reader
+  (`xml.ts`) + importer (`from-bpmn.ts`) + glyph renderer (`bpmn-shapes.ts`),
+  and `renderSVG` now draws BPMN glyphs, pools/lanes, and DI-waypoint flows.
+  Output matches the Python renderer (monochrome, bpmn.io-faithful). This
+  reflects that `packages/js` is an **independent implementation at feature
+  parity**, not a port.
+
 - **`renderSVG(diagram)`** in the JS/TS package — a standalone SVG renderer
   (background, cubic-Bézier edges with arrowheads, icon glyphs + labels, and
-  auto-computed canvas bounds). It is an original TypeScript implementation,
-  not a port of the Python renderer.
+  auto-computed canvas bounds). It is an original TypeScript implementation.
 
 ### Changed
 

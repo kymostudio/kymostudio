@@ -13,10 +13,14 @@
  * require `setIconBaseURL(...)` to point at a host serving the manifest.
  */
 import {
-  anchor, resolveAnchors, SHAPE_HALF, LABEL_HEIGHT,
+  anchor, resolveAnchors, componentHalf, LABEL_HEIGHT,
   type Component, type Diagram, type Point, type Side,
 } from "./model.js";
 import { getIcon } from "./icons-loader.js";
+import {
+  BPMN_DEFS, BPMN_STYLE, renderBpmnComponent, renderBpmnEdge,
+  bpmnRegionRect, bpmnRegionLabel,
+} from "./bpmn-shapes.js";
 
 export interface RenderOptions {
   /** Outer margin around the content, in px. Default 52. */
@@ -32,7 +36,7 @@ function escapeXml(s: string): string {
 }
 
 function half(c: Component): Point {
-  return SHAPE_HALF[c.shape] ?? [35, 35];
+  return componentHalf(c) ?? [35, 35];
 }
 
 const r1 = (n: number): number => Math.round(n * 10) / 10;
@@ -82,15 +86,26 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
   const pad = opts.padding ?? 52;
   const background = opts.background === undefined ? "#f8fafc" : opts.background;
 
+  // A BPMN diagram uses pool/lane regions, bpmn-* glyphs, and flows with
+  // explicit waypoints — inject the BPMN defs/CSS only when present so
+  // ordinary diagrams stay unchanged.
+  const hasBpmn = d.components.some((c) => c.shape.startsWith("bpmn-"))
+    || d.edges.some((e) => e.points != null && e.points.length > 0)
+    || d.regions.some((r) => r.style === "pool" || r.style === "lane");
+
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const grow = (x: number, y: number): void => {
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+  };
   for (const c of d.components) {
     const [hw, hh] = half(c);
-    const lh = LABEL_HEIGHT[c.shape] ?? 0;
-    minX = Math.min(minX, c.pos[0] - hw);
-    maxX = Math.max(maxX, c.pos[0] + hw);
-    minY = Math.min(minY, c.pos[1] - hh);
-    maxY = Math.max(maxY, c.pos[1] + hh + lh);
+    const lh = c.size ? (c.name ? 30 : 0) : (LABEL_HEIGHT[c.shape] ?? 0);
+    grow(c.pos[0] - hw, c.pos[1] - hh);
+    grow(c.pos[0] + hw, c.pos[1] + hh + lh);
   }
+  for (const r of d.regions) { const [x, y, w, h] = r.bounds; grow(x, y); grow(x + w, y + h); }
+  for (const e of d.edges) for (const [x, y] of e.points ?? []) grow(x, y);
   if (!Number.isFinite(minX)) { minX = 0; minY = 0; maxX = 0; maxY = 0; }
 
   const x0 = minX - pad;
@@ -102,6 +117,10 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 
   const edges: string[] = [];
   for (const e of d.edges) {
+    if (e.points && e.points.length >= 2) {   // BPMN flow — draw through DI waypoints
+      edges.push(renderBpmnEdge(e));
+      continue;
+    }
     const s = byId.get(e.src);
     const t = byId.get(e.dst);
     if (!s || !t) continue;
@@ -116,12 +135,21 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 
   const nodes: string[] = [];
   for (const c of d.components) {
+    if (c.shape.startsWith("bpmn-")) {   // BPMN glyph draws its own geometry (no icon)
+      nodes.push(renderBpmnComponent(c));
+      continue;
+    }
     const glyph = await getIcon(c.icon);
     const [, hh] = half(c);
     const parts = [`<g transform="translate(${c.pos[0]},${c.pos[1]})" filter="url(#soft)">${glyph}</g>`];
     if (c.name) parts.push(`<text class="label" x="${c.pos[0]}" y="${c.pos[1] + hh + 18}">${escapeXml(c.name)}</text>`);
     nodes.push(parts.join(""));
   }
+
+  const regionRects = d.regions.length
+    ? `\n  <g class="regions">\n    ${d.regions.map(bpmnRegionRect).join("\n    ")}\n  </g>` : "";
+  const regionLabels = d.regions.length
+    ? `\n  <g class="region-labels">\n    ${d.regions.map(bpmnRegionLabel).join("\n    ")}\n  </g>` : "";
 
   const bg = background === null
     ? ""
@@ -131,18 +159,18 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${w} ${h}" width="${w}" height="${h}">
-  <defs>${DEFS}
+  <defs>${DEFS}${hasBpmn ? BPMN_DEFS : ""}
   </defs>
-  <style>${CSS}
+  <style>${CSS}${hasBpmn ? BPMN_STYLE : ""}
   </style>
   ${bg}
-  ${title}
+  ${title}${regionRects}
   <g class="edges">
     ${edges.join("\n    ")}
   </g>
   <g class="nodes">
     ${nodes.join("\n    ")}
-  </g>
+  </g>${regionLabels}
 </svg>
 `;
 }

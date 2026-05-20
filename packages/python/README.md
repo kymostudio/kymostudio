@@ -1,10 +1,7 @@
 # kymostudio (Python)
 
-Diagram-as-code DSL — declarative architecture diagrams to **animated SVG / WebP**.
-
-This is the Python package and source-of-truth for kymo (the DSL parser,
-layout engine and SVG renderer). The browser/Node port lives in
-[`../js`](../js).
+Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
+`.bpmn` file — into **animated SVG / WebP** (also Figma / Excalidraw).
 
 ## Install
 
@@ -14,22 +11,23 @@ pip install kymostudio
 uv tool install kymostudio
 ```
 
-## CLI
+## Convert (CLI)
 
 ```bash
-kymo path/to/diagram.diagram             # → path/to/diagram.svg
-kymo path/to/diagram.diagram --animate   # → path/to/diagram-animated.svg
-kymo path/to/diagram.diagram --figma     # → path/to/diagram.figma.js
+kymo path/to/diagram.diagram              # → path/to/diagram.svg
+kymo path/to/diagram.diagram --animate    # → path/to/diagram-animated.svg
+kymo path/to/diagram.diagram --figma      # → path/to/diagram.figma.js
 kymo path/to/diagram.diagram --excalidraw # → path/to/diagram.excalidraw
 kymo path/to/process.bpmn                 # → path/to/process.svg (BPMN 2.0)
 ```
 
-See [`../../samples/`](../../samples/) for complete example `.diagram` files.
+See [`../../samples/`](../../samples/) for complete example `.diagram` and
+`.bpmn` files.
 
 ### BPMN 2.0 import
 
-kymo renders a standard `.bpmn` file (bpmn.io / Camunda Modeler / Signavio)
-to SVG, using the geometry in the file's Diagram-Interchange section — no
+A standard `.bpmn` file (from bpmn.io / Camunda Modeler / Signavio …) renders
+to SVG using the geometry in the file's Diagram-Interchange section — no
 layout pass runs. See [`../../docs/BPMN.md`](../../docs/BPMN.md) for the
 element mapping.
 

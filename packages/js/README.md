@@ -1,9 +1,8 @@
 # kymostudio (JavaScript / TypeScript)
 
-A browser/Node port of the shared **data model + icon library** for
-[kymo](../python) — the diagram-as-code DSL — plus a standalone **SVG
-renderer**. Written in TypeScript and published with type declarations. The
-DSL parser and layout engine remain Python-only (see [`../python`](../python)).
+Diagram-as-code for browser/Node: a **data model**, **icon library**, **SVG
+renderer** (`renderSVG`), and a **BPMN 2.0 importer** (`parseBpmn`).
+Dependency-free TypeScript, published with type declarations.
 
 ## Install
 
@@ -11,11 +10,24 @@ DSL parser and layout engine remain Python-only (see [`../python`](../python)).
 npm install kymostudio
 ```
 
-## Render an SVG
+## Convert a BPMN file
+
+`parseBpmn(xml)` reads a standard `.bpmn` file (from bpmn.io / Camunda /
+Signavio …) into a Diagram using the file's Diagram-Interchange geometry;
+`renderSVG` turns it into an SVG document.
+
+```ts
+import { parseBpmn, renderSVG } from "kymostudio";
+import { readFileSync } from "node:fs";
+
+const svg = await renderSVG(parseBpmn(readFileSync("process.bpmn", "utf8")));
+```
+
+## Render an SVG from a model
 
 `renderSVG(diagram)` turns a model (whose components carry positions) into a
 complete SVG document — background, edges with arrowheads, icon glyphs and
-labels. It's an original TypeScript renderer, not a port of the Python one.
+labels (and BPMN glyphs / pools / flows for an imported `.bpmn`).
 
 ```ts
 import { makeComponent, makeEdge, makeDiagram, renderSVG } from "kymostudio";
@@ -55,9 +67,9 @@ npm test               # build, then node --test
 npm run build-manifest # scan ../../icons and (re)write icons-manifest.json
 ```
 
-The icon set itself lives at the repo root in [`../../icons/`](../../icons/),
-shared with the Python package. `icons-manifest.json` is generated from it and
-bundled into the published npm package alongside the compiled `dist/`.
+The icon set lives at the repo root in [`../../icons/`](../../icons/);
+`icons-manifest.json` is generated from it and bundled into the published
+package alongside the compiled `dist/`.
 
 ## License
 
