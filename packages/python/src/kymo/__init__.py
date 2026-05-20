@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from .alignment import resolve_alignments
 from .dsl import parse
+from .from_bpmn import parse as parse_bpmn
 from .layout import layout
 from .model import Component, Diagram, Edge, Region
 from .to_svg import render
@@ -22,6 +23,7 @@ __version__ = "0.1.1"
 
 __all__ = [
     "parse",
+    "parse_bpmn",
     "layout",
     "resolve_alignments",
     "render",

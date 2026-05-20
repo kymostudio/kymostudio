@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_collab">
+
+  <bpmn:collaboration id="Collab">
+    <bpmn:participant id="Pool_Customer" name="Customer"/>
+    <bpmn:participant id="Pool_Shop" name="Online Shop" processRef="ShopProcess"/>
+    <bpmn:messageFlow id="MF1" sourceRef="Pool_Customer" targetRef="Start_Order"/>
+    <bpmn:messageFlow id="MF2" sourceRef="Task_Dispatch" targetRef="Pool_Customer"/>
+  </bpmn:collaboration>
+
+  <bpmn:process id="ShopProcess" isExecutable="false">
+    <bpmn:laneSet>
+      <bpmn:lane id="Lane_Sales" name="Sales">
+        <bpmn:flowNodeRef>Start_Order</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_Approved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Notify</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Rejected</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Ful" name="Fulfilment">
+        <bpmn:flowNodeRef>Task_Reserve</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Pack</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Dispatch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Shipped</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="Start_Order" name="Order received">
+      <bpmn:messageEventDefinition/>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Review" name="Review order"/>
+    <bpmn:exclusiveGateway id="GW_Approved" name="Approved?" default="SF_no"/>
+    <bpmn:userTask id="Task_Notify" name="Notify customer"/>
+    <bpmn:endEvent id="End_Rejected" name="Order rejected"/>
+
+    <bpmn:serviceTask id="Task_Reserve" name="Reserve stock"/>
+    <bpmn:manualTask  id="Task_Pack"    name="Pack items"/>
+    <bpmn:sendTask    id="Task_Dispatch" name="Dispatch shipment"/>
+    <bpmn:endEvent id="End_Shipped" name="Shipped"/>
+
+    <bpmn:dataStoreReference id="DataStore_Inv" name="Inventory"/>
+    <bpmn:dataObjectReference id="DataObj_Label" name="Shipping label"/>
+    <bpmn:textAnnotation id="Anno_QC"><bpmn:text>Fragile goods — manual quality check</bpmn:text></bpmn:textAnnotation>
+
+    <bpmn:sequenceFlow id="SF1" sourceRef="Start_Order" targetRef="Task_Review"/>
+    <bpmn:sequenceFlow id="SF2" sourceRef="Task_Review" targetRef="GW_Approved"/>
+    <bpmn:sequenceFlow id="SF_yes" name="yes" sourceRef="GW_Approved" targetRef="Task_Reserve">
+      <bpmn:conditionExpression>${approved}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SF_no" name="no" sourceRef="GW_Approved" targetRef="Task_Notify"/>
+    <bpmn:sequenceFlow id="SF3" sourceRef="Task_Notify" targetRef="End_Rejected"/>
+    <bpmn:sequenceFlow id="SF4" sourceRef="Task_Reserve" targetRef="Task_Pack"/>
+    <bpmn:sequenceFlow id="SF5" sourceRef="Task_Pack" targetRef="Task_Dispatch"/>
+    <bpmn:sequenceFlow id="SF6" sourceRef="Task_Dispatch" targetRef="End_Shipped"/>
+
+    <bpmn:association id="A1" sourceRef="Task_Pack" targetRef="Anno_QC"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane bpmnElement="Collab">
+      <bpmndi:BPMNShape bpmnElement="Pool_Customer" isHorizontal="true">
+        <dc:Bounds x="150" y="70" width="970" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Pool_Shop" isHorizontal="true">
+        <dc:Bounds x="150" y="160" width="970" height="380"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Lane_Sales" isHorizontal="true">
+        <dc:Bounds x="180" y="160" width="940" height="180"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Lane_Ful" isHorizontal="true">
+        <dc:Bounds x="180" y="340" width="940" height="200"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape bpmnElement="Start_Order"><dc:Bounds x="220" y="232" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Task_Review"><dc:Bounds x="310" y="210" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="GW_Approved"><dc:Bounds x="470" y="225" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Task_Notify"><dc:Bounds x="590" y="210" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="End_Rejected"><dc:Bounds x="760" y="232" width="36" height="36"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape bpmnElement="Task_Reserve"><dc:Bounds x="310" y="390" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Task_Pack"><dc:Bounds x="470" y="390" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Task_Dispatch"><dc:Bounds x="630" y="390" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="End_Shipped"><dc:Bounds x="800" y="412" width="36" height="36"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape bpmnElement="DataStore_Inv"><dc:Bounds x="335" y="486" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DataObj_Label"><dc:Bounds x="502" y="486" width="36" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Anno_QC"><dc:Bounds x="610" y="486" width="170" height="44"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge bpmnElement="MF1"><di:waypoint x="238" y="130"/><di:waypoint x="238" y="232"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="MF2"><di:waypoint x="712" y="390"/><di:waypoint x="712" y="130"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge bpmnElement="SF1"><di:waypoint x="256" y="250"/><di:waypoint x="310" y="250"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SF2"><di:waypoint x="410" y="250"/><di:waypoint x="470" y="250"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SF_yes"><di:waypoint x="495" y="275"/><di:waypoint x="495" y="345"/><di:waypoint x="360" y="345"/><di:waypoint x="360" y="390"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="500" y="300" width="22" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SF_no"><di:waypoint x="520" y="250"/><di:waypoint x="590" y="250"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="546" y="228" width="16" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SF3"><di:waypoint x="690" y="250"/><di:waypoint x="760" y="250"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SF4"><di:waypoint x="410" y="430"/><di:waypoint x="470" y="430"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SF5"><di:waypoint x="570" y="430"/><di:waypoint x="630" y="430"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SF6"><di:waypoint x="730" y="430"/><di:waypoint x="800" y="430"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge bpmnElement="A1"><di:waypoint x="540" y="470"/><di:waypoint x="620" y="486"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
