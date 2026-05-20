@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - visual-paradigm.comparision.md
   - ../diagrams/bpmn/README.md
   - ../DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
@@ -47,7 +48,7 @@ upstream:
 | License           | Commercial (+ free Community Edition)                         |
 | Version Reviewed  | Visual Paradigm 17 line (2026)                               |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`visual-paradigm.comparision.md`](./visual-paradigm.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Visual Paradigm's design choices so the team can consult them when reasoning about multi-notation modelling and authoring UX. No code or behaviour in this repository depends on it. Visual Paradigm is a broad **modelling toolset** — a different category from kymo (a static diagram DSL).
 
@@ -77,23 +78,9 @@ This is a **reference note on prior art**, not a specification of kymo. It captu
 
 ## 5. Comparison vs `kymo`
 
-| Axis                  | Visual Paradigm                                          | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | Multi-notation modelling + round-trip engineering        | Render static architecture diagrams                               |
-| Notations             | BPMN, UML, ArchiMate, ERD …                             | kymo `.diagram` DSL                                             |
-| Authoring             | WYSIWYG desktop/web, repository-backed                   | Local text DSL                                                   |
-| Code link             | Round-trip model ↔ code                                  | None                                                             |
-| Cost                  | Commercial (+ free Community Edition)                    | Apache-2.0, free                                                 |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of Visual Paradigm against kymo, and open questions for kymo — lives in [`visual-paradigm.comparision.md`](visual-paradigm.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream Visual Paradigm has not moved).
 
-## 6. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **Guidance embedded with the tool.** Visual Paradigm couples authoring with teaching content; kymo's docs (`DSL.md`, `BEST_PRACTICE_DIAGRAMS.md`) play that role and benefit from staying close to the tool's behaviour.
-- **Round-trip thinking.** Model↔code round-tripping is out of scope for kymo, but the *idea* — that a representation can be regenerated rather than hand-maintained — supports keeping the `.diagram` source as the single source of truth and never hand-editing generated SVG.
-- **Tiered editions vs one free tool.** A useful contrast: kymo's single Apache-2.0 surface avoids the edition-matrix complexity that commercial modellers carry.
-
-## 7. References
+## 6. References
 
 All accessed 2026-05-20.
 

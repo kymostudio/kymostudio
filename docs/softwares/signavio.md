@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - signavio.comparision.md
   - ../diagrams/bpmn/README.md
   - ../DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
@@ -47,7 +48,7 @@ upstream:
 | License           | Commercial SaaS (30-day trial)                                |
 | Version Reviewed  | SAP Signavio cloud (2026)                                    |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`signavio.comparision.md`](./signavio.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures SAP Signavio's design choices so the team can consult them when reasoning about collaborative modelling and process governance. No code or behaviour in this repository depends on Signavio. Signavio is an enterprise **process-management suite** — a different category and price point from kymo (a static diagram DSL).
 
@@ -80,24 +81,9 @@ Signavio's differentiator is the layer **around** the diagram:
 
 ## 5. Comparison vs `kymo`
 
-| Axis                  | SAP Signavio                                             | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | Enterprise process modelling, governance, mining         | Render static architecture diagrams                               |
-| Notation              | BPMN 2.0 + EPC + DMN                                     | kymo `.diagram` DSL                                             |
-| Authoring             | Browser, collaborative, governed repository              | Local text DSL, single-file                                      |
-| Deployment            | Commercial SaaS                                          | Local CLI / library                                              |
-| Extras                | Simulation, process mining, approvals                    | None — rendering only                                            |
-| Licence/cost          | Commercial subscription                                  | Apache-2.0, free                                                 |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of SAP Signavio against kymo, and open questions for kymo — lives in [`signavio.comparision.md`](signavio.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream SAP Signavio has not moved).
 
-## 6. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **A dictionary of reusable elements.** Signavio's shared element dictionary echoes a long-standing kymo wish (cf. the D2 note on *variables and imports*): shared component definitions across the `samples/` set would reduce duplication.
-- **The model is more valuable when it can be analysed.** Simulation and mining only work because the model is structured data. kymo's diagrams are visual, but keeping the underlying model clean leaves room for analyses (e.g. linting diagrams for disconnected nodes).
-- **Governance states (draft/released).** The frontmatter `status:` field already gestures at this; Signavio shows how far a release-state discipline can be taken.
-
-## 7. References
+## 6. References
 
 All accessed 2026-05-20.
 

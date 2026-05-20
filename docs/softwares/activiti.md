@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - activiti.comparision.md
   - ../diagrams/bpmn/README.md
   - ./flowable.md
   - ./camunda.md
@@ -47,7 +48,7 @@ upstream:
 | License           | Apache-2.0                                                    |
 | Version Reviewed  | Activiti 7.x / Activiti Cloud (2026)                         |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`flowable.md`](./flowable.md), [`camunda.md`](./camunda.md) |
+| Related Documents | [`activiti.comparision.md`](./activiti.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`flowable.md`](./flowable.md), [`camunda.md`](./camunda.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Activiti's design choices and its role as the common ancestor of today's open BPMN engines. No code or behaviour in this repository depends on Activiti. Activiti is a **process-execution engine**, a different category from kymo (a static diagram DSL).
 
@@ -87,23 +88,9 @@ So Activiti, Camunda, and Flowable share DNA; differences are in governance, fea
 
 ## 6. Comparison vs `kymo`
 
-| Axis                  | Activiti                                                 | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | Lightweight BPMN **execution** engine                    | Render static architecture diagrams                               |
-| Notation              | BPMN 2.0                                                 | kymo `.diagram` DSL                                              |
-| Implementation        | Java                                                     | Python renderer + JS data-model port                              |
-| Semantics             | Full execution semantics                                 | None — visual only                                               |
-| Licence               | Apache-2.0                                               | Apache-2.0                                                       |
-| Historical role       | Ancestor of Camunda & Flowable                          | —                                                                |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of Activiti against kymo, and open questions for kymo — lives in [`activiti.comparision.md`](activiti.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream Activiti has not moved).
 
-## 7. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **"Lightweight and embeddable" is a durable value.** Activiti's original pitch — a small engine you embed rather than a platform you adopt — has aged well; kymo's small-surface library/CLI shares that spirit.
-- **A standard interchange enables an ecosystem.** The whole Activiti→Camunda/Flowable fork tree only works because BPMN XML is standardised. It is the strongest argument for kymo eventually documenting a stable model/serialisation if third-party tooling is ever desired.
-
-## 8. References
+## 7. References
 
 All accessed 2026-05-20.
 

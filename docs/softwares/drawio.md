@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - drawio.comparision.md
   - ../diagrams/bpmn/README.md
   - ../DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
@@ -48,7 +49,7 @@ upstream:
 | License           | Apache-2.0 (with stencil/template caveats)                    |
 | Version Reviewed  | drawio 30.0.2 (2026-05-16)                                    |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`drawio.comparision.md`](./drawio.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures draw.io's design choices so the team can consult them when evolving kymo's render and export pipeline. No code or behaviour in this repository depends on draw.io. draw.io is a **general-purpose** diagram editor (BPMN is one of many shape libraries), included here because it is a common way teams draw BPMN and because, like bpmn.io, it is a client-side SVG engine.
 
@@ -84,28 +85,9 @@ This is a **reference note on prior art**, not a specification of kymo. It captu
 
 ## 6. Comparison vs `kymo`
 
-| Axis                  | draw.io                                                  | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Authoring model       | WYSIWYG drag-and-drop editor                             | Text DSL (`.diagram`) compiled to SVG                             |
-| Scope                 | General diagramming (BPMN is one library)               | Architecture diagrams, opinionated icon set                       |
-| Implementation        | JavaScript, client-side                                 | Python renderer + JS data-model port                              |
-| File format           | mxGraph XML (`.drawio`)                                 | `.diagram` DSL source                                             |
-| BPMN                  | Shape library, no semantics                             | Not a BPMN tool                                                   |
-| Layout                | Manual placement (+ optional auto-layout)               | Computed by kymo's layout engine                                  |
-| Output                | SVG, PNG, PDF, HTML                                     | SVG, animated SVG, animated WebP                                  |
-| Licence               | Apache-2.0 (stencil caveats)                            | Apache-2.0                                                        |
-| Hosting               | Self-hostable, offline desktop build                    | CLI / library, local                                             |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of draw.io against kymo, and open questions for kymo — lives in [`drawio.comparision.md`](drawio.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream draw.io has not moved).
 
-## 7. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **Self-hosting and offline-first as a default.** draw.io's "your data never leaves the device" stance is a useful framing for kymo's local-CLI model.
-- **A pluggable shape-library panel.** draw.io's enable-a-library UX is a clean mental model for how kymo's icon families might be organised and surfaced.
-- **One source, many export targets (SVG/PNG/PDF).** kymo already does SVG/WebP; PDF/PNG export from the same model is a natural, low-cost addition.
-- **A caution, not only a lesson:** draw.io shows the cost of drawing symbols *without* semantics — diagrams look right but cannot be validated or executed. kymo's value is similarly visual, so being explicit about that boundary (as BPMN tools are) keeps expectations honest.
-
-## 8. References
+## 7. References
 
 All accessed 2026-05-20.
 

@@ -10,6 +10,7 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
+  - lucidchart.comparision.md
   - ../diagrams/bpmn/README.md
   - ./drawio.md
   - ../DSL.md
@@ -48,7 +49,7 @@ upstream:
 | License           | Proprietary SaaS (freemium)                                   |
 | Version Reviewed  | Lucidchart cloud (2026)                                      |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn/README.md`](../diagrams/bpmn/README.md), [`drawio.md`](./drawio.md), [`DSL.md`](../DSL.md) |
+| Related Documents | [`lucidchart.comparision.md`](./lucidchart.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`drawio.md`](./drawio.md), [`DSL.md`](../DSL.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Lucidchart's design choices so the team can consult them when reasoning about collaborative, web-based diagramming. No code or behaviour in this repository depends on Lucidchart. Lucidchart is a **general-purpose** diagram SaaS (BPMN is one shape set), in the same broad category as [draw.io](./drawio.md) rather than the BPMN-specialised tools.
 
@@ -78,24 +79,9 @@ This is a **reference note on prior art**, not a specification of kymo. It captu
 
 ## 5. Comparison vs `kymo`
 
-| Axis                  | Lucidchart                                               | kymo (this repo)                                                  |
-|-----------------------|----------------------------------------------------------|-------------------------------------------------------------------|
-| Primary purpose       | General collaborative diagramming                        | Render static architecture diagrams                               |
-| Authoring             | WYSIWYG, browser, real-time multi-user                   | Local text DSL, single author per file                            |
-| Scope                 | Many diagram types (BPMN is one library)                | Architecture diagrams, opinionated icons                          |
-| BPMN                  | Shapes, no semantics                                     | Not a BPMN tool                                                  |
-| Deployment            | Proprietary SaaS, cloud-only                            | Local CLI / library                                              |
-| Cost                  | Freemium subscription                                    | Apache-2.0, free                                                 |
+The opinionated prior-art comparison — at-a-glance matrix, headline tradeoffs, a per-category scoring of Lucidchart against kymo, and open questions for kymo — lives in [`lucidchart.comparision.md`](lucidchart.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream Lucidchart has not moved).
 
-## 6. Lessons we may consider borrowing
-
-Listed without commitment — these are observations, not roadmap items.
-
-- **Diagram-from-data.** Lucidchart can generate diagrams from imported structured data — conceptually adjacent to kymo's "text in, diagram out" model, and a reminder that the input need not always be hand-written DSL.
-- **Real-time collaboration is a SaaS moat, not a library feature.** A useful boundary: kymo's local, file-based model deliberately trades live collaboration for git-friendliness; the two design centres serve different needs.
-- **Approachable shape libraries.** Lucidchart's enable-a-shape-set UX (shared with draw.io) is a clean model for organising kymo's icon families.
-
-## 7. References
+## 6. References
 
 All accessed 2026-05-20.
 

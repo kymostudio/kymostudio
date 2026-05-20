@@ -1,12 +1,12 @@
 ---
 title: diagrams (mingrammer) — External Reference
 document_id: REF-DIAGRAMS-MINGRAMMER-001
-version: "1.0"
-issue_date: 2026-05-18
+version: "1.1"
+issue_date: 2026-05-21
 status: Released
 classification: Internal
 owner: diagrams/ project
-audience: Engineers evolving the `axo` DSL, layout engine, or render pipeline
+audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
@@ -43,21 +43,21 @@ upstream:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | REF-DIAGRAMS-MINGRAMMER-001                                    |
-| Version           | 1.0                                                            |
-| Issue Date        | 2026-05-18                                                     |
+| Version           | 1.1                                                            |
+| Issue Date        | 2026-05-21                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
 | Owner             | `diagrams/` project                                            |
-| Audience          | Engineers evolving the `axo` DSL, layout, or render pipeline   |
+| Audience          | Engineers evolving the `kymo` DSL, layout, or render pipeline   |
 | Upstream          | [`mingrammer/diagrams`](https://github.com/mingrammer/diagrams) · [diagrams.mingrammer.com](https://diagrams.mingrammer.com/) |
 | License           | MIT                                                            |
 | Runtime           | Python ≥ 3.7 (CPython)                                         |
 | Hard Dependency   | Graphviz (`dot` binary on `$PATH`)                             |
 | Access Date       | 2026-05-18                                                     |
 | Primary Source    | [Examples page](https://diagrams.mingrammer.com/docs/getting-started/examples) |
-| Related Documents | [`diagrams.mingrammer.comparision.md`](diagrams.mingrammer.comparision.md) (axo comparison), [`d2.md`](d2.md), [`figma.md`](figma.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`diagrams.mingrammer.comparision.md`](diagrams.mingrammer.comparision.md) (kymo comparison), [`d2.md`](d2.md), [`figma.md`](figma.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
-This is a **reference note on prior art**, not a specification of axo. It captures the design choices in `mingrammer/diagrams` so the team can consult them when evolving axo's DSL, layout, and render pipeline. No code or behavior in this repository depends on `diagrams`.
+This is a **reference note on prior art**, not a specification of kymo. It captures the design choices in `mingrammer/diagrams` so the team can consult them when evolving kymo's DSL, layout, and render pipeline. No code or behavior in this repository depends on `diagrams`.
 
 ## 1. Overview
 
@@ -143,7 +143,7 @@ Lists fan out a connection to/from many nodes in one expression:
 ELB("lb") >> [EC2("worker1"), EC2("worker2"), EC2("worker3")] >> RDS("db")
 ```
 
-Two limitations worth flagging when comparing against axo:
+Two limitations worth flagging when comparing against kymo:
 
 1. **List-to-list edges are not allowed** — Python disallows the arithmetic operation between lists, so the user must chain through a singleton in between.
 2. **Mixing `-` with `>>`/`<<`** requires explicit parentheses because of Python operator precedence.
@@ -170,7 +170,7 @@ with Diagram("Simple Web Service with DB Cluster", show=False):
     dns >> web >> db_primary
 ```
 
-This is the closest construct to axo's `region`/container model, but with a more lightweight surface (no nesting depth limit, no explicit keyword — just `with Cluster("name"):`).
+This is the closest construct to kymo's `region`/container model, but with a more lightweight surface (no nesting depth limit, no explicit keyword — just `with Cluster("name"):`).
 
 ### 3.4 `Edge`
 
@@ -449,7 +449,7 @@ with Diagram(name="Advanced Web Service with On-Premises (colored)", show=False)
 
 ### 4.9 RabbitMQ Consumers with Custom Nodes
 
-Pulls a PNG icon at runtime and uses `Custom` to render it as a node. The pattern any axo user would need if axo's icon catalog is incomplete.
+Pulls a PNG icon at runtime and uses `Custom` to render it as a node. The pattern any kymo user would need if kymo's icon catalog is incomplete.
 
 ```python
 from urllib.request import urlretrieve
@@ -476,9 +476,9 @@ with Diagram("Broker Consumers", show=False):
     queue >> consumers >> Aurora("Database")
 ```
 
-## 5. Comparison to axo
+## 5. Comparison to kymo
 
-The opinionated prior-art comparison — host-language vs. external DSL, layout ownership, catalog strategy, `Cluster` semantics, edge decoration, and open questions for axo — lives in [`diagrams.mingrammer.comparision.md`](diagrams.mingrammer.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (axo changes alone are enough to invalidate it, even when upstream `diagrams` has not moved).
+The opinionated prior-art comparison — host-language vs. external DSL, layout ownership, catalog strategy, `Cluster` semantics, edge decoration, and open questions for kymo — lives in [`diagrams.mingrammer.comparision.md`](diagrams.mingrammer.comparision.md). It is kept separate so it can evolve at a different cadence than this factual reference (kymo changes alone are enough to invalidate it, even when upstream `diagrams` has not moved).
 
 ## 6. Provenance
 
