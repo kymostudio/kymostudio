@@ -1,6 +1,6 @@
 [project]
 name = "kymostudio"
-version = "0.2.0"
+version = "0.2.1"
 description = "Diagram-as-code DSL — declarative architecture diagrams to animated SVG/WebP"
 readme = "README.md"
 license = "Apache-2.0"

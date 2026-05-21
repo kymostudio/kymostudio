@@ -9,6 +9,15 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-21
+
+### Changed
+
+- **Docs:** simplified both package README titles to `kymostudio` (dropped the
+  `(Python)` / `(JavaScript / TypeScript)` suffixes) and unified the tagline
+  across the Python and JS package READMEs, so the PyPI and npm pages describe
+  kymostudio identically.
+
 ## [0.2.0] - 2026-05-21
 
 ### Added
