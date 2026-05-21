@@ -1,8 +1,7 @@
 # kymostudio
 
-Diagram-as-code for browser/Node: a **data model**, **icon library**, **SVG
-renderer** (`renderSVG`), and a **BPMN 2.0 importer** (`parseBpmn`).
-Dependency-free TypeScript, published with type declarations.
+Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
+`.bpmn` file — into **animated SVG / WebP** (also Figma / Excalidraw).
 
 ## Install
 
