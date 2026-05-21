@@ -9,6 +9,20 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-05-21
+
+### Changed
+
+- **Python:** lowered the minimum supported Python from `3.13` to `3.10` — the
+  package only needs `match`/`case`, so it now installs on 3.10, 3.11, and 3.12
+  as well. CI tests against 3.10, 3.11, 3.12, and 3.13.
+
+### Internal
+
+- Added lint/type-check gates to CI: `ruff` for the Python package, and
+  `eslint` + `tsc --noEmit` for the JS package (both dev-only — the JS package
+  remains zero-runtime-dependency).
+
 ## [0.2.2] - 2026-05-21
 
 ### Changed

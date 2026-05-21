@@ -279,7 +279,7 @@ export function bpmnRegionRect(r: Region): string {
 
 export function bpmnRegionLabel(r: Region): string {
   if (!r.label) return "";
-  const [x, y, w, h] = r.bounds;
+  const [x, y, , h] = r.bounds;
   if (r.style === "pool" || r.style === "lane") {
     const tx = x + 15, ty = y + (h / 2) | 0;
     return `<text class="bpmn-pool-label" x="${tx}" y="${ty}" text-anchor="middle" transform="rotate(-90 ${tx} ${ty})">${esc(r.label)}</text>`;

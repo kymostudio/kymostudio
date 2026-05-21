@@ -33,6 +33,7 @@ the SVG's viewBox, quality 85.
 """
 from __future__ import annotations
 
+import math
 import re
 import sys
 from io import BytesIO
@@ -40,9 +41,6 @@ from pathlib import Path
 
 import resvg_py
 from PIL import Image
-
-
-import math
 
 # Match the constants in to_svg.py ANIM_PRESETS["flow"].
 DASH_LEN           = 16          # @keyframes edge-flow { from: 16 → to: 0 }

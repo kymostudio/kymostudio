@@ -11,6 +11,9 @@ so the glyphs sit ON the face with the right perspective. Use
 """
 from __future__ import annotations
 
+import base64
+from pathlib import Path
+
 
 # ── Isometric cube template ────────────────────────────────────────────
 def _r(x: float) -> str:
@@ -472,8 +475,6 @@ ICONS: dict[str, str] = {
 # `<provider>-<name>` (drop the category, which is just a filesystem
 # grouping). Last-write-wins on collisions; pick filenames carefully if
 # this matters.
-import base64
-from pathlib import Path
 
 
 # Repo-root `icons/` is shared by both packages and lives outside this

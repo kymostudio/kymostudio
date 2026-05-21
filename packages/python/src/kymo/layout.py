@@ -23,8 +23,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .model import Component, Diagram, Edge, LABEL_HEIGHT, SHAPE_HALF, resolve_anchors
-
+from .model import LABEL_HEIGHT, SHAPE_HALF, Component, Diagram, Edge, resolve_anchors
 
 # ── Sizing ─────────────────────────────────────────────────────────────
 # Empirically-tuned character widths (avg over Latin + Vietnamese diacritics

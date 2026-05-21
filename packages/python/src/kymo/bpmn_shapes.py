@@ -412,7 +412,7 @@ def _render_data_object(c: Component, cx: float, cy: float, hw: float, hh: float
 
 
 def _render_data_store(c: Component, cx: float, cy: float, hw: float, hh: float) -> str:
-    x, w, h = cx - hw, 2 * hw, 2 * hh
+    x, w = cx - hw, 2 * hw
     top, bot = cy - hh, cy + hh
     ry = min(hh * 0.45, hw * 0.4)
     body = (

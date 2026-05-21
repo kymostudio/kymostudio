@@ -22,7 +22,6 @@ import re
 
 from .model import Component, Diagram, Edge, Region
 
-
 # ── Top-level directives (file scope only) ────────────────────────────
 # `:` is optional on `canvas:` for back-compat; title/subtitle require it.
 CANVAS_RE   = re.compile(r'^canvas\s*:?\s+(\d+)\s*x\s*(\d+)\s*$')

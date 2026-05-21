@@ -1,13 +1,13 @@
 [project]
 name = "kymostudio"
-version = "0.2.2"
+version = "0.2.3"
 description = "Diagram-as-code: turn a declarative .diagram DSL — or a standard BPMN 2.0 .bpmn file — into animated SVG / WebP."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 authors = [
-    { name = "rain1024", email = "brother.rain.1024@gmail.com" },
+    { name = "rain1024", email = "anhv.ict91@gmail.com" },
 ]
 keywords = ["diagram", "diagram-as-code", "svg", "architecture", "dsl", "animation"]
 classifiers = [
@@ -16,6 +16,9 @@ classifiers = [
     "Topic :: Multimedia :: Graphics :: Presentation",
     "Topic :: Software Development :: Documentation",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
@@ -36,11 +39,24 @@ kymo = "kymo.cli:main"
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "ruff>=0.6",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+# pyflakes (F: undefined names, unused imports/vars) + pycodestyle (E) + isort (I).
+select = ["E", "F", "I"]
+# Not enforced — deliberate style in this codebase:
+#   E501 line-length: dense SVG / BPMN-XML literals are intentionally long.
+#   E701 compact one-line `if cond: stmt`: used for tabular min/max geometry.
+ignore = ["E501", "E701"]
 
 [build-system]
 requires = ["hatchling"]

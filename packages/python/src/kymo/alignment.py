@@ -24,8 +24,7 @@ Moving `orch` by 50 px moves every descendant by 50 px automatically.
 """
 from __future__ import annotations
 
-from .model import Component, Diagram, LABEL_HEIGHT
-
+from .model import LABEL_HEIGHT, Component, Diagram
 
 # Approximate per-char widths used to estimate label extent. The renderer
 # does not have access to real font metrics; these constants are tuned for
@@ -98,6 +97,7 @@ def _stagger_trunk_lanes(diagram: Diagram, min_step: int = 8, max_step: int = 16
     Mutates each edge's `trunk_offset`; route_edge then shifts the
     midpoint coord on the perpendicular axis."""
     from collections import defaultdict
+
     from .model import resolve_anchors
 
     horiz: dict[tuple[int, int], list] = defaultdict(list)
@@ -170,6 +170,7 @@ def _stagger_fanin_edges(diagram: Diagram) -> None:
     dimension so offsets stay inside the icon. Pre-existing explicit
     offsets are accumulated on top of, not replaced."""
     from collections import defaultdict
+
     from .model import resolve_anchors
 
     fanin:  dict[tuple[str, str], list[tuple]] = defaultdict(list)
