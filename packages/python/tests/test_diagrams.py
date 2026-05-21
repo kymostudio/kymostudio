@@ -19,7 +19,6 @@ from kymo.dsl import parse as parse_dsl
 from kymo.layout import layout as apply_grid_layout
 from kymo.to_svg import render
 
-
 CASES_DIR = Path(__file__).parent / "diagrams"
 UPDATE = os.environ.get("KYMO_UPDATE_GOLDEN") == "1"
 

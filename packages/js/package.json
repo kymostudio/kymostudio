@@ -1,6 +1,6 @@
 {
   "name": "kymostudio",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Diagram-as-code: turn a declarative .diagram DSL — or a standard BPMN 2.0 .bpmn file — into animated SVG / WebP.",
   "type": "module",
   "license": "Apache-2.0",
@@ -33,6 +33,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
     "build-manifest": "node scripts/build-manifest.mjs",
     "prepack": "npm run build",
     "test": "npm run build && node --test"
@@ -42,7 +43,10 @@
     "icons-manifest.json"
   ],
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/node": "^25.9.1",
-    "typescript": "^6.0.3"
+    "eslint": "^9.0.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.0.0"
   }
 }

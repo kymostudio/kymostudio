@@ -17,9 +17,8 @@ import json
 import os
 from pathlib import Path
 
-import pytest
-
 import _bpmn_regress as R
+import pytest
 
 HERE = Path(__file__).resolve().parent
 CORPUS = HERE / "corpus_bpmn"

@@ -37,7 +37,6 @@ from .icons import ICONS
 from .model import SHAPE_HALF, Component, Diagram, Edge, Region
 from .to_svg import route_edge
 
-
 # ── Palette (Excalidraw uses CSS hex strings) ─────────────────────────
 ACCENTS: dict[str, str] = {
     "green":  "#76b900",    # NVIDIA

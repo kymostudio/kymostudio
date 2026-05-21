@@ -31,9 +31,8 @@ from __future__ import annotations
 
 import json
 
-from .model import Component, Diagram, Edge, Region
+from .model import Component, Diagram, Edge
 from .to_svg import component_svg_snippet, route_edge
-
 
 # ── Palette (Figma 0..1 normalised RGB) ────────────────────────────────
 ACCENTS: dict[str, tuple[float, float, float]] = {
