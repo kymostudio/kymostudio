@@ -1,6 +1,6 @@
 {
   "name": "kymostudio",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Diagram-as-code for browser/Node — data model, icon library, SVG renderer, and BPMN 2.0 importer. Independent, dependency-free TypeScript implementation.",
   "type": "module",
   "license": "Apache-2.0",
