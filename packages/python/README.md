@@ -1,7 +1,7 @@
 # kymostudio
 
 Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
-`.bpmn` file — into **animated SVG / WebP** (also Figma / Excalidraw).
+`.bpmn` file — into **animated SVG / WebP**.
 
 ## Install
 
@@ -21,14 +21,14 @@ kymo path/to/diagram.diagram --excalidraw # → path/to/diagram.excalidraw
 kymo path/to/process.bpmn                 # → path/to/process.svg (BPMN 2.0)
 ```
 
-See [`../../samples/`](../../samples/) for complete example `.diagram` and
+See [`samples/`](https://github.com/kymostudio/kymostudio/tree/main/samples) for complete example `.diagram` and
 `.bpmn` files.
 
 ### BPMN 2.0 import
 
 A standard `.bpmn` file (from bpmn.io / Camunda Modeler / Signavio …) renders
 to SVG using the geometry in the file's Diagram-Interchange section — no
-layout pass runs. See [`../../docs/BPMN.md`](../../docs/BPMN.md) for the
+layout pass runs. See [`docs/BPMN.md`](https://github.com/kymostudio/kymostudio/blob/main/docs/BPMN.md) for the
 element mapping.
 
 ```python
@@ -59,4 +59,4 @@ uv run ../../playground/server.py            # local showcase + playground
 
 ## License
 
-Apache License 2.0 — see [`LICENSE`](./LICENSE).
+Apache License 2.0 — see [`LICENSE`](https://github.com/kymostudio/kymostudio/blob/main/packages/python/LICENSE).

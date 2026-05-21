@@ -9,6 +9,15 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-05-21
+
+### Changed
+
+- **Docs:** the package summary/description is now identical across PyPI and
+  npm; dropped the "(also Figma / Excalidraw)" clause from the tagline; and
+  rewrote the relative README links (`samples/`, `docs/BPMN.md`, `icons/`,
+  `LICENSE`) as absolute GitHub URLs so they resolve on the registry pages.
+
 ## [0.2.1] - 2026-05-21
 
 ### Changed

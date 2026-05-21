@@ -1,7 +1,7 @@
 {
   "name": "kymostudio",
-  "version": "0.2.1",
-  "description": "Diagram-as-code for browser/Node — data model, icon library, SVG renderer, and BPMN 2.0 importer. Independent, dependency-free TypeScript implementation.",
+  "version": "0.2.2",
+  "description": "Diagram-as-code: turn a declarative .diagram DSL — or a standard BPMN 2.0 .bpmn file — into animated SVG / WebP.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "rain1024",
