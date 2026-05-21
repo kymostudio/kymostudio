@@ -1,4 +1,4 @@
-# kymostudio (JavaScript / TypeScript)
+# kymostudio
 
 Diagram-as-code for browser/Node: a **data model**, **icon library**, **SVG
 renderer** (`renderSVG`), and a **BPMN 2.0 importer** (`parseBpmn`).

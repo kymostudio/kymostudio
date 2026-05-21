@@ -1,4 +1,4 @@
-# kymostudio (Python)
+# kymostudio
 
 Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
 `.bpmn` file — into **animated SVG / WebP** (also Figma / Excalidraw).
