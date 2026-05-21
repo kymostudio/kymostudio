@@ -49,3 +49,26 @@ jobs:
         run: npm run lint
       - name: Run tests
         run: npm test   # builds TS to dist/, then `node --test`
+
+  vscode-extension:
+    name: VS Code extension build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/vscode-extension
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+      - name: Build JS engine (bundled by the extension)
+        working-directory: packages/js
+        run: npm ci && npm run build
+      - name: Install deps
+        run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Test
+        run: npm test        # node --test (webview behaviour, via jsdom)
+      - name: Bundle
+        run: npm run build   # esbuild -> dist/extension.js (inlines kymostudio)

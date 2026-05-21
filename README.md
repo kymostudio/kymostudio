@@ -31,6 +31,10 @@ See [`samples/`](./samples/) for complete example `.diagram` files, and the
 per-package READMEs ([Python](./packages/python/README.md),
 [JavaScript](./packages/js/README.md)) for API details.
 
+A [**VS Code extension**](./packages/vscode-extension/README.md) gives `.diagram`
+and `.bpmn` files a live SVG preview inside the editor (zoom / pan / export),
+rendered in-process by the JS engine — no Python required.
+
 ### Python API
 
 ```python
@@ -45,11 +49,14 @@ svg = render(diagram, animate=True)
 
 ### JavaScript / npm
 
-A browser/Node port of the shared **data model + icon library** (the DSL
-parser, layout engine and SVG renderer remain Python-only):
+An independent TypeScript implementation at feature parity — its own DSL parser,
+layout engine, alignment resolver, SVG renderer, icon library and BPMN importer
+(dependency-free):
 
 ```js
-import { makeComponent, makeEdge, anchor, ICONS, getIcon } from "kymostudio";
+import { parseDiagram, parseBpmn, renderSVG } from "kymostudio";
+
+const svg = await renderSVG(parseDiagram(source));   // .diagram DSL → SVG
 ```
 
 ## Develop
@@ -60,6 +67,10 @@ cd packages/python && uv run --group dev python -m pytest -q
 
 # JavaScript
 cd packages/js && npm test && npm run build-manifest
+
+# VS Code extension (bundles the JS engine; build it first)
+cd packages/js && npm install && npm run build
+cd ../vscode-extension && npm install && npm run build   # then press F5 in VS Code
 
 # Local showcase + playground (renders via the Python package)
 uv run --project packages/python playground/server.py

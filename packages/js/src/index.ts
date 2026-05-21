@@ -9,9 +9,18 @@
  *     `anchor`, `resolveAnchors`, …
  *   - icons: `ICONS`, `getIcon`, `setIconBaseURL`, `setManifest`, `registerIcon`
  *   - renderer: `renderSVG`
+ *   - DSL: `parse` (.diagram → Diagram + layout/external specs),
+ *     `parseDiagram` (full pipeline → positioned Diagram), `layout`,
+ *     `resolveAlignments`
  *   - BPMN import: `parseBpmn` (BPMN 2.0 `.bpmn` XML → Diagram)
  */
 export * from "./model.js";
 export * from "./icons-loader.js"; // ICONS, getIcon, setIconBaseURL, setManifest, registerIcon
 export * from "./render.js";       // renderSVG
+export { parse, parseDiagram, type ParseResult } from "./dsl.js";
+export {
+  layout, applyLayoutTree, minimizeCrossings, cellSize,
+  type LayoutNode, type RegionLayout, type ExternalSpec, type LayoutOptions, type Cell,
+} from "./layout.js";
+export { resolveAlignments } from "./alignment.js";
 export { parseBpmn } from "./from-bpmn.js";
