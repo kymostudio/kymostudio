@@ -9,6 +9,15 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-05-21
+
+### Internal
+
+- **CI:** moved the GitHub Actions toolchain off the deprecated Node.js 20
+  runtime — `actions/checkout@v5`, `actions/setup-node@v5`, and
+  `astral-sh/setup-uv@v7` (all first Node-24 majors). No change to the
+  published package payload versus 0.2.3.
+
 ## [0.2.3] - 2026-05-21
 
 ### Changed
