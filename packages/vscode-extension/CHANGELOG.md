@@ -2,6 +2,11 @@
 
 All notable changes to the kymostudio VS Code extension.
 
+## 0.2.5
+
+- Version aligned with the kymostudio monorepo (`0.2.5`); no change to the
+  extension's behaviour versus `0.2.4`.
+
 ## 0.2.4
 
 - Initial release (version aligned with the kymostudio monorepo).

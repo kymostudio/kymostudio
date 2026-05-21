@@ -9,6 +9,21 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-05-22
+
+### Added
+
+- **JavaScript:** the JS package now ships the full `.diagram` front-end at
+  parity with Python — a line-oriented DSL parser, an auto-layout engine, and
+  an alignment resolver, exported as `parse` / `parseDiagram` (plus `layout`
+  and `resolveAlignments`). `parseDiagram(src)` → `renderSVG(diagram)` renders
+  a `.diagram` file to SVG entirely in JS, no Python required. The package
+  stays zero-runtime-dependency.
+- **VS Code extension** (`packages/vscode-extension`, bundled separately —
+  not published to PyPI/npm): live in-editor SVG preview for `.diagram` and
+  `.bpmn` files (zoom / pan / export), rendered in-process by the bundled JS
+  engine, so no Python is required.
+
 ## [0.2.4] - 2026-05-21
 
 ### Internal
