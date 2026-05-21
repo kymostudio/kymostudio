@@ -1,0 +1,143 @@
+{
+  "name": "kymostudio-vscode",
+  "displayName": "kymostudio — Diagram Preview",
+  "description": "Live SVG preview for kymostudio diagrams: the .diagram DSL and BPMN 2.0 (.bpmn), rendered natively in-process.",
+  "version": "0.2.4",
+  "license": "Apache-2.0",
+  "publisher": "kymostudio",
+  "author": "rain1024",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "bpmn",
+    "diagram",
+    "diagram-as-code",
+    "svg",
+    "preview"
+  ],
+  "homepage": "https://github.com/kymostudio/kymostudio#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kymostudio/kymostudio.git",
+    "directory": "packages/vscode-extension"
+  },
+  "bugs": {
+    "url": "https://github.com/kymostudio/kymostudio/issues"
+  },
+  "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
+  "activationEvents": [
+    "onWebviewPanel:kymostudio.preview"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "kymo-diagram",
+        "aliases": [
+          "kymostudio Diagram",
+          "kymo-diagram"
+        ],
+        "extensions": [
+          ".diagram"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "kymostudio.showPreviewToSide",
+        "title": "Open Preview to the Side",
+        "category": "kymostudio",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "kymostudio.showPreview",
+        "title": "Open Preview",
+        "category": "kymostudio",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "kymostudio.exportSvg",
+        "title": "Export Diagram as SVG…",
+        "category": "kymostudio"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "kymostudio.showPreviewToSide",
+          "when": "resourceExtname == .bpmn || resourceExtname == .diagram",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "kymostudio.showPreview",
+          "when": "resourceExtname == .bpmn || resourceExtname == .diagram",
+          "group": "navigation@10"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "kymostudio.showPreview",
+          "when": "resourceExtname == .bpmn || resourceExtname == .diagram"
+        },
+        {
+          "command": "kymostudio.showPreviewToSide",
+          "when": "resourceExtname == .bpmn || resourceExtname == .diagram"
+        },
+        {
+          "command": "kymostudio.exportSvg",
+          "when": "resourceExtname == .bpmn || resourceExtname == .diagram"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "kymostudio",
+      "properties": {
+        "kymostudio.preview.background": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "transparent"
+          ],
+          "default": "light",
+          "description": "Background fill behind the rendered diagram."
+        },
+        "kymostudio.preview.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Re-render the preview as you type (debounced). When off, the preview refreshes on save only."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test",
+    "vscode:prepublish": "node esbuild.mjs --production",
+    "package": "npx --yes @vscode/vsce package --no-dependencies"
+  },
+  "dependencies": {
+    "kymostudio": "file:../js"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.24.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3"
+  }
+}

@@ -9,6 +9,26 @@ Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
 npm install kymostudio
 ```
 
+## Render a `.diagram` DSL file
+
+`parseDiagram(src)` runs the full front-end pipeline — parse the declarative
+DSL, then position everything (grid / Figma-style auto-layout, parent/child
+alignment, auto-bounded regions, auto-canvas sizing) — returning a positioned
+Diagram. Equivalent to the Python `kymo` CLI's `.diagram` path.
+
+```ts
+import { parseDiagram, renderSVG } from "kymostudio";
+import { readFileSync } from "node:fs";
+
+const svg = await renderSVG(parseDiagram(readFileSync("arch.diagram", "utf8")));
+```
+
+For finer control the stages are exported individually — `parse(src)` returns
+`{ diagram, layout, external }` (unresolved), then `layout(diagram, …)` and
+`resolveAlignments(diagram)` mutate it into place. See
+[`docs/DSL.md`](https://github.com/kymostudio/kymostudio/blob/main/docs/DSL.md)
+for the grammar.
+
 ## Convert a BPMN file
 
 `parseBpmn(xml)` reads a standard `.bpmn` file (from bpmn.io / Camunda /

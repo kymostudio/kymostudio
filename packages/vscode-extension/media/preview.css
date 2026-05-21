@@ -1,0 +1,126 @@
+:root {
+  --toolbar-h: 36px;
+}
+
+/* An ID selector that sets `display` would otherwise out-rank the `hidden`
+   attribute and the panel could never be hidden — force it. */
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: var(--vscode-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+}
+
+#toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--toolbar-h);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  background: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+  border-bottom: 1px solid var(--vscode-panel-border, transparent);
+  z-index: 10;
+}
+
+#toolbar .spacer {
+  flex: 1;
+}
+
+#toolbar button {
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 4px;
+  color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+  background: var(--vscode-button-secondaryBackground, transparent);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 22px;
+}
+
+#toolbar button:hover {
+  background: var(--vscode-button-secondaryHoverBackground, var(--vscode-toolbar-hoverBackground));
+}
+
+#toolbar button[data-cmd="export"] {
+  color: var(--vscode-button-foreground);
+  background: var(--vscode-button-background);
+}
+
+#toolbar button[data-cmd="export"]:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+#stage {
+  position: absolute;
+  top: var(--toolbar-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 11px, var(--vscode-editorIndentGuide-background, rgba(127, 127, 127, 0.08)) 11px, var(--vscode-editorIndentGuide-background, rgba(127, 127, 127, 0.08)) 12px),
+    repeating-linear-gradient(90deg, transparent, transparent 11px, var(--vscode-editorIndentGuide-background, rgba(127, 127, 127, 0.08)) 11px, var(--vscode-editorIndentGuide-background, rgba(127, 127, 127, 0.08)) 12px);
+  cursor: grab;
+}
+
+#stage.panning {
+  cursor: grabbing;
+}
+
+#canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+#canvas svg {
+  display: block;
+}
+
+/* Error banner — pinned to the bottom so the last good render stays visible
+   while you fix a transient typo, instead of blanking the whole preview. */
+#message {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  background: var(--vscode-inputValidation-errorBackground, rgba(90, 29, 29, 0.96));
+  border-top: 1px solid var(--vscode-inputValidation-errorBorder, #be1100);
+  color: var(--vscode-inputValidation-errorForeground, var(--vscode-foreground));
+  z-index: 20;
+}
+
+#message .msg-title {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#message .msg-detail {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  opacity: 0.85;
+}
