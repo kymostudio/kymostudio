@@ -1,7 +1,7 @@
 # kymostudio
 
 Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
-`.bpmn` file — into **animated SVG / WebP** (also Figma / Excalidraw).
+`.bpmn` file — into **animated SVG / WebP**.
 
 ## Install
 
@@ -66,10 +66,10 @@ npm test               # build, then node --test
 npm run build-manifest # scan ../../icons and (re)write icons-manifest.json
 ```
 
-The icon set lives at the repo root in [`../../icons/`](../../icons/);
+The icon set lives at the repo root in [`icons/`](https://github.com/kymostudio/kymostudio/tree/main/icons);
 `icons-manifest.json` is generated from it and bundled into the published
 package alongside the compiled `dist/`.
 
 ## License
 
-Apache License 2.0 — see [`LICENSE`](./LICENSE).
+Apache License 2.0 — see [`LICENSE`](https://github.com/kymostudio/kymostudio/blob/main/packages/js/LICENSE).
