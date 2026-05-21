@@ -9,6 +9,8 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-21
+
 ### Added
 
 - **BPMN 2.0 import** (Python). `kymo path/to/process.bpmn → process.svg`
