@@ -56,7 +56,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | Visual Paradigm | kymo |
 |------|-----------------|------|
 | Primary purpose | Multi-notation + round-trip engineering | Render static architecture diagrams |
-| Notations | BPMN, UML, ArchiMate, ERD … | kymo `.diagram` DSL |
+| Notations | BPMN, UML, ArchiMate, ERD … | kymo `.kymo` DSL |
 | Authoring | WYSIWYG desktop/web, repository | Local text DSL |
 | Code link | Round-trip model ↔ code | None |
 | Cost/License | Commercial (+ free Community) | Apache-2.0, free |
@@ -73,7 +73,7 @@ VP couples authoring with **teaching content** — much of the widely cited onli
 
 ### 2.3 Round-trip thinking
 
-VP's distinctive capability is **round-trip engineering**: a model and its source code kept in sync, each regenerable from the other. That is out of scope for kymo, but the *idea* — a representation regenerated rather than hand-maintained — directly supports kymo's discipline of keeping the `.diagram` source as the single source of truth and never hand-editing generated SVG. The principle is borrowable even though the feature is not.
+VP's distinctive capability is **round-trip engineering**: a model and its source code kept in sync, each regenerable from the other. That is out of scope for kymo, but the *idea* — a representation regenerated rather than hand-maintained — directly supports kymo's discipline of keeping the `.kymo` source as the single source of truth and never hand-editing generated SVG. The principle is borrowable even though the feature is not.
 
 ### 2.4 Tiered editions vs one free tool
 
@@ -99,7 +99,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Visual Paradigm | kymo | Why |
 |---|-----------|:------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 3 | 9 | VP's model lives in a binary/repository format, not a diffable text file; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 3 | 9 | VP's model lives in a binary/repository format, not a diffable text file; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 5 | 8 | VP has automation and round-trip code generation but diagrams are hand-built repository artefacts; kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 5 | 6 | VP is a multi-notation toolset with embedded guidance to soften the ramp, but it is still a heavyweight app; kymo asks the user to learn a small DSL — narrower but quicker to start. |
 | A4 | Grouping / container semantics | 8 | 7 | VP has rich cross-notation containment and packaging; kymo's typed `region` containers carry layout/styling meaning but no cross-diagram links. |
@@ -198,7 +198,7 @@ Re-run the relevant categories when any of the following happens — flag the da
 These follow from the comparison and the borrowable ideas catalogued in [`visual-paradigm.md`](visual-paradigm.md):
 
 1. **How tightly should guidance track behaviour?** VP's strength is guidance embedded with the tool; kymo's `DSL.md` and `BEST_PRACTICE_DIAGRAMS.md` should stay close enough to implementation that they never drift into aspiration.
-2. **Is "regenerated, not hand-maintained" enforced?** VP's round-trip thinking supports keeping `.diagram` the single source of truth — does anything in kymo's workflow tempt users to hand-edit generated SVG, and should that be guarded against?
+2. **Is "regenerated, not hand-maintained" enforced?** VP's round-trip thinking supports keeping `.kymo` the single source of truth — does anything in kymo's workflow tempt users to hand-edit generated SVG, and should that be guarded against?
 3. **An icon escape hatch (arbitrary SVG/PNG by path)?** The recurring gap across every comparison in this folder; without it, every catalog miss reads as "kymo can't draw that".
 4. **Is one free tool a protected invariant?** VP's edition matrix is the cautionary example; kymo's single Apache-2.0 surface is a simplicity asset — worth stating explicitly as a non-goal to tier it.
 

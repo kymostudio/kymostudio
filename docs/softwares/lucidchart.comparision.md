@@ -66,7 +66,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 
 ### 2.1 Real-time SaaS canvas vs local text source
 
-Lucidchart is a browser canvas built around **real-time multi-user collaboration**: many people edit the same diagram at once, with presence and comments. kymo is a local text DSL: the `.diagram` source records *intent*, the layout engine computes positions, and a single author commits it to a repo. This cascades through almost every axis. Lucidchart wins approachability (no syntax) and live collaboration; kymo wins everything that flows from plain-text source — diffs, code review, git history, regenerate-from-source automation. Real-time collaboration is a SaaS moat, not a library feature; kymo deliberately trades it for git-friendliness. Neither is "better" — they serve different needs.
+Lucidchart is a browser canvas built around **real-time multi-user collaboration**: many people edit the same diagram at once, with presence and comments. kymo is a local text DSL: the `.kymo` source records *intent*, the layout engine computes positions, and a single author commits it to a repo. This cascades through almost every axis. Lucidchart wins approachability (no syntax) and live collaboration; kymo wins everything that flows from plain-text source — diffs, code review, git history, regenerate-from-source automation. Real-time collaboration is a SaaS moat, not a library feature; kymo deliberately trades it for git-friendliness. Neither is "better" — they serve different needs.
 
 ### 2.2 Diagram-from-data — input need not be hand-written
 
@@ -104,7 +104,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Lucidchart | kymo | Why |
 |---|-----------|:----------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 3 | 9 | Lucidchart stores a cloud canvas of hand-placed shapes — not diffable or reviewable as text; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 3 | 9 | Lucidchart stores a cloud canvas of hand-placed shapes — not diffable or reviewable as text; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 5 | 8 | Lucidchart can generate from imported data and export via API, but diagrams are hand-drawn cloud artefacts; kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 9 | 6 | Lucidchart is drag-and-drop in the browser with zero syntax and live collaboration; kymo asks the user to learn a small DSL. |
 | A4 | Grouping / container semantics | 6 | 7 | Lucidchart has generic containers/groups (no kind); kymo's typed `region` containers carry layout/styling meaning. |
@@ -202,7 +202,7 @@ Re-run the relevant categories when any of the following happens — flag the da
 
 These follow from the comparison and the borrowable ideas catalogued in [`lucidchart.md`](lucidchart.md):
 
-1. **A non-DSL input front-end (diagram-from-data)?** Lucidchart shows the input need not be hand-written. Could a structured source (CSV, inventory file) drive kymo as a second front-end alongside the `.diagram` DSL?
+1. **A non-DSL input front-end (diagram-from-data)?** Lucidchart shows the input need not be hand-written. Could a structured source (CSV, inventory file) drive kymo as a second front-end alongside the `.kymo` DSL?
 2. **An enable-a-library / icon-family organisation?** Lucidchart's enable-a-shape-set UX is a clean mental model for how kymo's icon families could be surfaced and grouped.
 3. **An icon escape hatch (arbitrary SVG/PNG by path)?** The recurring gap across every comparison in this folder; without it, every catalog miss reads as "kymo can't draw that".
 4. **How explicit should the "visual, not validated" boundary be?** Lucidchart shows the cost of symbols-without-semantics; kymo's docs should keep that boundary honest so a clean picture isn't mistaken for a checked architecture.

@@ -4,7 +4,7 @@
  * Both formats render fully in-process via the bundled, dependency-free
  * `kymostudio` package — no Python, no network:
  *   - `.bpmn`    → `parseBpmn` + `renderSVG`
- *   - `.diagram` → `parseDiagram` (parse + layout + alignment) + `renderSVG`
+ *   - `.kymo` → `parseDiagram` (parse + layout + alignment) + `renderSVG`
  */
 import * as vscode from "vscode";
 import { parseBpmn, parseDiagram, renderSVG, type RenderOptions } from "kymostudio";
@@ -50,7 +50,7 @@ export async function renderSource(
     }
   }
 
-  if (ext === ".diagram") {
+  if (ext === ".kymo") {
     try {
       const diagram = parseDiagram(doc.getText());
       const svg = await renderSVG(diagram, opts);
@@ -58,7 +58,7 @@ export async function renderSource(
     } catch (err) {
       return {
         ok: false,
-        title: "Could not render this .diagram file",
+        title: "Could not render this .kymo file",
         detail: err instanceof Error ? err.message : String(err),
       };
     }
@@ -67,7 +67,7 @@ export async function renderSource(
   return {
     ok: false,
     title: "Unsupported file type",
-    detail: `kymostudio previews .bpmn and .diagram files. Got "${ext || doc.languageId}".`,
+    detail: `kymostudio previews .bpmn and .kymo files. Got "${ext || doc.languageId}".`,
   };
 }
 

@@ -1,6 +1,6 @@
 # kymostudio
 
-Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
+Diagram-as-code: turn a declarative `.kymo` DSL — or a standard BPMN 2.0
 `.bpmn` file — into **animated SVG / WebP**.
 
 ## Install
@@ -14,14 +14,14 @@ uv tool install kymostudio
 ## Convert (CLI)
 
 ```bash
-kymo path/to/diagram.diagram              # → path/to/diagram.svg
-kymo path/to/diagram.diagram --animate    # → path/to/diagram-animated.svg
-kymo path/to/diagram.diagram --figma      # → path/to/diagram.figma.js
-kymo path/to/diagram.diagram --excalidraw # → path/to/diagram.excalidraw
+kymo path/to/diagram.kymo              # → path/to/diagram.svg
+kymo path/to/diagram.kymo --animate    # → path/to/diagram-animated.svg
+kymo path/to/diagram.kymo --figma      # → path/to/diagram.figma.js
+kymo path/to/diagram.kymo --excalidraw # → path/to/diagram.excalidraw
 kymo path/to/process.bpmn                 # → path/to/process.svg (BPMN 2.0)
 ```
 
-See [`samples/`](https://github.com/kymostudio/kymostudio/tree/main/samples) for complete example `.diagram` and
+See [`samples/`](https://github.com/kymostudio/kymostudio/tree/main/samples) for complete example `.kymo` and
 `.bpmn` files.
 
 ### BPMN 2.0 import
@@ -43,7 +43,7 @@ svg = render(diagram)
 ```python
 from kymo import parse, layout, resolve_alignments, render
 
-diagram, layout_spec, external = parse(open("diagram.diagram").read())
+diagram, layout_spec, external = parse(open("diagram.kymo").read())
 if layout_spec:
     layout(diagram, layout_spec, external)
 resolve_alignments(diagram)

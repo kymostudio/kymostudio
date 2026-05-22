@@ -9,7 +9,7 @@ Plugin API to construct the diagram. The output is intended to be:
 
 Two render paths:
 
-  1. **Hybrid auto-layout (preferred)** — used when the source `.diagram`
+  1. **Hybrid auto-layout (preferred)** — used when the source `.kymo`
      declared one or more `layout { … }` blocks. Walks each tree and
      emits nested Figma auto-layout frames (`layoutMode`,
      `itemSpacing`, `counterAxisAlignItems`) mirroring the user's

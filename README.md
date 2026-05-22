@@ -23,11 +23,11 @@ npm  install kymostudio       # JavaScript
 ## Usage
 
 ```bash
-kymo sample.diagram              # → sample.svg
-kymo sample.diagram --animate    # → sample-animated.svg
-kymo sample.diagram --figma      # → sample.figma.js
-kymo sample.diagram --excalidraw # → sample.excalidraw
-kymo process.bpmn                # → process.svg (BPMN 2.0 import)
+kymo sample.kymo              # → sample.svg
+kymo sample.kymo --animate    # → sample-animated.svg
+kymo sample.kymo --figma      # → sample.figma.js
+kymo sample.kymo --excalidraw # → sample.excalidraw
+kymo process.bpmn             # → process.svg (BPMN 2.0 import)
 ```
 
 kymo also imports standard **BPMN 2.0 XML** (`.bpmn` from bpmn.io / Camunda
@@ -36,6 +36,6 @@ see [`docs/BPMN.md`](./docs/BPMN.md) and the
 [`samples/order.bpmn`](./samples/order.bpmn) /
 [`samples/collaboration.bpmn`](./samples/collaboration.bpmn) examples.
 
-A [**VS Code extension**](./packages/vscode-extension/README.md) gives `.diagram`
+A [**VS Code extension**](./packages/vscode-extension/README.md) gives `.kymo`
 and `.bpmn` files a live SVG preview inside the editor (zoom / pan / export),
 rendered in-process by the JS engine — no Python required.

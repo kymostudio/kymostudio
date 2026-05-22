@@ -56,8 +56,8 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | Enterprise Architect | kymo |
 |------|----------------------|------|
 | Primary purpose | Multi-notation enterprise/systems modelling | Render static architecture diagrams |
-| Notations | UML, SysML, ArchiMate, BPMN | kymo `.diagram` DSL |
-| Model | Shared repository, cross-model traceability | Single-file `.diagram` |
+| Notations | UML, SysML, ArchiMate, BPMN | kymo `.kymo` DSL |
+| Model | Shared repository, cross-model traceability | Single-file `.kymo` |
 | Authoring | WYSIWYG desktop, repository | Local text DSL |
 | Scope | Heavyweight, enterprise | Lightweight, single-purpose |
 | Cost/License | Commercial per-seat | Apache-2.0, free |
@@ -70,7 +70,7 @@ Enterprise Architect and kymo sit at opposite ends of one axis: capability-weigh
 
 ### 2.2 Traceability across many diagrams
 
-EA's distinctive value is **traceability**: many diagrams over a shared underlying model, with links between elements across notations (a business process linked to the system and architecture models that realise it). kymo is single-file today — each `.diagram` stands alone. Even a lightweight notion of "the same component appears in diagram A and B" could help large doc sets stay consistent without adopting EA's full repository machinery.
+EA's distinctive value is **traceability**: many diagrams over a shared underlying model, with links between elements across notations (a business process linked to the system and architecture models that realise it). kymo is single-file today — each `.kymo` stands alone. Even a lightweight notion of "the same component appears in diagram A and B" could help large doc sets stay consistent without adopting EA's full repository machinery.
 
 ### 2.3 A shared model behind many views
 
@@ -100,7 +100,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Enterprise Architect | kymo | Why |
 |---|-----------|:------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 3 | 9 | EA's model lives in a binary/database repository, not a diffable text file; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 3 | 9 | EA's model lives in a binary/database repository, not a diffable text file; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 5 | 8 | EA has scripting/automation APIs but diagrams are hand-built repository artefacts; kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 4 | 6 | EA is a heavyweight multi-notation platform with a steep ramp; kymo asks the user to learn a small DSL — narrower but far quicker to start. |
 | A4 | Grouping / container semantics | 8 | 7 | EA has rich, traceable, cross-notation containment and packaging; kymo's typed `region` containers carry layout/styling meaning but no cross-diagram links. |

@@ -19,7 +19,7 @@ echo "→ bundling playground → kymo.bundle.js"
 npx --yes esbuild@0.24 app.js \
   --bundle --format=esm --target=es2022 \
   --outfile=kymo.bundle.js \
-  --loader:.diagram=text --loader:.bpmn=text \
+  --loader:.kymo=text --loader:.bpmn=text \
   --minify
 
 echo "✓ built $(du -h kymo.bundle.js | cut -f1) kymo.bundle.js"

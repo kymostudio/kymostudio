@@ -6,7 +6,7 @@ issue_date: 2026-05-18
 status: Released
 classification: Internal
 owner: diagrams/ project
-audience: Engineers authoring or parsing `.diagram` files
+audience: Engineers authoring or parsing `.kymo` files
 review_cycle: On grammar change, or annually (whichever first)
 supersedes: "1.0"
 related_documents:
@@ -41,7 +41,7 @@ iso_compliance:
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
 | Owner             | `diagrams/` project                                            |
-| Audience          | Engineers authoring or parsing `.diagram` files                |
+| Audience          | Engineers authoring or parsing `.kymo` files                |
 | Review Cycle      | On grammar change, or annually (whichever first)               |
 | Supersedes        | v1.0                                                           |
 | Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), [`dsl.py`](../src/dsl.py), [`model.py`](../src/model.py) |
@@ -71,15 +71,15 @@ Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar produ
 
 ### 1.1 Purpose
 
-This document specifies the **Diagram DSL** — a textual surface language for declaring architecture diagrams. A conforming source file (`.diagram`) declares the leaves, containers (region and layout), and edges of a single diagram. A conforming parser produces an in-memory `model.Diagram` value semantically equivalent to the source.
+This document specifies the **Diagram DSL** — a textual surface language for declaring architecture diagrams. A conforming source file (`.kymo`) declares the leaves, containers (region and layout), and edges of a single diagram. A conforming parser produces an in-memory `model.Diagram` value semantically equivalent to the source.
 
 ### 1.2 Applicability
 
 This specification applies to:
 
-- Source files with extension `.diagram` in this repository
+- Source files with extension `.kymo` in this repository
 - The reference parser implementation [`dsl.py`](../src/dsl.py)
-- Any future tooling (linters, formatters, IDE plug-ins) operating on `.diagram` files
+- Any future tooling (linters, formatters, IDE plug-ins) operating on `.kymo` files
 
 It does **not** specify:
 
@@ -111,7 +111,7 @@ The following documents are indispensable for the application of this specificat
 
 For the purposes of this specification, the following terms apply:
 
-- **3.1 Diagram** — the top-level entity declared by a single `.diagram` file; corresponds to one instance of `model.Diagram`.
+- **3.1 Diagram** — the top-level entity declared by a single `.kymo` file; corresponds to one instance of `model.Diagram`.
 - **3.2 Leaf** — a single rendered element (icon + name + subtitle); the surface form for a `model.Component`. Declared as `id shape/icon/accent "Name" "Sub" [@ placement]`.
 - **3.3 Container** — a brace-delimited block (`id kind … { … }`). Two flavours, distinguished by the kind keyword on the opening line:
   - **Region container** — kind ∈ `outer | inner`. Visible rectangle with a label; bounds auto-fit to its members.
@@ -413,7 +413,7 @@ DSL coordinates therefore remain in the **content coordinate space**; the title 
 
 ### 7.6 Render-Time Concerns Outside DSL
 
-The following SHALL NOT appear in `.diagram` files:
+The following SHALL NOT appear in `.kymo` files:
 
 - Output file path (controlled by `cli.py` → `TARGETS`)
 - Stylesheet or icon definitions (controlled by `to_svg.py` → `STYLE`, `DEFS`)
@@ -472,7 +472,7 @@ Inline comments SHOULD explain **why** a non-obvious offset or via point exists,
 
 ### 9.1 Conforming Source File
 
-A `.diagram` file is conforming if and only if:
+A `.kymo` file is conforming if and only if:
 
 1. It is UTF-8 encoded (clause 5.1)
 2. Every non-comment, non-blank line matches one of the productions in clause 6
@@ -568,7 +568,7 @@ critical inner "Critical Path"
 }
 ```
 
-For full real-world examples, see [`aiq.diagram`](../samples/aiq.diagram), [`aws_1.diagram`](../samples/aws_1.diagram), and [`data.diagram`](../samples/data.diagram).
+For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kymo`](../samples/aws_1.kymo), and [`data.kymo`](../samples/data.kymo).
 
 ---
 

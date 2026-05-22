@@ -9,7 +9,7 @@
  *     `anchor`, `resolveAnchors`, …
  *   - icons: `ICONS`, `getIcon`, `setIconBaseURL`, `setManifest`, `registerIcon`
  *   - renderer: `renderSVG`
- *   - DSL: `parse` (.diagram → Diagram + layout/external specs),
+ *   - DSL: `parse` (.kymo → Diagram + layout/external specs),
  *     `parseDiagram` (full pipeline → positioned Diagram), `layout`,
  *     `resolveAlignments`
  *   - BPMN import: `parseBpmn` (BPMN 2.0 `.bpmn` XML → Diagram)

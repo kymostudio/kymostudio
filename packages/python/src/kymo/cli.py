@@ -1,13 +1,13 @@
 """Entry point: `kymo <path> [--animate] [--figma] [--excalidraw]`
 
-Argument is a path to a `.diagram` (DSL), `.bpmn` (BPMN 2.0 XML), or
+Argument is a path to a `.kymo` (DSL), `.bpmn` (BPMN 2.0 XML), or
 `.py` (Python form) source. Output is a SVG (or Figma Plugin JS /
 Excalidraw scene) written next to the input file:
 
-    kymo samples/aws_1.diagram                → samples/aws_1.svg
-    kymo samples/aws_1.diagram --animate      → samples/aws_1-animated.svg
-    kymo samples/aws_1.diagram --figma        → samples/aws_1.figma.js
-    kymo samples/aws_1.diagram --excalidraw   → samples/aws_1.excalidraw
+    kymo samples/aws_1.kymo                → samples/aws_1.svg
+    kymo samples/aws_1.kymo --animate      → samples/aws_1-animated.svg
+    kymo samples/aws_1.kymo --figma        → samples/aws_1.figma.js
+    kymo samples/aws_1.kymo --excalidraw   → samples/aws_1.excalidraw
     kymo samples/order.bpmn                    → samples/order.svg
 
 `.bpmn` files are imported via their Diagram-Interchange geometry
@@ -43,7 +43,7 @@ def load(source: Path) -> tuple[object, object | None, object | None]:
         from .from_bpmn import parse as parse_bpmn
         # BPMN files carry their own geometry — already resolved, no layout.
         return parse_bpmn(source.read_text(encoding="utf-8")), None, None
-    if source.suffix == ".diagram":
+    if source.suffix == ".kymo":
         return parse_dsl(source.read_text(encoding="utf-8"))
     # For .py sources, the file's parent directory must be on sys.path so the
     # module can import its siblings (e.g. samples/data.py importing model).
@@ -64,8 +64,8 @@ def main() -> None:
     if not src.exists():
         print(f"not found: {src}")
         sys.exit(1)
-    if src.suffix not in (".diagram", ".py", ".bpmn"):
-        print(f"unsupported source: {src} (expected .diagram, .bpmn or .py)")
+    if src.suffix not in (".kymo", ".py", ".bpmn"):
+        print(f"unsupported source: {src} (expected .kymo, .bpmn or .py)")
         sys.exit(1)
 
     animate    = "--animate"    in flags

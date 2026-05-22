@@ -113,7 +113,7 @@ diagrams/
 │   └── cli.py         Entry point — `uv run src/cli.py`
 ├── samples/
 │   ├── data.py                       Diagram instance + LAYOUT spec + edges
-│   ├── aiq.diagram                   DSL form
+│   ├── aiq.kymo                   DSL form
 │   └── *.svg / *.webp / *.png        Rendered outputs + reference images
 ├── docs/                             Spec docs (this file, DSL.md)
 └── out/container-diagram.svg         Transient build artefact (~12 KB, 1080 × 658)
@@ -227,7 +227,7 @@ To add a connection: append an `Edge` to the `EDGES` list and regenerate.
 ### 5.5 Diagram DSL (D2-style)
 
 A textual surface for the same `Diagram` dataclasses §5.4 produces.
-Defined in `dsl.py`; parses `.diagram` files into `Diagram` objects.
+Defined in `dsl.py`; parses `.kymo` files into `Diagram` objects.
 Use this when authoring or reviewing a diagram by hand — the brace
 syntax + arrows read as a flat declaration without Python boilerplate.
 
@@ -403,11 +403,11 @@ researcher --> user : "Deep Research Report"  { src=top, dst=top, via=(990,45);(
 
 #### 5.5.3 Wiring into the build
 
-`.diagram` files are loaded directly by `src/cli.py`:
+`.kymo` files are loaded directly by `src/cli.py`:
 
 ```bash
-uv run src/cli.py samples/aiq.diagram           # → samples/aiq.svg
-uv run src/cli.py samples/aiq.diagram --animate # → samples/aiq-animated.svg
+uv run src/cli.py samples/aiq.kymo           # → samples/aiq.svg
+uv run src/cli.py samples/aiq.kymo --animate # → samples/aiq-animated.svg
 ```
 
 `cli.py` calls `parse_dsl(...)` → `layout(...)` → `resolve_alignments(...)` → `render(...)`.
@@ -1210,7 +1210,7 @@ The five revisions that produced the greatest visual quality gain were:
 | 1.1     | 2026-05-18 | Vũ Anh      | §6.0.3 Auto-layout regions (Figma-style); RegionStyle inner=`stroke-dasharray 4 4`. |
 | 1.2     | 2026-05-18 | Vũ Anh      | §7.1.1 Edge endpoints — `Edge.src`/`dst` may target Components OR Regions.         |
 | 1.3     | 2026-05-18 | Vũ Anh      | §6.7.6 Region-to-region label clearance — 25 px minimum gap above lower region.    |
-| 1.4     | 2026-05-18 | Vũ Anh      | §5.5 Diagram DSL (Mermaid-like) — grammar + `dsl.py` parser + `.diagram` format.   |
+| 1.4     | 2026-05-18 | Vũ Anh      | §5.5 Diagram DSL (Mermaid-like) — grammar + `dsl.py` parser + `.kymo` format.   |
 | 1.5     | 2026-05-18 | Vũ Anh      | §5.5.1.1 Region border overrides — `dash (X, Y)` + `stroke #hex` per-region.       |
 | 1.6     | 2026-05-18 | Vũ Anh      | §5.5.1.2 Asymmetric padding — `padding-bottom N` balances label's top visual weight.|
 | 1.7     | 2026-05-18 | Vũ Anh      | §7.6 Orthogonality rule — every routed edge segment must be H or V (no diagonals).  |

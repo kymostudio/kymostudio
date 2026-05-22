@@ -58,7 +58,7 @@ The comparison is here so it can evolve at a different cadence than the factual 
 | Dimension                | `mingrammer/diagrams`                                  | `kymo`                                                       |
 |--------------------------|--------------------------------------------------------|-------------------------------------------------------------|
 | DSL surface              | Host-language Python (classes + overloaded operators)  | External grammar with its own parser                        |
-| Source file shape        | `.py`, executed by CPython                             | `.diagram`, parsed by kymo                       |
+| Source file shape        | `.py`, executed by CPython                             | `.kymo`, parsed by kymo                       |
 | Grouping primitive       | `Cluster` only (unlabeled-kind, unbounded nesting)     | Multiple container kinds (`region`, …) carrying semantics   |
 | Edge routing             | Whatever Graphviz `dot` produces                       | Owned pipeline; default H-V-H midpoint Z-shape ([[feedback-kymo-edge-routing]]) |
 | Edge styling             | `Edge(color=…, style=…, label=…)` sidecar in operator chain | Native to the DSL                                       |

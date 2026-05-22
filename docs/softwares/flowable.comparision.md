@@ -57,7 +57,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | Flowable | kymo |
 |------|----------|------|
 | Primary purpose | Embeddable BPMN/CMMN/DMN **execution** | Render static architecture diagrams |
-| Notation | BPMN 2.0 (+ CMMN, DMN) | kymo `.diagram` DSL |
+| Notation | BPMN 2.0 (+ CMMN, DMN) | kymo `.kymo` DSL |
 | Implementation | Java (Spring-friendly) | Python + JS |
 | Semantics | Full execution | None — visual only |
 | Output | Running instances, history | SVG / animated SVG / WebP |
@@ -67,7 +67,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 
 ### 2.1 Different category: execution vs rendering
 
-Flowable is a **process-execution engine**: a BPMN/CMMN/DMN model is deployed and *run* — tasks dispatch, gateways route tokens, cases and decisions evaluate, and the engine tracks each live instance with full history. kymo is a **diagram renderer**: a `.diagram` source compiles to an SVG and nothing executes. They are not competitors on a single axis; they sit in different product categories. Everything below scores Flowable *through kymo's diagram-rendering-and-authoring lens*, which deliberately ignores the entire half of Flowable — execution — that is its actual reason to exist. Keep that asymmetry in mind: the matrix measures overlap on visualisation/authoring, not which tool is "better".
+Flowable is a **process-execution engine**: a BPMN/CMMN/DMN model is deployed and *run* — tasks dispatch, gateways route tokens, cases and decisions evaluate, and the engine tracks each live instance with full history. kymo is a **diagram renderer**: a `.kymo` source compiles to an SVG and nothing executes. They are not competitors on a single axis; they sit in different product categories. Everything below scores Flowable *through kymo's diagram-rendering-and-authoring lens*, which deliberately ignores the entire half of Flowable — execution — that is its actual reason to exist. Keep that asymmetry in mind: the matrix measures overlap on visualisation/authoring, not which tool is "better".
 
 ### 2.2 Embeddability as a design goal
 
@@ -101,7 +101,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Flowable | kymo | Why |
 |---|-----------|:-------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 4 | 9 | Flowable's source is BPMN/CMMN/DMN XML with DI — diffable in principle but coordinate-heavy and tool-generated; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 4 | 9 | Flowable's source is BPMN/CMMN/DMN XML with DI — diffable in principle but coordinate-heavy and tool-generated; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 6 | 8 | Flowable deployment is scriptable and the model is data, but the artefact is a running process, not a regenerable picture; kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 5 | 6 | Flowable asks the user to learn execution semantics across three notations plus a Java/Spring runtime; kymo asks for a small DSL only. |
 | A4 | Grouping / container semantics | 7 | 7 | Flowable's pools/lanes/sub-processes (and CMMN stages) carry execution meaning; kymo's typed `region` containers carry layout/styling meaning — different purposes, comparable expressiveness. |

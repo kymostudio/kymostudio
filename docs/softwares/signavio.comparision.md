@@ -56,7 +56,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | SAP Signavio | kymo |
 |------|--------------|------|
 | Primary purpose | Enterprise process modelling, governance, mining | Render static architecture diagrams |
-| Notation | BPMN 2.0 + EPC + DMN | kymo `.diagram` DSL |
+| Notation | BPMN 2.0 + EPC + DMN | kymo `.kymo` DSL |
 | Authoring | Browser, collaborative, governed repository | Local text DSL, single-file |
 | Deployment | Commercial SaaS | Local CLI / library |
 | Extras | Simulation, mining, approvals | None — rendering only |
@@ -70,7 +70,7 @@ Signavio and kymo are **not in the same product category**, and the §3 matrix s
 
 ### 2.2 Governed repository vs local text source
 
-Signavio is a browser-based, collaborative, **governed** repository: processes live in a shared store with review workflows, approval/release states, and a dictionary of reusable elements. kymo is a local text DSL: the `.diagram` source records *intent*, the layout engine computes positions, and a single author commits it to a repo. kymo wins everything that flows from plain-text source — diffs, code review, git history, regenerate-from-source automation — but Signavio's governance layer (release states, approvals, shared dictionary) is something kymo only gestures at via the frontmatter `status:` field. These are different disciplines at very different scales.
+Signavio is a browser-based, collaborative, **governed** repository: processes live in a shared store with review workflows, approval/release states, and a dictionary of reusable elements. kymo is a local text DSL: the `.kymo` source records *intent*, the layout engine computes positions, and a single author commits it to a repo. kymo wins everything that flows from plain-text source — diffs, code review, git history, regenerate-from-source automation — but Signavio's governance layer (release states, approvals, shared dictionary) is something kymo only gestures at via the frontmatter `status:` field. These are different disciplines at very different scales.
 
 ### 2.3 A dictionary of reusable elements
 
@@ -104,7 +104,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Signavio | kymo | Why |
 |---|-----------|:--------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 3 | 9 | Signavio stores models in a governed cloud repository — not diffable or reviewable as text; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 3 | 9 | Signavio stores models in a governed cloud repository — not diffable or reviewable as text; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 5 | 8 | Signavio exports BPMN 2.0 XML and has APIs, but models are authored in a browser; kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 6 | 6 | Signavio is collaborative and browser-based but carries enterprise BPMN/governance complexity; kymo asks the user to learn a small DSL — a wash. |
 | A4 | Grouping / container semantics | 7 | 7 | Signavio has BPMN pools/lanes/sub-processes with rich semantics; kymo's typed `region` containers carry layout/styling meaning — a wash. |

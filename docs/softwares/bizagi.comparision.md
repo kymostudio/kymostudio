@@ -56,7 +56,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | Bizagi Modeler | kymo |
 |------|----------------|------|
 | Primary purpose | Free BPMN modelling + documentation | Render static architecture diagrams |
-| Notation | BPMN 2.0 | kymo `.diagram` DSL |
+| Notation | BPMN 2.0 | kymo `.kymo` DSL |
 | Authoring | WYSIWYG desktop editor | Local text DSL |
 | Standout feature | One-click process documentation export | Animated SVG / WebP output |
 | License/Cost | Free (freeware); commercial upsell platform | Apache-2.0, free |
@@ -65,7 +65,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 
 ### 2.1 WYSIWYG BPMN editor vs text source
 
-Bizagi Modeler is a polished desktop canvas: you place BPMN symbols by hand and the model records *positions and properties*, not regenerable intent. kymo is a text DSL: the `.diagram` source records *intent* and the layout engine computes positions. Bizagi wins approachability (no syntax, full descriptive/analytical palette, genuinely free) and fine-grained manual control; kymo wins everything that flows from plain-text source — diffs, code review, git history, regenerate-from-source automation. Neither is "better"; they serve different workflows (a process analyst at a canvas vs an engineer in a repo).
+Bizagi Modeler is a polished desktop canvas: you place BPMN symbols by hand and the model records *positions and properties*, not regenerable intent. kymo is a text DSL: the `.kymo` source records *intent* and the layout engine computes positions. Bizagi wins approachability (no syntax, full descriptive/analytical palette, genuinely free) and fine-grained manual control; kymo wins everything that flows from plain-text source — diffs, code review, git history, regenerate-from-source automation. Neither is "better"; they serve different workflows (a process analyst at a canvas vs an engineer in a repo).
 
 ### 2.2 Documentation as a first-class output
 
@@ -99,7 +99,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Bizagi Modeler | kymo | Why |
 |---|-----------|:------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 3 | 9 | Bizagi's model file is a binary/structured artefact tied to the editor — not meaningfully diffable or reviewable; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 3 | 9 | Bizagi's model file is a binary/structured artefact tied to the editor — not meaningfully diffable or reviewable; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 4 | 8 | Bizagi diagrams are hand-drawn artefacts (BPMN XML export aside); kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 9 | 6 | Bizagi is drag-and-drop with a guided BPMN palette and zero syntax; kymo asks the user to learn a small DSL. |
 | A4 | Grouping / container semantics | 7 | 7 | Bizagi's pools/lanes/sub-processes carry standardised BPMN semantics; kymo's typed `region` containers carry layout/styling meaning. A wash on expressiveness, different vocabularies. |
@@ -197,7 +197,7 @@ Re-run the relevant categories when any of the following happens — flag the da
 
 These follow from the comparison and the borrowable ideas catalogued in [`bizagi.md`](bizagi.md):
 
-1. **A structured description alongside the SVG?** Bizagi's documentation export shows the value of treating the model as a source for a written spec; kymo could emit a component/edge/region listing for accessibility and review without leaving the `.diagram` source.
+1. **A structured description alongside the SVG?** Bizagi's documentation export shows the value of treating the model as a source for a written spec; kymo could emit a component/edge/region listing for accessibility and review without leaving the `.kymo` source.
 2. **What is the right "frictionless free core" story?** Bizagi's freeware funnels to a paid platform; kymo's Apache-2.0 core has no upsell, so the audience-building benefit must come from the docs and the exporter ergonomics, not a funnel.
 3. **An icon escape hatch (arbitrary SVG/PNG by path)?** The recurring gap across every comparison in this folder; without it, every catalog miss reads as "kymo can't draw that".
 4. **How explicit should the "visual, not executed" boundary be?** Bizagi keeps modelling and execution in separate products; kymo's docs should keep the visual-only boundary honest so a clean picture isn't mistaken for a checked architecture.

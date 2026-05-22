@@ -58,7 +58,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | jBPM | kymo |
 |------|------|------|
 | Primary purpose | BPMN **execution** + rules (Drools) | Render static architecture diagrams |
-| Notation | BPMN 2.0 (+ DMN/DRL) | kymo `.diagram` DSL |
+| Notation | BPMN 2.0 (+ DMN/DRL) | kymo `.kymo` DSL |
 | Implementation | Java (KIE platform) | Python + JS |
 | Semantics | Full execution | None — visual only |
 | Distinctive trait | Process + rules integration | Architecture diagram rendering |
@@ -68,7 +68,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 
 ### 2.1 Different category: execution vs rendering
 
-jBPM is a **process-execution toolkit**: a BPMN 2.0 model is deployed and *run* — events fire, gateways route tokens, Business Rule tasks delegate to Drools, and the engine tracks each live instance. kymo is a **diagram renderer**: a `.diagram` source compiles to an SVG and nothing executes. They are not competitors on a single axis; they sit in different product categories. Everything below scores jBPM *through kymo's diagram-rendering-and-authoring lens*, which deliberately ignores the entire half of jBPM — execution plus rules — that is its actual reason to exist. Keep that asymmetry in mind: the matrix measures overlap on visualisation/authoring, not which tool is "better".
+jBPM is a **process-execution toolkit**: a BPMN 2.0 model is deployed and *run* — events fire, gateways route tokens, Business Rule tasks delegate to Drools, and the engine tracks each live instance. kymo is a **diagram renderer**: a `.kymo` source compiles to an SVG and nothing executes. They are not competitors on a single axis; they sit in different product categories. Everything below scores jBPM *through kymo's diagram-rendering-and-authoring lens*, which deliberately ignores the entire half of jBPM — execution plus rules — that is its actual reason to exist. Keep that asymmetry in mind: the matrix measures overlap on visualisation/authoring, not which tool is "better".
 
 ### 2.2 Separate concerns that change at different rates
 
@@ -98,7 +98,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | jBPM | kymo | Why |
 |---|-----------|:----:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 4 | 9 | jBPM's source is BPMN XML (plus DRL/DMN for rules) with DI — diffable in principle but coordinate-heavy and tool-generated; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 4 | 9 | jBPM's source is BPMN XML (plus DRL/DMN for rules) with DI — diffable in principle but coordinate-heavy and tool-generated; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 6 | 8 | jBPM deployment is scriptable via the KIE platform and the model is data, but the artefact is a running process, not a regenerable picture; kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 4 | 6 | jBPM asks the user to learn BPMN execution *and* the Drools rules model on the KIE platform — a notably steep surface; kymo asks for a small DSL only. |
 | A4 | Grouping / container semantics | 7 | 7 | jBPM's pools/lanes/sub-processes carry execution meaning; kymo's typed `region` containers carry layout/styling meaning — different purposes, comparable expressiveness. |
