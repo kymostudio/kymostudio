@@ -2,6 +2,13 @@
 
 All notable changes to the kymostudio VS Code extension.
 
+## 0.2.6
+
+- Published to the Visual Studio Marketplace and Open VSX
+  (`kymostudio.kymostudio-vscode`), with a marketplace icon and an automated
+  `release-vscode.yml` workflow. No change to the extension's behaviour versus
+  `0.2.5`.
+
 ## 0.2.5
 
 - Version aligned with the kymostudio monorepo (`0.2.5`); no change to the
