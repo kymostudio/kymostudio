@@ -1,24 +1,33 @@
-# kymo
+<h1 align="center">kymo</h1>
 
-Diagram-as-code DSL — declarative architecture diagrams to **animated SVG / WebP**.
+<p align="center">
+  <b>Diagram-as-code DSL</b> — turn declarative text into <b>animated SVG</b> (plus WebP, Figma &amp; Excalidraw), and import standard <b>BPMN 2.0</b>.
+</p>
+
+<p align="center">
+  <a href="https://pypi.org/project/kymostudio/"><img alt="PyPI" src="https://img.shields.io/pypi/v/kymostudio?logo=pypi&logoColor=white&label=PyPI"></a>
+  <a href="https://www.npmjs.com/package/kymostudio"><img alt="npm" src="https://img.shields.io/npm/v/kymostudio?logo=npm&label=npm"></a>
+  <a href="https://github.com/kymostudio/kymostudio/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/kymostudio/kymostudio/actions/workflows/test.yml/badge.svg"></a>
+  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
+</p>
 
 ![NVIDIA AIQ replica — animated](samples/nvidia-aiq-animated.webp)
 
 ## Install
 
 ```bash
-pip install kymostudio        # Python  (CLI: `kymo`)
+pip install kymostudio        # Python
 npm  install kymostudio       # JavaScript
 ```
 
 ## Usage
 
 ```bash
-kymo path/to/diagram.diagram             # → path/to/diagram.svg
-kymo path/to/diagram.diagram --animate   # → path/to/diagram-animated.svg
-kymo path/to/diagram.diagram --figma     # → path/to/diagram.figma.js
-kymo path/to/diagram.diagram --excalidraw # → path/to/diagram.excalidraw
-kymo path/to/process.bpmn                 # → path/to/process.svg (BPMN 2.0 import)
+kymo sample.diagram              # → sample.svg
+kymo sample.diagram --animate    # → sample-animated.svg
+kymo sample.diagram --figma      # → sample.figma.js
+kymo sample.diagram --excalidraw # → sample.excalidraw
+kymo process.bpmn                # → process.svg (BPMN 2.0 import)
 ```
 
 kymo also imports standard **BPMN 2.0 XML** (`.bpmn` from bpmn.io / Camunda
@@ -27,55 +36,6 @@ see [`docs/BPMN.md`](./docs/BPMN.md) and the
 [`samples/order.bpmn`](./samples/order.bpmn) /
 [`samples/collaboration.bpmn`](./samples/collaboration.bpmn) examples.
 
-See [`samples/`](./samples/) for complete example `.diagram` files, and the
-per-package READMEs ([Python](./packages/python/README.md),
-[JavaScript](./packages/js/README.md)) for API details.
-
 A [**VS Code extension**](./packages/vscode-extension/README.md) gives `.diagram`
 and `.bpmn` files a live SVG preview inside the editor (zoom / pan / export),
 rendered in-process by the JS engine — no Python required.
-
-### Python API
-
-```python
-from kymo import parse, layout, resolve_alignments, render
-
-diagram, layout_spec, external = parse(open("diagram.diagram").read())
-if layout_spec:
-    layout(diagram, layout_spec, external)
-resolve_alignments(diagram)
-svg = render(diagram, animate=True)
-```
-
-### JavaScript / npm
-
-An independent TypeScript implementation at feature parity — its own DSL parser,
-layout engine, alignment resolver, SVG renderer, icon library and BPMN importer
-(dependency-free):
-
-```js
-import { parseDiagram, parseBpmn, renderSVG } from "kymostudio";
-
-const svg = await renderSVG(parseDiagram(source));   // .diagram DSL → SVG
-```
-
-## Develop
-
-```bash
-# Python
-cd packages/python && uv run --group dev python -m pytest -q
-
-# JavaScript
-cd packages/js && npm test && npm run build-manifest
-
-# VS Code extension (bundles the JS engine; build it first)
-cd packages/js && npm install && npm run build
-cd ../vscode-extension && npm install && npm run build   # then press F5 in VS Code
-
-# Local showcase + playground (renders via the Python package)
-uv run --project packages/python playground/server.py
-```
-
-## License
-
-Apache License 2.0 — see [`LICENSE`](./LICENSE).

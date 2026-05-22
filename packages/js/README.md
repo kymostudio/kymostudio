@@ -14,7 +14,7 @@ npm install kymostudio
 `parseDiagram(src)` runs the full front-end pipeline — parse the declarative
 DSL, then position everything (grid / Figma-style auto-layout, parent/child
 alignment, auto-bounded regions, auto-canvas sizing) — returning a positioned
-Diagram. Equivalent to the Python `kymo` CLI's `.diagram` path.
+Diagram.
 
 ```ts
 import { parseDiagram, renderSVG } from "kymostudio";

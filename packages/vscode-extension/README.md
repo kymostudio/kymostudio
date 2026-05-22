@@ -2,8 +2,7 @@
 
 Live SVG preview for [kymostudio](https://github.com/kymostudio/kymostudio)
 diagrams, right inside VS Code. Both formats render **natively**, in-process,
-by the bundled, dependency-free [`kymostudio`](../js) JS engine — no Python, no
-network, no language server.
+by the bundled, dependency-free [`kymostudio`](../js) JS engine.
 
 - **`.diagram` (the DSL)** — parsed and positioned (grid / auto-layout,
   parent/child alignment, auto-bounded regions, auto-canvas) via `parseDiagram`,
