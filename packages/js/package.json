@@ -1,7 +1,7 @@
 {
   "name": "kymostudio",
   "version": "0.2.6",
-  "description": "Diagram-as-code: turn a declarative .kymo DSL — or a standard BPMN 2.0 .bpmn file — into animated SVG / WebP.",
+  "description": "Type it. See it appear. Watch it animate.",
   "type": "module",
   "license": "Apache-2.0",
   "author": "rain1024",

@@ -1,7 +1,6 @@
 # kymostudio
 
-Diagram-as-code: turn a declarative `.kymo` DSL — or a standard BPMN 2.0
-`.bpmn` file — into **animated SVG / WebP**.
+**Type it. See it appear. Watch it animate.**
 
 ## Install
 
