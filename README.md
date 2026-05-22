@@ -1,12 +1,13 @@
 <h1 align="center">kymo</h1>
 
 <p align="center">
-  <b>Diagram-as-code DSL</b> — turn declarative text into <b>animated SVG</b> (plus WebP, Figma &amp; Excalidraw), and import standard <b>BPMN 2.0</b>.
+  <b>Type it. See it appear. Watch it animate.</b>
 </p>
 
 <p align="center">
   <a href="https://pypi.org/project/kymostudio/"><img alt="PyPI" src="https://img.shields.io/pypi/v/kymostudio?logo=pypi&logoColor=white&label=PyPI"></a>
   <a href="https://www.npmjs.com/package/kymostudio"><img alt="npm" src="https://img.shields.io/npm/v/kymostudio?logo=npm&label=npm"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode"><img alt="VS Code Extension" src="https://img.shields.io/badge/VS%20Code-Extension-FE7D37?logo=visualstudiocode&logoColor=white"></a>
   <a href="https://github.com/kymostudio/kymostudio/actions/workflows/test.yml"><img alt="Tests" src="https://github.com/kymostudio/kymostudio/actions/workflows/test.yml/badge.svg"></a>
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
 </p>
@@ -17,7 +18,7 @@
 
 ```bash
 pip install kymostudio        # Python
-npm  install kymostudio       # JavaScript
+npm install kymostudio        # JavaScript
 ```
 
 ## Usage
@@ -35,7 +36,3 @@ Modeler / Signavio) and renders it to SVG using the file's own geometry —
 see [`docs/BPMN.md`](./docs/BPMN.md) and the
 [`samples/order.bpmn`](./samples/order.bpmn) /
 [`samples/collaboration.bpmn`](./samples/collaboration.bpmn) examples.
-
-A [**VS Code extension**](./packages/vscode-extension/README.md) gives `.kymo`
-and `.bpmn` files a live SVG preview inside the editor (zoom / pan / export),
-rendered in-process by the JS engine — no Python required.
