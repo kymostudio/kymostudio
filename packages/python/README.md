@@ -54,7 +54,6 @@ svg = render(diagram, animate=True)
 
 ```bash
 uv run --group dev python -m pytest -q       # run the test suite
-uv run ../../playground/server.py            # local showcase + playground
 ```
 
 ## License

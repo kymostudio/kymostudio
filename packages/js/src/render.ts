@@ -61,6 +61,17 @@ const CSS = `
     .label { fill: #1e293b; font-size: 13px; font-weight: 600; text-anchor: middle; }
     .elabel { fill: #64748b; font-size: 10.5px; text-anchor: middle; }`;
 
+// Architecture-diagram region styling. These same three rules also live in
+// BPMN_STYLE (which serves pool/lane diagrams); inject this only for non-BPMN
+// diagrams that have regions, so a `.diagram` with `outer`/`inner` frames gets
+// its near-transparent fills + outlines instead of falling back to SVG-default
+// black, while BPMN output stays byte-identical. (Without this, region rects
+// have no fill rule and render solid black — breaking light backgrounds.)
+const REGION_STYLE = `
+    .region-rect        { fill: rgba(15,23,42,0.02); stroke: #cbd5e1; stroke-width: 1.4; }
+    .region-rect--inner { fill: rgba(124,58,237,0.03); stroke: #7c3aed; stroke-width: 1.3; stroke-dasharray: 4 4; }
+    .region-label--inner { font-size: 12px; font-weight: 600; fill: #6d28d9; }`;
+
 /** Horizontally-biased cubic Bézier between two resolved anchor points. */
 function edgePath(x1: number, y1: number, sa: Side, x2: number, y2: number, da: Side): string {
   const k = Math.max(40, Math.abs(x2 - x1) * 0.5);
@@ -92,6 +103,9 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
   const hasBpmn = d.components.some((c) => c.shape.startsWith("bpmn-"))
     || d.edges.some((e) => e.points != null && e.points.length > 0)
     || d.regions.some((r) => r.style === "pool" || r.style === "lane");
+  // Non-BPMN diagrams with regions need the region CSS injected too (BPMN
+  // diagrams already get it via BPMN_STYLE).
+  const needsRegionStyle = !hasBpmn && d.regions.length > 0;
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   const grow = (x: number, y: number): void => {
@@ -161,7 +175,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${w} ${h}" width="${w}" height="${h}">
   <defs>${DEFS}${hasBpmn ? BPMN_DEFS : ""}
   </defs>
-  <style>${CSS}${hasBpmn ? BPMN_STYLE : ""}
+  <style>${CSS}${needsRegionStyle ? REGION_STYLE : ""}${hasBpmn ? BPMN_STYLE : ""}
   </style>
   ${bg}
   ${title}${regionRects}

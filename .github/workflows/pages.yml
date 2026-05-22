@@ -1,10 +1,10 @@
-name: Deploy showcase to Pages
+name: Deploy website to Pages
 
 on:
   push:
     branches: [main]
     paths:
-      - 'showcase/**'
+      - 'website/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -28,6 +28,6 @@ jobs:
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./showcase
+          path: ./website
       - id: deployment
         uses: actions/deploy-pages@v4
