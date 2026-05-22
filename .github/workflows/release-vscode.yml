@@ -1,0 +1,83 @@
+name: Release kymo VS Code extension
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on tags like v0.1.0
+  workflow_dispatch:
+
+# Extension lives in packages/vscode-extension/. It inlines the dependency-free
+# JS engine from packages/js/ at bundle time, so that package is built first
+# (mirrors the `vscode-extension` job in test.yml).
+jobs:
+  verify-version:
+    name: Verify Version
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    defaults:
+      run:
+        working-directory: packages/vscode-extension
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify tag matches package.json version
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          echo "Tag version: $TAG_VERSION"
+          echo "package.json version: $PKG_VERSION"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "ERROR: Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+          echo "✓ Versions match"
+
+  publish:
+    name: Build and Publish extension
+    # On a tag push, gate on verify-version; on workflow_dispatch it is
+    # skipped, so allow this job to run regardless of that result.
+    needs: [verify-version]
+    if: always() && (needs.verify-version.result == 'success' || needs.verify-version.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      OVSX_PAT: ${{ secrets.OVSX_PAT }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      # The extension bundles packages/js, so build that first.
+      - name: Build JS engine (bundled by the extension)
+        working-directory: packages/js
+        run: npm ci && npm run build
+
+      - name: Install extension deps
+        working-directory: packages/vscode-extension
+        run: npm ci
+
+      - name: Bundle extension
+        working-directory: packages/vscode-extension
+        run: npm run build   # esbuild -> dist/extension.js (inlines kymostudio)
+
+      # Publish the current package.json version to the Visual Studio Marketplace.
+      # Needs repo secret VSCE_PAT — a Marketplace (Manage) PAT for the
+      # `kymostudio` publisher; vsce reads it from the VSCE_PAT env var.
+      # Skipped (with a warning) until the secret is configured, so it never
+      # red-fails the shared `v*` tag release before setup.
+      - name: Publish to VS Code Marketplace
+        if: ${{ env.VSCE_PAT != '' }}
+        working-directory: packages/vscode-extension
+        run: npx --yes @vscode/vsce publish --no-dependencies
+      - name: Note if VSCE_PAT is missing
+        if: ${{ env.VSCE_PAT == '' }}
+        run: echo "::warning::VSCE_PAT secret not set — skipped VS Code Marketplace publish. Add it in Settings → Secrets and variables → Actions."
+
+      # Optional mirror to Open VSX (VSCodium / Cursor / Gitpod). Runs only when
+      # an OVSX_PAT secret (open-vsx.org, free, no Azure) is configured.
+      - name: Publish to Open VSX
+        if: ${{ env.OVSX_PAT != '' }}
+        working-directory: packages/vscode-extension
+        run: npx --yes ovsx publish --no-dependencies -p "$OVSX_PAT"
