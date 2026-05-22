@@ -9,6 +9,19 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.7] - 2026-05-23
+
+### Changed
+
+- **Breaking — DSL source file extension renamed `.diagram` → `.kymo`.** The
+  CLI, the JavaScript parser dispatch, and the VS Code extension now recognise
+  `.kymo` source files; `.diagram` is no longer accepted. Rename existing
+  sources to `.kymo`. Samples, tests, and the DSL spec/docs were updated to
+  match.
+- Refreshed the project tagline to **"Type it. See it appear. Watch it
+  animate."** across the root and per-package READMEs and the PyPI / npm / VS
+  Code package descriptions; added a VS Code Marketplace badge to the README.
+
 ## [0.2.6] - 2026-05-22
 
 The Python (PyPI) and JavaScript (npm) package payloads are unchanged versus
