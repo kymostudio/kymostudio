@@ -56,8 +56,8 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | bpmn-js | kymo |
 |------|---------|------|
 | Primary purpose | View **and edit** BPMN models in the browser | Render static architecture diagrams from a text DSL |
-| Notation | BPMN 2.0 (fixed, standardised) | kymo's own `.diagram` DSL |
-| Input | BPMN 2.0 XML (+ DI) | `.diagram` source text |
+| Notation | BPMN 2.0 (fixed, standardised) | kymo's own `.kymo` DSL |
+| Input | BPMN 2.0 XML (+ DI) | `.kymo` source text |
 | Implementation | JavaScript (browser-first) | Python renderer + JS data-model port |
 | Interactivity | Full: drag, edit, undo/redo, palette | None — static SVG / animated SVG / WebP |
 | Layout | Manual (author-placed), preserved via DI | Computed by kymo's layout engine |
@@ -107,7 +107,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | bpmn-js | kymo | Why |
 |---|-----------|:------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 5 | 9 | BPMN 2.0 XML is text and diffable, but it is verbose machine-generated XML with embedded DI — reviewable in principle, painful in practice; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 5 | 9 | BPMN 2.0 XML is text and diffable, but it is verbose machine-generated XML with embedded DI — reviewable in principle, painful in practice; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 6 | 8 | bpmn-js can render headlessly from XML in CI; kymo regenerates SVG/WebP from terse source, with less to template. |
 | A3 | Approachability / learning curve | 8 | 6 | bpmn-js is drag-and-drop in the browser with a guided palette; kymo asks the user to learn a small DSL. |
 | A4 | Grouping / container semantics | 7 | 7 | bpmn-js's pools/lanes carry standardised BPMN semantics; kymo's typed `region` containers carry layout/styling meaning. A wash, different vocabularies. |

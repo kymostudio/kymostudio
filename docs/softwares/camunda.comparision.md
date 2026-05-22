@@ -57,7 +57,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | Camunda | kymo |
 |------|---------|------|
 | Primary purpose | **Execute** BPMN processes (orchestration runtime) | Render static architecture diagrams |
-| Artifact | Executable BPMN 2.0 XML model | `.diagram` DSL source → SVG |
+| Artifact | Executable BPMN 2.0 XML model | `.kymo` DSL source → SVG |
 | Semantics | Full token/execution semantics | None — purely visual |
 | Implementation | Java (C7) / Zeebe distributed (C8) | Python renderer + JS data-model port |
 | Output | Running process instances, audit history | SVG / animated SVG / WebP |
@@ -68,7 +68,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 
 ### 2.1 Different category: execution vs rendering
 
-Camunda is a **process-execution platform**: a BPMN 2.0 model is deployed to the engine and *run* — tasks dispatch to workers, gateways route tokens, timers fire, and the engine tracks every running instance. kymo is a **diagram renderer**: a `.diagram` source compiles to an SVG and nothing executes. They are not competitors on a single axis; they sit in different product categories. Everything below scores Camunda *through kymo's diagram-rendering-and-authoring lens*, which deliberately ignores the entire half of Camunda — execution — that is its actual reason to exist. The nearest genuine like-for-like to kymo inside Camunda's world is not the engine at all but **bpmn.io**, the web modeler Camunda authors. Keep that asymmetry in mind: the matrix measures overlap on visualisation/authoring, not which tool is "better".
+Camunda is a **process-execution platform**: a BPMN 2.0 model is deployed to the engine and *run* — tasks dispatch to workers, gateways route tokens, timers fire, and the engine tracks every running instance. kymo is a **diagram renderer**: a `.kymo` source compiles to an SVG and nothing executes. They are not competitors on a single axis; they sit in different product categories. Everything below scores Camunda *through kymo's diagram-rendering-and-authoring lens*, which deliberately ignores the entire half of Camunda — execution — that is its actual reason to exist. The nearest genuine like-for-like to kymo inside Camunda's world is not the engine at all but **bpmn.io**, the web modeler Camunda authors. Keep that asymmetry in mind: the matrix measures overlap on visualisation/authoring, not which tool is "better".
 
 ### 2.2 Separate the model from the picture (BPMN DI)
 
@@ -102,7 +102,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Camunda | kymo | Why |
 |---|-----------|:------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 4 | 9 | Camunda's source is BPMN XML with embedded DI — diffable in principle but coordinate-heavy and modeler-generated; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 4 | 9 | Camunda's source is BPMN XML with embedded DI — diffable in principle but coordinate-heavy and modeler-generated; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 7 | 8 | Camunda models are data and deployment is scriptable (CI pipelines deploy BPMN); but the artefact is a running process, not a regenerable picture. kymo regenerates SVG/WebP from source. |
 | A3 | Approachability / learning curve | 6 | 6 | bpmn.io makes *drawing* BPMN approachable, but running it means BPMN execution semantics + a JVM/Zeebe runtime; kymo asks for a small DSL only. Roughly even on the authoring slice. |
 | A4 | Grouping / container semantics | 7 | 7 | Camunda's pools/lanes/sub-processes carry execution meaning; kymo's typed `region` containers carry layout/styling meaning — different purposes, comparable expressiveness. |

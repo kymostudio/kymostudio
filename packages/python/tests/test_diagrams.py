@@ -1,5 +1,5 @@
 """Golden-file tests: each subdirectory under ``tests/diagrams/`` is a
-case with ``input.diagram`` and ``output.svg``. We re-render the input
+case with ``input.kymo`` and ``output.svg``. We re-render the input
 through the full pipeline (parse → layout → align → SVG) and assert the
 output matches the committed golden byte-for-byte.
 
@@ -28,7 +28,7 @@ def _discover_cases() -> list[str]:
 
 
 def _render_case(case: str) -> str:
-    src = CASES_DIR / case / "input.diagram"
+    src = CASES_DIR / case / "input.kymo"
     diagram, layout_spec, external = parse_dsl(src.read_text(encoding="utf-8"))
     if layout_spec:
         apply_grid_layout(diagram, layout_spec, external)

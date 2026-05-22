@@ -56,7 +56,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | Activiti | kymo |
 |------|----------|------|
 | Primary purpose | Lightweight BPMN **execution** engine | Render static architecture diagrams |
-| Notation | BPMN 2.0 | kymo `.diagram` DSL |
+| Notation | BPMN 2.0 | kymo `.kymo` DSL |
 | Implementation | Java | Python renderer + JS data-model port |
 | Semantics | Full execution semantics | None — visual only |
 | Output | Running process instances, audit history | SVG / animated SVG / WebP |
@@ -67,7 +67,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 
 ### 2.1 Different category: execution vs rendering
 
-Activiti is a **process-execution engine**: a BPMN 2.0 model is deployed and *run* — tasks dispatch to workers, gateways route tokens, the engine tracks each live instance and its audit history. kymo is a **diagram renderer**: a `.diagram` source compiles to an SVG and nothing executes. They are not competitors on a single axis; they sit in different product categories that happen to share the word "BPMN" only because Activiti's notation is sometimes drawn before it is run. Everything below scores Activiti *through kymo's diagram-rendering-and-authoring lens*, which deliberately ignores the entire half of Activiti — execution — that is its actual reason to exist. Keep that asymmetry in mind: the matrix measures overlap on visualisation/authoring, not which tool is "better".
+Activiti is a **process-execution engine**: a BPMN 2.0 model is deployed and *run* — tasks dispatch to workers, gateways route tokens, the engine tracks each live instance and its audit history. kymo is a **diagram renderer**: a `.kymo` source compiles to an SVG and nothing executes. They are not competitors on a single axis; they sit in different product categories that happen to share the word "BPMN" only because Activiti's notation is sometimes drawn before it is run. Everything below scores Activiti *through kymo's diagram-rendering-and-authoring lens*, which deliberately ignores the entire half of Activiti — execution — that is its actual reason to exist. Keep that asymmetry in mind: the matrix measures overlap on visualisation/authoring, not which tool is "better".
 
 ### 2.2 "Lightweight and embeddable" is a durable value
 
@@ -75,7 +75,7 @@ Activiti's original pitch — a small engine you embed rather than a platform yo
 
 ### 2.3 A standard interchange is what enabled the ecosystem
 
-The whole Activiti→Camunda/Flowable lineage only works because **BPMN 2.0 XML is standardised**: a model authored against one engine is legible to the others. kymo has no such interchange today — its `.diagram` source is the only representation and the exporters are one-way. This is the strongest argument for kymo eventually documenting a stable model/serialisation if third-party tooling is ever wanted: a healthy data format is the precondition for an ecosystem, and Activiti's fork history is the proof.
+The whole Activiti→Camunda/Flowable lineage only works because **BPMN 2.0 XML is standardised**: a model authored against one engine is legible to the others. kymo has no such interchange today — its `.kymo` source is the only representation and the exporters are one-way. This is the strongest argument for kymo eventually documenting a stable model/serialisation if third-party tooling is ever wanted: a healthy data format is the precondition for an ecosystem, and Activiti's fork history is the proof.
 
 ## 3. Detailed scoring by category
 
@@ -97,7 +97,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Activiti | kymo | Why |
 |---|-----------|:-------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 4 | 9 | Activiti's source is BPMN XML — diffable in principle but coordinate-heavy DI noise and tool-generated layout make review painful; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 4 | 9 | Activiti's source is BPMN XML — diffable in principle but coordinate-heavy DI noise and tool-generated layout make review painful; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 6 | 8 | Activiti deployments are scriptable and the model is data, but the artefact is a running process, not a regenerable picture; kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 5 | 6 | Activiti asks the user to learn BPMN execution semantics and a Java/Spring runtime; kymo asks for a small DSL only. |
 | A4 | Grouping / container semantics | 7 | 7 | Activiti's pools/lanes/sub-processes carry execution meaning; kymo's typed `region` containers carry layout/styling meaning — different purposes, comparable expressiveness. |

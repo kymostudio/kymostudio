@@ -1,6 +1,6 @@
 # kymo playground
 
-A fully client-side editor — write a `.diagram` DSL (or paste a BPMN 2.0
+A fully client-side editor — write a `.kymo` DSL (or paste a BPMN 2.0
 `.bpmn` file) and get an SVG live in the browser. No server, no Python: it
 bundles the dependency-free [`kymostudio`](../../packages/js) JS package and
 runs `parseDiagram` / `parseBpmn` + `renderSVG` entirely in-page.

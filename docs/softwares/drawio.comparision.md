@@ -57,10 +57,10 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | draw.io | kymo |
 |------|---------|------|
 | Primary purpose | General-purpose diagram editor | Render static architecture diagrams |
-| Authoring model | WYSIWYG drag-and-drop | Text DSL (`.diagram`) compiled to SVG |
+| Authoring model | WYSIWYG drag-and-drop | Text DSL (`.kymo`) compiled to SVG |
 | Scope | General (BPMN is one of many shape libraries) | Architecture diagrams, opinionated icon set |
 | Implementation | JavaScript, client-side | Python renderer + JS data-model port |
-| File format | mxGraph XML (`.drawio`) | `.diagram` DSL source |
+| File format | mxGraph XML (`.drawio`) | `.kymo` DSL source |
 | BPMN | Shape library, no semantics | Not a BPMN tool |
 | Layout | Manual placement (+ optional auto-layout) | Computed by kymo's layout engine |
 | Output | SVG, PNG, PDF, HTML | SVG, animated SVG, animated WebP, Figma, Excalidraw |
@@ -71,7 +71,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 
 ### 2.1 WYSIWYG vs text source — the defining split
 
-draw.io is a canvas: you place shapes by hand and the file (`.drawio`, mxGraph XML) records *positions*, not intent. kymo is a text DSL: the `.diagram` source records *intent* and the layout engine computes positions. This single difference cascades through almost every axis. draw.io wins approachability (no syntax to learn) and fine-grained manual control; kymo wins everything that flows from plain-text source — diffs, code review, git history, regenerate-from-source automation. Neither is "better"; they serve different workflows (a designer at a canvas vs an engineer in a repo).
+draw.io is a canvas: you place shapes by hand and the file (`.drawio`, mxGraph XML) records *positions*, not intent. kymo is a text DSL: the `.kymo` source records *intent* and the layout engine computes positions. This single difference cascades through almost every axis. draw.io wins approachability (no syntax to learn) and fine-grained manual control; kymo wins everything that flows from plain-text source — diffs, code review, git history, regenerate-from-source automation. Neither is "better"; they serve different workflows (a designer at a canvas vs an engineer in a repo).
 
 ### 2.2 Layout ownership
 
@@ -109,7 +109,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | draw.io | kymo | Why |
 |---|-----------|:------:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 3 | 9 | `.drawio` is mxGraph XML recording coordinates — not meaningfully diffable or reviewable; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 3 | 9 | `.drawio` is mxGraph XML recording coordinates — not meaningfully diffable or reviewable; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 4 | 8 | draw.io can export via CLI but diagrams are hand-drawn artefacts; kymo regenerates SVG/WebP from source, ideal for CI. |
 | A3 | Approachability / learning curve | 9 | 6 | draw.io is drag-and-drop with zero syntax; kymo asks the user to learn a small DSL. |
 | A4 | Grouping / container semantics | 6 | 7 | draw.io has generic containers/groups (no kind); kymo's typed `region` containers carry layout/styling meaning. |

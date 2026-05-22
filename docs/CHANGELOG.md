@@ -21,7 +21,7 @@ extension.
   **Open VSX** as `kymostudio.kymostudio-vscode`, with a marketplace icon and a
   `release-vscode.yml` workflow that publishes to both on a `v*` tag (each
   publish step is gated on its token secret).
-- **Website:** a client-side `.diagram` playground deployed to
+- **Website:** a client-side `.kymo` playground deployed to
   `kymostudio.github.io`.
 - **`tools/info.py`** — read or set the shared version and tagline across the
   monorepo from one place.
@@ -35,14 +35,14 @@ extension.
 
 ### Added
 
-- **JavaScript:** the JS package now ships the full `.diagram` front-end at
+- **JavaScript:** the JS package now ships the full `.kymo` front-end at
   parity with Python — a line-oriented DSL parser, an auto-layout engine, and
   an alignment resolver, exported as `parse` / `parseDiagram` (plus `layout`
   and `resolveAlignments`). `parseDiagram(src)` → `renderSVG(diagram)` renders
-  a `.diagram` file to SVG entirely in JS, no Python required. The package
+  a `.kymo` file to SVG entirely in JS, no Python required. The package
   stays zero-runtime-dependency.
 - **VS Code extension** (`packages/vscode-extension`, bundled separately —
-  not published to PyPI/npm): live in-editor SVG preview for `.diagram` and
+  not published to PyPI/npm): live in-editor SVG preview for `.kymo` and
   `.bpmn` files (zoom / pan / export), rendered in-process by the bundled JS
   engine, so no Python is required.
 

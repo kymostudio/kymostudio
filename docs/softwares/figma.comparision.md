@@ -56,7 +56,7 @@ The comparison is kept separate so it can evolve at a different cadence than the
 | Axis | Figma | kymo |
 |------|-------|------|
 | Primary purpose | Collaborative design canvas | Render static architecture diagrams |
-| Authoring surface | WYSIWYG canvas; no DSL | `.diagram` declarative DSL |
+| Authoring surface | WYSIWYG canvas; no DSL | `.kymo` declarative DSL |
 | Implementation | TypeScript + Rust (closed); Plugin sandbox JS | Python 3 + JS port |
 | Layout | Auto-layout (flex) + grid + absolute | Single: grid pack + per-row height sync |
 | Edge routing | Manual (Design) / magnet connectors (FigJam) | Orthogonal Z-router with rounded corners |
@@ -77,7 +77,7 @@ Figma is not a competing diagram renderer; it is a collaborative design environm
 
 ### 2.2 Text source vs WYSIWYG canvas
 
-Figma is a canvas: positions are authored by hand and stored as coordinates. kymo is a text DSL: the `.diagram` source records *intent* and the layout engine computes positions. This is where kymo wins outright — diffs, code review, git history, regenerate-from-source automation — and Figma cannot follow, because its "source" is a node tree, not reviewable text. The flip side is approachability: a designer at the Figma canvas needs no syntax; a kymo author learns a small DSL. The two serve different ends of the same workflow, which is exactly why the handoff exists.
+Figma is a canvas: positions are authored by hand and stored as coordinates. kymo is a text DSL: the `.kymo` source records *intent* and the layout engine computes positions. This is where kymo wins outright — diffs, code review, git history, regenerate-from-source automation — and Figma cannot follow, because its "source" is a node tree, not reviewable text. The flip side is approachability: a designer at the Figma canvas needs no syntax; a kymo author learns a small DSL. The two serve different ends of the same workflow, which is exactly why the handoff exists.
 
 ### 2.3 Auto-layout is more expressive than kymo's row-sync
 
@@ -111,7 +111,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | Figma | kymo | Why |
 |---|-----------|:-----:|:----:|-----|
-| A1 | Text / diff / git-friendliness of source | 3 | 9 | Figma's "source" is a node tree authored on a canvas — not diffable or reviewable as text; kymo's `.diagram` is plain declarative text built for git. |
+| A1 | Text / diff / git-friendliness of source | 3 | 9 | Figma's "source" is a node tree authored on a canvas — not diffable or reviewable as text; kymo's `.kymo` is plain declarative text built for git. |
 | A2 | Reproducibility & automation | 5 | 8 | Figma can be driven via Plugin/REST/MCP but its artifacts are hand-authored; kymo regenerates SVG/WebP/Figma JS from source, ideal for CI. |
 | A3 | Approachability / learning curve | 8 | 6 | Figma's canvas needs no syntax and is famously approachable; kymo asks the user to learn a small DSL. |
 | A4 | Grouping / container semantics | 7 | 7 | Figma's frames/auto-layout + pages are powerful but generic; kymo's typed `region` containers carry layout/styling meaning — a wash. |

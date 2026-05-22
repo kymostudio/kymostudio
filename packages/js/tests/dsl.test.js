@@ -188,9 +188,9 @@ test("a bare unknown token at file scope errors with its line number", () => {
 });
 
 // ── End-to-end: parse + layout + alignment + render every sample ───────
-test("parseDiagram positions + renders every sample .diagram", async () => {
-  const files = readdirSync(samplesDir).filter((f) => f.endsWith(".diagram"));
-  assert.ok(files.length > 0, "expected at least one .diagram sample");
+test("parseDiagram positions + renders every sample .kymo", async () => {
+  const files = readdirSync(samplesDir).filter((f) => f.endsWith(".kymo"));
+  assert.ok(files.length > 0, "expected at least one .kymo sample");
   for (const f of files) {
     const text = readFileSync(join(samplesDir, f), "utf8");
     const d = parseDiagram(text);
@@ -203,12 +203,12 @@ test("parseDiagram positions + renders every sample .diagram", async () => {
   }
 });
 
-test("grid layout (data.diagram) aligns rows across regions", () => {
-  if (!existsSync(join(samplesDir, "data.diagram"))) return;
-  const text = readFileSync(join(samplesDir, "data.diagram"), "utf8");
+test("grid layout (data.kymo) aligns rows across regions", () => {
+  if (!existsSync(join(samplesDir, "data.kymo"))) return;
+  const text = readFileSync(join(samplesDir, "data.kymo"), "utf8");
   const { layout: spec, external } = parse(text);
-  assert.ok(spec, "data.diagram uses grid `row` mode");
-  assert.ok(external, "data.diagram declares an `external` component");
+  assert.ok(spec, "data.kymo uses grid `row` mode");
+  assert.ok(external, "data.kymo declares an `external` component");
   const d = parseDiagram(text);
   const byId = Object.fromEntries(d.components.map((c) => [c.id, c]));
   // jupyter (row 0) and docker (row 0 of brev) share a row → same Y after layout.

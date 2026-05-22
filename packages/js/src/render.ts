@@ -63,7 +63,7 @@ const CSS = `
 
 // Architecture-diagram region styling. These same three rules also live in
 // BPMN_STYLE (which serves pool/lane diagrams); inject this only for non-BPMN
-// diagrams that have regions, so a `.diagram` with `outer`/`inner` frames gets
+// diagrams that have regions, so a `.kymo` with `outer`/`inner` frames gets
 // its near-transparent fills + outlines instead of falling back to SVG-default
 // black, while BPMN output stays byte-identical. (Without this, region rects
 // have no fill rule and render solid black — breaking light backgrounds.)

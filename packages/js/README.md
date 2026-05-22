@@ -1,6 +1,6 @@
 # kymostudio
 
-Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
+Diagram-as-code: turn a declarative `.kymo` DSL — or a standard BPMN 2.0
 `.bpmn` file — into **animated SVG / WebP**.
 
 ## Install
@@ -9,7 +9,7 @@ Diagram-as-code: turn a declarative `.diagram` DSL — or a standard BPMN 2.0
 npm install kymostudio
 ```
 
-## Render a `.diagram` DSL file
+## Render a `.kymo` DSL file
 
 `parseDiagram(src)` runs the full front-end pipeline — parse the declarative
 DSL, then position everything (grid / Figma-style auto-layout, parent/child
@@ -20,7 +20,7 @@ Diagram.
 import { parseDiagram, renderSVG } from "kymostudio";
 import { readFileSync } from "node:fs";
 
-const svg = await renderSVG(parseDiagram(readFileSync("arch.diagram", "utf8")));
+const svg = await renderSVG(parseDiagram(readFileSync("arch.kymo", "utf8")));
 ```
 
 For finer control the stages are exported individually — `parse(src)` returns

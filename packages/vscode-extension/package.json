@@ -1,7 +1,7 @@
 {
   "name": "kymostudio-vscode",
   "displayName": "kymostudio — Diagram Preview",
-  "description": "Live SVG preview for kymostudio diagrams: the .diagram DSL and BPMN 2.0 (.bpmn), rendered natively in-process.",
+  "description": "Live SVG preview for kymostudio diagrams: the .kymo DSL and BPMN 2.0 (.bpmn), rendered natively in-process.",
   "version": "0.2.6",
   "license": "Apache-2.0",
   "icon": "media/icon.png",
@@ -48,7 +48,7 @@
           "kymo-diagram"
         ],
         "extensions": [
-          ".diagram"
+          ".kymo"
         ],
         "configuration": "./language-configuration.json"
       }
@@ -76,29 +76,29 @@
       "editor/title": [
         {
           "command": "kymostudio.showPreviewToSide",
-          "when": "resourceExtname == .bpmn || resourceExtname == .diagram",
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
           "command": "kymostudio.showPreview",
-          "when": "resourceExtname == .bpmn || resourceExtname == .diagram",
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo",
           "group": "navigation@10"
         }
       ],
       "commandPalette": [
         {
           "command": "kymostudio.showPreview",
-          "when": "resourceExtname == .bpmn || resourceExtname == .diagram"
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo"
         },
         {
           "command": "kymostudio.showPreviewToSide",
-          "when": "resourceExtname == .bpmn || resourceExtname == .diagram"
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo"
         },
         {
           "command": "kymostudio.exportSvg",
-          "when": "resourceExtname == .bpmn || resourceExtname == .diagram"
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo"
         }
       ]
     },

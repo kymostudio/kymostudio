@@ -1,6 +1,6 @@
 /**
  * kymostudio playground — a fully client-side editor that compiles a
- * `.diagram` DSL (or a BPMN 2.0 `.bpmn` file) to SVG in the browser, with no
+ * `.kymo` DSL (or a BPMN 2.0 `.bpmn` file) to SVG in the browser, with no
  * server. It bundles the dependency-free `kymostudio` JS package; esbuild
  * inlines the package, the icon manifest, and the starter samples into
  * `kymo.bundle.js` (see build.sh), so the deployed page is pure static assets.
@@ -19,9 +19,9 @@ import manifest from "../../packages/js/icons-manifest.json";
 
 // Starter diagrams. esbuild's `text` loader inlines these file contents as
 // strings at build time (the real `samples/` dir is not deployed to Pages).
-import aiqSrc from "../../samples/aiq.diagram";
-import dataSrc from "../../samples/data.diagram";
-import awsSrc from "../../samples/aws_1.diagram";
+import aiqSrc from "../../samples/aiq.kymo";
+import dataSrc from "../../samples/data.kymo";
+import awsSrc from "../../samples/aws_1.kymo";
 import orderBpmn from "../../samples/order.bpmn";
 
 // Built-in vector icons render with zero network. The ~2300 file-backed icons
@@ -65,7 +65,7 @@ function svgBackground() {
   return transparent ? null : THEME_BG[theme];
 }
 
-/** Heuristic: BPMN files are XML; everything else is the .diagram DSL. */
+/** Heuristic: BPMN files are XML; everything else is the .kymo DSL. */
 function isBpmn(src) {
   const head = src.slice(0, 600);
   return /<\?xml/.test(head) || /<([a-zA-Z]+:)?definitions[\s>]/.test(head);

@@ -4,7 +4,7 @@ Live SVG preview for [kymostudio](https://github.com/kymostudio/kymostudio)
 diagrams, right inside VS Code. Both formats render **natively**, in-process,
 by the bundled, dependency-free [`kymostudio`](../js) JS engine.
 
-- **`.diagram` (the DSL)** — parsed and positioned (grid / auto-layout,
+- **`.kymo` (the DSL)** — parsed and positioned (grid / auto-layout,
   parent/child alignment, auto-bounded regions, auto-canvas) via `parseDiagram`,
   then rendered with `renderSVG`.
 - **BPMN 2.0 (`.bpmn`)** — imported via the file's Diagram-Interchange geometry
@@ -13,7 +13,7 @@ by the bundled, dependency-free [`kymostudio`](../js) JS engine.
 ## Features
 
 - **Open Preview to the Side** button in the editor title bar for `.bpmn` /
-  `.diagram` files (also in the Command Palette and the Explorer context menu).
+  `.kymo` files (also in the Command Palette and the Explorer context menu).
 - **Live re-render** as you type (debounced) — toggle with
   `kymostudio.preview.autoRefresh` (off = refresh on save only).
 - **Zoom & pan**: scroll to zoom toward the cursor, drag to pan, plus
@@ -25,7 +25,7 @@ by the bundled, dependency-free [`kymostudio`](../js) JS engine.
 
 ## Usage
 
-1. Open a `.diagram` or `.bpmn` file.
+1. Open a `.kymo` or `.bpmn` file.
 2. Click the **Open Preview to the Side** icon (top-right of the editor), or run
    **kymostudio: Open Preview** from the Command Palette.
 3. The diagram renders beside the source and updates as you edit.
@@ -60,7 +60,7 @@ npm run package   # → kymostudio-vscode-<version>.vsix  (npx @vscode/vsce)
 
 ## How it works
 
-`src/render.ts` dispatches by file extension — `.diagram` through
+`src/render.ts` dispatches by file extension — `.kymo` through
 `parseDiagram(text)`, `.bpmn` through `parseBpmn(text)` — then `renderSVG(diagram)`
 from the `kymostudio` package, handing the SVG string to a webview that does
 nothing but display, zoom, and pan it. Rendering runs entirely in the extension

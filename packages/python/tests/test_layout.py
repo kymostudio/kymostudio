@@ -38,7 +38,7 @@ def _discover_cases() -> list[str]:
 
 
 def _render_case(case: str) -> str:
-    src = CASES_DIR / case / "input.diagram"
+    src = CASES_DIR / case / "input.kymo"
     diagram, layout_spec, external = parse_dsl(src.read_text(encoding="utf-8"))
     if layout_spec:
         apply_grid_layout(diagram, layout_spec, external)

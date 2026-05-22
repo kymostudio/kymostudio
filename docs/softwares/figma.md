@@ -183,7 +183,7 @@ Auto-layout is Figma's flex-equivalent — set `layoutMode` on a frame and its c
 
 Per-child sizing is controlled by `layoutSizingHorizontal` / `layoutSizingVertical` (`'FIXED' \| 'HUG' \| 'FILL'`). Hug-content vs fill-container is Figma's most distinctive layout primitive — it expresses "this column grows with its children" vs "this column fills the remaining space" without resorting to absolute coordinates.
 
-kymo's hybrid render path (`packages/python/src/kymo/to_figma.py:161`, `_tree_to_js`) maps a `.diagram` layout tree onto nested auto-layout frames: each `|` becomes `layoutMode: 'HORIZONTAL'`, each `,` becomes `layoutMode: 'VERTICAL'`, `itemSpacing` is uniformly `DEFAULT_GAP = 40`, and sizing is `AUTO/AUTO` so the frame hugs its children. Because Python's `apply_layout_tree` and Figma's auto-layout share the same spacing + alignment rules, component positions match — which lets kymo keep edges as top-level absolute vectors and still have them connect.
+kymo's hybrid render path (`packages/python/src/kymo/to_figma.py:161`, `_tree_to_js`) maps a `.kymo` layout tree onto nested auto-layout frames: each `|` becomes `layoutMode: 'HORIZONTAL'`, each `,` becomes `layoutMode: 'VERTICAL'`, `itemSpacing` is uniformly `DEFAULT_GAP = 40`, and sizing is `AUTO/AUTO` so the frame hugs its children. Because Python's `apply_layout_tree` and Figma's auto-layout share the same spacing + alignment rules, component positions match — which lets kymo keep edges as top-level absolute vectors and still have them connect.
 
 A subtle gotcha: `clipsContent` defaults to `true` on auto-layout frames in newer Figma versions; kymo explicitly disables it (`packages/python/src/kymo/to_figma.py:191`) so edges that extend past the frame bounds remain visible.
 
@@ -306,7 +306,7 @@ Per <https://developers.figma.com/docs/figma-mcp-server/tools-and-prompts/>, the
 
 `use_figma` is what consumes kymo's `--figma` output: the JS string emitted by `packages/python/src/kymo/to_figma.py` is passed as the `code` argument. **The `/figma-use` skill is mandatory** before any `use_figma` call (declared in the MCP server's `instructions` block); skipping it has produced silent malformed-input errors in practice.
 
-The recommended workflow from Figma's own docs is `get_design_context` → (if too big) `get_metadata` then re-call `get_design_context` on narrower IDs → `get_screenshot` → only then start writing code. For kymo specifically the direction is reversed — we generate Figma content from a `.diagram` source — so the relevant tools are `use_figma`, `create_new_file`, and `upload_assets`.
+The recommended workflow from Figma's own docs is `get_design_context` → (if too big) `get_metadata` then re-call `get_design_context` on narrower IDs → `get_screenshot` → only then start writing code. For kymo specifically the direction is reversed — we generate Figma content from a `.kymo` source — so the relevant tools are `use_figma`, `create_new_file`, and `upload_assets`.
 
 Rate-limit caveat: Starter plan + View/Collab seats are capped at **6 tool calls per month**; Dev/Full seats on paid plans share the Tier 1 REST rate limit. The cap bites quickly during iteration.
 

@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
       void vscode.window.showInformationMessage(
-        "kymostudio: open a .bpmn or .diagram file first.",
+        "kymostudio: open a .bpmn or .kymo file first.",
       );
       return;
     }
@@ -51,14 +51,14 @@ async function exportActive(): Promise<void> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     void vscode.window.showInformationMessage(
-      "kymostudio: open a .bpmn or .diagram file first.",
+      "kymostudio: open a .bpmn or .kymo file first.",
     );
     return;
   }
   const ext = extname(editor.document.uri);
-  if (ext !== ".bpmn" && ext !== ".diagram") {
+  if (ext !== ".bpmn" && ext !== ".kymo") {
     void vscode.window.showWarningMessage(
-      "kymostudio: open a .bpmn or .diagram file to export.",
+      "kymostudio: open a .bpmn or .kymo file to export.",
     );
     return;
   }

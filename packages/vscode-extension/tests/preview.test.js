@@ -80,7 +80,7 @@ test("posts a ready handshake on load", () => {
 
 test("render injects the SVG and keeps the error banner hidden", () => {
   const { $, send } = boot();
-  send({ type: "render", svg: SVG_A, sourceUri: "file:///x.diagram" });
+  send({ type: "render", svg: SVG_A, sourceUri: "file:///x.kymo" });
   assert.match($("canvas").innerHTML, /<svg/, "canvas should hold the rendered SVG");
   assert.match($("canvas").innerHTML, /id="a"/);
   assert.equal($("message").hidden, true, "no error → banner hidden");
@@ -88,15 +88,15 @@ test("render injects the SVG and keeps the error banner hidden", () => {
 
 test("render strips the XML prolog before injecting", () => {
   const { $, send } = boot();
-  send({ type: "render", svg: `<?xml version="1.0"?>\n${SVG_A}`, sourceUri: "file:///x.diagram" });
+  send({ type: "render", svg: `<?xml version="1.0"?>\n${SVG_A}`, sourceUri: "file:///x.kymo" });
   assert.ok(!$("canvas").innerHTML.trimStart().startsWith("<?xml"), "prolog must be stripped");
   assert.match($("canvas").innerHTML, /<svg/);
 });
 
 test("a transient error keeps the last good render and shows a banner", () => {
   const { $, send } = boot();
-  send({ type: "render", svg: SVG_A, sourceUri: "file:///x.diagram" });
-  send({ type: "error", title: "line 12: unrecognised — \"orch\"", detail: "fix the syntax", sourceUri: "file:///x.diagram" });
+  send({ type: "render", svg: SVG_A, sourceUri: "file:///x.kymo" });
+  send({ type: "error", title: "line 12: unrecognised — \"orch\"", detail: "fix the syntax", sourceUri: "file:///x.kymo" });
 
   // The fix: the diagram is NOT blanked while you correct a typo.
   assert.match($("canvas").innerHTML, /id="a"/, "last good render must remain on screen");
@@ -107,22 +107,22 @@ test("a transient error keeps the last good render and shows a banner", () => {
 
 test("a successful render clears a previously shown error banner", () => {
   const { $, send } = boot();
-  send({ type: "render", svg: SVG_A, sourceUri: "file:///x.diagram" });
-  send({ type: "error", title: "oops", detail: "bad", sourceUri: "file:///x.diagram" });
+  send({ type: "render", svg: SVG_A, sourceUri: "file:///x.kymo" });
+  send({ type: "error", title: "oops", detail: "bad", sourceUri: "file:///x.kymo" });
   assert.equal($("message").hidden, false);
 
   // The core bug: the banner used to get stuck. It must clear on the next render.
-  send({ type: "render", svg: SVG_B, sourceUri: "file:///x.diagram" });
+  send({ type: "render", svg: SVG_B, sourceUri: "file:///x.kymo" });
   assert.equal($("message").hidden, true, "banner must clear once the diagram renders again");
   assert.match($("canvas").innerHTML, /id="b"/, "canvas updates to the new render");
 });
 
 test("live re-renders preserve the user's zoom/pan (fit runs once)", () => {
   const { $, send } = boot();
-  send({ type: "render", svg: SVG_A, sourceUri: "file:///x.diagram" });
+  send({ type: "render", svg: SVG_A, sourceUri: "file:///x.kymo" });
   // Simulate the user zooming/panning after the first auto-fit.
   $("canvas").style.transform = "translate(13px, 17px) scale(2)";
-  send({ type: "render", svg: SVG_B, sourceUri: "file:///x.diagram" });
+  send({ type: "render", svg: SVG_B, sourceUri: "file:///x.kymo" });
   assert.equal(
     $("canvas").style.transform,
     "translate(13px, 17px) scale(2)",
@@ -132,8 +132,8 @@ test("live re-renders preserve the user's zoom/pan (fit runs once)", () => {
 
 test("persists the source URI into webview state for restore", () => {
   const { window, send } = boot();
-  send({ type: "render", svg: SVG_A, sourceUri: "file:///demo/hello.diagram" });
+  send({ type: "render", svg: SVG_A, sourceUri: "file:///demo/hello.kymo" });
   // acquireVsCodeApi().getState() is stubbed via the closure; re-acquire to read it.
   const state = window.acquireVsCodeApi().getState();
-  assert.equal(state && state.sourceUri, "file:///demo/hello.diagram");
+  assert.equal(state && state.sourceUri, "file:///demo/hello.kymo");
 });
