@@ -6,7 +6,7 @@ bundles the dependency-free [`kymostudio`](../../packages/js) JS package and
 runs `parseDiagram` / `parseBpmn` + `renderSVG` entirely in-page.
 
 Deployed as a static subfolder of `website/`, so the existing
-`.github/workflows/pages.yml` ships it automatically on push to `main`.
+`.github/workflows/deploy-website.yml` ships it automatically on push to `main`.
 
 ## Files
 
