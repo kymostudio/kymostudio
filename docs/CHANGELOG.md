@@ -9,6 +9,28 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-05-22
+
+The Python (PyPI) and JavaScript (npm) package payloads are unchanged versus
+0.2.5; this release covers the surrounding tooling, docs, and the VS Code
+extension.
+
+### Added
+
+- **VS Code extension** published to the **Visual Studio Marketplace** and
+  **Open VSX** as `kymostudio.kymostudio-vscode`, with a marketplace icon and a
+  `release-vscode.yml` workflow that publishes to both on a `v*` tag (each
+  publish step is gated on its token secret).
+- **Website:** a client-side `.diagram` playground deployed to
+  `kymostudio.github.io`.
+- **`tools/info.py`** — read or set the shared version and tagline across the
+  monorepo from one place.
+
+### Changed
+
+- Revamped the root README (centered header; PyPI / npm / Tests / License
+  badges) and scoped each package README to its own implementation.
+
 ## [0.2.5] - 2026-05-22
 
 ### Added

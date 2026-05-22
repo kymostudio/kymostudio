@@ -2,7 +2,7 @@
   "name": "kymostudio-vscode",
   "displayName": "kymostudio — Diagram Preview",
   "description": "Live SVG preview for kymostudio diagrams: the .diagram DSL and BPMN 2.0 (.bpmn), rendered natively in-process.",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "license": "Apache-2.0",
   "icon": "media/icon.png",
   "publisher": "kymostudio",
