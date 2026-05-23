@@ -707,6 +707,10 @@ def render(d: Diagram, animate: bool = False) -> str:
     the motion. All static SVG viewers (browsers, Figma, Inkscape)
     will render it correctly — non-animating viewers show a dashed
     line frozen at offset 0."""
+    if getattr(d, "bpmn_blocks", None):
+        raise NotImplementedError(
+            "bpmn { } block layout is not implemented yet (planned for P2)"
+        )
     region_rects  = "\n  ".join(render_region_rect(r)  for r in d.regions)
     region_labels = "\n  ".join(render_region_label(r) for r in d.regions)
     edges         = "\n  ".join(render_edge(e, d)      for e in d.edges)

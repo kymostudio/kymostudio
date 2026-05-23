@@ -330,6 +330,10 @@ class Diagram:
     # Consumed by `to_figma.render()` to emit nested Figma auto-layout
     # frames that mirror the user's `|`/`,` grouping. Empty → flat layout.
     layout_trees: list = field(default_factory=list)
+    # Positionless `bpmn { … }` blocks parsed by `dsl.py` (BpmnBlock ASTs).
+    # Laid out into components/edges by `bpmn_layout` (not yet wired); while a
+    # block is present the diagram is unresolved, so `to_svg.render` raises.
+    bpmn_blocks: list = field(default_factory=list)
 
     def get(self, id: str) -> Component:
         for c in self.components:

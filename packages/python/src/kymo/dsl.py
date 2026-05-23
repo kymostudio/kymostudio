@@ -19,6 +19,7 @@ a nested container are also appended to the outer container's
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 
 from .model import Component, Diagram, Edge, Region
 
@@ -104,6 +105,145 @@ ROW_RE = re.compile(r'^row(?:\s+(.+))?$')
 BARE_IDS_RE = re.compile(r'^[A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*\s*$')
 
 
+# ── BPMN block (`bpmn { … }`) ─────────────────────────────────────────
+# A file-scope block authoring BPMN as typed nodes + flows. Parsing is
+# positionless: it builds a `BpmnBlock` AST (declarations + connections).
+# Layout into positioned components/edges is done later by `bpmn_layout`
+# (not yet wired) — until then, rendering a diagram that still carries a
+# block raises (see `to_svg.render` / `cli`).
+
+@dataclass
+class BpmnNode:
+    id: str
+    kind: str                 # start|end|end!|task|xor|and|or|event|subprocess|note|data|store
+    label: str
+    shape: str                # resolved bpmn-* glyph (FR-3)
+    marker: str               # resolved event/task/gateway marker key (FR-3/FR-4)
+    pin: tuple[int, int] | None = None   # `@ (x,y)` — parsed now, honoured in P2 (FR-9)
+
+
+@dataclass
+class BpmnFlow:
+    src: str
+    dst: str
+    flow: str                 # sequence|message|association (FR-6)
+    label: str = ""
+
+
+@dataclass
+class BpmnBlock:
+    nodes: list[BpmnNode]
+    flows: list[BpmnFlow]
+
+
+# kind → (shape, default marker) — mirrors `from_bpmn` classification (FR-3).
+_BPMN_KIND: dict[str, tuple[str, str]] = {
+    "start":      ("bpmn-start",        ""),
+    "end":        ("bpmn-end",          ""),
+    "end!":       ("bpmn-end",          "terminate"),
+    "task":       ("bpmn-task",         ""),
+    "xor":        ("bpmn-gateway",      "exclusive"),
+    "and":        ("bpmn-gateway",      "parallel"),
+    "or":         ("bpmn-gateway",      "inclusive"),
+    "event":      ("bpmn-intermediate", ""),
+    "subprocess": ("bpmn-subprocess",   ""),
+    "note":       ("bpmn-annotation",   ""),
+    "data":       ("bpmn-data-object",  ""),
+    "store":      ("bpmn-data-store",   ""),
+}
+# arrow → flow kind (FR-6).
+_BPMN_ARROW: dict[str, str] = {"->": "sequence", "~>": "message", "..>": "association"}
+
+BPMN_OPEN_RE = re.compile(r'^bpmn\s*\{\s*$')
+# <kind> <id> ["Label"] [type=<subtype>] [@ (x,y)]   (`end!` before `end`)
+BPMN_NODE_RE = re.compile(
+    r'^(start|end!|end|task|xor|and|or|event|subprocess|note|data|store)\s+'
+    r'(\w+)'
+    r'(?:\s+"([^"]*)")?'
+    r'(?:\s+type=(\w+))?'
+    r'(?:\s+@\s*(\(\s*-?\d+\s*,\s*-?\d+\s*\)))?'
+    r'\s*$'
+)
+BPMN_ARROW_SPLIT = re.compile(r'\s*(->|\.\.>|~>)\s*')
+BPMN_LABEL_RE    = re.compile(r'\s*:\s*"([^"]*)"\s*$')
+
+
+def _make_bpmn_node(m: re.Match, line_no: int) -> BpmnNode:
+    kind, nid, label, subtype, pin_s = m.groups()
+    shape, marker = _BPMN_KIND[kind]
+    if subtype:                       # FR-4: type= refines/sets the marker
+        marker = subtype              # passed through unvalidated (parser validates nothing)
+    pin = None
+    if pin_s:
+        pm = POS_LITERAL_RE.match(pin_s.strip())
+        if not pm:
+            raise SyntaxError(f"line {line_no}: bad bpmn pin {pin_s!r}")
+        pin = (int(pm.group(1)), int(pm.group(2)))
+    return BpmnNode(id=nid, kind=kind, label=label or "",
+                    shape=shape, marker=marker, pin=pin)
+
+
+def _split_bpmn_statements(line: str) -> list[str]:
+    """Split a connection line on `;` outside double quotes (FR-7)."""
+    out: list[str] = []
+    buf: list[str] = []
+    in_q = False
+    for ch in line:
+        if ch == '"':
+            in_q = not in_q
+            buf.append(ch)
+        elif ch == ';' and not in_q:
+            out.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+    out.append("".join(buf))
+    return [s.strip() for s in out if s.strip()]
+
+
+def _parse_bpmn_connections(stmt: str, line_no: int) -> list[BpmnFlow]:
+    """Parse one connection statement (a chain) into BpmnFlows (FR-6/FR-7)."""
+    label = ""
+    if (lm := BPMN_LABEL_RE.search(stmt)):
+        label = lm.group(1)
+        stmt = stmt[:lm.start()]
+    parts = BPMN_ARROW_SPLIT.split(stmt.strip())
+    # parts = [id, arrow, id, arrow, id, …]
+    ids = [p.strip() for p in parts[0::2]]
+    arrows = parts[1::2]
+    if len(parts) < 3 or len(parts) % 2 == 0 or any(not x for x in ids):
+        raise SyntaxError(f"line {line_no}: bad bpmn connection — {stmt!r}")
+    flows = [BpmnFlow(src=ids[k], dst=ids[k + 1], flow=_BPMN_ARROW[arrow])
+             for k, arrow in enumerate(arrows)]
+    if label:                         # FR-7: label sits on the (last) segment
+        flows[-1].label = label
+    return flows
+
+
+def _consume_bpmn_block(state: _State, lines: list[str], i: int) -> int:
+    """Parse a `bpmn { … }` block opening at `lines[i]` into a positionless
+    `BpmnBlock` AST and append it to `state.bpmn_blocks`. Returns the index
+    AFTER the closing `}`. Positions are computed later (bpmn_layout, P2)."""
+    nodes: list[BpmnNode] = []
+    flows: list[BpmnFlow] = []
+    j = i + 1
+    while j < len(lines):
+        line = _strip_comment(lines[j]).strip()
+        if not line:
+            j += 1
+            continue
+        if CLOSE_RE.match(line):
+            state.bpmn_blocks.append(BpmnBlock(nodes=nodes, flows=flows))
+            return j + 1
+        if (m := BPMN_NODE_RE.match(line)):
+            nodes.append(_make_bpmn_node(m, line_no=j + 1))
+        else:
+            for stmt in _split_bpmn_statements(line):
+                flows.extend(_parse_bpmn_connections(stmt, line_no=j + 1))
+        j += 1
+    raise SyntaxError(f"line {i + 1}: unclosed `bpmn {{` block (no matching `}}`)")
+
+
 # ── Public API ────────────────────────────────────────────────────────
 def parse(dsl: str) -> tuple[Diagram, dict | None, dict | None]:
     """Parse a D2-style diagram DSL.
@@ -140,6 +280,7 @@ class _State:
         self.canvas: tuple[int, int] = (0, 0)
         self.title: str = ""
         self.subtitle: str = ""
+        self.bpmn_blocks: list = []          # positionless `bpmn { … }` ASTs
 
     def finalize(self) -> tuple[Diagram, dict | None, dict | None]:
         diagram = Diagram(
@@ -147,6 +288,7 @@ class _State:
             title=self.title, subtitle=self.subtitle,
             components=self.components, regions=self.regions, edges=self.edges,
             layout_trees=self.layout_trees,
+            bpmn_blocks=self.bpmn_blocks,
         )
         if self.layout_trees:
             from .layout import apply_layout_tree, minimize_crossings
@@ -231,6 +373,9 @@ def _parse_block(
                     _parse_layout_tree(m.group(1), line_no=i + 1)
                 )
                 i += 1
+                continue
+            if BPMN_OPEN_RE.match(line):
+                i = _consume_bpmn_block(state, lines, i)
                 continue
 
         # Edges (file scope only — nesting an edge inside a container is
