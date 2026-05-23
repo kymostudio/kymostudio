@@ -1,7 +1,7 @@
 ---
 title: BPMN in the kymo DSL — Requirements
 document_id: FEAT-BPMN-DSL-REQ-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-23
 status: Released
 classification: Internal
@@ -15,7 +15,7 @@ related_documents:
   - FEAT-BPMN-DSL-TST-001    # Test documentation
   - FEAT-BPMN-DSL-PLAN-001   # Plan
   - DSL-LANG-001             # kymo DSL language specification (normative)
-  - BPD-DGM-001              # BPMN importer element mapping
+  - BPMN-MAP-001              # BPMN importer element mapping
 authors:
   - Vũ Anh
 language: en
@@ -35,7 +35,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-REQ-001                              |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
@@ -93,7 +93,7 @@ bpmn {
   `data`→data-object, `store`→data-store.
 - **FR-4** An optional `type=<subtype>` modifier SHALL select finer markers
   (e.g. `task type=user`, `start type=message`, `event type=timer`), mapping to
-  the `bpmn_shapes` marker keys (BPD-DGM-001).
+  the `bpmn_shapes` marker keys (BPMN-MAP-001).
 - **FR-5** Node box sizes SHALL come from `model.SHAPE_HALF` (event 36 / task
   100×80 / gateway 50), set on `Component.size`.
 
@@ -143,6 +143,7 @@ bpmn {
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
 | 0.2     | 2026-05-23 | Vũ Anh | Doc-set version sync after P0 (spike) complete; requirements unchanged. |
 | 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in DSL-LANG-001 §6.9). |
+| 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
 
 ## Annex B — Document Control
 

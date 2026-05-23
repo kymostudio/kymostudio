@@ -1,9 +1,9 @@
 ---
 title: BPMN 2.0 Export — Test Documentation
 document_id: FEAT-BPMN-EXPORT-TST-001
-version: "0.1"
+version: "1.0"
 issue_date: 2026-05-23
-status: Proposed
+status: Released
 classification: Internal
 owner: diagrams/ project
 audience: Engineers verifying the BPMN export feature
@@ -14,7 +14,7 @@ related_documents:
   - FEAT-BPMN-EXPORT-REQ-001    # Requirements (traced below)
   - FEAT-BPMN-EXPORT-DSN-001    # Design
   - FEAT-BPMN-EXPORT-PLAN-001   # Plan
-  - BPD-DGM-001                 # BPMN importer (round-trip counterpart)
+  - BPMN-MAP-001                 # BPMN importer (round-trip counterpart)
 authors:
   - Vũ Anh
 language: en
@@ -35,14 +35,14 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-EXPORT-TST-001                           |
-| Version      | 0.1                                                |
-| Status       | Proposed                                           |
+| Version      | 1.0                                                |
+| Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | FEAT-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-REQ-001, FEAT-BPMN-EXPORT-DSN-001, FEAT-BPMN-EXPORT-PLAN-001 |
 
 Verifies FEAT-BPMN-EXPORT-REQ-001 (FR/NFR IDs). Covers 12207 Verification &
-Validation. The headline check is **round-trip** against the importer (BPD-DGM-001).
+Validation. The headline check is **round-trip** against the importer (BPMN-MAP-001).
 
 ## 1. Test approach and levels
 
@@ -103,6 +103,7 @@ BPMN corpus gate) and JS `npm test` are green. Round-trip drift on any corpus fi
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
+| 1.0 | 2026-05-24 | Vũ Anh | Released — P4 complete: BPMN-MAP-001 Export section added; doc set marked Released; importer-mapping citations repointed. |
 
 ## Annex B — Document Control
 

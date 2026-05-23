@@ -1,9 +1,9 @@
 ---
 title: BPMN 2.0 Export — Design
 document_id: FEAT-BPMN-EXPORT-DSN-001
-version: "0.1"
+version: "1.0"
 issue_date: 2026-05-23
-status: Proposed
+status: Released
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing the kymo BPMN emitter and its JS port
@@ -14,7 +14,7 @@ related_documents:
   - FEAT-BPMN-EXPORT-REQ-001    # Requirements (traced below)
   - FEAT-BPMN-EXPORT-TST-001    # Test documentation
   - FEAT-BPMN-EXPORT-PLAN-001   # Plan
-  - BPD-DGM-001                 # BPMN importer element mapping (inverted here)
+  - BPMN-MAP-001                 # BPMN importer element mapping (inverted here)
   - DSL-LANG-001                # kymo DSL language specification
 authors:
   - Vũ Anh
@@ -36,20 +36,20 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-EXPORT-DSN-001                           |
-| Version      | 0.1                                                |
-| Status       | Proposed                                           |
+| Version      | 1.0                                                |
+| Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | FEAT-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-REQ-001, FEAT-BPMN-EXPORT-TST-001, FEAT-BPMN-EXPORT-PLAN-001 |
 
 Realises FEAT-BPMN-EXPORT-REQ-001 (FR/NFR cited per clause). The emitter is the
-exact inverse of the importer mapping in BPD-DGM-001. Covers ISO/IEC/IEEE 12207
+exact inverse of the importer mapping in BPMN-MAP-001. Covers ISO/IEC/IEEE 12207
 Architecture & Design Definition.
 
 ## 1. Scope
 
 The architecture of `to_bpmn`: how a resolved `Diagram` becomes a BPMN 2.0 document
-(semantic tree + DI plane). The normative element mapping is BPD-DGM-001 (read in
+(semantic tree + DI plane). The normative element mapping is BPMN-MAP-001 (read in
 reverse); behaviour requirements are in FEAT-BPMN-EXPORT-REQ-001.
 
 ## 2. Pipeline (FR-1)
@@ -67,7 +67,7 @@ XML is built with the standard-library writer (Python `xml.etree.ElementTree`; J
 small dependency-free string builder with proper escaping) so output is well-formed
 (NFR-2/NFR-3). Namespaces: `bpmn=…/MODEL`, `bpmndi=…/DI`, `dc=…/DD/DC`, `di=…/DD/DI`.
 
-## 3. Element mapping (FR-2, FR-3) — inverse of BPD-DGM-001
+## 3. Element mapping (FR-2, FR-3) — inverse of BPMN-MAP-001
 
 The importer's classification tables (`_EVENT_SHAPE`/`_EVENT_DEF`, `_TASK_MARKER`,
 `_GATEWAY_MARKER`) are the single source of truth; the emitter inverts them. To avoid
@@ -130,6 +130,7 @@ yields byte-identical XML across runs and across the Python/JS implementations
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
+| 1.0 | 2026-05-24 | Vũ Anh | Released — P4 complete: BPMN-MAP-001 Export section added; doc set marked Released; importer-mapping citations repointed. |
 
 ## Annex B — Document Control
 
@@ -143,8 +144,8 @@ Implicit — checked in with the feature; available to all repository readers.
 ### B.3 Change Control
 On a design change: update the affected clause; keep the requirement IDs it traces
 (FR-1…FR-8, NFR-1…NFR-4) consistent with FEAT-BPMN-EXPORT-REQ-001; increment `version`;
-append a row to Annex A; reflect any mapping change against BPD-DGM-001.
+append a row to Annex A; reflect any mapping change against BPMN-MAP-001.
 
 ### B.4 Backwards Compatibility
 This describes the intended implementation; the normative surface is
-FEAT-BPMN-EXPORT-REQ-001 and BPD-DGM-001. Reconcile any deviation there before release.
+FEAT-BPMN-EXPORT-REQ-001 and BPMN-MAP-001. Reconcile any deviation there before release.

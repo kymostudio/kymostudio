@@ -1,9 +1,9 @@
 ---
 title: BPMN 2.0 Export — Requirements
 document_id: FEAT-BPMN-EXPORT-REQ-001
-version: "0.1"
+version: "1.0"
 issue_date: 2026-05-23
-status: Proposed
+status: Released
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing and verifying the BPMN export feature
@@ -14,7 +14,7 @@ related_documents:
   - FEAT-BPMN-EXPORT-DSN-001    # Design
   - FEAT-BPMN-EXPORT-TST-001    # Test documentation
   - FEAT-BPMN-EXPORT-PLAN-001   # Plan
-  - BPD-DGM-001                 # BPMN importer element mapping (inverted here)
+  - BPMN-MAP-001                 # BPMN importer element mapping (inverted here)
   - DSL-LANG-001                # kymo DSL language specification
 authors:
   - Vũ Anh
@@ -35,8 +35,8 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-EXPORT-REQ-001                           |
-| Version      | 0.1                                                |
-| Status       | Proposed                                           |
+| Version      | 1.0                                                |
+| Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | FEAT-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-DSN-001, FEAT-BPMN-EXPORT-TST-001, FEAT-BPMN-EXPORT-PLAN-001 |
@@ -44,7 +44,7 @@ iso_compliance:
 The key words **SHALL**, **SHOULD**, and **MAY** are used per ISO drafting
 conventions. Each requirement carries a stable ID for traceability from
 FEAT-BPMN-EXPORT-TST-001. Concept: FEAT-BPMN-EXPORT-001; realisation:
-FEAT-BPMN-EXPORT-DSN-001. The mapping inverts BPD-DGM-001.
+FEAT-BPMN-EXPORT-DSN-001. The mapping inverts BPMN-MAP-001.
 
 ## 1. Scope and stakeholder needs
 
@@ -61,7 +61,7 @@ round-trip — the gap identified in FEAT-BPMN-EXPORT-001 §2.
   namespaces, a semantic body (`<process>`, or `<collaboration>` + per-pool
   `<process>` when pools are present), and a `<bpmndi:BPMNDiagram>` DI section.
 
-**Semantic mapping (inverse of BPD-DGM-001)**
+**Semantic mapping (inverse of BPMN-MAP-001)**
 - **FR-2** Each `bpmn-*` `Component` SHALL map back to its BPMN element by the
   inverse of `from_bpmn`'s classification: events (`bpmn-start`/`bpmn-end`/
   `bpmn-intermediate`/`bpmn-boundary`) with the matching `*EventDefinition` child
@@ -127,6 +127,7 @@ round-trip — the gap identified in FEAT-BPMN-EXPORT-001 §2.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
+| 1.0 | 2026-05-24 | Vũ Anh | Released — P4 complete: BPMN-MAP-001 Export section added; doc set marked Released; importer-mapping citations repointed. |
 
 ## Annex B — Document Control
 
