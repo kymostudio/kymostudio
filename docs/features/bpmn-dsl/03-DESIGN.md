@@ -1,7 +1,7 @@
 ---
 title: BPMN in the kymo DSL — Design
 document_id: FEAT-BPMN-DSL-DSN-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-05-23
 status: Proposed
 classification: Internal
@@ -37,7 +37,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-DSN-001                             |
-| Version      | 0.2                                                |
+| Version      | 0.3                                                |
 | Status       | Proposed                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
@@ -96,14 +96,16 @@ A left-to-right Sugiyama pipeline turns the positionless graph into geometry:
 
 ## 4. Integration and data flow
 
-- `_State.finalize` runs `bpmn_layout.build_and_layout(block)` and extends the
-  diagram with the positioned components/edges — mirroring how `layout_trees`
-  are applied. Canvas dimensions are set from the laid-out extent, as
-  `from_bpmn` does.
-- `cli.py` uses the normal pipeline. `resolve_alignments` must leave the
-  absolutely-positioned components and `points`-bearing edges untouched (no
-  `parent`/`align`, `points` set); gate it for bpmn-block diagrams if needed, as
-  `.bpmn` is already special-cased.
+- **`bpmn_layout.layout(diagram)`** is a post-parse pipeline pass (like `layout()`
+  / `resolve_alignments()`), invoked by `cli.py`. It consumes `diagram.bpmn_blocks`,
+  appends the positioned components/edges, sets the canvas from the laid-out extent
+  (as `from_bpmn` does), and clears the blocks. `parse()` itself stays position-free,
+  so the parser is independently testable (P1). *(Earlier drafts placed this in
+  `_State.finalize`; a pass keeps `parse()` pure and the renderer guard a backstop.)*
+- `cli.py` **skips `resolve_alignments` for bpmn-block diagrams** (gated like
+  `.bpmn`): the geometry is already absolute, and `resolve_alignments` would perturb
+  `points`-bearing edges (`_stagger_*`) while `_auto_size_canvas` ignores
+  `Edge.points` — so the layout owns canvas sizing.
 - **JS parity (FR-11)**: `dsl.ts` gains the block branch; a new `bpmn-layout.ts`
   ports the algorithm. The JS renderer already routes `e.points` → `renderBpmnEdge`.
 
@@ -131,6 +133,7 @@ SVG across runs.
 |---------|------------|--------|----------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue (extracted from the plan). |
 | 0.2     | 2026-05-23 | Vũ Anh | Fold P0 spike findings: explicit primary-path/trunk pinning (§3.4), dummy-node caveat (§3.2), determinism pre-validated (§6). |
+| 0.3     | 2026-05-23 | Vũ Anh | §4: integration is a cli `bpmn_layout.layout()` pass (not `finalize`); skip `resolve_alignments` for bpmn-block diagrams (realised in P2). |
 
 ## Annex B — Document Control
 
