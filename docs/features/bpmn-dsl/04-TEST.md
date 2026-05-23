@@ -1,13 +1,13 @@
 ---
 title: BPMN in the kymo DSL — Test Documentation
 document_id: FEAT-BPMN-DSL-TST-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Proposed
 classification: Internal
 owner: diagrams/ project
 audience: Engineers verifying the BPMN-in-kymo feature
-review_cycle: On milestone completion, or on grammar change
+review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
   - FEAT-BPMN-DSL-001        # Introduction
@@ -35,7 +35,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-TST-001                             |
-| Version      | 0.1                                                |
+| Version      | 0.2                                                |
 | Status       | Proposed                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
@@ -53,6 +53,11 @@ Verifies the requirements in FEAT-BPMN-DSL-REQ-001 (FR/NFR IDs). Covers
 - **Regression gate** — existing `tests/test_bpmn_corpus.py` + `test_edges`/
   `test_layout`/`test_diagrams` goldens remain green **without** regeneration.
 - **Parity** — JS parser + render smoke (`packages/js/tests/`).
+
+> **P0 status (2026-05-23):** the throwaway spike (`packages/python/spikes/`, per
+> FEAT-BPMN-DSL-PLAN-001 §3) gives early *informal* evidence for TC-4 (split/join
+> structure) and TC-7 (determinism — byte-identical SVG across runs). The formal
+> cases below are implemented against the real engine in P2/P3.
 
 ## 2. Test items, environment, tooling
 
@@ -77,7 +82,7 @@ Verifies the requirements in FEAT-BPMN-DSL-REQ-001 (FR/NFR IDs). Covers
 
 ## 4. Pass/fail criteria
 
-A milestone passes when its mapped test cases pass and the full Python suite
+A phase passes when its mapped test cases pass and the full Python suite
 (incl. the regression gate) and JS `npm test` are green. Any golden change
 outside the new `bpmn_block_order` case is a **failure**, not a re-baseline.
 
@@ -108,6 +113,7 @@ outside the new `bpmn_block_order` case is a **failure**, not a re-baseline.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
+| 0.2     | 2026-05-23 | Vũ Anh | Note P0 spike as early evidence for TC-4/TC-7; version sync. |
 
 ## Annex B — Document Control
 

@@ -1,13 +1,13 @@
 ---
 title: BPMN in the kymo DSL — Introduction
 document_id: FEAT-BPMN-DSL-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Proposed
 classification: Internal
 owner: diagrams/ project
 audience: Engineers and reviewers of the kymo DSL, layout engine, and renderers
-review_cycle: On milestone completion, or on grammar change
+review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
   - FEAT-BPMN-DSL-REQ-001    # Requirements
@@ -37,7 +37,7 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-001                                           |
-| Version      | 0.1                                                         |
+| Version      | 0.2                                                         |
 | Status       | Proposed                                                    |
 | Issue Date   | 2026-05-23                                                  |
 | Owner        | `diagrams/` project                                         |
@@ -116,6 +116,7 @@ Read in order:
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
+| 0.2     | 2026-05-23 | Vũ Anh | Doc-set version sync after P0 (spike) complete; no normative change to this item. |
 
 ## Annex B — Document Control
 
