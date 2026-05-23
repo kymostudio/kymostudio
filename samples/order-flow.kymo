@@ -1,0 +1,27 @@
+# Order fulfilment — authored with the `bpmn { }` block.
+# Nodes are declared (kind id "Label"), flows connect them, and the engine
+# auto-lays-out left-to-right (no manual @ coordinates). Compare with the
+# hand-placed order-fulfillment.kymo / imported order-fulfillment.bpmn.
+bpmn {
+  start S  "Order received"
+  task  V  "Validate order"
+  xor   GW "In stock?"
+  task  P  "Process payment"
+  task  N  "Notify customer"
+  end!  C  "Order cancelled"
+  and   SP "Split"
+  task  Pk "Pack items"
+  task  Iv "Generate invoice"
+  and   Sy "Sync"
+  task  Sh "Ship order"
+  end   D  "Order delivered"
+
+  S -> V -> GW
+  GW -> P : "Yes"
+  GW -> N : "No"
+  N -> C
+  P -> SP
+  SP -> Pk ; SP -> Iv
+  Pk -> Sy ; Iv -> Sy
+  Sy -> Sh -> D
+}

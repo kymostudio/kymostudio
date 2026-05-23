@@ -73,16 +73,17 @@ def main() -> None:
     excalidraw = "--excalidraw" in flags
 
     diagram, layout_spec, external_layout = load(src)
-    if getattr(diagram, "bpmn_blocks", None):
-        raise SystemExit(
-            "bpmn { } block parsed but layout is not implemented yet (P2)"
-        )
+    had_bpmn = bool(getattr(diagram, "bpmn_blocks", None))
+    if had_bpmn:
+        from .bpmn_layout import layout as layout_bpmn
+        layout_bpmn(diagram)
     if layout_spec:
         layout(diagram, layout_spec, external_layout)
-    # BPMN diagrams arrive fully positioned from their DI geometry; the
-    # alignment/auto-size passes assume DSL-authored nodes and would choke
-    # on flow endpoints that aren't drawn nodes (data objects, etc.).
-    if src.suffix != ".bpmn":
+    # BPMN diagrams arrive fully positioned — from DI geometry (`.bpmn`) or our
+    # `bpmn { }` block layout. The alignment/auto-size passes assume
+    # DSL-authored nodes and would perturb the already-absolute geometry
+    # (and `_auto_size_canvas` ignores `Edge.points`), so skip them.
+    if src.suffix != ".bpmn" and not had_bpmn:
         resolve_alignments(diagram)
 
     if excalidraw:
