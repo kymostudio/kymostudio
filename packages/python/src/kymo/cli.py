@@ -32,6 +32,7 @@ from pathlib import Path
 from .alignment import resolve_alignments
 from .dsl import parse as parse_dsl
 from .layout import layout
+from .to_bpmn import export as render_bpmn
 from .to_excalidraw import render as render_excalidraw
 from .to_figma import render as render_figma
 from .to_svg import render
@@ -71,6 +72,7 @@ def main() -> None:
     animate    = "--animate"    in flags
     figma      = "--figma"      in flags
     excalidraw = "--excalidraw" in flags
+    bpmn       = "--bpmn"       in flags
 
     diagram, layout_spec, external_layout = load(src)
     had_bpmn = bool(getattr(diagram, "bpmn_blocks", None))
@@ -100,6 +102,16 @@ def main() -> None:
         out.write_text(payload, encoding="utf-8")
         rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
         print(f"✓ wrote {rel} (figma plugin js)  ({diagram.width}×{diagram.height}, {len(payload):,} bytes)")
+        return
+
+    if bpmn:
+        payload = render_bpmn(diagram)
+        out = src.with_suffix(".bpmn")
+        if out.resolve() == src.resolve():            # don't clobber a .bpmn input
+            out = src.with_name(src.stem + ".export.bpmn")
+        out.write_text(payload, encoding="utf-8")
+        rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
+        print(f"✓ wrote {rel} (bpmn 2.0 xml)  ({diagram.width}×{diagram.height}, {len(payload):,} bytes)")
         return
 
     svg = render(diagram, animate=animate)
