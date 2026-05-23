@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Plan
 document_id: PLAN-CANVAS-001
-version: "0.8"
+version: "0.9"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.8                                                              |
+| Version           | 0.9                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -160,7 +160,7 @@ Value lands early; the risky serializer is isolated to Phase 3.
 | **1 — tldraw board, diagram embedded (one-way)** | Replace the preview pane with `<Tldraw>`. Render the kymo SVG as **one image / embed shape** on the board. Immediately get pan/zoom + sticky notes + freehand around the diagram. Editing still via text. Delivers the whiteboard+diagram combo first. | No |
 | **2 — per-node mapping (canvas mirrors the model)** | Implement `diagramToShapes` + `KymoNodeShapeUtil` so each Component / Region / Edge is a real tldraw shape; selection / inspection on canvas. Still text-as-source for *editing*. | No |
 | **3 — round-trip (drag → `.kymo`)** | Implement `shapesToDsl` (3a regenerate → 3b surgical patch + parser spans) and two-way binding with the loop guard. **The "sync with file" milestone.** | **Yes** |
-| **4 — polish** | Freeform-layer persistence (`persistenceKey` / `.tldr`), undo/redo across both layers, animated-WebP export hook, icon palette / drag-in. | — |
+| **4 — polish** *(reduced scope)* | **Delivered:** freeform persistence (`persistenceKey`) + undo/redo across both layers (native tldraw + the Phase-3 round-trip). **Deferred to backlog** (Annex B §5): animated-WebP export, icon palette / drag-in. | — |
 
 ---
 
@@ -177,7 +177,7 @@ the critical path**.
 | 2 | Each Component/Region/Edge is a selectable tldraw shape; inspector reads model | P1 done | L | 13 | P1 | Vũ Anh |
 | 3a | Tier-1 `shapesToDsl`; drag → `.kymo` updates (lossy) | P2 done | L | 8 | P2 | Vũ Anh |
 | 3b | Tier-2 surgical patch; comments/structure byte-preserved | P3a done; **`dsl.ts` source-span change merged** | XL | 13 | P3a, parser spans | Vũ Anh |
-| 4 | Persistence + undo across layers; WebP export; icon palette | P3 done | M | 8 | P3 | Vũ Anh |
+| 4 | **Persistence + undo across layers delivered**; animated-WebP + icon palette **deferred to backlog** | P3 done | M | 8 | P3 | Vũ Anh |
 
 **Sequencing:** `P0 → P1 → P2 → P3a → P3b → P4`. Gate before P1: resolve RK-02. Gate before P3b:
 land the additive parser-span change (`DESIGN-CANVAS-001` §9) behind passing golden tests.
@@ -270,6 +270,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.6     | 2026-05-23 | Vũ Anh | Phase-3 sync: RK-01 → Mitigated (straight to surgical), RK-06 → Accepted; Worklog Phase-3 row; Next → Phase 4. |
 | 0.7     | 2026-05-23 | Vũ Anh | RK-02 finding (live check): no-key tldraw **blanks the board in production** → a key is REQUIRED. Decision **deferred** (keep tldraw); SDK/license alternatives logged (Annex B §4). RK-02 Open — blocks deploy. |
 | 0.8     | 2026-05-23 | Vũ Anh | Phase 4a — freeform persistence (`persistenceKey`); added FR-CE-11 / TC-17; Worklog + Next updated. |
+| 0.9     | 2026-05-23 | Vũ Anh | Phase 4 closed (reduced scope): 4b undo verified (FR-CE-12 / TC-18); §4–§5 updated; animated-WebP + icon palette deferred (Annex B §5). |
 
 ## Annex B — Open questions / pending decisions
 
@@ -285,6 +286,10 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
    Accept the free key + watermark, or switch to **react-flow** (free / no watermark, but drops the
    freeform whiteboard + re-do the canvas layer; `patchDsl`/sync reusable) or **Excalidraw** (keeps
    whiteboard, harder per-node round-trip)? **Deferred — keeping tldraw for now.**
+5. **Phase 4 backlog (deferred)** — **animated-WebP export** (needs an in-browser WebP encoder +
+   extra bundle weight; low priority while RK-02 blanks the public board) and an **icon palette /
+   drag-in** (drag an icon → create a kymo-node and append a leaf to `.kymo`, extending the
+   round-trip from "move" to "create"). Revisit after RK-02.
 
 ## Annex C — Worklog
 
@@ -301,6 +306,7 @@ not yet merged.
 | 2026-05-23 | Phase 2 | Per-element shapes: Component→`kymo-node` (getIcon glyph + label), Region→`geo`, Edge→`arrow`; diff-sync (create/update/delete `meta.kymo`, `history:'ignore'`); `Inspector` reads the model; BPMN→embed fallback. Verified (chrome-anhv): AIQ 19 nodes / 4 regions / 20 arrows, selection→inspector, text-edit diff-update, no `.kymo` leak. Bundle ≈588 KB gzip. **`FR-CE-03`** (two-layer `meta.kymo`) satisfied. Scope cuts: edge via-routing/labels + BPMN per-element → later. | ✅ | PR #37 |
 | 2026-05-23 | Phase 3 | Round-trip canvas→text (surgical, app-side `patchDsl`, no `packages/js` change): drag a node → `.kymo` updated — rewrite `@ (x,y)` / `@ parent`→absolute / append / **lift out of layout frame + grid `row`**; comments + untouched lines byte-preserved (8/8 unit tests). Two-way sync + **genuine-delta loop-guard** (no A→B→A). Verified (chrome-anhv): dragged a `routing_chain` member → leaf `@ (732, 326)` + removed from body, siblings re-flow, no oscillation, no console errors. **`FR-CE-02`** + **`FR-CE-06`** satisfied. | ✅ | PR #40 |
 | 2026-05-23 | RK-02 | **Live-deploy check (chrome-anhv, kymostudio.github.io): the board is BLANK** — tldraw with no key blocks the canvas in production (no `.tl-canvas`; console *"license required for production"*); only localhost renders. So "accept watermark, no key" is **not viable** — a free Hobby/trial key (keeps watermark) or Business key is **required**. **Decision deferred — keep tldraw for now** (SDK/license alternatives in Annex B §4). | 🚧 | — |
-| 2026-05-23 | Phase 4a | Freeform persistence: tldraw `persistenceKey="kymo-canvas"` — board + camera persist to IndexedDB across reloads; kymo shapes re-derive from text and **reconcile by deterministic id (0 duplicates)**, so NFR-CE-07 holds. `zoomToFit` gated to honor a restored camera. Verified (chrome-anhv): created a freeform geo → reload → persisted; 43 kymo + 1 freeform, 0 dup ids, clean console. New **FR-CE-11** + **TC-17**. | ✅ | PR #TBD |
+| 2026-05-23 | Phase 4a | Freeform persistence: tldraw `persistenceKey="kymo-canvas"` — board + camera persist to IndexedDB across reloads; kymo shapes re-derive from text and **reconcile by deterministic id (0 duplicates)**, so NFR-CE-07 holds. `zoomToFit` gated to honor a restored camera. Verified (chrome-anhv): created a freeform geo → reload → persisted; 43 kymo + 1 freeform, 0 dup ids, clean console. New **FR-CE-11** + **TC-17**. | ✅ | PR #44 |
+| 2026-05-23 | Phase 4b | Undo/redo across layers — **verified, no code needed**: freeform undo is native tldraw; undoing a kymo-node move returns the node to its origin and the text round-trips (leaving an explicit `@`, per accepted RK-06). Verified (chrome-anhv): moved `hitl` → text `@ (748, 240)`; undo → shape back to origin, text follows. **Phase 4 closed (reduced scope)** — animated-WebP export + icon palette deferred to backlog (Annex B §5). New **FR-CE-12** + **TC-18**. | ✅ | PR #TBD |
 
-**Next:** Phase 4 in progress — **4a persistence done**; remaining: undo across layers, animated-WebP export, icon palette. RK-02 deferred (public board blank until a key/SDK call; local dev works). RK-07 open.
+**Next:** **Phase 4 closed** — persistence (4a) + undo (4b) delivered; animated-WebP + icon palette **deferred to backlog** (Annex B §5). Open: **RK-02** (public board blank without a key/SDK call), **RK-07** (BPMN embed robustness / edge labels).
