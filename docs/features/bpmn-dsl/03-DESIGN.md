@@ -1,9 +1,9 @@
 ---
 title: BPMN in the kymo DSL — Design
 document_id: FEAT-BPMN-DSL-DSN-001
-version: "0.3"
+version: "1.0"
 issue_date: 2026-05-23
-status: Proposed
+status: Released
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing the kymo DSL parser, layout engine, and renderers
@@ -37,8 +37,8 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-DSN-001                             |
-| Version      | 0.3                                                |
-| Status       | Proposed                                           |
+| Version      | 1.0                                                |
+| Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | FEAT-BPMN-DSL-001, FEAT-BPMN-DSL-REQ-001, FEAT-BPMN-DSL-TST-001, FEAT-BPMN-DSL-PLAN-001 |
@@ -134,6 +134,7 @@ SVG across runs.
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue (extracted from the plan). |
 | 0.2     | 2026-05-23 | Vũ Anh | Fold P0 spike findings: explicit primary-path/trunk pinning (§3.4), dummy-node caveat (§3.2), determinism pre-validated (§6). |
 | 0.3     | 2026-05-23 | Vũ Anh | §4: integration is a cli `bpmn_layout.layout()` pass (not `finalize`); skip `resolve_alignments` for bpmn-block diagrams (realised in P2). |
+| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in DSL-LANG-001 §6.9). |
 
 ## Annex B — Document Control
 
