@@ -13,6 +13,7 @@
  *     `parseDiagram` (full pipeline → positioned Diagram), `layout`,
  *     `resolveAlignments`
  *   - BPMN import: `parseBpmn` (BPMN 2.0 `.bpmn` XML → Diagram)
+ *   - BPMN export: `toBpmn` (Diagram → BPMN 2.0 `.bpmn` XML; inverse of import)
  */
 export * from "./model.js";
 export * from "./icons-loader.js"; // ICONS, getIcon, setIconBaseURL, setManifest, registerIcon
@@ -25,3 +26,4 @@ export {
 export { resolveAlignments } from "./alignment.js";
 export { bpmnLayout } from "./bpmn-layout.js";
 export { parseBpmn } from "./from-bpmn.js";
+export { toBpmn } from "./to-bpmn.js";
