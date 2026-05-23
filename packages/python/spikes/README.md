@@ -72,3 +72,47 @@ start/end) render via the existing `bpmn_shapes`. Output is **deterministic**
    parallel branches don't overlap their elbows on denser graphs.
 5. **Determinism is easy to keep** here (stable sorts + fixed sweep counts +
    integer coords); preserve exactly this discipline in P2 for byte-stable goldens.
+
+## `bpmn_export_spike.py` — bpmn-export Phase 0 (P0)
+
+Feature doc set: `docs/features/bpmn-export/` (`FEAT-BPMN-EXPORT-*`). Covers **P0**
+from its `05-PLAN.md`: a throwaway `to_bpmn` prototype proving round-trip.
+
+- **Question it answers (FR-4):** can a `to_bpmn` emitter (inverse of `from_bpmn`)
+  turn a kymo `Diagram` back into BPMN 2.0 XML that **re-imports and renders the
+  same**? De-risks the **DI coordinate inverse** (centre → top-left `<dc:Bounds>`)
+  and the **element/flow mapping** (inverting the importer's classification).
+- **Flow:** `samples/order.bpmn` → `from_bpmn.parse` → export → re-parse → compare +
+  render both. Reuses the real importer + renderer.
+
+### Verdict — PASS ✅
+
+`order.bpmn` (single process) **round-trips exactly**: 7 components + 6 edges
+preserve `shape`/`icon`/`pos`/`size` and flow kinds (sequence + default), and the
+re-imported render is **byte-identical** to the original (`order-orig.svg` ==
+`order-roundtrip.svg`). Validated mapping coverage: message start, plain/terminate
+end, user/service/script tasks, exclusive gateway, `sequenceFlow`, default flow.
+**P1 is greenlit.**
+
+### Findings to carry into P1 / P2
+
+1. **`isMarkerVisible` is a DI attribute, not semantic.** `from_bpmn` reads it off
+   `<bpmndi:BPMNShape>`, so the exclusive-gateway X must be emitted there: gateway
+   `icon=="exclusive"` → `BPMNShape isMarkerVisible="true"`; `icon==""` → omit it.
+2. **Pools/lanes (Regions) are the P2 work.** `collaboration.bpmn`: component types
+   (incl. service/manual/send tasks, data-object/store, annotation), message flows,
+   and associations all round-trip — but the 4 pool/lane `Region`s are *not* exported,
+   which drops them **and** shifts every component by a uniform `(−70,−60)` (the
+   importer re-normalises to `MARGIN` against a now-smaller bounding box). **P2 must
+   emit `<collaboration>` + `<participant>`/`<laneSet>`/`<lane><flowNodeRef>`** — that
+   also fixes the position drift. (No de-normalisation is needed when the diagram is
+   already MARGIN-normalised, as `order.bpmn` proves.)
+3. **Flow ids are generated** (`flow0`, …) — kymo `Edge` has no id. Fine; the
+   `default="<id>"` attribute on the source node references the generated id.
+4. **Round-trip is semantic + DI, not byte-of-original.** `conditionExpression` on a
+   *gateway*-sourced flow isn't captured by the importer (it becomes `sequence`), so
+   it's absent on export — inherent import lossiness, not an export bug.
+5. **Intermediate catch vs throw** both map to `bpmn-intermediate`; export defaults
+   to `intermediateCatchEvent` (minor; P1 may carry a hint if needed).
+6. Build XML with `xml.etree.ElementTree` (registered `bpmn`/`bpmndi`/`dc`/`di`
+   namespaces) for well-formed escaping — works cleanly; reuse in `src/kymo/to_bpmn.py`.
