@@ -22,6 +22,7 @@ from kymo.to_bpmn import _EVENT_TAG, _EVENTDEF_TAG, _GW_TAG, _TASK_TAG, export
 
 ROOT = Path(__file__).resolve().parents[3]
 ORDER = ROOT / "samples" / "order.bpmn"
+COLLAB = ROOT / "samples" / "collaboration.bpmn"
 CORPUS = sorted((Path(__file__).resolve().parent / "corpus_bpmn").glob("*.bpmn"))
 
 
@@ -71,6 +72,28 @@ def _flow_keys(d):
 
 def _flow_kinds(d):
     return sorted(e.bpmn_flow for e in d.edges)
+
+
+def _geom(d):
+    """Round-trip fixpoint signature, invariant to a benign uniform translation.
+
+    `from_bpmn` re-normalises every diagram so its top-left corner sits at
+    MARGIN; for a few files that corner is anchored on a participant shape kymo
+    records for sizing but doesn't re-emit, so a faithful export can still come
+    back translated as a whole (no distortion). To stay invariant we compare
+    **region** bounds *relative to the leftmost region* — these are exact ints
+    (no centre conversion, so the rel-bounds round-trip exactly) — and compare
+    **components** by `(shape, icon, size)` only: their centre↔top-left↔centre
+    conversion is ±1px on odd-width shapes, a pre-existing importer artifact
+    (exact-position round-trip is covered by `test_roundtrip_order_exact`).
+    Plus the flow-kind multiset."""
+    ox = min((r.bounds[0] for r in d.regions), default=0)
+    oy = min((r.bounds[1] for r in d.regions), default=0)
+    comps = {c.id: (c.shape, c.icon, c.size) for c in d.components}   # type + size
+    regs = {r.id: (r.style, r.label,
+                   (r.bounds[0] - ox, r.bounds[1] - oy, r.bounds[2], r.bounds[3]))
+            for r in d.regions}                                       # rel-bounds: exact
+    return comps, regs, sorted(e.bpmn_flow for e in d.edges)
 
 
 # ── inverse-map consistency with the importer (BPD-DGM-001) ──────────────
@@ -126,14 +149,31 @@ def test_roundtrip_order_exact():
     assert _flow_keys(d1) == _flow_keys(d2)
 
 
+def test_collaboration_structure_and_roundtrip():
+    """Pools/lanes export to a <collaboration>/<laneSet> and round-trip (FR-5)."""
+    d1 = parse_bpmn(COLLAB.read_text(encoding="utf-8"))
+    assert any(r.style == "pool" for r in d1.regions)          # sanity: has pools
+    root = ET.fromstring(export(d1))
+    assert {"collaboration", "participant", "laneSet", "lane"} <= _tags(root)
+    assert any(_local(e.tag) == "BPMNShape" and e.get("isHorizontal") == "true"
+               for e in root.iter())
+    assert _find(root, tag="BPMNPlane").get("bpmnElement") == "Collab_kymo"
+    d2 = parse_bpmn(export(d1))
+    assert len(d1.regions) == len(d2.regions)
+    assert _geom(d1) == _geom(d2)                  # pools/lanes + nodes survive intact
+
+
 @pytest.mark.parametrize("path", CORPUS, ids=[p.stem for p in CORPUS])
-def test_roundtrip_corpus_region_free(path):
-    """Region-free corpus files round-trip shape/icon + flow kinds (P1 scope)."""
+def test_roundtrip_corpus(path):
+    """Every corpus file is a parse→export→re-parse structural fixpoint (P2):
+    component/edge/region counts, per-id component (shape, icon, size), region
+    (style, label, rel-bounds), and flow kinds are preserved — pools/lanes
+    included (see `_geom` for the translation-invariance)."""
     d1 = parse_bpmn(path.read_text(encoding="utf-8", errors="replace"))
-    if d1.regions or not d1.components:
-        pytest.skip("has pools/lanes (P2) or no drawable nodes")
+    if not d1.components and not d1.regions:
+        pytest.skip("no drawable content")
     d2 = parse_bpmn(export(d1))
     assert len(d1.components) == len(d2.components)
     assert len(d1.edges) == len(d2.edges)
-    assert _comp_shapes(d1) == _comp_shapes(d2)
-    assert _flow_kinds(d1) == _flow_kinds(d2)
+    assert len(d1.regions) == len(d2.regions)
+    assert _geom(d1) == _geom(d2)
