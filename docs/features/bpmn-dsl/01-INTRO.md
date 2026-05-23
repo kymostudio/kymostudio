@@ -1,7 +1,7 @@
 ---
 title: BPMN in the kymo DSL — Introduction
 document_id: FEAT-BPMN-DSL-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-23
 status: Released
 classification: Internal
@@ -15,7 +15,7 @@ related_documents:
   - FEAT-BPMN-DSL-TST-001    # Test documentation
   - FEAT-BPMN-DSL-PLAN-001   # Plan
   - DSL-LANG-001             # kymo DSL language specification (normative)
-  - BPD-DGM-001              # BPMN importer element mapping
+  - BPMN-MAP-001              # BPMN importer element mapping
   - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
 authors:
   - Vũ Anh
@@ -37,7 +37,7 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-001                                           |
-| Version      | 1.0                                                         |
+| Version      | 1.1                                                         |
 | Status       | Released                                                    |
 | Issue Date   | 2026-05-23                                                  |
 | Owner        | `diagrams/` project                                         |
@@ -59,7 +59,7 @@ explicit `@ (x,y)` and hand-tracing every edge's `via` waypoints (see
 `samples/order-fulfillment.kymo`). This is laborious and error-prone. Tools such
 as Mermaid let an author describe a process textually and lay it out
 automatically (cf. RES-MERMAID-D2-001). kymo can already *import* BPMN 2.0 XML
-(BPD-DGM-001) but cannot *author* it concisely.
+(BPMN-MAP-001) but cannot *author* it concisely.
 
 ## 3. Feature concept
 
@@ -118,6 +118,7 @@ Read in order:
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
 | 0.2     | 2026-05-23 | Vũ Anh | Doc-set version sync after P0 (spike) complete; no normative change to this item. |
 | 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in DSL-LANG-001 §6.9). |
+| 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
 
 ## Annex B — Document Control
 

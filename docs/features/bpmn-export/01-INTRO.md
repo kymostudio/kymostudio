@@ -1,9 +1,9 @@
 ---
 title: BPMN 2.0 Export — Introduction
 document_id: FEAT-BPMN-EXPORT-001
-version: "0.1"
+version: "1.0"
 issue_date: 2026-05-23
-status: Proposed
+status: Released
 classification: Internal
 owner: diagrams/ project
 audience: Engineers and reviewers of the kymo renderers, BPMN importer, and DSL
@@ -14,7 +14,7 @@ related_documents:
   - FEAT-BPMN-EXPORT-DSN-001    # Design
   - FEAT-BPMN-EXPORT-TST-001    # Test documentation
   - FEAT-BPMN-EXPORT-PLAN-001   # Plan
-  - BPD-DGM-001                 # BPMN importer element mapping (this feature inverts it)
+  - BPMN-MAP-001                 # BPMN importer element mapping (this feature inverts it)
   - DSL-LANG-001                # kymo DSL language specification (bpmn { } block)
   - FEAT-BPMN-DSL-DSN-001       # BPMN-in-DSL design
   - REF-BPMNIO-CMP-001          # bpmn.io comparison (lossless round-trip benchmark)
@@ -38,8 +38,8 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | FEAT-BPMN-EXPORT-001                                        |
-| Version      | 0.1                                                         |
-| Status       | Proposed                                                    |
+| Version      | 1.0                                                         |
+| Status       | Released                                                    |
 | Issue Date   | 2026-05-23                                                  |
 | Owner        | `diagrams/` project                                         |
 | Related      | FEAT-BPMN-EXPORT-REQ-001, FEAT-BPMN-EXPORT-DSN-001, FEAT-BPMN-EXPORT-TST-001, FEAT-BPMN-EXPORT-PLAN-001 |
@@ -55,7 +55,7 @@ the plan (FEAT-BPMN-EXPORT-PLAN-001). The set conforms to ISO/IEC/IEEE 12207:201
 
 ## 2. Background
 
-kymo can already **import** BPMN 2.0 XML (`from_bpmn`, BPD-DGM-001) and, since
+kymo can already **import** BPMN 2.0 XML (`from_bpmn`, BPMN-MAP-001) and, since
 DSL-LANG-001 §6.9, **author** BPMN textually with the `bpmn { }` block. But all of
 kymo's *output* paths are **one-way**: SVG, animated WebP, Figma, and Excalidraw —
 none is a standard, machine-readable interchange format. The tool comparisons under
@@ -76,7 +76,7 @@ with events, tasks, gateways, flows) and the **Diagram-Interchange** geometry
 - **Round-trip**: `.bpmn` → import → kymo `Diagram` → **export** → `.bpmn` preserves
   the structure and layout — closing the interchange gap above.
 - **Inverse mapping**: every `(shape, marker)` and `bpmn_flow` maps back to the BPMN
-  element it came from (the exact reverse of BPD-DGM-001's table).
+  element it came from (the exact reverse of BPMN-MAP-001's table).
 - **Reuse**: emits a `.bpmn` from any `Diagram`; the CLI gains a `--bpmn` target and
   the Python/JS libraries gain `export` / `toBpmn`.
 
@@ -94,7 +94,7 @@ maintainers verifying round-trip fidelity against real-world `.bpmn` corpora.
 - **DI** — BPMN Diagram Interchange: the `<bpmndi:*>` geometry (shape bounds, edge waypoints).
 - **Semantic model** — the `<process>` / `<collaboration>` element tree (the *meaning*, distinct from the *diagram*).
 - **Round-trip** — import then export (or vice-versa) preserving structure + layout.
-- **Importer** — `from_bpmn` (BPD-DGM-001); this feature is its inverse.
+- **Importer** — `from_bpmn` (BPMN-MAP-001); this feature is its inverse.
 - **Emitter** — an output back-end (`to_svg`, `to_figma`, …); `to_bpmn` is the new one.
 
 ## 6. Document map
@@ -116,6 +116,7 @@ Read in order:
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
+| 1.0 | 2026-05-24 | Vũ Anh | Released — P4 complete: BPMN-MAP-001 Export section added; doc set marked Released; importer-mapping citations repointed. |
 
 ## Annex B — Document Control
 

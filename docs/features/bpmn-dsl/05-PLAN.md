@@ -1,7 +1,7 @@
 ---
 title: BPMN in the kymo DSL — Plan
 document_id: FEAT-BPMN-DSL-PLAN-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-23
 status: Released
 classification: Internal
@@ -15,7 +15,7 @@ related_documents:
   - FEAT-BPMN-DSL-DSN-001    # Design
   - FEAT-BPMN-DSL-TST-001    # Test documentation
   - DSL-LANG-001             # kymo DSL language specification (normative)
-  - BPD-DGM-001              # BPMN importer element mapping
+  - BPMN-MAP-001              # BPMN importer element mapping
   - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
 authors:
   - Vũ Anh
@@ -36,7 +36,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-PLAN-001                            |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
@@ -124,6 +124,7 @@ is comparatively mechanical.
 | 0.5     | 2026-05-23 | Vũ Anh | Record P2 (layout engine) complete: phase Status + progress + Annex C worklog row. |
 | 0.6     | 2026-05-23 | Vũ Anh | Record P3 (JS parity) complete: phase Status + progress + Annex C worklog row. |
 | 1.0     | 2026-05-23 | Vũ Anh | Released — P4 complete: added DSL-LANG-001 §6.9 clause; marked the feature doc set Released (status + version 1.0). |
+| 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
 
 ## Annex B — Document Control
 

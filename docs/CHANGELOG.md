@@ -9,6 +9,18 @@ packages share a version number.
 
 ## [Unreleased]
 
+### Added
+
+- **BPMN 2.0 export** — turn any kymo diagram of BPMN glyphs (imported from a
+  `.bpmn`, or authored with the `bpmn { }` DSL block) back into BPMN 2.0 XML: a
+  `<bpmn:process>` (or a `<bpmn:collaboration>` of `<participant>`s when there
+  are pools) plus a `<bpmndi:BPMNDiagram>` of DI geometry. The exact inverse of
+  the importer, so a file round-trips (`.bpmn` → kymo → `.bpmn`) preserving
+  structure and geometry. Python: `kymo <file> --bpmn` and
+  `from kymo import to_bpmn`; JavaScript: `toBpmn(diagram)` — at parity, both
+  engines. Pools/lanes/groups/expanded sub-processes are emitted; round-trip is
+  gated against the full MIWG corpus. See [`docs/formats/bpmn.md`](./formats/bpmn.md).
+
 ## [0.2.8] - 2026-05-23
 
 ### Added
@@ -132,7 +144,7 @@ extension.
   public API `from kymo import parse_bpmn`. See
   [`samples/order.bpmn`](../samples/order.bpmn),
   [`samples/collaboration.bpmn`](../samples/collaboration.bpmn) and
-  [`docs/BPMN.md`](./BPMN.md).
+  [`docs/formats/bpmn.md`](./formats/bpmn.md).
 
 - **BPMN 2.0 import in the JS/TS package** — `parseBpmn(xml)` brings the same
   feature to `packages/js` at parity with Python: a dependency-free XML reader

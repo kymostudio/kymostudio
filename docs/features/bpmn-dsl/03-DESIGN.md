@@ -1,7 +1,7 @@
 ---
 title: BPMN in the kymo DSL — Design
 document_id: FEAT-BPMN-DSL-DSN-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-23
 status: Released
 classification: Internal
@@ -15,7 +15,7 @@ related_documents:
   - FEAT-BPMN-DSL-TST-001    # Test documentation
   - FEAT-BPMN-DSL-PLAN-001   # Plan
   - DSL-LANG-001             # kymo DSL language specification (normative)
-  - BPD-DGM-001              # BPMN importer element mapping
+  - BPMN-MAP-001              # BPMN importer element mapping
   - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
 authors:
   - Vũ Anh
@@ -37,7 +37,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-DSN-001                             |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
@@ -59,7 +59,7 @@ into a `BpmnBlock` AST (node declarations + connections):
 
 - **Nodes** → `bpmn-*` `Component`s. The kind keyword (+ optional `type=`)
   selects `(shape, marker)` per FR-3/FR-4, reusing the `bpmn_shapes` marker keys
-  (BPD-DGM-001). Box size is set on `Component.size` from `model.SHAPE_HALF`
+  (BPMN-MAP-001). Box size is set on `Component.size` from `model.SHAPE_HALF`
   (FR-5).
 - **Connections** → `Edge`s. The arrow selects `bpmn_flow` (`->` sequence,
   `~>` message, `..>` association); chains and `;` expand to one `Edge` per
@@ -135,6 +135,7 @@ SVG across runs.
 | 0.2     | 2026-05-23 | Vũ Anh | Fold P0 spike findings: explicit primary-path/trunk pinning (§3.4), dummy-node caveat (§3.2), determinism pre-validated (§6). |
 | 0.3     | 2026-05-23 | Vũ Anh | §4: integration is a cli `bpmn_layout.layout()` pass (not `finalize`); skip `resolve_alignments` for bpmn-block diagrams (realised in P2). |
 | 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in DSL-LANG-001 §6.9). |
+| 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
 
 ## Annex B — Document Control
 

@@ -27,8 +27,8 @@ See [`samples/`](https://github.com/kymostudio/kymostudio/tree/main/samples) for
 
 A standard `.bpmn` file (from bpmn.io / Camunda Modeler / Signavio …) renders
 to SVG using the geometry in the file's Diagram-Interchange section — no
-layout pass runs. See [`docs/BPMN.md`](https://github.com/kymostudio/kymostudio/blob/main/docs/BPMN.md) for the
-element mapping.
+layout pass runs. See [`docs/formats/bpmn.md`](https://github.com/kymostudio/kymostudio/blob/main/docs/formats/bpmn.md)
+for the element mapping (import + export).
 
 ```python
 from kymo import parse_bpmn, render
