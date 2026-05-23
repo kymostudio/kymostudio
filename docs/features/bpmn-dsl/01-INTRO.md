@@ -1,0 +1,138 @@
+---
+title: BPMN in the kymo DSL — Introduction
+document_id: FEAT-BPMN-DSL-001
+version: "0.1"
+issue_date: 2026-05-23
+status: Proposed
+classification: Internal
+owner: diagrams/ project
+audience: Engineers and reviewers of the kymo DSL, layout engine, and renderers
+review_cycle: On milestone completion, or on grammar change
+supersedes: null
+related_documents:
+  - FEAT-BPMN-DSL-REQ-001    # Requirements
+  - FEAT-BPMN-DSL-DSN-001    # Design
+  - FEAT-BPMN-DSL-TST-001    # Test documentation
+  - FEAT-BPMN-DSL-PLAN-001   # Plan
+  - DSL-LANG-001             # kymo DSL language specification (normative)
+  - BPD-DGM-001              # BPMN importer element mapping
+  - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
+authors:
+  - Vũ Anh
+language: en
+keywords:
+  - bpmn
+  - dsl
+  - auto-layout
+  - sugiyama
+  - introduction
+iso_compliance:
+  - ISO/IEC/IEEE 12207:2017
+  - ISO/IEC/IEEE 15289:2019
+  - ISO 8601:2019
+---
+
+# BPMN in the kymo DSL — Introduction
+
+| Field        | Value                                                       |
+|--------------|-------------------------------------------------------------|
+| Document ID  | FEAT-BPMN-DSL-001                                           |
+| Version      | 0.1                                                         |
+| Status       | Proposed                                                    |
+| Issue Date   | 2026-05-23                                                  |
+| Owner        | `diagrams/` project                                         |
+| Related      | FEAT-BPMN-DSL-REQ-001, FEAT-BPMN-DSL-DSN-001, FEAT-BPMN-DSL-TST-001, FEAT-BPMN-DSL-PLAN-001 |
+
+## 1. Purpose and scope
+
+This document introduces the **BPMN-in-kymo** feature and is the entry point to
+its document set. It states the problem, the concept, and the terminology, and
+maps the reader to the requirements (FEAT-BPMN-DSL-REQ-001), the design
+(FEAT-BPMN-DSL-DSN-001), the test documentation (FEAT-BPMN-DSL-TST-001), and the
+plan (FEAT-BPMN-DSL-PLAN-001). The set conforms to ISO/IEC/IEEE 12207:2017
+(life-cycle processes) and ISO/IEC/IEEE 15289:2019 (information-item content).
+
+## 2. Background
+
+Authoring BPMN in `.kymo` today requires placing every `bpmn-*` leaf at an
+explicit `@ (x,y)` and hand-tracing every edge's `via` waypoints (see
+`samples/order-fulfillment.kymo`). This is laborious and error-prone. Tools such
+as Mermaid let an author describe a process textually and lay it out
+automatically (cf. RES-MERMAID-D2-001). kymo can already *import* BPMN 2.0 XML
+(BPD-DGM-001) but cannot *author* it concisely.
+
+## 3. Feature concept
+
+A new file-scope `bpmn { … }` block in the kymo DSL (DSL-LANG-001) lets an author
+describe a process as typed nodes and flows — *declare-then-connect* — and have
+the engine lay it out:
+
+- **Declarative**: `start`/`task`/`xor`/`and`/`end` … node kinds, then `->`
+  connections.
+- **Auto-layout**: a left-to-right layered (Sugiyama/DAG) layout positions nodes
+  and routes orthogonal flows.
+- **Hybrid coordinates**: a node may add `@ (x,y)` to pin/override its position;
+  un-pinned nodes are auto-placed.
+- **Renderer reuse**: the block emits a fully-resolved sub-diagram (absolute
+  positions + edge waypoints) exactly like the BPMN importer, so the existing
+  `bpmn-*` glyphs and flow renderer draw it unchanged.
+
+The normative grammar is in DSL-LANG-001; the surface and behaviour are
+specified as requirements in FEAT-BPMN-DSL-REQ-001; the architecture and
+algorithm in FEAT-BPMN-DSL-DSN-001.
+
+## 4. Audience
+
+Engineers implementing or reviewing the kymo DSL parser, the layout engine, and
+the Python/JS renderers; and maintainers verifying conformance.
+
+## 5. Terms and abbreviations
+
+- **BPMN** — Business Process Model and Notation 2.0.
+- **DSL** — the kymo domain-specific language (`.kymo`); see DSL-LANG-001.
+- **Block** — the brace-delimited `bpmn { … }` construct.
+- **Leaf / node** — a single rendered element (a `bpmn-*` `Component`).
+- **Flow** — a directed edge (sequence / message / association).
+- **DAG** — directed acyclic graph.
+- **Sugiyama** — layered graph-drawing method (rank → order → coordinates).
+- **Pin** — a node carrying an explicit `@ (x,y)` override.
+
+## 6. Document map
+
+Read in order:
+
+| # | Information item | Document | Standard role (15289) |
+|---|------------------|----------|-----------------------|
+| 1 | Introduction (this) | FEAT-BPMN-DSL-001 | Concept / overview |
+| 2 | Requirements | FEAT-BPMN-DSL-REQ-001 | Requirements specification |
+| 3 | Design | FEAT-BPMN-DSL-DSN-001 | Design / architecture |
+| 4 | Test documentation | FEAT-BPMN-DSL-TST-001 | Test plan / cases / traceability |
+| 5 | Plan | FEAT-BPMN-DSL-PLAN-001 | Plan |
+
+## Annex A — Revision History
+
+**Table A.1 — Document revisions**
+
+| Version | Date       | Author | Changes        |
+|---------|------------|--------|----------------|
+| 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
+
+## Annex B — Document Control
+
+### B.1 Storage and Retrieval
+Version-controlled in the project repository at
+`docs/features/bpmn-dsl/01-INTRO.md`; the authoritative source is the
+main-branch working tree, with history via `git log`.
+
+### B.2 Distribution
+Implicit — checked in alongside the feature it introduces; available to anyone
+with repository read access.
+
+### B.3 Change Control
+Changes require: update the relevant clause; keep the document set
+(REQ/DSN/TST/PLAN) consistent; increment `version` (MAJOR/MINOR/PATCH); append a
+row to Annex A.
+
+### B.4 Backwards Compatibility
+This is an informative overview; on any feature change, reconcile it with
+FEAT-BPMN-DSL-REQ-001 (the normative requirements) before release.

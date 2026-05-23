@@ -1,0 +1,37 @@
+# Order-fulfillment BPMN process, authored in the .kymo DSL.
+# Mirrors samples/order-fulfillment.bpmn — the bpmn-* leaves reuse the
+# same bpmn_shapes glyphs (their SHAPE_HALF defaults are 36 / 100×80 / 50,
+# i.e. standard BPMN sizes), and @ (x,y) sets each glyph centre. Edges trace
+# the BPMN waypoints via explicit src/dst anchors + `via`. Coordinates are
+# the importer's MARGIN-normalised space (BPMN source shifted by -62,-20)
+# so this renders flush with order-fulfillment.svg.
+
+canvas: 1286 x 550
+
+# ── Nodes (shape/marker/accent — accent is ignored by BPMN glyphs) ─────
+Start     bpmn-start/none/blue        "Order received"   @ (48, 310)
+Validate  bpmn-task/none/blue         "Validate order"   @ (178, 310)
+InStock   bpmn-gateway/exclusive/blue "In stock?"        @ (338, 310)
+Notify    bpmn-task/none/blue         "Notify customer"  @ (498, 70)
+Cancelled bpmn-end/terminate/blue     "Order cancelled"  @ (658, 70)
+Payment   bpmn-task/none/blue         "Process payment"  @ (478, 310)
+Split     bpmn-gateway/parallel/blue  "Split"            @ (638, 310)
+Pack      bpmn-task/none/blue         "Pack items"       @ (798, 140)
+Invoice   bpmn-task/none/blue         "Generate invoice" @ (798, 480)
+Sync      bpmn-gateway/parallel/blue  "Sync"             @ (958, 310)
+Ship      bpmn-task/none/blue         "Ship order"       @ (1098, 310)
+Delivered bpmn-end/none/blue          "Order delivered"  @ (1238, 310)
+
+# ── Flows (straight runs along y=310; branches use top/bottom + via) ───
+Start    --> Validate  { src=right, dst=left }
+Validate --> InStock   { src=right, dst=left }
+InStock  --> Payment : "Yes" { src=right, dst=left, label_pos=(397, 298) }
+InStock  --> Notify  : "No"  { src=top,   dst=left, via=(338, 70), label_pos=(350, 180) }
+Notify   --> Cancelled { src=right, dst=left }
+Payment  --> Split     { src=right, dst=left }
+Split    --> Pack      { src=top,    dst=left, via=(638, 140) }
+Split    --> Invoice   { src=bottom, dst=left, via=(638, 480) }
+Pack     --> Sync      { src=right,  dst=top,  via=(958, 140) }
+Invoice  --> Sync      { src=right,  dst=bottom, via=(958, 480) }
+Sync     --> Ship      { src=right, dst=left }
+Ship     --> Delivered { src=right, dst=left }
