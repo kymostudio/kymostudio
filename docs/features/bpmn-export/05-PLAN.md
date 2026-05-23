@@ -1,7 +1,7 @@
 ---
 title: BPMN 2.0 Export — Plan
 document_id: FEAT-BPMN-EXPORT-PLAN-001
-version: "0.1"
+version: "0.3"
 issue_date: 2026-05-23
 status: Proposed
 classification: Internal
@@ -34,7 +34,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-EXPORT-PLAN-001                          |
-| Version      | 0.1                                                |
+| Version      | 0.3                                                |
 | Status       | Proposed                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
@@ -61,8 +61,8 @@ reconstruction), the emitter API, and integration are specified in
 
 | ID | Phase | Deliverables | Exit criteria | Reqs | Status |
 |----|-------|--------------|---------------|------|--------|
-| **P0** | Spike | Throwaway export of `samples/order.bpmn` (+ `collaboration.bpmn`) → BPMN XML; re-import + open in bpmn.io; eyeball round-trip | Exported XML re-imports; layout legible | FR-4 | Planned |
-| **P1** | Python core | `to_bpmn.py` `export()` (single `<process>` + DI; events/tasks/gateways/flows) + inverse maps; CLI `--bpmn`; unit + round-trip tests | Single-process corpus files round-trip; suite green | FR-1..FR-4, FR-6, FR-7 | Planned |
+| **P0** | Spike | Throwaway export of `samples/order.bpmn` (+ `collaboration.bpmn`) → BPMN XML; re-import + open in bpmn.io; eyeball round-trip | Exported XML re-imports; layout legible | FR-4 | ✅ Done (2026-05-23) |
+| **P1** | Python core | `to_bpmn.py` `export()` (single `<process>` + DI; events/tasks/gateways/flows) + inverse maps; CLI `--bpmn`; unit + round-trip tests | Single-process corpus files round-trip; suite green | FR-1..FR-4, FR-6, FR-7 | ✅ Done (2026-05-23) |
 | **P2** | Containers | Pools/lanes/groups → collaboration + laneSet; data-object/store/annotation/subprocess; **full corpus round-trip** gate | Whole `samples/` + `tests/corpus_bpmn/` round-trip; structure preserved | FR-5, NFR-1, NFR-2 | Planned |
 | **P3** | JS parity | `to-bpmn.ts` port + `index.ts` export + JS round-trip tests | `npm test` green; XML ~matches Python; round-trips via `parseBpmn` | FR-8, NFR-3 | Planned |
 | **P4** | Docs & release | `docs/BPMN.md` export section (cite BPD-DGM-001 as inverse); mark this set `Released`; version bump | Spec updated; doc set Released | all | Planned |
@@ -99,6 +99,8 @@ Relative complexity in **story points** (Fibonacci):
 ~24 points = a medium feature. **P1** carries the core emitter; **P2** carries the
 correctness risk (round-trip over the full corpus).
 
+**Progress:** P0 + P1 (3 + 8 = 11 pts) complete (2026-05-23) — ~13 points remain (P2–P4).
+
 ## Annex A — Revision History
 
 **Table A.1 — Document revisions**
@@ -106,6 +108,8 @@ correctness risk (round-trip over the full corpus).
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue (feature doc set created). |
+| 0.2     | 2026-05-23 | Vũ Anh | Record P0 (spike) complete: round-trip proven (order.bpmn byte-identical). |
+| 0.3     | 2026-05-23 | Vũ Anh | Record P1 (Python core emitter + CLI) complete: phase Status + progress + Annex C worklog. |
 
 ## Annex B — Document Control
 
@@ -134,3 +138,5 @@ ISO 8601.
 | Date       | Phase | Work | Outcome / artifacts |
 |------------|-------|------|---------------------|
 | 2026-05-23 | — (doc set) | Authored the feature doc set (INTRO/REQ/DSN/TST/PLAN) defining `to_bpmn` as the inverse of `from_bpmn` (BPD-DGM-001). | **Proposed** — no code yet; P0–P4 planned in §3. |
+| 2026-05-23 | P0 — Spike | Throwaway `to_bpmn` prototype (`packages/python/spikes/bpmn_export_spike.py`): import `order.bpmn` → export → re-import → compare + render. | **Done** — `order.bpmn` round-trips **byte-identical**; DI coordinate inverse + element/flow mapping validated. Findings (`isMarkerVisible` is a DI attr; pools/lanes ⇒ P2) in `spikes/README.md`. P1 greenlit. |
+| 2026-05-23 | P1 — Python core | Built `src/kymo/to_bpmn.py` `export()` — inverse maps *derived from* `from_bpmn` (single source of truth) + semantic process + DI plane + default/conditional flows. Wired CLI `--bpmn` (clobber-guarded) and the `to_bpmn` library API. | **Done** — every **region-free** corpus file round-trips (shape/icon + flow kinds); `order.bpmn` exact; `tests/test_to_bpmn.py` (unit + round-trip); full suite **332 passed, 24 skipped** (pools/lanes ⇒ P2). |
