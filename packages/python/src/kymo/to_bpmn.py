@@ -6,11 +6,19 @@ document: a single `<bpmn:process>` (semantic model) plus a
 `<bpmndi:BPMNDiagram>` (Diagram-Interchange geometry). This enables a
 `.bpmn` → kymo → `.bpmn` round-trip.
 
-Scope (this phase): a single process — events, tasks, gateways, and
-sequence / message / association flows. Pools / lanes / collaboration are not
-yet emitted (regions are dropped); that is planned for a later phase.
-`Component.pos` is a centre and `<dc:Bounds>` is a top-left, so a DI-bearing
-diagram round-trips its geometry exactly.
+Scope: events, tasks, gateways, sub-processes, and sequence / message /
+association flows, plus **pools / lanes / groups / expanded sub-processes**.
+When the diagram has any pool, semantics are wrapped in a `<collaboration>` of
+`<participant>`s over a single `<process>` (with a `<laneSet>` for lanes);
+otherwise a lone `<process>` is emitted, as before. `Component.pos` is a centre
+and `<dc:Bounds>` is a top-left; `Region.bounds` is already top-left. A
+DI-bearing diagram round-trips its geometry — region bounds exactly, node
+centres within ±1px on odd-width shapes (centre↔top-left rounding).
+
+Out of scope (the importer flattens these on re-import, so the round-trip
+fixpoint doesn't need them): faithful multi-pool node→process assignment and
+nested `<childLaneSet>` hierarchy — pools beyond the first are emitted black-box
+and lanes are emitted flat.
 
 The element/flow mapping is the exact inverse of `from_bpmn`'s classification
 (BPD-DGM-001); the inverse tables are *derived* from that module's maps so the
@@ -81,10 +89,47 @@ def _sub(parent: ET.Element, ns: str, tag: str, **attrs) -> ET.Element:
     return el
 
 
+def _within(pos: tuple[int, int], bounds: tuple[int, int, int, int]) -> bool:
+    """Is a component centre inside a region's (x, y, w, h) box?"""
+    x, y, w, h = bounds
+    cx, cy = pos
+    return x <= cx <= x + w and y <= cy <= y + h
+
+
 def export(diagram: Diagram) -> str:
     """Render a `Diagram` to a BPMN 2.0 XML string (FR-1)."""
     defs = ET.Element(f"{{{BPMN}}}definitions", id="defs_kymo")
+
+    regions = list(diagram.regions)
+    pools = [r for r in regions if r.style == "pool"]
+    lanes = [r for r in regions if r.style == "lane"]
+    groups = [r for r in regions if r.style == "outer"]
+    subprocs = [r for r in regions if r.style == "inner"]
+    use_collab = bool(pools)
+
+    collab = _sub(defs, BPMN, "collaboration", id="Collab_kymo") if use_collab else None
     proc = _sub(defs, BPMN, "process", id="Process_kymo", isExecutable="false")
+
+    # ── pools → participants (FR-5) ──
+    for i, r in enumerate(pools):
+        p = _sub(collab, BPMN, "participant", id=r.id)
+        if r.label:
+            p.set("name", r.label)
+        if i == 0:
+            p.set("processRef", "Process_kymo")     # first pool owns the (single) process
+
+    # ── lanes → laneSet, with geometric flowNodeRef membership (for validity) ──
+    if lanes:
+        laneset = _sub(proc, BPMN, "laneSet", id="LaneSet_kymo")
+        lane_els = {r.id: _sub(laneset, BPMN, "lane", id=r.id) for r in lanes}
+        for r in lanes:
+            if r.label:
+                lane_els[r.id].set("name", r.label)
+        for c in diagram.components:
+            for r in lanes:
+                if _within(c.pos, r.bounds):
+                    _sub(lane_els[r.id], BPMN, "flowNodeRef").text = c.id
+                    break                            # one lane per node
 
     # ── semantic flow nodes (FR-2) ──
     nodes: dict[str, ET.Element] = {}
@@ -100,12 +145,23 @@ def export(diagram: Diagram) -> str:
                 _sub(el, BPMN, _EVENTDEF_TAG[c.icon])
         nodes[c.id] = el
 
-    # ── semantic flows (FR-3) ──
+    # ── groups + expanded sub-processes → semantic placeholders (FR-5) ──
+    for r in groups:
+        g = _sub(proc, BPMN, "group", id=r.id)
+        if r.label:
+            g.set("name", r.label)
+    for r in subprocs:
+        sp = _sub(proc, BPMN, "subProcess", id=r.id)
+        if r.label:
+            sp.set("name", r.label)
+
+    # ── semantic flows (FR-3); message flows live in the collaboration ──
     flow_ids: list[str] = []
     for i, e in enumerate(diagram.edges):
         fid = f"flow{i}"
         flow_ids.append(fid)
-        el = _sub(proc, BPMN, _FLOW_TAG.get(e.bpmn_flow or "sequence", "sequenceFlow"),
+        parent = collab if (use_collab and e.bpmn_flow == "message") else proc
+        el = _sub(parent, BPMN, _FLOW_TAG.get(e.bpmn_flow or "sequence", "sequenceFlow"),
                   id=fid, sourceRef=e.src, targetRef=e.dst)
         if e.label:
             el.set("name", e.label)
@@ -114,9 +170,17 @@ def export(diagram: Diagram) -> str:
         elif e.bpmn_flow == "default" and e.src in nodes:
             nodes[e.src].set("default", fid)   # default flow named on its source node
 
-    # ── DI plane (FR-4) ──
+    # ── DI plane (FR-4) — references the collaboration when pools exist ──
     plane = _sub(_sub(defs, BPMNDI, "BPMNDiagram"), BPMNDI, "BPMNPlane",
-                 bpmnElement="Process_kymo")
+                 bpmnElement="Collab_kymo" if use_collab else "Process_kymo")
+    for r in regions:                               # region shapes first (behind nodes)
+        sh = _sub(plane, BPMNDI, "BPMNShape", bpmnElement=r.id)
+        if r.style in ("pool", "lane"):
+            sh.set("isHorizontal", "true")
+        elif r.style == "inner":
+            sh.set("isExpanded", "true")            # re-imports as an expanded sub-process
+        rx, ry, rw, rh = r.bounds
+        _sub(sh, DC, "Bounds", x=rx, y=ry, width=rw, height=rh)
     for c in diagram.components:
         w, h = c.size if c.size else _DEFAULT_SIZE
         shape = _sub(plane, BPMNDI, "BPMNShape", bpmnElement=c.id)
