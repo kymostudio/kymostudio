@@ -12,6 +12,14 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { parseDiagram, parseBpmn, renderSVG } from "../../../packages/js/dist/index.js";
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
+import { Board } from "./Board";
+
+/** Pull the intrinsic width/height off the rendered `<svg>` header. */
+function svgSize(svg: string): { w: number; h: number } {
+  const wm = svg.match(/width="([\d.]+)"/);
+  const hm = svg.match(/height="([\d.]+)"/);
+  return { w: wm ? parseFloat(wm[1]) : 320, h: hm ? parseFloat(hm[1]) : 200 };
+}
 
 export function App() {
   const [source, setSource] = useState("");
@@ -160,6 +168,8 @@ export function App() {
   const bgActive = (mode: "light" | "dark" | "transparent"): boolean =>
     mode === "transparent" ? transparent : !transparent && theme === mode;
 
+  const size = svgSize(svg);
+
   // ── Markup (mirrors the original index.html body; same ids/classes). ────
   return (
     <>
@@ -197,11 +207,7 @@ export function App() {
         </section>
 
         <section className="pane view">
-          <div
-            id="preview"
-            className={transparent ? "checker" : undefined}
-            dangerouslySetInnerHTML={{ __html: svg }}
-          />
+          <Board svg={svg} w={size.w} h={size.h} />
           <div id="error" hidden={error == null}>
             {error}
           </div>
