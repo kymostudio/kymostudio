@@ -1,0 +1,46 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/packages/python"
+    schedule:
+      interval: "weekly"
+    groups:
+      python:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/js"
+    schedule:
+      interval: "weekly"
+    groups:
+      js:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/vscode-extension"
+    schedule:
+      interval: "weekly"
+    groups:
+      vscode-extension:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "/website/app"
+    schedule:
+      interval: "weekly"
+    groups:
+      website:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns:
+          - "*"

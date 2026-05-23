@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a problem with kymo (CLI, engine, extension, or website)
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the fields below.
+        For security vulnerabilities, do **not** file here — see SECURITY.md.
+  - type: dropdown
+    id: package
+    attributes:
+      label: Affected package
+      options:
+        - python (PyPI kymostudio)
+        - js (npm kymostudio)
+        - vscode-extension
+        - website / playground
+        - docs
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Package version or git commit
+      placeholder: "0.2.8"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, and what went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: A minimal .kymo or .bpmn source (and command) that triggers the bug.
+      render: text
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS and Python/Node version (e.g. macOS 14, Python 3.12 / Node 20)
+    validations:
+      required: false
