@@ -94,6 +94,9 @@ function edgePath(x1: number, y1: number, sa: Side, x2: number, y2: number, da: 
  * are resolved through {@link getIcon}.
  */
 export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<string> {
+  if (d.bpmnBlocks && d.bpmnBlocks.length) {
+    throw new Error("Diagram has un-laid-out bpmn { } blocks — run bpmnLayout (or parseDiagram) before renderSVG");
+  }
   const pad = opts.padding ?? 52;
   const background = opts.background === undefined ? "#f8fafc" : opts.background;
 
