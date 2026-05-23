@@ -1,7 +1,7 @@
 ---
-title: Interactive Canvas Editor — Roadmap
-document_id: RMAP-CANVAS-001
-version: "0.1"
+title: Interactive Canvas Editor — Plan
+document_id: PLAN-CANVAS-001
+version: "0.3"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -10,41 +10,47 @@ audience: Engineers evolving the kymo web playground (`website/app/`) and the `p
 review_cycle: On scope change, or when a phase completes
 supersedes: null
 related_documents:
+  - INTRO-CANVAS-001
+  - FEAT-CANVAS-001
+  - DESIGN-CANVAS-001
+  - TEST-CANVAS-001
   - DSL-LANG-001
   - RES-MERMAID-D2-001
-  - RES-LANG-EVAL-001
 authors:
   - Vũ Anh
 language: en
 keywords:
-  - roadmap
+  - plan
+  - project-plan
+  - risk-register
   - playground
   - canvas-editor
   - whiteboard
   - tldraw
   - react
   - wysiwyg
-  - dsl-serializer
   - round-trip
+  - estimation
+  - story-points
 ---
 
-# Interactive Canvas Editor — Roadmap
+# Interactive Canvas Editor — Plan
 
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
-| Document ID       | RMAP-CANVAS-001                                                  |
-| Version           | 0.1                                                              |
+| Document ID       | PLAN-CANVAS-001                                                 |
+| Version           | 0.3                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers evolving the web playground (`website/app/`) and `packages/js` |
-| Related Documents | `DSL-LANG-001` (serializer target grammar), `RES-MERMAID-D2-001` (positioning / "animation is the moat"), `RES-LANG-EVAL-001` |
+| Related Documents | `FEAT-CANVAS-001` (requirements), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `DSL-LANG-001`, `RES-MERMAID-D2-001` |
 
-> **Status note.** This is a *proposal / roadmap*, not a committed spec. It records the decision
-> to grow the playground into an interactive canvas editor, the architecture that follows from the
-> current code, and a phased path. Phase 0 should be re-validated against the live code before
-> starting (the playground evolves).
+> **Status note.** A *proposal / plan*, not a committed spec. It records the decision to grow the
+> playground into an interactive canvas editor, the mission rationale, the phased plan, and the risk
+> register. The *detailed design* lives in `DESIGN-CANVAS-001`; the *requirements* in
+> `FEAT-CANVAS-001`. Phase 0 should be re-validated against the live code before starting.
 
 ---
 
@@ -96,24 +102,26 @@ the code force the architecture:
   document, persisted via `persistenceKey` / exported `.tldr`).
 - **tldraw licensing / watermark.** The SDK shows a "made with tldraw" watermark unless a license
   key is set (free key for many cases; business license to remove). Confirm acceptable or obtain
-  a key.
+  a key. (Tracked as risk RK-02.)
 - **Bundle size.** The committed `kymo.bundle.js` is ~222 KB today; tldraw + React push it to
-  ~1–3 MB. Acceptable for a static playground, but it is a committed-in-git artifact.
+  ~1–3 MB. Acceptable for a static playground, but it is a committed-in-git artifact. (RK-03.)
 - **tldraw assets.** For zero-network rendering, self-host tldraw fonts/icons via `@tldraw/assets`
   copied into `website/` (else it fetches from a CDN).
 - **DSL v3 watch-out.** The mooted v3 direction (indentation / CSS-cascade styling) is **not yet
-  in `docs/`**. If v3 lands, the serializer's *output grammar* changes — either target it directly
-  or accept that Phase 3 needs re-targeting. Coordinate with `DSL-LANG-001`.
+  in `docs/`**. If v3 lands, the serializer's *output grammar* changes. Coordinate with
+  `DSL-LANG-001`. (RK-04.)
 
 ---
 
-## 3. Architecture
+## 3. Architecture (overview)
+
+The full engineering design — module interfaces, the kymo↔tldraw mapping, the custom shape, the
+sync engine, and the serializer — is specified in **`DESIGN-CANVAS-001`**. The overview:
 
 ```
 website/app/
 ├── package.json          # NEW devDeps: react, react-dom, @tldraw/tldraw, @tldraw/assets, esbuild, typescript
 ├── build.sh              # UPDATED: npm ci → esbuild src/main.tsx (JSX auto) → committed kymo.bundle.js
-│                         #          + copy tldraw assets + tldraw CSS into website/app/
 ├── index.html            # <div id="root">; loads kymo.bundle.js (module) + tldraw.css
 ├── src/
 │   ├── main.tsx                  # React root render
@@ -130,33 +138,15 @@ website/app/
 
 **Reused as-is from `packages/js` (`src/index.ts`):** `parseDiagram`, `parseBpmn`, `renderSVG`,
 `setManifest`, `setIconBaseURL`, `getIcon`, and the `Diagram` / `Component` / `Region` / `Edge`
-types. Crucially, the model carries **resolved absolute `pos` / `bounds` / `via`** after
-`parseDiagram` — exactly what a model-driven canvas needs.
+types. The model carries **resolved absolute `pos` / `bounds` / `via`** after `parseDiagram` —
+exactly what a model-driven canvas needs.
 
-### 3.1 Sync flow (with a loop guard)
+### 3.1 The crux — `shapesToDsl` (Diagram → `.kymo`)
 
-Mirror the existing `renderToken` pattern in `app.js` to prevent A→B→A feedback:
-
-- **text → canvas:** edit `.kymo` → `parseDiagram()` → `diagramToShapes()` → patch the tldraw
-  store, touching **only diagram-layer shapes** (never the freeform layer).
-- **canvas → text:** drag/resize a kymo shape → `shapesToDsl()` → update editor text → re-render.
-- Debounce both; a monotonic token discards stale updates.
-
-### 3.2 The crux — `shapesToDsl` (Diagram → `.kymo`)
-
-`DSL-LANG-001` §6 already provides every construct the serializer needs: leaves with `@ (x,y)`
-absolute positions (§6.4), regions (`outer`/`inner` + `contains`, §6.5), and edges with `src=` /
-`dst=` anchors + `via=` waypoints (§6.7). Two implementation tiers:
-
-- **Tier 1 (MVP, Phase 3a) — regenerate.** Emit every leaf with explicit `@ (x,y)`, regions with
-  their member ids, edges with anchors / vias. Simple and correct, but **lossy**: drops comments,
-  layout containers (`horizontal`/`vertical`), and parent-relative placement (`@ orch right 50`)
-  — everything flattens to absolute coordinates.
-- **Tier 2 (better, Phase 3b) — surgical text patch.** Retain per-element **source spans** so a
-  canvas edit rewrites *only* the changed `@ placement` / `pos` / `via` token in the original
-  text, preserving comments and declarative structure. Requires a small **additive** parser
-  enhancement in `packages/js/src/dsl.ts` to record line/col ranges per leaf/edge (currently
-  discarded). This is what truly delivers "sync with the `.kymo` file".
+`DSL-LANG-001` §6 already provides every construct the serializer needs (leaf `@ (x,y)`; regions +
+`contains`; edge `src=`/`dst=`/`via=`). Two tiers: **Tier 1 (regenerate)** — simple but lossy (drops
+comments / layout frames / parent-relative placement); **Tier 2 (surgical patch)** — retain source
+spans, rewrite only changed tokens, preserve structure. Full algorithm in `DESIGN-CANVAS-001` §8.
 
 ---
 
@@ -174,7 +164,67 @@ Value lands early; the risky serializer is isolated to Phase 3.
 
 ---
 
-## 5. Files to create / modify
+## 5. Project plan
+
+Single-maintainer OSS project — effort is **relative sizing**: T-shirt (S/M/L/XL) plus **story
+points** (`SP`, see §5.1), not committed dates. Phases are sequential; **Phase 3 (the serializer) is
+the critical path**.
+
+| Phase | Exit criteria (milestone) | Entry criteria | Effort | SP | Depends on | Owner |
+|-------|---------------------------|----------------|--------|----|------------|-------|
+| 0 | Playground ported 1:1 to React; bundle committed; deploy unchanged; e2e parity verified | current playground stable | M | 8 | — | Vũ Anh |
+| 1 | tldraw board live; kymo SVG embedded; pan/zoom + sticky notes work; freeform persists | P0 done; **tldraw license decided (RK-02)** | M | 5 | P0 | Vũ Anh |
+| 2 | Each Component/Region/Edge is a selectable tldraw shape; inspector reads model | P1 done | L | 13 | P1 | Vũ Anh |
+| 3a | Tier-1 `shapesToDsl`; drag → `.kymo` updates (lossy) | P2 done | L | 8 | P2 | Vũ Anh |
+| 3b | Tier-2 surgical patch; comments/structure byte-preserved | P3a done; **`dsl.ts` source-span change merged** | XL | 13 | P3a, parser spans | Vũ Anh |
+| 4 | Persistence + undo across layers; WebP export; icon palette | P3 done | M | 8 | P3 | Vũ Anh |
+
+**Sequencing:** `P0 → P1 → P2 → P3a → P3b → P4`. Gate before P1: resolve RK-02. Gate before P3b:
+land the additive parser-span change (`DESIGN-CANVAS-001` §9) behind passing golden tests.
+
+### 5.1 Complexity & sizing (story points)
+
+Relative story points (Fibonacci); one experienced dev. The §5 `SP` column is **phase-specific**;
+cross-cutting work (sync-engine hardening, V&V/test harness) adds the remainder, reconciling the
+phase subtotal (55) to the total below.
+
+| Work item | Phase | SP | Complexity driver |
+|-----------|-------|----|-------------------|
+| React/TS scaffold + 1:1 port + build pipeline + `?script=` | P0 | 8 | toolchain risk, parity, committed bundle |
+| tldraw board + SVG embed + self-host assets + license | P1 | 5 | integration/config, little logic |
+| `diagramToShapes` + `KymoNodeShapeUtil` (custom shape, async icons) | P2 | 13 | custom render + model↔shape mapping |
+| Sync engine: text→canvas diff + canvas→text + loop guard | P2–P3 | 8 | stateful, race-prone |
+| Serializer Tier-1 (`Diagram → .kymo`) | P3a | 8 | cover all element types, ordering, rounding |
+| Serializer Tier-2 surgical patch + `dsl.ts` source-spans | P3b | 13 | parser change, golden-safe, byte preservation |
+| Polish: persistence / undo / WebP / icon palette | P4 | 8 | breadth |
+| V&V build-out (unit + integration + e2e via chrome MCP) | all | 5 | test infrastructure |
+| **Total** | | **≈ 68** | **Complexity: High** |
+
+- **Confidence:** range **55–85 SP**; widest variance is the **Tier-2 serializer** (8→21 alone) and
+  the **sync loop-guard**.
+- **Risk concentration:** P2 + sync + P3 ≈ **57 %** of points — the canvas mapping + round-trip
+  serializer are the hard core (`DESIGN-CANVAS-001` §7–§9). **Critical path: P3b** (gated on the
+  parser-span change).
+- **T-shirt ↔ SP key:** S ≈ 2–3 · M ≈ 5–8 · L ≈ 13 · XL ≈ 13–20.
+
+---
+
+## 6. Risk register
+
+Likelihood / impact are qualitative (Low / Med / High).
+
+| ID | Risk | Likelihood | Impact | Mitigation | Owner | Status |
+|----|------|-----------|--------|------------|-------|--------|
+| RK-01 | Tier-1 serializer is lossy (drops comments / layout frames / parent-relative placement) → degrades `.kymo` authoring | High | High | Ship Tier-2 surgical patch (`DESIGN-CANVAS-001` §8.2); isolate serializer output behind one module | Vũ Anh | Open |
+| RK-02 | tldraw watermark / license terms unacceptable for the OSS site | Med | Med | Evaluate free license key; else accept watermark; **decide before Phase 1** | Vũ Anh | Open |
+| RK-03 | Committed bundle grows to ~1–3 MB → repo bloat / slower first load | Med | Med | Lazy-load tldraw; monitor bundle diff; enforce footprint NFR (`FEAT-CANVAS-001`) | Vũ Anh | Open |
+| RK-04 | DSL v3 (CSS-cascade) lands mid-build → serializer must re-target grammar | Med | High | Isolate grammar-output module; coordinate with `DSL-LANG-001` owner | Vũ Anh | Open |
+| RK-05 | Sync feedback loop (A→B→A oscillation) corrupts text or canvas | Med | High | `epoch` token + `applying` flag + tldraw `source:'user'` filter (`DESIGN-CANVAS-001` §7) | Vũ Anh | Mitigated by design |
+| RK-06 | Dragging a node replaces declarative placement (`@ parent side gap`) with `@ (x,y)` | Med | Low | Tier-2 keeps parent-ref for unmoved nodes; optional "re-flow" (Annex B) | Vũ Anh | Open |
+
+---
+
+## 7. Files to create / modify
 
 - **New:** `website/app/package.json`, `website/app/src/*` (per §3), `website/app/.gitignore`
   (node_modules), self-hosted tldraw assets directory.
@@ -188,7 +238,9 @@ Value lands early; the risky serializer is isolated to Phase 3.
 
 ---
 
-## 6. Verification
+## 8. Verification
+
+Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 
 - **Toolchain / deploy (Phase 0):** `cd website/app && ./build.sh` produces a committed
   `kymo.bundle.js`; serve `python3 -m http.server --directory website 8000` and confirm at
@@ -207,16 +259,18 @@ Value lands early; the risky serializer is isolated to Phase 3.
 
 ## Annex A — Revision History
 
-| Version | Date       | Author | Changes                          |
-|---------|------------|--------|----------------------------------|
-| 0.1     | 2026-05-23 | Vũ Anh | Initial roadmap draft.           |
+| Version | Date       | Author | Changes                                                                 |
+|---------|------------|--------|-------------------------------------------------------------------------|
+| 0.1     | 2026-05-23 | Vũ Anh | Initial roadmap draft (as `RMAP-CANVAS-001`).                           |
+| 0.2     | 2026-05-23 | Vũ Anh | Renamed Roadmap → Plan (`PLAN-CANVAS-001`); added §5 Project plan + §6 Risk register; split design into `DESIGN-CANVAS-001`, requirements into `FEAT-CANVAS-001`. |
+| 0.3     | 2026-05-23 | Vũ Anh | Added §5.1 Complexity & sizing (story points); SP column in §5 (≈ 68 SP total, High). |
 
-## Annex B — Open Questions
+## Annex B — Open questions / pending decisions
 
 1. **tldraw vs. a lighter custom canvas** if the freeform half turns out to be secondary — would
-   react-flow + a thin drawing layer suffice and keep the bundle small?
+   react-flow + a thin drawing layer suffice and keep the bundle small? (See RK-03.)
 2. **Serializer target grammar** — build against `DSL-LANG-001` v2.0 now, or wait for the v3
-   direction to stabilise to avoid re-targeting?
+   direction to stabilise to avoid re-targeting? (See RK-04.)
 3. **Auto-layout vs. manual positions** — once a node is dragged, its declarative placement
-   (`@ parent side gap`) is replaced by `@ (x,y)`. Is that acceptable, or should the editor offer
-   a "re-flow" that restores declarative layout?
+   (`@ parent side gap`) is replaced by `@ (x,y)`. Acceptable, or offer a "re-flow" that restores
+   declarative layout? (See RK-06.)
