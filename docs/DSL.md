@@ -1,8 +1,8 @@
 ---
 title: Diagram DSL — Language Specification
 document_id: DSL-LANG-001
-version: "2.0"
-issue_date: 2026-05-18
+version: "2.1"
+issue_date: 2026-05-23
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -11,6 +11,7 @@ review_cycle: On grammar change, or annually (whichever first)
 supersedes: "1.0"
 related_documents:
   - BEST_PRACTICE_DIAGRAMS.md
+  - FEAT-BPMN-DSL-DSN-001    # BPMN-in-DSL design (bpmn { } block + layout)
   - dsl.py
   - model.py
 authors:
@@ -36,15 +37,15 @@ iso_compliance:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | DSL-LANG-001                                                   |
-| Version           | 2.0                                                            |
-| Issue Date        | 2026-05-18                                                     |
+| Version           | 2.1                                                            |
+| Issue Date        | 2026-05-23                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
 | Owner             | `diagrams/` project                                            |
 | Audience          | Engineers authoring or parsing `.kymo` files                |
 | Review Cycle      | On grammar change, or annually (whichever first)               |
 | Supersedes        | v1.0                                                           |
-| Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), [`dsl.py`](../src/dsl.py), [`model.py`](../src/model.py) |
+| Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), `FEAT-BPMN-DSL-DSN-001`, [`dsl.py`](../src/dsl.py), [`model.py`](../src/model.py) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar productions follow ISO/IEC 14977:1996 (Extended Backus–Naur Form).
 
@@ -311,11 +312,12 @@ A conforming parser MUST discriminate body lines in this order (first match wins
 
 1. `}` alone (possibly with whitespace) — closes the current container.
 2. `row` followed by zero or more ids — grid row (region body only; rejected in layout body or at file scope).
-3. Line ending with `{` — container opener; kind selects region vs layout.
-4. Match against the arrow forms `-->` or `==>` — edge (file scope only).
-5. Second token contains `/` — leaf component.
-6. All tokens match the `id` production — bare-id reference list (container body only).
-7. Otherwise — syntax error.
+3. Exactly `bpmn {` (first token `bpmn`) — opens a BPMN process block (file scope only; see §6.9).
+4. Line ending with `{` — container opener; kind selects region vs layout.
+5. Match against the arrow forms `-->` or `==>` — edge (file scope only).
+6. Second token contains `/` — leaf component.
+7. All tokens match the `id` production — bare-id reference list (container body only).
+8. Otherwise — syntax error.
 
 ### 6.7 Edges
 
@@ -358,9 +360,60 @@ start     middle      end
 src       dst         via         route
 label_offset  label_pos  label_at  small  dashed
 auto      over        under       curve
+bpmn
 ```
 
-These tokens SHALL NOT be used as user-defined leaf, container, or icon identifiers. Removed in v2.0: `component`, `region`, `layout` (no longer keywords — the parser distinguishes by line shape).
+These tokens SHALL NOT be used as user-defined leaf, container, or icon identifiers. Removed in v2.0: `component`, `region`, `layout` (no longer keywords — the parser distinguishes by line shape). Within a `bpmn { }` body, the node-kind keywords (`start`, `end`, `end!`, `task`, `xor`, `and`, `or`, `event`, `subprocess`, `note`, `data`, `store`) and the flow arrows (`->`, `~>`, `..>`) are reserved (see §6.9).
+
+### 6.9 BPMN Process Blocks
+
+A `bpmn { … }` block authors a BPMN 2.0 process as typed nodes and flows in a
+*positionless*, auto-laid-out form — the inverse of placing each `bpmn-*` leaf at
+an explicit `@ (x,y)`. The block is **file scope only**; nesting it inside a
+region or layout is a syntax error.
+
+```
+bpmn_block = "bpmn" , "{" , { bpmn_stmt } , "}" ;
+bpmn_stmt  = bpmn_node | bpmn_conn ;
+bpmn_node  = bpmn_kind , id , [ STRING ] , [ "type" , "=" , identifier ] , [ "@" , point ] ;
+bpmn_kind  = "start" | "end" | "end!" | "task"
+           | "xor" | "and" | "or"                       (* gateways *)
+           | "event" | "subprocess" | "note" | "data" | "store" ;
+bpmn_conn  = bpmn_chain , { ";" , bpmn_chain } ;
+bpmn_chain = id , bpmn_arrow , id , { bpmn_arrow , id } , [ ":" , STRING ] ;
+bpmn_arrow = "->"      (* sequence flow *)
+           | "~>"      (* message flow  *)
+           | "..>"     (* association   *)
+           ;
+```
+
+A body line is a **node declaration** when its first token is a `bpmn_kind`,
+otherwise a **connection**. Semantics:
+
+- **Kinds → glyphs.** Each kind maps to a `bpmn-*` shape + marker: `start`→bpmn-start,
+  `end`→bpmn-end, `end!`→bpmn-end + terminate, `task`→bpmn-task, `xor`/`and`/`or`→
+  bpmn-gateway (exclusive / parallel / inclusive), `event`→bpmn-intermediate,
+  `subprocess`→bpmn-subprocess, `note`→bpmn-annotation, `data`→data-object,
+  `store`→data-store. An optional `type=<subtype>` refines the marker (e.g.
+  `task … type=user`, `start … type=message`).
+- **Flows.** `->` is a sequence flow, `~>` a message flow (dashed), `..>` an
+  association (dotted, no arrowhead). A chain `A -> B -> C` expands to one flow per
+  segment; `;` separates statements on a line; a trailing `: "label"` labels the
+  (last) segment.
+- **Auto-layout.** Un-pinned nodes are placed by a deterministic left-to-right
+  layered (Sugiyama) layout — rank assignment, crossing-minimised ordering,
+  coordinate assignment (the longest path is held on a straight baseline and branches
+  are balanced above/below it), and orthogonal edge routing. The algorithm is
+  specified in FEAT-BPMN-DSL-DSN-001 §3.
+- **Pins.** A node carrying `@ (x,y)` has its centre fixed to that coordinate and its
+  incident edges re-route to it; un-pinned nodes are not re-ranked.
+- **Resolution.** The block emits a fully-resolved sub-diagram (components with
+  absolute position/size, edges carrying explicit `points` + flow kind), so the
+  existing renderer draws it unchanged; identical input yields byte-identical output.
+  The same grammar and layout exist in the Python and JS implementations
+  (FEAT-BPMN-DSL-REQ-001 FR-11).
+
+See §10.7 for an example and `samples/order-flow.kymo` for a complete process.
 
 ---
 
@@ -568,7 +621,27 @@ critical inner "Critical Path"
 }
 ```
 
-For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kymo`](../samples/aws_1.kymo), and [`data.kymo`](../samples/data.kymo).
+### 10.7 BPMN Process Block
+
+```text
+bpmn {
+  start S  "Order received"
+  task  V  "Validate order"
+  xor   GW "In stock?"
+  task  P  "Process payment"
+  task  N  "Notify customer"
+  end!  C  "Order cancelled"
+  end   D  "Order delivered"
+
+  S -> V -> GW
+  GW -> P : "Yes"
+  GW -> N : "No"
+  N -> C
+  P -> D
+}
+```
+
+For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kymo`](../samples/aws_1.kymo), [`data.kymo`](../samples/data.kymo), and [`order-flow.kymo`](../samples/order-flow.kymo) (a complete BPMN process with a parallel split/join).
 
 ---
 
@@ -580,6 +653,7 @@ For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kym
 |---------|------------|-------------|----------------------|
 | 1.0     | 2026-05-18 | Vũ Anh      | Initial specification. |
 | 2.0     | 2026-05-18 | Vũ Anh      | **Breaking grammar change.** Removed `component`, `region`, `layout` keywords — the parser now disambiguates by line shape (clause 6.6). Containers nest; a region body may hold inline leaves, bare-id references, and nested containers; an outer region's `contains` is flattened from nested regions (clause 7.3.1). Added `icon` region option (was implementation-only). Reserved tokens updated (clause 6.8). |
+| 2.1     | 2026-05-23 | Vũ Anh      | Added the `bpmn { }` process-block grammar (clause 6.9) — node kinds, flow arrows (`->`/`~>`/`..>`), chains, `type=`, `@` pins — with automatic left-to-right (Sugiyama) layout. Design/algorithm: FEAT-BPMN-DSL-DSN-001. |
 
 ---
 
