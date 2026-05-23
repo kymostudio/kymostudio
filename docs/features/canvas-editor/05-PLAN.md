@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Plan
 document_id: PLAN-CANVAS-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.3                                                              |
+| Version           | 0.4                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -264,6 +264,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.1     | 2026-05-23 | Vũ Anh | Initial roadmap draft (as `RMAP-CANVAS-001`).                           |
 | 0.2     | 2026-05-23 | Vũ Anh | Renamed Roadmap → Plan (`PLAN-CANVAS-001`); added §5 Project plan + §6 Risk register; split design into `DESIGN-CANVAS-001`, requirements into `FEAT-CANVAS-001`. |
 | 0.3     | 2026-05-23 | Vũ Anh | Added §5.1 Complexity & sizing (story points); SP column in §5 (≈ 68 SP total, High). |
+| 0.4     | 2026-05-23 | Vũ Anh | Added Annex C — Worklog (ISO/IEC/IEEE 12207 §6.3.2 progress tracking). |
 
 ## Annex B — Open questions / pending decisions
 
@@ -274,3 +275,17 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 3. **Auto-layout vs. manual positions** — once a node is dragged, its declarative placement
    (`@ parent side gap`) is replaced by `@ (x,y)`. Acceptable, or offer a "re-flow" that restores
    declarative layout? (See RK-06.)
+
+## Annex C — Worklog
+
+Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2 (Project Assessment &
+Control). `Status`: ✅ done · 🚧 in progress · ⏳ pending. "pending ship" = done & verified locally but
+not yet merged.
+
+| Date       | Phase / area | Work | Status | Ref |
+|------------|--------------|------|--------|-----|
+| 2026-05-23 | Docs (Phases 0–3) | Authored the ISO-12207 feature doc set — `INTRO` / `FEATURE` / `DESIGN` / `TEST` / `PLAN` (`docs/features/canvas-editor/`). | ✅ | PR #31 |
+| 2026-05-23 | Phase 0 | React + TypeScript re-platform of the playground (`website/app/src/*`, esbuild → committed `kymo.bundle.js`); 1:1 parity with the FigJam UI verified in-browser via chrome-anhv (render, Light/Dark/None, debounced edits, error path, `?script=`, Tab, samples). `npm run typecheck` clean. | ✅ pending ship | uncommitted |
+| 2026-05-23 | Phase 0 | Fixed full-viewport layout regression — `#root` flex-column (`NFR-CE-08`, `TC-16`); verified desktop (1680×929, gap 0) + narrow (600×800 stacks). | ✅ pending ship | uncommitted |
+
+**Next:** ship Phase 0 (PR) → resolve RK-02 (tldraw license) → begin Phase 1 (tldraw board, diagram embedded).

@@ -12,25 +12,26 @@ Deployed as a static subfolder of `website/`, so the existing
 
 | File | Role |
 |------|------|
-| `index.html` | Page shell + styles (two panes: editor / live preview) |
-| `app.js` | Source: render loop, format detection, `?script=` share links |
+| `index.html` | Page shell + styles; mounts the React app into `#root` |
+| `src/` | React + TypeScript source (`main.tsx`, `App.tsx`, `kymo.ts`, `share.ts`) |
 | `kymo.bundle.js` | **Built artifact** — esbuild output, committed for Pages |
 | `build.sh` | Regenerates `kymo.bundle.js` |
+| `package.json` · `tsconfig.json` | Build tooling (React, esbuild, TypeScript) |
 
 ## Develop / rebuild
 
-`app.js`, the `kymostudio` package, the icon manifest, and the starter samples
-are inlined into `kymo.bundle.js`. After editing any of them, rebuild:
+`src/`, the `kymostudio` package, the icon manifest, and the starter samples are
+bundled into `kymo.bundle.js` by esbuild. After editing any of them, rebuild:
 
 ```bash
-./build.sh        # recompiles packages/js, then re-bundles
+./build.sh        # builds packages/js, npm ci, then esbuild src/main.tsx
+npm run typecheck # optional: tsc --noEmit
 ```
 
-Then preview locally (serve `website/` so `/app/` resolves):
+Then preview locally with Node (serve `website/` so `/app/` resolves):
 
 ```bash
-cd ..             # into website/
-python3 -m http.server 8000
+npx http-server website -p 8000 -c-1
 # open http://localhost:8000/app/
 ```
 

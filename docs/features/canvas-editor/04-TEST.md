@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Tests, V&V & Traceability
 document_id: TEST-CANVAS-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -33,7 +33,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | TEST-CANVAS-001                                                 |
-| Version           | 0.1                                                              |
+| Version           | 0.2                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -67,7 +67,7 @@ against the acceptance criteria in `FEAT-CANVAS-001`).
 
 ## 3. Environment & tooling
 
-- Local static serve: `python3 -m http.server --directory website 8000` → `http://localhost:8000/app/`.
+- Local static serve (Node): `npx http-server website -p 8000 -c-1` → `http://localhost:8000/app/`. Hard-reload after a rebuild — `kymo.bundle.js` has no cache-buster.
 - Browser automation: chrome-anhv MCP (screenshot, evaluate, click).
 - Build: `website/app/build.sh` (esbuild) producing the committed bundle.
 
@@ -90,6 +90,7 @@ against the acceptance criteria in `FEAT-CANVAS-001`).
 | TC-13 | Non-functional | NFR-CE-06 | §10 | Measure committed bundle size ≤ budget (~3 MB); flag regressions in the diff. |
 | TC-14 | Review (static) | NFR-CE-04 | §8 | Code review confirms all DSL-emitting logic lives in one module (re-targetable for v3). |
 | TC-15 | Regression | FR-CE-06 (support) | §9 | After the additive parser source-span change, JS `npm test` + Python golden suite pass unchanged (no rendered-byte drift). |
+| TC-16 | E2E / layout | NFR-CE-08 | §10 | At desktop and < 760 px widths: `main`'s bounding-rect bottom ≈ `window.innerHeight` (no whitespace below the canvas); under 760 px the editor + canvas **stack** vertically and share the height. |
 
 ## 5. Traceability matrix
 
@@ -114,6 +115,7 @@ Every requirement maps to ≥ 1 test case (no orphans).
 | NFR-CE-05 | TC-11 |
 | NFR-CE-06 | TC-13 |
 | NFR-CE-07 | TC-06 |
+| NFR-CE-08 | TC-16 |
 
 **Coverage gate:** any requirement added to `FEAT-CANVAS-001` without a row here is a defect.
 
@@ -132,3 +134,4 @@ Every requirement maps to ≥ 1 test case (no orphans).
 | Version | Date       | Author | Changes                                   |
 |---------|------------|--------|-------------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial V&V plan + traceability matrix.   |
+| 0.2     | 2026-05-23 | Vũ Anh | Added TC-16 (full-viewport layout, NFR-CE-08); serve via Node not python3. |

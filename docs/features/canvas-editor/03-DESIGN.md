@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Design
 document_id: DESIGN-CANVAS-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | DESIGN-CANVAS-001                                               |
-| Version           | 0.1                                                              |
+| Version           | 0.2                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -295,6 +295,11 @@ Design:
   watermark. Decide before Phase 1.
 - **Bundle budget**: ~222 KB today → ~1–3 MB with React + tldraw. Acceptable for a static playground
   but it is a committed-in-git artifact; watch the diff size.
+- **Layout contract (`NFR-CE-08`)**: React mounts into `<div id="root">`, an extra DOM level between
+  `<body>` and `header`/`main`. The vanilla `<body>` held the full-height flex column, so `#root`
+  **must** re-declare it — `#root { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0 }`
+  — otherwise `main { flex:1 }` has no full-height parent and the panes collapse to content height
+  (the Phase-0 full-viewport regression). CSS lives in `index.html`, not the bundle (no rebuild to fix).
 
 ## 11. Persistence & sharing
 
@@ -348,3 +353,4 @@ Carried from `PLAN-CANVAS-001` Annex B:
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial technical design draft.  |
+| 0.2     | 2026-05-23 | Vũ Anh | §10: added the `#root` full-height layout contract (NFR-CE-08). |
