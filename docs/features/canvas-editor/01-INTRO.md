@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Introduction & Document Map
 document_id: INTRO-CANVAS-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -31,7 +31,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | INTRO-CANVAS-001                                                |
-| Version           | 0.1                                                              |
+| Version           | 0.2                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -64,7 +64,7 @@ yields a separate document).
 | 02 | `02-FEATURE.md` | `FEAT-CANVAS-001` | 6.4.2 Stakeholder Needs + 6.4.3 System/SW Requirements | *what must it do?* |
 | 03 | `03-DESIGN.md` | `DESIGN-CANVAS-001` | 6.4.4 Architecture Definition + 6.4.5 Design Definition | *how is it built?* |
 | 04 | `04-TEST.md` | `TEST-CANVAS-001` | 6.4.9 Verification + 6.4.11 Validation + 6.3.8 QA + 6.3.6 Traceability | *how do we know it's right?* |
-| 05 | `05-PLAN.md` | `PLAN-CANVAS-001` | 6.4.1 Mission Analysis + 6.3.1 Project Planning + 6.3.4 Risk Management | *why, in what order, at what risk?* |
+| 05 | `05-PLAN.md` | `PLAN-CANVAS-001` | 6.4.1 Mission Analysis + 6.3.1 Project Planning + 6.3.4 Risk Management + 6.3.2 Project Assessment & Control (Annex C Worklog) | *why, in what order, at what risk, what's done?* |
 
 Cross-document references use **`document_id`** (never file paths), so the numeric `NN-` prefixes are
 purely a reading-order aid and can be renumbered without breaking links.
@@ -100,3 +100,4 @@ Quick paths: *implementer* → 02 → 03 → 05 §5; *reviewer* → 02 → 04; *
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial introduction + document map.     |
+| 0.2     | 2026-05-23 | Vũ Anh | Map row: PLAN also covers 6.3.2 (Annex C Worklog). |

@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Features & Requirements
 document_id: FEAT-CANVAS-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -33,7 +33,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | FEAT-CANVAS-001                                                 |
-| Version           | 0.1                                                              |
+| Version           | 0.2                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -89,6 +89,7 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 | NFR-CE-05 | Usability | Offline icons | Built-in (vector) icons render with **zero network**; only file-backed icons fetch from the CDN | §6 |
 | NFR-CE-06 | Performance / footprint | Bounded bundle | Committed bundle stays within budget (target ≤ ~3 MB); tldraw is lazy-loaded where feasible | §10, RK-03 |
 | NFR-CE-07 | Functional correctness (invariant) | Source-of-truth integrity | Freeform-layer content is **never** serialized into `.kymo`; a sticky note never appears in the text | §3, §11 |
+| NFR-CE-08 | Usability (interaction capability) | Full-viewport layout | Header + split panes fill **100 % of the viewport** height/width with no dead space at any window size; < 760 px stacks editor/canvas vertically (each pane sharing the height) | §10 |
 
 ## 5. Constraints & assumptions
 
@@ -110,3 +111,4 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial requirements draft.      |
+| 0.2     | 2026-05-23 | Vũ Anh | Added NFR-CE-08 (full-viewport layout) after a Phase-0 regression. |
