@@ -1,9 +1,9 @@
 ---
 title: BPMN in the kymo DSL — Plan
 document_id: FEAT-BPMN-DSL-PLAN-001
-version: "0.6"
+version: "1.0"
 issue_date: 2026-05-23
-status: Proposed
+status: Released
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing the kymo DSL, layout engine, and renderers
@@ -36,8 +36,8 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-PLAN-001                            |
-| Version      | 0.6                                                |
-| Status       | Proposed                                           |
+| Version      | 1.0                                                |
+| Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | FEAT-BPMN-DSL-001, FEAT-BPMN-DSL-REQ-001, FEAT-BPMN-DSL-DSN-001, FEAT-BPMN-DSL-TST-001 |
@@ -67,7 +67,7 @@ pipeline, integration, renderer reuse, determinism) are specified in
 | **P1** | Python parser | `bpmn { }` → AST → Components/Edges (no layout; raise if rendered); parser tests | Parser tests green; suite green | FR-1..FR-7 | ✅ Done (2026-05-23) |
 | **P2** | Python layout | `bpmn_layout.py` + cli-pass wiring; `samples/order-flow.kymo`; golden + `tests/test_bpmn_layout.py` | Renders LR; full suite green incl. corpus gate (no regen); deterministic | FR-8..FR-10, NFR-1, NFR-2 | ✅ Done (2026-05-23) |
 | **P3** | JS parity | `dsl.ts` block branch + `bpmn-layout.ts` port + JS tests | `npm test` green; geometry ~matches Python | FR-11, NFR-3 | ✅ Done (2026-05-23) |
-| **P4** | Docs & release | DSL-LANG-001 clause (EBNF + semantics) + version/Annex bump; finalise samples; mark this set `Released` | Spec updated in lockstep with `dsl.py`/`dsl.ts` | all | Planned |
+| **P4** | Docs & release | DSL-LANG-001 clause (EBNF + semantics) + version/Annex bump; finalise samples; mark this set `Released` | Spec updated in lockstep with `dsl.py`/`dsl.ts` | all | ✅ Done (2026-05-23) |
 
 **P0 complete (2026-05-23).** The throwaway spike
 (`packages/python/spikes/bpmn_layout_spike.py`) validated the layered LR pipeline
@@ -109,7 +109,7 @@ engine, the dominant effort and risk):
 the principal risks (routing aesthetics, determinism — see §4); everything else
 is comparatively mechanical.
 
-**Progress:** P0 + P1 + P2 + P3 (3 + 5 + 13 + 8 = 29 pts) complete (2026-05-23) — ~3 points remain (P4).
+**Progress:** P0–P4 complete (3 + 5 + 13 + 8 + 3 = **32 / 32 pts**, 2026-05-23) — feature shipped. 🎉
 
 ## Annex A — Revision History
 
@@ -123,6 +123,7 @@ is comparatively mechanical.
 | 0.4     | 2026-05-23 | Vũ Anh | Record P1 (parser) complete: phase Status + progress + Annex C worklog row. |
 | 0.5     | 2026-05-23 | Vũ Anh | Record P2 (layout engine) complete: phase Status + progress + Annex C worklog row. |
 | 0.6     | 2026-05-23 | Vũ Anh | Record P3 (JS parity) complete: phase Status + progress + Annex C worklog row. |
+| 1.0     | 2026-05-23 | Vũ Anh | Released — P4 complete: added DSL-LANG-001 §6.9 clause; marked the feature doc set Released (status + version 1.0). |
 
 ## Annex B — Document Control
 
@@ -156,3 +157,4 @@ bottom; dates ISO 8601.
 | 2026-05-23 | P1 — Python parser | Added the file-scope `bpmn { }` parser to `dsl.py`: `BpmnNode`/`BpmnFlow`/`BpmnBlock` AST; kind→`(shape, marker)` + arrow→flow maps (mirroring `from_bpmn`); chain/`;` expansion + `: "label"`; `@ (x,y)` parsed (honoured in P2). `Diagram.bpmn_blocks` field; `to_svg.render()` + CLI raise while a block is unlaid-out. | **Done** — 8 new `test_dsl.py` cases (covering TC-1/TC-2/TC-3); full suite **220 passed, 1 skipped**, goldens + BPMN corpus baseline byte-identical. No layout yet (P2). |
 | 2026-05-23 | P2 — Python layout | Built `bpmn_layout.py`: rank → dummy nodes → barycenter order → coordinate assignment (longest path pinned to a straight baseline — finding #1) → `@` pin override (FR-9) → orthogonal routing (`Edge.points`). Wired as a cli pass; `resolve_alignments` skipped for bpmn-block diagrams. Added `samples/order-flow.kymo` + golden `.svg`. | **Done** — straight trunk, branches balanced above/below the trunk, legible split/join (eyeballed vs benchmark), deterministic. 8 new `test_bpmn_layout.py` cases; full suite **228 passed, 1 skipped**; other goldens + corpus baseline byte-identical (only the new golden minted). |
 | 2026-05-23 | P3 — JS parity | Ported the parser + layout to `packages/js`: `bpmn { }` branch in `dsl.ts`, new `bpmn-layout.ts` (same algorithm/constants), `bpmnBlocks` on the model, wired into `parseDiagram` (skips `resolveAlignments`), render-guard backstop. Also **fixed red CI**: P2's `samples/order-flow.kymo` had broken the JS `renders every sample .kymo` test. | **Done** — `npm test` **49 passed** (incl. the sample test) + 8 new bpmn cases; typecheck clean; **zero runtime deps** (NFR-3). JS render geometrically matches the Python golden (eyeballed) — functional parity (FR-11/NFR-4). |
+| 2026-05-23 | P4 — Docs & release | Added the normative `bpmn { }` clause to DSL-LANG-001 (§6.9 EBNF + semantics; line-discriminator + reserved-keyword updates; §10.7 example; bumped 2.0→2.1). Marked this feature doc set **Released** (status + version 1.0 across all five docs). | **Done** — spec in lockstep with `dsl.py`/`dsl.ts`; docs-only (no source/test change). PyPI/npm publish deferred to a separate `/kymo-bump`. |
