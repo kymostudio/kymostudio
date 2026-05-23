@@ -9,7 +9,7 @@
  * render immediately, matching the original.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { parseDiagram, parseBpmn, renderSVG } from "../../../packages/js/dist/index.js";
+import { parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packages/js/dist/index.js";
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
 import { Board } from "./Board";
@@ -27,6 +27,8 @@ export function App() {
   const [transparent, setTransparent] = useState(false);
   const [sampleKey, setSampleKey] = useState(DEFAULT_SAMPLE);
   const [svg, setSvg] = useState("");
+  const [diagram, setDiagram] = useState<Diagram | null>(null);
+  const [isBpmnState, setIsBpmnState] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; show: boolean }>({ msg: "", show: false });
 
@@ -61,11 +63,14 @@ export function App() {
   async function render(src: string, th: Theme, tr: boolean): Promise<void> {
     const token = ++renderToken.current;
     try {
-      const diagram = isBpmn(src) ? parseBpmn(src) : parseDiagram(src);
-      const out = await renderSVG(diagram, { background: svgBackground(th, tr) });
+      const bpmn = isBpmn(src);
+      const parsed = bpmn ? parseBpmn(src) : parseDiagram(src);
+      const out = await renderSVG(parsed, { background: svgBackground(th, tr) });
       if (token !== renderToken.current) return; // a newer keystroke superseded us
       lastSvg.current = out;
       setSvg(out);
+      setDiagram(parsed);
+      setIsBpmnState(bpmn);
       setError(null);
     } catch (err) {
       if (token !== renderToken.current) return;
@@ -207,7 +212,7 @@ export function App() {
         </section>
 
         <section className="pane view">
-          <Board svg={svg} w={size.w} h={size.h} />
+          <Board diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} />
           <div id="error" hidden={error == null}>
             {error}
           </div>
