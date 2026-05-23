@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Plan
 document_id: PLAN-CANVAS-001
-version: "0.7"
+version: "0.8"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.7                                                              |
+| Version           | 0.8                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -269,6 +269,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.5     | 2026-05-23 | Vũ Anh | Phase-1 sync: §5 P1 exit (drop "persists", RK-02 deferred); RK-02/RK-03 updated, added RK-07; §8 serve via Node; Worklog P1 row. |
 | 0.6     | 2026-05-23 | Vũ Anh | Phase-3 sync: RK-01 → Mitigated (straight to surgical), RK-06 → Accepted; Worklog Phase-3 row; Next → Phase 4. |
 | 0.7     | 2026-05-23 | Vũ Anh | RK-02 finding (live check): no-key tldraw **blanks the board in production** → a key is REQUIRED. Decision **deferred** (keep tldraw); SDK/license alternatives logged (Annex B §4). RK-02 Open — blocks deploy. |
+| 0.8     | 2026-05-23 | Vũ Anh | Phase 4a — freeform persistence (`persistenceKey`); added FR-CE-11 / TC-17; Worklog + Next updated. |
 
 ## Annex B — Open questions / pending decisions
 
@@ -300,5 +301,6 @@ not yet merged.
 | 2026-05-23 | Phase 2 | Per-element shapes: Component→`kymo-node` (getIcon glyph + label), Region→`geo`, Edge→`arrow`; diff-sync (create/update/delete `meta.kymo`, `history:'ignore'`); `Inspector` reads the model; BPMN→embed fallback. Verified (chrome-anhv): AIQ 19 nodes / 4 regions / 20 arrows, selection→inspector, text-edit diff-update, no `.kymo` leak. Bundle ≈588 KB gzip. **`FR-CE-03`** (two-layer `meta.kymo`) satisfied. Scope cuts: edge via-routing/labels + BPMN per-element → later. | ✅ | PR #37 |
 | 2026-05-23 | Phase 3 | Round-trip canvas→text (surgical, app-side `patchDsl`, no `packages/js` change): drag a node → `.kymo` updated — rewrite `@ (x,y)` / `@ parent`→absolute / append / **lift out of layout frame + grid `row`**; comments + untouched lines byte-preserved (8/8 unit tests). Two-way sync + **genuine-delta loop-guard** (no A→B→A). Verified (chrome-anhv): dragged a `routing_chain` member → leaf `@ (732, 326)` + removed from body, siblings re-flow, no oscillation, no console errors. **`FR-CE-02`** + **`FR-CE-06`** satisfied. | ✅ | PR #40 |
 | 2026-05-23 | RK-02 | **Live-deploy check (chrome-anhv, kymostudio.github.io): the board is BLANK** — tldraw with no key blocks the canvas in production (no `.tl-canvas`; console *"license required for production"*); only localhost renders. So "accept watermark, no key" is **not viable** — a free Hobby/trial key (keeps watermark) or Business key is **required**. **Decision deferred — keep tldraw for now** (SDK/license alternatives in Annex B §4). | 🚧 | — |
+| 2026-05-23 | Phase 4a | Freeform persistence: tldraw `persistenceKey="kymo-canvas"` — board + camera persist to IndexedDB across reloads; kymo shapes re-derive from text and **reconcile by deterministic id (0 duplicates)**, so NFR-CE-07 holds. `zoomToFit` gated to honor a restored camera. Verified (chrome-anhv): created a freeform geo → reload → persisted; 43 kymo + 1 freeform, 0 dup ids, clean console. New **FR-CE-11** + **TC-17**. | ✅ | PR #TBD |
 
-**Next:** RK-02 **deferred (keeping tldraw for now)** — the public board stays blank until a license decision (free Hobby/trial key keeps the watermark, or switch SDK — Annex B §4); **local dev works**. Then Phase 4 (polish). RK-07 still open.
+**Next:** Phase 4 in progress — **4a persistence done**; remaining: undo across layers, animated-WebP export, icon palette. RK-02 deferred (public board blank until a key/SDK call; local dev works). RK-07 open.

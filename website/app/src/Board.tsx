@@ -5,6 +5,11 @@
  * two-way and loop-guarded. BPMN diagrams use the Phase-1 single-embed fallback.
  * Freeform shapes (no `meta.kymo`) are never touched.
  *
+ * Phase 4: the board persists across reloads via tldraw `persistenceKey`. Freeform
+ * shapes (sticky/draw) come back verbatim; kymo shapes are re-derived from the
+ * `.kymo` text and reconciled by deterministic id (stale ones dropped) — so the
+ * diagram always matches the source while the whiteboard layer survives.
+ *
  * RK-02: `LICENSE_KEY` empty → renders on localhost only; BLANK on a deployed
  * domain. A (free) key is required before deploy — see the note by `LICENSE_KEY`.
  */
@@ -23,6 +28,8 @@ import { Inspector } from "./Inspector";
 // Hobby/trial key (keeps the "Made with tldraw" watermark) or a Business key
 // (removes it) here before deploying.
 const LICENSE_KEY = "";
+// Phase 4: persist the board (freeform layer + camera) to IndexedDB under this key.
+const PERSISTENCE_KEY = "kymo-canvas";
 const EMBED_ID = createShapeId("kymo-diagram");
 const shapeUtils = [KymoNodeShapeUtil, KymoDiagramShapeUtil];
 
@@ -112,6 +119,8 @@ export function Board({ diagram, svg, w, h, isBpmn, source, onPatch }: BoardProp
   const handleMount = useCallback(
     (editor: Editor) => {
       editorRef.current = editor;
+      // Persistence restored shapes/camera → honor that view, skip the auto-fit.
+      if (editor.getCurrentPageShapes().length > 0) fittedRef.current = true;
       sync(editor);
       // Listen for user-driven document changes; debounce a writeback.
       editor.store.listen(
@@ -132,7 +141,7 @@ export function Board({ diagram, svg, w, h, isBpmn, source, onPatch }: BoardProp
 
   return (
     <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-      <Tldraw licenseKey={LICENSE_KEY || undefined} shapeUtils={shapeUtils} onMount={handleMount}>
+      <Tldraw licenseKey={LICENSE_KEY || undefined} persistenceKey={PERSISTENCE_KEY} shapeUtils={shapeUtils} onMount={handleMount}>
         <Inspector />
       </Tldraw>
     </div>
