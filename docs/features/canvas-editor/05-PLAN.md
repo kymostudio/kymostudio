@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Plan
 document_id: PLAN-CANVAS-001
-version: "0.4"
+version: "0.5"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.4                                                              |
+| Version           | 0.5                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -173,7 +173,7 @@ the critical path**.
 | Phase | Exit criteria (milestone) | Entry criteria | Effort | SP | Depends on | Owner |
 |-------|---------------------------|----------------|--------|----|------------|-------|
 | 0 | Playground ported 1:1 to React; bundle committed; deploy unchanged; e2e parity verified | current playground stable | M | 8 | — | Vũ Anh |
-| 1 | tldraw board live; kymo SVG embedded; pan/zoom + sticky notes work; freeform persists | P0 done; **tldraw license decided (RK-02)** | M | 5 | P0 | Vũ Anh |
+| 1 | tldraw board live; kymo SVG embedded as a shape; pan/zoom + sticky notes + freehand work | P0 done; **RK-02 deferred (dev-mode)** | M | 5 | P0 | Vũ Anh |
 | 2 | Each Component/Region/Edge is a selectable tldraw shape; inspector reads model | P1 done | L | 13 | P1 | Vũ Anh |
 | 3a | Tier-1 `shapesToDsl`; drag → `.kymo` updates (lossy) | P2 done | L | 8 | P2 | Vũ Anh |
 | 3b | Tier-2 surgical patch; comments/structure byte-preserved | P3a done; **`dsl.ts` source-span change merged** | XL | 13 | P3a, parser spans | Vũ Anh |
@@ -216,11 +216,12 @@ Likelihood / impact are qualitative (Low / Med / High).
 | ID | Risk | Likelihood | Impact | Mitigation | Owner | Status |
 |----|------|-----------|--------|------------|-------|--------|
 | RK-01 | Tier-1 serializer is lossy (drops comments / layout frames / parent-relative placement) → degrades `.kymo` authoring | High | High | Ship Tier-2 surgical patch (`DESIGN-CANVAS-001` §8.2); isolate serializer output behind one module | Vũ Anh | Open |
-| RK-02 | tldraw watermark / license terms unacceptable for the OSS site | Med | Med | Evaluate free license key; else accept watermark; **decide before Phase 1** | Vũ Anh | Open |
-| RK-03 | Committed bundle grows to ~1–3 MB → repo bloat / slower first load | Med | Med | Lazy-load tldraw; monitor bundle diff; enforce footprint NFR (`FEAT-CANVAS-001`) | Vũ Anh | Open |
+| RK-02 | tldraw watermark / license terms unacceptable for the OSS site | Med | Med | Dev-mode for Phases 1–3 (watermark + console warning); decide Hobby (free, keeps watermark) vs Business (paid, removes it) **before the public deploy** | Vũ Anh | Open — deferred |
+| RK-03 | Committed bundle grows too large → repo bloat / slower first load | Med | Med | **Phase 1 measured: 2.0 MB raw / ≈586 KB gzip** (Pages gzips) — within the 3 MB budget. Lazy-load tldraw only if it grows | Vũ Anh | Mitigated — within budget |
 | RK-04 | DSL v3 (CSS-cascade) lands mid-build → serializer must re-target grammar | Med | High | Isolate grammar-output module; coordinate with `DSL-LANG-001` owner | Vũ Anh | Open |
 | RK-05 | Sync feedback loop (A→B→A oscillation) corrupts text or canvas | Med | High | `epoch` token + `applying` flag + tldraw `source:'user'` filter (`DESIGN-CANVAS-001` §7) | Vũ Anh | Mitigated by design |
 | RK-06 | Dragging a node replaces declarative placement (`@ parent side gap`) with `@ (x,y)` | Med | Low | Tier-2 keeps parent-ref for unmoved nodes; optional "re-flow" (Annex B) | Vũ Anh | Open |
+| RK-07 | Embedded diagram (inline SVG in an `HTMLContainer` custom shape) can blank transiently during heavy tldraw interaction (culling / perf) | Med | Low | Render the diagram as a tldraw image/asset (SVG data-URL) or add `toSvg`; per-node shapes (Phase 2) supersede the single-embed approach | Vũ Anh | Open — under assessment |
 
 ---
 
@@ -243,7 +244,7 @@ Likelihood / impact are qualitative (Low / Med / High).
 Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 
 - **Toolchain / deploy (Phase 0):** `cd website/app && ./build.sh` produces a committed
-  `kymo.bundle.js`; serve `python3 -m http.server --directory website 8000` and confirm at
+  `kymo.bundle.js`; serve with Node (`npx http-server website -p 8000 -c-1`) and confirm at
   `http://localhost:8000/app/` (drive via the chrome-anhv MCP) that editor + preview + theme
   toggle + Share link + `?script=` round-trip all still work.
 - **Phase 1+:** screenshot the board — pan/zoom, drop a sticky note, confirm the diagram embed
@@ -265,6 +266,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.2     | 2026-05-23 | Vũ Anh | Renamed Roadmap → Plan (`PLAN-CANVAS-001`); added §5 Project plan + §6 Risk register; split design into `DESIGN-CANVAS-001`, requirements into `FEAT-CANVAS-001`. |
 | 0.3     | 2026-05-23 | Vũ Anh | Added §5.1 Complexity & sizing (story points); SP column in §5 (≈ 68 SP total, High). |
 | 0.4     | 2026-05-23 | Vũ Anh | Added Annex C — Worklog (ISO/IEC/IEEE 12207 §6.3.2 progress tracking). |
+| 0.5     | 2026-05-23 | Vũ Anh | Phase-1 sync: §5 P1 exit (drop "persists", RK-02 deferred); RK-02/RK-03 updated, added RK-07; §8 serve via Node; Worklog P1 row. |
 
 ## Annex B — Open questions / pending decisions
 
@@ -287,5 +289,6 @@ not yet merged.
 | 2026-05-23 | Docs (Phases 0–3) | Authored the ISO-12207 feature doc set — `INTRO` / `FEATURE` / `DESIGN` / `TEST` / `PLAN` (`docs/features/canvas-editor/`). | ✅ | PR #31 |
 | 2026-05-23 | Phase 0 | React + TypeScript re-platform of the playground (`website/app/src/*`, esbuild → committed `kymo.bundle.js`); 1:1 parity with the FigJam UI verified in-browser via chrome-anhv (render, Light/Dark/None, debounced edits, error path, `?script=`, Tab, samples). `npm run typecheck` clean. | ✅ | PR #33 |
 | 2026-05-23 | Phase 0 | Fixed full-viewport layout regression — `#root` flex-column (`NFR-CE-08`, `TC-16`); verified desktop (1680×929, gap 0) + narrow (600×800 stacks). | ✅ | PR #33 |
+| 2026-05-23 | Phase 1 | tldraw board replaces the preview; kymo SVG embedded as a custom `kymo-diagram` shape (one-way, text-driven, registered via `TLGlobalShapePropsMap`); pan/zoom + note/draw + live text→diagram update verified via chrome-anhv; no leak into `.kymo`. Bundle 2.0 MB raw / ≈586 KB gzip (< 3 MB). dev-mode watermark (RK-02). Logged RK-07 (embed render-robustness). | ✅ | PR #TBD |
 
-**Next:** resolve RK-02 (tldraw license) → begin Phase 1 (tldraw board, diagram embedded).
+**Next:** resolve RK-02 (license, before deploy) → Phase 2 (per-node mapping: `diagramToShapes` + `KymoNodeShapeUtil`). Consider RK-07 (image/asset embed) if the blank recurs.

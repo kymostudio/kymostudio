@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- tldraw styles — esbuild emits this from `import "tldraw/tldraw.css"`. -->
+  <link rel="stylesheet" href="kymo.bundle.css">
   <style>
     :root {
       /* Light theme (base) — FigJam-flavoured: white board, dotted canvas,
@@ -166,9 +168,10 @@
     }
 
     /* ── Floating toolbelt (bottom-centre of the board) ──────────── */
+    /* Top-centre so it clears tldraw's own bottom toolbar (Phase 1). */
     .toolbar {
-      position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
-      z-index: 20;
+      position: absolute; left: 50%; top: 14px; transform: translateX(-50%);
+      z-index: 200;
       display: flex; align-items: center; gap: 6px;
       padding: 7px; border-radius: 18px;
       background: var(--panel); box-shadow: var(--shadow-bar);
@@ -206,8 +209,8 @@
 
     /* ── Error card ──────────────────────────────────────────────── */
     #error {
-      position: absolute; left: 18px; right: 18px; bottom: 86px;
-      max-height: 42%; overflow: auto; z-index: 15;
+      position: absolute; left: 18px; right: 18px; top: 70px;
+      max-height: 42%; overflow: auto; z-index: 200;
       padding: 13px 15px; border-radius: 14px;
       background: var(--panel);
       border: 1px solid #f0a3a3; border-left: 4px solid #e23b3b;
@@ -231,7 +234,7 @@
     @media (max-width: 760px) {
       main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
       .pane.editor { border-right: 0; border-bottom: 1px solid var(--border); }
-      .toolbar { gap: 4px; padding: 6px; bottom: 16px; }
+      .toolbar { gap: 4px; padding: 6px; top: 12px; }
       .toolbar select { padding: 8px 28px 8px 11px; }
       .tbtn { min-width: 34px; height: 34px; }
     }
