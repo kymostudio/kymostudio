@@ -17,7 +17,11 @@ import { iterAll, parseXml, type XmlEl } from "./xml.js";
 
 const MARGIN = 30;
 
-const EVENT_SHAPE: Record<string, Shape> = {
+// These five classification tables are the single source of truth for the
+// BPMN element ↔ kymo glyph mapping; `to-bpmn.ts` imports them to derive its
+// inverse maps (a consistency test guards against drift). Not re-exported by
+// index.ts — they stay internal to the BPMN modules.
+export const EVENT_SHAPE: Record<string, Shape> = {
   startEvent: "bpmn-start",
   endEvent: "bpmn-end",
   intermediateCatchEvent: "bpmn-intermediate",
@@ -25,7 +29,7 @@ const EVENT_SHAPE: Record<string, Shape> = {
   boundaryEvent: "bpmn-boundary",
 };
 
-const EVENT_DEF: Record<string, string> = {
+export const EVENT_DEF: Record<string, string> = {
   messageEventDefinition: "message",
   timerEventDefinition: "timer",
   errorEventDefinition: "error",
@@ -38,19 +42,19 @@ const EVENT_DEF: Record<string, string> = {
   cancelEventDefinition: "",
 };
 
-const TASK_MARKER: Record<string, string> = {
+export const TASK_MARKER: Record<string, string> = {
   task: "", userTask: "user", serviceTask: "service", scriptTask: "script",
   sendTask: "send", receiveTask: "receive", manualTask: "manual",
   businessRuleTask: "rule", callActivity: "",
 };
 
-const GATEWAY_MARKER: Record<string, string> = {
+export const GATEWAY_MARKER: Record<string, string> = {
   exclusiveGateway: "exclusive", parallelGateway: "parallel",
   inclusiveGateway: "inclusive", eventBasedGateway: "event",
   complexGateway: "complex",
 };
 
-const SUBPROCESS_TAGS = new Set(["subProcess", "transaction", "adHocSubProcess"]);
+export const SUBPROCESS_TAGS = new Set(["subProcess", "transaction", "adHocSubProcess"]);
 
 const num = (v: string | undefined): number => (v ? parseFloat(v) : 0);
 
