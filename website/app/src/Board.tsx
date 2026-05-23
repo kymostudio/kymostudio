@@ -5,7 +5,8 @@
  * two-way and loop-guarded. BPMN diagrams use the Phase-1 single-embed fallback.
  * Freeform shapes (no `meta.kymo`) are never touched.
  *
- * RK-02: `LICENSE_KEY` empty → tldraw dev mode (watermark). Set before deploy.
+ * RK-02: `LICENSE_KEY` empty → renders on localhost only; BLANK on a deployed
+ * domain. A (free) key is required before deploy — see the note by `LICENSE_KEY`.
  */
 import { useCallback, useEffect, useRef } from "react";
 import { Tldraw, createShapeId, type Editor, type TLShape } from "tldraw";
@@ -17,7 +18,11 @@ import { diagramToShapes } from "./diagramToShapes";
 import { patchPositions, type XY } from "./patchDsl";
 import { Inspector } from "./Inspector";
 
-const LICENSE_KEY = ""; // RK-02 — set before public deploy
+// RK-02: tldraw REQUIRES a license key in production — with no key the canvas
+// renders only on localhost and is BLANK on a deployed domain. Set a free
+// Hobby/trial key (keeps the "Made with tldraw" watermark) or a Business key
+// (removes it) here before deploying.
+const LICENSE_KEY = "";
 const EMBED_ID = createShapeId("kymo-diagram");
 const shapeUtils = [KymoNodeShapeUtil, KymoDiagramShapeUtil];
 

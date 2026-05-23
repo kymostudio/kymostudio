@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Plan
 document_id: PLAN-CANVAS-001
-version: "0.6"
+version: "0.7"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.6                                                              |
+| Version           | 0.7                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -216,7 +216,7 @@ Likelihood / impact are qualitative (Low / Med / High).
 | ID | Risk | Likelihood | Impact | Mitigation | Owner | Status |
 |----|------|-----------|--------|------------|-------|--------|
 | RK-01 | Tier-1 serializer is lossy (drops comments / layout frames / parent-relative placement) → degrades `.kymo` authoring | High | High | Phase 3 went **straight to surgical** (Tier-2, app-side `patchDsl`); Tier-1 regenerate never used — comments/structure preserved | Vũ Anh | Mitigated |
-| RK-02 | tldraw watermark / license terms unacceptable for the OSS site | Med | Med | Dev-mode for Phases 1–3 (watermark + console warning); decide Hobby (free, keeps watermark) vs Business (paid, removes it) **before the public deploy** | Vũ Anh | Open — deferred |
+| RK-02 | tldraw **requires a license key in production** — with no key the board is **BLANK on a non-localhost domain** (renders only on localhost) | High | High | **Confirmed on the live deploy** (kymostudio.github.io: empty canvas, no `.tl-canvas`, console *"license required for production"*). A key is **required**: free Hobby/trial keeps the "Made with tldraw" watermark; Business removes it. Obtain one before the site is usable. | Vũ Anh | Open — blocks deploy |
 | RK-03 | Committed bundle grows too large → repo bloat / slower first load | Med | Med | **Phase 1 measured: 2.0 MB raw / ≈586 KB gzip** (Pages gzips) — within the 3 MB budget. Lazy-load tldraw only if it grows | Vũ Anh | Mitigated — within budget |
 | RK-04 | DSL v3 (CSS-cascade) lands mid-build → serializer must re-target grammar | Med | High | Isolate grammar-output module; coordinate with `DSL-LANG-001` owner | Vũ Anh | Open |
 | RK-05 | Sync feedback loop (A→B→A oscillation) corrupts text or canvas | Med | High | `epoch` token + `applying` flag + tldraw `source:'user'` filter (`DESIGN-CANVAS-001` §7) | Vũ Anh | Mitigated by design |
@@ -268,6 +268,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.4     | 2026-05-23 | Vũ Anh | Added Annex C — Worklog (ISO/IEC/IEEE 12207 §6.3.2 progress tracking). |
 | 0.5     | 2026-05-23 | Vũ Anh | Phase-1 sync: §5 P1 exit (drop "persists", RK-02 deferred); RK-02/RK-03 updated, added RK-07; §8 serve via Node; Worklog P1 row. |
 | 0.6     | 2026-05-23 | Vũ Anh | Phase-3 sync: RK-01 → Mitigated (straight to surgical), RK-06 → Accepted; Worklog Phase-3 row; Next → Phase 4. |
+| 0.7     | 2026-05-23 | Vũ Anh | RK-02 finding (live check): no-key tldraw **blanks the board in production** → a key is REQUIRED. Decision **deferred** (keep tldraw); SDK/license alternatives logged (Annex B §4). RK-02 Open — blocks deploy. |
 
 ## Annex B — Open questions / pending decisions
 
@@ -278,6 +279,11 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 3. **Auto-layout vs. manual positions** — once a node is dragged, its declarative placement
    (`@ parent side gap`) is replaced by `@ (x,y)`. Acceptable, or offer a "re-flow" that restores
    declarative layout? (See RK-06.)
+4. **Canvas SDK / license (RK-02)** — tldraw needs a key for production (free Hobby/trial keeps a
+   "Made with tldraw" watermark; Business removes it; **no-key blanks the board** — live-verified).
+   Accept the free key + watermark, or switch to **react-flow** (free / no watermark, but drops the
+   freeform whiteboard + re-do the canvas layer; `patchDsl`/sync reusable) or **Excalidraw** (keeps
+   whiteboard, harder per-node round-trip)? **Deferred — keeping tldraw for now.**
 
 ## Annex C — Worklog
 
@@ -293,5 +299,6 @@ not yet merged.
 | 2026-05-23 | Phase 1 | tldraw board replaces the preview; kymo SVG embedded as a custom `kymo-diagram` shape (one-way, text-driven, registered via `TLGlobalShapePropsMap`); pan/zoom + note/draw + live text→diagram update verified via chrome-anhv; no leak into `.kymo`. Bundle 2.0 MB raw / ≈586 KB gzip (< 3 MB). dev-mode watermark (RK-02). Logged RK-07 (embed render-robustness). | ✅ | PR #36 |
 | 2026-05-23 | Phase 2 | Per-element shapes: Component→`kymo-node` (getIcon glyph + label), Region→`geo`, Edge→`arrow`; diff-sync (create/update/delete `meta.kymo`, `history:'ignore'`); `Inspector` reads the model; BPMN→embed fallback. Verified (chrome-anhv): AIQ 19 nodes / 4 regions / 20 arrows, selection→inspector, text-edit diff-update, no `.kymo` leak. Bundle ≈588 KB gzip. **`FR-CE-03`** (two-layer `meta.kymo`) satisfied. Scope cuts: edge via-routing/labels + BPMN per-element → later. | ✅ | PR #37 |
 | 2026-05-23 | Phase 3 | Round-trip canvas→text (surgical, app-side `patchDsl`, no `packages/js` change): drag a node → `.kymo` updated — rewrite `@ (x,y)` / `@ parent`→absolute / append / **lift out of layout frame + grid `row`**; comments + untouched lines byte-preserved (8/8 unit tests). Two-way sync + **genuine-delta loop-guard** (no A→B→A). Verified (chrome-anhv): dragged a `routing_chain` member → leaf `@ (732, 326)` + removed from body, siblings re-flow, no oscillation, no console errors. **`FR-CE-02`** + **`FR-CE-06`** satisfied. | ✅ | PR #40 |
+| 2026-05-23 | RK-02 | **Live-deploy check (chrome-anhv, kymostudio.github.io): the board is BLANK** — tldraw with no key blocks the canvas in production (no `.tl-canvas`; console *"license required for production"*); only localhost renders. So "accept watermark, no key" is **not viable** — a free Hobby/trial key (keeps watermark) or Business key is **required**. **Decision deferred — keep tldraw for now** (SDK/license alternatives in Annex B §4). | 🚧 | — |
 
-**Next:** Phase 4 (polish: freeform persistence `persistenceKey`/`.tldr`, undo across layers, animated-WebP export, icon palette). Resolve RK-02 before the public deploy.
+**Next:** RK-02 **deferred (keeping tldraw for now)** — the public board stays blank until a license decision (free Hobby/trial key keeps the watermark, or switch SDK — Annex B §4); **local dev works**. Then Phase 4 (polish). RK-07 still open.
