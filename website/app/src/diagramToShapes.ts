@@ -5,7 +5,7 @@
  * sync in Board stable. Every shape is tagged `meta.kymo` so the freeform layer
  * stays untouched.
  */
-import { createShapeId, toRichText, type TLShapeId, type TLShapePartial } from "tldraw";
+import { createShapeId, toRichText, type TLShapeId, type TLShapePartial } from "./engine/adapter";
 import {
   anchor, componentHalf, resolveAnchors,
   type Component, type Diagram, type Region,

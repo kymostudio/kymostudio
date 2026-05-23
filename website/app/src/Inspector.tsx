@@ -3,7 +3,7 @@
  * selected canvas shape (a `meta.kymo`-tagged shape). Rendered inside the
  * <Tldraw> context so it can use `useEditor` + `useValue`.
  */
-import { useEditor, useValue } from "tldraw";
+import { useEditor, useValue } from "./engine/adapter";
 
 interface KymoMeta {
   id?: string;

@@ -11,7 +11,7 @@
  * reappears instantly instead of re-parsing the inline markup (which flashed
  * blank). `toSvg` lets tldraw's image/PNG export include the diagram cleanly.
  */
-import { HTMLContainer, Rectangle2d, ShapeUtil, T, type TLBaseShape } from "tldraw";
+import { HTMLContainer, Rectangle2d, ShapeUtil, T, type TLBaseShape } from "./engine/adapter";
 
 export type KymoDiagramShape = TLBaseShape<
   "kymo-diagram",
@@ -81,6 +81,9 @@ export class KymoDiagramShapeUtil extends ShapeUtil<KymoDiagramShape> {
 // Register the custom shape in tldraw's shape registry (type → props) so
 // `KymoDiagramShape` joins the `TLShape` union — v5 derives `TLShape` from the
 // augmentable `TLGlobalShapePropsMap` interface.
+// NOTE(canvas-engine P1): kept until the engine derives its own shape union
+// (DESIGN-ENGINE-001 §9.3); dropping it now, with tldraw still the runtime,
+// breaks the union typing.
 declare module "@tldraw/tlschema" {
   interface TLGlobalShapePropsMap {
     "kymo-diagram": KymoDiagramShape["props"];

@@ -345,9 +345,10 @@ export * from "./impl";   // ./impl re-exports tldraw today; the engine by Phase
 ```
 
 - **Phase 1 (this feature):** `./impl` simply re-exports the tldraw symbols the app uses, under the
-  engine's own names. `Board.tsx` & friends change their imports from `"tldraw"` → `"./engine/adapter"`
-  (and the two shapes drop the `@tldraw/tlschema` augmentation). **Zero behaviour change** — tldraw
-  still runs.
+  engine's own names (and owns the `tldraw/tldraw.css` side-effect). `Board.tsx` & friends change
+  their imports from `"tldraw"` → `"./engine/adapter"`. The `@tldraw/tlschema` augmentation **stays**
+  (see §9.3 — it can only be dropped once the engine owns the shape union). **Zero behaviour change**
+  — tldraw still runs.
 - **Phases 2–7 (this feature):** implement `engine/store`, `editor`, `shape`, `view`, `react`,
   `tools`, `persist`. Point `./impl` at the engine **piece by piece** (store first, render last) — or
   run a feature-flag (`?engine=native`) to A/B the two implementations on the same `Board`. By Phase 7

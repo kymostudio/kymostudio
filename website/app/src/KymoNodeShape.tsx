@@ -6,7 +6,7 @@
  * until Phase 3).
  */
 import { useEffect, useState } from "react";
-import { HTMLContainer, Rectangle2d, ShapeUtil, T, type TLBaseShape } from "tldraw";
+import { HTMLContainer, Rectangle2d, ShapeUtil, T, type TLBaseShape } from "./engine/adapter";
 import { getIcon } from "../../../packages/js/dist/index.js";
 
 export type KymoNodeShape = TLBaseShape<
@@ -80,6 +80,10 @@ export class KymoNodeShapeUtil extends ShapeUtil<KymoNodeShape> {
   }
 }
 
+// NOTE(canvas-engine P1): the `@tldraw/tlschema` augmentation that registers
+// this shape in tldraw's `TLShape` union is kept until the engine derives its
+// own shape union from the registered `shapeUtils` (DESIGN-ENGINE-001 §9.3) —
+// dropping it now, while tldraw is still the runtime, breaks the union typing.
 declare module "@tldraw/tlschema" {
   interface TLGlobalShapePropsMap {
     "kymo-node": KymoNodeShape["props"];

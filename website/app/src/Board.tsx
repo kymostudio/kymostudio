@@ -14,8 +14,7 @@
  * domain. A (free) key is required before deploy — see the note by `LICENSE_KEY`.
  */
 import { useCallback, useEffect, useRef } from "react";
-import { Tldraw, createShapeId, type Editor, type TLShape } from "tldraw";
-import "tldraw/tldraw.css";
+import { Tldraw, createShapeId, type Editor, type TLShape } from "./engine/adapter";
 import type { Diagram } from "../../../packages/js/dist/index.js";
 import { KymoNodeShapeUtil, type KymoNodeShape } from "./KymoNodeShape";
 import { KymoDiagramShapeUtil, type KymoDiagramShape } from "./KymoDiagramShape";
