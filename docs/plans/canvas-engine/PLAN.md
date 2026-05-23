@@ -1,7 +1,7 @@
 ---
 title: In-House Canvas Engine — Implementation Plan
 document_id: PLAN-ENGINE-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -14,6 +14,7 @@ related_documents:
   - FEAT-ENGINE-001
   - DESIGN-ENGINE-001
   - TEST-ENGINE-001
+  - PLAN-FIGJAM-001
   - PLAN-CANVAS-001
   - DESIGN-CANVAS-001
 authors:
@@ -36,10 +37,10 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-ENGINE-001                                                  |
-| Version           | 0.1                                                              |
+| Version           | 0.2                                                              |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
-| Related Documents | `FEAT-ENGINE-001` (requirements), `DESIGN-ENGINE-001` (design), `TEST-ENGINE-001` (V&V), `PLAN-CANVAS-001` (parent — the editor on top) |
+| Related Documents | `FEAT-ENGINE-001` (requirements), `DESIGN-ENGINE-001` (design), `TEST-ENGINE-001` (V&V), `PLAN-FIGJAM-001` (sibling — engine completion + FigJam authoring), `PLAN-CANVAS-001` (parent — the editor on top) |
 
 > **Implementation plan (ISO/IEC/IEEE 12207 §6.3 Technical Management).** The *delivery* layer for the
 > in-house canvas engine: mission rationale, the phased plan, the risk register, and the worklog /
@@ -66,12 +67,27 @@ freeform whiteboard *authoring* tools (draw/sticky/text) that tldraw gave for fr
 half".** We sequence so the key-free rendering public board lands *early* and the FigJam half lands
 *last*.
 
+### 1.1 Feature split (this revision)
+
+The original v0.1 plan covered the whole programme (≈91 SP, Phases 0–7) in one feature — over the
+**50-SP-per-feature** cap. v0.2 splits it at the **KEY-FREE BOARD milestone**:
+
+- **This feature — `canvas-engine` (≈42 SP):** the render/interaction core. Adapter seam → reactive
+  store → ShapeUtil + viewport → interaction + persistence → **public board renders with no license
+  key** (`RK-02` closes at the render level). tldraw stays bundled behind the adapter.
+- **Sibling feature — `canvas-figjam` (`PLAN-FIGJAM-001`, ≈44 SP):** *completes* the replacement
+  (built-in shape consolidation, undo/redo, board export, **physical tldraw removal + full
+  `TEST-CANVAS-001` parity**, footprint) and adds the net-new **FigJam freeform-authoring** tools.
+  Its first phase's entry gate is **this feature's Phase 7 complete**.
+
+Phases are also **renumbered 1-based** and decomposed so **no phase exceeds 10 SP** (§4–§5).
+
 ## 2. Decision
 
 **Build an in-house canvas engine behind an adapter seam; phased, not big-bang; tldraw stays until
 parity.** (`DESIGN-ENGINE-001` §13.)
 
-- **Adapter-first.** The app imports canvas primitives only from `engine/adapter`. Phase 0 makes that
+- **Adapter-first.** The app imports canvas primitives only from `engine/adapter`. Phase 1 makes that
   adapter re-export tldraw (zero behaviour change); later phases swap the implementation underneath,
   reversibly. This is what turns a scary rewrite into incremental, shippable steps (SN-5).
 - **Minimal, not a clone.** Reproduce exactly the surface in `FEAT-ENGINE-001` §2 — nothing more.
@@ -107,7 +123,7 @@ packages/js-canvas/              # NEW workspace pkg (node --test like packages/
     ├── react/          # <Canvas>, HTMLContainer, useEditor, useValue                        (DESIGN §9.4)
     └── shapes-builtin/ # kymo-region / kymo-edge (or geo / arrow)                            (DESIGN §10)
 
-website/app/src/engine/adapter.ts   # the seam: re-exports tldraw (P0) → engine (P6)          (DESIGN §13)
+website/app/src/engine/adapter.ts   # the seam: re-exports tldraw (P1) → engine (this feature); tldraw deleted in canvas-figjam   (DESIGN §13)
 ```
 
 **Reused unchanged** from `DESIGN-CANVAS-001`: `Board.tsx` sync/writeback, `KymoNodeShapeUtil`,
@@ -116,59 +132,57 @@ import `engine/adapter`, never the engine internals (`NFR-EN-04`).
 
 ## 4. Phased plan
 
-Value lands early (a key-free rendering board by Phase 3); the FigJam authoring tools are isolated to
-Phase 7.
+Phases are **1-based** and sized so **no phase exceeds 10 SP**. This feature ends at **Phase 7 — the
+KEY-FREE BOARD**; everything after it (built-in consolidation, undo, export, tldraw removal,
+footprint, FigJam authoring) is the sibling `PLAN-FIGJAM-001`.
 
-| Phase | Goal | tldraw still present? |
-|-------|------|------------------------|
-| **0 — Adapter seam** | Introduce `engine/adapter.ts` re-exporting the exact tldraw symbols in `DESIGN-ENGINE-001` §3 under engine names. Re-point `Board`/shapes/`Inspector`/`diagramToShapes` imports to it; drop the `@tldraw/tlschema` augmentation. **Zero behaviour change.** Establishes the swap point. | Yes (behind adapter) |
-| **1 — Reactive store + Editor** | `store.ts` + `editor.ts`: records, `run`/transactions, **`source`/`scope`/history** semantics (DESIGN §5–§6). Unit-tested headless (`TC-EN-01..04`). Not yet rendering. | Yes |
-| **2 — ShapeUtil + viewport (render)** | `shape.ts` (ShapeUtil, Rectangle2d, T), `view/` camera + DOM render, `react/` (`<Canvas>`, HTMLContainer, hooks). Render the kymo shapes **read-only** behind a `?engine=native` flag, A/B against tldraw on the same `Board`. | Yes (A/B) |
-| **3 — Interaction + persistence → KEY-FREE BOARD** | `tools/` select/drag/pan/zoom + `persist.ts`. The round-trip (drag→`.kymo`) and reload work on the engine. **Flip the public deploy to the engine: board renders, no key, no watermark — `RK-02` closes.** | Optional |
-| **4 — Built-in shapes consolidated** | Re-point `diagramToShapes` to `kymo-region`/`kymo-edge` (DESIGN §10); drop reliance on tldraw `geo`/`arrow`. | Removable |
-| **5 — Undo/redo + export parity** | History stack drives `TC-18`; board `toSvg` export (`FR-EN-11`). Full `TEST-CANVAS-001` parity (`TC-01..19`) green on the engine. **Remove tldraw from `package.json`; delete assets/CSS/`licenseKey`.** | **No** |
-| **6 — Footprint** | Measure & shrink bundle (`NFR-EN-02`); culling/perf pass (`NFR-EN-01`). | No |
-| **7 — FigJam authoring tools** *(post-parity)* | Freeform **draw / sticky / text** tools — the whiteboard-authoring half tldraw gave for free (`FEAT-ENGINE-001` §5). Largest chunk; sized separately once parity ships. | No |
+| Phase | Goal | tldraw present? |
+|-------|------|------------------|
+| **1 — Adapter seam** | Introduce `engine/adapter.ts` re-exporting the exact tldraw symbols in `DESIGN-ENGINE-001` §3 under engine names. Re-point `Board`/shapes/`Inspector`/`diagramToShapes` imports to it; drop the `@tldraw/tlschema` augmentation. **Zero behaviour change.** Establishes the swap point. | Yes (behind adapter) |
+| **2 — Reactive store** | `store.ts`: records, `run`/transactions, **`source`/`scope`** semantics + `history:"ignore"` tagging (DESIGN §5). The `source:"user"` choke-point — loop-guard fidelity. Unit-tested headless (`TC-EN-01..04`). | Yes |
+| **3 — Editor facade** | `editor.ts`: CRUD + `run` + `zoomToFit` + selection over the store (DESIGN §6). | Yes |
+| **4 — ShapeUtil + geometry** | `shape.ts` — ShapeUtil base, `Rectangle2d`, `T` validators, `BaseShape` (DESIGN §7,§9). `TC-EN-05/06`. | Yes |
+| **5 — Viewport (render)** | `view/` camera + DOM render loop + cull, `react/` (`<Canvas>`, `HTMLContainer`, `useEditor`, `useValue`). Render the kymo shapes **read-only** behind a `?engine=native` flag, A/B against tldraw. | Yes (A/B) |
+| **6 — Interaction** | `tools/` select / drag / pan / zoom + hit-test + selection indicator — the drag that drives canvas→text. | Yes (A/B) |
+| **7 — Persistence → KEY-FREE BOARD** | `persist.ts` (IndexedDB). Round-trip (drag→`.kymo`) + reload on the engine. **Flip the public deploy to the engine: board renders, no key, no watermark — `RK-02` closes at the render level.** tldraw stays bundled behind the adapter (physically removed in `canvas-figjam`). | Yes (engine renders) |
 
 ## 5. Project plan
 
-Single-maintainer OSS — **relative sizing** (T-shirt + story points), not dates. Phases are sequential;
-**Phase 1 (store source-fidelity) is the correctness-critical path**; **Phase 7 is the largest by
-effort.**
+Single-maintainer OSS — **relative sizing** (T-shirt + story points), not dates. Phases are sequential
+and **each ≤ 10 SP**; **Phase 2 (store source-fidelity) is the correctness-critical path.**
 
 | Phase | Exit criteria (milestone) | Entry criteria | Effort | SP | Depends on |
 |-------|---------------------------|----------------|--------|----|------------|
-| 0 | Adapter in place; app imports only the adapter; tldraw still runs; e2e parity unchanged | canvas-editor stable | S | 3 | — |
-| 1 | Store + Editor pass `TC-EN-01..04` headless (incl. loop-guard) | P0 | L | 13 | 0 |
-| 2 | kymo shapes render via the engine behind `?engine=native`; visual parity | P1 | L | 13 | 1 |
-| 3 | Drag→`.kymo` + persistence on the engine; **public board renders, no key** | P2 | L | 13 | 2 |
-| 4 | `diagramToShapes` on custom `kymo-region`/`kymo-edge`; tldraw `geo`/`arrow` unused | P3 | M | 5 | 3 |
-| 5 | Undo + export; **`TEST-CANVAS-001` parity green; tldraw removed** | P3, P4 | L | 13 | 3, 4 |
-| 6 | Bundle measured & shrunk; 60 fps on AIQ sample | P5 | M | 5 | 5 |
-| 7 | Freeform draw/sticky/text authoring tools | P5 | XL | 21 | 5 |
+| 1 | Adapter in place; app imports only the adapter; tldraw still runs; e2e parity unchanged | canvas-editor stable | S | 3 | — |
+| 2 | Store passes `TC-EN-01..04` headless (incl. zero-echo loop-guard) | P1 | M | 8 | 1 |
+| 3 | Editor facade CRUD/`run`/`zoomToFit`/selection over the store | P2 | M | 5 | 2 |
+| 4 | ShapeUtil + `Rectangle2d` + `T` pass `TC-EN-05/06` | P3 | M | 5 | 3 |
+| 5 | kymo shapes render via the engine behind `?engine=native`; visual parity | P4 | M | 8 | 4 |
+| 6 | Drag/select/pan/zoom on the engine; drag→`.kymo` fires | P5 | M | 8 | 5 |
+| 7 | Persistence + **public board renders, no key** (`RK-02` closes) | P6 | M | 5 | 6 |
 
-**Sequencing:** `0 → 1 → 2 → 3 → (4 ∥ 5) → 6 → 7`. **Gate before the Phase-3 flip:** `TC-EN-02`
-(zero-echo) green — never ship a round-trip that can oscillate. **Gate before Phase-5
-tldraw-removal:** full `TEST-CANVAS-001` parity green on the engine.
+**Sequencing:** `1 → 2 → 3 → 4 → 5 → 6 → 7`. **Gate before the Phase-7 flip:** `TC-EN-02`
+(zero-echo) green — never ship a round-trip that can oscillate. Full `TEST-CANVAS-001` parity and
+the physical tldraw removal are the sibling feature's gates (`PLAN-FIGJAM-001`).
 
 ### 5.1 Complexity & sizing (story points)
 
 | Work item | Phase | SP | Complexity driver |
 |-----------|-------|----|-------------------|
-| Adapter seam + import re-point | 0 | 3 | mechanical, but touches every canvas file |
-| Reactive store (source/scope/history) + Editor facade | 1 | 13 | **the hard core** — loop-guard fidelity, transactions |
-| ShapeUtil + Rectangle2d + T + camera/render + React bindings | 2 | 13 | render loop, signals→React, geometry |
-| Tools (select/drag/pan/zoom) + IndexedDB persistence | 3 | 13 | pointer math, hit-test, snapshot reconcile |
-| Built-in shapes consolidation (`kymo-region`/`kymo-edge`) | 4 | 5 | re-point one module |
-| Undo/redo history + board SVG export | 5 | 13 | history correctness, export aggregation |
-| Bundle/perf pass | 6 | 5 | measurement + culling |
-| Freeform authoring tools (draw/sticky/text) | 7 | 21 | **the FigJam half** — breadth |
-| V&V build-out (`TC-EN` + parity harness) | all | 5 | test infrastructure |
-| **Total** | | **≈ 91** | **Complexity: High** |
+| Adapter seam + import re-point | 1 | 3 | mechanical, but touches every canvas file |
+| Reactive store (source/scope/history tagging) | 2 | 8 | **the hard core** — loop-guard fidelity, transactions |
+| Editor facade (CRUD + run + zoomToFit + selection) | 3 | 5 | thin imperative layer over the store |
+| ShapeUtil + `Rectangle2d` + `T` validators | 4 | 5 | geometry + prop schema |
+| Viewport: camera + DOM render loop + cull + React bindings | 5 | 8 | render loop, signals→React |
+| Interaction tools (select/drag/pan/zoom) + hit-test | 6 | 8 | pointer math, hit-test |
+| Persistence (IndexedDB) + key-free deploy flip | 7 | 5 | snapshot reconcile |
+| V&V build-out (`TC-EN` + parity harness) — *shared, programme-level* | all | (5) | test infrastructure |
+| **Total (this feature)** | | **≈ 42** | **Complexity: High** |
 
-- **Confidence:** range **70–120 SP**; widest variance is **Phase 1** (store fidelity, 13→21) and
-  **Phase 7** (freeform tools, 13→34 depending on ambition).
-- **Risk concentration:** Phases 1 + 2 + 3 ≈ **43 %** of points (parity MVP); Phase 7 alone ≈ 23 %.
+- **Confidence:** range **35–55 SP**; widest variance is **Phase 2** (store fidelity, 8→13).
+- **Per-feature cap:** ≈42 SP **≤ 50** ✓. **Per-phase cap:** every phase **≤ 10 SP** ✓ (largest 8).
+- **Risk concentration:** Phase 2 (store source-fidelity) gates everything downstream.
+- **Sibling:** the remaining ≈44 SP (parity completion + FigJam authoring) are in `PLAN-FIGJAM-001`.
 - **T-shirt ↔ SP key:** S ≈ 2–3 · M ≈ 5–8 · L ≈ 13 · XL ≈ 20+.
 
 ## 6. Risk register
@@ -177,42 +191,45 @@ Likelihood / impact qualitative (Low / Med / High).
 
 | ID | Risk | Likelihood | Impact | Mitigation | Status |
 |----|------|-----------|--------|------------|--------|
-| RK-EN-01 | Store `source` fidelity slips → a programmatic apply leaks as `source:"user"` → round-trip oscillates (`RK-05` regression) | Med | High | Single `source`-tagging choke-point in `run` (DESIGN §5.3); `TC-EN-02` gates the Phase-3 flip; keep `Board`'s `applyingRef` belt-and-braces until proven | Open |
-| RK-EN-02 | Undo must restore node `x/y` **and** round-trip text (Phase 4b / `TC-18`) | Med | Med | History stack restores records; `Board` writeback patches text on the restore (DESIGN §14); re-run `TC-18` | Open |
-| RK-EN-03 | Freeform authoring tools (draw/sticky/text) are far larger than parity — scope blowout if pulled forward | High | Med | **Sequenced last (Phase 7)**; parity MVP (read/move/persist) ships first so the key-free board lands regardless | Open |
-| RK-EN-04 | Reactivity too coarse (single epoch) → broad re-renders → misses 60 fps on larger boards | Med | Med | Start coarse (simplest correct); measure on AIQ sample (`NFR-EN-01`); refine to per-record atoms only if needed | Open |
-| RK-EN-05 | Engine bundle not as small as hoped (own render/signals/persist code) | Low | Low | Still far below tldraw's ~2 MB; measure each phase (`NFR-EN-02`); tree-shake; target ≤ ~50 KB gzip | Open |
-| RK-EN-06 | Rich-text **label editing** on `geo`/`arrow` (tldraw feature) expected by users | Low | Low | MVP renders labels read-only (text stays source-of-truth via `.kymo`); inline edit deferred to a backlog item | Open |
-| RK-EN-07 | `RK-07` embed-blank regression if culling unmounts the diagram `<img>` | Low | Med | Preserve the data-URL `<img>` cache (DESIGN §8.2); re-run `TC-19` | Open |
-| RK-02 *(parent)* | No-key tldraw blanks the public board | — | — | **Closed by this effort** at Phase 5 (tldraw removed → no key needed) | Closing |
+| RK-EN-01 | Store `source` fidelity slips → a programmatic apply leaks as `source:"user"` → round-trip oscillates (`RK-05` regression) | Med | High | Single `source`-tagging choke-point in `run` (DESIGN §5.3); `TC-EN-02` gates the Phase-7 flip; keep `Board`'s `applyingRef` belt-and-braces until proven | Open |
+| RK-EN-04 | Reactivity too coarse (single epoch) → broad re-renders → render jank | Med | Med | Start coarse (simplest correct) in Phase 5; the formal 60 fps measurement is the sibling's footprint pass (`PLAN-FIGJAM-001`) | Open |
+| RK-EN-07 | `RK-07` embed-blank regression if the render loop unmounts the diagram `<img>` | Low | Med | Preserve the data-URL `<img>` cache (DESIGN §8.2); re-run `TC-19` | Open |
+| RK-02 *(parent)* | No-key tldraw blanks the public board | — | — | **Closes at render level** at this feature's Phase 7 (engine renders the board, no key); **fully retired** when `canvas-figjam` physically removes tldraw | Closing |
+
+> Risks owned by the sibling feature (`PLAN-FIGJAM-001` §6): **RK-EN-02** (undo restores `x/y` +
+> round-trip text), **RK-EN-03** (freeform authoring scope blowout), **RK-EN-05** (engine bundle
+> size), **RK-EN-06** (rich-text label editing). They concern work that lands after this feature's
+> key-free board.
 
 ## 7. Files to create / modify
 
 - **New:** `packages/js-canvas/` (or `website/app/src/engine/`) per §3 — `store.ts`, `editor.ts`,
-  `shape.ts`, `view/`, `tools/`, `persist.ts`, `react/`, `shapes-builtin/`; plus
-  `website/app/src/engine/adapter.ts` (the seam).
+  `shape.ts`, `view/`, `tools/`, `persist.ts`, `react/`; plus `website/app/src/engine/adapter.ts`
+  (the seam).
 - **Modify (import path only, + drop `tlschema` augmentation):** `Board.tsx`, `KymoNodeShape.tsx`,
-  `KymoDiagramShape.tsx`, `Inspector.tsx`, `diagramToShapes.ts` (the last also re-pointed to custom
-  shapes in Phase 4).
-- **Modify (Phase 5):** `website/app/package.json` (remove `tldraw`, `@tldraw/assets`), `build.sh`
-  (drop asset copy), `Board.tsx` (remove `licenseKey`, `tldraw/tldraw.css`); regenerate & commit
-  `kymo.bundle.js`.
+  `KymoDiagramShape.tsx`, `Inspector.tsx`, `diagramToShapes.ts`.
 - **Unchanged:** `packages/js/*` (the model/parser/renderer — the engine does not touch it);
   `.github/workflows/deploy-website.yml` (still uploads `website/` as-is — committed bundle, no CI
   build).
+- **Owned by the sibling feature (`PLAN-FIGJAM-001`):** `engine/shapes-builtin/` (built-in
+  consolidation), the `diagramToShapes` re-point, undo/export, and the tldraw-removal edits
+  (`package.json`, `build.sh`, `Board.tsx` `licenseKey`/`tldraw.css`, bundle regen).
 
 ## 8. Verification
 
-Detailed cases + traceability in `TEST-ENGINE-001`. At the plan level:
+Detailed cases + traceability in `TEST-ENGINE-001`. At the plan level (this feature's gates):
 
-- **Phase 1:** `TC-EN-01..04` headless (`node --test`) — store CRUD, **zero-echo loop-guard**, history.
-- **Phase 2/3:** A/B render under `?engine=native`; drag a node → `.kymo` updates; reload persists;
-  freeform no-leak. E2E via chrome MCP (as in `PLAN-CANVAS-001` worklog).
-- **Phase 3 flip:** **public-domain render check** — board renders, no watermark, no "license
-  required" console error (`RK-02` closure, `NFR-EN-03`).
-- **Phase 5:** full `TEST-CANVAS-001` (`TC-01..19`) green on the engine; then remove tldraw.
-- **Regression throughout:** `cd packages/js && npm test` stays green; `grep -r '"tldraw"'
-  website/app/src` → 0 outside `engine/` (`NFR-EN-04`).
+- **Phase 2:** `TC-EN-01..04` headless (`node --test`) — store CRUD, **zero-echo loop-guard**,
+  history tagging.
+- **Phase 4:** `TC-EN-05/06` — ShapeUtil defaults/validators, `Rectangle2d` hit-test.
+- **Phase 5/6:** A/B render under `?engine=native`; drag a node → `.kymo` updates; freeform no-leak.
+  E2E via chrome MCP (as in `PLAN-CANVAS-001` worklog).
+- **Phase 7 flip:** reload persists; **public-domain render check** — board renders, no watermark,
+  no "license required" console error (`RK-02` render-level closure, `NFR-EN-03`).
+- **Regression throughout:** `cd packages/js && npm test` stays green; `Board`/shapes/`Inspector`/
+  `diagramToShapes` import only `engine/adapter` (`NFR-EN-04`).
+- **Out of scope here:** full `TEST-CANVAS-001` (`TC-01..19`) parity, undo (`TC-18`), export, and
+  the `grep -r '"tldraw"' → 0` removal check are the sibling's gates (`PLAN-FIGJAM-001` / `TEST-FIGJAM-001`).
 
 ---
 
@@ -220,20 +237,20 @@ Detailed cases + traceability in `TEST-ENGINE-001`. At the plan level:
 
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
-| 0.1     | 2026-05-23 | Vũ Anh | Initial plan: decision (adapter-first, minimal, render-first), phased plan (0→A→…→G), story-point sizing (≈ 91 SP), risk register (`RK-EN-01..07`, `RK-02` closing), files, verification gates. |
+| 0.1     | 2026-05-23 | Vũ Anh | Initial plan: decision (adapter-first, minimal, render-first), phased plan (0→7), story-point sizing (≈ 91 SP), risk register (`RK-EN-01..07`, `RK-02` closing), files, verification gates. |
+| 0.2     | 2026-05-24 | Vũ Anh | **Split at the KEY-FREE BOARD seam** to honour the ≤50-SP/feature and ≤10-SP/phase caps: this feature keeps the render/interaction core (≈42 SP); built-in consolidation, undo, export, tldraw removal, footprint and FigJam authoring spun out to `PLAN-FIGJAM-001`. Phases **renumbered 1-based** and decomposed so every phase ≤10 SP. Risks RK-EN-02/03/05/06 moved to the sibling; RK-02 now *closes at render level* here. |
 
 ## Annex B — Open questions / pending decisions
 
 1. **Engine home** — new workspace package `packages/js-canvas` (testable, reusable) vs. start inside
-   `website/app/src/engine/` and graduate later? (Lean: start in-app for the MVP, extract at Phase 6.)
-2. **Built-ins vs. custom** — ship tldraw-shaped `geo`/`arrow`, or re-point `diagramToShapes` to lean
-   `kymo-region`/`kymo-edge` (DESIGN §10)? (Lean: custom — smaller surface. Phase 4.)
-3. **Reactivity granularity** — single document epoch (simplest) vs. per-record atoms (faster)?
-   Decide by measuring `NFR-EN-01` (`RK-EN-04`).
-4. **Freeform tool ambition (Phase 7)** — minimal (pen + sticky + text) vs. richer (shapes, connectors,
-   frames)? Size after parity ships; this is where the FigJam/Miro comparison really bites.
-5. **A/B flag lifetime** — keep `?engine=native` as a permanent escape hatch, or delete at Phase 5
-   once tldraw is removed?
+   `website/app/src/engine/` and graduate later? (Lean: start in-app for the MVP, extract later.)
+2. **Reactivity granularity** — single document epoch (simplest) vs. per-record atoms (faster)?
+   Start coarse in Phase 5; the formal 60 fps decision is the sibling's footprint pass (`RK-EN-04`).
+3. **A/B flag lifetime** — keep `?engine=native` as a permanent escape hatch, or delete once
+   `canvas-figjam` removes tldraw? (Decided there.)
+
+> Decided/moved: *built-ins vs. custom* (re-point `diagramToShapes` to `kymo-region`/`kymo-edge`) and
+> *freeform tool ambition* are now the sibling feature's open questions (`PLAN-FIGJAM-001` Annex B).
 
 ## Annex C — Worklog
 
@@ -243,7 +260,7 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 | Date       | Phase / area | Work | Status | Ref |
 |------------|--------------|------|--------|-----|
 | 2026-05-23 | Docs | Authored the canvas-engine spec/plan doc set (`INTRO`/`FEATURE`/`DESIGN`/`TEST`/`PLAN`) — design-before-code for the tldraw replacement; surface census from `website/app/src`, adapter-seam strategy, phased plan, risk register. | ✅ | — |
+| 2026-05-24 | Docs | **Split the feature at the KEY-FREE BOARD seam** (≤50-SP/feature, ≤10-SP/phase caps): rescoped this doc-set to the render/interaction core (≈42 SP, Phases 1–7, 1-based); spun the parity-completion + FigJam-authoring half out to the new `*-FIGJAM-001` doc-set (≈44 SP). | ✅ | `PLAN-FIGJAM-001` |
 
-**Next:** decide Annex B §1–§2 (engine home; built-ins vs custom), then execute **Phase 0** (the
-adapter seam) — mechanical and zero-behaviour-change, establishing the swap point before any engine
-code is written.
+**Next:** decide Annex B §1 (engine home), then execute **Phase 1** (the adapter seam) — mechanical
+and zero-behaviour-change, establishing the swap point before any engine code is written.

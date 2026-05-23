@@ -1,7 +1,7 @@
 ---
 title: In-House Canvas Engine — Specification: Overview & Document Map
 document_id: INTRO-ENGINE-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -14,6 +14,7 @@ related_documents:
   - DESIGN-ENGINE-001
   - TEST-ENGINE-001
   - PLAN-ENGINE-001
+  - INTRO-FIGJAM-001
   - DESIGN-CANVAS-001
   - PLAN-CANVAS-001
 authors:
@@ -35,19 +36,22 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | INTRO-ENGINE-001                                                  |
-| Version           | 0.1                                                               |
+| Version           | 0.2                                                               |
 | Issue Date        | 2026-05-23                                                        |
 | Status            | Draft                                                             |
 | Classification    | Internal                                                          |
 | Owner             | `diagrams/` project                                              |
-| Related Documents | `FEAT-ENGINE-001`, `DESIGN-ENGINE-001`, `TEST-ENGINE-001`, `PLAN-ENGINE-001` |
+| Related Documents | `FEAT-ENGINE-001`, `DESIGN-ENGINE-001`, `TEST-ENGINE-001`, `PLAN-ENGINE-001`, `INTRO-FIGJAM-001` (sibling) |
 
-> Start here. This folder (`docs/specs/canvas-engine/`) specifies an **in-house canvas engine** that
-> replaces the **tldraw** dependency behind the already-delivered canvas-editor (`DESIGN-CANVAS-001`,
-> `PLAN-CANVAS-001`). The goal is **vendor independence**: no license key, no production watermark, no
-> CDN-hosted assets, and a far smaller committed bundle — while preserving the canvas-editor's
-> behaviour. The **implementation plan** that delivers it (phases, risks, worklog) lives in
-> `docs/plans/canvas-engine/` (`PLAN-ENGINE-001`).
+> Start here. This folder (`docs/specs/canvas-engine/`) specifies the **render/interaction core** of
+> an in-house canvas engine that replaces the **tldraw** dependency behind the already-delivered
+> canvas-editor (`DESIGN-CANVAS-001`, `PLAN-CANVAS-001`). The goal is **vendor independence**: no
+> license key, no production watermark, no CDN-hosted assets, and a far smaller committed bundle —
+> while preserving the canvas-editor's behaviour. This feature lands the **key-free rendering board**
+> (Phases 1–7); the parity completion (tldraw removal) and the **FigJam freeform-authoring** half are
+> the sibling feature **`INTRO-FIGJAM-001`** (`docs/specs/canvas-figjam/`). The implementation plan
+> that delivers this feature (phases, risks, worklog) lives in `docs/plans/canvas-engine/`
+> (`PLAN-ENGINE-001`).
 
 ---
 
@@ -103,9 +107,20 @@ substrate they sit on:
 
 - `DESIGN-CANVAS-001` **§10** (tldraw assets / license / watermark) and **§11** (tldraw
   `persistenceKey`) are **superseded** by this engine's own persistence and zero-asset model.
-- `RK-02` (no-key blank board) is **closed by removal** — the engine needs no key.
+- `RK-02` (no-key blank board) **closes at the render level** in this feature (Phase 7 — the engine
+  renders the board, needing no key); it is **fully retired** when the sibling feature physically
+  removes tldraw.
 
 The engine's job is to satisfy the canvas-editor's behaviour with an implementation we own.
+
+### 3.1 Sibling feature — `canvas-figjam` (`INTRO-FIGJAM-001`)
+
+The programme was split (v0.2) to honour the ≤50-SP/feature cap. **This feature** is the
+render/interaction core that lands the key-free board. The **sibling** (`docs/specs/canvas-figjam/`)
+*completes* the engine — built-in shape consolidation, undo/redo, board export, the **physical
+tldraw removal + full `TEST-CANVAS-001` parity**, footprint — and adds the **FigJam freeform
+authoring** tools. Its first phase's entry gate is **this feature's Phase 7 complete**. Requirements
+re-homed there (`FR-EN-06/10/11`, `NFR-EN-01/02`) become `FR-FJ-`/`NFR-FJ-` and are retired here.
 
 ## 4. Reading guide
 
@@ -118,8 +133,9 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 
 ## 5. Status & ownership
 
-- **Status:** Draft — design-before-code. No engine code exists yet; tldraw remains in place until
-  Phase 5 parity (`PLAN-ENGINE-001` §4).
+- **Status:** Draft — design-before-code. No engine code exists yet; tldraw remains bundled behind
+  the adapter **throughout this feature** (Phases 1–7), its physical removal being the sibling
+  feature (`PLAN-FIGJAM-001`).
 - **Owner:** `diagrams/` project (Vũ Anh).
 - **Traceability invariant:** every requirement in `FEAT-ENGINE-001` will have ≥ 1 covering test in
   `TEST-ENGINE-001` §5 before the engine is declared at parity.
@@ -131,3 +147,4 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial introduction + document map for the in-house canvas engine. |
+| 0.2     | 2026-05-24 | Vũ Anh | **Feature split** at the key-free-board seam: rescoped to the render/interaction core; added §3.1 sibling-feature relationship to `INTRO-FIGJAM-001`; `RK-02` now closes at render level here. |
