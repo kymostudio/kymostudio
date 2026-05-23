@@ -1,13 +1,13 @@
 ---
 title: BPMN in the kymo DSL — Design
 document_id: FEAT-BPMN-DSL-DSN-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-23
 status: Proposed
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing the kymo DSL parser, layout engine, and renderers
-review_cycle: On milestone completion, or on grammar change
+review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
   - FEAT-BPMN-DSL-001        # Introduction
@@ -37,7 +37,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-DSN-001                             |
-| Version      | 0.1                                                |
+| Version      | 0.2                                                |
 | Status       | Proposed                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
@@ -74,13 +74,19 @@ A left-to-right Sugiyama pipeline turns the positionless graph into geometry:
 1. **Rank / layer** — longest-path from sources (layer = column / x). Back-edges
    (DFS) are reversed for ranking and restored for routing (basic loop tolerance).
 2. **Dummy nodes** — edges spanning >1 layer are split into unit segments through
-   dummy nodes (routing channels + crossing accounting).
+   dummy nodes (routing channels + crossing accounting). *(The P0 spike's order
+   graph has no layer-skipping edge, so this step is unverified there; it is
+   required for graphs whose flows bypass a stage.)*
 3. **Ordering** — BFS initialisation, then median/barycenter sweeps (fixed
    iteration count) minimise crossings. A new layer-array variant; it reuses the
    *idea* of `layout.minimize_crossings`, not its tree-shaped implementation.
 4. **Coordinates** — x per layer cumulative (`maxWidth(layer)` + h-gap); y by
    stacked slots with v-gap, then median alignment (Brandes–Köpf-lite), keeping
-   single-in/single-out chains collinear so the main flow stays straight.
+   single-in/single-out chains collinear so the main flow stays straight. The P0
+   spike showed naïve symmetric per-layer centring *lifts* the trunk at an
+   asymmetric fork (e.g. an `xor` whose two successors straddle the parent); the
+   engine MUST instead pin the continuing single successor on the parent's `y`
+   and offset only true branches (priority/median), not centre every layer block.
 5. **Pin override (FR-9)** — a node carrying `@ (x,y)` has its centre replaced by
    the pinned value; un-pinned nodes are not re-ranked/re-ordered (v1).
 6. **Orthogonal routing** — collinear endpoints → straight segment; otherwise an
@@ -113,7 +119,9 @@ present.
 
 Every ordering and tie-break uses stable sorts; iteration counts are fixed;
 coordinates are integers. Re-running the layout on the same input yields
-byte-identical SVG, so golden tests stay stable (FEAT-BPMN-DSL-TST-001 TC-7).
+byte-identical SVG, so golden tests stay stable (FEAT-BPMN-DSL-TST-001 TC-7). The
+P0 spike pre-validated this: re-rendering the order graph produced byte-identical
+SVG across runs.
 
 ## Annex A — Revision History
 
@@ -122,6 +130,7 @@ byte-identical SVG, so golden tests stay stable (FEAT-BPMN-DSL-TST-001 TC-7).
 | Version | Date       | Author | Changes                                |
 |---------|------------|--------|----------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue (extracted from the plan). |
+| 0.2     | 2026-05-23 | Vũ Anh | Fold P0 spike findings: explicit primary-path/trunk pinning (§3.4), dummy-node caveat (§3.2), determinism pre-validated (§6). |
 
 ## Annex B — Document Control
 
