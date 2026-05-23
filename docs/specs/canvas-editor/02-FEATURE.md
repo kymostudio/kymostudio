@@ -1,9 +1,9 @@
 ---
 title: Interactive Canvas Editor — Features & Requirements
 document_id: FEAT-CANVAS-001
-version: "0.4"
+version: "1.0"
 issue_date: 2026-05-23
-status: Draft
+status: Baselined
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing & verifying the canvas editor (`website/app/`)
@@ -33,9 +33,9 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | FEAT-CANVAS-001                                                 |
-| Version           | 0.4                                                              |
+| Version           | 1.0                                                              |
 | Issue Date        | 2026-05-23                                                       |
-| Status            | Draft                                                           |
+| Status            | Baselined                                                       |
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers implementing & verifying the editor                   |
@@ -116,3 +116,4 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 | 0.2     | 2026-05-23 | Vũ Anh | Added NFR-CE-08 (full-viewport layout) after a Phase-0 regression. |
 | 0.3     | 2026-05-23 | Vũ Anh | Added FR-CE-11 (board persistence) for Phase 4. |
 | 0.4     | 2026-05-23 | Vũ Anh | Added FR-CE-12 (undo/redo across layers); Phase 4 closed (reduced scope). |
+| 1.0     | 2026-05-23 | Vũ Anh | **Baselined** & relocated to `docs/specs/canvas-editor/` (single-source spec; owns FR-CE/NFR-CE ids). |
