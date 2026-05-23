@@ -22,12 +22,14 @@
 import {
   makeComponent, makeEdge, makeRegion, makeDiagram,
   type Component, type Diagram, type Edge, type Region, type Point, type Shape, type Side,
+  type BpmnBlock, type BpmnNode, type BpmnFlow,
 } from "./model.js";
 import {
   layout, applyLayoutTree, minimizeCrossings, idNode, groupNode,
   type LayoutNode, type RegionLayout, type ExternalSpec,
 } from "./layout.js";
 import { resolveAlignments } from "./alignment.js";
+import { bpmnLayout } from "./bpmn-layout.js";
 
 // ── Top-level directives ───────────────────────────────────────────────
 const CANVAS_RE = /^canvas\s*:?\s+(\d+)\s*x\s*(\d+)\s*$/;
@@ -68,6 +70,23 @@ const VIA_PT_RE = /\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)/g;
 const ROW_RE = /^row(?:\s+(.+))?$/;
 const BARE_IDS_RE = /^[A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*\s*$/;
 
+// ── BPMN block (`bpmn { … }`) — mirrors the Python parser ───────────────
+const BPMN_OPEN_RE = /^bpmn\s*\{\s*$/;
+// <kind> <id> ["Label"] [type=<subtype>] [@ (x,y)]   (`end!` before `end`)
+const BPMN_NODE_RE =
+  /^(start|end!|end|task|xor|and|or|event|subprocess|note|data|store)\s+(\w+)(?:\s+"([^"]*)")?(?:\s+type=(\w+))?(?:\s+@\s*(\(\s*-?\d+\s*,\s*-?\d+\s*\)))?\s*$/;
+const BPMN_ARROW_SPLIT_RE = /\s*(->|\.\.>|~>)\s*/;
+const BPMN_LABEL_RE = /\s*:\s*"([^"]*)"\s*$/;
+// kind → [shape, default marker] (FR-3); arrow → flow kind (FR-6).
+const BPMN_KIND: Record<string, [Shape, string]> = {
+  "start": ["bpmn-start", ""], "end": ["bpmn-end", ""], "end!": ["bpmn-end", "terminate"],
+  "task": ["bpmn-task", ""], "xor": ["bpmn-gateway", "exclusive"],
+  "and": ["bpmn-gateway", "parallel"], "or": ["bpmn-gateway", "inclusive"],
+  "event": ["bpmn-intermediate", ""], "subprocess": ["bpmn-subprocess", ""],
+  "note": ["bpmn-annotation", ""], "data": ["bpmn-data-object", ""], "store": ["bpmn-data-store", ""],
+};
+const BPMN_ARROW: Record<string, string> = { "->": "sequence", "~>": "message", "..>": "association" };
+
 export interface ParseResult {
   diagram: Diagram;
   layout: RegionLayout | null;
@@ -89,8 +108,11 @@ export function parse(dsl: string): ParseResult {
  *  Returns a positioned {@link Diagram} ready for `renderSVG`. */
 export function parseDiagram(dsl: string): Diagram {
   const { diagram, layout: layoutSpec, external } = parse(dsl);
+  const hadBpmn = (diagram.bpmnBlocks?.length ?? 0) > 0;
+  if (hadBpmn) bpmnLayout(diagram);
   if (layoutSpec) layout(diagram, layoutSpec, external);
-  resolveAlignments(diagram);
+  // bpmn-block diagrams arrive fully positioned (like `.bpmn`) — skip alignment.
+  if (!hadBpmn) resolveAlignments(diagram);
   return diagram;
 }
 
@@ -105,6 +127,7 @@ class State {
   canvas: Point = [0, 0];      // (0, 0) → render-time auto-sizing
   title = "";
   subtitle = "";
+  bpmnBlocks: BpmnBlock[] = [];
 
   finalize(): ParseResult {
     const diagram = makeDiagram({
@@ -112,6 +135,7 @@ class State {
       title: this.title, subtitle: this.subtitle,
       components: this.components, regions: this.regions, edges: this.edges,
       layoutTrees: this.layoutTrees,
+      bpmnBlocks: this.bpmnBlocks,
     });
     if (this.layoutTrees.length) {
       const byId = new Map(this.components.map((c) => [c.id, c]));
@@ -166,6 +190,7 @@ function parseBlock(
         state.layoutTrees.push(parseLayoutTree(m[1], i + 1));
         i++; continue;
       }
+      if (BPMN_OPEN_RE.test(line)) { i = consumeBpmnBlock(state, lines, i); continue; }
     }
 
     if ((m = EDGE_RE.exec(line))) {
@@ -244,6 +269,77 @@ function consumeContainer(
     parent.contains.push(...region.contains);
   }
   return nextI;
+}
+
+// ── BPMN block parser (positionless AST; bpmn-layout.ts positions it) ────
+function consumeBpmnBlock(state: State, lines: string[], i: number): number {
+  const nodes: BpmnNode[] = [];
+  const flows: BpmnFlow[] = [];
+  let j = i + 1;
+  while (j < lines.length) {
+    const line = stripComment(lines[j]).trim();
+    if (!line) { j++; continue; }
+    if (CLOSE_RE.test(line)) {
+      state.bpmnBlocks.push({ nodes, flows });
+      return j + 1;
+    }
+    const m = BPMN_NODE_RE.exec(line);
+    if (m) {
+      nodes.push(makeBpmnNode(m, j + 1));
+    } else {
+      for (const stmt of splitBpmnStatements(line)) {
+        for (const fl of parseBpmnConnections(stmt, j + 1)) flows.push(fl);
+      }
+    }
+    j++;
+  }
+  throw new SyntaxError(`line ${i + 1}: unclosed \`bpmn {\` block (no matching \`}\`)`);
+}
+
+function makeBpmnNode(m: RegExpExecArray, lineNo: number): BpmnNode {
+  const [, kind, id, label, subtype, pinStr] = m;
+  const [shape, baseMarker] = BPMN_KIND[kind];
+  const marker = subtype ? subtype : baseMarker;   // FR-4: type= refines the marker
+  let pin: Point | null = null;
+  if (pinStr) {
+    const pm = POS_LITERAL_RE.exec(pinStr.trim());
+    if (!pm) throw new SyntaxError(`line ${lineNo}: bad bpmn pin ${JSON.stringify(pinStr)}`);
+    pin = [parseInt(pm[1]), parseInt(pm[2])];
+  }
+  return { id, kind, label: label ?? "", shape, marker, pin };
+}
+
+/** Split a connection line on `;` outside double quotes (FR-7). */
+function splitBpmnStatements(line: string): string[] {
+  const out: string[] = [];
+  let buf = "";
+  let inQ = false;
+  for (const ch of line) {
+    if (ch === '"') { inQ = !inQ; buf += ch; }
+    else if (ch === ";" && !inQ) { out.push(buf); buf = ""; }
+    else buf += ch;
+  }
+  out.push(buf);
+  return out.map((s) => s.trim()).filter((s) => s.length > 0);
+}
+
+/** Parse one connection statement (a chain) into BpmnFlows (FR-6/FR-7). */
+function parseBpmnConnections(stmt: string, lineNo: number): BpmnFlow[] {
+  let label = "";
+  const lm = BPMN_LABEL_RE.exec(stmt);
+  if (lm) { label = lm[1]; stmt = stmt.slice(0, lm.index); }
+  const parts = stmt.trim().split(BPMN_ARROW_SPLIT_RE);
+  const ids: string[] = [];
+  const arrows: string[] = [];
+  parts.forEach((p, k) => { if (k % 2 === 0) ids.push(p.trim()); else arrows.push(p); });
+  if (parts.length < 3 || parts.length % 2 === 0 || ids.some((x) => !x)) {
+    throw new SyntaxError(`line ${lineNo}: bad bpmn connection — ${JSON.stringify(stmt)}`);
+  }
+  const flows: BpmnFlow[] = arrows.map((arrow, k) => ({
+    src: ids[k], dst: ids[k + 1], flow: BPMN_ARROW[arrow], label: "",
+  }));
+  if (label) flows[flows.length - 1].label = label;
+  return flows;
 }
 
 // ── Per-kind builders ───────────────────────────────────────────────────

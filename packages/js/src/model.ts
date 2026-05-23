@@ -140,6 +140,30 @@ export interface Edge {
   bpmnFlow: string | null;
 }
 
+// ── BPMN block AST (`bpmn { … }`) ─────────────────────────────────────
+// Parsed positionless by dsl.ts; turned into positioned components/edges by
+// bpmn-layout.ts. Mirrors the Python BpmnNode/BpmnFlow/BpmnBlock dataclasses.
+export interface BpmnNode {
+  id: string;
+  kind: string;        // start|end|end!|task|xor|and|or|event|subprocess|note|data|store
+  label: string;
+  shape: Shape;        // resolved bpmn-* glyph
+  marker: string;      // resolved event/task/gateway marker key
+  pin: Point | null;   // `@ (x,y)` — honoured by the layout (FR-9)
+}
+
+export interface BpmnFlow {
+  src: string;
+  dst: string;
+  flow: string;        // sequence | message | association
+  label: string;
+}
+
+export interface BpmnBlock {
+  nodes: BpmnNode[];
+  flows: BpmnFlow[];
+}
+
 export interface Diagram {
   width: number;
   height: number;
@@ -149,6 +173,9 @@ export interface Diagram {
   regions: Region[];
   edges: Edge[];
   layoutTrees: unknown[];
+  /** Positionless `bpmn { … }` blocks (from dsl.ts). Laid out into
+   *  components/edges by bpmn-layout.ts; empty/absent once laid out. */
+  bpmnBlocks?: BpmnBlock[];
 }
 
 // ── Factories (mirror Python @dataclass with defaults) ────────────────
@@ -218,12 +245,13 @@ export function makeEdge({
 
 export function makeDiagram({
   width = 0, height = 0, title = "", subtitle = "",
-  components = [], regions = [], edges = [], layoutTrees = [],
+  components = [], regions = [], edges = [], layoutTrees = [], bpmnBlocks = [],
 }: {
   width?: number; height?: number; title?: string; subtitle?: string;
   components?: Component[]; regions?: Region[]; edges?: Edge[]; layoutTrees?: unknown[];
+  bpmnBlocks?: BpmnBlock[];
 } = {}): Diagram {
-  return { width, height, title, subtitle, components, regions, edges, layoutTrees };
+  return { width, height, title, subtitle, components, regions, edges, layoutTrees, bpmnBlocks };
 }
 
 // ── Lookups & geometry helpers ────────────────────────────────────────

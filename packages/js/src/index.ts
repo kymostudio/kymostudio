@@ -23,4 +23,5 @@ export {
   type LayoutNode, type RegionLayout, type ExternalSpec, type LayoutOptions, type Cell,
 } from "./layout.js";
 export { resolveAlignments } from "./alignment.js";
+export { bpmnLayout } from "./bpmn-layout.js";
 export { parseBpmn } from "./from-bpmn.js";
