@@ -285,7 +285,7 @@ not yet merged.
 | Date       | Phase / area | Work | Status | Ref |
 |------------|--------------|------|--------|-----|
 | 2026-05-23 | Docs (Phases 0–3) | Authored the ISO-12207 feature doc set — `INTRO` / `FEATURE` / `DESIGN` / `TEST` / `PLAN` (`docs/features/canvas-editor/`). | ✅ | PR #31 |
-| 2026-05-23 | Phase 0 | React + TypeScript re-platform of the playground (`website/app/src/*`, esbuild → committed `kymo.bundle.js`); 1:1 parity with the FigJam UI verified in-browser via chrome-anhv (render, Light/Dark/None, debounced edits, error path, `?script=`, Tab, samples). `npm run typecheck` clean. | ✅ pending ship | uncommitted |
-| 2026-05-23 | Phase 0 | Fixed full-viewport layout regression — `#root` flex-column (`NFR-CE-08`, `TC-16`); verified desktop (1680×929, gap 0) + narrow (600×800 stacks). | ✅ pending ship | uncommitted |
+| 2026-05-23 | Phase 0 | React + TypeScript re-platform of the playground (`website/app/src/*`, esbuild → committed `kymo.bundle.js`); 1:1 parity with the FigJam UI verified in-browser via chrome-anhv (render, Light/Dark/None, debounced edits, error path, `?script=`, Tab, samples). `npm run typecheck` clean. | ✅ | PR #33 |
+| 2026-05-23 | Phase 0 | Fixed full-viewport layout regression — `#root` flex-column (`NFR-CE-08`, `TC-16`); verified desktop (1680×929, gap 0) + narrow (600×800 stacks). | ✅ | PR #33 |
 
-**Next:** ship Phase 0 (PR) → resolve RK-02 (tldraw license) → begin Phase 1 (tldraw board, diagram embedded).
+**Next:** resolve RK-02 (tldraw license) → begin Phase 1 (tldraw board, diagram embedded).
