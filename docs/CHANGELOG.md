@@ -9,6 +9,8 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-24
+
 ### Added
 
 - **BPMN 2.0 export** — turn any kymo diagram of BPMN glyphs (imported from a
