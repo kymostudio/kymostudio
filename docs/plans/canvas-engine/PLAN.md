@@ -138,7 +138,7 @@ footprint, FigJam authoring) is the sibling `PLAN-FIGJAM-001`.
 
 | Phase | Goal | tldraw present? |
 |-------|------|------------------|
-| **1 — Adapter seam** | Introduce `engine/adapter.ts` re-exporting the exact tldraw symbols in `DESIGN-ENGINE-001` §3 under engine names. Re-point `Board`/shapes/`Inspector`/`diagramToShapes` imports to it; drop the `@tldraw/tlschema` augmentation. **Zero behaviour change.** Establishes the swap point. | Yes (behind adapter) |
+| **1 — Adapter seam** | Introduce `engine/adapter.ts` re-exporting the exact tldraw symbols in `DESIGN-ENGINE-001` §3 under engine names (+ the `tldraw/tldraw.css` side-effect). Re-point `Board`/shapes/`Inspector`/`diagramToShapes` imports to it. The `@tldraw/tlschema` augmentation **stays** until the engine owns its shape union (DESIGN §9.3) — dropping it while tldraw is the runtime breaks the `TLShape` union. **Zero behaviour change.** Establishes the swap point. | Yes (behind adapter) |
 | **2 — Reactive store** | `store.ts`: records, `run`/transactions, **`source`/`scope`** semantics + `history:"ignore"` tagging (DESIGN §5). The `source:"user"` choke-point — loop-guard fidelity. Unit-tested headless (`TC-EN-01..04`). | Yes |
 | **3 — Editor facade** | `editor.ts`: CRUD + `run` + `zoomToFit` + selection over the store (DESIGN §6). | Yes |
 | **4 — ShapeUtil + geometry** | `shape.ts` — ShapeUtil base, `Rectangle2d`, `T` validators, `BaseShape` (DESIGN §7,§9). `TC-EN-05/06`. | Yes |
@@ -261,6 +261,7 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 |------------|--------------|------|--------|-----|
 | 2026-05-23 | Docs | Authored the canvas-engine spec/plan doc set (`INTRO`/`FEATURE`/`DESIGN`/`TEST`/`PLAN`) — design-before-code for the tldraw replacement; surface census from `website/app/src`, adapter-seam strategy, phased plan, risk register. | ✅ | — |
 | 2026-05-24 | Docs | **Split the feature at the KEY-FREE BOARD seam** (≤50-SP/feature, ≤10-SP/phase caps): rescoped this doc-set to the render/interaction core (≈42 SP, Phases 1–7, 1-based); spun the parity-completion + FigJam-authoring half out to the new `*-FIGJAM-001` doc-set (≈44 SP). | ✅ | `PLAN-FIGJAM-001` |
+| 2026-05-24 | Phase 1 | **Adapter seam shipped.** New `website/app/src/engine/adapter.ts` re-exports the tldraw surface (+ `tldraw.css`); `Board`/`Inspector`/`KymoNodeShape`/`KymoDiagramShape`/`diagramToShapes` re-pointed to `./engine/adapter`. `@tldraw/tlschema` augmentation kept (deferred per DESIGN §9.3). Verified: `tsc --noEmit` clean; `grep '"tldraw"'` only in `adapter.ts` (`NFR-EN-04`); bundle rebuilt (CSS byte-identical); E2E smoke — board renders 43 shapes, 0 console errors; `packages/js` 59/59 green. | ✅ | — |
 
-**Next:** decide Annex B §1 (engine home), then execute **Phase 1** (the adapter seam) — mechanical
-and zero-behaviour-change, establishing the swap point before any engine code is written.
+**Next:** **Phase 2** — the reactive store (`store.ts`): records, `run`/transactions, `source`/`scope`
+semantics + `history:"ignore"` tagging, headless unit tests `TC-EN-01..04` (the loop-guard core).
