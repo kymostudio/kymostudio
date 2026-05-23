@@ -87,6 +87,15 @@ export function App() {
     }, 220);
   }
 
+  // Phase 3: canvas → text. The board hands back surgically-patched `.kymo`;
+  // treat it like a programmatic edit — re-parse + re-sync. The board's
+  // genuine-delta filter prevents the resulting text→canvas write from echoing.
+  function onPatch(text: string): void {
+    setSource(text);
+    void render(text, themeRef.current, transparentRef.current);
+    void syncURL(text);
+  }
+
   // ── Boot: shared link wins, else default sample (runs once on mount). ──
   useEffect(() => {
     (async () => {
@@ -212,7 +221,7 @@ export function App() {
         </section>
 
         <section className="pane view">
-          <Board diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} />
+          <Board diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
           <div id="error" hidden={error == null}>
             {error}
           </div>

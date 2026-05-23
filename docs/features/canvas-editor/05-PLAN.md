@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Plan
 document_id: PLAN-CANVAS-001
-version: "0.5"
+version: "0.6"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.5                                                              |
+| Version           | 0.6                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -215,12 +215,12 @@ Likelihood / impact are qualitative (Low / Med / High).
 
 | ID | Risk | Likelihood | Impact | Mitigation | Owner | Status |
 |----|------|-----------|--------|------------|-------|--------|
-| RK-01 | Tier-1 serializer is lossy (drops comments / layout frames / parent-relative placement) → degrades `.kymo` authoring | High | High | Ship Tier-2 surgical patch (`DESIGN-CANVAS-001` §8.2); isolate serializer output behind one module | Vũ Anh | Open |
+| RK-01 | Tier-1 serializer is lossy (drops comments / layout frames / parent-relative placement) → degrades `.kymo` authoring | High | High | Phase 3 went **straight to surgical** (Tier-2, app-side `patchDsl`); Tier-1 regenerate never used — comments/structure preserved | Vũ Anh | Mitigated |
 | RK-02 | tldraw watermark / license terms unacceptable for the OSS site | Med | Med | Dev-mode for Phases 1–3 (watermark + console warning); decide Hobby (free, keeps watermark) vs Business (paid, removes it) **before the public deploy** | Vũ Anh | Open — deferred |
 | RK-03 | Committed bundle grows too large → repo bloat / slower first load | Med | Med | **Phase 1 measured: 2.0 MB raw / ≈586 KB gzip** (Pages gzips) — within the 3 MB budget. Lazy-load tldraw only if it grows | Vũ Anh | Mitigated — within budget |
 | RK-04 | DSL v3 (CSS-cascade) lands mid-build → serializer must re-target grammar | Med | High | Isolate grammar-output module; coordinate with `DSL-LANG-001` owner | Vũ Anh | Open |
 | RK-05 | Sync feedback loop (A→B→A oscillation) corrupts text or canvas | Med | High | `epoch` token + `applying` flag + tldraw `source:'user'` filter (`DESIGN-CANVAS-001` §7) | Vũ Anh | Mitigated by design |
-| RK-06 | Dragging a node replaces declarative placement (`@ parent side gap`) with `@ (x,y)` | Med | Low | Tier-2 keeps parent-ref for unmoved nodes; optional "re-flow" (Annex B) | Vũ Anh | Open |
+| RK-06 | Dragging a node replaces declarative placement (`@ parent side gap` / layout / grid) with `@ (x,y)` | Med | Low | **Accepted by design** (Phase 3, user-chosen full-surgical): dragged node → absolute; layout/grid members lifted out → siblings re-flow | Vũ Anh | Accepted |
 | RK-07 | Embedded diagram (inline SVG in an `HTMLContainer` custom shape) can blank transiently during heavy tldraw interaction (culling / perf) | Med | Low | Render the diagram as a tldraw image/asset (SVG data-URL) or add `toSvg`; per-node shapes (Phase 2) supersede the single-embed approach | Vũ Anh | Open — under assessment |
 
 ---
@@ -267,6 +267,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.3     | 2026-05-23 | Vũ Anh | Added §5.1 Complexity & sizing (story points); SP column in §5 (≈ 68 SP total, High). |
 | 0.4     | 2026-05-23 | Vũ Anh | Added Annex C — Worklog (ISO/IEC/IEEE 12207 §6.3.2 progress tracking). |
 | 0.5     | 2026-05-23 | Vũ Anh | Phase-1 sync: §5 P1 exit (drop "persists", RK-02 deferred); RK-02/RK-03 updated, added RK-07; §8 serve via Node; Worklog P1 row. |
+| 0.6     | 2026-05-23 | Vũ Anh | Phase-3 sync: RK-01 → Mitigated (straight to surgical), RK-06 → Accepted; Worklog Phase-3 row; Next → Phase 4. |
 
 ## Annex B — Open questions / pending decisions
 
@@ -291,5 +292,6 @@ not yet merged.
 | 2026-05-23 | Phase 0 | Fixed full-viewport layout regression — `#root` flex-column (`NFR-CE-08`, `TC-16`); verified desktop (1680×929, gap 0) + narrow (600×800 stacks). | ✅ | PR #33 |
 | 2026-05-23 | Phase 1 | tldraw board replaces the preview; kymo SVG embedded as a custom `kymo-diagram` shape (one-way, text-driven, registered via `TLGlobalShapePropsMap`); pan/zoom + note/draw + live text→diagram update verified via chrome-anhv; no leak into `.kymo`. Bundle 2.0 MB raw / ≈586 KB gzip (< 3 MB). dev-mode watermark (RK-02). Logged RK-07 (embed render-robustness). | ✅ | PR #36 |
 | 2026-05-23 | Phase 2 | Per-element shapes: Component→`kymo-node` (getIcon glyph + label), Region→`geo`, Edge→`arrow`; diff-sync (create/update/delete `meta.kymo`, `history:'ignore'`); `Inspector` reads the model; BPMN→embed fallback. Verified (chrome-anhv): AIQ 19 nodes / 4 regions / 20 arrows, selection→inspector, text-edit diff-update, no `.kymo` leak. Bundle ≈588 KB gzip. **`FR-CE-03`** (two-layer `meta.kymo`) satisfied. Scope cuts: edge via-routing/labels + BPMN per-element → later. | ✅ | PR #37 |
+| 2026-05-23 | Phase 3 | Round-trip canvas→text (surgical, app-side `patchDsl`, no `packages/js` change): drag a node → `.kymo` updated — rewrite `@ (x,y)` / `@ parent`→absolute / append / **lift out of layout frame + grid `row`**; comments + untouched lines byte-preserved (8/8 unit tests). Two-way sync + **genuine-delta loop-guard** (no A→B→A). Verified (chrome-anhv): dragged a `routing_chain` member → leaf `@ (732, 326)` + removed from body, siblings re-flow, no oscillation, no console errors. **`FR-CE-02`** + **`FR-CE-06`** satisfied. | ✅ | PR #TBD |
 
-**Next:** Phase 3 (round-trip: `shapesToDsl` Tier-1 → Tier-2 + two-way sync with loop-guard, gated on the `dsl.ts` source-span change). Resolve RK-02 before the public deploy.
+**Next:** Phase 4 (polish: freeform persistence `persistenceKey`/`.tldr`, undo across layers, animated-WebP export, icon palette). Resolve RK-02 before the public deploy.
