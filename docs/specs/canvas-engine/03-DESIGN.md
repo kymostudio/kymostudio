@@ -86,9 +86,9 @@ drop-in for each; the right column is the module that owns the replacement (§4)
 
 Two consequences:
 1. The **built-in `geo` rectangle and `arrow`** are part of the surface (Regions and Edges use them in
-   `diagramToShapes.ts:29,60`). The engine ships these two, **or** Phase D re-points `diagramToShapes`
+   `diagramToShapes.ts:29,60`). The engine ships these two, **or** Phase 4 re-points `diagramToShapes`
    to custom `kymo-region` / `kymo-edge` shapes. Re-pointing is cleaner long-term (fewer built-ins to
-   own) — decided in `PLAN-ENGINE-001` §4 (Phase D).
+   own) — decided in `PLAN-ENGINE-001` §4 (Phase 4).
 2. The **`@tldraw/tlschema` module augmentation** (`declare module ... TLGlobalShapePropsMap`) in the
    two custom shapes is tldraw-specific and is **dropped** — the engine derives its shape union from
    the registered `shapeUtils` array instead (§9.3).
@@ -309,7 +309,7 @@ A positioned `<div>` that sizes to the shape and forwards `style`/children (matc
   arrowheadEnd, richText }`. An `ArrowShapeUtil` drawing a line/curve with an arrowhead and optional
   label.
 
-**Decision (see `PLAN-ENGINE-001` §4, Phase D):** rather than re-implement tldraw's full `geo`/`arrow`
+**Decision (see `PLAN-ENGINE-001` §4, Phase 4):** rather than re-implement tldraw's full `geo`/`arrow`
 prop surface, **re-point `diagramToShapes` to two tiny custom shapes** `kymo-region` / `kymo-edge`
 carrying only the props kymo sets. This shrinks the surface and removes dead tldraw prop fields
 (`bend`, `verticalAlign`, …). The `patchDsl` round-trip is unaffected (it reads `meta.kymo`, not the
@@ -342,16 +342,16 @@ This is what makes the rewrite incremental and reversible (the whole strategy in
 
 ```ts
 // engine/adapter.ts  — the ONLY module the app imports for canvas primitives
-export * from "./impl";   // ./impl re-exports tldraw today; the engine after Phase E
+export * from "./impl";   // ./impl re-exports tldraw today; the engine after Phase 5
 ```
 
 - **Phase 0:** `./impl` simply re-exports the tldraw symbols the app uses, under the engine's own
   names. `Board.tsx` & friends change their imports from `"tldraw"` → `"./engine/adapter"` (and the
   two shapes drop the `@tldraw/tlschema` augmentation). **Zero behaviour change** — tldraw still runs.
-- **Phases A–E:** implement `engine/store`, `editor`, `view`, `shape`, `react`, `tools`, `persist`.
+- **Phases 1–5:** implement `engine/store`, `editor`, `view`, `shape`, `react`, `tools`, `persist`.
   Point `./impl` at the engine **piece by piece** (e.g. store first, render last) — or run a
   feature-flag (`?engine=native`) to A/B the two implementations on the same `Board`.
-- **Phase F:** flip `./impl` fully to the engine, delete tldraw from `package.json`, drop
+- **Phase 6:** flip `./impl` fully to the engine, delete tldraw from `package.json`, drop
   `@tldraw/assets` and `tldraw/tldraw.css`, remove `licenseKey` (`Board.tsx:30,144`). `RK-02` closes.
 
 Because the app depends only on the adapter, tldraw can be reinstated instantly by reverting one

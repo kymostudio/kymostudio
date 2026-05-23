@@ -119,7 +119,7 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 ## 5. Status & ownership
 
 - **Status:** Draft — design-before-code. No engine code exists yet; tldraw remains in place until
-  Phase E parity (`PLAN-ENGINE-001` §4).
+  Phase 5 parity (`PLAN-ENGINE-001` §4).
 - **Owner:** `diagrams/` project (Vũ Anh).
 - **Traceability invariant:** every requirement in `FEAT-ENGINE-001` will have ≥ 1 covering test in
   `TEST-ENGINE-001` §5 before the engine is declared at parity.
