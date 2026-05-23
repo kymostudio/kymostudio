@@ -1,0 +1,143 @@
+---
+title: BPMN in the kymo DSL — Design
+document_id: FEAT-BPMN-DSL-DSN-001
+version: "0.1"
+issue_date: 2026-05-23
+status: Proposed
+classification: Internal
+owner: diagrams/ project
+audience: Engineers implementing the kymo DSL parser, layout engine, and renderers
+review_cycle: On milestone completion, or on grammar change
+supersedes: null
+related_documents:
+  - FEAT-BPMN-DSL-001        # Introduction
+  - FEAT-BPMN-DSL-REQ-001    # Requirements (traced below)
+  - FEAT-BPMN-DSL-TST-001    # Test documentation
+  - FEAT-BPMN-DSL-PLAN-001   # Plan
+  - DSL-LANG-001             # kymo DSL language specification (normative)
+  - BPD-DGM-001              # BPMN importer element mapping
+  - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
+authors:
+  - Vũ Anh
+language: en
+keywords:
+  - bpmn
+  - dsl
+  - design
+  - architecture
+  - sugiyama
+iso_compliance:
+  - ISO/IEC/IEEE 12207:2017
+  - ISO/IEC/IEEE 15289:2019
+  - ISO 8601:2019
+---
+
+# BPMN in the kymo DSL — Design
+
+| Field        | Value                                              |
+|--------------|----------------------------------------------------|
+| Document ID  | FEAT-BPMN-DSL-DSN-001                             |
+| Version      | 0.1                                                |
+| Status       | Proposed                                           |
+| Issue Date   | 2026-05-23                                         |
+| Owner        | `diagrams/` project                                |
+| Related      | FEAT-BPMN-DSL-001, FEAT-BPMN-DSL-REQ-001, FEAT-BPMN-DSL-TST-001, FEAT-BPMN-DSL-PLAN-001 |
+
+Realises the requirements in FEAT-BPMN-DSL-REQ-001 (FR/NFR IDs cited per clause).
+Covers ISO/IEC/IEEE 12207 Architecture & Design Definition.
+
+## 1. Scope
+
+The architecture and algorithm behind the `bpmn { }` block: how source text
+becomes a resolved sub-diagram the existing renderer can draw. The normative
+grammar is in DSL-LANG-001; behaviour requirements in FEAT-BPMN-DSL-REQ-001.
+
+## 2. Grammar → AST → model (FR-1…FR-7)
+
+`dsl.py` `parseBlock` detects a file-scope `bpmn {` opener and parses the body
+into a `BpmnBlock` AST (node declarations + connections):
+
+- **Nodes** → `bpmn-*` `Component`s. The kind keyword (+ optional `type=`)
+  selects `(shape, marker)` per FR-3/FR-4, reusing the `bpmn_shapes` marker keys
+  (BPD-DGM-001). Box size is set on `Component.size` from `model.SHAPE_HALF`
+  (FR-5).
+- **Connections** → `Edge`s. The arrow selects `bpmn_flow` (`->` sequence,
+  `~>` message, `..>` association); chains and `;` expand to one `Edge` per
+  segment (FR-6/FR-7).
+
+No positions are computed here — the AST is positionless.
+
+## 3. Layout engine — `bpmn_layout.py` (FR-8)
+
+A left-to-right Sugiyama pipeline turns the positionless graph into geometry:
+
+1. **Rank / layer** — longest-path from sources (layer = column / x). Back-edges
+   (DFS) are reversed for ranking and restored for routing (basic loop tolerance).
+2. **Dummy nodes** — edges spanning >1 layer are split into unit segments through
+   dummy nodes (routing channels + crossing accounting).
+3. **Ordering** — BFS initialisation, then median/barycenter sweeps (fixed
+   iteration count) minimise crossings. A new layer-array variant; it reuses the
+   *idea* of `layout.minimize_crossings`, not its tree-shaped implementation.
+4. **Coordinates** — x per layer cumulative (`maxWidth(layer)` + h-gap); y by
+   stacked slots with v-gap, then median alignment (Brandes–Köpf-lite), keeping
+   single-in/single-out chains collinear so the main flow stays straight.
+5. **Pin override (FR-9)** — a node carrying `@ (x,y)` has its centre replaced by
+   the pinned value; un-pinned nodes are not re-ranked/re-ordered (v1).
+6. **Orthogonal routing** — collinear endpoints → straight segment; otherwise an
+   elbow through the inter-layer gap (dummy-node x as the bend channel). Edges
+   incident to a pinned node route to the pinned centre. Emits `Edge.points`
+   (sharp polyline), `bpmn_flow`, and a `label_pos` heuristic.
+
+## 4. Integration and data flow
+
+- `_State.finalize` runs `bpmn_layout.build_and_layout(block)` and extends the
+  diagram with the positioned components/edges — mirroring how `layout_trees`
+  are applied. Canvas dimensions are set from the laid-out extent, as
+  `from_bpmn` does.
+- `cli.py` uses the normal pipeline. `resolve_alignments` must leave the
+  absolutely-positioned components and `points`-bearing edges untouched (no
+  `parent`/`align`, `points` set); gate it for bpmn-block diagrams if needed, as
+  `.bpmn` is already special-cased.
+- **JS parity (FR-11)**: `dsl.ts` gains the block branch; a new `bpmn-layout.ts`
+  ports the algorithm. The JS renderer already routes `e.points` → `renderBpmnEdge`.
+
+## 5. Renderer reuse (FR-10)
+
+Because the block emits a fully-resolved sub-diagram (absolute `pos`/`size` +
+edge `points`/`bpmn_flow`), the existing back-end draws it with **no change**:
+`bpmn-*` glyphs via `bpmn_shapes`, flows via `render_bpmn_edge` / `renderBpmnEdge`
+(dispatched on `e.points`), and BPMN defs/CSS injected only when bpmn shapes are
+present.
+
+## 6. Determinism (NFR-1)
+
+Every ordering and tie-break uses stable sorts; iteration counts are fixed;
+coordinates are integers. Re-running the layout on the same input yields
+byte-identical SVG, so golden tests stay stable (FEAT-BPMN-DSL-TST-001 TC-7).
+
+## Annex A — Revision History
+
+**Table A.1 — Document revisions**
+
+| Version | Date       | Author | Changes                                |
+|---------|------------|--------|----------------------------------------|
+| 0.1     | 2026-05-23 | Vũ Anh | Initial issue (extracted from the plan). |
+
+## Annex B — Document Control
+
+### B.1 Storage and Retrieval
+Version-controlled at `docs/features/bpmn-dsl/03-DESIGN.md`; authoritative source
+is the main-branch working tree (history via `git log`).
+
+### B.2 Distribution
+Implicit — checked in with the feature; available to all repository readers.
+
+### B.3 Change Control
+On a design change: update the affected clause; keep the requirement IDs it
+traces (FR-8…FR-10, NFR-1) consistent with FEAT-BPMN-DSL-REQ-001; increment
+`version`; append a row to Annex A; reflect any grammar change in DSL-LANG-001.
+
+### B.4 Backwards Compatibility
+This describes the intended implementation; the normative surface is
+FEAT-BPMN-DSL-REQ-001 and DSL-LANG-001. Reconcile any deviation there before
+release.

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_order_fulfillment">
+  <bpmn:process id="OrderFulfillment" isExecutable="false">
+    <bpmn:startEvent id="Start" name="Order received"/>
+    <bpmn:task id="Validate" name="Validate order"/>
+    <bpmn:exclusiveGateway id="InStock" name="In stock?" default="F_no"/>
+    <bpmn:task id="Notify" name="Notify customer"/>
+    <bpmn:endEvent id="Cancelled" name="Order cancelled">
+      <bpmn:terminateEventDefinition/>
+    </bpmn:endEvent>
+    <bpmn:task id="Payment" name="Process payment"/>
+    <bpmn:parallelGateway id="Split" name="Split"/>
+    <bpmn:task id="Pack" name="Pack items"/>
+    <bpmn:task id="Invoice" name="Generate invoice"/>
+    <bpmn:parallelGateway id="Sync" name="Sync"/>
+    <bpmn:task id="Ship" name="Ship order"/>
+    <bpmn:endEvent id="Delivered" name="Order delivered"/>
+
+    <bpmn:sequenceFlow id="F0"     sourceRef="Start"    targetRef="Validate"/>
+    <bpmn:sequenceFlow id="F1"     sourceRef="Validate" targetRef="InStock"/>
+    <bpmn:sequenceFlow id="F_yes"  name="Yes" sourceRef="InStock" targetRef="Payment">
+      <bpmn:conditionExpression>${inStock}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_no"   name="No"  sourceRef="InStock" targetRef="Notify"/>
+    <bpmn:sequenceFlow id="F_can"  sourceRef="Notify"  targetRef="Cancelled"/>
+    <bpmn:sequenceFlow id="F_pay"  sourceRef="Payment" targetRef="Split"/>
+    <bpmn:sequenceFlow id="F_pack" sourceRef="Split"   targetRef="Pack"/>
+    <bpmn:sequenceFlow id="F_inv"  sourceRef="Split"   targetRef="Invoice"/>
+    <bpmn:sequenceFlow id="F_pack2" sourceRef="Pack"    targetRef="Sync"/>
+    <bpmn:sequenceFlow id="F_inv2"  sourceRef="Invoice" targetRef="Sync"/>
+    <bpmn:sequenceFlow id="F_sync" sourceRef="Sync"    targetRef="Ship"/>
+    <bpmn:sequenceFlow id="F_ship" sourceRef="Ship"    targetRef="Delivered"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane bpmnElement="OrderFulfillment">
+      <bpmndi:BPMNShape bpmnElement="Start"><dc:Bounds x="92" y="312" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Validate"><dc:Bounds x="190" y="290" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="InStock" isMarkerVisible="true"><dc:Bounds x="375" y="305" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Notify"><dc:Bounds x="510" y="50" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Cancelled"><dc:Bounds x="702" y="72" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Payment"><dc:Bounds x="490" y="290" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Split"><dc:Bounds x="675" y="305" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Pack"><dc:Bounds x="810" y="120" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Invoice"><dc:Bounds x="810" y="460" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Sync"><dc:Bounds x="995" y="305" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Ship"><dc:Bounds x="1110" y="290" width="100" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Delivered"><dc:Bounds x="1282" y="312" width="36" height="36"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge bpmnElement="F0"><di:waypoint x="128" y="330"/><di:waypoint x="190" y="330"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F1"><di:waypoint x="290" y="330"/><di:waypoint x="375" y="330"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_yes"><di:waypoint x="425" y="330"/><di:waypoint x="490" y="330"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="448" y="311" width="22" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_no"><di:waypoint x="400" y="305"/><di:waypoint x="400" y="90"/><di:waypoint x="510" y="90"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="404" y="193" width="16" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_can"><di:waypoint x="610" y="90"/><di:waypoint x="702" y="90"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_pay"><di:waypoint x="590" y="330"/><di:waypoint x="675" y="330"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_pack"><di:waypoint x="700" y="305"/><di:waypoint x="700" y="160"/><di:waypoint x="810" y="160"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_inv"><di:waypoint x="700" y="355"/><di:waypoint x="700" y="500"/><di:waypoint x="810" y="500"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_pack2"><di:waypoint x="910" y="160"/><di:waypoint x="1020" y="160"/><di:waypoint x="1020" y="305"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_inv2"><di:waypoint x="910" y="500"/><di:waypoint x="1020" y="500"/><di:waypoint x="1020" y="355"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_sync"><di:waypoint x="1045" y="330"/><di:waypoint x="1110" y="330"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="F_ship"><di:waypoint x="1210" y="330"/><di:waypoint x="1282" y="330"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
