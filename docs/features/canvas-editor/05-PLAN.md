@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Plan
 document_id: PLAN-CANVAS-001
-version: "0.10"
+version: "0.11"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.10                                                             |
+| Version           | 0.11                                                             |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -216,7 +216,7 @@ Likelihood / impact are qualitative (Low / Med / High).
 | ID | Risk | Likelihood | Impact | Mitigation | Owner | Status |
 |----|------|-----------|--------|------------|-------|--------|
 | RK-01 | Tier-1 serializer is lossy (drops comments / layout frames / parent-relative placement) → degrades `.kymo` authoring | High | High | Phase 3 went **straight to surgical** (Tier-2, app-side `patchDsl`); Tier-1 regenerate never used — comments/structure preserved | Vũ Anh | Mitigated |
-| RK-02 | tldraw **requires a license key in production** — with no key the board is **BLANK on a non-localhost domain** (renders only on localhost) | High | High | **Confirmed on the live deploy** (kymostudio.github.io: empty canvas, no `.tl-canvas`, console *"license required for production"*). A key is **required**: free Hobby/trial keeps the "Made with tldraw" watermark; Business removes it. Obtain one before the site is usable. | Vũ Anh | Open — blocks deploy |
+| RK-02 | tldraw **requires a license key in production** — with no key the board is **BLANK on a non-localhost domain** (renders only on localhost) | High | High | **Confirmed on the live deploy** (kymostudio.github.io: empty canvas, no `.tl-canvas`, console *"license required for production"*). **Accepted (skipped) for now** — the public board stays blank; **local dev works**. A free Hobby/trial key (keeps the watermark) or an SDK switch would revive the public deploy; deferred until a usable public deploy is needed. | Vũ Anh | Accepted |
 | RK-03 | Committed bundle grows too large → repo bloat / slower first load | Med | Med | **Phase 1 measured: 2.0 MB raw / ≈586 KB gzip** (Pages gzips) — within the 3 MB budget. Lazy-load tldraw only if it grows | Vũ Anh | Mitigated — within budget |
 | RK-04 | DSL v3 (CSS-cascade) lands mid-build → serializer must re-target grammar | Med | High | Isolate grammar-output module; coordinate with `DSL-LANG-001` owner | Vũ Anh | Open |
 | RK-05 | Sync feedback loop (A→B→A oscillation) corrupts text or canvas | Med | High | `epoch` token + `applying` flag + tldraw `source:'user'` filter (`DESIGN-CANVAS-001` §7) | Vũ Anh | Mitigated by design |
@@ -272,6 +272,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.8     | 2026-05-23 | Vũ Anh | Phase 4a — freeform persistence (`persistenceKey`); added FR-CE-11 / TC-17; Worklog + Next updated. |
 | 0.9     | 2026-05-23 | Vũ Anh | Phase 4 closed (reduced scope): 4b undo verified (FR-CE-12 / TC-18); §4–§5 updated; animated-WebP + icon palette deferred (Annex B §5). |
 | 0.10    | 2026-05-23 | Vũ Anh | RK-07 resolved — embed renders as a cached `<img>` data-URL (+ `toSvg`); Worklog + Next; new TC-19 (TEST 0.5). |
+| 0.11    | 2026-05-23 | Vũ Anh | RK-02 Accepted (skipped) — blank public board accepted for now; canvas-editor risk register closed (only external RK-04 + deferred backlog remain). |
 
 ## Annex B — Open questions / pending decisions
 
@@ -286,7 +287,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
    "Made with tldraw" watermark; Business removes it; **no-key blanks the board** — live-verified).
    Accept the free key + watermark, or switch to **react-flow** (free / no watermark, but drops the
    freeform whiteboard + re-do the canvas layer; `patchDsl`/sync reusable) or **Excalidraw** (keeps
-   whiteboard, harder per-node round-trip)? **Deferred — keeping tldraw for now.**
+   whiteboard, harder per-node round-trip)? **Accepted — keeping tldraw; the blank public board is accepted for now (RK-02 skipped).**
 5. **Phase 4 backlog (deferred)** — **animated-WebP export** (needs an in-browser WebP encoder +
    extra bundle weight; low priority while RK-02 blanks the public board) and an **icon palette /
    drag-in** (drag an icon → create a kymo-node and append a leaf to `.kymo`, extending the
@@ -309,6 +310,7 @@ not yet merged.
 | 2026-05-23 | RK-02 | **Live-deploy check (chrome-anhv, kymostudio.github.io): the board is BLANK** — tldraw with no key blocks the canvas in production (no `.tl-canvas`; console *"license required for production"*); only localhost renders. So "accept watermark, no key" is **not viable** — a free Hobby/trial key (keeps watermark) or Business key is **required**. **Decision deferred — keep tldraw for now** (SDK/license alternatives in Annex B §4). | 🚧 | — |
 | 2026-05-23 | Phase 4a | Freeform persistence: tldraw `persistenceKey="kymo-canvas"` — board + camera persist to IndexedDB across reloads; kymo shapes re-derive from text and **reconcile by deterministic id (0 duplicates)**, so NFR-CE-07 holds. `zoomToFit` gated to honor a restored camera. Verified (chrome-anhv): created a freeform geo → reload → persisted; 43 kymo + 1 freeform, 0 dup ids, clean console. New **FR-CE-11** + **TC-17**. | ✅ | PR #44 |
 | 2026-05-23 | Phase 4b | Undo/redo across layers — **verified, no code needed**: freeform undo is native tldraw; undoing a kymo-node move returns the node to its origin and the text round-trips (leaving an explicit `@`, per accepted RK-06). Verified (chrome-anhv): moved `hitl` → text `@ (748, 240)`; undo → shape back to origin, text follows. **Phase 4 closed (reduced scope)** — animated-WebP export + icon palette deferred to backlog (Annex B §5). New **FR-CE-12** + **TC-18**. | ✅ | PR #46 |
-| 2026-05-23 | RK-07 | Embed render-robustness **fixed**: `KymoDiagramShape` (now the BPMN fallback) renders the SVG as an `<img>` **data-URL** — the browser caches the decoded image by `src`, so tldraw culling no longer blanks it; added `toSvg` for image/PNG export. Verified (chrome-anhv): BPMN · Order faithful; pan off-screen → culled → pan back → img `complete:true`, naturalWidth 670, no flash; clean console. New **TC-19**. | ✅ | PR #TBD |
+| 2026-05-23 | RK-07 | Embed render-robustness **fixed**: `KymoDiagramShape` (now the BPMN fallback) renders the SVG as an `<img>` **data-URL** — the browser caches the decoded image by `src`, so tldraw culling no longer blanks it; added `toSvg` for image/PNG export. Verified (chrome-anhv): BPMN · Order faithful; pan off-screen → culled → pan back → img `complete:true`, naturalWidth 670, no flash; clean console. New **TC-19**. | ✅ | PR #48 |
+| 2026-05-23 | RK-02 | **Accepted (skipped)** per decision — the public board stays blank without a tldraw key; local dev works. A free key (keeps watermark) or an SDK switch can revive the public deploy later. No code change. Canvas-editor risk register now closed: all risks Mitigated/Accepted/Resolved except external **RK-04** (DSL v3). | ✅ | PR #TBD |
 
-**Next:** **RK-07 resolved** (embed → cached `<img>` data-URL + `toSvg`). The only open blocker is **RK-02** (public board blank without a tldraw key/SDK call; local dev works). Phase 4 backlog (animated-WebP, icon palette) remains deferred (Annex B §5).
+**Next:** **Canvas-editor wrapped up** — Phases 0–4 done; RK-01/03/05 Mitigated, RK-06 Accepted, RK-07 Resolved, **RK-02 Accepted** (blank public board is a known limitation; local dev works). Remaining: external **RK-04** (DSL v3) + deferred backlog (animated-WebP, icon palette — Annex B §5).
