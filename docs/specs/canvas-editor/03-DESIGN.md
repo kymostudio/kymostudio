@@ -1,9 +1,9 @@
 ---
 title: Interactive Canvas Editor — Design
 document_id: DESIGN-CANVAS-001
-version: "0.2"
+version: "1.0"
 issue_date: 2026-05-23
-status: Draft
+status: Baselined
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing the canvas editor in `website/app/` and touching `packages/js`
@@ -34,9 +34,9 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | DESIGN-CANVAS-001                                               |
-| Version           | 0.2                                                              |
+| Version           | 1.0                                                              |
 | Issue Date        | 2026-05-23                                                       |
-| Status            | Draft                                                           |
+| Status            | Baselined                                                       |
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers implementing the editor (`website/app/`) and `packages/js` |
@@ -354,3 +354,4 @@ Carried from `PLAN-CANVAS-001` Annex B:
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial technical design draft.  |
 | 0.2     | 2026-05-23 | Vũ Anh | §10: added the `#root` full-height layout contract (NFR-CE-08). |
+| 1.0     | 2026-05-23 | Vũ Anh | **Baselined** & relocated to `docs/specs/canvas-editor/`. |

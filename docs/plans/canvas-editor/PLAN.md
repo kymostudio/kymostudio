@@ -1,7 +1,7 @@
 ---
-title: Interactive Canvas Editor — Plan
+title: Interactive Canvas Editor — Implementation Plan
 document_id: PLAN-CANVAS-001
-version: "0.11"
+version: "0.12"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -34,12 +34,12 @@ keywords:
   - story-points
 ---
 
-# Interactive Canvas Editor — Plan
+# Interactive Canvas Editor — Implementation Plan
 
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.11                                                             |
+| Version           | 0.12                                                             |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -47,10 +47,12 @@ keywords:
 | Audience          | Engineers evolving the web playground (`website/app/`) and `packages/js` |
 | Related Documents | `FEAT-CANVAS-001` (requirements), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `DSL-LANG-001`, `RES-MERMAID-D2-001` |
 
-> **Status note.** A *proposal / plan*, not a committed spec. It records the decision to grow the
-> playground into an interactive canvas editor, the mission rationale, the phased plan, and the risk
-> register. The *detailed design* lives in `DESIGN-CANVAS-001`; the *requirements* in
-> `FEAT-CANVAS-001`. Phase 0 should be re-validated against the live code before starting.
+> **Implementation plan (ISO/IEC/IEEE 12207 §6.3 Technical Management).** This is the *delivery*
+> layer for the canvas-editor: mission rationale, the phased plan (**milestones = phases**), the risk
+> register, and the worklog / **change-requests**. It *implements* the **baselined specification** in
+> `docs/specs/canvas-editor/` — requirements `FEAT-CANVAS-001`, design `DESIGN-CANVAS-001`,
+> verification `TEST-CANVAS-001`. A change to the spec is raised as a change-request here, then the
+> spec is re-baselined.
 
 ---
 
@@ -273,6 +275,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.9     | 2026-05-23 | Vũ Anh | Phase 4 closed (reduced scope): 4b undo verified (FR-CE-12 / TC-18); §4–§5 updated; animated-WebP + icon palette deferred (Annex B §5). |
 | 0.10    | 2026-05-23 | Vũ Anh | RK-07 resolved — embed renders as a cached `<img>` data-URL (+ `toSvg`); Worklog + Next; new TC-19 (TEST 0.5). |
 | 0.11    | 2026-05-23 | Vũ Anh | RK-02 Accepted (skipped) — blank public board accepted for now; canvas-editor risk register closed (only external RK-04 + deferred backlog remain). |
+| 0.12    | 2026-05-23 | Vũ Anh | Reframed as the **implementation plan** (§6.3) and moved to `docs/plans/canvas-editor/PLAN.md`; the spec is now the baseline in `docs/specs/canvas-editor/`. |
 
 ## Annex B — Open questions / pending decisions
 
@@ -301,7 +304,7 @@ not yet merged.
 
 | Date       | Phase / area | Work | Status | Ref |
 |------------|--------------|------|--------|-----|
-| 2026-05-23 | Docs (Phases 0–3) | Authored the ISO-12207 feature doc set — `INTRO` / `FEATURE` / `DESIGN` / `TEST` / `PLAN` (`docs/features/canvas-editor/`). | ✅ | PR #31 |
+| 2026-05-23 | Docs (Phases 0–3) | Authored the ISO-12207 feature doc set — `INTRO` / `FEATURE` / `DESIGN` / `TEST` / `PLAN` (later split into `docs/specs/` + `docs/plans/canvas-editor/`). | ✅ | PR #31 |
 | 2026-05-23 | Phase 0 | React + TypeScript re-platform of the playground (`website/app/src/*`, esbuild → committed `kymo.bundle.js`); 1:1 parity with the FigJam UI verified in-browser via chrome-anhv (render, Light/Dark/None, debounced edits, error path, `?script=`, Tab, samples). `npm run typecheck` clean. | ✅ | PR #33 |
 | 2026-05-23 | Phase 0 | Fixed full-viewport layout regression — `#root` flex-column (`NFR-CE-08`, `TC-16`); verified desktop (1680×929, gap 0) + narrow (600×800 stacks). | ✅ | PR #33 |
 | 2026-05-23 | Phase 1 | tldraw board replaces the preview; kymo SVG embedded as a custom `kymo-diagram` shape (one-way, text-driven, registered via `TLGlobalShapePropsMap`); pan/zoom + note/draw + live text→diagram update verified via chrome-anhv; no leak into `.kymo`. Bundle 2.0 MB raw / ≈586 KB gzip (< 3 MB). dev-mode watermark (RK-02). Logged RK-07 (embed render-robustness). | ✅ | PR #36 |

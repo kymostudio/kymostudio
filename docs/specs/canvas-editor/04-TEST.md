@@ -1,9 +1,9 @@
 ---
 title: Interactive Canvas Editor — Tests, V&V & Traceability
 document_id: TEST-CANVAS-001
-version: "0.5"
+version: "1.0"
 issue_date: 2026-05-23
-status: Draft
+status: Baselined
 classification: Internal
 owner: diagrams/ project
 audience: Engineers verifying & validating the canvas editor
@@ -33,9 +33,9 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | TEST-CANVAS-001                                                 |
-| Version           | 0.5                                                              |
+| Version           | 1.0                                                              |
 | Issue Date        | 2026-05-23                                                       |
-| Status            | Draft                                                           |
+| Status            | Baselined                                                       |
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers verifying & validating the editor                     |
@@ -143,3 +143,4 @@ Every requirement maps to ≥ 1 test case (no orphans).
 | 0.3     | 2026-05-23 | Vũ Anh | Added TC-17 (board persistence, FR-CE-11) — verified via chrome-anhv. |
 | 0.4     | 2026-05-23 | Vũ Anh | Added TC-18 (undo/redo across layers, FR-CE-12) — verified via chrome-anhv. |
 | 0.5     | 2026-05-23 | Vũ Anh | Added TC-19 (BPMN embed cull/remount robustness, RK-07) — verified via chrome-anhv. |
+| 1.0     | 2026-05-23 | Vũ Anh | **Baselined** & relocated to `docs/specs/canvas-editor/` (owns TC ids; FR→TC traceability matrix). |
