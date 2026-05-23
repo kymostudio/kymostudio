@@ -8,11 +8,17 @@ from pathlib import Path
 import pytest
 
 from kymo.from_bpmn import (
-    parse as parse_bpmn, _local,
-    _EVENT_SHAPE, _EVENT_DEF, _TASK_MARKER, _GATEWAY_MARKER,
+    _EVENT_DEF,
+    _EVENT_SHAPE,
+    _GATEWAY_MARKER,
+    _TASK_MARKER,
+    _local,
+)
+from kymo.from_bpmn import (
+    parse as parse_bpmn,
 )
 from kymo.model import Component, Diagram, Edge
-from kymo.to_bpmn import export, _EVENT_TAG, _EVENTDEF_TAG, _TASK_TAG, _GW_TAG
+from kymo.to_bpmn import _EVENT_TAG, _EVENTDEF_TAG, _GW_TAG, _TASK_TAG, export
 
 ROOT = Path(__file__).resolve().parents[3]
 ORDER = ROOT / "samples" / "order.bpmn"
@@ -49,6 +55,22 @@ def _find(root, **kw):
         if all((_local(e.tag) == v if k == "tag" else e.get(k) == v) for k, v in kw.items()):
             return e
     return None
+
+
+def _comp_full(d):
+    return {c.id: (c.shape, c.icon, c.pos, c.size) for c in d.components}
+
+
+def _comp_shapes(d):
+    return {c.id: (c.shape, c.icon) for c in d.components}
+
+
+def _flow_keys(d):
+    return sorted((e.src, e.dst, e.bpmn_flow) for e in d.edges)
+
+
+def _flow_kinds(d):
+    return sorted(e.bpmn_flow for e in d.edges)
 
 
 # ── inverse-map consistency with the importer (BPD-DGM-001) ──────────────
@@ -100,10 +122,8 @@ def test_roundtrip_order_exact():
     d1 = parse_bpmn(ORDER.read_text(encoding="utf-8"))
     d2 = parse_bpmn(export(d1))
     assert len(d1.components) == len(d2.components) and len(d1.edges) == len(d2.edges)
-    key = lambda d: {c.id: (c.shape, c.icon, c.pos, c.size) for c in d.components}
-    assert key(d1) == key(d2)
-    flows = lambda d: sorted((e.src, e.dst, e.bpmn_flow) for e in d.edges)
-    assert flows(d1) == flows(d2)
+    assert _comp_full(d1) == _comp_full(d2)
+    assert _flow_keys(d1) == _flow_keys(d2)
 
 
 @pytest.mark.parametrize("path", CORPUS, ids=[p.stem for p in CORPUS])
@@ -115,6 +135,5 @@ def test_roundtrip_corpus_region_free(path):
     d2 = parse_bpmn(export(d1))
     assert len(d1.components) == len(d2.components)
     assert len(d1.edges) == len(d2.edges)
-    shp = lambda d: {c.id: (c.shape, c.icon) for c in d.components}
-    assert shp(d1) == shp(d2)
-    assert sorted(e.bpmn_flow for e in d1.edges) == sorted(e.bpmn_flow for e in d2.edges)
+    assert _comp_shapes(d1) == _comp_shapes(d2)
+    assert _flow_kinds(d1) == _flow_kinds(d2)
