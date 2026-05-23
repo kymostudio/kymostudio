@@ -9,6 +9,20 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.2.8] - 2026-05-23
+
+### Added
+
+- **`bpmn { }` DSL block** — author BPMN 2.0 processes directly in `.kymo` as
+  typed nodes and flows, auto-laid-out left-to-right (Sugiyama) with optional
+  `@ (x,y)` pins, in both the Python and JavaScript engines. Node kinds map to
+  `bpmn-*` glyphs/markers (`start`/`end`/`end!`/`task`/`xor`/`and`/`or`/…, with
+  `type=` refinements); flow arrows `->` (sequence), `~>` (message), `..>`
+  (association); chains and `;` expand to one flow per segment. The block emits
+  a fully-resolved sub-diagram, so the existing renderer draws it unchanged. New
+  sample [`samples/order-flow.kymo`](../samples/order-flow.kymo); grammar
+  specified in `DSL.md` §6.9 (DSL-LANG-001 v2.1).
+
 ## [0.2.7] - 2026-05-23
 
 ### Changed
