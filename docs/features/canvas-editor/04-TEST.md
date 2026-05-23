@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Tests, V&V & Traceability
 document_id: TEST-CANVAS-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -33,7 +33,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | TEST-CANVAS-001                                                 |
-| Version           | 0.2                                                              |
+| Version           | 0.3                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -91,6 +91,7 @@ against the acceptance criteria in `FEAT-CANVAS-001`).
 | TC-14 | Review (static) | NFR-CE-04 | §8 | Code review confirms all DSL-emitting logic lives in one module (re-targetable for v3). |
 | TC-15 | Regression | FR-CE-06 (support) | §9 | After the additive parser source-span change, JS `npm test` + Python golden suite pass unchanged (no rendered-byte drift). |
 | TC-16 | E2E / layout | NFR-CE-08 | §10 | At desktop and < 760 px widths: `main`'s bounding-rect bottom ≈ `window.innerHeight` (no whitespace below the canvas); under 760 px the editor + canvas **stack** vertically and share the height. |
+| TC-17 | E2E | FR-CE-11 | §3, §7 | Create a freeform shape → reload → it persists (same id/props); kymo shapes re-derive from text with **0 duplicate ids** (reconcile by id); the freeform shape carries no `meta.kymo`. |
 
 ## 5. Traceability matrix
 
@@ -108,6 +109,7 @@ Every requirement maps to ≥ 1 test case (no orphans).
 | FR-CE-08 | TC-08 |
 | FR-CE-09 | TC-09 |
 | FR-CE-10 | TC-10 |
+| FR-CE-11 | TC-17 |
 | NFR-CE-01 | TC-03 |
 | NFR-CE-02 | TC-12 |
 | NFR-CE-03 | TC-05 |
@@ -135,3 +137,4 @@ Every requirement maps to ≥ 1 test case (no orphans).
 |---------|------------|--------|-------------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial V&V plan + traceability matrix.   |
 | 0.2     | 2026-05-23 | Vũ Anh | Added TC-16 (full-viewport layout, NFR-CE-08); serve via Node not python3. |
+| 0.3     | 2026-05-23 | Vũ Anh | Added TC-17 (board persistence, FR-CE-11) — verified via chrome-anhv. |

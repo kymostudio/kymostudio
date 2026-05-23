@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Features & Requirements
 document_id: FEAT-CANVAS-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -33,7 +33,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | FEAT-CANVAS-001                                                 |
-| Version           | 0.2                                                              |
+| Version           | 0.3                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -77,6 +77,7 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 | FR-CE-08 | Sample loading | Built-in samples load into the editor and render | §3 (`samples.ts`) |
 | FR-CE-09 | SVG export | User can export the current diagram to a standalone SVG (via `renderSVG`) | §3 |
 | FR-CE-10 | BPMN import | A `.bpmn` file parses and renders as today (`parseBpmn`) | §3 |
+| FR-CE-11 | Board persistence | Freeform-layer shapes and the camera survive a page reload (tldraw `persistenceKey`); kymo shapes are re-derived from text and reconciled by id (no duplicates), upholding NFR-CE-07 | §3, §7 |
 
 ## 4. Non-functional requirements (ISO/IEC 25010)
 
@@ -112,3 +113,4 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial requirements draft.      |
 | 0.2     | 2026-05-23 | Vũ Anh | Added NFR-CE-08 (full-viewport layout) after a Phase-0 regression. |
+| 0.3     | 2026-05-23 | Vũ Anh | Added FR-CE-11 (board persistence) for Phase 4. |
