@@ -1,9 +1,15 @@
 /**
- * A single tldraw shape that embeds the rendered kymo SVG (Phase 1 — one-way:
- * the diagram is produced from the `.kymo` text and shown as one shape on the
- * board; per-node mapping comes in Phase 2). It's a box shape sized to the
- * SVG's intrinsic width/height, so the SVG fills it 1:1 and tldraw's zoom
- * scales the whole thing.
+ * A single tldraw shape that embeds a rendered kymo SVG, sized to the SVG's
+ * intrinsic width/height so it fills the box 1:1 and tldraw's zoom scales the
+ * whole thing. Since Phase 2, DSL diagrams render as per-element shapes — this
+ * single-embed is now the **BPMN fallback** (BPMN SVGs are self-contained
+ * vector + embedded CSS, so they render faithfully as an image).
+ *
+ * RK-07: the diagram is shown as an `<img>` backed by an SVG **data-URL**, not
+ * as inline SVG in the DOM. The browser caches the decoded image by `src`, so
+ * when tldraw culls and remounts the shape during heavy interaction it
+ * reappears instantly instead of re-parsing the inline markup (which flashed
+ * blank). `toSvg` lets tldraw's image/PNG export include the diagram cleanly.
  */
 import { HTMLContainer, Rectangle2d, ShapeUtil, T, type TLBaseShape } from "tldraw";
 
@@ -11,6 +17,11 @@ export type KymoDiagramShape = TLBaseShape<
   "kymo-diagram",
   { w: number; h: number; svg: string }
 >;
+
+/** Encode a self-contained SVG string as an `<img>`-ready data-URL (unicode-safe). */
+function svgDataUrl(svg: string): string {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
 
 export class KymoDiagramShapeUtil extends ShapeUtil<KymoDiagramShape> {
   static override type = "kymo-diagram" as const;
@@ -36,15 +47,28 @@ export class KymoDiagramShapeUtil extends ShapeUtil<KymoDiagramShape> {
   }
 
   override component(shape: KymoDiagramShape) {
+    const { w, h, svg } = shape.props;
     return (
-      <HTMLContainer style={{ width: shape.props.w, height: shape.props.h }}>
-        <div
-          style={{ width: "100%", height: "100%", pointerEvents: "none" }}
-          // The kymo SVG carries its own width/height = shape.props.w/h.
-          dangerouslySetInnerHTML={{ __html: shape.props.svg }}
-        />
+      <HTMLContainer style={{ width: w, height: h }}>
+        {svg ? (
+          <img
+            src={svgDataUrl(svg)}
+            width={w}
+            height={h}
+            alt=""
+            draggable={false}
+            style={{ width: "100%", height: "100%", display: "block", pointerEvents: "none" }}
+          />
+        ) : null}
       </HTMLContainer>
     );
+  }
+
+  // Export hook: emit an <image> referencing the same data-URL so tldraw's
+  // SVG/PNG export captures the diagram (RK-07).
+  override toSvg(shape: KymoDiagramShape) {
+    const { w, h, svg } = shape.props;
+    return <image href={svgDataUrl(svg)} width={w} height={h} />;
   }
 
   override getIndicatorPath(shape: KymoDiagramShape) {

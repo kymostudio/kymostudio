@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Plan
 document_id: PLAN-CANVAS-001
-version: "0.9"
+version: "0.10"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.9                                                              |
+| Version           | 0.10                                                             |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -221,7 +221,7 @@ Likelihood / impact are qualitative (Low / Med / High).
 | RK-04 | DSL v3 (CSS-cascade) lands mid-build → serializer must re-target grammar | Med | High | Isolate grammar-output module; coordinate with `DSL-LANG-001` owner | Vũ Anh | Open |
 | RK-05 | Sync feedback loop (A→B→A oscillation) corrupts text or canvas | Med | High | `epoch` token + `applying` flag + tldraw `source:'user'` filter (`DESIGN-CANVAS-001` §7) | Vũ Anh | Mitigated by design |
 | RK-06 | Dragging a node replaces declarative placement (`@ parent side gap` / layout / grid) with `@ (x,y)` | Med | Low | **Accepted by design** (Phase 3, user-chosen full-surgical): dragged node → absolute; layout/grid members lifted out → siblings re-flow | Vũ Anh | Accepted |
-| RK-07 | Embedded diagram (inline SVG in an `HTMLContainer` custom shape) can blank transiently during heavy tldraw interaction (culling / perf) | Med | Low | Render the diagram as a tldraw image/asset (SVG data-URL) or add `toSvg`; per-node shapes (Phase 2) supersede the single-embed approach | Vũ Anh | Open — under assessment |
+| RK-07 | Embedded diagram (inline SVG in an `HTMLContainer` custom shape) can blank transiently during heavy tldraw interaction (culling / perf) | Med | Low | **Resolved** — the embed (now the BPMN fallback only) renders as an `<img>` backed by an SVG **data-URL**: the browser caches the decoded image by `src`, so a cull/remount reappears instantly (verified `complete:true` on remount, no flash); `toSvg` added for clean image export | Vũ Anh | Resolved |
 
 ---
 
@@ -271,6 +271,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.7     | 2026-05-23 | Vũ Anh | RK-02 finding (live check): no-key tldraw **blanks the board in production** → a key is REQUIRED. Decision **deferred** (keep tldraw); SDK/license alternatives logged (Annex B §4). RK-02 Open — blocks deploy. |
 | 0.8     | 2026-05-23 | Vũ Anh | Phase 4a — freeform persistence (`persistenceKey`); added FR-CE-11 / TC-17; Worklog + Next updated. |
 | 0.9     | 2026-05-23 | Vũ Anh | Phase 4 closed (reduced scope): 4b undo verified (FR-CE-12 / TC-18); §4–§5 updated; animated-WebP + icon palette deferred (Annex B §5). |
+| 0.10    | 2026-05-23 | Vũ Anh | RK-07 resolved — embed renders as a cached `<img>` data-URL (+ `toSvg`); Worklog + Next; new TC-19 (TEST 0.5). |
 
 ## Annex B — Open questions / pending decisions
 
@@ -307,6 +308,7 @@ not yet merged.
 | 2026-05-23 | Phase 3 | Round-trip canvas→text (surgical, app-side `patchDsl`, no `packages/js` change): drag a node → `.kymo` updated — rewrite `@ (x,y)` / `@ parent`→absolute / append / **lift out of layout frame + grid `row`**; comments + untouched lines byte-preserved (8/8 unit tests). Two-way sync + **genuine-delta loop-guard** (no A→B→A). Verified (chrome-anhv): dragged a `routing_chain` member → leaf `@ (732, 326)` + removed from body, siblings re-flow, no oscillation, no console errors. **`FR-CE-02`** + **`FR-CE-06`** satisfied. | ✅ | PR #40 |
 | 2026-05-23 | RK-02 | **Live-deploy check (chrome-anhv, kymostudio.github.io): the board is BLANK** — tldraw with no key blocks the canvas in production (no `.tl-canvas`; console *"license required for production"*); only localhost renders. So "accept watermark, no key" is **not viable** — a free Hobby/trial key (keeps watermark) or Business key is **required**. **Decision deferred — keep tldraw for now** (SDK/license alternatives in Annex B §4). | 🚧 | — |
 | 2026-05-23 | Phase 4a | Freeform persistence: tldraw `persistenceKey="kymo-canvas"` — board + camera persist to IndexedDB across reloads; kymo shapes re-derive from text and **reconcile by deterministic id (0 duplicates)**, so NFR-CE-07 holds. `zoomToFit` gated to honor a restored camera. Verified (chrome-anhv): created a freeform geo → reload → persisted; 43 kymo + 1 freeform, 0 dup ids, clean console. New **FR-CE-11** + **TC-17**. | ✅ | PR #44 |
-| 2026-05-23 | Phase 4b | Undo/redo across layers — **verified, no code needed**: freeform undo is native tldraw; undoing a kymo-node move returns the node to its origin and the text round-trips (leaving an explicit `@`, per accepted RK-06). Verified (chrome-anhv): moved `hitl` → text `@ (748, 240)`; undo → shape back to origin, text follows. **Phase 4 closed (reduced scope)** — animated-WebP export + icon palette deferred to backlog (Annex B §5). New **FR-CE-12** + **TC-18**. | ✅ | PR #TBD |
+| 2026-05-23 | Phase 4b | Undo/redo across layers — **verified, no code needed**: freeform undo is native tldraw; undoing a kymo-node move returns the node to its origin and the text round-trips (leaving an explicit `@`, per accepted RK-06). Verified (chrome-anhv): moved `hitl` → text `@ (748, 240)`; undo → shape back to origin, text follows. **Phase 4 closed (reduced scope)** — animated-WebP export + icon palette deferred to backlog (Annex B §5). New **FR-CE-12** + **TC-18**. | ✅ | PR #46 |
+| 2026-05-23 | RK-07 | Embed render-robustness **fixed**: `KymoDiagramShape` (now the BPMN fallback) renders the SVG as an `<img>` **data-URL** — the browser caches the decoded image by `src`, so tldraw culling no longer blanks it; added `toSvg` for image/PNG export. Verified (chrome-anhv): BPMN · Order faithful; pan off-screen → culled → pan back → img `complete:true`, naturalWidth 670, no flash; clean console. New **TC-19**. | ✅ | PR #TBD |
 
-**Next:** **Phase 4 closed** — persistence (4a) + undo (4b) delivered; animated-WebP + icon palette **deferred to backlog** (Annex B §5). Open: **RK-02** (public board blank without a key/SDK call), **RK-07** (BPMN embed robustness / edge labels).
+**Next:** **RK-07 resolved** (embed → cached `<img>` data-URL + `toSvg`). The only open blocker is **RK-02** (public board blank without a tldraw key/SDK call; local dev works). Phase 4 backlog (animated-WebP, icon palette) remains deferred (Annex B §5).
