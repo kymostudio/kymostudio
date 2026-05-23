@@ -73,6 +73,10 @@ def main() -> None:
     excalidraw = "--excalidraw" in flags
 
     diagram, layout_spec, external_layout = load(src)
+    if getattr(diagram, "bpmn_blocks", None):
+        raise SystemExit(
+            "bpmn { } block parsed but layout is not implemented yet (P2)"
+        )
     if layout_spec:
         layout(diagram, layout_spec, external_layout)
     # BPMN diagrams arrive fully positioned from their DI geometry; the

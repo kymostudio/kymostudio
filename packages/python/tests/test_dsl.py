@@ -134,3 +134,131 @@ def test_inline_region_without_direction_stays_opaque():
     regions = {"svc": _Region(None, ["a", "b"])}
     out = _inline_region_leaves(("id", "svc"), regions)
     assert out == ("id", "svc")     # untouched
+
+
+# ── BPMN block (`bpmn { … }`) — P1 parser ────────────────────────────
+def _block(text: str):
+    """Parse a `bpmn { … }` source and return its single BpmnBlock AST."""
+    d, _, _ = parse(text)
+    assert len(d.bpmn_blocks) == 1
+    return d.bpmn_blocks[0]
+
+
+def test_bpmn_node_kinds():
+    """Each kind maps to the expected (shape, marker) (FR-3)."""
+    blk = _block(
+        "bpmn {\n"
+        '  start S "Start"\n'
+        '  end   E "End"\n'
+        '  end!  T "Terminate"\n'
+        '  task  A "Do"\n'
+        '  xor   X "X?"\n'
+        '  and   P "Split"\n'
+        '  or    O "Or"\n'
+        '  event V "Wait"\n'
+        '  subprocess U "Sub"\n'
+        '  note  N "Note"\n'
+        '  data  D "Doc"\n'
+        '  store R "DB"\n'
+        "}\n"
+    )
+    got = {n.id: (n.shape, n.marker) for n in blk.nodes}
+    assert got == {
+        "S": ("bpmn-start", ""),
+        "E": ("bpmn-end", ""),
+        "T": ("bpmn-end", "terminate"),
+        "A": ("bpmn-task", ""),
+        "X": ("bpmn-gateway", "exclusive"),
+        "P": ("bpmn-gateway", "parallel"),
+        "O": ("bpmn-gateway", "inclusive"),
+        "V": ("bpmn-intermediate", ""),
+        "U": ("bpmn-subprocess", ""),
+        "N": ("bpmn-annotation", ""),
+        "D": ("bpmn-data-object", ""),
+        "R": ("bpmn-data-store", ""),
+    }
+
+
+def test_bpmn_type_subtype():
+    """`type=` refines the marker (FR-4)."""
+    blk = _block(
+        "bpmn {\n"
+        '  task  A "Approve" type=user\n'
+        '  start S "Msg" type=message\n'
+        '  event V "Wait" type=timer\n'
+        "}\n"
+    )
+    assert {n.id: n.marker for n in blk.nodes} == {
+        "A": "user", "S": "message", "V": "timer",
+    }
+
+
+def test_bpmn_pin_parsed():
+    """`@ (x,y)` is parsed now (honoured in P2, FR-9); else None."""
+    assert _block('bpmn {\n  task N "Notify" @ (560,90)\n}\n').nodes[0].pin == (560, 90)
+    assert _block('bpmn {\n  task M "x"\n}\n').nodes[0].pin is None
+
+
+def test_bpmn_flow_kinds():
+    """`->`/`~>`/`..>` set the flow kind (FR-6)."""
+    blk = _block("bpmn {\n  A -> B\n  B ~> C\n  C ..> D\n}\n")
+    assert [(f.src, f.dst, f.flow) for f in blk.flows] == [
+        ("A", "B", "sequence"),
+        ("B", "C", "message"),
+        ("C", "D", "association"),
+    ]
+
+
+def test_bpmn_chain_and_semicolon():
+    """Chains expand to one flow per segment; `;` separates statements (FR-7)."""
+    blk = _block("bpmn {\n  S -> V -> GW\n  SP -> Pk ; SP -> Iv\n}\n")
+    assert [(f.src, f.dst) for f in blk.flows] == [
+        ("S", "V"), ("V", "GW"), ("SP", "Pk"), ("SP", "Iv"),
+    ]
+    assert all(f.flow == "sequence" for f in blk.flows)
+
+
+def test_bpmn_edge_label():
+    blk = _block('bpmn {\n  GW -> P : "Yes"\n  GW -> N : "No"\n}\n')
+    assert {(f.src, f.dst): f.label for f in blk.flows} == {
+        ("GW", "P"): "Yes", ("GW", "N"): "No",
+    }
+
+
+def test_bpmn_full_example_parses():
+    """The order-graph block parses to 12 nodes + 12 flows."""
+    blk = _block(
+        "bpmn {\n"
+        '  start S  "Order received"\n'
+        '  task  V  "Validate order"\n'
+        '  xor   GW "In stock?"\n'
+        '  task  N  "Notify customer" @ (560,90)\n'
+        '  end!  C  "Order cancelled"\n'
+        '  task  P  "Process payment"\n'
+        '  and   SP "Split"\n'
+        '  task  Pk "Pack"\n'
+        '  task  Iv "Invoice"\n'
+        '  and   Sy "Sync"\n'
+        '  task  Sh "Ship order"\n'
+        '  end   D  "Order delivered"\n'
+        "\n"
+        "  S -> V -> GW\n"
+        '  GW -> P : "Yes"\n'
+        '  GW -> N : "No"\n'
+        "  N -> C\n"
+        "  P -> SP\n"
+        "  SP -> Pk ; SP -> Iv\n"
+        "  Pk -> Sy ; Iv -> Sy\n"
+        "  Sy -> Sh -> D\n"
+        "}\n"
+    )
+    assert len(blk.nodes) == 12
+    assert len(blk.flows) == 12
+
+
+def test_bpmn_render_raises_until_layout():
+    """A diagram still carrying an un-laid-out block must not render (P1)."""
+    from kymo.to_svg import render
+    d, _, _ = parse('bpmn {\n  start S "x"\n  S -> E\n  end E "y"\n}\n')
+    with pytest.raises(NotImplementedError, match="not implemented"):
+        render(d)
