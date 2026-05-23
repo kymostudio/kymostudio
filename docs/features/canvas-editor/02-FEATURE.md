@@ -1,7 +1,7 @@
 ---
 title: Interactive Canvas Editor — Features & Requirements
 document_id: FEAT-CANVAS-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-05-23
 status: Draft
 classification: Internal
@@ -33,7 +33,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | FEAT-CANVAS-001                                                 |
-| Version           | 0.3                                                              |
+| Version           | 0.4                                                              |
 | Issue Date        | 2026-05-23                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
@@ -78,6 +78,7 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 | FR-CE-09 | SVG export | User can export the current diagram to a standalone SVG (via `renderSVG`) | §3 |
 | FR-CE-10 | BPMN import | A `.bpmn` file parses and renders as today (`parseBpmn`) | §3 |
 | FR-CE-11 | Board persistence | Freeform-layer shapes and the camera survive a page reload (tldraw `persistenceKey`); kymo shapes are re-derived from text and reconciled by id (no duplicates), upholding NFR-CE-07 | §3, §7 |
+| FR-CE-12 | Undo/redo across layers | Undo/redo reverts freeform edits natively; undoing a kymo-node move returns it to its prior position and the text round-trips (as an explicit `@`, per RK-06) | §7 |
 
 ## 4. Non-functional requirements (ISO/IEC 25010)
 
@@ -114,3 +115,4 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 | 0.1     | 2026-05-23 | Vũ Anh | Initial requirements draft.      |
 | 0.2     | 2026-05-23 | Vũ Anh | Added NFR-CE-08 (full-viewport layout) after a Phase-0 regression. |
 | 0.3     | 2026-05-23 | Vũ Anh | Added FR-CE-11 (board persistence) for Phase 4. |
+| 0.4     | 2026-05-23 | Vũ Anh | Added FR-CE-12 (undo/redo across layers); Phase 4 closed (reduced scope). |
