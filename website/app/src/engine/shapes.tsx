@@ -162,6 +162,13 @@ export class KymoRegionEngineUtil extends ShapeUtil {
     const h = num(shape.props.h, 1);
     const dashed = shape.props.dash === "dashed";
     const label = String(shape.props.label ?? "");
+    // canvas-studio P4 (FR-CS-04): match renderSVG REGION_STYLE so the live board
+    // and the export agree — inner = purple dashed + faint purple fill; outer =
+    // slate solid + faint dark fill.
+    const stroke = dashed ? "#7c3aed" : "#cbd5e1";
+    const fill = dashed ? "rgba(124,58,237,0.03)" : "rgba(15,23,42,0.02)";
+    const labelColor = dashed ? "#6d28d9" : "#64748b";
+    const bw = dashed ? 1.3 : 1.4;
     return (
       <HTMLContainer style={{ width: w, height: h, pointerEvents: "none" }}>
         <div
@@ -169,7 +176,8 @@ export class KymoRegionEngineUtil extends ShapeUtil {
             width: "100%",
             height: "100%",
             boxSizing: "border-box",
-            border: `1.5px ${dashed ? "dashed" : "solid"} #9ca3af`,
+            border: `${bw}px ${dashed ? "dashed" : "solid"} ${stroke}`,
+            background: fill,
             borderRadius: 4,
           }}
         />
@@ -181,7 +189,8 @@ export class KymoRegionEngineUtil extends ShapeUtil {
               left: 6,
               fontSize: 12,
               fontFamily: "Inter, ui-sans-serif, system-ui",
-              color: "#64748b",
+              fontWeight: dashed ? 600 : 500,
+              color: labelColor,
               whiteSpace: "nowrap",
             }}
           >
@@ -196,9 +205,13 @@ export class KymoRegionEngineUtil extends ShapeUtil {
     const h = num(shape.props.h, 1);
     const dashed = shape.props.dash === "dashed";
     const label = String(shape.props.label ?? "");
-    const rect = `<rect x="0" y="0" width="${w}" height="${h}" rx="4" fill="none" stroke="#9ca3af" stroke-width="1.5"${dashed ? ' stroke-dasharray="4 4"' : ""}/>`;
+    const stroke = dashed ? "#7c3aed" : "#cbd5e1";
+    const fill = dashed ? "rgba(124,58,237,0.03)" : "rgba(15,23,42,0.02)";
+    const labelColor = dashed ? "#6d28d9" : "#64748b";
+    const bw = dashed ? 1.3 : 1.4;
+    const rect = `<rect x="0" y="0" width="${w}" height="${h}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="${bw}"${dashed ? ' stroke-dasharray="4 4"' : ""}/>`;
     const text = label
-      ? `<text x="6" y="16" font-family="Inter, ui-sans-serif, system-ui" font-size="12" fill="#64748b">${esc(label)}</text>`
+      ? `<text x="6" y="16" font-family="Inter, ui-sans-serif, system-ui" font-size="12" font-weight="${dashed ? 600 : 500}" fill="${labelColor}">${esc(label)}</text>`
       : "";
     return rect + text;
   }
@@ -242,10 +255,23 @@ export class KymoEdgeEngineUtil extends ShapeUtil {
         <svg width="1" height="1" style={{ position: "absolute", overflow: "visible" }}>
           <defs>
             <marker id={markerId} markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6 Z" fill="#9ca3af" />
+              <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8" />
             </marker>
           </defs>
-          <line x1={s.x} y1={s.y} x2={e.x} y2={e.y} stroke="#9ca3af" strokeWidth="1.5" markerEnd={showArrow ? `url(#${markerId})` : undefined} />
+          {/* canvas-studio P4 (FR-CS-04): flow-dash animation — the signature
+              "animated SVG" look. The dash period (6+4) matches the keyframe's
+              -10 offset so it loops seamlessly. CSS-only → no React re-render. */}
+          <line
+            x1={s.x}
+            y1={s.y}
+            x2={e.x}
+            y2={e.y}
+            stroke="#94a3b8"
+            strokeWidth="2"
+            strokeDasharray="6 4"
+            markerEnd={showArrow ? `url(#${markerId})` : undefined}
+            style={{ animation: "kymo-edge-flow .8s linear infinite" }}
+          />
         </svg>
         {label && (
           <div
@@ -275,9 +301,11 @@ export class KymoEdgeEngineUtil extends ShapeUtil {
     const showArrow = shape.props.arrowhead !== "none";
     const markerId = `kymo-arrow-${String(shape.id).replace(/[^a-zA-Z0-9_-]/g, "")}`;
     const defs = showArrow
-      ? `<defs><marker id="${markerId}" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#9ca3af"/></marker></defs>`
+      ? `<defs><marker id="${markerId}" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/></marker></defs>`
       : "";
-    const line = `<line x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}" stroke="#9ca3af" stroke-width="1.5"${showArrow ? ` marker-end="url(#${markerId})"` : ""}/>`;
+    // Flow-dash animation via SMIL so the exported board SVG flows too (WYSIWYG
+    // with the live canvas; static-renders fine where SMIL is unsupported).
+    const line = `<line x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 4"${showArrow ? ` marker-end="url(#${markerId})"` : ""}><animate attributeName="stroke-dashoffset" from="0" to="-10" dur="0.8s" repeatCount="indefinite"/></line>`;
     const text = label
       ? `<text x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2}" text-anchor="middle" dominant-baseline="middle" font-family="Inter, ui-sans-serif, system-ui" font-size="11" fill="#64748b">${esc(label)}</text>`
       : "";
