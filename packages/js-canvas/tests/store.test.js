@@ -93,3 +93,78 @@ test("TC-EN-04: history tagging (history:ignore excluded from the log)", () => {
   store.update({ id: a.id, type: "kymo-node", x: 2 });
   assert.equal(store.getHistory().length, base + 1, "default write recorded exactly once");
 });
+
+test("TC-J-02: undo restores the exact prior record; redo re-applies", () => {
+  const store = new Store();
+  const a = mk("a");
+  store.put(a);
+  const orig = structuredClone(store.get(a.id));
+  store.update({ id: a.id, type: "kymo-node", x: 5, y: 7, props: { w: 80 } });
+  assert.equal(store.canUndo, true, "a default write is undoable");
+
+  store.undo();
+  assert.deepEqual(store.get(a.id), orig, "undo restored the exact prior record");
+  assert.equal(store.canRedo, true);
+
+  store.redo();
+  assert.equal(store.get(a.id).x, 5);
+  assert.equal(store.get(a.id).y, 7);
+  assert.equal(store.get(a.id).props.w, 80, "redo re-applied");
+});
+
+test("TC-J-02: history:ignore writes never enter the undo stack", () => {
+  const store = new Store();
+  const a = mk("a");
+  store.put(a); // recordable → the only undo step
+  store.run(() => store.update({ id: a.id, type: "kymo-node", x: 99 }), { history: "ignore" });
+
+  store.undo(); // pops the put, not the ignored move
+  assert.equal(store.get(a.id), undefined, "undo reverted the put; the ignored write was never on the stack");
+  assert.equal(store.canUndo, false);
+});
+
+test("TC-J-02: a drag's contiguous same-node updates coalesce into one undo step", () => {
+  const store = new Store();
+  const a = mk("a");
+  store.put(a);
+  store.update({ id: a.id, type: "kymo-node", x: 1 });
+  store.update({ id: a.id, type: "kymo-node", x: 2 });
+  store.update({ id: a.id, type: "kymo-node", x: 3 });
+
+  store.undo();
+  assert.equal(store.get(a.id).x, 0, "all three same-node updates undo as one step");
+  assert.equal(store.canUndo, true, "the put is still undoable");
+});
+
+test("TC-J-02: mark() seals a boundary so the next change is a separate step", () => {
+  const store = new Store();
+  const a = mk("a");
+  store.put(a);
+  store.update({ id: a.id, type: "kymo-node", x: 1 });
+  store.update({ id: a.id, type: "kymo-node", x: 2 }); // coalesces with x:1
+  store.mark();
+  store.update({ id: a.id, type: "kymo-node", x: 9 }); // fresh step
+
+  store.undo();
+  assert.equal(store.get(a.id).x, 2, "first undo reverts only the post-mark step");
+  store.undo();
+  assert.equal(store.get(a.id).x, 0, "second undo reverts the coalesced pre-mark run");
+});
+
+test("TC-J-02: a new recordable edit clears the redo stack; empty undo/redo are no-ops", () => {
+  const store = new Store();
+  const a = mk("a");
+  store.put(a);
+  store.update({ id: a.id, type: "kymo-node", x: 5 });
+  store.undo();
+  assert.equal(store.canRedo, true);
+
+  store.update({ id: a.id, type: "kymo-node", x: 7 }); // new edit invalidates redo
+  assert.equal(store.canRedo, false, "new recordable edit cleared the redo stack");
+
+  const empty = new Store();
+  empty.undo();
+  empty.redo();
+  assert.equal(empty.canUndo, false);
+  assert.equal(empty.canRedo, false);
+});

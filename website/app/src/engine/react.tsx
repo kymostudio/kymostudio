@@ -204,6 +204,10 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
       // A click: select the shape under the pointer, or clear.
       editor.select(g.downId ? [g.downId as Shape["id"]] : []);
       force();
+    } else if (g.downId && isDraggable(g.downType ?? "")) {
+      // A node drag ended → seal it as a single undo step (FR-J-02); its many
+      // per-move writes coalesced into one history entry.
+      editor.mark();
     }
   };
 

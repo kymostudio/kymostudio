@@ -108,6 +108,29 @@ export class Editor {
     this.store.run(fn, opts);
   }
 
+  // --- undo / redo (FR-J-02) — delegate to the store's history stacks ---
+
+  /** Seal the current undo step (gesture boundary); the next change won't coalesce. */
+  mark(): void {
+    this.store.mark();
+  }
+
+  undo(): void {
+    this.store.undo();
+  }
+
+  redo(): void {
+    this.store.redo();
+  }
+
+  get canUndo(): boolean {
+    return this.store.canUndo;
+  }
+
+  get canRedo(): boolean {
+    return this.store.canRedo;
+  }
+
   // --- selection (state; tools set it in Phase 6, Inspector reads it) ---
 
   select(ids: ShapeId[]): void {

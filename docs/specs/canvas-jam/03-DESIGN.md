@@ -89,12 +89,21 @@ The new `ShapeUtil`s live in `engine/shapes.tsx` as `KymoRegionEngineUtil`/`Kymo
 The store already **tags** each write `history:"ignore"|"record"` at write time
 (`DESIGN-ENGINE-001` §5.3). This feature adds the consuming **stack**:
 
-- An append-only list of recordable change-entries (forward + inverse patches); `undo()` applies the
-  inverse, `redo()` re-applies. `{history:"ignore"}` writes never enter the stack — so a programmatic
-  `text→canvas` apply is **not** undoable (matches tldraw).
-- Undo of a kymo-node move restores its `x/y` record; `Board`'s existing `source:"user"` listener
-  then fires and the writeback re-patches the `.kymo` text — exactly the Phase-4b behaviour
-  `TC-18` asserts. (`RK-EN-02`.)
+- Two stacks (`undos`/`redos`) of recordable change-entries (each carries the `{from,to}` snapshots);
+  `undo()` applies the inverse, `redo()` re-applies; a new recordable edit clears `redos`.
+  `{history:"ignore"}` writes never enter — so a programmatic `text→canvas` apply is **not** undoable
+  (matches tldraw). The raw `getHistory()` log is kept separate and untouched.
+- **Coalescing (as implemented):** a drag fires one store write *per pointer-move*, so contiguous
+  same-source, *update-only*, same-id-set entries **merge into one undo step** (keep earliest `from`,
+  latest `to`) until `mark()` seals a boundary — `mark()` is called on a drag's pointer-up so each drag
+  is a single Cmd+Z. (Without this, one Cmd+Z would revert only the last pixel.)
+- Undo/redo re-apply inside `run({ source:"user", history:"ignore" })`: `source:"user"` makes `Board`'s
+  existing writeback listener fire and re-patch the `.kymo` text (exactly the behaviour `TC-18` asserts,
+  `RK-EN-02`); `history:"ignore"` keeps the revert itself off the stack.
+- **Trigger:** a document-level Cmd/Ctrl+Z (+Shift / Ctrl+Y) keydown in `EngineBoard`, guarded on
+  `document.activeElement` so the `.kymo` `<textarea>` keeps its **native** text undo (the two undo
+  domains stay separate). **Out of MVP scope:** selection restore on undo; text-editor edits are not on
+  the canvas undo stack.
 
 ## 4. Board export (`engine/view` + `ShapeUtil.toSvg`) — FR-J-03
 
