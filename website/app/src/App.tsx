@@ -10,10 +10,12 @@
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packages/js/dist/index.js";
+import type { Editor } from "../../../packages/js-canvas/dist/index.js";
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
 import { EngineBoard } from "./engine/EngineBoard";
 import type { Tool } from "./engine/react";
+import { TopBar } from "./ui/TopBar";
 
 /** Pull the intrinsic width/height off the rendered `<svg>` header. */
 function svgSize(svg: string): { w: number; h: number } {
@@ -28,6 +30,8 @@ export function App() {
   const [transparent, setTransparent] = useState(false);
   const [sampleKey, setSampleKey] = useState(DEFAULT_SAMPLE);
   const [tool, setTool] = useState<Tool>("select");
+  const [showCode, setShowCode] = useState(true); // FR-CS-02: Code tab toggles the .kymo pane
+  const [title, setTitle] = useState("Untitled diagram"); // FR-CS-02: local breadcrumb title
   const [svg, setSvg] = useState("");
   const [diagram, setDiagram] = useState<Diagram | null>(null);
   const [isBpmnState, setIsBpmnState] = useState(false);
@@ -40,6 +44,7 @@ export function App() {
   const toastId = useRef<number | undefined>(undefined);
   const lastSvg = useRef(""); // last successful render, the download fallback
   const exportRef = useRef<(() => Promise<string>) | null>(null); // engine board→SVG (FR-J-03)
+  const engineEditor = useRef<Editor | null>(null); // live engine editor (FR-CS-02 undo/redo)
   const pendingSel = useRef<number | null>(null); // caret to restore after Tab
 
   // Latest theme/transparent for closures inside the debounce timer.
@@ -193,41 +198,42 @@ export function App() {
   // ── Markup (mirrors the original index.html body; same ids/classes). ────
   return (
     <>
-      <header>
-        <span className="brand">
-          <span className="brand-dot" /> kymo <small>playground</small>
-        </span>
-        <div className="spacer" />
-        <button id="copy" className="share" title="Copy a shareable link to this diagram" onClick={onShare}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
-            <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
-          </svg>
-          Share link
-        </button>
-      </header>
+      <TopBar
+        title={title}
+        onTitleChange={setTitle}
+        theme={theme}
+        onToggleTheme={() => selectBg(theme === "dark" ? "light" : "dark")}
+        showCode={showCode}
+        onToggleCode={() => setShowCode((c) => !c)}
+        onUndo={() => engineEditor.current?.undo()}
+        onRedo={() => engineEditor.current?.redo()}
+        onExport={onDownload}
+        onShare={onShare}
+      />
 
-      <main>
-        <section className="pane editor">
-          <div className="editor-bar">
-            <span className="chip">source</span>
-            <span className="hint">.kymo DSL or BPMN 2.0 — renders live</span>
-          </div>
-          <textarea
-            id="editor"
-            ref={editorRef}
-            spellCheck={false}
-            autoComplete="off"
-            autoCapitalize="off"
-            placeholder="Write a .kymo DSL or paste a BPMN 2.0 file…"
-            value={source}
-            onChange={onEditorChange}
-            onKeyDown={onEditorKeyDown}
-          />
-        </section>
+      <main className={showCode ? undefined : "code-hidden"}>
+        {showCode && (
+          <section className="pane editor">
+            <div className="editor-bar">
+              <span className="chip">source</span>
+              <span className="hint">.kymo DSL or BPMN 2.0 — renders live</span>
+            </div>
+            <textarea
+              id="editor"
+              ref={editorRef}
+              spellCheck={false}
+              autoComplete="off"
+              autoCapitalize="off"
+              placeholder="Write a .kymo DSL or paste a BPMN 2.0 file…"
+              value={source}
+              onChange={onEditorChange}
+              onKeyDown={onEditorKeyDown}
+            />
+          </section>
+        )}
 
         <section className="pane view">
-          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} tool={tool} onToolReset={() => setTool("select")} />
+          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} onEditorReady={(ed) => { engineEditor.current = ed; }} tool={tool} onToolReset={() => setTool("select")} />
           <div id="error" hidden={error == null}>
             {error}
           </div>

@@ -64,7 +64,7 @@ Target layout (replaces today's `header` + `main.{editor|view}`):
 
 ```
 ┌──────────────────────────── TopBar (FR-CS-02) ───────────────────────────┐
-│ ◧ kymo  ▸ Acme / title ★   │ Code Preview Comments Versions │ ↶ ↷ ☾ ⤓ Share│
+│ ◧ kymo · Untitled diagram        │ Code  Preview │  ↶ ↷  ☾  ⤓ Export  Share │
 ├──────┬──────────────────────────────────────────────────┬──────(reserved)─┤
 │ Tool │  .kymo code pane          ░ Canvas (EngineBoard) ░ │  right panel    │
 │ rail │  (toggle via Code tab)    ░  items (FR-CS-04)    ░ │  → canvas-      │
@@ -91,9 +91,11 @@ existing playground before/after to confirm no unintended restyle (`RK-CS-03`).
 
 ## 3. Top bar (`ui/TopBar.tsx`) — FR-CS-02
 
-Replaces `App.tsx:196` `<header>`. A fl. row of: brand (`KLogo`), an editable breadcrumb/title
-(`contentEditable`/controlled input, **local state only** — no persistence backend), the center
-**panel-toggle tabs**, and the right action cluster.
+Replaces `App.tsx:196` `<header>`. A flex row of: brand (`KLogo`), an **editable title**
+(controlled input, **local state only** — no persistence backend), the center **panel-toggle
+tabs**, and the right action cluster. **Trimmed to client-only at the P2 build:** the bar carries
+**no** breadcrumb, star, comments, version-history, or presence/account chrome — those imply a
+backend (boards, comments, multiuser) and are out of scope (`FEAT-STUDIO-001` §4).
 
 - **Undo/redo** → call `editor.undo()` / `editor.redo()` (engine history from `FR-J-02`). The
   enabled state reflects `editor.canUndo` / `canRedo`; since the engine has **no reactive selection
@@ -103,10 +105,9 @@ Replaces `App.tsx:196` `<header>`. A fl. row of: brand (`KLogo`), an editable br
   (`App.tsx:54`). Icon swaps sun/moon.
 - **Export / Share** → reuse `onDownload` (board `toSvg` from `DESIGN-JAM-001` §4, DSL-render
   fallback) and `onShare` (`?script=` link copy) verbatim (`App.tsx:158-180`).
-- **Center tabs** → `Code` toggles the `.kymo` pane visibility (a new `showCode` layout flag),
-  `Preview` is the canvas (always on). `Comments` / `Versions` are **disabled placeholders**
-  (backend out of scope).
-- **Presence avatars** → static placeholder stack (no awareness protocol).
+- **Center tabs** → just `Code` (toggles the `.kymo` pane via a new `showCode` layout flag) and
+  `Preview` (the canvas, always on). `Comments` / `Versions` were **removed** — they need a backend
+  (out of scope, `FEAT-STUDIO-001` §4).
 
 ## 4. Tool rail + registry (`ui/ToolRail.tsx`, `engine/tools-registry.ts`) — FR-CS-03
 
@@ -192,7 +193,7 @@ re-renders the canvas shape layer — `NFR-CS-02`):
 - **New components:** `website/app/src/ui/{TopBar,ToolRail,BottomToolbar,StatusBar}.tsx` +
   `engine/tools-registry.ts` + an icon set (port the prototype's `icons.jsx` as a small TS module).
 - **`App.tsx` changes:** swap `<header>`+`<main>` for `TopBar` + a 3-column flex
-  (`code | canvas | reserved`) + `StatusBar`; add layout flags (`showCode`, breadcrumb `title`); keep
+  (`code | canvas | reserved`) + `StatusBar`; add layout flags (`showCode`, editable `title`); keep
   the `tool` state and pass it to the rail + `EngineBoard` (already threaded). Reuse `onShare` /
   `onDownload` / theme effect untouched.
 - **Engine layer:** `engine/shapes.tsx` (item styling, §5), `engine/react.tsx` (selection-handle
@@ -226,4 +227,4 @@ Tracked in `PLAN-STUDIO-001` §6. Design-level callouts:
 
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
-| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. |
+| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. |

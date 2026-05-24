@@ -38,6 +38,9 @@ interface EngineBoardProps {
   onPatch: (text: string) => void;
   /** Hands the host a board→SVG exporter once the editor is live (FR-J-03). */
   onReady?: (exportSvg: () => Promise<string>) => void;
+  /** Hands the host the live `Editor` (canvas-studio `FR-CS-02`: top-bar undo/redo,
+   *  `FR-CS-06`: status-bar zoom/fit). The editor outlives the canvas mount. */
+  onEditorReady?: (editor: Editor) => void;
   /** Active canvas tool (canvas-jam `FR-J-05`+): `select` (default), `draw`, `sticky`. */
   tool?: Tool;
   /** Click-to-place tools call this to revert the host's tool to `select`. */
@@ -71,7 +74,7 @@ function syncElements(editor: Editor, diagram: Diagram): void {
   for (const p of partials) if (existingIds.has(p.id)) editor.updateShape(p);
 }
 
-export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onReady, tool, onToolReset }: EngineBoardProps) {
+export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onReady, onEditorReady, tool, onToolReset }: EngineBoardProps) {
   const editorRef = useRef<Editor | null>(null);
   if (!editorRef.current) editorRef.current = new Editor(new Store(), { shapeUtils: utils });
   const editor = editorRef.current;
@@ -187,9 +190,11 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onRea
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor]);
 
-  // Mount once: hand the host a board→SVG exporter bound to this editor (FR-J-03).
+  // Mount once: hand the host a board→SVG exporter bound to this editor (FR-J-03)
+  // and the live editor itself (canvas-studio top-bar undo/redo, FR-CS-02).
   useEffect(() => {
     onReady?.(() => boardToSvg(editor, utils));
+    onEditorReady?.(editor);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor]);
 
