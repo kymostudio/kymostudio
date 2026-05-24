@@ -121,11 +121,12 @@ packages/js-canvas/              # the engine home (private workspace pkg; node 
     └── shapes-builtin/ # kymo-region / kymo-edge (or geo / arrow)                            (DESIGN §10)
     # (pointer interaction — select/drag/pan/zoom — lives in-app in react.tsx, not a package tools/ dir)
 
-website/app/src/engine/                                                                       # the React/DOM-coupled layer (in-app for now; graduates to the package later)
+website/app/src/engine/                                                                       # the React/DOM-coupled layer (in-app; graduates to the package later)
     ├── adapter.ts      # the seam: re-exports tldraw (P1) → engine; tldraw deleted in canvas-figjam   (DESIGN §13) ✅ Phase 1
     ├── react.tsx       # <EngineCanvas> render loop + pointer interaction, HTMLContainer, hooks (DESIGN §8,§9.4) ✅ Phase 5,6
     ├── shapes.tsx      # engine ShapeUtils (kymo-node/diagram + parity geo/arrow)             (DESIGN §8) ✅ Phase 5
-    └── EngineBoard.tsx # interactive board behind ?engine=native (sync/writeback round-trip)  ✅ Phase 5,6
+    ├── persist.ts      # IndexedDB snapshot (camera + freeform) — replaces persistenceKey    (DESIGN §11) ✅ Phase 7
+    └── EngineBoard.tsx # the board (sync/writeback round-trip + restore) — **the DEFAULT** (`?engine=tldraw` opts out)  ✅ Phase 5,6,7
 ```
 
 **Reused unchanged** from `DESIGN-CANVAS-001`: `Board.tsx` sync/writeback, `KymoNodeShapeUtil`,
@@ -196,7 +197,7 @@ Likelihood / impact qualitative (Low / Med / High).
 | RK-EN-01 | Store `source` fidelity slips → a programmatic apply leaks as `source:"user"` → round-trip oscillates (`RK-05` regression) | Med | High | Single `source`-tagging choke-point in `run` (DESIGN §5.3); `TC-EN-02` gates the Phase-7 flip; keep `Board`'s `applyingRef` belt-and-braces until proven | Open |
 | RK-EN-04 | Reactivity too coarse (single epoch) → broad re-renders → render jank | Med | Med | Start coarse (simplest correct) in Phase 5; the formal 60 fps measurement is the sibling's footprint pass (`PLAN-FIGJAM-001`) | Open |
 | RK-EN-07 | `RK-07` embed-blank regression if the render loop unmounts the diagram `<img>` | Low | Med | Preserve the data-URL `<img>` cache (DESIGN §8.2); re-run `TC-19` | Open |
-| RK-02 *(parent)* | No-key tldraw blanks the public board | — | — | **Closes at render level** at this feature's Phase 7 (engine renders the board, no key); **fully retired** when `canvas-figjam` physically removes tldraw | Closing |
+| RK-02 *(parent)* | No-key tldraw blanks the public board | — | — | **Closed at render level (Phase 7):** the engine is the default renderer and needs no key, so the deployed board renders. **Fully retired** when `canvas-figjam` physically removes tldraw. | Closed (render) |
 
 > Risks owned by the sibling feature (`PLAN-FIGJAM-001` §6): **RK-EN-02** (undo restores `x/y` +
 > round-trip text), **RK-EN-03** (freeform authoring scope blowout), **RK-EN-05** (engine bundle
@@ -271,7 +272,10 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 | 2026-05-24 | Phase 4 | **ShapeUtil + geometry shipped.** `packages/js-canvas/src/shape.ts` — `Rectangle2d` (bounds/hitTestPoint/toSvgPath), `T` validators (number/string/boolean/literal/optional), `ShapeUtil` abstract base (`static type`/`props`, instance `get type()`, abstract `getDefaultProps`/`getGeometry`, dev-time `validateProps`; render hooks `component`/`getIndicatorPath`/`toSvg` optional & `unknown` → **headless**, narrowed by Phase 5). Editor now validates props on `createShape`/`updateShape`; `zoomToFit` consumes real `getGeometry` bounds. Verified: **`TC-EN-05`, `TC-EN-06`** + zoomToFit-upgrade green (12/12 in `js-canvas`); `tsc --noEmit` clean (no React/DOM); `packages/js` 59/59; `website/app` untouched. | ✅ | — |
 | 2026-05-24 | Phase 5 | **Viewport + render (React) shipped.** Render layer lives **in-app** (`website/app/src/engine/`, keeping `packages/js-canvas` headless): `react.tsx` (`EngineCanvas` camera-transform render loop, `HTMLContainer`, `useEditor`/`useValue`), `shapes.tsx` (engine `ShapeUtil`s for `kymo-node`, `kymo-diagram`, + Phase-5 parity-stopgap `geo`/`arrow`), `EngineBoard.tsx` (read-only build from `diagramToShapes`). `App.tsx` branches on **`?engine=native`** → `EngineBoard` (Board.tsx untouched); `build.sh` builds the engine dist. **A/B verified (chrome E2E):** AIQ DSL renders nodes + 4 regions + edges; `order` BPMN renders the `<img>` embed; 0 console errors; default (no-flag) path still mounts tldraw. `tsc --noEmit` clean (app + js-canvas); `packages/js` 59/59, `js-canvas` 12/12. | ✅ | — |
 | 2026-05-24 | Phase 6 | **Interaction + round-trip shipped.** Editor gains pure camera helpers (`screenToPage`/`panBy`/`zoomToPoint`, clamped — unit-tested). `EngineCanvas` handles pointer/wheel: **drag a `kymo-node`** (`source:"user"` write), **pan** on empty-drag, **wheel-zoom** to cursor, **click-select** + indicator outline (DOM hit-test via `data-shape-id`). `EngineBoard` reworked from read-only → **persistent editor + `sync`/`writeback`/loop-guard** (mirrors Board.tsx); `App` passes `source`/`onPatch`. **E2E verified:** dragging Orchestrator patched the `.kymo` to `@ (964,278)` and the node **stayed put — no oscillation** (loop-guard held); pan/zoom/select work; 0 console errors; default path unchanged. `js-canvas` 13/13 (incl. camera ops); `packages/js` 59/59; Board.tsx untouched. | ✅ | — |
+| 2026-05-24 | Phase 7 | **Persistence + engine-default shipped — `canvas-engine` FEATURE-COMPLETE.** New in-app `engine/persist.ts` (IndexedDB snapshot `{schemaVersion, camera, freeform}`; debounced save; schema-guarded load) replaces tldraw's `persistenceKey` (`FR-EN-07`). `EngineBoard` restores the camera on mount (fit suppressed when restored); `EngineCanvas` gains `autoFit`/`onChange`, fits **once** (resize re-measures only). **`App.tsx` flips the default to the engine** (`USE_ENGINE = engine !== "tldraw"`); `?engine=tldraw` opts out. **`RK-02` closes at the render level** (engine renders with no key; live closure on the next `deploy-website` publish). **E2E verified:** default `/app/` renders via the engine (19 nodes, no tldraw); pan→reload **restores the camera** (IndexedDB snapshot present); round-trip intact; `?engine=tldraw` mounts tldraw; 0 console errors. `packages/js` 59/59; `js-canvas` 13/13; Board.tsx/adapter/core untouched. | ✅ | — |
 
-**Next:** **Phase 7** — `persist.ts` (IndexedDB) + **flip the public deploy to the engine**: board
-renders with no license key → **`RK-02` closes at the render level** (`DESIGN-ENGINE-001` §11, `FR-EN-07`).
-The feature-complete milestone for `canvas-engine`.
+**Status: `canvas-engine` is complete (Phases 1–7).** The engine is the default renderer; the
+deployed board renders with no license key (`RK-02` closed at the render level). **Remaining work is
+the sibling `canvas-figjam`** (`PLAN-FIGJAM-001`): built-in `geo`/`arrow` consolidation, undo/redo,
+board export, the **physical tldraw removal + full `TEST-CANVAS-001` parity**, footprint, and the
+FigJam freeform-authoring tools.

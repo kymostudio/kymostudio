@@ -70,6 +70,10 @@ interface Gesture {
 interface EngineCanvasProps {
   editor: Editor;
   shapeUtils: RenderUtil[];
+  /** Zoom-to-fit once on mount. False when a persisted camera was restored. */
+  autoFit?: boolean;
+  /** Called after a camera change (pan/zoom) so the host can persist it. */
+  onChange?: () => void;
   children?: ReactNode;
 }
 
@@ -77,7 +81,7 @@ interface EngineCanvasProps {
  * The viewport: a clip box holding a camera-transformed container
  * (`screen = (page + cam) * z`, §8.1) with one positioned wrapper per shape.
  */
-export function EngineCanvas({ editor, shapeUtils, children }: EngineCanvasProps) {
+export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, children }: EngineCanvasProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const fittedFor = useRef<Editor | null>(null);
   const gesture = useRef<Gesture | null>(null);
@@ -86,23 +90,26 @@ export function EngineCanvas({ editor, shapeUtils, children }: EngineCanvasProps
   // Re-render on store changes (drags write the store; sync re-applies it).
   useEffect(() => editor.store.listen(() => force()), [editor]);
 
-  // Measure the viewport, fit once per editor (before paint), re-fit on resize.
+  // Measure the viewport (always), and fit ONCE per editor — only when
+  // `autoFit` (a restored camera is honored, matching Board.tsx's fittedRef).
+  // Resize only re-measures; it never re-fits (tldraw fits once, then never).
   useLayoutEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
-    const fit = () => {
-      editor.setViewportSize({ w: el.clientWidth, h: el.clientHeight });
-      editor.zoomToFit();
-      force();
-    };
-    if (fittedFor.current !== editor) {
+    const measure = () => editor.setViewportSize({ w: el.clientWidth, h: el.clientHeight });
+    measure();
+    if (autoFit && fittedFor.current !== editor) {
       fittedFor.current = editor;
-      fit();
+      editor.zoomToFit();
     }
-    const ro = new ResizeObserver(fit);
+    force();
+    const ro = new ResizeObserver(() => {
+      measure();
+      force();
+    });
     ro.observe(el);
     return () => ro.disconnect();
-  }, [editor]);
+  }, [editor, autoFit]);
 
   // Wheel-zoom toward the cursor (non-passive so we can preventDefault).
   useEffect(() => {
@@ -114,10 +121,11 @@ export function EngineCanvas({ editor, shapeUtils, children }: EngineCanvasProps
       const factor = Math.exp(-e.deltaY * 0.0015);
       editor.zoomToPoint(editor.getCamera().z * factor, { x: e.clientX - r.left, y: e.clientY - r.top });
       force();
+      onChange?.();
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [editor]);
+  }, [editor, onChange]);
 
   const screenOf = (e: ReactPointerEvent): { x: number; y: number } => {
     const r = viewportRef.current!.getBoundingClientRect();
@@ -162,6 +170,7 @@ export function EngineCanvas({ editor, shapeUtils, children }: EngineCanvasProps
       editor.updateShape({ id: g.downId as Shape["id"], type: g.downType, x: g.ox + dx / g.z, y: g.oy + dy / g.z });
     } else {
       editor.setCamera({ x: g.camX + dx / g.z, y: g.camY + dy / g.z, z: g.z });
+      onChange?.(); // camera panned → persist (debounced)
     }
     force();
   };
