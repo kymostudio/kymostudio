@@ -25,7 +25,7 @@ async function freshBoard(page: Page): Promise<void> {
 
 /** Text tool → click the canvas → returns the auto-opened inline editor. */
 async function placeText(page: Page, fx = 0.4, fy = 0.5) {
-  const btn = page.getByRole("button", { name: "Text tool" });
+  const btn = page.getByTestId("tool-text");
   await btn.click();
   await expect(btn).toHaveClass(/active/); // tool=text committed before we click
   const vp = (await page.getByTestId("engine-viewport").boundingBox())!;
