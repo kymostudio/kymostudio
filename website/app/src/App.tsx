@@ -227,7 +227,7 @@ export function App() {
         </section>
 
         <section className="pane view">
-          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} tool={tool} />
+          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} tool={tool} onToolReset={() => setTool("select")} />
           <div id="error" hidden={error == null}>
             {error}
           </div>
@@ -262,6 +262,12 @@ export function App() {
                   <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
                   <path d="M2 2l7.586 7.586" />
                   <circle cx="11" cy="11" r="2" />
+                </svg>
+              </button>
+              <button className={`tbtn${tool === "sticky" ? " active" : ""}`} title="Sticky note (click to place)" aria-label="Sticky tool" onClick={() => setTool("sticky")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10l6-6V5a2 2 0 0 0-2-2z" />
+                  <path d="M15 21v-6h6" />
                 </svg>
               </button>
             </div>

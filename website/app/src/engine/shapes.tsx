@@ -337,3 +337,58 @@ export class FreedrawEngineUtil extends ShapeUtil {
     return `<path d="${strokePath(pts)}" fill="none" stroke="${color}" stroke-width="${size}" stroke-linecap="round" stroke-linejoin="round"/>`;
   }
 }
+
+// ── note (sticky note; canvas-jam FR-J-06) ───────────────────────────────────
+// Freeform layer (no `meta.kymo`). Click-to-place, double-click to edit its
+// plain-text label (the editor overlay lives in `react.tsx`; this util renders
+// the static sticky). Fixed default size in the P5/P6 MVP — interactive
+// resize/move is deferred to a later freeform-transform pass (`RK-EN-03`).
+
+export const NOTE_W = 180;
+export const NOTE_H = 120;
+export const NOTE_COLOR = "#fde68a"; // amber-200 sticky
+
+const NOTE_FONT = "13px/1.4 Inter, ui-sans-serif, system-ui";
+
+export class KymoNoteEngineUtil extends ShapeUtil {
+  static override type = "note";
+  override getDefaultProps() {
+    return { w: NOTE_W, h: NOTE_H, color: NOTE_COLOR, text: "" };
+  }
+  override getGeometry(shape: Shape) {
+    return new Rectangle2d({ width: num(shape.props.w, NOTE_W), height: num(shape.props.h, NOTE_H), isFilled: true });
+  }
+  override component(shape: Shape) {
+    const w = num(shape.props.w, NOTE_W);
+    const h = num(shape.props.h, NOTE_H);
+    const color = String(shape.props.color ?? NOTE_COLOR);
+    const text = String(shape.props.text ?? "");
+    return (
+      <HTMLContainer style={{ width: w, height: h }}>
+        <div
+          style={{
+            // pointerEvents:auto re-enables hit-testing under the (none) wrapper
+            // so a double-click reaches the note → enters edit mode.
+            width: "100%", height: "100%", boxSizing: "border-box",
+            background: color, borderRadius: 6, boxShadow: "0 2px 6px rgba(15,23,42,.18)",
+            padding: 10, font: NOTE_FONT, color: "#1e293b",
+            whiteSpace: "pre-wrap", overflow: "hidden", wordBreak: "break-word",
+            pointerEvents: "auto", cursor: "text", userSelect: "none",
+          }}
+        >
+          {text}
+        </div>
+      </HTMLContainer>
+    );
+  }
+  override toSvg(shape: Shape): string {
+    const w = num(shape.props.w, NOTE_W);
+    const h = num(shape.props.h, NOTE_H);
+    const color = String(shape.props.color ?? NOTE_COLOR);
+    const text = String(shape.props.text ?? "");
+    const rect = `<rect width="${w}" height="${h}" rx="6" fill="${color}"/>`;
+    if (!text) return rect;
+    const tspans = text.split("\n").map((ln, i) => `<tspan x="10" dy="${i ? 18 : 0}">${esc(ln)}</tspan>`).join("");
+    return rect + `<text x="10" y="24" font-family="Inter, ui-sans-serif, system-ui" font-size="13" fill="#1e293b">${tspans}</text>`;
+  }
+}
