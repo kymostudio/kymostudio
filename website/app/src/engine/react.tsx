@@ -14,7 +14,9 @@ import {
   useLayoutEffect,
   useReducer,
   useRef,
+  useState,
   type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
@@ -23,14 +25,17 @@ import { createShapeId, type Editor, type Shape, type ShapeId } from "../../../.
 const num = (v: unknown, fallback = 0): number =>
   typeof v === "number" && Number.isFinite(v) ? v : fallback;
 
-/** The draw tool's default stroke (mirrors `shapes.tsx`; inlined to avoid a
- *  circular import — `shapes.tsx` imports `HTMLContainer` from this module). */
+/** Tool defaults (mirror `shapes.tsx`; inlined to avoid a circular import —
+ *  `shapes.tsx` imports `HTMLContainer` from this module). */
 const DRAW_COLOR = "#1e293b";
 const DRAW_SIZE = 3;
+const NOTE_W = 180;
+const NOTE_H = 120;
+const NOTE_COLOR = "#fde68a";
 
 /** Which tool owns the pointer (canvas-jam `DESIGN-JAM-001` §7). `select` is the
- *  default; `draw` creates freeform `freedraw` strokes. */
-export type Tool = "select" | "draw";
+ *  default; `draw` creates freeform `freedraw` strokes; `sticky` places `note`s. */
+export type Tool = "select" | "draw" | "sticky";
 
 /** The slice of a shape util the render loop needs. */
 export interface RenderUtil {
@@ -169,8 +174,11 @@ interface EngineCanvasProps {
   autoFit?: boolean;
   /** Called after a camera change (pan/zoom) so the host can persist it. */
   onChange?: () => void;
-  /** Active tool (default `select`). `draw` makes a pointer-drag a freedraw stroke. */
+  /** Active tool (default `select`). `draw` makes a pointer-drag a freedraw stroke;
+   *  `sticky` places a note on click. */
   tool?: Tool;
+  /** Click-to-place tools (`sticky`) call this on commit so the host reverts to `select`. */
+  onToolReset?: () => void;
   children?: ReactNode;
 }
 
@@ -178,8 +186,23 @@ interface EngineCanvasProps {
  * The viewport: a clip box holding a camera-transformed container
  * (`screen = (page + cam) * z`, §8.1) with one positioned wrapper per shape.
  */
-export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, tool = "select", children }: EngineCanvasProps) {
+export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, tool = "select", onToolReset, children }: EngineCanvasProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
+  // The note currently being edited (its label shows an inline <textarea> overlay).
+  const [editingId, setEditingId] = useState<ShapeId | null>(null);
+  const noteEditorRef = useRef<HTMLTextAreaElement | null>(null);
+  const editStartRef = useRef(0);
+  // Focus the editor AFTER mount via an effect (not `autoFocus`): the opening
+  // gesture's native mousedown shifts focus to <body>, which would blur (and
+  // commit-close) an autofocused overlay. The effect runs after the gesture; we
+  // also stamp the open time so onBlur can ignore that one spurious focus-loss.
+  useEffect(() => {
+    if (editingId && noteEditorRef.current) {
+      editStartRef.current = Date.now();
+      noteEditorRef.current.focus();
+      noteEditorRef.current.select();
+    }
+  }, [editingId]);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const fittedFor = useRef<Editor | null>(null);
   const gesture = useRef<Gesture | null>(null);
@@ -270,6 +293,20 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
       }
       return;
     }
+    if (tool === "sticky") {
+      // Click-to-place a note centred on the pointer, then enter edit mode and
+      // revert to `select` (click-to-place tools don't stay active). Freeform: no
+      // `meta.kymo`. One recorded add → one undo step.
+      const pg = editor.screenToPage(p);
+      const id = createShapeId();
+      editor.run(
+        () => editor.createShape({ id, type: "note", x: pg.x - NOTE_W / 2, y: pg.y - NOTE_H / 2, props: { w: NOTE_W, h: NOTE_H, color: NOTE_COLOR, text: "" }, meta: {} }),
+        { source: "user", history: "record" },
+      );
+      editor.mark();
+      onToolReset?.(); // revert to select; the user double-clicks the note to edit (FR-J-06)
+      return; // no gesture: subsequent move/up are ignored
+    }
     const el = (e.target as HTMLElement).closest("[data-shape-id]");
     const downId = el?.getAttribute("data-shape-id") ?? null;
     const downType = el?.getAttribute("data-shape-type") ?? null;
@@ -350,8 +387,30 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
     }
   };
 
+  // Double-click a note (in select mode) → edit its label.
+  const onDoubleClick = (e: ReactMouseEvent) => {
+    if (tool !== "select") return;
+    // Scan every element under the point (not just e.target — the note's wrapper is
+    // pointer-events:none, so the bubbled target can be an ancestor) for a note.
+    for (const el of document.elementsFromPoint(e.clientX, e.clientY)) {
+      const w = (el as HTMLElement).closest?.("[data-shape-id]");
+      if (w?.getAttribute("data-shape-type") === "note") {
+        setEditingId(w.getAttribute("data-shape-id") as ShapeId);
+        return;
+      }
+    }
+  };
+
+  // Commit an edited note label as one recorded (undoable, persisted) step.
+  const commitEdit = (id: ShapeId, text: string) => {
+    editor.run(() => editor.updateShape({ id, type: "note", props: { text } }), { source: "user", history: "record" });
+    editor.mark();
+    setEditingId(null);
+  };
+
   const utils = new Map(shapeUtils.map((u) => [u.type, u]));
   const cam = editor.getCamera();
+  const editing = editingId ? editor.getShape(editingId) : undefined;
 
   return (
     <EditorContext.Provider value={editor}>
@@ -362,7 +421,8 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
         onPointerMove={onPointerMove}
         onPointerUp={endGesture}
         onPointerCancel={endGesture}
-        style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none", cursor: tool === "draw" ? "crosshair" : undefined }}
+        onDoubleClick={onDoubleClick}
+        style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none", cursor: tool === "draw" ? "crosshair" : tool === "sticky" ? "copy" : undefined }}
       >
         <div
           ref={containerRef}
@@ -390,6 +450,49 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
               />
             );
           })}
+
+          {/* Inline note-label editor (FR-J-06). A <textarea> overlaying the note,
+              inside the transformed container so it tracks the camera. */}
+          {editing && editing.type === "note" && (
+            <textarea
+              key={String(editingId)}
+              data-testid="note-editor"
+              ref={noteEditorRef}
+              defaultValue={String(editing.props.text ?? "")}
+              onPointerDown={(e) => e.stopPropagation()}
+              onDoubleClick={(e) => e.stopPropagation()}
+              onWheel={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") { e.preventDefault(); setEditingId(null); }
+                else if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); commitEdit(editing.id, e.currentTarget.value); }
+              }}
+              onBlur={(e) => {
+                // The opening gesture can blur the just-focused overlay (focus → <body>);
+                // ignore that one and re-focus. A genuine later click-away commits.
+                if (Date.now() - editStartRef.current < 300 && noteEditorRef.current) {
+                  noteEditorRef.current.focus();
+                  return;
+                }
+                commitEdit(editing.id, e.currentTarget.value);
+              }}
+              style={{
+                position: "absolute",
+                transform: `translate(${editing.x}px, ${editing.y}px)`,
+                width: num(editing.props.w, NOTE_W),
+                height: num(editing.props.h, NOTE_H),
+                boxSizing: "border-box",
+                background: String(editing.props.color ?? NOTE_COLOR),
+                borderRadius: 6,
+                border: "none",
+                outline: "2px solid #3b82f6",
+                padding: 10,
+                font: "13px/1.4 Inter, ui-sans-serif, system-ui",
+                color: "#1e293b",
+                resize: "none",
+                overflow: "hidden",
+              }}
+            />
+          )}
         </div>
         {children}
       </div>

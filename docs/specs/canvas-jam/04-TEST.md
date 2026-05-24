@@ -89,6 +89,12 @@ The headline acceptance — execute **every** canvas-editor case against the tld
 > snapshot, the `.kymo` text stays byte-identical, and one undo removes the whole stroke. This begins
 > un-deferring `TC-06`'s freeform clause — **draw** is now covered; **sticky**/**text** follow in P6/P7.
 
+> **`TC-J-06` — PASS (P6).** The sticky tool is verified by `website/app/e2e/sticky.spec.ts`: clicking
+> the canvas places a `note` (reverting to select), a double-click opens an inline editor whose text is
+> committed to the note, the note is `meta.kymo == null` and persists across reload while the `.kymo`
+> text stays byte-identical, and one undo removes a freshly-placed note. `TC-06` now covers draw +
+> sticky; only **text** (P7) remains.
+
 ## 4. Non-functional verification
 
 | NFR | Method |

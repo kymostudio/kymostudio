@@ -185,6 +185,16 @@ the point extent; `note`/`text` from `w/h` — all via `Rectangle2d` for hit-tes
 > are page-space, stored relative to the shape origin. Default stroke `#1e293b` / 3 px (no colour/size
 > picker in the MVP; `RK-EN-06`). `toSvg` emits a `<path>` (single-point click → a dot), so freeform
 > strokes are included in board export (`FR-J-03`). `note`/`text` follow in P6/P7.
+>
+> **As-built (P6, `note`):** click-to-place centres a fixed-size sticky (`#fde68a`, 180×120) as one
+> recorded add, then reverts to `select`. **Double-click → inline edit** via an overlay `<textarea>`
+> rendered inside the camera-transformed container (tracks pan/zoom); the dblclick hit-test scans
+> `elementsFromPoint` (the note wrapper is `pointer-events:none`, only its content div is interactive),
+> and the editor is focused via an effect with a short blur-guard so the opening gesture's native
+> focus-shift doesn't commit-close it. Commit (Enter / click-away) is one recorded, persisted step;
+> Escape cancels. **Resize and post-placement move are deferred** (the `FR-J-06` gesture is only
+> place + edit; interactive transform of freeform shapes is a later pass — `RK-EN-03`). Plain text only
+> (`RK-EN-06`). `text` (P7) reuses this overlay.
 
 ## 8. Risks / open questions
 
