@@ -60,10 +60,11 @@ questions:
 2. Where does each renderer's curve bend, so we know what `canvas-jam` (`NFR-J-01`: culling +
    per-record reactivity) must still buy.
 
-A non-gating regression guard already locks the *render-count* invariant in CI
-(`website/app/e2e/render-guard.spec.ts`); a headless cross-renderer harness lives alongside it
-(`website/app/e2e/perf-compare.spec.ts`, `@perf`, run via `npm run test:perf`). The numbers below are
-the **real-GPU** companion to that headless harness.
+A non-gating regression guard locks the *render-count* invariant in CI
+(`website/app/e2e/render-guard.spec.ts`). A headless cross-renderer harness (`perf-compare.spec.ts`,
+`npm run test:perf`) also existed, but was **removed in canvas-jam P3 (`FR-J-04`) when tldraw was deleted**
+— there is no second renderer to compare against anymore. The numbers below are archival (captured while
+tldraw was still bundled behind `?engine=tldraw`).
 
 ## 2. Method
 
@@ -186,8 +187,8 @@ close much of the gap, and the engine — until it culls — would lose that sce
 3. Engine = default; tldraw = add `&engine=tldraw`. Drive one camera update per `requestAnimationFrame`
    for ~2.5 s and count frames (engine via dispatched pointer/wheel; tldraw via `editor.setCamera`).
 
-The headless, repeatable version of this comparison is `npm run test:perf`
-(`website/app/e2e/perf-compare.spec.ts`).
+> **Note (P3):** tldraw and the `?engine=tldraw` opt-out were removed (`FR-J-04`), so this comparison is
+> no longer reproducible against a live tldraw — re-pin tldraw via `git revert` of the P3 removal to re-run.
 
 ## 8. Conclusions & traceability
 

@@ -4,15 +4,15 @@
  * `<HTMLContainer>`.
  *
  * Four shape types: `kymo-node`, `kymo-diagram` (BPMN embed), `kymo-region`
- * (region rect) and `kymo-edge` (edge). `kymo-region`/`kymo-edge` are the
- * canvas-jam Phase-1 consolidation (FR-J-01) that replaced the Phase-5
- * tldraw-style `geo`/`arrow` stopgaps; their props come from
- * `diagramToShapesEngine` (label is already plain text, not tldraw rich-text).
+ * (region rect) and `kymo-edge` (edge). Their props come from `diagramToShapes`
+ * (plain-text labels). Each util also implements `toSvg(shape)` — an SVG-string
+ * fragment in shape-local coords — consumed by the board exporter (FR-J-03).
  */
 import { useEffect, useState } from "react";
 import { ShapeUtil, Rectangle2d, type Shape } from "../../../../packages/js-canvas/dist/index.js";
 import { getIcon } from "../../../../packages/js/dist/index.js";
 import { HTMLContainer } from "./react";
+import { glyphCache } from "./export";
 
 const num = (v: unknown, fallback = 0): number =>
   typeof v === "number" && Number.isFinite(v) ? v : fallback;
@@ -21,9 +21,10 @@ function svgDataUrl(svg: string): string {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-// ── kymo-node ──────────────────────────────────────────────────────────────
+/** Escape text for safe inclusion in exported SVG `<text>` content. */
+const esc = (s: string): string => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-const glyphCache = new Map<string, string>();
+// ── kymo-node ──────────────────────────────────────────────────────────────
 
 function useGlyph(icon: string): string {
   const [glyph, setGlyph] = useState(() => glyphCache.get(icon) ?? "");
@@ -97,6 +98,16 @@ export class KymoNodeEngineUtil extends ShapeUtil {
   override component(shape: Shape) {
     return <NodeView shape={shape} />;
   }
+  override toSvg(shape: Shape): string {
+    const w = num(shape.props.w, 76);
+    const h = num(shape.props.h, 76);
+    const glyph = glyphCache.get(String(shape.props.icon ?? "")) ?? ""; // pre-warmed by the exporter
+    const name = String(shape.props.name ?? "");
+    const label = name
+      ? `<text x="${w / 2}" y="${h + 14}" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui" font-weight="600" font-size="13" fill="#1e293b">${esc(name)}</text>`
+      : "";
+    return `<g transform="translate(${w / 2},${h / 2})">${glyph}</g>${label}`;
+  }
 }
 
 // ── kymo-diagram (BPMN embed) ────────────────────────────────────────────────
@@ -127,6 +138,12 @@ export class KymoDiagramEngineUtil extends ShapeUtil {
         ) : null}
       </HTMLContainer>
     );
+  }
+  override toSvg(shape: Shape): string {
+    const w = num(shape.props.w, 320);
+    const h = num(shape.props.h, 200);
+    const svg = String(shape.props.svg ?? "");
+    return svg ? `<image href="${svgDataUrl(svg)}" width="${w}" height="${h}"/>` : "";
   }
 }
 
@@ -173,6 +190,17 @@ export class KymoRegionEngineUtil extends ShapeUtil {
         )}
       </HTMLContainer>
     );
+  }
+  override toSvg(shape: Shape): string {
+    const w = num(shape.props.w, 1);
+    const h = num(shape.props.h, 1);
+    const dashed = shape.props.dash === "dashed";
+    const label = String(shape.props.label ?? "");
+    const rect = `<rect x="0" y="0" width="${w}" height="${h}" rx="4" fill="none" stroke="#9ca3af" stroke-width="1.5"${dashed ? ' stroke-dasharray="4 4"' : ""}/>`;
+    const text = label
+      ? `<text x="6" y="16" font-family="Inter, ui-sans-serif, system-ui" font-size="12" fill="#64748b">${esc(label)}</text>`
+      : "";
+    return rect + text;
   }
 }
 
@@ -239,5 +267,20 @@ export class KymoEdgeEngineUtil extends ShapeUtil {
         )}
       </HTMLContainer>
     );
+  }
+  override toSvg(shape: Shape): string {
+    const s = pt(shape.props.start);
+    const e = pt(shape.props.end);
+    const label = String(shape.props.label ?? "");
+    const showArrow = shape.props.arrowhead !== "none";
+    const markerId = `kymo-arrow-${String(shape.id).replace(/[^a-zA-Z0-9_-]/g, "")}`;
+    const defs = showArrow
+      ? `<defs><marker id="${markerId}" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#9ca3af"/></marker></defs>`
+      : "";
+    const line = `<line x1="${s.x}" y1="${s.y}" x2="${e.x}" y2="${e.y}" stroke="#9ca3af" stroke-width="1.5"${showArrow ? ` marker-end="url(#${markerId})"` : ""}/>`;
+    const text = label
+      ? `<text x="${(s.x + e.x) / 2}" y="${(s.y + e.y) / 2}" text-anchor="middle" dominant-baseline="middle" font-family="Inter, ui-sans-serif, system-ui" font-size="11" fill="#64748b">${esc(label)}</text>`
+      : "";
+    return defs + line + text;
   }
 }

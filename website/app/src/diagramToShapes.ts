@@ -1,23 +1,23 @@
 /**
- * Phase 2 — map a positioned `Diagram` to tldraw shape partials, one per
- * element (Component → custom `kymo-node`, Region → native `geo` rect, Edge →
- * native `arrow`). Deterministic ids (derived from the kymo id) make the diff
- * sync in Board stable. Every shape is tagged `meta.kymo` so the freeform layer
- * stays untouched.
+ * Map a positioned `Diagram` to engine shape partials, one per element
+ * (Component → `kymo-node`, Region → `kymo-region` rect, Edge → `kymo-edge`).
+ * Deterministic ids (derived from the kymo id) keep `EngineBoard`'s diff-sync
+ * stable; every shape is tagged `meta.kymo` so the freeform layer stays
+ * untouched. (Built-in consolidation, `FR-J-01`; tldraw-free since `FR-J-04`.)
  */
-import { createShapeId, toRichText, type TLShapeId, type TLShapePartial } from "./engine/adapter";
+import { createShapeId, type ShapeId, type ShapePartial } from "../../../packages/js-canvas/dist/index.js";
 import {
   anchor, componentHalf, resolveAnchors,
   type Component, type Diagram, type Region,
 } from "../../../packages/js/dist/index.js";
 
-export const nodeShapeId = (id: string): TLShapeId => createShapeId("kymo-node-" + id);
-export const regionShapeId = (id: string): TLShapeId => createShapeId("kymo-region-" + id);
-export const edgeShapeId = (i: number): TLShapeId => createShapeId("kymo-edge-" + i);
+export const nodeShapeId = (id: string): ShapeId => createShapeId("kymo-node-" + id);
+export const regionShapeId = (id: string): ShapeId => createShapeId("kymo-region-" + id);
+export const edgeShapeId = (i: number): ShapeId => createShapeId("kymo-edge-" + i);
 
 /** Build the kymo-layer shape partials for a positioned diagram. */
-export function diagramToShapes(d: Diagram): TLShapePartial[] {
-  const out: TLShapePartial[] = [];
+export function diagramToShapes(d: Diagram): ShapePartial[] {
+  const out: ShapePartial[] = [];
   const lookup = (id: string): Component | Region | undefined =>
     d.components.find((c) => c.id === id) ?? d.regions.find((r) => r.id === id);
 
@@ -27,18 +27,13 @@ export function diagramToShapes(d: Diagram): TLShapePartial[] {
     const [x, y, w, h] = r.bounds;
     if (w <= 0 || h <= 0) continue;
     out.push({
-      id: regionShapeId(r.id), type: "geo", x, y,
-      props: {
-        geo: "rectangle", w, h, size: "s", color: "grey", fill: "none",
-        dash: r.style === "inner" ? "dashed" : "solid", font: "sans",
-        align: "start", verticalAlign: "start",
-        richText: toRichText(r.label || ""),
-      },
+      id: regionShapeId(r.id), type: "kymo-region", x, y,
+      props: { w, h, color: "grey", dash: r.style === "inner" ? "dashed" : "solid", label: r.label || "" },
       meta: { kymo: { id: r.id, kind: "region" } },
     });
   }
 
-  // Component nodes (pos is centre → tldraw x/y is top-left).
+  // Component nodes (pos is centre → top-left).
   for (const c of d.components) {
     const [hw, hh] = componentHalf(c);
     out.push({
@@ -48,7 +43,7 @@ export function diagramToShapes(d: Diagram): TLShapePartial[] {
     });
   }
 
-  // Edges → arrows from resolved anchor points (BPMN polylines handled by the embed fallback).
+  // Edges → kymo-edge from resolved anchor points (BPMN polylines use the embed fallback).
   d.edges.forEach((e, i) => {
     if (e.points && e.points.length) return;
     const s = lookup(e.src), t = lookup(e.dst);
@@ -57,12 +52,8 @@ export function diagramToShapes(d: Diagram): TLShapePartial[] {
     const [x1, y1] = anchor(s, sa);
     const [x2, y2] = anchor(t, da);
     out.push({
-      id: edgeShapeId(i), type: "arrow", x: x1, y: y1,
-      props: {
-        start: { x: 0, y: 0 }, end: { x: x2 - x1, y: y2 - y1 }, bend: 0,
-        size: "s", color: "grey", font: "sans", arrowheadStart: "none", arrowheadEnd: "arrow",
-        richText: toRichText(e.label || ""),
-      },
+      id: edgeShapeId(i), type: "kymo-edge", x: x1, y: y1,
+      props: { start: { x: 0, y: 0 }, end: { x: x2 - x1, y: y2 - y1 }, color: "grey", arrowhead: "arrow", label: e.label || "" },
       meta: { kymo: { kind: "edge", src: e.src, dst: e.dst } },
     });
   });
