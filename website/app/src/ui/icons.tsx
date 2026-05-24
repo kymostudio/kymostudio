@@ -119,3 +119,9 @@ export const Pen = (p: IconProps) => (
 export const Sparkle = (p: IconProps) => (
   <Svg {...p}><path d="M12 3v6M12 15v6M3 12h6M15 12h6M6 6l4 4M14 14l4 4M18 6l-4 4M10 14l-4 4" /></Svg>
 );
+export const Minus = (p: IconProps) => (
+  <Svg {...p}><path d="M5 12h14" /></Svg>
+);
+export const Plus = (p: IconProps) => (
+  <Svg {...p}><path d="M12 5v14M5 12h14" /></Svg>
+);

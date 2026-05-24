@@ -188,16 +188,21 @@ belongs to the backend comments feature.
 
 ## 7. Status bar (`ui/StatusBar.tsx`) — FR-CS-06
 
-A bottom strip reading three independent sources, each as ordinary React state (so it never
-re-renders the canvas shape layer — `NFR-CS-02`):
+A floating strip at the canvas bottom (prototype `.k-statusbar`/`.k-chip`), a **sibling of
+`EngineBoard`** under `.canvas-wrap`, so its re-renders never touch the canvas shape layer
+(`NFR-CS-02`). Three chips:
 
-- **Counts** — from the parsed `Diagram` already in `App` state (`diagram.components`/`regions`/
-  `edges`): "N nodes · M edges".
-- **Autosave** — a small signal from `engine/persist` (`scheduleSave` fires on every user edit,
-  `DESIGN-JAM-001` §7); show "● saved" / "saving…".
-- **Zoom & Fit** — `−`/`+` step `editor` camera zoom; the `%` shows `editor.getCamera().z`; **Fit**
-  calls `editor.zoomToFit()` (exists, `TC-EN-07`). Camera reads can poll on the store-change tick the
-  board already emits, or on a rAF while interacting.
+- **Counts** — from the parsed `Diagram` in `App` state (`diagram.components.length` /
+  `diagram.edges.length`): "N nodes · M edges".
+- **Autosave** — `Saving…`→`Saved`, driven by the `source` prop (an edit → `Saving…`, then a 700 ms
+  idle → `Saved`). Honest: the app debounce-persists `source`→URL (`syncURL`) and
+  camera/freeform→IndexedDB (`engine/persist`). *(No dedicated persist "saved" event exists, so the
+  indicator is edit-driven, not a `scheduleSave` callback.)*
+- **Zoom & Fit** — `−`/`+`/Fit call the engine **`ViewApi`** (`react.tsx`): `zoomIn`/`zoomOut` =
+  `editor.zoomToPoint(clamp(z·f), viewportCentre)` + `applyCamera()`; `fit` = `editor.zoomToFit()` +
+  `applyCamera()`. Going **through `applyCamera`** (DOM transform, no React render) keeps zoom at 0
+  shape re-renders, like wheel-zoom. The `%` is a **200 ms poll** of `ViewApi.getZoom()` inside
+  `StatusBar` (setState-on-change), so wheel-zoom updates the readout without re-rendering the canvas.
 
 ## 8. Component structure & state
 
@@ -238,4 +243,4 @@ Tracked in `PLAN-STUDIO-001` §6. Design-level callouts:
 
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
-| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. **P4 build:** §5 as-built — match `renderSVG` not the mockup: node glyph kept, region outer-slate / inner-purple-dashed, edge flow-dash (CSS keyframe + SMIL). **P5 build:** §6 as-built — selection generalised to any selected shape; rect/handles/badge accent-green; comment-pin dropped (no data model). |
+| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. **P4 build:** §5 as-built — match `renderSVG` not the mockup: node glyph kept, region outer-slate / inner-purple-dashed, edge flow-dash (CSS keyframe + SMIL). **P5 build:** §6 as-built — selection generalised to any selected shape; rect/handles/badge accent-green; comment-pin dropped (no data model). **P6 build:** §7 as-built — status bar via engine `ViewApi` (zoom through `applyCamera`, isolated `%` poll); autosave edit-driven. **canvas-studio complete (P1–P6).** |

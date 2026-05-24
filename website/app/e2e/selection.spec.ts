@@ -58,15 +58,20 @@ test("TC-CS-05: clicking empty canvas clears the selection", async ({ page }) =>
   await page.locator('[data-shape-type="kymo-node"]').first().click();
   await expect(page.getByTestId("selection-size")).toHaveCount(1);
 
-  // Click a genuinely empty viewport point (no shape under it).
+  // Click a genuinely empty viewport point — no shape AND no floating chrome
+  // (top toolbar / bottom status bar / left rail) under it, so the click reaches
+  // the canvas and clears the selection. Candidates stay clear of top/bottom.
   const empty = await page.evaluate(() => {
     const vp = document.querySelector('[data-testid="engine-viewport"]')!.getBoundingClientRect();
-    for (const [fx, fy] of [[0.06, 0.94], [0.94, 0.06], [0.06, 0.06], [0.5, 0.97]]) {
+    for (const [fx, fy] of [[0.04, 0.45], [0.96, 0.45], [0.04, 0.25], [0.96, 0.72]]) {
       const x = vp.left + vp.width * fx, y = vp.top + vp.height * fy;
-      const onShape = document.elementsFromPoint(x, y).some((e) => (e as HTMLElement).closest?.("[data-shape-id]"));
-      if (!onShape) return { x, y };
+      const blocked = document.elementsFromPoint(x, y).some((e) => {
+        const el = e as HTMLElement;
+        return el.closest?.("[data-shape-id]") || el.closest?.(".k-statusbar, .toolbar, .k-rail");
+      });
+      if (!blocked) return { x, y };
     }
-    return { x: vp.left + 6, y: vp.top + vp.height - 6 };
+    return { x: vp.left + vp.width * 0.04, y: vp.top + vp.height * 0.45 };
   });
   await page.mouse.click(empty.x, empty.y);
 

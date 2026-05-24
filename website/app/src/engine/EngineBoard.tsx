@@ -18,7 +18,7 @@ import {
 import type { Diagram } from "../../../../packages/js/dist/index.js";
 import { diagramToShapes } from "../diagramToShapes";
 import { patchPositions, type XY } from "../patchDsl";
-import { EngineCanvas, type Tool } from "./react";
+import { EngineCanvas, type Tool, type ViewApi } from "./react";
 import { boardToSvg } from "./export";
 import { loadSnapshot, saveSnapshot } from "./persist";
 import { KymoNodeEngineUtil, KymoDiagramEngineUtil, KymoRegionEngineUtil, KymoEdgeEngineUtil, FreedrawEngineUtil, KymoNoteEngineUtil, KymoTextEngineUtil } from "./shapes";
@@ -38,9 +38,11 @@ interface EngineBoardProps {
   onPatch: (text: string) => void;
   /** Hands the host a board→SVG exporter once the editor is live (FR-J-03). */
   onReady?: (exportSvg: () => Promise<string>) => void;
-  /** Hands the host the live `Editor` (canvas-studio `FR-CS-02`: top-bar undo/redo,
-   *  `FR-CS-06`: status-bar zoom/fit). The editor outlives the canvas mount. */
+  /** Hands the host the live `Editor` (canvas-studio `FR-CS-02`: top-bar undo/redo).
+   *  The editor outlives the canvas mount. */
   onEditorReady?: (editor: Editor) => void;
+  /** Hands the host the canvas zoom/fit API (canvas-studio `FR-CS-06`, status bar). */
+  onViewReady?: (api: ViewApi) => void;
   /** Active canvas tool (canvas-jam `FR-J-05`+): `select` (default), `draw`, `sticky`. */
   tool?: Tool;
   /** Click-to-place tools call this to revert the host's tool to `select`. */
@@ -74,7 +76,7 @@ function syncElements(editor: Editor, diagram: Diagram): void {
   for (const p of partials) if (existingIds.has(p.id)) editor.updateShape(p);
 }
 
-export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onReady, onEditorReady, tool, onToolReset }: EngineBoardProps) {
+export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onReady, onEditorReady, onViewReady, tool, onToolReset }: EngineBoardProps) {
   const editorRef = useRef<Editor | null>(null);
   if (!editorRef.current) editorRef.current = new Editor(new Store(), { shapeUtils: utils });
   const editor = editorRef.current;
@@ -206,7 +208,7 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onRea
 
   return (
     <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-      {loaded && <EngineCanvas editor={editor} shapeUtils={utils} autoFit={!restoredRef.current} onChange={scheduleSave} tool={tool} onToolReset={onToolReset} />}
+      {loaded && <EngineCanvas editor={editor} shapeUtils={utils} autoFit={!restoredRef.current} onChange={scheduleSave} tool={tool} onToolReset={onToolReset} onViewReady={onViewReady} />}
     </div>
   );
 }
