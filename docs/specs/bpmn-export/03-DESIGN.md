@@ -1,6 +1,6 @@
 ---
 title: BPMN 2.0 Export — Design
-document_id: FEAT-BPMN-EXPORT-DSN-001
+document_id: DESIGN-BPMN-EXPORT-001
 version: "1.0"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers implementing the kymo BPMN emitter and its JS port
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-EXPORT-001        # Introduction
-  - FEAT-BPMN-EXPORT-REQ-001    # Requirements (traced below)
-  - FEAT-BPMN-EXPORT-TST-001    # Test documentation
-  - FEAT-BPMN-EXPORT-PLAN-001   # Plan
+  - INTRO-BPMN-EXPORT-001        # Introduction
+  - FEAT-BPMN-EXPORT-001    # Requirements (traced below)
+  - TEST-BPMN-EXPORT-001    # Test documentation
+  - PLAN-BPMN-EXPORT-001   # Plan
   - BPMN-MAP-001                 # BPMN importer element mapping (inverted here)
   - DSL-LANG-001                # kymo DSL language specification
 authors:
@@ -35,14 +35,14 @@ iso_compliance:
 
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
-| Document ID  | FEAT-BPMN-EXPORT-DSN-001                           |
+| Document ID  | DESIGN-BPMN-EXPORT-001                           |
 | Version      | 1.0                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | FEAT-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-REQ-001, FEAT-BPMN-EXPORT-TST-001, FEAT-BPMN-EXPORT-PLAN-001 |
+| Related      | INTRO-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001, PLAN-BPMN-EXPORT-001 |
 
-Realises FEAT-BPMN-EXPORT-REQ-001 (FR/NFR cited per clause). The emitter is the
+Realises FEAT-BPMN-EXPORT-001 (FR/NFR cited per clause). The emitter is the
 exact inverse of the importer mapping in BPMN-MAP-001. Covers ISO/IEC/IEEE 12207
 Architecture & Design Definition.
 
@@ -50,7 +50,7 @@ Architecture & Design Definition.
 
 The architecture of `to_bpmn`: how a resolved `Diagram` becomes a BPMN 2.0 document
 (semantic tree + DI plane). The normative element mapping is BPMN-MAP-001 (read in
-reverse); behaviour requirements are in FEAT-BPMN-EXPORT-REQ-001.
+reverse); behaviour requirements are in FEAT-BPMN-EXPORT-001.
 
 ## 2. Pipeline (FR-1)
 
@@ -135,7 +135,7 @@ yields byte-identical XML across runs and across the Python/JS implementations
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-export/03-DESIGN.md`; authoritative source is
+Version-controlled at `docs/specs/bpmn-export/03-DESIGN.md`; authoritative source is
 the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
@@ -143,9 +143,9 @@ Implicit — checked in with the feature; available to all repository readers.
 
 ### B.3 Change Control
 On a design change: update the affected clause; keep the requirement IDs it traces
-(FR-1…FR-8, NFR-1…NFR-4) consistent with FEAT-BPMN-EXPORT-REQ-001; increment `version`;
+(FR-1…FR-8, NFR-1…NFR-4) consistent with FEAT-BPMN-EXPORT-001; increment `version`;
 append a row to Annex A; reflect any mapping change against BPMN-MAP-001.
 
 ### B.4 Backwards Compatibility
 This describes the intended implementation; the normative surface is
-FEAT-BPMN-EXPORT-REQ-001 and BPMN-MAP-001. Reconcile any deviation there before release.
+FEAT-BPMN-EXPORT-001 and BPMN-MAP-001. Reconcile any deviation there before release.

@@ -6,8 +6,9 @@
 
 ## `bpmn_layout_spike.py` — bpmn-dsl Phase 0 (P0)
 
-Feature doc set: `docs/features/bpmn-dsl/` (`FEAT-BPMN-DSL-*`). This spike covers
-**P0** from `05-PLAN.md`: a throwaway layered-layout prototype on the order graph.
+Spec docs: `docs/specs/bpmn-dsl/`; plan: `docs/plans/bpmn-dsl/PLAN.md`
+(`*-BPMN-DSL-001`). This spike covers **P0** from that plan: a throwaway
+layered-layout prototype on the order graph.
 
 - **Question it answers (FR-8):** does a left-to-right Sugiyama-style layered
   layout produce a *sane, legible* BPMN diagram — especially the parallel
@@ -75,8 +76,9 @@ start/end) render via the existing `bpmn_shapes`. Output is **deterministic**
 
 ## `bpmn_export_spike.py` — bpmn-export Phase 0 (P0)
 
-Feature doc set: `docs/features/bpmn-export/` (`FEAT-BPMN-EXPORT-*`). Covers **P0**
-from its `05-PLAN.md`: a throwaway `to_bpmn` prototype proving round-trip.
+Spec docs: `docs/specs/bpmn-export/`; plan: `docs/plans/bpmn-export/PLAN.md`
+(`*-BPMN-EXPORT-001`). Covers **P0** from that plan: a throwaway `to_bpmn`
+prototype proving round-trip.
 
 - **Question it answers (FR-4):** can a `to_bpmn` emitter (inverse of `from_bpmn`)
   turn a kymo `Diagram` back into BPMN 2.0 XML that **re-imports and renders the

@@ -1,6 +1,6 @@
 ---
 title: BPMN in the kymo DSL — Test Documentation
-document_id: FEAT-BPMN-DSL-TST-001
+document_id: TEST-BPMN-DSL-001
 version: "1.0"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers verifying the BPMN-in-kymo feature
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-DSL-001        # Introduction
-  - FEAT-BPMN-DSL-REQ-001    # Requirements (traced below)
-  - FEAT-BPMN-DSL-DSN-001    # Design
-  - FEAT-BPMN-DSL-PLAN-001   # Plan
+  - INTRO-BPMN-DSL-001        # Introduction
+  - FEAT-BPMN-DSL-001    # Requirements (traced below)
+  - DESIGN-BPMN-DSL-001    # Design
+  - PLAN-BPMN-DSL-001   # Plan
   - DSL-LANG-001             # kymo DSL language specification (normative)
 authors:
   - Vũ Anh
@@ -34,14 +34,14 @@ iso_compliance:
 
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
-| Document ID  | FEAT-BPMN-DSL-TST-001                             |
+| Document ID  | TEST-BPMN-DSL-001                             |
 | Version      | 1.0                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | FEAT-BPMN-DSL-001, FEAT-BPMN-DSL-REQ-001, FEAT-BPMN-DSL-DSN-001, FEAT-BPMN-DSL-PLAN-001 |
+| Related      | INTRO-BPMN-DSL-001, FEAT-BPMN-DSL-001, DESIGN-BPMN-DSL-001, PLAN-BPMN-DSL-001 |
 
-Verifies the requirements in FEAT-BPMN-DSL-REQ-001 (FR/NFR IDs). Covers
+Verifies the requirements in FEAT-BPMN-DSL-001 (FR/NFR IDs). Covers
 12207 Verification & Validation.
 
 ## 1. Test approach and levels
@@ -55,7 +55,7 @@ Verifies the requirements in FEAT-BPMN-DSL-REQ-001 (FR/NFR IDs). Covers
 - **Parity** — JS parser + render smoke (`packages/js/tests/`).
 
 > **P0 status (2026-05-23):** the throwaway spike (`packages/python/spikes/`, per
-> FEAT-BPMN-DSL-PLAN-001 §3) gives early *informal* evidence for TC-4 (split/join
+> PLAN-BPMN-DSL-001 §3) gives early *informal* evidence for TC-4 (split/join
 > structure) and TC-7 (determinism — byte-identical SVG across runs). The formal
 > cases below are implemented against the real engine in P2/P3.
 
@@ -119,7 +119,7 @@ outside the new `bpmn_block_order` case is a **failure**, not a re-baseline.
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-dsl/04-TEST.md`; authoritative source
+Version-controlled at `docs/specs/bpmn-dsl/04-TEST.md`; authoritative source
 is the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

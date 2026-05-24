@@ -1,6 +1,6 @@
 ---
 title: BPMN in the kymo DSL — Introduction
-document_id: FEAT-BPMN-DSL-001
+document_id: INTRO-BPMN-DSL-001
 version: "1.1"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers and reviewers of the kymo DSL, layout engine, and renderers
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-DSL-REQ-001    # Requirements
-  - FEAT-BPMN-DSL-DSN-001    # Design
-  - FEAT-BPMN-DSL-TST-001    # Test documentation
-  - FEAT-BPMN-DSL-PLAN-001   # Plan
+  - FEAT-BPMN-DSL-001    # Requirements
+  - DESIGN-BPMN-DSL-001    # Design
+  - TEST-BPMN-DSL-001    # Test documentation
+  - PLAN-BPMN-DSL-001   # Plan
   - DSL-LANG-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
   - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
@@ -36,20 +36,20 @@ iso_compliance:
 
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
-| Document ID  | FEAT-BPMN-DSL-001                                           |
+| Document ID  | INTRO-BPMN-DSL-001                                           |
 | Version      | 1.1                                                         |
 | Status       | Released                                                    |
 | Issue Date   | 2026-05-23                                                  |
 | Owner        | `diagrams/` project                                         |
-| Related      | FEAT-BPMN-DSL-REQ-001, FEAT-BPMN-DSL-DSN-001, FEAT-BPMN-DSL-TST-001, FEAT-BPMN-DSL-PLAN-001 |
+| Related      | FEAT-BPMN-DSL-001, DESIGN-BPMN-DSL-001, TEST-BPMN-DSL-001, PLAN-BPMN-DSL-001 |
 
 ## 1. Purpose and scope
 
 This document introduces the **BPMN-in-kymo** feature and is the entry point to
 its document set. It states the problem, the concept, and the terminology, and
-maps the reader to the requirements (FEAT-BPMN-DSL-REQ-001), the design
-(FEAT-BPMN-DSL-DSN-001), the test documentation (FEAT-BPMN-DSL-TST-001), and the
-plan (FEAT-BPMN-DSL-PLAN-001). The set conforms to ISO/IEC/IEEE 12207:2017
+maps the reader to the requirements (FEAT-BPMN-DSL-001), the design
+(DESIGN-BPMN-DSL-001), the test documentation (TEST-BPMN-DSL-001), and the
+plan (PLAN-BPMN-DSL-001). The set conforms to ISO/IEC/IEEE 12207:2017
 (life-cycle processes) and ISO/IEC/IEEE 15289:2019 (information-item content).
 
 ## 2. Background
@@ -78,8 +78,8 @@ the engine lay it out:
   `bpmn-*` glyphs and flow renderer draw it unchanged.
 
 The normative grammar is in DSL-LANG-001; the surface and behaviour are
-specified as requirements in FEAT-BPMN-DSL-REQ-001; the architecture and
-algorithm in FEAT-BPMN-DSL-DSN-001.
+specified as requirements in FEAT-BPMN-DSL-001; the architecture and
+algorithm in DESIGN-BPMN-DSL-001.
 
 ## 4. Audience
 
@@ -103,11 +103,11 @@ Read in order:
 
 | # | Information item | Document | Standard role (15289) |
 |---|------------------|----------|-----------------------|
-| 1 | Introduction (this) | FEAT-BPMN-DSL-001 | Concept / overview |
-| 2 | Requirements | FEAT-BPMN-DSL-REQ-001 | Requirements specification |
-| 3 | Design | FEAT-BPMN-DSL-DSN-001 | Design / architecture |
-| 4 | Test documentation | FEAT-BPMN-DSL-TST-001 | Test plan / cases / traceability |
-| 5 | Plan | FEAT-BPMN-DSL-PLAN-001 | Plan |
+| 1 | Introduction (this) | INTRO-BPMN-DSL-001 | Concept / overview |
+| 2 | Requirements | FEAT-BPMN-DSL-001 | Requirements specification |
+| 3 | Design | DESIGN-BPMN-DSL-001 | Design / architecture |
+| 4 | Test documentation | TEST-BPMN-DSL-001 | Test plan / cases / traceability |
+| 5 | Plan | PLAN-BPMN-DSL-001 | Plan |
 
 ## Annex A — Revision History
 
@@ -124,7 +124,7 @@ Read in order:
 
 ### B.1 Storage and Retrieval
 Version-controlled in the project repository at
-`docs/features/bpmn-dsl/01-INTRO.md`; the authoritative source is the
+`docs/specs/bpmn-dsl/01-INTRO.md`; the authoritative source is the
 main-branch working tree, with history via `git log`.
 
 ### B.2 Distribution
@@ -138,4 +138,4 @@ row to Annex A.
 
 ### B.4 Backwards Compatibility
 This is an informative overview; on any feature change, reconcile it with
-FEAT-BPMN-DSL-REQ-001 (the normative requirements) before release.
+FEAT-BPMN-DSL-001 (the normative requirements) before release.
