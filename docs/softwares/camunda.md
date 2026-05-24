@@ -13,7 +13,7 @@ related_documents:
   - camunda.comparision.md
   - ../diagrams/bpmn/README.md
   - ./bpmn-io.md
-  - ../DSL.md
+  - ../KYMO_DSL.md
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +48,7 @@ upstream:
 | License           | C7 CE: Apache-2.0 (EoL) · C8: source-available + proprietary  |
 | Version Reviewed  | Camunda 8 (current); Camunda 7 CE (EoL)                       |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`camunda.comparision.md`](./camunda.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`bpmn-io.md`](./bpmn-io.md), [`DSL.md`](../DSL.md) |
+| Related Documents | [`camunda.comparision.md`](./camunda.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`bpmn-io.md`](./bpmn-io.md), [`KYMO_DSL.md`](../KYMO_DSL.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Camunda's design choices so the team can consult them when reasoning about process notation and model interchange. No code or behaviour in this repository depends on Camunda. Camunda is a **process-execution platform**, a different category from kymo (a static diagram DSL); it is included because it authored bpmn.io and exemplifies BPMN's "executable model" ambition.
 

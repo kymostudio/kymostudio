@@ -14,7 +14,7 @@ related_documents:
   - FEAT-CANVAS-001
   - DESIGN-CANVAS-001
   - TEST-CANVAS-001
-  - DSL-LANG-001
+  - KYMO-DSL-001
   - RES-MERMAID-D2-001
 authors:
   - Vũ Anh
@@ -45,7 +45,7 @@ keywords:
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers evolving the web playground (`website/app/`) and `packages/js` |
-| Related Documents | `FEAT-CANVAS-001` (requirements), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `DSL-LANG-001`, `RES-MERMAID-D2-001` |
+| Related Documents | `FEAT-CANVAS-001` (requirements), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `KYMO-DSL-001`, `RES-MERMAID-D2-001` |
 
 > **Implementation plan (ISO/IEC/IEEE 12207 §6.3 Technical Management).** This is the *delivery*
 > layer for the canvas-editor: mission rationale, the phased plan (**milestones = phases**), the risk
@@ -98,7 +98,7 @@ the code force the architecture:
 ### 2.1 Caveats to accept up front (decision points, not blockers)
 
 - **`.kymo` is source-of-truth for the *diagram layer only*.** Freeform whiteboard content
-  (sticky notes, freehand strokes, frames) has **no representation in the DSL** (`DSL-LANG-001`
+  (sticky notes, freehand strokes, frames) has **no representation in the DSL** (`KYMO-DSL-001`
   §6) — it cannot sync to `.kymo`. It must persist in tldraw's own store. Mental model: **two
   layers** — a kymo-diagram layer (bound to `.kymo`) and a freeform layer (bound to tldraw's
   document, persisted via `persistenceKey` / exported `.tldr`).
@@ -111,7 +111,7 @@ the code force the architecture:
   copied into `website/` (else it fetches from a CDN).
 - **DSL v3 watch-out.** The mooted v3 direction (indentation / CSS-cascade styling) is **not yet
   in `docs/`**. If v3 lands, the serializer's *output grammar* changes. Coordinate with
-  `DSL-LANG-001`. (RK-04.)
+  `KYMO-DSL-001`. (RK-04.)
 
 ---
 
@@ -145,7 +145,7 @@ exactly what a model-driven canvas needs.
 
 ### 3.1 The crux — `shapesToDsl` (Diagram → `.kymo`)
 
-`DSL-LANG-001` §6 already provides every construct the serializer needs (leaf `@ (x,y)`; regions +
+`KYMO-DSL-001` §6 already provides every construct the serializer needs (leaf `@ (x,y)`; regions +
 `contains`; edge `src=`/`dst=`/`via=`). Two tiers: **Tier 1 (regenerate)** — simple but lossy (drops
 comments / layout frames / parent-relative placement); **Tier 2 (surgical patch)** — retain source
 spans, rewrite only changed tokens, preserve structure. Full algorithm in `DESIGN-CANVAS-001` §8.
@@ -220,7 +220,7 @@ Likelihood / impact are qualitative (Low / Med / High).
 | RK-01 | Tier-1 serializer is lossy (drops comments / layout frames / parent-relative placement) → degrades `.kymo` authoring | High | High | Phase 3 went **straight to surgical** (Tier-2, app-side `patchDsl`); Tier-1 regenerate never used — comments/structure preserved | Vũ Anh | Mitigated |
 | RK-02 | tldraw **requires a license key in production** — with no key the board is **BLANK on a non-localhost domain** (renders only on localhost) | High | High | **Confirmed on the live deploy** (kymostudio.github.io: empty canvas, no `.tl-canvas`, console *"license required for production"*). **Accepted (skipped) for now** — the public board stays blank; **local dev works**. A free Hobby/trial key (keeps the watermark) or an SDK switch would revive the public deploy; deferred until a usable public deploy is needed. | Vũ Anh | Accepted |
 | RK-03 | Committed bundle grows too large → repo bloat / slower first load | Med | Med | **Phase 1 measured: 2.0 MB raw / ≈586 KB gzip** (Pages gzips) — within the 3 MB budget. Lazy-load tldraw only if it grows | Vũ Anh | Mitigated — within budget |
-| RK-04 | DSL v3 (CSS-cascade) lands mid-build → serializer must re-target grammar | Med | High | Isolate grammar-output module; coordinate with `DSL-LANG-001` owner | Vũ Anh | Open |
+| RK-04 | DSL v3 (CSS-cascade) lands mid-build → serializer must re-target grammar | Med | High | Isolate grammar-output module; coordinate with `KYMO-DSL-001` owner | Vũ Anh | Open |
 | RK-05 | Sync feedback loop (A→B→A oscillation) corrupts text or canvas | Med | High | `epoch` token + `applying` flag + tldraw `source:'user'` filter (`DESIGN-CANVAS-001` §7) | Vũ Anh | Mitigated by design |
 | RK-06 | Dragging a node replaces declarative placement (`@ parent side gap` / layout / grid) with `@ (x,y)` | Med | Low | **Accepted by design** (Phase 3, user-chosen full-surgical): dragged node → absolute; layout/grid members lifted out → siblings re-flow | Vũ Anh | Accepted |
 | RK-07 | Embedded diagram (inline SVG in an `HTMLContainer` custom shape) can blank transiently during heavy tldraw interaction (culling / perf) | Med | Low | **Resolved** — the embed (now the BPMN fallback only) renders as an `<img>` backed by an SVG **data-URL**: the browser caches the decoded image by `src`, so a cull/remount reappears instantly (verified `complete:true` on remount, no flash); `toSvg` added for clean image export | Vũ Anh | Resolved |
@@ -281,7 +281,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 
 1. **tldraw vs. a lighter custom canvas** if the freeform half turns out to be secondary — would
    react-flow + a thin drawing layer suffice and keep the bundle small? (See RK-03.)
-2. **Serializer target grammar** — build against `DSL-LANG-001` v2.0 now, or wait for the v3
+2. **Serializer target grammar** — build against `KYMO-DSL-001` v2.0 now, or wait for the v3
    direction to stabilise to avoid re-targeting? (See RK-04.)
 3. **Auto-layout vs. manual positions** — once a node is dragged, its declarative placement
    (`@ parent side gap`) is replaced by `@ (x,y)`. Acceptable, or offer a "re-flow" that restores

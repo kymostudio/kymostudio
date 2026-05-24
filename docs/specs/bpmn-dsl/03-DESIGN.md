@@ -14,7 +14,7 @@ related_documents:
   - FEAT-BPMN-DSL-001    # Requirements (traced below)
   - TEST-BPMN-DSL-001    # Test documentation
   - PLAN-BPMN-DSL-001   # Plan
-  - DSL-LANG-001             # kymo DSL language specification (normative)
+  - KYMO-DSL-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
   - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
 authors:
@@ -50,7 +50,7 @@ Covers ISO/IEC/IEEE 12207 Architecture & Design Definition.
 
 The architecture and algorithm behind the `bpmn { }` block: how source text
 becomes a resolved sub-diagram the existing renderer can draw. The normative
-grammar is in DSL-LANG-001; behaviour requirements in FEAT-BPMN-DSL-001.
+grammar is in KYMO-DSL-001; behaviour requirements in FEAT-BPMN-DSL-001.
 
 ## 2. Grammar → AST → model (FR-1…FR-7)
 
@@ -134,7 +134,7 @@ SVG across runs.
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue (extracted from the plan). |
 | 0.2     | 2026-05-23 | Vũ Anh | Fold P0 spike findings: explicit primary-path/trunk pinning (§3.4), dummy-node caveat (§3.2), determinism pre-validated (§6). |
 | 0.3     | 2026-05-23 | Vũ Anh | §4: integration is a cli `bpmn_layout.layout()` pass (not `finalize`); skip `resolve_alignments` for bpmn-block diagrams (realised in P2). |
-| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in DSL-LANG-001 §6.9). |
+| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in KYMO-DSL-001 §6.9). |
 | 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
 
 ## Annex B — Document Control
@@ -149,9 +149,9 @@ Implicit — checked in with the feature; available to all repository readers.
 ### B.3 Change Control
 On a design change: update the affected clause; keep the requirement IDs it
 traces (FR-8…FR-10, NFR-1) consistent with FEAT-BPMN-DSL-001; increment
-`version`; append a row to Annex A; reflect any grammar change in DSL-LANG-001.
+`version`; append a row to Annex A; reflect any grammar change in KYMO-DSL-001.
 
 ### B.4 Backwards Compatibility
 This describes the intended implementation; the normative surface is
-FEAT-BPMN-DSL-001 and DSL-LANG-001. Reconcile any deviation there before
+FEAT-BPMN-DSL-001 and KYMO-DSL-001. Reconcile any deviation there before
 release.

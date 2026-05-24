@@ -14,7 +14,7 @@ related_documents:
   - FEAT-CANVAS-001
   - PLAN-CANVAS-001
   - TEST-CANVAS-001
-  - DSL-LANG-001
+  - KYMO-DSL-001
 authors:
   - Vũ Anh
 language: en
@@ -40,7 +40,7 @@ keywords:
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers implementing the editor (`website/app/`) and `packages/js` |
-| Related Documents | `PLAN-CANVAS-001` (why / phases), `DSL-LANG-001` (serializer target grammar), `RES-MERMAID-D2-001` |
+| Related Documents | `PLAN-CANVAS-001` (why / phases), `KYMO-DSL-001` (serializer target grammar), `RES-MERMAID-D2-001` |
 
 > **Status note.** Draft engineering design, not a committed spec. This is the *how* that
 > complements `PLAN-CANVAS-001` (the *why* and the phase ordering). Re-validate symbol names against
@@ -70,8 +70,8 @@ Phasing is **not** repeated here — see `PLAN-CANVAS-001` §4.
 
 **Non-goals (this version)**
 - Multiplayer / real-time collaboration (needs a server — explicitly out per `PLAN-CANVAS-001` §2.1).
-- Serializing the **freeform layer** into `.kymo` (the DSL has no representation for it — `DSL-LANG-001` §6).
-- Targeting a future v3 grammar; we serialize to `DSL-LANG-001` v2.0.
+- Serializing the **freeform layer** into `.kymo` (the DSL has no representation for it — `KYMO-DSL-001` §6).
+- Targeting a future v3 grammar; we serialize to `KYMO-DSL-001` v2.0.
 
 ## 3. Architecture & data flow
 
@@ -207,13 +207,13 @@ filter); stale async parses are dropped by `epoch`. This prevents `A → B → A
 
 ## 8. The serializer — `shapesToDsl` (the crux)
 
-The DSL provides every construct needed (`DSL-LANG-001` §6): leaf `@ (x,y)` absolute positions (§6.4),
+The DSL provides every construct needed (`KYMO-DSL-001` §6): leaf `@ (x,y)` absolute positions (§6.4),
 regions with `contains` (§6.5), edges with `src=`/`dst=` anchors + `via=` waypoints (§6.7). **All
 coordinates are integers** (`-?\d+`) — `Math.round` every value.
 
 ### 8.1 Tier 1 — regenerate (Phase 3a)
 
-Emit a complete `.kymo` from the model, in the recommended statement order (`DSL-LANG-001` §8.1):
+Emit a complete `.kymo` from the model, in the recommended statement order (`KYMO-DSL-001` §8.1):
 
 ```
 title: "…"            # if Diagram.title
@@ -253,7 +253,7 @@ declarative structure:
 | Shape **deleted** on canvas | Remove its source line (Tier 2) / omit it (Tier 1). |
 | **Renamed** label | Replace the quoted `"name"` / `"subtitle"` token. |
 | Non-integer position | `Math.round` (DSL ints only). |
-| Id collides with a **reserved keyword** | Reject / suffix; see `DSL-LANG-001` §6.8 reserved list. |
+| Id collides with a **reserved keyword** | Reject / suffix; see `KYMO-DSL-001` §6.8 reserved list. |
 | Parent-relative leaf dragged | Tier 1 flattens to `@ (x,y)`; Tier 2 may keep parent ref if unmoved (see Risk §14). |
 
 ## 9. Parser change for source spans (additive)
@@ -339,7 +339,7 @@ Carried from `PLAN-CANVAS-001` Annex B:
 1. **Auto-layout vs. manual positions** — dragging a node replaces its declarative `@ parent side gap`
    with `@ (x,y)`. Acceptable, or offer a "re-flow" that restores declarative layout? Tier-2 can keep
    the parent ref for *unmoved* nodes to limit churn.
-2. **Serializer target grammar** — build against `DSL-LANG-001` v2.0 now; a future v3 (indentation /
+2. **Serializer target grammar** — build against `KYMO-DSL-001` v2.0 now; a future v3 (indentation /
    CSS-cascade styling) would force a re-target. Keep `shapesToDsl` grammar-output isolated behind one
    module to ease that.
 3. **tldraw licensing** — watermark vs license key (also §10).

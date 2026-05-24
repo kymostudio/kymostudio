@@ -14,7 +14,7 @@ related_documents:
   - FEAT-BPMN-DSL-001    # Requirements (traced below)
   - DESIGN-BPMN-DSL-001    # Design
   - PLAN-BPMN-DSL-001   # Plan
-  - DSL-LANG-001             # kymo DSL language specification (normative)
+  - KYMO-DSL-001             # kymo DSL language specification (normative)
 authors:
   - Vũ Anh
 language: en
@@ -114,7 +114,7 @@ outside the new `bpmn_block_order` case is a **failure**, not a re-baseline.
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
 | 0.2     | 2026-05-23 | Vũ Anh | Note P0 spike as early evidence for TC-4/TC-7; version sync. |
-| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in DSL-LANG-001 §6.9). |
+| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in KYMO-DSL-001 §6.9). |
 
 ## Annex B — Document Control
 

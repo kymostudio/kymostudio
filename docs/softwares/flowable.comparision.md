@@ -11,7 +11,7 @@ review_cycle: On upstream Flowable major release, on kymo DSL/layout change, or 
 supersedes: null
 related_documents:
   - flowable.md
-  - ../DSL.md
+  - ../KYMO_DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -46,7 +46,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline  |
 | Access Date       | 2026-05-20                                                   |
 | Parent Reference  | [`flowable.md`](flowable.md)                                |
-| Related Documents | [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This document isolates the **prior-art comparison** between [Flowable](https://www.flowable.com/open-source) and kymo. The factual reference (lineage as an Activiti fork, BPMN/CMMN/DMN coverage, architecture) lives in [`flowable.md`](flowable.md); read that first if you need ground truth on how Flowable actually behaves.
 
@@ -206,5 +206,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`flowab
 
 - Comparison subject: the Flowable 7.x line as documented at <https://www.flowable.com/open-source> on 2026-05-20.
 - Factual basis for the Flowable column: [`flowable.md`](flowable.md).
-- Factual basis for the kymo column: this repository's [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]], cited where B3 is scored). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]], cited where B3 is scored). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

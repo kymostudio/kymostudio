@@ -15,7 +15,7 @@ related_documents:
   - TEST-BPMN-EXPORT-001    # Test documentation
   - PLAN-BPMN-EXPORT-001   # Plan
   - BPMN-MAP-001                 # BPMN importer element mapping (this feature inverts it)
-  - DSL-LANG-001                # kymo DSL language specification (bpmn { } block)
+  - KYMO-DSL-001                # kymo DSL language specification (bpmn { } block)
   - DESIGN-BPMN-DSL-001       # BPMN-in-DSL design
   - REF-BPMNIO-CMP-001          # bpmn.io comparison (lossless round-trip benchmark)
 authors:
@@ -56,7 +56,7 @@ the plan (PLAN-BPMN-EXPORT-001). The set conforms to ISO/IEC/IEEE 12207:2017
 ## 2. Background
 
 kymo can already **import** BPMN 2.0 XML (`from_bpmn`, BPMN-MAP-001) and, since
-DSL-LANG-001 §6.9, **author** BPMN textually with the `bpmn { }` block. But all of
+KYMO-DSL-001 §6.9, **author** BPMN textually with the `bpmn { }` block. But all of
 kymo's *output* paths are **one-way**: SVG, animated WebP, Figma, and Excalidraw —
 none is a standard, machine-readable interchange format. The tool comparisons under
 `docs/softwares/` make this the recurring gap: bpmn.io (REF-BPMNIO-CMP-001), Camunda

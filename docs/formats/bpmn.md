@@ -12,7 +12,7 @@ supersedes: null
 related_documents:
   - DESIGN-BPMN-EXPORT-001    # BPMN export design (inverts this mapping)
   - DESIGN-BPMN-DSL-001       # BPMN-in-DSL design (bpmn { } block)
-  - DSL-LANG-001                # kymo DSL language specification
+  - KYMO-DSL-001                # kymo DSL language specification
   - REF-BPMNIO-001              # bpmn.io reference (round-trip benchmark)
 authors:
   - Vũ Anh
@@ -42,7 +42,7 @@ iso_compliance:
 | Audience          | Engineers using or maintaining the kymo BPMN importer/exporter   |
 | Review Cycle      | On BPMN-mapping change                                            |
 | Supersedes        | —                                                                |
-| Related Documents | `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `DSL-LANG-001`, `REF-BPMNIO-001` |
+| Related Documents | `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `KYMO-DSL-001`, `REF-BPMNIO-001` |
 
 kymo can **import** a standard **BPMN 2.0 XML** file (`.bpmn`) — the format
 exported by [bpmn.io](https://bpmn.io), [Camunda Modeler](https://camunda.com/download/modeler/),
@@ -116,7 +116,7 @@ Unrecognised element types are skipped rather than failing the import.
 ## Export
 
 Any diagram made of BPMN glyphs — imported from a `.bpmn`, or authored with the
-`bpmn { }` DSL block (DSL-LANG-001) — exports back to BPMN 2.0 XML: a
+`bpmn { }` DSL block (KYMO-DSL-001) — exports back to BPMN 2.0 XML: a
 `<bpmn:process>` (semantic model) plus a `<bpmndi:BPMNDiagram>` (DI geometry).
 When the diagram has pools, the process is wrapped in a `<bpmn:collaboration>`.
 

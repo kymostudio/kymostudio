@@ -11,7 +11,7 @@ review_cycle: On upstream Visual Paradigm major release, on kymo DSL/layout chan
 supersedes: null
 related_documents:
   - visual-paradigm.md
-  - ../DSL.md
+  - ../KYMO_DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -45,7 +45,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-20                                                     |
 | Parent Reference  | [`visual-paradigm.md`](visual-paradigm.md)                    |
-| Related Documents | [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This document isolates the **prior-art comparison** between [Visual Paradigm](https://www.visual-paradigm.com/) and kymo. The factual reference (editions, multi-notation support, round-trip engineering, BPMN conformance) lives in [`visual-paradigm.md`](visual-paradigm.md); read that first if you need ground truth on how Visual Paradigm actually behaves.
 
@@ -69,7 +69,7 @@ Visual Paradigm and kymo sit at opposite ends of one axis: capability-weight. VP
 
 ### 2.2 Guidance embedded with the tool
 
-VP couples authoring with **teaching content** — much of the widely cited online BPMN tutorial material (gateway types, orchestration vs choreography) comes from VP's integrated guides. kymo's docs (`DSL.md`, `BEST_PRACTICE_DIAGRAMS.md`) play that role and benefit from staying close to the tool's actual behaviour, so guidance and implementation don't drift apart.
+VP couples authoring with **teaching content** — much of the widely cited online BPMN tutorial material (gateway types, orchestration vs choreography) comes from VP's integrated guides. kymo's docs (`KYMO_DSL.md`, `BEST_PRACTICE_DIAGRAMS.md`) play that role and benefit from staying close to the tool's actual behaviour, so guidance and implementation don't drift apart.
 
 ### 2.3 Round-trip thinking
 
@@ -197,7 +197,7 @@ Re-run the relevant categories when any of the following happens — flag the da
 
 These follow from the comparison and the borrowable ideas catalogued in [`visual-paradigm.md`](visual-paradigm.md):
 
-1. **How tightly should guidance track behaviour?** VP's strength is guidance embedded with the tool; kymo's `DSL.md` and `BEST_PRACTICE_DIAGRAMS.md` should stay close enough to implementation that they never drift into aspiration.
+1. **How tightly should guidance track behaviour?** VP's strength is guidance embedded with the tool; kymo's `KYMO_DSL.md` and `BEST_PRACTICE_DIAGRAMS.md` should stay close enough to implementation that they never drift into aspiration.
 2. **Is "regenerated, not hand-maintained" enforced?** VP's round-trip thinking supports keeping `.kymo` the single source of truth — does anything in kymo's workflow tempt users to hand-edit generated SVG, and should that be guarded against?
 3. **An icon escape hatch (arbitrary SVG/PNG by path)?** The recurring gap across every comparison in this folder; without it, every catalog miss reads as "kymo can't draw that".
 4. **Is one free tool a protected invariant?** VP's edition matrix is the cautionary example; kymo's single Apache-2.0 surface is a simplicity asset — worth stating explicitly as a non-goal to tier it.
@@ -206,5 +206,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`visual
 
 - Comparison subject: Visual Paradigm (17 line, 2026) as documented at <https://www.visual-paradigm.com/> on 2026-05-20.
 - Factual basis for the Visual Paradigm column: [`visual-paradigm.md`](visual-paradigm.md).
-- Factual basis for the kymo column: this repository's [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

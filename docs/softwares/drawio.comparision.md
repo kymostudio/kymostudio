@@ -12,7 +12,7 @@ supersedes: null
 related_documents:
   - drawio.md
   - lucidchart.comparision.md
-  - ../DSL.md
+  - ../KYMO_DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -46,7 +46,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-20                                                     |
 | Parent Reference  | [`drawio.md`](drawio.md)                                       |
-| Related Documents | [`lucidchart.comparision.md`](lucidchart.comparision.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`lucidchart.comparision.md`](lucidchart.comparision.md), [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This document isolates the **prior-art comparison** between [draw.io / diagrams.net](https://www.drawio.com/) and kymo. The factual reference (architecture, file format, BPMN support, capabilities) lives in [`drawio.md`](drawio.md); read that first if you need ground truth on how draw.io actually behaves.
 
@@ -216,5 +216,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`drawio
 
 - Comparison subject: draw.io / diagrams.net 30.0.2 as documented at <https://www.drawio.com/> on 2026-05-20.
 - Factual basis for the draw.io column: [`drawio.md`](drawio.md).
-- Factual basis for the kymo column: this repository's [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

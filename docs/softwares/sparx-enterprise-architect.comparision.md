@@ -11,7 +11,7 @@ review_cycle: On upstream Sparx Enterprise Architect major release, on kymo DSL/
 supersedes: null
 related_documents:
   - sparx-enterprise-architect.md
-  - ../DSL.md
+  - ../KYMO_DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -45,7 +45,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-20                                                     |
 | Parent Reference  | [`sparx-enterprise-architect.md`](sparx-enterprise-architect.md) |
-| Related Documents | [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This document isolates the **prior-art comparison** between [Sparx Systems Enterprise Architect](https://sparxsystems.com/) and kymo. The factual reference (editions, repository model, multi-notation support, BPMN conformance) lives in [`sparx-enterprise-architect.md`](sparx-enterprise-architect.md); read that first if you need ground truth on how Enterprise Architect actually behaves.
 
@@ -207,5 +207,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`sparx-
 
 - Comparison subject: Sparx Systems Enterprise Architect (16/17 line, 2026) as documented at <https://sparxsystems.com/> on 2026-05-20.
 - Factual basis for the Enterprise Architect column: [`sparx-enterprise-architect.md`](sparx-enterprise-architect.md).
-- Factual basis for the kymo column: this repository's [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.
