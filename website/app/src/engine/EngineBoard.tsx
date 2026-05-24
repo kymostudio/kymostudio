@@ -21,11 +21,11 @@ import { patchPositions, type XY } from "../patchDsl";
 import { EngineCanvas, type Tool } from "./react";
 import { boardToSvg } from "./export";
 import { loadSnapshot, saveSnapshot } from "./persist";
-import { KymoNodeEngineUtil, KymoDiagramEngineUtil, KymoRegionEngineUtil, KymoEdgeEngineUtil, FreedrawEngineUtil, KymoNoteEngineUtil } from "./shapes";
+import { KymoNodeEngineUtil, KymoDiagramEngineUtil, KymoRegionEngineUtil, KymoEdgeEngineUtil, FreedrawEngineUtil, KymoNoteEngineUtil, KymoTextEngineUtil } from "./shapes";
 
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
-const utils = [new KymoNodeEngineUtil(), new KymoDiagramEngineUtil(), new KymoRegionEngineUtil(), new KymoEdgeEngineUtil(), new FreedrawEngineUtil(), new KymoNoteEngineUtil()];
+const utils = [new KymoNodeEngineUtil(), new KymoDiagramEngineUtil(), new KymoRegionEngineUtil(), new KymoEdgeEngineUtil(), new FreedrawEngineUtil(), new KymoNoteEngineUtil(), new KymoTextEngineUtil()];
 const EMBED_ID = createShapeId("kymo-diagram");
 
 interface EngineBoardProps {
