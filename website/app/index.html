@@ -219,7 +219,35 @@
     }
 
     /* ── Canvas (the FigJam "board") ─────────────────────────────── */
-    .pane.view { background: var(--canvas); overflow: hidden; }
+    /* canvas-studio P3 (FR-CS-03): the view pane is a flex row — left tool rail
+       + the canvas area. EngineBoard's position:absolute;inset:0 now anchors to
+       .canvas-wrap (the floating toolbar + #error live inside it too). */
+    .pane.view { display: flex; flex-direction: row; overflow: hidden; }
+    .canvas-wrap { position: relative; flex: 1 1 auto; min-width: 0; overflow: hidden; background: var(--canvas); }
+
+    /* Left tool rail — flush vertical sidebar driven by the tool registry. */
+    .k-rail {
+      flex: 0 0 var(--rail-w); width: var(--rail-w);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 10px 0; gap: 2px;
+      background: var(--bg-soft); border-right: 1px solid var(--border);
+      z-index: 5;
+    }
+    .k-rail .tool {
+      width: 38px; height: 38px; border-radius: 9px;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--text-dim); cursor: pointer; position: relative;
+      transition: background .12s, color .12s;
+    }
+    .k-rail .tool:hover { background: var(--bg-elev); color: var(--text); }
+    .k-rail .tool.active { background: var(--accent-soft); color: var(--accent); }
+    .k-rail .tool.disabled { opacity: .38; cursor: not-allowed; }
+    .k-rail .tool.disabled:hover { background: transparent; color: var(--text-dim); }
+    .k-rail .tool .kbd {
+      position: absolute; bottom: 3px; right: 4px;
+      font: 600 9px/1 var(--mono); color: var(--text-mute);
+    }
+    .k-rail .sep { width: 24px; height: 1px; background: var(--border); margin: 6px 0; }
     #preview {
       flex: 1; overflow: auto; display: grid; place-items: center;
       padding: 40px 40px 96px;

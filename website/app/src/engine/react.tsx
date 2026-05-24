@@ -35,10 +35,11 @@ const NOTE_COLOR = "#fde68a";
 const TEXT_COLOR = "#1e293b";
 const TEXT_SIZE = 18;
 
-/** Which tool owns the pointer (canvas-jam `DESIGN-JAM-001` §7). `select` is the
- *  default; `draw` creates freeform `freedraw` strokes; `sticky` places `note`s;
- *  `text` places an editable `text` label. */
-export type Tool = "select" | "draw" | "sticky" | "text";
+/** Which tool owns the pointer (canvas-jam `DESIGN-JAM-001` §7; canvas-studio
+ *  `FR-CS-03` adds `hand`). `select` is the default; `hand` pans on any drag;
+ *  `draw` creates freeform `freedraw` strokes; `sticky` places `note`s; `text`
+ *  places an editable `text` label. */
+export type Tool = "select" | "hand" | "draw" | "sticky" | "text";
 
 /** The slice of a shape util the render loop needs. */
 export interface RenderUtil {
@@ -165,6 +166,8 @@ interface Gesture {
   camY: number;
   z: number;
   moved: boolean;
+  /** Set when the `hand` tool owns this gesture: pan on any drag, never select. */
+  pan?: boolean;
   /** Set when the draw tool owns this gesture: the in-progress freedraw stroke
    *  (`ox/oy` = page-space origin; `pts` = points relative to it). */
   draw?: { id: ShapeId; ox: number; oy: number; pts: { x: number; y: number }[] };
@@ -278,6 +281,18 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
 
   const onPointerDown = (e: ReactPointerEvent) => {
     const p = screenOf(e);
+    if (tool === "hand") {
+      // Pan-anywhere: a pan-only gesture (downId null → onPointerMove's else-branch
+      // pans; pan:true → endGesture skips click-select). Never moves/selects shapes.
+      const cam = editor.getCamera();
+      gesture.current = { downId: null, downType: null, startSx: p.x, startSy: p.y, ox: 0, oy: 0, camX: cam.x, camY: cam.y, z: cam.z, moved: false, pan: true };
+      try {
+        viewportRef.current!.setPointerCapture(e.pointerId);
+      } catch {
+        // best-effort
+      }
+      return;
+    }
     if (tool === "draw") {
       // Start a freedraw stroke. Built live with `history:"ignore"` (preview only)
       // and sealed as ONE undo step on pointer-up (endGesture). No `meta.kymo` →
@@ -394,9 +409,12 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
       return;
     }
     if (!g.moved) {
-      // A click: select the shape under the pointer, or clear.
-      editor.select(g.downId ? [g.downId as Shape["id"]] : []);
-      force();
+      // A click: select the shape under the pointer, or clear. The `hand` tool
+      // never selects (pan-only), so a hand click leaves the selection intact.
+      if (!g.pan) {
+        editor.select(g.downId ? [g.downId as Shape["id"]] : []);
+        force();
+      }
     } else if (g.downId && isDraggable(g.downType ?? "")) {
       // A node drag ended → seal it as a single undo step (FR-J-02); its many
       // per-move writes coalesced into one history entry.
@@ -476,7 +494,7 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
         onPointerUp={endGesture}
         onPointerCancel={endGesture}
         onDoubleClick={onDoubleClick}
-        style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none", cursor: tool === "draw" ? "crosshair" : tool === "sticky" ? "copy" : tool === "text" ? "text" : undefined }}
+        style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none", cursor: tool === "hand" ? "grab" : tool === "draw" ? "crosshair" : tool === "sticky" ? "copy" : tool === "text" ? "text" : undefined }}
       >
         <div
           ref={containerRef}

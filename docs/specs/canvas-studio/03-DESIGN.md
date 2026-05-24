@@ -109,7 +109,7 @@ backend (boards, comments, multiuser) and are out of scope (`FEAT-STUDIO-001` §
   `Preview` (the canvas, always on). `Comments` / `Versions` were **removed** — they need a backend
   (out of scope, `FEAT-STUDIO-001` §4).
 
-## 4. Tool rail + registry (`ui/ToolRail.tsx`, `engine/tools-registry.ts`) — FR-CS-03
+## 4. Tool rail + registry (`ui/ToolRail.tsx`, `ui/tools.ts`) — FR-CS-03
 
 The current FigJam toolbar (`App.tsx:236-316`) hard-codes four tool buttons. Generalise to a
 **tool registry** so future creation tools are additive:
@@ -118,7 +118,7 @@ The current FigJam toolbar (`App.tsx:236-316`) hard-codes four tool buttons. Gen
 type ToolDef = { id: Tool | PlaceholderTool; icon: IconKey; kbd: string; title: string; enabled: boolean };
 const TOOLS: ToolDef[] = [
   { id: "select", kbd: "V", title: "Select",        enabled: true },
-  { id: "hand",   kbd: "H", title: "Pan",           enabled: true },   // maps to select+space/drag-empty
+  { id: "hand",   kbd: "H", title: "Pan",           enabled: true },   // real pan-anywhere tool (engine Tool union)
   { id: "draw",   kbd: "P", title: "Draw (pen)",    enabled: true },
   { id: "sticky", kbd: "S", title: "Sticky note",   enabled: true },
   { id: "text",   kbd: "T", title: "Text",          enabled: true },
@@ -132,12 +132,15 @@ const TOOLS: ToolDef[] = [
 ];
 ```
 
-`ToolRail` (vertical, left) and a `BottomToolbar` (horizontal, centred — same registry) render the
-list, highlight the active `tool`, and call `setTool(id)` for `enabled` ones. A **document-level
-keydown** in `App`/`EngineBoard` maps `kbd → setTool`, guarded on `document.activeElement` so the
-`.kymo` `<textarea>` keeps its keys (the same guard the undo keydown uses, `DESIGN-JAM-001` §3).
-`hand` is presentational over the engine's existing empty-drag pan. The engine `Tool` union
-(`engine/react.tsx`) is unchanged for the enabled set; placeholder ids never reach the engine.
+`ToolRail` (`ui/ToolRail.tsx`, the flush vertical left rail) renders the registry, highlights the
+active `tool`, and calls `setTool(id)` for `enabled` ones; placeholders are inert + tooltip-explained.
+A **document-level keydown** in `App` maps `kbd → setTool` (`TOOL_SHORTCUTS`: V/H/P/S/T), guarded on
+`document.activeElement` so the `.kymo` `<textarea>` keeps its keys (the same guard the undo keydown
+uses, `DESIGN-JAM-001` §3). **As-built:** `hand` is a *real* tool added to the engine `Tool` union
+(`engine/react.tsx`) — it pans on **any** drag (a pan-only gesture + grab cursor), not just
+empty-canvas drag; placeholder ids never reach the engine. The existing floating toolbar **kept** the
+sample-picker / background / export controls and its tool buttons **moved** to the rail (no
+duplication) — so there is no separate bottom tool toolbar.
 
 ## 5. Canvas item styling (`engine/shapes.tsx`) — FR-CS-04
 
@@ -227,4 +230,4 @@ Tracked in `PLAN-STUDIO-001` §6. Design-level callouts:
 
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
-| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. |
+| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. |
