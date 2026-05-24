@@ -1,7 +1,7 @@
 ---
 title: "BPMN 2.0.2 — Clause 4: Terms and Definitions"
 document_id: BPMN-NREF-TERMS-001
-version: "1.2"
+version: "1.4"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -37,42 +37,19 @@ upstream:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | BPMN-NREF-TERMS-001                                         |
-| Version           | 1.2                                                           |
+| Version           | 1.4                                                           |
 | Issue Date        | 2026-05-24                                                    |
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
-| Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§4 Terms and Definitions** |
+| Source            | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§4 Terms and Definitions** (p.16) / ISO/IEC 19510:2013 |
 | Related Documents | `BPMN-NREF-001`, `BPMN-NREF-ANNEXC-001`, `REF-BPMN-001`       |
 
-Mirrors **Clause 4 (Terms and Definitions)** of the OMG BPMN 2.0.2 specification. Part of
-the normative-reference set `BPMN-NREF-001`. Where this note and the OMG specification
-disagree, the OMG specification is authoritative.
+## 4 Terms and Definitions (p.16)
 
-> **Authoritative text.** This file is a **non-verbatim summary** of OMG BPMN 2.0.2 §4;
-> it does not reproduce the specification. For the normative wording, read §4 in the
-> official PDF: <https://www.omg.org/spec/BPMN/2.0.2/PDF> (ISO/IEC 19510:2013).
+> **NOTE:** See Annex C - Glossary.
 
-## §4 Terms and Definitions
-
-Clause 4 fixes the core vocabulary used throughout the standard. The essential terms:
-
-| Term | Meaning (after §4) |
-|---|---|
-| **Process** | A sequence/flow of activities performed to achieve an outcome. |
-| **Activity** | A unit of work; atomic (**Task**) or compound (**Sub-Process**). |
-| **Event** | Something that "happens" and affects flow (a cause or an impact). |
-| **Gateway** | A control-flow construct that diverges/converges Sequence Flows. |
-| **Token** | A theoretical marker traversing Sequence Flows; defines execution (§13). |
-| **Sequence Flow** | The order of Flow Objects within one Process. |
-| **Message Flow** | A Message exchange between two Participants. |
-| **Participant / Pool** | A business entity in a Collaboration / its graphical container. |
-| **Lane** | A sub-partition within a Pool. |
-| **Orchestration / Collaboration / Choreography / Conversation** | The four diagram viewpoints (§7.4). |
-| **Artifact** | A non-flow element that documents a diagram. |
-
-The fuller running glossary (definitions 3.1–3.15 in repo terms) is maintained in
-`REF-BPMN-001 §3`; the specification's own consolidated glossary is **Annex C** (see
-`BPMN-NREF-ANNEXC-001`).
+Clause 4 has no content of its own — the standard's vocabulary is defined in **Annex C
+(Glossary)** (`BPMN-NREF-ANNEXC-001`).
 
 ## Annex A — Revision History
 
@@ -81,6 +58,8 @@ The fuller running glossary (definitions 3.1–3.15 in repo terms) is maintained
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — §4.      |
 | 1.1     | 2026-05-24 | Vũ Anh | Removed implementation-specific notes (pure OMG-spec reference). |
 | 1.2     | 2026-05-24 | Vũ Anh | Added an authoritative-source pointer to the official OMG PDF; clarified that this file summarises (does not reproduce) the spec. |
+| 1.3     | 2026-05-24 | Vũ Anh | Synced against the OMG PDF: recorded that §4 in 2.0.2 is only the note "See Annex C - Glossary"; added the p.16 citation. |
+| 1.4     | 2026-05-24 | Vũ Anh | Removed the "Mirrors §4" intro paragraph and the lead disclaimer; replaced the summary (incl. its editorial digest table) with a **full extraction of §4 (p.16)** — which is the single note "See Annex C - Glossary". |
 
 ## Annex B — Document Control
 
@@ -96,4 +75,4 @@ Re-verify against OMG BPMN 2.0.2 §4 on any edition change. Increment `version`;
 row to Annex A.
 
 ### B.4 References
-OMG BPMN 2.0.2 §4, Annex C; `REF-BPMN-001 §3`.
+OMG BPMN 2.0.2 §4 (p.16), Annex C; `REF-BPMN-001 §3`.

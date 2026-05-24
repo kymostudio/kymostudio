@@ -1,7 +1,7 @@
 ---
 title: "BPMN 2.0.2 — Clause 5: Symbols"
 document_id: BPMN-NREF-SYMBOLS-001
-version: "1.2"
+version: "1.4"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -37,37 +37,20 @@ upstream:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | BPMN-NREF-SYMBOLS-001                                       |
-| Version           | 1.2                                                           |
+| Version           | 1.4                                                           |
 | Issue Date        | 2026-05-24                                                    |
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
-| Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§5 Symbols** |
+| Source            | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§5 Symbols** (p.16) / ISO/IEC 19510:2013 |
 | Related Documents | `BPMN-NREF-001`, `BPMN-NREF-NOTATION-001`, `REF-BPMN-001`     |
 
-Mirrors **Clause 5 (Symbols)** of the OMG BPMN 2.0.2 specification. Part of the
-normative-reference set `BPMN-NREF-001`. Where this note and the OMG specification disagree,
-the OMG specification is authoritative.
+## 5 Symbols (p.16)
 
-> **Authoritative text.** This file is a **non-verbatim summary** of OMG BPMN 2.0.2 §5;
-> it does not reproduce the specification. For the normative wording, read §5 in the
-> official PDF: <https://www.omg.org/spec/BPMN/2.0.2/PDF> (ISO/IEC 19510:2013).
+> **NOTE:** There are no symbols defined.
 
-## §5 Symbols
-
-Clause 5 is brief: it notes the symbol/abbreviation conventions used in the document. The
-**graphical** symbol vocabulary — the actual shapes drawn for each element — is not defined
-here but throughout the element clauses (§8–§11) and, normatively for depiction, in the
-**Notational Depiction Library** of §12.3 (see `BPMN-NREF-NOTATION-001`). The four basic
-shape families:
-
-| Shape | Element family |
-|---|---|
-| Circle | Event (§10.5) |
-| Rounded rectangle | Activity (§10.3) |
-| Diamond | Gateway (§10.6) |
-| Rectangle with label band | Pool / Lane (§9.3) |
-
-Connecting objects use line styles (solid / dashed / dotted) defined in §7.6 and §8.4.
+Clause 5 has no content of its own. The graphical vocabulary is specified throughout the element
+clauses (§8–§11) and normatively for depiction in the **Notational Depiction Library** of §12.3
+(`BPMN-NREF-NOTATION-001`).
 
 ## Annex A — Revision History
 
@@ -76,6 +59,8 @@ Connecting objects use line styles (solid / dashed / dotted) defined in §7.6 an
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — §5.      |
 | 1.1     | 2026-05-24 | Vũ Anh | Removed implementation-specific notes (pure OMG-spec reference). |
 | 1.2     | 2026-05-24 | Vũ Anh | Added an authoritative-source pointer to the official OMG PDF; clarified that this file summarises (does not reproduce) the spec. |
+| 1.3     | 2026-05-24 | Vũ Anh | Synced against the OMG PDF: recorded that §5 in 2.0.2 is only the note "There are no symbols defined"; added the p.16 citation. |
+| 1.4     | 2026-05-24 | Vũ Anh | Removed the "Mirrors §5" intro paragraph and the lead disclaimer; replaced the summary (incl. its editorial shape-family table) with a **full extraction of §5 (p.16)** — which is the single note "There are no symbols defined". |
 
 ## Annex B — Document Control
 
@@ -91,4 +76,4 @@ Re-verify against OMG BPMN 2.0.2 §5 on any edition change. Increment `version`;
 row to Annex A.
 
 ### B.4 References
-OMG BPMN 2.0.2 §5, §12.3; `REF-BPMN-001 §7`.
+OMG BPMN 2.0.2 §5 (p.16), §12.3; `REF-BPMN-001 §7`.

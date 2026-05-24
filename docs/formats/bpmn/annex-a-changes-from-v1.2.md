@@ -1,7 +1,7 @@
 ---
 title: "BPMN 2.0.2 — Annex A: Changes from v1.2"
 document_id: BPMN-NREF-ANNEXA-001
-version: "1.2"
+version: "1.3"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -12,6 +12,8 @@ supersedes: null
 related_documents:
   - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-ADDINFO-001  # Clause 6 — Additional Information
+  - BPMN-NREF-CHOREO-001   # Clause 11 — Choreography (new in 2.0)
+  - BPMN-NREF-COLLAB-001   # Clause 9 — Collaboration / Conversation (new in 2.0)
   - REF-BPMN-001           # BPMN 2.0 research reference (history §5)
 authors:
   - Vũ Anh
@@ -38,39 +40,47 @@ upstream:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | BPMN-NREF-ANNEXA-001                                       |
-| Version           | 1.2                                                           |
+| Version           | 1.3                                                           |
 | Issue Date        | 2026-05-24                                                    |
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
-| Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **Annex A — Changes from v1.2** |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-ADDINFO-001`, `REF-BPMN-001`      |
+| Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **Annex A — Changes from v1.2** *(informative)* (pp.479–480) |
+| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-ADDINFO-001`, `BPMN-NREF-CHOREO-001`, `BPMN-NREF-COLLAB-001`, `REF-BPMN-001` |
 
-Mirrors **Annex A (Changes from v1.2)** of the OMG BPMN 2.0.2 specification. Part of the
-normative-reference set `BPMN-NREF-001`. Where this note and the OMG specification disagree,
-the OMG specification is authoritative.
+Mirrors **Annex A (Changes from v1.2)** — an **informative** annex — of the OMG BPMN 2.0.2
+specification (pp.479–480). Part of the normative-reference set `BPMN-NREF-001`. Where this
+note and the OMG specification disagree, the OMG specification is authoritative.
 
-> **Authoritative text.** This file is a **non-verbatim summary** of OMG BPMN 2.0.2 Annex A;
-> it does not reproduce the specification. For the normative wording, read Annex A in the
-> official PDF: <https://www.omg.org/spec/BPMN/2.0.2/PDF> (ISO/IEC 19510:2013).
+> **Normative wording.** This file states the **normative wording** for Annex A of the `.bpmn`
+> interchange format adopted by this project, following OMG BPMN 2.0.2 Annex A; it does **not**
+> reproduce the copyrighted OMG text. The upstream source of record is the official OMG PDF:
+> <https://www.omg.org/spec/BPMN/2.0.2/PDF> (ISO/IEC 19510:2013).
 
-## Annex A — Changes from v1.2
+## §A.1 Changes from BPMN, v1.2 (p.479)
+Annex A records the notational and technical changes made when **BPMN 2.0** superseded **BPMN
+1.2**. The annex itself lists exactly the following.
 
-Annex A records what changed when **BPMN 2.0** superseded **BPMN 1.2** — the major revision
-of January 2011. The headline changes:
+**Major notational changes:**
+- The addition of a **Choreography** diagram.
+- The addition of a **Conversation** diagram.
+- **Non-interrupting Events** for a Process.
+- **Event Sub-Processes** for a Process.
 
-- A formal **MOF-based metamodel** (§8) — BPMN 1.x was a notation only; 2.0 adds an
-  underlying abstract model.
-- Precise **execution semantics** via token flow (§13), enabling executable models.
-- A native, serialisable **XML interchange format** with an XSD schema (§15) and **Diagram
-  Interchange (DI)** for layout (§12) — 1.x had no standard interchange (XPDL was used).
-- Three **new diagram types** beyond the Process diagram: **Collaboration**,
-  **Choreography**, and **Conversation** (§9, §11).
-- A **mapping to WS-BPEL** (§14).
-- The acronym re-expanded from "Business Process *Modeling* Notation" (1.x) to "Business
-  Process *Model and* Notation" (2.0).
+**Major technical changes:**
+- A **formal metamodel**, expressed through the class-diagram figures.
+- Interchange formats for **abstract-syntax model interchange** in both **XMI and XSD**.
+- Interchange formats for **diagram interchange** in both **XMI and XSD**.
+- **XSLT transformations** between the XMI and XSD formats.
 
-The standardisation timeline (1.0 → 1.2 → 2.0 → ISO/IEC 19510 → 2.0.2) is summarised in
-`REF-BPMN-001 §5`.
+**Other technical changes:**
+- **Reference Tasks are removed.** They provided reusability *within a single diagram*, whereas
+  **GlobalTasks** are reusable *across multiple diagrams*; GlobalTasks can be used instead of
+  Reference Tasks, simplifying the language and implementations.
+
+The two new diagram types are detailed in Clause 9 / Clause 11 (`BPMN-NREF-COLLAB-001`,
+`BPMN-NREF-CHOREO-001`). The broader standardisation timeline (1.0 → 1.2 → 2.0 → ISO/IEC 19510
+→ 2.0.2, and the acronym's re-expansion from "…*Modeling* Notation" to "…*Model and*
+Notation") is summarised in `REF-BPMN-001 §5`.
 
 ## Annex A — Revision History
 
@@ -79,6 +89,7 @@ The standardisation timeline (1.0 → 1.2 → 2.0 → ISO/IEC 19510 → 2.0.2) i
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — BPMN Annex A. |
 | 1.1     | 2026-05-24 | Vũ Anh | Removed implementation-specific notes (pure OMG-spec reference). |
 | 1.2     | 2026-05-24 | Vũ Anh | Added an authoritative-source pointer to the official OMG PDF; clarified that this file summarises (does not reproduce) the spec. |
+| 1.3     | 2026-05-24 | Vũ Anh | Synced against the OMG PDF: replaced the earlier paraphrase with the actual Annex A change list (the four notational changes, four technical changes, and the Reference-Task removal), marked the annex *informative*, and moved the broader-timeline/name-change asides to the `REF-BPMN-001 §5` cross-reference; added page citation. |
 
 ## Annex B — Document Control
 
@@ -94,4 +105,4 @@ Re-verify against OMG BPMN 2.0.2 Annex A on any edition change. Increment `versi
 row to the Revision History above.
 
 ### B.4 References
-OMG BPMN 2.0.2 Annex A; `REF-BPMN-001 §5`.
+OMG BPMN 2.0.2 Annex A (pp.479–480); `REF-BPMN-001 §5`.
