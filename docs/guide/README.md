@@ -32,8 +32,9 @@ see the SVG on the right, share via URL:
 - **[DSL Language Specification](../KYMO_DSL.md)** (`KYMO-DSL-001`) — the normative grammar (EBNF),
   semantics, and conformance rules. The reference implementation is
   [`packages/python/src/kymo/dsl.py`](../../packages/python/src/kymo/dsl.py).
-- **[BPMN element mapping](../formats/bpmn.md)** (`BPMN-MAP-001`) — how `.bpmn` files map to
-  kymo shapes on import and export.
+- **[BPMN element mapping](../formats/bpmn/kymo-mapping.md)** (`BPMN-MAP-001`) — how `.bpmn`
+  files map to kymo shapes on import and export; part of the
+  [BPMN 2.0.2 normative-reference set](../formats/bpmn/) (`BPMN-NREF-001`).
 - **[Best-practice diagrams](../BEST_PRACTICE_DIAGRAMS.md)** — design principles for diagrams
   that read well.
 - **[`samples/`](../../samples)** — complete `.kymo` and `.bpmn` files, each with its rendered SVG.

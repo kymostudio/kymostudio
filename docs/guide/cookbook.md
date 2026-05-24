@@ -179,7 +179,7 @@ kymo samples/collaboration.bpmn  # → samples/collaboration.svg
 ```
 
 For the full element-to-shape mapping (and BPMN *export* via `--bpmn`), see the
-[BPMN element mapping](../formats/bpmn.md) (`BPMN-MAP-001`).
+[BPMN element mapping](../formats/bpmn/kymo-mapping.md) (`BPMN-MAP-001`).
 
 ---
 

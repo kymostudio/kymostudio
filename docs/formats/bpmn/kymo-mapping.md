@@ -1,7 +1,7 @@
 ---
 title: BPMN 2.0 Import & Export — Element Mapping
 document_id: BPMN-MAP-001
-version: "1.3"
+version: "1.4"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -10,6 +10,8 @@ audience: Engineers using or maintaining the kymo BPMN importer and exporter
 review_cycle: On BPMN-mapping change
 supersedes: null
 related_documents:
+  - BPMN-NREF-001             # BPMN 2.0.2 normative-reference set (this file is its kymo-mapping part)
+  - REF-BPMN-001              # BPMN 2.0 research reference (notation/semantics)
   - DESIGN-BPMN-PARSER-001    # BPMN import design (realises this mapping)
   - DESIGN-BPMN-EXPORT-001    # BPMN export design (inverts this mapping)
   - DESIGN-BPMN-DSL-001       # BPMN-in-DSL design (bpmn { } block)
@@ -36,7 +38,7 @@ iso_compliance:
 | Field             | Value                                                              |
 |-------------------|--------------------------------------------------------------------|
 | Document ID       | BPMN-MAP-001                                                      |
-| Version           | 1.3                                                               |
+| Version           | 1.4                                                               |
 | Issue Date        | 2026-05-24                                                        |
 | Status            | Released                                                          |
 | Classification    | Internal                                                         |
@@ -44,7 +46,7 @@ iso_compliance:
 | Audience          | Engineers using or maintaining the kymo BPMN importer/exporter   |
 | Review Cycle      | On BPMN-mapping change                                            |
 | Supersedes        | —                                                                |
-| Related Documents | `DESIGN-BPMN-PARSER-001`, `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `KYMO-DSL-001`, `KYMOJSON-MAP-001`, `REF-BPMNIO-001` |
+| Related Documents | `BPMN-NREF-001`, `REF-BPMN-001`, `DESIGN-BPMN-PARSER-001`, `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `KYMO-DSL-001`, `KYMOJSON-MAP-001`, `REF-BPMNIO-001` |
 
 kymo can **import** a standard **BPMN 2.0 XML** file (`.bpmn`) — the interchange
 format defined by the OMG *Business Process Model and Notation* specification (see
@@ -81,6 +83,12 @@ Interchange) geometry kymo reads and writes:
 This document maps that standard to and from kymo's model; **where the two
 disagree, the OMG specification is authoritative**. The element-mapping and export
 tables below are the kymo-side view, not a restatement of the standard.
+
+This file is the kymo-mapping part of the **BPMN 2.0.2 normative-reference set**
+(`BPMN-NREF-001`) under `docs/formats/bpmn/`; that set mirrors the OMG specification
+clause by clause — its **15 clauses** (`01-scope` … `15-exchange-formats`) and **3
+annexes** (`annex-a` … `annex-c`). The notation's behavioural semantics (token flow,
+conformance classes) are also covered descriptively by `REF-BPMN-001`.
 
 ## How it works
 
@@ -216,12 +224,13 @@ lanes, message flows, data objects, and an annotation) for worked examples.
 | 1.1     | 2026-05-24 | Vũ Anh | Added `DESIGN-BPMN-PARSER-001` (the BPMN importer feature design that realises this mapping) to related documents. |
 | 1.2     | 2026-05-24 | Vũ Anh | Added `KYMOJSON-MAP-001` (the `.kymo.json` serialization of the resolved model this importer produces) to related documents. |
 | 1.3     | 2026-05-24 | Vũ Anh | Added a **Normative reference** section citing the OMG *BPMN 2.0.2* specification (PDF: <https://www.omg.org/spec/BPMN/2.0.2/PDF>; ISO/IEC 19510:2013) as the authoritative source for the `.bpmn` format, and linked it from the intro. |
+| 1.4     | 2026-05-24 | Vũ Anh | Split the BPMN format doc into the `docs/formats/bpmn/` normative-reference set (index `BPMN-NREF-001`), structured as a 1:1 mirror of the OMG spec (15 clauses + 3 annexes); this file is the kymo element-mapping part at `docs/formats/bpmn/kymo-mapping.md`. Added `BPMN-NREF-001` and `REF-BPMN-001` to related documents. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/formats/bpmn.md`; authoritative source is the
-main-branch working tree (history via `git log`).
+Version-controlled at `docs/formats/bpmn/kymo-mapping.md`; authoritative source is
+the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
 Implicit — checked in with the repository; available to all readers.
