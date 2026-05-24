@@ -121,7 +121,9 @@ function ShapeView({
   if (!shape) return null; // transient: our id is mid-removal (the parent drops us next render)
   const cam = editor.getCamera();
   const b = boundsOf(util, shape);
-  const selected = draggable && editor.getSelectedShapeIds().includes(shapeId);
+  // canvas-studio P5 (FR-CS-05): show selection for ANY selected shape (regions
+  // are pointer-events:none so can't be click-selected; nodes + notes/text can).
+  const selected = editor.getSelectedShapeIds().includes(shapeId);
   return (
     <div
       data-shape-id={shape.id}
@@ -135,22 +137,51 @@ function ShapeView({
       }}
     >
       {util.component(shape)}
-      {selected && (
-        // Selection outline rides inside the wrapper (already translated to
-        // shape.x/y), so it follows the node frame-for-frame during a drag.
-        <div
-          style={{
-            position: "absolute",
-            left: b.x,
-            top: b.y,
-            width: b.w,
-            height: b.h,
-            border: `${1.5 / cam.z}px solid #3b82f6`,
-            boxSizing: "border-box",
-            pointerEvents: "none",
-          }}
-        />
-      )}
+      {selected && (() => {
+        // Selection rect + corner handles + size badge ride inside the wrapper
+        // (already translated to shape.x/y), so they follow a dragged node
+        // frame-for-frame (FR-CS-05). Sized in page units (`/cam.z`) → constant
+        // on screen at any zoom. Accent-green matches the prototype `KSelect`.
+        // Handles are presentational in the MVP — interactive resize is backlog.
+        const bw = 1.5 / cam.z;
+        const hs = 7 / cam.z;
+        const corners = [
+          [b.x, b.y], [b.x + b.w, b.y], [b.x, b.y + b.h], [b.x + b.w, b.y + b.h],
+        ];
+        return (
+          <>
+            <div
+              style={{
+                position: "absolute", left: b.x, top: b.y, width: b.w, height: b.h,
+                border: `${bw}px solid var(--accent)`, boxSizing: "border-box", pointerEvents: "none",
+              }}
+            />
+            {corners.map(([cx, cy], i) => (
+              <div
+                key={i}
+                data-testid="selection-handle"
+                style={{
+                  position: "absolute", left: cx - hs / 2, top: cy - hs / 2, width: hs, height: hs,
+                  background: "#fff", border: `${bw}px solid var(--accent)`, boxSizing: "border-box", pointerEvents: "none",
+                }}
+              />
+            ))}
+            <div
+              data-testid="selection-size"
+              style={{
+                position: "absolute", left: b.x + b.w / 2, top: b.y + b.h + 6 / cam.z,
+                transform: "translateX(-50%)",
+                background: "var(--accent)", color: "var(--accent-fg)",
+                fontFamily: "Inter, ui-sans-serif, system-ui", fontWeight: 600, fontSize: 10 / cam.z, lineHeight: 1.4,
+                padding: `${1 / cam.z}px ${5 / cam.z}px`, borderRadius: 3 / cam.z,
+                whiteSpace: "nowrap", pointerEvents: "none",
+              }}
+            >
+              {Math.round(b.w)} × {Math.round(b.h)}
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 }
