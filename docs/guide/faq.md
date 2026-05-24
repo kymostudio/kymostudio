@@ -72,7 +72,7 @@ Also check you're opening the `-animated.svg` file, not the plain `.svg`.
 It shouldn't — on import, kymo uses the geometry stored in the file's Diagram-Interchange (DI)
 section and renders it as laid out, skipping its own layout pass. If positions look off, the
 file's DI data is likely the cause. For the element-to-shape mapping, see the
-[BPMN element mapping](../formats/bpmn.md) (`BPMN-MAP-001`).
+[BPMN element mapping](../formats/bpmn/kymo-mapping.md) (`BPMN-MAP-001`).
 
 ### Should I author BPMN in the DSL or import a `.bpmn`?
 

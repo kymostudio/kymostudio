@@ -247,7 +247,7 @@ bpmn {
 
 Already have a `.bpmn` file from bpmn.io, Camunda Modeler, or Signavio? Just render it
 directly — `kymo process.bpmn` — and kymo uses the geometry stored in the file. See the
-[BPMN element mapping](../formats/bpmn.md) (`BPMN-MAP-001`).
+[BPMN element mapping](../formats/bpmn/kymo-mapping.md) (`BPMN-MAP-001`).
 
 → Spec: [§6.9 BPMN Process Blocks](../KYMO_DSL.md#69-bpmn-process-blocks)
 

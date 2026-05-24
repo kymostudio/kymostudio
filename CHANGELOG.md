@@ -9,6 +9,17 @@ packages share a version number.
 
 ## [Unreleased]
 
+### Changed
+
+- **BPMN format docs restructured into a normative-reference set** — the single
+  `docs/formats/bpmn.md` is now the folder [`docs/formats/bpmn/`](docs/formats/bpmn/),
+  a **1:1 mirror of the OMG BPMN 2.0.2 specification** (OMG `formal/2013-12-09` /
+  ISO/IEC 19510:2013): a `README.md` index (`BPMN-NREF-001`) over one file per clause
+  (`01-scope` … `15-exchange-formats`) and per annex (`annex-a` … `annex-c`) — the
+  spec's **15 clauses + 3 annexes** — each citing its governing OMG clause. The kymo
+  element mapping keeps its id `BPMN-MAP-001` and moves to
+  [`docs/formats/bpmn/kymo-mapping.md`](docs/formats/bpmn/kymo-mapping.md).
+
 ## [0.3.0] - 2026-05-24
 
 ### Added
