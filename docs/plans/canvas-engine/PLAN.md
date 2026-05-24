@@ -112,9 +112,9 @@ Full engineering design — store, editor facade, viewport, ShapeUtil parity, pe
 seam — is in **`DESIGN-ENGINE-001`**. Proposed layout:
 
 ```
-packages/js-canvas/              # NEW workspace pkg (node --test like packages/js); MAY start as website/app/src/engine/
+packages/js-canvas/              # the engine home (private workspace pkg; node --test like packages/js) — Annex B §1 decided
 └── src/
-    ├── store.ts        # reactive records, scoped/sourced listeners, transactions, history   (DESIGN §5)
+    ├── store.ts        # reactive records, scoped/sourced listeners, transactions, history   (DESIGN §5) ✅ Phase 2
     ├── editor.ts       # Editor facade: CRUD + run + zoomToFit + selection                   (DESIGN §6)
     ├── shape.ts        # ShapeUtil base, Rectangle2d, T validators, BaseShape                (DESIGN §7,§9)
     ├── view/           # camera, hit-test, culling, DOM render loop                          (DESIGN §8)
@@ -242,8 +242,10 @@ Detailed cases + traceability in `TEST-ENGINE-001`. At the plan level (this feat
 
 ## Annex B — Open questions / pending decisions
 
-1. **Engine home** — new workspace package `packages/js-canvas` (testable, reusable) vs. start inside
-   `website/app/src/engine/` and graduate later? (Lean: start in-app for the MVP, extract later.)
+1. ~~**Engine home**~~ — **DECIDED (Phase 2):** the engine lives in a new **private** workspace
+   package **`packages/js-canvas`** (mirrors `packages/js`: `tsc → dist`, `node --test`). Clean
+   headless test harness, reusable/extractable; the app's `engine/adapter.ts` re-exports from it in
+   later phases. (`DESIGN-ENGINE-001` §4's primary proposal.)
 2. **Reactivity granularity** — single document epoch (simplest) vs. per-record atoms (faster)?
    Start coarse in Phase 5; the formal 60 fps decision is the sibling's footprint pass (`RK-EN-04`).
 3. **A/B flag lifetime** — keep `?engine=native` as a permanent escape hatch, or delete once
@@ -262,6 +264,7 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 | 2026-05-23 | Docs | Authored the canvas-engine spec/plan doc set (`INTRO`/`FEATURE`/`DESIGN`/`TEST`/`PLAN`) — design-before-code for the tldraw replacement; surface census from `website/app/src`, adapter-seam strategy, phased plan, risk register. | ✅ | — |
 | 2026-05-24 | Docs | **Split the feature at the KEY-FREE BOARD seam** (≤50-SP/feature, ≤10-SP/phase caps): rescoped this doc-set to the render/interaction core (≈42 SP, Phases 1–7, 1-based); spun the parity-completion + FigJam-authoring half out to the new `*-FIGJAM-001` doc-set (≈44 SP). | ✅ | `PLAN-FIGJAM-001` |
 | 2026-05-24 | Phase 1 | **Adapter seam shipped.** New `website/app/src/engine/adapter.ts` re-exports the tldraw surface (+ `tldraw.css`); `Board`/`Inspector`/`KymoNodeShape`/`KymoDiagramShape`/`diagramToShapes` re-pointed to `./engine/adapter`. `@tldraw/tlschema` augmentation kept (deferred per DESIGN §9.3). Verified: `tsc --noEmit` clean; `grep '"tldraw"'` only in `adapter.ts` (`NFR-EN-04`); bundle rebuilt (CSS byte-identical); E2E smoke — board renders 43 shapes, 0 console errors; `packages/js` 59/59 green. | ✅ | — |
+| 2026-05-24 | Phase 2 | **Reactive store shipped.** New private package `packages/js-canvas` (mirrors `packages/js`: `tsc → dist`, `node --test`) with `src/store.ts` — records + CRUD, `listen(scope/source)`, `run(history/source)` transactions, the single **source-tagging choke-point** (loop-guard, `RK-EN-01`), monotonic index order, history tagging. CI gains a `js-canvas` job. Resolves Annex B §1 (engine home). Verified headless: **`TC-EN-01..04` green** (incl. the zero-echo loop-guard); `tsc --noEmit` clean; `packages/js` 59/59; `website/app` untouched. | ✅ | — |
 
-**Next:** **Phase 2** — the reactive store (`store.ts`): records, `run`/transactions, `source`/`scope`
-semantics + `history:"ignore"` tagging, headless unit tests `TC-EN-01..04` (the loop-guard core).
+**Next:** **Phase 3** — the editor facade (`editor.ts`): CRUD + `run` + `zoomToFit` + selection over
+the store (`DESIGN-ENGINE-001` §6). Still headless; thin imperative layer.

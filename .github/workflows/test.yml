@@ -50,6 +50,24 @@ jobs:
       - name: Run tests
         run: npm test   # builds TS to dist/, then `node --test`
 
+  js-canvas:
+    name: JS canvas engine tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/js-canvas
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Run tests
+        run: npm test   # builds TS to dist/, then `node --test`
+
   vscode-extension:
     name: VS Code extension build
     runs-on: ubuntu-latest
