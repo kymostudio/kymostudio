@@ -117,13 +117,15 @@ packages/js-canvas/              # the engine home (private workspace pkg; node 
     ├── store.ts        # reactive records, scoped/sourced listeners, transactions, history   (DESIGN §5) ✅ Phase 2
     ├── editor.ts       # Editor facade: CRUD + run + zoomToFit + selection                   (DESIGN §6) ✅ Phase 3
     ├── shape.ts        # ShapeUtil base, Rectangle2d, T validators, BaseShape                (DESIGN §7,§9) ✅ Phase 4
-    ├── view/           # camera, hit-test, culling, DOM render loop                          (DESIGN §8)
     ├── tools/          # select / drag / pan / zoom  (+ later: draw / sticky / text)         (DESIGN §4)
     ├── persist.ts      # IndexedDB serialize ⇄ restore                                       (DESIGN §11)
-    ├── react/          # <Canvas>, HTMLContainer, useEditor, useValue                        (DESIGN §9.4)
     └── shapes-builtin/ # kymo-region / kymo-edge (or geo / arrow)                            (DESIGN §10)
 
-website/app/src/engine/adapter.ts   # the seam: re-exports tldraw (P1) → engine (this feature); tldraw deleted in canvas-figjam   (DESIGN §13)
+website/app/src/engine/                                                                       # the React/DOM-coupled layer (in-app for now; graduates to the package later)
+    ├── adapter.ts      # the seam: re-exports tldraw (P1) → engine; tldraw deleted in canvas-figjam   (DESIGN §13) ✅ Phase 1
+    ├── react.tsx       # <EngineCanvas> render loop, HTMLContainer, useEditor, useValue       (DESIGN §8,§9.4) ✅ Phase 5
+    ├── shapes.tsx      # engine ShapeUtils (kymo-node/diagram + parity geo/arrow)             (DESIGN §8) ✅ Phase 5
+    └── EngineBoard.tsx # read-only board behind ?engine=native                                ✅ Phase 5
 ```
 
 **Reused unchanged** from `DESIGN-CANVAS-001`: `Board.tsx` sync/writeback, `KymoNodeShapeUtil`,
@@ -267,7 +269,8 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 | 2026-05-24 | Phase 2 | **Reactive store shipped.** New private package `packages/js-canvas` (mirrors `packages/js`: `tsc → dist`, `node --test`) with `src/store.ts` — records + CRUD, `listen(scope/source)`, `run(history/source)` transactions, the single **source-tagging choke-point** (loop-guard, `RK-EN-01`), monotonic index order, history tagging. CI gains a `js-canvas` job. Resolves Annex B §1 (engine home). Verified headless: **`TC-EN-01..04` green** (incl. the zero-echo loop-guard); `tsc --noEmit` clean; `packages/js` 59/59; `website/app` untouched. | ✅ | — |
 | 2026-05-24 | Phase 3 | **Editor facade shipped.** `packages/js-canvas/src/editor.ts` — `Editor` over the store: `getCurrentPageShapes`/`getShape`, `createShape(s)`/`updateShape`/`deleteShape(s)`, `run`, **selection** state (`select`/`getSelectedShapeIds`/`getOnlySelectedShape`), **camera** state + `zoomToFit`. Uses an optional structural `ShapeUtilLike` for `getDefaultProps`/`getGeometry`, with an `x/y`+`props.w/h` fallback until Phase 4. Verified headless: **`TC-EN-01`, `TC-EN-07`** + selection + default-fill green (8/8 in `js-canvas`); `tsc --noEmit` clean; `packages/js` 59/59; `website/app` untouched. | ✅ | — |
 | 2026-05-24 | Phase 4 | **ShapeUtil + geometry shipped.** `packages/js-canvas/src/shape.ts` — `Rectangle2d` (bounds/hitTestPoint/toSvgPath), `T` validators (number/string/boolean/literal/optional), `ShapeUtil` abstract base (`static type`/`props`, instance `get type()`, abstract `getDefaultProps`/`getGeometry`, dev-time `validateProps`; render hooks `component`/`getIndicatorPath`/`toSvg` optional & `unknown` → **headless**, narrowed by Phase 5). Editor now validates props on `createShape`/`updateShape`; `zoomToFit` consumes real `getGeometry` bounds. Verified: **`TC-EN-05`, `TC-EN-06`** + zoomToFit-upgrade green (12/12 in `js-canvas`); `tsc --noEmit` clean (no React/DOM); `packages/js` 59/59; `website/app` untouched. | ✅ | — |
+| 2026-05-24 | Phase 5 | **Viewport + render (React) shipped.** Render layer lives **in-app** (`website/app/src/engine/`, keeping `packages/js-canvas` headless): `react.tsx` (`EngineCanvas` camera-transform render loop, `HTMLContainer`, `useEditor`/`useValue`), `shapes.tsx` (engine `ShapeUtil`s for `kymo-node`, `kymo-diagram`, + Phase-5 parity-stopgap `geo`/`arrow`), `EngineBoard.tsx` (read-only build from `diagramToShapes`). `App.tsx` branches on **`?engine=native`** → `EngineBoard` (Board.tsx untouched); `build.sh` builds the engine dist. **A/B verified (chrome E2E):** AIQ DSL renders nodes + 4 regions + edges; `order` BPMN renders the `<img>` embed; 0 console errors; default (no-flag) path still mounts tldraw. `tsc --noEmit` clean (app + js-canvas); `packages/js` 59/59, `js-canvas` 12/12. | ✅ | — |
 
-**Next:** **Phase 5** — `view/` (camera transform + DOM render loop + cull) and `react/`
-(`<Canvas>`, `HTMLContainer`, `useEditor`, `useValue`); render kymo shapes read-only behind
-`?engine=native` (`DESIGN-ENGINE-001` §8,§9.4). First phase that touches `website/app`.
+**Next:** **Phase 6** — `tools/` (select / drag / pan / zoom + hit-test + indicator) and the
+drag→`.kymo` round-trip on the engine (`DESIGN-ENGINE-001` §5.3 loop-guard, `FR-EN-05`). Makes the
+engine path interactive (wire `EngineBoard` to Board's `sync`/`writeback`).

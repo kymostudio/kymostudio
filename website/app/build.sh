@@ -16,6 +16,9 @@ cd "$(dirname "$0")"
 echo "→ compiling kymostudio JS package to dist/"
 npm --prefix ../../packages/js run build
 
+echo "→ compiling canvas engine to dist/"
+npm --prefix ../../packages/js-canvas run build
+
 echo "→ installing playground deps"
 npm ci
 

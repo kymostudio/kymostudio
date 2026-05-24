@@ -13,6 +13,11 @@ import { parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packa
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
 import { Board } from "./Board";
+import { EngineBoard } from "./engine/EngineBoard";
+
+// canvas-engine A/B: `?engine=native` mounts the in-house engine (read-only,
+// Phase 5) instead of tldraw. Read once at load.
+const ENGINE_NATIVE = new URL(location.href).searchParams.get("engine") === "native";
 
 /** Pull the intrinsic width/height off the rendered `<svg>` header. */
 function svgSize(svg: string): { w: number; h: number } {
@@ -221,7 +226,11 @@ export function App() {
         </section>
 
         <section className="pane view">
-          <Board diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
+          {ENGINE_NATIVE ? (
+            <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} />
+          ) : (
+            <Board diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
+          )}
           <div id="error" hidden={error == null}>
             {error}
           </div>
