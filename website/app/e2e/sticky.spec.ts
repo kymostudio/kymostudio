@@ -25,7 +25,7 @@ async function freshBoard(page: Page): Promise<void> {
 /** Sticky tool → click the canvas to place a note (which reverts to select).
  *  Returns the placement point (the note's centre) for a later double-click. */
 async function placeNote(page: Page, fx = 0.4, fy = 0.5): Promise<{ x: number; y: number }> {
-  const btn = page.getByRole("button", { name: "Sticky tool" });
+  const btn = page.getByTestId("tool-sticky");
   await btn.click();
   await expect(btn).toHaveClass(/active/); // tool=sticky committed before we click the canvas
   const vp = (await page.getByTestId("engine-viewport").boundingBox())!;

@@ -22,6 +22,8 @@ export function ToolRail({ tool, setTool }: { tool: Tool; setTool: (t: Tool) => 
             {t.sepBefore && <div className="sep" />}
             <div
               className={`tool${active ? " active" : ""}${t.enabled ? "" : " disabled"}`}
+              role="button"
+              data-testid={`tool-${t.id}`}
               title={t.title}
               aria-label={t.title}
               aria-disabled={!t.enabled}

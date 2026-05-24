@@ -32,7 +32,7 @@ test("TC-J-05: draw creates a persisted freedraw stroke that never enters .kymo"
   expect(await page.locator('[data-shape-type="freedraw"]').count()).toBe(0);
 
   // Switch to the draw tool and drag a freehand stroke.
-  await page.getByRole("button", { name: "Draw tool" }).click();
+  await page.getByTestId("tool-draw").click();
   const vp = (await page.getByTestId("engine-viewport").boundingBox())!;
   const sx = vp.x + vp.width * 0.22;
   const sy = vp.y + vp.height * 0.25;
@@ -55,7 +55,7 @@ test("TC-J-05: draw creates a persisted freedraw stroke that never enters .kymo"
 });
 
 test("TC-J-05: undo removes the whole stroke in one step (FR-J-02 × freeform)", async ({ page }) => {
-  await page.getByRole("button", { name: "Draw tool" }).click();
+  await page.getByTestId("tool-draw").click();
   const vp = (await page.getByTestId("engine-viewport").boundingBox())!;
   const sx = vp.x + vp.width * 0.3;
   const sy = vp.y + vp.height * 0.3;
