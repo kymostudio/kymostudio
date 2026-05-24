@@ -88,8 +88,8 @@ The headline acceptance — execute **every** canvas-editor case against the tld
 
 | NFR | Method |
 |-----|--------|
-| **NFR-J-01** (60 fps) | Profile pan/zoom/drag on the AIQ sample (19 nodes / 4 regions / 20 arrows); record frame time; cull on/off comparison. |
-| **NFR-J-02** (bundle) | `ls -la website/app/kymo.bundle.js` + gzip before/after tldraw removal; assert materially below 2.0 MB / ≈586 KB-gzip; engine ≤ ~50 KB gzip target. |
+| **NFR-J-01** (60 fps) | **PASS (P4).** AIQ (19/4/20) holds 60 fps on pan/zoom/drag. Drag refined to **per-record reactivity** — the render-guard E2E asserts a 1-node drag re-renders only that id (not ∝ N); real-GPU drag-at-high-N (`BENCH-ENGINE-001` §4.4) confirms O(1) re-render scope and 60 fps median to ≥600 nodes (vs 30 fps parent-wide). **Culling deferred** (`NFR-J-01`-`MAY`; net-negative for on-screen workloads — `DESIGN-JAM-001` §6). |
+| **NFR-J-02** (bundle) | **PASS (P3/P4).** `gzip -c website/app/kymo.bundle.js \| wc -c` ≈ **107 KB** gzip / 399 KB raw — from the 2.09 MB / 586 KB tldraw baseline (−82% gzip); unchanged by the P4 reactivity change (no new deps). |
 
 > Inherited checks still apply (`TEST-ENGINE-001` §4): `NFR-EN-04` (adapter seam) — now `grep
 > '"tldraw"'` → **0** everywhere; `NFR-EN-06` (committed bundle, no CI build).

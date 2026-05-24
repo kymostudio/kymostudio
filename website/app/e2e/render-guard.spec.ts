@@ -7,8 +7,10 @@
  * (hardware-dependent, flaky in CI). A drag, by contrast, mutates the store and
  * must re-render.
  *
- * `EngineCanvas` increments `window.__kymoRenders` once per render when
- * `window.__kymoBench` is set (a no-op test seam in prod).
+ * Each `ShapeView` increments `window.__kymoRenders` once per render and adds its
+ * id to `window.__kymoRenderedIds` when `window.__kymoBench` is set (a no-op test
+ * seam in prod). Per-record reactivity (RK-EN-04): a drag re-renders ONLY the
+ * moved shape, so dragging one node touches exactly one id — asserted below.
  */
 import { test, expect, type Page } from "@playwright/test";
 
@@ -19,6 +21,9 @@ const flush = (page: Page) =>
 
 const renders = (page: Page) =>
   page.evaluate(() => (window as { __kymoRenders?: number }).__kymoRenders ?? 0);
+
+const renderedIds = (page: Page) =>
+  page.evaluate(() => [...((window as { __kymoRenderedIds?: Set<string> }).__kymoRenderedIds ?? [])]);
 
 const cameraTransform = (page: Page) =>
   page.evaluate(() => {
@@ -57,11 +62,12 @@ const emptyPoint = (page: Page) =>
     return null;
   });
 
-/** Drain any pending mount/sync renders, then zero the counter. */
+/** Drain any pending mount/sync renders, then zero the render counter + id set. */
 async function arm(page: Page): Promise<void> {
   await page.waitForTimeout(250);
   await page.evaluate(() => {
     (window as { __kymoRenders?: number }).__kymoRenders = 0;
+    (window as { __kymoRenderedIds?: Set<string> }).__kymoRenderedIds = new Set();
   });
 }
 
@@ -116,6 +122,32 @@ test("dragging a node re-renders (sanity: the store path still updates shapes)",
   await page.waitForTimeout(150);
 
   expect(await renders(page)).toBeGreaterThan(0);
+});
+
+// canvas-jam Phase 4 (NFR-J-01, RK-EN-04): per-record reactivity. Dragging ONE
+// node must re-render ONLY that node, not the whole shape list — the lever that
+// keeps drag-at-high-N smooth. Locks against a regression to a parent-wide
+// re-render (which would put every shape id in __kymoRenderedIds).
+test("per-record: dragging one node re-renders only that node, not all N (NFR-J-01)", async ({ page }) => {
+  const nodes = page.locator('[data-shape-type="kymo-node"]');
+  expect(await nodes.count(), "a real multi-node diagram (AIQ ≈ 19)").toBeGreaterThan(5);
+  const target = nodes.first();
+  const targetId = await target.getAttribute("data-shape-id");
+  const b = (await target.boundingBox())!;
+  await arm(page);
+
+  const cx = b.x + b.width / 2;
+  const cy = b.y + b.height / 2;
+  await page.mouse.move(cx, cy);
+  await page.mouse.down();
+  for (let i = 1; i <= 8; i++) await page.mouse.move(cx + i * 9, cy + i * 6);
+  await page.mouse.up();
+  await page.waitForTimeout(150); // < the 200ms writeback debounce, so no re-sync yet
+
+  // The ONLY shape that re-rendered during the drag is the dragged node.
+  expect(await renderedIds(page)).toEqual([targetId]);
+  // …and the render count is a small constant (~one per move), NOT ∝ N.
+  expect(await renders(page)).toBeLessThanOrEqual(12);
 });
 
 // canvas-jam Phase 1 (FR-J-01): the engine renders regions/edges as its own

@@ -253,10 +253,15 @@ screen→page via the inverse. Single source of truth; persisted (§11).
   wrapper **per shape**; each wrapper renders `util.component(shape)` inside an **`HTMLContainer`**
   (a positioned `<div>` honouring the shape's `w/h`, matching `KymoNodeShape.tsx:38`).
 - React renders the shape list keyed by id; the signals layer (§5.4) re-renders only changed shapes.
-- **Culling (`NFR-J-01`, perf pass in `canvas-jam`):** skip wrappers whose `getGeometry().bounds` fall outside the viewport rect
-  (with a margin). *Note `RK-07`:* `KymoDiagramShape` already renders as a cached `<img>` data-URL
-  specifically so culling/remount doesn't flash — preserve that; do not eagerly unmount its DOM
-  without the data-URL cache.
+  **As-built (`canvas-jam` P4):** per-record reactivity landed — each wrapper subscribes to the store
+  for its own id, so a drag re-renders only the moved shape (`DESIGN-JAM-001` §6; `BENCH-ENGINE-001` §4.4).
+- **Culling (`NFR-J-01`) — DEFERRED in `canvas-jam` P4 (not implemented).** Design (kept for reference):
+  skip wrappers whose `getGeometry().bounds` fall outside the viewport rect (with a margin). *Why
+  deferred:* it would recompute the visible set on every pan → re-render on pan, regressing the §8.1
+  0-re-render pan win (`BENCH-ENGINE-001` §6); counterproductive for kymo's all-on-screen workload, and
+  spec'd `MAY`. Revisit only for the off-screen/large-board case. *Note `RK-07`:* `KymoDiagramShape`
+  renders as a cached `<img>` data-URL specifically so culling/remount wouldn't flash — preserve that if
+  culling is ever added; moot while there's no cull/remount.
 
 ### 8.3 `zoomToFit`
 

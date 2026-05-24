@@ -135,11 +135,20 @@ removal commit, and `grep -r '"tldraw"' website/app/src` → 0 **after**. `RK-02
 ## 6. Footprint & performance (`engine/view`) — NFR-J-01/02
 
 - **Bundle:** measure `kymo.bundle.js` (raw + gzip) before/after removal; assert materially below the
-  2.0 MB / ≈586 KB-gzip tldraw baseline; tree-shake; target engine ≤ ~50 KB gzip.
-- **Perf:** profile pan/zoom/drag on the AIQ sample; if coarse single-epoch reactivity
-  (`DESIGN-ENGINE-001` §5.4) misses ~60 fps, refine to per-record atoms (`RK-EN-04`). Culling
-  (`DESIGN-ENGINE-001` §8.2) on/off comparison; preserve the `KymoDiagramShape` `<img>` data-URL
-  cache so cull/remount doesn't flash (`RK-07`).
+  2.0 MB / ≈586 KB-gzip tldraw baseline; tree-shake; target engine ≤ ~50 KB gzip. **As-built (P3/P4):**
+  399 KB raw / **~107 KB gzip** (from 2.09 MB / 586 KB) — unchanged by the P4 reactivity change (no deps).
+- **Perf — as-built (P4):** the coarse single-epoch reactivity (`DESIGN-ENGINE-001` §5.4) was **refined
+  to per-record reactivity** (`RK-EN-04`): each shape's wrapper subscribes to the store for its own id,
+  so a **drag re-renders only the moved shape** (the parent re-renders only on add/remove + selection).
+  Pan/zoom stay at 0 re-renders (transform-only). Drag re-render scope is now O(1) — proven at 19/300/600
+  shapes (`BENCH-ENGINE-001` §4.4: 600-node drag holds 60 fps median vs 30 fps parent-wide). The
+  selection outline rides **inside** the shape wrapper so it follows a dragged node frame-for-frame.
+- **Culling deferred (was `DESIGN-ENGINE-001` §8.2 on/off comparison).** Decided **against** viewport
+  culling: `BENCH-ENGINE-001` §6 shows the engine beats tldraw at scale *because* it does 0 re-renders on
+  pan; culling must recompute the visible set on every pan → re-renders on pan → regresses that headline
+  win, for a benefit only on large mostly-off-screen boards (rare for kymo's zoomed-to-fit diagrams).
+  Culling is `NFR-J-01`-`MAY`; revisit only for the off-screen/large-board case. The `KymoDiagram`
+  `<img>` data-URL cache (`RK-07`) is moot while there's no cull/remount.
 
 ## 7. Freeform authoring tools (`engine/tools` + freeform shapes) — FR-J-05..07
 
