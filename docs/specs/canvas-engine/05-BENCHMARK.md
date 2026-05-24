@@ -1,7 +1,7 @@
 ---
 title: In-House Canvas Engine — Performance Benchmark Report
 document_id: BENCH-ENGINE-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | BENCH-ENGINE-001                                                  |
-| Version           | 0.1                                                               |
+| Version           | 0.2                                                               |
 | Status            | Draft                                                             |
 | Owner             | `diagrams/` project                                              |
 | Related Documents | `FEAT-ENGINE-001` (NFRs), `DESIGN-ENGINE-001` (camera/render design), `TEST-ENGINE-001` (V&V), `PLAN-ENGINE-001` (risk `RK-EN-04`), `PLAN-FIGJAM-001` (the footprint pass `NFR-FJ-01`) |
@@ -100,23 +100,31 @@ the **real-GPU** companion to that headless harness.
 
 ## 4. Results
 
-Average FPS (higher is better) · worst-frame ms (lower is better) · engine React re-renders during the gesture.
+Average FPS (higher is better) · worst-frame ms · engine React re-renders. Five shape counts, both
+scenarios, real GPU. Engine **re-renders = 0 at every N**.
 
-### 4.1 N = 75 shapes
+### 4.1 Pan
 
-| Scenario | Engine | tldraw |
-|----------|:------:|:------:|
-| pan  | **60** fps · 17.6 ms · **0 re-renders** | 58 fps · 33.3 ms |
-| zoom | **60** fps · 17.7 ms · **0 re-renders** | 47 fps · 83.3 ms |
+| N | Engine fps | Engine worst | re-renders | tldraw fps | tldraw worst | engine÷tldraw |
+|----:|:------:|:------:|:--:|:------:|:------:|:--:|
+| 75   | **60** | 17.6 ms | 0 | 58 | 33 ms  | 1.0× |
+| 150  | **60** | 17.6 ms | 0 | 28 | 51 ms  | 2.1× |
+| 300  | **52** | 133 ms  | 0 | 15 | 84 ms  | 3.5× |
+| 600  | **35** | 83 ms   | 0 | 8  | 150 ms | 4.4× |
+| 1000 | **21** | 100 ms  | 0 | 8  | 150 ms | 2.6× |
 
-### 4.2 N = 300 shapes
+### 4.2 Zoom
 
-| Scenario | Engine | tldraw |
-|----------|:------:|:------:|
-| pan  | **52** fps · 133 ms · **0 re-renders** | **15** fps · 84 ms |
-| zoom | **56** fps · 118 ms · **0 re-renders** | **16** fps · 199 ms |
+| N | Engine fps | Engine worst | re-renders | tldraw fps | tldraw worst | engine÷tldraw |
+|----:|:------:|:------:|:--:|:------:|:------:|:--:|
+| 75   | **60** | 17.7 ms | 0 | 47 | 83 ms  | 1.3× |
+| 150  | **60** | 17.7 ms | 0 | 28 | 83 ms  | 2.1× |
+| 300  | **56** | 118 ms  | 0 | 16 | 199 ms | 3.5× |
+| 600  | **37** | 100 ms  | 0 | 10 | 150 ms | 3.7× |
+| 1000 | **21** | 200 ms  | 0 | 9  | 484 ms | 2.3× |
 
-tldraw's 300-shape pan was re-measured three times → **14 / 16 / 16 fps** (stable, not a fluke).
+tldraw's 300-pan re-measured ×3 → 14/16/16 (stable). Driving validated at small N (tldraw is healthy
+at ≤75), so the collapse is real scaling, not a broken method.
 
 ### 4.3 Small-N anchor (headless, different method)
 
@@ -126,15 +134,34 @@ for the trend, not the absolute.)
 
 ## 5. Analysis
 
-- **≤ 75 shapes: rough parity** (both ~50–60 fps). This covers typical kymo diagrams.
-- **300 shapes: the engine pulls decisively ahead** — it holds **52–56 fps with 0 React re-renders**
-  (pan/zoom are a pure GPU transform, the `RK-EN-04` fix), while tldraw collapses to **~15 fps** because
-  it re-evaluates its rendering/cull pipeline on every camera change. tldraw *does* use a CSS transform
-  for the camera (confirmed: its shape layer carries `scale() translate()`), but its per-frame
-  reactive/cull bookkeeping dominates once many shapes are involved.
-- **Failure shape differs.** The engine is mostly smooth with occasional hitches (worst frame
-  117–133 ms — a GC/large-layer repaint spike); tldraw is *uniformly* slow at 300 (every frame
-  ~60–80 ms). Engine = better average, rarer-but-larger hitch; tldraw = steady low rate.
+### 5.1 Both scale ~linearly in N — but the engine's slope is ~5× lower
+
+Converting FPS → frame time (`ms = 1000/fps`) and fitting the curve:
+
+- **Engine** (fit 300→1000, past the vsync cap): **~0.04 ms added per shape per frame**. Its cost is
+  **100% GPU paint/composite** — re-renders are **0 at every N**, so the `RK-EN-04` decoupling holds at
+  all scales; the only N-dependence is compositing a larger layer.
+- **tldraw** (fit 75→300): **~0.22 ms per shape per frame — ~5× steeper**. Its per-frame reactive/cull
+  bookkeeping (JS, on the CPU) dominates, on top of the same paint. tldraw *does* use a CSS transform
+  for the camera (its shape layer carries `scale() translate()`), but the JS work, not the transform,
+  is the bottleneck.
+
+### 5.2 Interactive head-room (the practical takeaway)
+
+| Threshold | Engine holds up to | tldraw holds up to |
+|-----------|:------------------:|:------------------:|
+| 60 fps (buttery) | ~200 shapes | ~75 shapes |
+| ≥ 30 fps (usable) | **~700 shapes** | **~145 shapes** |
+
+→ at an interactive frame rate the engine carries **~5× more shapes**. The FPS ratio widens from parity
+(75) to **~4.4×** at 600, then narrows at **N = 1000** because tldraw **plateaus at ~8 fps** (a floor /
+partial culling / render-throttle) while the engine keeps a clean ~21 fps.
+
+### 5.3 Failure shape
+
+Engine = **low mean, periodic spikes** (worst 100–200 ms — large-layer re-raster / GC; **not** React,
+since re-renders = 0). tldraw = **steady-slow** with severe spikes at scale (zoom worst **484 ms** at
+1000). At N = 1000 the engine is still interactive (21 fps) where tldraw is unusable (8–9 fps).
 
 ## 6. Caveat — this is tldraw's worst case (read fairly)
 
@@ -166,9 +193,9 @@ The headless, repeatable version of this comparison is `npm run test:perf`
 
 | Finding | Backs |
 |---------|-------|
-| Pan/zoom hold 60 fps (≤75) / 52–56 fps (300) at **0 React re-renders** | `RK-EN-04` mitigation (`PLAN-ENGINE-001`); `DESIGN-ENGINE-001` §8.1 |
-| Engine ≫ tldraw at 300 on-screen shapes (52–56 vs ~15 fps) | the vendor-independence + performance case for the in-house engine (`INTRO-ENGINE-001`) |
-| Off-screen/large-board scaling still needs culling + per-record reactivity | `NFR-FJ-01` (`PLAN-FIGJAM-001`) |
+| Engine pan/zoom = **0 React re-renders at every N (75→1000)** — cost is pure GPU paint, ~0.04 ms/shape | `RK-EN-04` mitigation (`PLAN-ENGINE-001`); `DESIGN-ENGINE-001` §8.1 |
+| Both scale ~linearly but tldraw's slope is **~5× steeper** (~0.22 ms/shape) → engine sustains ≥30 fps to ~700 shapes vs tldraw ~145 | the vendor-independence + performance case for the in-house engine (`INTRO-ENGINE-001`) |
+| Off-screen/large-board scaling still needs culling + per-record reactivity (engine cost ∝ painted N) | `NFR-FJ-01` (`PLAN-FIGJAM-001`) |
 
 **Next scale point to measure:** the same sweep **with culling enabled** once `canvas-figjam` lands, and
 a drag-at-high-N run (drag still re-renders by design — `RK-EN-04`).
