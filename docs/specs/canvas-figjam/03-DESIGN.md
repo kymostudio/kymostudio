@@ -73,9 +73,16 @@ sibling feature):
 - **`KymoEdgeShapeUtil`** (`kymo-edge`) — props `{ start, end, color, arrowhead, label }`; renders a
   line/curve with an arrowhead and optional label.
 
-Re-point `diagramToShapes.ts` to create these (carrying only the props kymo sets — dropping dead
-tldraw fields `bend`, `verticalAlign`, …). This is the **only** logic change to `diagramToShapes.ts`
-and it is mechanical; `meta.kymo` and the `patchDsl` round-trip are untouched.
+**Engine-only split (as implemented in P1).** `diagramToShapes.ts` is shared by the still-live tldraw
+`Board.tsx` (`?engine=tldraw`), where `geo`/`arrow` are tldraw's *native* built-in shapes — re-pointing
+it in place would leave that path with no util for the new types (broken render + changed golden
+output). So `diagramToShapes.ts` keeps emitting `geo`/`arrow` for tldraw, and a thin engine builder
+`engine/diagramToShapesEngine.ts` reuses it (for stable ids / positions / `meta.kymo`) then remaps
+`geo` → `kymo-region` and `arrow` → `kymo-edge`, carrying only the props the engine reads (dropping
+dead tldraw fields `bend`, `size`, `verticalAlign`, … and flattening `richText` → a plain `label`).
+The new `ShapeUtil`s live in `engine/shapes.tsx` as `KymoRegionEngineUtil`/`KymoEdgeEngineUtil`
+(alongside `KymoNodeEngineUtil`). `meta.kymo` and the `patchDsl` round-trip are untouched. The shared
+`diagramToShapes.ts` leaves the engine path entirely when tldraw is deleted (FR-FJ-04, P3).
 
 ## 3. Undo / redo (`engine/store` history stack) — FR-FJ-02
 
