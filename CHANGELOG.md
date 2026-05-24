@@ -21,7 +21,7 @@ packages share a version number.
   structure and geometry. Python: `kymo <file> --bpmn` and
   `from kymo import to_bpmn`; JavaScript: `toBpmn(diagram)` — at parity, both
   engines. Pools/lanes/groups/expanded sub-processes are emitted; round-trip is
-  gated against the full MIWG corpus. See [`docs/formats/bpmn.md`](./formats/bpmn.md).
+  gated against the full MIWG corpus. See [`docs/formats/bpmn.md`](docs/formats/bpmn.md).
 
 ## [0.2.8] - 2026-05-23
 
@@ -34,7 +34,7 @@ packages share a version number.
   `type=` refinements); flow arrows `->` (sequence), `~>` (message), `..>`
   (association); chains and `;` expand to one flow per segment. The block emits
   a fully-resolved sub-diagram, so the existing renderer draws it unchanged. New
-  sample [`samples/order-flow.kymo`](../samples/order-flow.kymo); grammar
+  sample [`samples/order-flow.kymo`](samples/order-flow.kymo); grammar
   specified in `DSL.md` §6.9 (DSL-LANG-001 v2.1).
 
 ## [0.2.7] - 2026-05-23
@@ -144,9 +144,9 @@ extension.
   flows, associations, data objects/stores, text annotations, and pools/
   lanes. New modules `from_bpmn.py` (parser) + `bpmn_shapes.py` (glyphs);
   public API `from kymo import parse_bpmn`. See
-  [`samples/order.bpmn`](../samples/order.bpmn),
-  [`samples/collaboration.bpmn`](../samples/collaboration.bpmn) and
-  [`docs/formats/bpmn.md`](./formats/bpmn.md).
+  [`samples/order.bpmn`](samples/order.bpmn),
+  [`samples/collaboration.bpmn`](samples/collaboration.bpmn) and
+  [`docs/formats/bpmn.md`](docs/formats/bpmn.md).
 
 - **BPMN 2.0 import in the JS/TS package** — `parseBpmn(xml)` brings the same
   feature to `packages/js` at parity with Python: a dependency-free XML reader
