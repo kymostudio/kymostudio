@@ -227,7 +227,7 @@ export function App() {
 
         <section className="pane view">
           {ENGINE_NATIVE ? (
-            <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} />
+            <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
           ) : (
             <Board diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
           )}

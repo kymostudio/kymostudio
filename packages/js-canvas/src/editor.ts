@@ -17,7 +17,7 @@ import {
   type ShapeId,
   type ShapePartial,
 } from "./store.js";
-import type { Box } from "./shape.js";
+import type { Box, Vec } from "./shape.js";
 
 export interface Camera {
   x: number;
@@ -45,6 +45,9 @@ const DEFAULT_SHAPE_SIZE = 100;
 const DEFAULT_VIEWPORT = { w: 1024, h: 768 };
 /** Fraction of the viewport the fitted content fills. */
 const DEFAULT_PADDING = 0.9;
+/** Zoom clamp (§8.1). */
+const MIN_ZOOM = 0.05;
+const MAX_ZOOM = 8;
 
 export class Editor {
   readonly store: Store;
@@ -133,6 +136,25 @@ export class Editor {
 
   setViewportSize(size: { w: number; h: number }): void {
     this.viewport = { ...size };
+  }
+
+  /** Screen → page, inverting `screen = (page + cam) * z` (§8.1). */
+  screenToPage(p: Vec): Vec {
+    return { x: p.x / this.camera.z - this.camera.x, y: p.y / this.camera.z - this.camera.y };
+  }
+
+  /** Pan by a screen-space delta (e.g. a drag on empty canvas). */
+  panBy(dxScreen: number, dyScreen: number): void {
+    const { z } = this.camera;
+    this.camera = { ...this.camera, x: this.camera.x + dxScreen / z, y: this.camera.y + dyScreen / z };
+  }
+
+  /** Zoom toward a screen point, keeping the page point under it fixed. */
+  zoomToPoint(nextZ: number, screen: Vec): void {
+    const z = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, nextZ));
+    const before = this.screenToPage(screen);
+    // Choose cam so screenToPage(screen) at the new z still equals `before`.
+    this.camera = { x: screen.x / z - before.x, y: screen.y / z - before.y, z };
   }
 
   /**
