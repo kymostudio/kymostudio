@@ -11,7 +11,7 @@ review_cycle: On upstream Camunda major release, on kymo DSL/layout change, or a
 supersedes: null
 related_documents:
   - camunda.md
-  - ../KYMO_DSL.md
+  - ../formats/kymo-dsl/README.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -46,7 +46,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline   |
 | Access Date       | 2026-05-20                                                    |
 | Parent Reference  | [`camunda.md`](camunda.md)                                   |
-| Related Documents | [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This document isolates the **prior-art comparison** between [Camunda](https://camunda.com/) and kymo. The factual reference (the C7-vs-C8 split, architecture, BPMN conformance, bpmn.io) lives in [`camunda.md`](camunda.md); read that first if you need ground truth on how Camunda actually behaves.
 
@@ -207,5 +207,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`camund
 
 - Comparison subject: Camunda 8 (current) and Camunda 7 CE (EoL) as documented at <https://camunda.com/> on 2026-05-20.
 - Factual basis for the Camunda column: [`camunda.md`](camunda.md).
-- Factual basis for the kymo column: this repository's [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]], cited where B3 is scored). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]], cited where B3 is scored). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

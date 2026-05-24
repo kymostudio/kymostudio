@@ -13,7 +13,7 @@ related_documents:
   - lucidchart.comparision.md
   - ../diagrams/bpmn/README.md
   - ./drawio.md
-  - ../KYMO_DSL.md
+  - ../formats/kymo-dsl/README.md
 authors:
   - Vũ Anh
 language: en
@@ -49,7 +49,7 @@ upstream:
 | License           | Proprietary SaaS (freemium)                                   |
 | Version Reviewed  | Lucidchart cloud (2026)                                      |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`lucidchart.comparision.md`](./lucidchart.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`drawio.md`](./drawio.md), [`KYMO_DSL.md`](../KYMO_DSL.md) |
+| Related Documents | [`lucidchart.comparision.md`](./lucidchart.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`drawio.md`](./drawio.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Lucidchart's design choices so the team can consult them when reasoning about collaborative, web-based diagramming. No code or behaviour in this repository depends on Lucidchart. Lucidchart is a **general-purpose** diagram SaaS (BPMN is one shape set), in the same broad category as [draw.io](./drawio.md) rather than the BPMN-specialised tools.
 

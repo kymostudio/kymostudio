@@ -3,7 +3,7 @@
 A guided tour of the building blocks you'll use to draw diagrams. Every section has a
 small snippet you can paste into a file and render with `kymo file.kymo`.
 
-This is the *teaching* companion to the [DSL Language Specification](../KYMO_DSL.md) (`KYMO-DSL-001`).
+This is the *teaching* companion to the [DSL Language Specification](../formats/kymo-dsl/README.md) (`KYMO-DSL-001`).
 Each section links to the spec clause that defines it formally; reach for the spec when you
 need the exact grammar or an edge case.
 
@@ -32,7 +32,7 @@ api  box/send/blue  "API Gateway"  "REST · :443"  @ (200, 150)
 - **`@ …`** — where to put it (next section). Omit it and the component lands at `(0, 0)`
   unless a layout container positions it.
 
-→ Spec: [§6.4 Leaf Components](../KYMO_DSL.md#64-leaf-components)
+→ Spec: [§6.4 Leaf Components](../formats/kymo-dsl/06-grammar.md#64-leaf-components)
 
 ## Placing components
 
@@ -53,7 +53,7 @@ child hex/hex-agent/green "Child" "" @ orch right 60
 
 This places `child` 60 px to the right of `orch`. The gap is optional.
 
-→ Spec: [§6.4](../KYMO_DSL.md#64-leaf-components), [§7 Semantics](../KYMO_DSL.md#7-semantics)
+→ Spec: [§6.4](../formats/kymo-dsl/06-grammar.md#64-leaf-components), [§7 Semantics](../formats/kymo-dsl/07-semantics.md#7-semantics)
 
 ## Regions — labelled containers
 
@@ -94,7 +94,7 @@ group inner "Workers" {
 }
 ```
 
-→ Spec: [§6.5 Containers](../KYMO_DSL.md#65-containers)
+→ Spec: [§6.5 Containers](../formats/kymo-dsl/06-grammar.md#65-containers)
 
 ## Arranging things automatically
 
@@ -135,7 +135,7 @@ right outer "Server" {
 }
 ```
 
-→ Spec: [§6.5](../KYMO_DSL.md#65-containers), [§6.10 Layout Tree](../KYMO_DSL.md#610-layout-tree)
+→ Spec: [§6.5](../formats/kymo-dsl/06-grammar.md#65-containers), [§6.10 Layout Tree](../formats/kymo-dsl/06-grammar.md#610-layout-tree)
 
 ## Edges — the arrows
 
@@ -179,7 +179,7 @@ src --> dst : "label" {
 
 Start simple — bare `a --> b` works great. Add hints only where the auto-router needs help.
 
-→ Spec: [§6.7 Edges](../KYMO_DSL.md#67-edges)
+→ Spec: [§6.7 Edges](../formats/kymo-dsl/06-grammar.md#67-edges)
 
 ## Canvas, title, and subtitle
 
@@ -195,7 +195,7 @@ subtitle: "v2 — production"
 plus a 30-px margin — usually what you want. `title:`/`subtitle:` render a heading block at
 the top.
 
-→ Spec: [§6.3 Metadata Directives](../KYMO_DSL.md#63-metadata-directives), [§7.4 Auto-Canvas](../KYMO_DSL.md#74-auto-canvas)
+→ Spec: [§6.3 Metadata Directives](../formats/kymo-dsl/06-grammar.md#63-metadata-directives), [§7.4 Auto-Canvas](../formats/kymo-dsl/07-semantics.md#74-auto-canvas)
 
 ## Icons
 
@@ -249,10 +249,10 @@ Already have a `.bpmn` file from bpmn.io, Camunda Modeler, or Signavio? Just ren
 directly — `kymo process.bpmn` — and kymo uses the geometry stored in the file. See the
 [BPMN element mapping](../formats/bpmn/kymo-mapping.md) (`BPMN-MAP-001`).
 
-→ Spec: [§6.9 BPMN Process Blocks](../KYMO_DSL.md#69-bpmn-process-blocks)
+→ Spec: [§6.9 BPMN Process Blocks](../formats/kymo-dsl/06-grammar.md#69-bpmn-process-blocks)
 
 ## Next steps
 
 - **[Cookbook](./cookbook.md)** — complete diagrams you can adapt.
 - **[FAQ & Troubleshooting](./faq.md)** — fixes for common surprises.
-- **[DSL Language Specification](../KYMO_DSL.md)** — the full normative grammar.
+- **[DSL Language Specification](../formats/kymo-dsl/README.md)** — the full normative grammar.

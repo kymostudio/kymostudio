@@ -1,7 +1,7 @@
 # FAQ & Troubleshooting
 
 Fixes for the things you're most likely to hit early on. If something here doesn't match what
-you see, the [DSL Language Specification](../KYMO_DSL.md) is the authoritative source.
+you see, the [DSL Language Specification](../formats/kymo-dsl/README.md) is the authoritative source.
 
 ## Getting set up
 
@@ -36,7 +36,7 @@ If you set `canvas: W x H` by hand and your content runs past it, the overflow i
 Easiest fix: **delete the `canvas:` line** and let kymo auto-size to your content (it adds a
 30-px margin). Add an explicit `canvas:` back only when you need a fixed frame.
 
-→ See [§7.4 Auto-Canvas](../KYMO_DSL.md#74-auto-canvas).
+→ See [§7.4 Auto-Canvas](../formats/kymo-dsl/07-semantics.md#74-auto-canvas).
 
 ### The render fails with `unknown icon: '…'`
 
@@ -57,7 +57,7 @@ The default router is orthogonal and usually fine, but you can steer it:
 - Force the path through waypoints: `via=(120,300);(220,300)`.
 - Change the routing style: add `curve`, `straight`, or `elbow` (the default).
 
-→ See [§6.7 Edges](../KYMO_DSL.md#67-edges).
+→ See [§6.7 Edges](../formats/kymo-dsl/06-grammar.md#67-edges).
 
 ### `--animate` output looks static
 
@@ -109,4 +109,4 @@ Or use the [browser playground](https://kymostudio.github.io/kymostudio/app/) �
 
 - Compare against a working file in [`samples/`](../../samples).
 - Re-read the relevant section of [The `.kymo` Language](./dsl-guide.md).
-- Consult the normative [DSL Language Specification](../KYMO_DSL.md) for exact grammar and edge cases.
+- Consult the normative [DSL Language Specification](../formats/kymo-dsl/README.md) for exact grammar and edge cases.

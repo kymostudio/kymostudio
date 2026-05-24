@@ -118,7 +118,7 @@ kymostudio/                          (monorepo root)
 │   ├── data.kymo                     DSL source
 │   ├── aiq.kymo                      DSL source
 │   └── *.svg / *.webp / *.png        Rendered outputs + reference images
-└── docs/                             Spec docs (this file, KYMO_DSL.md)
+└── docs/                             Spec docs (this file, formats/kymo-dsl/)
 ```
 
 ---
