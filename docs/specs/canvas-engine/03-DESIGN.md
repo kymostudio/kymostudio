@@ -14,7 +14,7 @@ related_documents:
   - FEAT-ENGINE-001
   - TEST-ENGINE-001
   - PLAN-ENGINE-001
-  - DESIGN-FIGJAM-001
+  - DESIGN-JAM-001
   - DESIGN-CANVAS-001
 authors:
   - Vũ Anh
@@ -41,7 +41,7 @@ keywords:
 | Status            | Draft                                                             |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers implementing the engine (`website/app/`)              |
-| Related Documents | `FEAT-ENGINE-001` (requirements), `PLAN-ENGINE-001` (phases/why), `DESIGN-FIGJAM-001` (sibling — built-ins, undo, export, footprint, freeform tools), `DESIGN-CANVAS-001` (the editor that sits on top) |
+| Related Documents | `FEAT-ENGINE-001` (requirements), `PLAN-ENGINE-001` (phases/why), `DESIGN-JAM-001` (sibling — built-ins, undo, export, footprint, freeform tools), `DESIGN-CANVAS-001` (the editor that sits on top) |
 
 > **Status note.** Draft engineering design, not a committed spec. This is the *how* that complements
 > `PLAN-ENGINE-001` (the *why* and the phase order). Re-validate symbol names against
@@ -51,7 +51,7 @@ keywords:
 > **Scope note (v0.2 split).** This document covers the **render/interaction core** (store, editor,
 > geometry, viewport, custom-shape API, persistence, adapter seam). The built-in shape consolidation
 > (§10), board export (§12), undo/redo stack, footprint pass, and freeform-authoring tools are
-> designed in the sibling **`DESIGN-FIGJAM-001`**; the stubs below point there.
+> designed in the sibling **`DESIGN-JAM-001`**; the stubs below point there.
 
 ---
 
@@ -93,8 +93,8 @@ drop-in for each; the right column is the module that owns the replacement (§4)
 Two consequences:
 1. The **built-in `geo` rectangle and `arrow`** are part of the surface (Regions and Edges use them in
    `diagramToShapes.ts:29,60`). In *this* feature they stay supplied by **tldraw behind the adapter**;
-   the sibling **`canvas-figjam`** re-points `diagramToShapes` to custom `kymo-region` / `kymo-edge`
-   shapes (`FR-FJ-01`, `DESIGN-FIGJAM-001` §2) — cleaner long-term (fewer built-ins to own).
+   the sibling **`canvas-jam`** re-points `diagramToShapes` to custom `kymo-region` / `kymo-edge`
+   shapes (`FR-J-01`, `DESIGN-JAM-001` §2) — cleaner long-term (fewer built-ins to own).
 2. The **`@tldraw/tlschema` module augmentation** (`declare module ... TLGlobalShapePropsMap`) in the
    two custom shapes is tldraw-specific and is **dropped** — the engine derives its shape union from
    the registered `shapeUtils` array instead (§9.3).
@@ -116,7 +116,7 @@ three are what tldraw hides and we must build.
    ├──────────────────────────────────────────────────────────────────────────┤
    │ engine/store    reactive records + scoped/sourced listeners + history   │  state + reactivity
    │ engine/view     camera, hit-test, culling, DOM render loop              │  rendering
-   │ engine/tools    select / drag / pan / zoom  (draw/sticky → canvas-figjam) │  interaction
+   │ engine/tools    select / drag / pan / zoom  (draw/sticky → canvas-jam) │  interaction
    │ engine/persist  IndexedDB serialize ⇄ restore                          │  durability
    └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -125,11 +125,11 @@ Proposed location: a new workspace package **`packages/js-canvas`** (so it is te
 `node --test` like `packages/js`, and reusable), imported by `website/app`. An MVP MAY start inside
 `website/app/src/engine/` and graduate to a package once stable.
 
-## 5. The reactive store (`engine/store`) — FR-EN-02 (+ history *tagging* for `FR-FJ-02`)
+## 5. The reactive store (`engine/store`) — FR-EN-02 (+ history *tagging* for `FR-J-02`)
 
 The store is the heart; the loop-guard correctness (`RK-05`) lives or dies here. It also *tags* each
-write as recordable/ignored — the foundation the sibling's undo/redo stack (`FR-FJ-02`,
-`DESIGN-FIGJAM-001`) later consumes.
+write as recordable/ignored — the foundation the sibling's undo/redo stack (`FR-J-02`,
+`DESIGN-JAM-001`) later consumes.
 
 ### 5.1 Records & shape model
 
@@ -178,9 +178,9 @@ editor.run(fn: () => void, opts?: { history?: "ignore" | "record"; source?: Chan
   writes from `engine/tools` (user gestures) carry **`source:"user"`**. `Board.tsx` wraps every
   `text→canvas` sync in `editor.run(..., { history: "ignore" })` (`Board.tsx:85-91`) → those changes
   are *programmatic* → **not** delivered to the `source:"user"` listener → no echo.
-- **History rule (FR-EN-02 tagging; the undo *stack* is `FR-FJ-02`):** the store **tags** each write
+- **History rule (FR-EN-02 tagging; the undo *stack* is `FR-J-02`):** the store **tags** each write
   `history:"ignore"|"record"` at write time and excludes `"ignore"` writes from the recorded history
-  log. The user-facing undo/redo stack that consumes these tags is designed in `DESIGN-FIGJAM-001`.
+  log. The user-facing undo/redo stack that consumes these tags is designed in `DESIGN-JAM-001`.
 
 > **Design invariant (RK-05):** "user listener fires" ⇔ "a change whose source is `user`". The
 > tldraw-side belt-and-braces `applyingRef` guard in `Board.tsx:78,92` becomes redundant but is left
@@ -195,7 +195,7 @@ recomputes when any store atom it *read* during `compute` changes. Implement a t
   atoms it touches (tldraw uses its own `@tldraw/state`; we ship a ~100-line equivalent).
 - `react/useValue` subscribes a React `useSyncExternalStore` to the derived computation.
 - Store records are atoms (or a coarse single document-epoch atom for the MVP — simplest correct
-  option; refine to per-record atoms only if the sibling's perf pass (`NFR-FJ-01`) needs it).
+  option; refine to per-record atoms only if the sibling's perf pass (`NFR-J-01`) needs it).
 
 ### 5.5 Z-order
 
@@ -253,7 +253,7 @@ screen→page via the inverse. Single source of truth; persisted (§11).
   wrapper **per shape**; each wrapper renders `util.component(shape)` inside an **`HTMLContainer`**
   (a positioned `<div>` honouring the shape's `w/h`, matching `KymoNodeShape.tsx:38`).
 - React renders the shape list keyed by id; the signals layer (§5.4) re-renders only changed shapes.
-- **Culling (`NFR-FJ-01`, perf pass in `canvas-figjam`):** skip wrappers whose `getGeometry().bounds` fall outside the viewport rect
+- **Culling (`NFR-J-01`, perf pass in `canvas-jam`):** skip wrappers whose `getGeometry().bounds` fall outside the viewport rect
   (with a margin). *Note `RK-07`:* `KymoDiagramShape` already renders as a cached `<img>` data-URL
   specifically so culling/remount doesn't flash — preserve that; do not eagerly unmount its DOM
   without the data-URL cache.
@@ -278,7 +278,7 @@ export abstract class ShapeUtil<S extends Shape> {
   abstract getGeometry(shape: S): Rectangle2d;
   abstract component(shape: S): ReactNode;
   getIndicatorPath?(shape: S): Path2D;
-  toSvg?(shape: S): ReactNode;                          // per-shape export hook; board-level aggregation is FR-FJ-03 (DESIGN-FIGJAM-001)
+  toSvg?(shape: S): ReactNode;                          // per-shape export hook; board-level aggregation is FR-J-03 (DESIGN-JAM-001)
   canResize?(): boolean;        // default true
   canEdit?(): boolean;          // default false
   hideRotateHandle?(): boolean; // default false
@@ -307,11 +307,11 @@ change beyond import paths.)
 A positioned `<div>` that sizes to the shape and forwards `style`/children (matches usage at
 `KymoNodeShape.tsx:38`, `KymoDiagramShape.tsx:52`). ~15 lines.
 
-## 10. Built-in shapes — moved to `DESIGN-FIGJAM-001`
+## 10. Built-in shapes — moved to `DESIGN-JAM-001`
 
 The built-in shape consolidation (re-pointing `diagramToShapes` from tldraw's `geo`/`arrow` to tiny
-custom `kymo-region`/`kymo-edge` shapes carrying only the props kymo sets — `FR-FJ-01`) is designed
-in the sibling **`DESIGN-FIGJAM-001`** (Phase 1 there). In *this* feature, Regions/Edges keep
+custom `kymo-region`/`kymo-edge` shapes carrying only the props kymo sets — `FR-J-01`) is designed
+in the sibling **`DESIGN-JAM-001`** (Phase 1 there). In *this* feature, Regions/Edges keep
 rendering via tldraw's `geo`/`arrow` behind the adapter; `patchDsl` is unaffected (it reads
 `meta.kymo`, not the shape type).
 
@@ -329,11 +329,11 @@ Replaces tldraw's `persistenceKey` (`Board.tsx:32,144`; `DESIGN-CANVAS-001` §11
 - A `schemaVersion` int enables future migrations; mismatch → drop snapshot (safe for a single-player
   playground).
 
-## 12. Export — moved to `DESIGN-FIGJAM-001`
+## 12. Export — moved to `DESIGN-JAM-001`
 
 The board-level exporter (walk shapes in `index` order, aggregate each `util.toSvg(shape)` into one
-`<svg>` sized to the `zoomToFit` bounds, SVG/PNG download — `FR-FJ-03`) is designed in the sibling
-**`DESIGN-FIGJAM-001`**. The per-shape `toSvg` hook on `ShapeUtil` it builds on lives here (§9.1).
+`<svg>` sized to the `zoomToFit` bounds, SVG/PNG download — `FR-J-03`) is designed in the sibling
+**`DESIGN-JAM-001`**. The per-shape `toSvg` hook on `ShapeUtil` it builds on lives here (§9.1).
 
 ## 13. The adapter seam (`engine/adapter.ts`) — NFR-EN-04, the migration enabler
 
@@ -341,7 +341,7 @@ This is what makes the rewrite incremental and reversible (the whole strategy in
 
 ```ts
 // engine/adapter.ts  — the ONLY module the app imports for canvas primitives
-export * from "./impl";   // ./impl re-exports tldraw today; the engine by Phase 7; tldraw deleted in canvas-figjam
+export * from "./impl";   // ./impl re-exports tldraw today; the engine by Phase 7; tldraw deleted in canvas-jam
 ```
 
 - **Phase 1 (this feature):** `./impl` simply re-exports the tldraw symbols the app uses, under the
@@ -353,9 +353,9 @@ export * from "./impl";   // ./impl re-exports tldraw today; the engine by Phase
   `tools`, `persist`. Point `./impl` at the engine **piece by piece** (store first, render last) — or
   run a feature-flag (`?engine=native`) to A/B the two implementations on the same `Board`. By Phase 7
   the engine renders + drives the public board with **no key** (`RK-02` render-level closure).
-- **`canvas-figjam`:** flip `./impl` fully to the engine, **delete tldraw** from `package.json`, drop
+- **`canvas-jam`:** flip `./impl` fully to the engine, **delete tldraw** from `package.json`, drop
   `@tldraw/assets` and `tldraw/tldraw.css`, remove `licenseKey` (`Board.tsx:30,144`). `RK-02` fully
-  retired. (Designed in `DESIGN-FIGJAM-001`.)
+  retired. (Designed in `DESIGN-JAM-001`.)
 
 Because the app depends only on the adapter, tldraw can be reinstated instantly by reverting one
 re-export — de-risking the whole effort (NFR-EN-04, SN-5).
@@ -369,10 +369,10 @@ tldraw gave several things "for free" that the canvas-editor quietly relies on. 
 | `source:"user"` change filter | round-trip loop-guard (`DESIGN-CANVAS-001` §7) | store source tagging (§5.2–5.3) — **highest-risk parity item** | **this** (§5) |
 | Pan/zoom/select/drag | all interaction | `engine/tools` (§4) | **this** (P6) |
 | Persistence | `FR-CE-11` | `engine/persist` (§11) | **this** (P7) |
-| Undo/redo | `FR-CE-12` / Phase 4b | history stack consuming the store's tags (§5.3, `FR-FJ-02`) | `canvas-figjam` |
-| `geo`/`arrow` shapes | Regions/Edges | re-point to custom (§10, `FR-FJ-01`) | `canvas-figjam` |
-| **Freeform draw / sticky / text tools** | the **FigJam half** (`DESIGN-CANVAS-001` §3 freeform layer) | the largest deferred chunk (`FR-FJ-`) | `canvas-figjam` |
-| Rich-text label **editing** | `geo`/`arrow` labels | renders labels read-only; inline edit deferred (`RK-EN-06`) | `canvas-figjam` |
+| Undo/redo | `FR-CE-12` / Phase 4b | history stack consuming the store's tags (§5.3, `FR-J-02`) | `canvas-jam` |
+| `geo`/`arrow` shapes | Regions/Edges | re-point to custom (§10, `FR-J-01`) | `canvas-jam` |
+| **Freeform draw / sticky / text tools** | the **FigJam half** (`DESIGN-CANVAS-001` §3 freeform layer) | the largest deferred chunk (`FR-J-`) | `canvas-jam` |
+| Rich-text label **editing** | `geo`/`arrow` labels | renders labels read-only; inline edit deferred (`RK-EN-06`) | `canvas-jam` |
 
 ## 15. Risks / open questions
 
@@ -383,9 +383,9 @@ Tracked in `PLAN-ENGINE-001` §6 (risk register). The design-level callouts:
    tagging in `run` (§5.3) + a `TC-EN` test asserting zero echo on a programmatic apply.
 2. **Perf at scale (`RK-EN-04`, this feature's render)** — coarse single-epoch reactivity (§5.4) is
    simplest but re-renders broadly; the formal 60 fps measurement is the sibling's footprint pass.
-3. **Undo scope (`RK-EN-02`, → `PLAN-FIGJAM-001`)** — kymo-node moves must undo *and* round-trip the
+3. **Undo scope (`RK-EN-02`, → `PLAN-JAM-001`)** — kymo-node moves must undo *and* round-trip the
    text; the history stack must restore `x/y`, then `Board`'s writeback patches the text (`TC-18`).
-4. **Freeform tools are the 80% (`RK-EN-03`, → `PLAN-FIGJAM-001`)** — parity (read/move/persist) is
+4. **Freeform tools are the 80% (`RK-EN-03`, → `PLAN-JAM-001`)** — parity (read/move/persist) is
    the tractable MVP that this feature ships; the draw/sticky/text **authoring** tools are a separate,
    larger build sequenced after the key-free board.
 
@@ -396,4 +396,4 @@ Tracked in `PLAN-ENGINE-001` §6 (risk register). The design-level callouts:
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial design: surface census (§3), layered architecture (§4), reactive store + source/history semantics (§5), Editor facade (§6), geometry/camera/render (§7–§8), ShapeUtil parity (§9), built-ins (§10), persistence (§11), export (§12), the adapter seam (§13), and the "what we lose" ledger (§14). |
-| 0.2     | 2026-05-24 | Vũ Anh | **Feature split.** Scoped to the render/interaction core; stubbed §10 (built-ins) and §12 (export) to `DESIGN-FIGJAM-001`; reframed §5 history as *tagging* (undo stack → sibling); annotated §14 ledger and §15 risks by feature. |
+| 0.2     | 2026-05-24 | Vũ Anh | **Feature split.** Scoped to the render/interaction core; stubbed §10 (built-ins) and §12 (export) to `DESIGN-JAM-001`; reframed §5 history as *tagging* (undo stack → sibling); annotated §14 ledger and §15 risks by feature. |

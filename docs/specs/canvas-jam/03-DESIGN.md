@@ -1,6 +1,6 @@
 ---
-title: Canvas FigJam — Design
-document_id: DESIGN-FIGJAM-001
+title: Canvas Jam — Design
+document_id: DESIGN-JAM-001
 version: "0.1"
 issue_date: 2026-05-24
 status: Draft
@@ -10,10 +10,10 @@ audience: Engineers completing the engine + building the freeform tools (`websit
 review_cycle: On scope change, or when a phase completes
 supersedes: null
 related_documents:
-  - INTRO-FIGJAM-001
-  - FEAT-FIGJAM-001
-  - TEST-FIGJAM-001
-  - PLAN-FIGJAM-001
+  - INTRO-JAM-001
+  - FEAT-JAM-001
+  - TEST-JAM-001
+  - PLAN-JAM-001
   - DESIGN-ENGINE-001
   - DESIGN-CANVAS-001
 authors:
@@ -21,7 +21,7 @@ authors:
 language: en
 keywords:
   - technical-design
-  - canvas-figjam
+  - canvas-jam
   - builtin-shapes
   - undo-redo
   - export
@@ -30,21 +30,21 @@ keywords:
   - footprint
 ---
 
-# Canvas FigJam — Design
+# Canvas Jam — Design
 
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
-| Document ID       | DESIGN-FIGJAM-001                                               |
+| Document ID       | DESIGN-JAM-001                                               |
 | Version           | 0.1                                                            |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Audience          | Engineers completing the engine + building freeform tools     |
-| Related Documents | `FEAT-FIGJAM-001` (requirements), `PLAN-FIGJAM-001` (phases/why), `DESIGN-ENGINE-001` (the render core this builds on), `DESIGN-CANVAS-001` (the editor on top) |
+| Related Documents | `FEAT-JAM-001` (requirements), `PLAN-JAM-001` (phases/why), `DESIGN-ENGINE-001` (the render core this builds on), `DESIGN-CANVAS-001` (the editor on top) |
 
 > **Status note.** Draft engineering design, not a committed spec. The *how* that complements
-> `PLAN-FIGJAM-001` (the *why* and the phase order). This feature **builds on** the engine core
+> `PLAN-JAM-001` (the *why* and the phase order). This feature **builds on** the engine core
 > designed in `DESIGN-ENGINE-001` (store §5, editor §6, geometry §7, viewport §8, custom-shape API
-> §9, persistence §11, adapter seam §13) — reused unchanged. Phasing is in `PLAN-FIGJAM-001` §4.
+> §9, persistence §11, adapter seam §13) — reused unchanged. Phasing is in `PLAN-JAM-001` §4.
 
 ---
 
@@ -55,7 +55,7 @@ This feature picks up at the **key-free board** the sibling delivers (`DESIGN-EN
 export, tldraw removal, footprint) and adds the **freeform-authoring tools**. The litmus test is the
 same: *does `Board.tsx` still compile and behave identically — now with tldraw gone?*
 
-## 2. Built-in shape consolidation (`engine/shapes-builtin`) — FR-FJ-01
+## 2. Built-in shape consolidation (`engine/shapes-builtin`) — FR-J-01
 
 `diagramToShapes.ts` emits two built-in types today (supplied by tldraw behind the adapter in the
 sibling feature):
@@ -82,9 +82,9 @@ output). So `diagramToShapes.ts` keeps emitting `geo`/`arrow` for tldraw, and a 
 dead tldraw fields `bend`, `size`, `verticalAlign`, … and flattening `richText` → a plain `label`).
 The new `ShapeUtil`s live in `engine/shapes.tsx` as `KymoRegionEngineUtil`/`KymoEdgeEngineUtil`
 (alongside `KymoNodeEngineUtil`). `meta.kymo` and the `patchDsl` round-trip are untouched. The shared
-`diagramToShapes.ts` leaves the engine path entirely when tldraw is deleted (FR-FJ-04, P3).
+`diagramToShapes.ts` leaves the engine path entirely when tldraw is deleted (FR-J-04, P3).
 
-## 3. Undo / redo (`engine/store` history stack) — FR-FJ-02
+## 3. Undo / redo (`engine/store` history stack) — FR-J-02
 
 The store already **tags** each write `history:"ignore"|"record"` at write time
 (`DESIGN-ENGINE-001` §5.3). This feature adds the consuming **stack**:
@@ -96,7 +96,7 @@ The store already **tags** each write `history:"ignore"|"record"` at write time
   then fires and the writeback re-patches the `.kymo` text — exactly the Phase-4b behaviour
   `TC-18` asserts. (`RK-EN-02`.)
 
-## 4. Board export (`engine/view` + `ShapeUtil.toSvg`) — FR-FJ-03
+## 4. Board export (`engine/view` + `ShapeUtil.toSvg`) — FR-J-03
 
 `KymoDiagramShapeUtil.toSvg` (`KymoDiagramShape.tsx:69`) returns an `<image>`; the per-shape `toSvg`
 hook lives on the engine's `ShapeUtil` base (`DESIGN-ENGINE-001` §9.1). The exporter here walks
@@ -104,7 +104,7 @@ shapes in `index` order, calls `util.toSvg(shape)` (or rasterises `component()` 
 them in an `<svg>` sized to the `zoomToFit` bounds, and offers SVG/PNG download. MVP ships SVG-only;
 PNG via canvas `drawImage` follows.
 
-## 5. tldraw removal + parity (`Board.tsx`, `package.json`, `build.sh`) — FR-FJ-04
+## 5. tldraw removal + parity (`Board.tsx`, `package.json`, `build.sh`) — FR-J-04
 
 Once consolidation (§2), undo (§3) and export (§4) land, flip the adapter's `./impl` **fully** to the
 engine and remove tldraw:
@@ -117,7 +117,7 @@ engine and remove tldraw:
 **Gate:** the **full** `TEST-CANVAS-001` (`TC-01..19`) must be green on the engine **before** the
 removal commit, and `grep -r '"tldraw"' website/app/src` → 0 **after**. `RK-02` is fully retired.
 
-## 6. Footprint & performance (`engine/view`) — NFR-FJ-01/02
+## 6. Footprint & performance (`engine/view`) — NFR-J-01/02
 
 - **Bundle:** measure `kymo.bundle.js` (raw + gzip) before/after removal; assert materially below the
   2.0 MB / ≈586 KB-gzip tldraw baseline; tree-shake; target engine ≤ ~50 KB gzip.
@@ -126,7 +126,7 @@ removal commit, and `grep -r '"tldraw"' website/app/src` → 0 **after**. `RK-02
   (`DESIGN-ENGINE-001` §8.2) on/off comparison; preserve the `KymoDiagramShape` `<img>` data-URL
   cache so cull/remount doesn't flash (`RK-07`).
 
-## 7. Freeform authoring tools (`engine/tools` + freeform shapes) — FR-FJ-05..07
+## 7. Freeform authoring tools (`engine/tools` + freeform shapes) — FR-J-05..07
 
 The "FigJam half" — the largest deferred chunk. Built on the engine's tool state machine
 (`engine/tools`, `DESIGN-ENGINE-001` §4) which already hosts select/drag/pan/zoom.
@@ -141,9 +141,9 @@ returns to `select`. Each created shape persists via `engine/persist` and is exc
 
 | Tool (`FR`) | Shape (`ShapeUtil`) | Props | Create gesture |
 |-------------|---------------------|-------|----------------|
-| draw/pen (`FR-FJ-05`) | `freedraw` | `{ points: Vec[], color, size }` | pointer-down → move (accumulate points) → up |
-| sticky (`FR-FJ-06`) | `note` | `{ w, h, color, text }` | click to place; double-click to edit text |
-| text (`FR-FJ-07`) | `text` | `{ text, color, size }` | click to place; type to edit |
+| draw/pen (`FR-J-05`) | `freedraw` | `{ points: Vec[], color, size }` | pointer-down → move (accumulate points) → up |
+| sticky (`FR-J-06`) | `note` | `{ w, h, color, text }` | click to place; double-click to edit text |
+| text (`FR-J-07`) | `text` | `{ text, color, size }` | click to place; type to edit |
 
 `freedraw` renders an SVG path from its `points`; `note`/`text` render in an `HTMLContainer`
 (`DESIGN-ENGINE-001` §9.4) with a plain (non-rich) editable label. Geometry: `freedraw` bounds from
@@ -151,7 +151,7 @@ the point extent; `note`/`text` from `w/h` — all via `Rectangle2d` for hit-tes
 
 ## 8. Risks / open questions
 
-Tracked in `PLAN-FIGJAM-001` §6 (risk register). Design-level callouts:
+Tracked in `PLAN-JAM-001` §6 (risk register). Design-level callouts:
 
 1. **Undo + round-trip (`RK-EN-02`)** — the history stack must restore `x/y` *and* let `Board`'s
    writeback re-patch the text; verify `TC-18`.

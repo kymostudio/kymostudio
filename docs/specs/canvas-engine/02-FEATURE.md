@@ -14,7 +14,7 @@ related_documents:
   - DESIGN-ENGINE-001
   - TEST-ENGINE-001
   - PLAN-ENGINE-001
-  - FEAT-FIGJAM-001
+  - FEAT-JAM-001
   - FEAT-CANVAS-001
   - DESIGN-CANVAS-001
 authors:
@@ -38,7 +38,7 @@ keywords:
 | Version           | 0.2                                                               |
 | Status            | Draft                                                             |
 | Owner             | `diagrams/` project                                              |
-| Related Documents | `DESIGN-ENGINE-001` (how), `TEST-ENGINE-001` (V&V), `FEAT-FIGJAM-001` (sibling — the deferred half), `FEAT-CANVAS-001` (parent feature) |
+| Related Documents | `DESIGN-ENGINE-001` (how), `TEST-ENGINE-001` (V&V), `FEAT-JAM-001` (sibling — the deferred half), `FEAT-CANVAS-001` (parent feature) |
 
 > Requirements per **ISO/IEC/IEEE 29148**. IDs: functional **`FR-EN-NN`**, non-functional
 > **`NFR-EN-NN`**. The engine is judged by **behavioural parity** with the tldraw-backed canvas-editor
@@ -49,7 +49,7 @@ keywords:
 > board (`PLAN-ENGINE-001` Phases 1–7). The post-parity work — built-in shape consolidation
 > (ex-`FR-EN-06`), undo/redo (ex-`FR-EN-10`), board export (ex-`FR-EN-11`), the 60 fps/footprint
 > NFRs (ex-`NFR-EN-01/02`), the physical tldraw removal, and the FigJam freeform-authoring tools —
-> is **re-homed in `FEAT-FIGJAM-001`** (as `FR-FJ-`/`NFR-FJ-`). Those IDs are retired here.
+> is **re-homed in `FEAT-JAM-001`** (as `FR-J-`/`NFR-J-`). Those IDs are retired here.
 
 ---
 
@@ -80,7 +80,7 @@ not listed is **out of scope** for parity.
 | ShapeUtil | `type`, `props`, `getDefaultProps`, `getGeometry`→`Rectangle2d`, `component`, `getIndicatorPath`, `toSvg`, `canResize`, `canEdit`, `hideRotateHandle` | FR-EN-03 |
 | Render host | `HTMLContainer`; prop validators `T.number`, `T.string` | FR-EN-03, FR-EN-08 |
 | Hooks | `useEditor`, `useValue` | FR-EN-08 |
-| Built-in shapes | `geo` (rectangle, `richText` label) for Region; `arrow` (`start`/`end`/`richText`) for Edge — supplied by **tldraw behind the adapter** in this feature; consolidated to custom `kymo-region`/`kymo-edge` in `FEAT-FIGJAM-001` | `FR-FJ-01` *(was FR-EN-06)* |
+| Built-in shapes | `geo` (rectangle, `richText` label) for Region; `arrow` (`start`/`end`/`richText`) for Edge — supplied by **tldraw behind the adapter** in this feature; consolidated to custom `kymo-region`/`kymo-edge` in `FEAT-JAM-001` | `FR-J-01` *(was FR-EN-06)* |
 | Types | `Editor`, `TLShape`, `TLShapeId`, `TLShapePartial`, `TLBaseShape` | FR-EN-09 |
 
 ## 3. Functional requirements (`FR-EN`)
@@ -97,22 +97,22 @@ not listed is **out of scope** for parity.
 | **FR-EN-09** | The engine SHALL provide the **helpers/types** in §2 (`createShapeId`, `toRichText`; `Editor`, `Shape`/`ShapeId`/`ShapePartial`/`BaseShape` types) so call sites type-check unchanged. | SN-3 |
 | **FR-EN-12** | The engine SHALL render with **zero network** at runtime — no CDN fonts/icons/translations. Any required font/asset is self-contained or system-default. | SN-2 |
 
-> **Deferred to `FEAT-FIGJAM-001`** (re-homed IDs): `FR-EN-06` built-in shape consolidation →
-> `FR-FJ-01`; `FR-EN-10` undo/redo → `FR-FJ-02`; `FR-EN-11` board export → `FR-FJ-03`. The store's
+> **Deferred to `FEAT-JAM-001`** (re-homed IDs): `FR-EN-06` built-in shape consolidation →
+> `FR-J-01`; `FR-EN-10` undo/redo → `FR-J-02`; `FR-EN-11` board export → `FR-J-03`. The store's
 > `history:"ignore"` **tagging** stays here (`FR-EN-02`, the foundation the undo stack builds on);
-> the user-facing undo/redo stack itself is `FR-FJ-02`.
+> the user-facing undo/redo stack itself is `FR-J-02`.
 
 ## 4. Non-functional requirements (`NFR-EN`)
 
 | ID | Attribute (ISO 25010) | Requirement |
 |----|-----------------------|-------------|
-| **NFR-EN-03** | Compatibility | No license key; **no watermark**; the engine renders the board on any domain — **closes `RK-02` at the render level** (Phase 7). tldraw's *physical* removal is `NFR-FJ-`/`FEAT-FIGJAM-001`. |
+| **NFR-EN-03** | Compatibility | No license key; **no watermark**; the engine renders the board on any domain — **closes `RK-02` at the render level** (Phase 7). tldraw's *physical* removal is `NFR-J-`/`FEAT-JAM-001`. |
 | **NFR-EN-04** | Maintainability | The engine SHALL sit behind a single **adapter module**; `Board.tsx`, `KymoNodeShape`, `KymoDiagramShape`, `Inspector`, `diagramToShapes` import **only** the adapter, never the engine internals — so the substrate is swappable. |
 | **NFR-EN-05** | Reliability | The reactive store MUST be loop-safe: a programmatic `text→canvas` apply produces **zero** `canvas→text` echo (re-verify `RK-05` against the new store). |
 | **NFR-EN-06** | Deployability | Unchanged static model: `build.sh` → committed `kymo.bundle.js`, uploaded as-is by `deploy-website.yml`; **no CI build**, no runtime fetch. |
 
-> **Deferred to `FEAT-FIGJAM-001`**: `NFR-EN-01` (60 fps perf) → `NFR-FJ-`; `NFR-EN-02`
-> (footprint/bundle shrink — only real once tldraw is physically removed) → `NFR-FJ-`.
+> **Deferred to `FEAT-JAM-001`**: `NFR-EN-01` (60 fps perf) → `NFR-J-`; `NFR-EN-02`
+> (footprint/bundle shrink — only real once tldraw is physically removed) → `NFR-J-`.
 
 ## 5. Scope
 
@@ -120,7 +120,7 @@ not listed is **out of scope** for parity.
 work on the engine with the **public board rendering, no key** — store, editor facade, ShapeUtil,
 viewport, interaction, persistence. tldraw stays bundled behind the adapter.
 
-**Deferred to `FEAT-FIGJAM-001`:** built-in shape consolidation, undo/redo, board export, the
+**Deferred to `FEAT-JAM-001`:** built-in shape consolidation, undo/redo, board export, the
 physical tldraw removal + full `TEST-CANVAS-001` parity, footprint/perf, and the **FigJam freeform
 authoring tools** (draw/pen, sticky, text) which tldraw supplied out of the box and which the kymo
 "freeform layer" (`DESIGN-CANVAS-001` §3) currently depends on tldraw to create. Until those land,
@@ -134,10 +134,10 @@ rich-text styling beyond plain labels.
 
 1. With the engine **rendering the board** (behind `?engine=native`, then as the default), the
    **public deploy renders** with **no watermark and no license key** — `RK-02` closes at the render
-   level. *(tldraw stays in `package.json`; its physical removal is `FEAT-FIGJAM-001`.)*
+   level. *(tldraw stays in `package.json`; its physical removal is `FEAT-JAM-001`.)*
 2. The **core round-trip** parity holds on the engine: drag a `kymo-node` → `.kymo` patches (`TC` for
    `FR-CE-02/06`); freeform shapes **never leak** into `.kymo` (`FR-CE-03`); **persistence** reload
-   reconciles (`TC-17`). *(The full `TC-01..19` suite, incl. undo `TC-18`, is `FEAT-FIGJAM-001`.)*
+   reconciles (`TC-17`). *(The full `TC-01..19` suite, incl. undo `TC-18`, is `FEAT-JAM-001`.)*
 3. `Board.tsx`, `KymoNodeShape.tsx`, `KymoDiagramShape.tsx`, `Inspector.tsx`, `diagramToShapes.ts`
    compile against the adapter with **no logic changes** (import path change only — `NFR-EN-04`).
 
@@ -148,4 +148,4 @@ rich-text styling beyond plain labels.
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial requirements: parity contract (§2), `FR-EN-01..12`, `NFR-EN-01..06`, scope & acceptance. |
-| 0.2     | 2026-05-24 | Vũ Anh | **Feature split.** Re-homed `FR-EN-06/10/11` and `NFR-EN-01/02` to `FEAT-FIGJAM-001` (as `FR-FJ-`/`NFR-FJ-`); rescoped §5 to the render/interaction core and §6 acceptance to the key-free board + core round-trip (full `TC-01..19` parity → sibling). |
+| 0.2     | 2026-05-24 | Vũ Anh | **Feature split.** Re-homed `FR-EN-06/10/11` and `NFR-EN-01/02` to `FEAT-JAM-001` (as `FR-J-`/`NFR-J-`); rescoped §5 to the render/interaction core and §6 acceptance to the key-free board + core round-trip (full `TC-01..19` parity → sibling). |

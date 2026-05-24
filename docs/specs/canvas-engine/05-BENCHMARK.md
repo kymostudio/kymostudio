@@ -15,7 +15,7 @@ related_documents:
   - DESIGN-ENGINE-001
   - TEST-ENGINE-001
   - PLAN-ENGINE-001
-  - PLAN-FIGJAM-001
+  - PLAN-JAM-001
 authors:
   - Vũ Anh
 language: en
@@ -37,12 +37,12 @@ keywords:
 | Version           | 0.2                                                               |
 | Status            | Draft                                                             |
 | Owner             | `diagrams/` project                                              |
-| Related Documents | `FEAT-ENGINE-001` (NFRs), `DESIGN-ENGINE-001` (camera/render design), `TEST-ENGINE-001` (V&V), `PLAN-ENGINE-001` (risk `RK-EN-04`), `PLAN-FIGJAM-001` (the footprint pass `NFR-FJ-01`) |
+| Related Documents | `FEAT-ENGINE-001` (NFRs), `DESIGN-ENGINE-001` (camera/render design), `TEST-ENGINE-001` (V&V), `PLAN-ENGINE-001` (risk `RK-EN-04`), `PLAN-JAM-001` (the footprint pass `NFR-J-01`) |
 
 > **Measured results, not targets.** This report records pan/zoom interaction performance of the
 > in-house engine against **tldraw v5** on the same diagram, machine, and scenarios. It backs the
 > `RK-EN-04` mitigation claim in `PLAN-ENGINE-001` and scopes the remaining work owned by
-> `NFR-FJ-01`. FPS is hardware-dependent — treat absolute numbers as *of this run*; the **engine↔tldraw
+> `NFR-J-01`. FPS is hardware-dependent — treat absolute numbers as *of this run*; the **engine↔tldraw
 > deltas** and the **render-count** are the durable signals. Re-measure (and bump the version) on any
 > renderer/layout change.
 
@@ -57,7 +57,7 @@ questions:
 
 1. Did the optimization hold at scale, and **how does the engine compare to tldraw** — the substrate it
    replaces — under identical load?
-2. Where does each renderer's curve bend, so we know what `canvas-figjam` (`NFR-FJ-01`: culling +
+2. Where does each renderer's curve bend, so we know what `canvas-jam` (`NFR-J-01`: culling +
    per-record reactivity) must still buy.
 
 A non-gating regression guard already locks the *render-count* invariant in CI
@@ -173,8 +173,8 @@ close much of the gap, and the engine — until it culls — would lose that sce
 
 - **The on-screen pan/zoom win is real and is the point of `RK-EN-04`.**
 - **The off-screen / very-large-board case needs the engine's missing lever:** viewport culling +
-  per-record reactivity (for drag-at-high-N and huge initial mounts). That is `NFR-FJ-01`, owned by
-  `PLAN-FIGJAM-001`.
+  per-record reactivity (for drag-at-high-N and huge initial mounts). That is `NFR-J-01`, owned by
+  `PLAN-JAM-001`.
 
 ## 7. Reproduce
 
@@ -195,7 +195,7 @@ The headless, repeatable version of this comparison is `npm run test:perf`
 |---------|-------|
 | Engine pan/zoom = **0 React re-renders at every N (75→1000)** — cost is pure GPU paint, ~0.04 ms/shape | `RK-EN-04` mitigation (`PLAN-ENGINE-001`); `DESIGN-ENGINE-001` §8.1 |
 | Both scale ~linearly but tldraw's slope is **~5× steeper** (~0.22 ms/shape) → engine sustains ≥30 fps to ~700 shapes vs tldraw ~145 | the vendor-independence + performance case for the in-house engine (`INTRO-ENGINE-001`) |
-| Off-screen/large-board scaling still needs culling + per-record reactivity (engine cost ∝ painted N) | `NFR-FJ-01` (`PLAN-FIGJAM-001`) |
+| Off-screen/large-board scaling still needs culling + per-record reactivity (engine cost ∝ painted N) | `NFR-J-01` (`PLAN-JAM-001`) |
 
-**Next scale point to measure:** the same sweep **with culling enabled** once `canvas-figjam` lands, and
+**Next scale point to measure:** the same sweep **with culling enabled** once `canvas-jam` lands, and
 a drag-at-high-N run (drag still re-renders by design — `RK-EN-04`).
