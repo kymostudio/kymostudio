@@ -167,12 +167,18 @@ The engine already renders a **selection outline inside each shape's wrapper** (
 the outline rides the drag frame-for-frame, `DESIGN-JAM-001` §6). This feature extends that overlay
 (in the **canvas layer**, not a React panel) with:
 
-- four **corner resize handles** (small squares) on the selection rect, and
-- a **size badge** (`W × H`, from `getGeometry(s).bounds`) below the shape (prototype `KSelect`).
+- four **corner resize handles** (`data-testid="selection-handle"`, white squares with an accent
+  border) on the selection rect, and
+- a **size badge** (`data-testid="selection-size"`, `W × H` from `getGeometry(s).bounds`) below the
+  shape (prototype `KSelect`).
 
-A shape with a (visual-only) comment marker renders a small **comment-pin** badge anchored to a
-corner. Handles are **presentational in the MVP** (interactive resize of items is the
-`canvas-create-tools`/transform backlog, mirroring `RK-EN-03` where freeform resize was deferred).
+**As-built (P5):** the `selected` gate was generalised from node-only to **any** selected shape
+(regions stay `pointer-events:none` so can't be click-selected; nodes + notes/text can). Rect,
+handles, and badge are **accent-green** (`var(--accent)` / `var(--accent-fg)`, matching `KSelect`,
+replacing the old generic blue) and sized in page units (`/cam.z`) so they're constant on screen.
+Handles are **presentational in the MVP** (interactive resize is the `canvas-create-tools`/transform
+backlog, mirroring `RK-EN-03`). **The comment-pin marker was dropped** — no comment data model; it
+belongs to the backend comments feature.
 
 > **Reactive-selection gap (`RK-CS-01`).** A *React panel* keyed on selection (the right inspector)
 > can't update because the engine exposes selection imperatively, not as a reactive signal
@@ -232,4 +238,4 @@ Tracked in `PLAN-STUDIO-001` §6. Design-level callouts:
 
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
-| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. **P4 build:** §5 as-built — match `renderSVG` not the mockup: node glyph kept, region outer-slate / inner-purple-dashed, edge flow-dash (CSS keyframe + SMIL). |
+| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. **P4 build:** §5 as-built — match `renderSVG` not the mockup: node glyph kept, region outer-slate / inner-purple-dashed, edge flow-dash (CSS keyframe + SMIL). **P5 build:** §6 as-built — selection generalised to any selected shape; rect/handles/badge accent-green; comment-pin dropped (no data model). |
