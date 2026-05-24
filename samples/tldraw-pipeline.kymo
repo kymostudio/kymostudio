@@ -1,0 +1,40 @@
+# Kymo on tldraw — a starter sample.
+# You type .kymo text; the engine parses it into a Diagram, derives one
+# tldraw shape per element, and the board renders it (pan/zoom persisted).
+# Dragging a node round-trips its new position back into the source text.
+
+title:    "Kymo on tldraw — Render Pipeline"
+subtitle: "samples/*.kymo  →  parse  →  shapes  →  canvas"
+
+# ── Regions (leaves declared where they semantically live) ────────────
+authoring outer "Authoring" {
+  source box/files/orange      "Source .kymo"  "DSL text"
+  parser cube/neural-sm/green  "parseDiagram"  "→ positioned Diagram"
+}
+
+board outer "tldraw Board" {
+  shapes cube/boxes/green          "diagramToShapes"  "one shape / element"
+  canvas box/zap/orange            "tldraw canvas"    "render · pan · zoom"
+  store  cylinder/cylinder/orange  "Snapshot"         "IndexedDB · camera"
+}
+
+# ── Leaf outside any region ───────────────────────────────────────────
+user circle/user/blue "You" "author"
+
+# ── Layouts (positioning only — reference leaves by bare id) ──────────
+authoring_layout horizontal pos (150, 130) gap 70 {
+  user source parser
+}
+board_layout horizontal pos (210, 330) gap 55 {
+  shapes canvas store
+}
+
+# ── Edges ─────────────────────────────────────────────────────────────
+user   --> source : "type"      { src=right, dst=left, label_offset=(0,-8), small }
+source --> parser
+parser --> shapes : "diff-sync" { src=bottom, dst=top, label_offset=(40,0), small }
+shapes --> canvas
+canvas --> store  : "persist"   { label_offset=(0,-8), small }
+
+# Canvas → source: dragging a node patches the .kymo text (two-way sync).
+canvas --> source : "drag → patch text" { src=top, dst=bottom, via=(245,250), label_pos=(250,240), small }
