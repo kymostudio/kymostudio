@@ -63,6 +63,56 @@
       --shadow-card: 0 14px 44px rgba(0, 0, 0, 0.5);
       --on-accent:   #0c1606;
     }
+
+    /* ── canvas-studio design tokens (FR-CS-01, PLAN-STUDIO-001 P1) ──────
+       Ported from the hi-fi prototype's tokens.css. ADDITIVE: new names
+       only — every token the current playground references above is left
+       untouched, so P1 changes no pixels (no selector consumes these yet;
+       the top bar / tool rail / status bar in P2–P6 do). Light values live
+       on :root, dark overrides on :root[data-theme="dark"]; theme-neutral
+       tokens are defined once. The unused --shadow-sm is repurposed from a
+       bare colour to a full box-shadow (the prototype's semantics). */
+    :root {
+      /* surfaces */
+      --bg-elev:      #ffffff;
+      --canvas-grid:  rgba(10, 10, 20, 0.05);
+      --border-soft:  #ececea;
+      --border-strong:#c8c4ba;
+      /* text */
+      --text-mute:    #9a9a9e;
+      --text-on-canvas:     #1a1a24;
+      --text-on-canvas-dim: #6a6a78;
+      /* brand (theme-neutral) */
+      --accent-soft:  rgba(118, 185, 0, 0.16);
+      --accent-fg:    #0a0a0f;
+      --accent-2-soft:rgba(234, 88, 12, 0.16);
+      /* collaborator hues */
+      --user-1: #76b900; --user-2: #ea580c; --user-3: #5c8dff; --user-4: #d946ef; --user-5: #facc15;
+      /* cloud diagram palette */
+      --aws-orange: #ff9900; --aws-blue: #2e5cc6; --aws-green: #1a8a4a; --aws-purple: #7a3eb1; --aws-navy: #1a2a55;
+      /* DSL syntax (light) */
+      --tok-comment: #9a9a9e; --tok-kw: #56880c; --tok-str: #c2410c; --tok-op: #3a3a48; --tok-num: #2a5fcc;
+      /* geometry scale */
+      --r-sm: 6px; --r: 10px; --r-md: 12px; --r-lg: 14px; --r-xl: 18px;
+      /* shadows (light) */
+      --shadow-sm:   0 1px 2px rgba(40, 30, 20, 0.08);
+      --shadow:      0 4px 16px rgba(40, 30, 20, 0.10);
+      --shadow-lg:   0 16px 48px rgba(40, 30, 20, 0.18);
+      --shadow-glow: 0 0 0 4px rgba(118, 185, 0, 0.2);
+      /* chrome layout metrics */
+      --topbar-h: 52px; --rail-w: 56px;
+    }
+    :root[data-theme="dark"] {
+      --bg-elev:      #1a1a24;
+      --border-soft:  #1c1c26;
+      --border-strong:#2e2e3c;
+      --text-mute:    #5a5a68;
+      --tok-comment: #6a6a78; --tok-kw: #76b900; --tok-str: #ea580c; --tok-op: #c0c0d0; --tok-num: #5c8dff;
+      --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow:      0 4px 16px rgba(0, 0, 0, 0.35);
+      --shadow-lg:   0 16px 48px rgba(0, 0, 0, 0.5);
+    }
+
     * { box-sizing: border-box; }
     html, body {
       margin: 0; height: 100%;
