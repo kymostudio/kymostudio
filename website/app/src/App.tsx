@@ -270,6 +270,13 @@ export function App() {
                   <path d="M15 21v-6h6" />
                 </svg>
               </button>
+              <button className={`tbtn${tool === "text" ? " active" : ""}`} title="Text (click to place)" aria-label="Text tool" onClick={() => setTool("text")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 7V5h16v2" />
+                  <path d="M12 5v14" />
+                  <path d="M9 19h6" />
+                </svg>
+              </button>
             </div>
 
             <span className="sep" />

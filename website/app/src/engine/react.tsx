@@ -32,10 +32,13 @@ const DRAW_SIZE = 3;
 const NOTE_W = 180;
 const NOTE_H = 120;
 const NOTE_COLOR = "#fde68a";
+const TEXT_COLOR = "#1e293b";
+const TEXT_SIZE = 18;
 
 /** Which tool owns the pointer (canvas-jam `DESIGN-JAM-001` §7). `select` is the
- *  default; `draw` creates freeform `freedraw` strokes; `sticky` places `note`s. */
-export type Tool = "select" | "draw" | "sticky";
+ *  default; `draw` creates freeform `freedraw` strokes; `sticky` places `note`s;
+ *  `text` places an editable `text` label. */
+export type Tool = "select" | "draw" | "sticky" | "text";
 
 /** The slice of a shape util the render loop needs. */
 export interface RenderUtil {
@@ -307,6 +310,20 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
       onToolReset?.(); // revert to select; the user double-clicks the note to edit (FR-J-06)
       return; // no gesture: subsequent move/up are ignored
     }
+    if (tool === "text") {
+      // Click-to-place a text label, then immediately edit it ("type to edit",
+      // FR-J-07). Created with `history:"ignore"` and re-stamped as one recorded
+      // add on commit (or dropped if left empty). Freeform: no `meta.kymo`.
+      const pg = editor.screenToPage(p);
+      const id = createShapeId();
+      editor.run(
+        () => editor.createShape({ id, type: "text", x: pg.x, y: pg.y, props: { text: "", color: TEXT_COLOR, size: TEXT_SIZE }, meta: {} }),
+        { source: "user", history: "ignore" },
+      );
+      setEditingId(id);
+      onToolReset?.();
+      return;
+    }
     const el = (e.target as HTMLElement).closest("[data-shape-id]");
     const downId = el?.getAttribute("data-shape-id") ?? null;
     const downType = el?.getAttribute("data-shape-type") ?? null;
@@ -390,27 +407,64 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
   // Double-click a note (in select mode) → edit its label.
   const onDoubleClick = (e: ReactMouseEvent) => {
     if (tool !== "select") return;
-    // Scan every element under the point (not just e.target — the note's wrapper is
-    // pointer-events:none, so the bubbled target can be an ancestor) for a note.
+    // Scan every element under the point (not just e.target — the wrapper is
+    // pointer-events:none, so the bubbled target can be an ancestor) for an
+    // editable freeform shape (note or text).
     for (const el of document.elementsFromPoint(e.clientX, e.clientY)) {
       const w = (el as HTMLElement).closest?.("[data-shape-id]");
-      if (w?.getAttribute("data-shape-type") === "note") {
-        setEditingId(w.getAttribute("data-shape-id") as ShapeId);
+      const t = w?.getAttribute("data-shape-type");
+      if (t === "note" || t === "text") {
+        setEditingId(w!.getAttribute("data-shape-id") as ShapeId);
         return;
       }
     }
   };
 
-  // Commit an edited note label as one recorded (undoable, persisted) step.
+  // Commit an edited label as one recorded (undoable, persisted) step. `note` was
+  // created on placement (a recorded update commits the text); `text` was created
+  // with `history:"ignore"`, so it's re-stamped as one recorded add — or dropped
+  // if left empty (no stray invisible text shapes).
   const commitEdit = (id: ShapeId, text: string) => {
-    editor.run(() => editor.updateShape({ id, type: "note", props: { text } }), { source: "user", history: "record" });
-    editor.mark();
+    const shape = editor.getShape(id);
+    if (!shape) {
+      setEditingId(null);
+      return;
+    }
+    if (shape.type === "text") {
+      editor.run(() => editor.deleteShape(id), { history: "ignore" });
+      if (text.trim()) {
+        editor.run(() => editor.createShape({ ...shape, props: { ...shape.props, text } }), { source: "user", history: "record" });
+        editor.mark();
+      }
+    } else {
+      editor.run(() => editor.updateShape({ id, type: shape.type, props: { text } }), { source: "user", history: "record" });
+      editor.mark();
+    }
     setEditingId(null);
   };
 
   const utils = new Map(shapeUtils.map((u) => [u.type, u]));
   const cam = editor.getCamera();
   const editing = editingId ? editor.getShape(editingId) : undefined;
+  // Style for the inline editor overlay (note = filled box; text = transparent label).
+  const editStyle: CSSProperties | null =
+    !editing || (editing.type !== "note" && editing.type !== "text")
+      ? null
+      : editing.type === "note"
+        ? {
+            position: "absolute", transform: `translate(${editing.x}px, ${editing.y}px)`,
+            width: num(editing.props.w, NOTE_W), height: num(editing.props.h, NOTE_H),
+            boxSizing: "border-box", background: String(editing.props.color ?? NOTE_COLOR),
+            borderRadius: 6, border: "none", outline: "2px solid #3b82f6", padding: 10,
+            font: "13px/1.4 Inter, ui-sans-serif, system-ui", color: "#1e293b", resize: "none", overflow: "hidden",
+          }
+        : {
+            position: "absolute", transform: `translate(${editing.x}px, ${editing.y}px)`,
+            minWidth: 220, minHeight: num(editing.props.size, TEXT_SIZE) * 2.4,
+            boxSizing: "border-box", background: "transparent", border: "none", outline: "1px dashed #3b82f6",
+            padding: 2, font: `${num(editing.props.size, TEXT_SIZE)}px/1.3 Inter, ui-sans-serif, system-ui`,
+            color: String(editing.props.color ?? TEXT_COLOR), resize: "none", overflow: "hidden",
+          };
 
   return (
     <EditorContext.Provider value={editor}>
@@ -422,7 +476,7 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
         onPointerUp={endGesture}
         onPointerCancel={endGesture}
         onDoubleClick={onDoubleClick}
-        style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none", cursor: tool === "draw" ? "crosshair" : tool === "sticky" ? "copy" : undefined }}
+        style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none", cursor: tool === "draw" ? "crosshair" : tool === "sticky" ? "copy" : tool === "text" ? "text" : undefined }}
       >
         <div
           ref={containerRef}
@@ -453,10 +507,10 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
 
           {/* Inline note-label editor (FR-J-06). A <textarea> overlaying the note,
               inside the transformed container so it tracks the camera. */}
-          {editing && editing.type === "note" && (
+          {editing && editStyle && (
             <textarea
               key={String(editingId)}
-              data-testid="note-editor"
+              data-testid="inline-editor"
               ref={noteEditorRef}
               defaultValue={String(editing.props.text ?? "")}
               onPointerDown={(e) => e.stopPropagation()}
@@ -475,22 +529,7 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
                 }
                 commitEdit(editing.id, e.currentTarget.value);
               }}
-              style={{
-                position: "absolute",
-                transform: `translate(${editing.x}px, ${editing.y}px)`,
-                width: num(editing.props.w, NOTE_W),
-                height: num(editing.props.h, NOTE_H),
-                boxSizing: "border-box",
-                background: String(editing.props.color ?? NOTE_COLOR),
-                borderRadius: 6,
-                border: "none",
-                outline: "2px solid #3b82f6",
-                padding: 10,
-                font: "13px/1.4 Inter, ui-sans-serif, system-ui",
-                color: "#1e293b",
-                resize: "none",
-                overflow: "hidden",
-              }}
+              style={editStyle}
             />
           )}
         </div>

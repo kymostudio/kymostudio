@@ -95,6 +95,12 @@ The headline acceptance — execute **every** canvas-editor case against the tld
 > text stays byte-identical, and one undo removes a freshly-placed note. `TC-06` now covers draw +
 > sticky; only **text** (P7) remains.
 
+> **`TC-J-07` — PASS (P7).** The text tool is verified by `website/app/e2e/text.spec.ts`: clicking the
+> canvas places a `text` shape and auto-enters edit ("type to edit"); the typed label commits, is
+> `meta.kymo == null`, persists across reload while `.kymo` stays byte-identical, an empty commit leaves
+> no shape, and one undo removes a placed+typed label. **`TC-06` is now fully met** — draw + sticky +
+> text all shipped on the engine's freeform layer; the canvas-jam V&V is complete.
+
 ## 4. Non-functional verification
 
 | NFR | Method |

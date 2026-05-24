@@ -392,3 +392,43 @@ export class KymoNoteEngineUtil extends ShapeUtil {
     return rect + `<text x="10" y="24" font-family="Inter, ui-sans-serif, system-ui" font-size="13" fill="#1e293b">${tspans}</text>`;
   }
 }
+
+// ── text (freeform plain-text label; canvas-jam FR-J-07) ─────────────────────
+// Freeform layer (no `meta.kymo`). Click-to-place → type to edit (the inline
+// editor overlay in `react.tsx` is shared with `note`). Auto-sizes to content,
+// so geometry is approximated from the text extent. Plain text only (`RK-EN-06`).
+
+export const TEXT_COLOR = "#1e293b";
+export const TEXT_SIZE = 18;
+
+export class KymoTextEngineUtil extends ShapeUtil {
+  static override type = "text";
+  override getDefaultProps() {
+    return { text: "", color: TEXT_COLOR, size: TEXT_SIZE };
+  }
+  override getGeometry(shape: Shape) {
+    const text = String(shape.props.text ?? "");
+    const size = num(shape.props.size, TEXT_SIZE);
+    const lines = text.split("\n");
+    const cols = Math.max(1, ...lines.map((l) => l.length));
+    return new Rectangle2d({ width: Math.max(cols * size * 0.6, 8), height: Math.max(lines.length * size * 1.3, size), isFilled: true });
+  }
+  override component(shape: Shape) {
+    const text = String(shape.props.text ?? "");
+    const color = String(shape.props.color ?? TEXT_COLOR);
+    const size = num(shape.props.size, TEXT_SIZE);
+    return (
+      <HTMLContainer style={{ pointerEvents: "auto", cursor: "text" }}>
+        <div style={{ font: `${size}px/1.3 Inter, ui-sans-serif, system-ui`, color, whiteSpace: "pre", padding: 2, userSelect: "none" }}>{text}</div>
+      </HTMLContainer>
+    );
+  }
+  override toSvg(shape: Shape): string {
+    const text = String(shape.props.text ?? "");
+    if (!text) return "";
+    const color = String(shape.props.color ?? TEXT_COLOR);
+    const size = num(shape.props.size, TEXT_SIZE);
+    const tspans = text.split("\n").map((ln, i) => `<tspan x="2" dy="${i ? size * 1.3 : 0}">${esc(ln)}</tspan>`).join("");
+    return `<text x="2" y="${size}" font-family="Inter, ui-sans-serif, system-ui" font-size="${size}" fill="${color}">${tspans}</text>`;
+  }
+}

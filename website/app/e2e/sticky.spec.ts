@@ -53,7 +53,7 @@ test("TC-J-06: sticky places an editable note that persists and never enters .ky
   // the wrapper locator — the note wrapper is pointer-events:none (only its inner
   // div is interactive), so a coordinate double-click is what reaches it.
   await page.mouse.dblclick(at.x, at.y);
-  const noteEditor = page.getByTestId("note-editor");
+  const noteEditor = page.getByTestId("inline-editor");
   await noteEditor.fill("hello sticky");
   await noteEditor.press("Enter"); // commit
 

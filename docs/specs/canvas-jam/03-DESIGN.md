@@ -195,6 +195,13 @@ the point extent; `note`/`text` from `w/h` — all via `Rectangle2d` for hit-tes
 > Escape cancels. **Resize and post-placement move are deferred** (the `FR-J-06` gesture is only
 > place + edit; interactive transform of freeform shapes is a later pass — `RK-EN-03`). Plain text only
 > (`RK-EN-06`). `text` (P7) reuses this overlay.
+>
+> **As-built (P7, `text`):** click-to-place → **type to edit** (auto-enters edit on placement). The text
+> shape is created with `history:"ignore"` and **re-stamped on commit** as one recorded add (or **dropped
+> if empty** — no stray invisible text), giving a single clean undo step. Auto-sizes to content
+> (geometry approximated from the text extent); transparent, no box (a dashed outline while editing).
+> The inline editor is **shared** with `note` (a per-type `editStyle`; testid `inline-editor`);
+> double-click re-edits either. Plain text only (`RK-EN-06`). **This completes the freeform tool set.**
 
 ## 8. Risks / open questions
 
