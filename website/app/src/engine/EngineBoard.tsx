@@ -7,7 +7,7 @@
  *     listener fires → `patchPositions` → `onPatch`.
  * The store's source filter + the genuine-delta filter keep it from oscillating.
  */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Store,
   Editor,
@@ -19,6 +19,7 @@ import type { Diagram } from "../../../../packages/js/dist/index.js";
 import { diagramToShapes } from "../diagramToShapes";
 import { patchPositions, type XY } from "../patchDsl";
 import { EngineCanvas } from "./react";
+import { loadSnapshot, saveSnapshot } from "./persist";
 import { KymoNodeEngineUtil, KymoDiagramEngineUtil, GeoEngineUtil, ArrowEngineUtil } from "./shapes";
 
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
@@ -70,9 +71,12 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch }: Eng
 
   const dataRef = useRef({ diagram, svg, w, h, isBpmn, source, onPatch });
   dataRef.current = { diagram, svg, w, h, isBpmn, source, onPatch };
-  const fittedRef = useRef(false);
   const applyingRef = useRef(false);
   const writebackId = useRef<number | undefined>(undefined);
+  // Persistence: gate the canvas on the (async) snapshot load; honor a restored
+  // camera (→ no auto-fit). The fit itself now lives in <EngineCanvas>.
+  const [loaded, setLoaded] = useState(false);
+  const restoredRef = useRef(false);
 
   // text → canvas (diff sync), loop-guarded by `history:"ignore"` (source:remote).
   const sync = (ed: Editor) => {
@@ -88,10 +92,14 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch }: Eng
     queueMicrotask(() => {
       applyingRef.current = false;
     });
-    if (!fittedRef.current && (d.svg || d.diagram)) {
-      ed.zoomToFit();
-      fittedRef.current = true;
-    }
+  };
+
+  // Persist the camera (+ future freeform shapes) — debounced inside saveSnapshot.
+  const scheduleSave = () => {
+    saveSnapshot({
+      camera: editor.getCamera(),
+      freeform: editor.getCurrentPageShapes().filter((s) => (s.meta as { kymo?: unknown })?.kymo == null),
+    });
   };
 
   // canvas → text (genuine-delta filter; mirrors Board.tsx).
@@ -111,6 +119,25 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch }: Eng
     }
     if (moves.size) d.onPatch(patchPositions(d.source, moves));
   };
+
+  // Mount once: restore the persisted snapshot (camera + freeform), then unblock
+  // the canvas. A restored camera suppresses the auto-fit.
+  useEffect(() => {
+    let alive = true;
+    void loadSnapshot().then((snap) => {
+      if (!alive) return;
+      if (snap?.camera) {
+        editor.setCamera(snap.camera);
+        restoredRef.current = true;
+      }
+      // (freeform shapes restore here once canvas-figjam ships them)
+      setLoaded(true);
+    });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
 
   // Mount once: the user-driven writeback listener (debounced).
   useEffect(() => {
@@ -134,7 +161,7 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch }: Eng
 
   return (
     <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-      <EngineCanvas editor={editor} shapeUtils={utils} />
+      {loaded && <EngineCanvas editor={editor} shapeUtils={utils} autoFit={!restoredRef.current} onChange={scheduleSave} />}
     </div>
   );
 }

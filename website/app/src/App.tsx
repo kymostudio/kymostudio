@@ -15,9 +15,10 @@ import { syncURL, loadFromURL } from "./share";
 import { Board } from "./Board";
 import { EngineBoard } from "./engine/EngineBoard";
 
-// canvas-engine A/B: `?engine=native` mounts the in-house engine (read-only,
-// Phase 5) instead of tldraw. Read once at load.
-const ENGINE_NATIVE = new URL(location.href).searchParams.get("engine") === "native";
+// canvas-engine (Phase 7): the in-house engine is the DEFAULT renderer — it needs
+// no license key, so the deployed board renders (RK-02 closes). `?engine=tldraw`
+// opts back into tldraw for comparison. Read once at load.
+const USE_ENGINE = new URL(location.href).searchParams.get("engine") !== "tldraw";
 
 /** Pull the intrinsic width/height off the rendered `<svg>` header. */
 function svgSize(svg: string): { w: number; h: number } {
@@ -226,7 +227,7 @@ export function App() {
         </section>
 
         <section className="pane view">
-          {ENGINE_NATIVE ? (
+          {USE_ENGINE ? (
             <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
           ) : (
             <Board diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
