@@ -284,3 +284,56 @@ export class KymoEdgeEngineUtil extends ShapeUtil {
     return defs + line + text;
   }
 }
+
+// ── freedraw (freehand pen stroke; canvas-jam FR-J-05) ───────────────────────
+// Freeform layer: NO `meta.kymo`, so it persists only via `engine/persist` and
+// NEVER serialises into `.kymo` (`NFR-CE-07`). `points` are page-space, stored
+// relative to the shape origin; geometry/bounds come from the point extent.
+
+/** The pen tool's default stroke (no colour/size picker in the P5 MVP). */
+export const DRAW_COLOR = "#1e293b";
+export const DRAW_SIZE = 3;
+
+const strokePath = (pts: Pt[]): string =>
+  pts.map((p, i) => `${i ? "L" : "M"}${p.x} ${p.y}`).join(" ");
+
+export class FreedrawEngineUtil extends ShapeUtil {
+  static override type = "freedraw";
+  override getDefaultProps() {
+    return { points: [] as Pt[], color: DRAW_COLOR, size: DRAW_SIZE };
+  }
+  override getGeometry(shape: Shape) {
+    const pts = ((shape.props.points ?? []) as unknown[]).map(pt);
+    if (!pts.length) return new Rectangle2d({ width: 1, height: 1 });
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const p of pts) {
+      minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
+      maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
+    }
+    return new Rectangle2d({ x: minX, y: minY, width: Math.max(maxX - minX, 1), height: Math.max(maxY - minY, 1) });
+  }
+  override component(shape: Shape) {
+    const pts = ((shape.props.points ?? []) as unknown[]).map(pt);
+    const color = String(shape.props.color ?? DRAW_COLOR);
+    const size = num(shape.props.size, DRAW_SIZE);
+    return (
+      <HTMLContainer style={{ width: 0, height: 0, overflow: "visible", pointerEvents: "none" }}>
+        <svg width="1" height="1" style={{ position: "absolute", overflow: "visible" }}>
+          {pts.length === 1 ? (
+            <circle cx={pts[0].x} cy={pts[0].y} r={size / 2} fill={color} />
+          ) : (
+            <path d={strokePath(pts)} fill="none" stroke={color} strokeWidth={size} strokeLinecap="round" strokeLinejoin="round" />
+          )}
+        </svg>
+      </HTMLContainer>
+    );
+  }
+  override toSvg(shape: Shape): string {
+    const pts = ((shape.props.points ?? []) as unknown[]).map(pt);
+    if (!pts.length) return "";
+    const color = String(shape.props.color ?? DRAW_COLOR);
+    const size = num(shape.props.size, DRAW_SIZE);
+    if (pts.length === 1) return `<circle cx="${pts[0].x}" cy="${pts[0].y}" r="${size / 2}" fill="${color}"/>`;
+    return `<path d="${strokePath(pts)}" fill="none" stroke="${color}" stroke-width="${size}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+}

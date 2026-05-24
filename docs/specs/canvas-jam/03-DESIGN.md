@@ -158,8 +158,15 @@ The "FigJam half" — the largest deferred chunk. Built on the engine's tool sta
 ### 7.1 Tool state machine
 
 A small current-tool state machine: `select` (default) plus `draw`, `sticky`, `text`. The active tool
-owns pointer events; on commit it creates a freeform shape (`meta.kymo == null`, `source:"user"`) and
-returns to `select`. Each created shape persists via `engine/persist` and is excluded from `.kymo`.
+owns pointer events; on commit it creates a freeform shape (`meta.kymo == null`, `source:"user"`).
+Each created shape persists via `engine/persist` and is excluded from `.kymo`.
+
+> **As-built (P5):** the tool lives in the render layer as a `Tool` union (`react.tsx`), threaded
+> `App → EngineBoard → EngineCanvas` and switched from a toolbar group (Select · Draw). Refinement to
+> "returns to `select` on commit": that holds for the **click-to-place** tools (`sticky`/`text`, P6/P7),
+> but the **pen stays active** after each stroke (multi-stroke drawing is the universal pen UX). Freeform
+> persistence is wired: `EngineBoard` restores `snapshot.freeform` on mount and `scheduleSave`s on every
+> user edit.
 
 ### 7.2 Shapes
 
@@ -172,6 +179,12 @@ returns to `select`. Each created shape persists via `engine/persist` and is exc
 `freedraw` renders an SVG path from its `points`; `note`/`text` render in an `HTMLContainer`
 (`DESIGN-ENGINE-001` §9.4) with a plain (non-rich) editable label. Geometry: `freedraw` bounds from
 the point extent; `note`/`text` from `w/h` — all via `Rectangle2d` for hit-test/selection.
+
+> **As-built (P5, `freedraw`):** built live with `history:"ignore"` (preview), then re-stamped on
+> pointer-up as one recorded add → a stroke is a single undo step (and redo restores it in full). Points
+> are page-space, stored relative to the shape origin. Default stroke `#1e293b` / 3 px (no colour/size
+> picker in the MVP; `RK-EN-06`). `toSvg` emits a `<path>` (single-point click → a dot), so freeform
+> strokes are included in board export (`FR-J-03`). `note`/`text` follow in P6/P7.
 
 ## 8. Risks / open questions
 

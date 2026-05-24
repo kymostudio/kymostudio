@@ -13,18 +13,19 @@ import {
   Editor,
   createShapeId,
   type Shape,
+  type ShapePartial,
 } from "../../../../packages/js-canvas/dist/index.js";
 import type { Diagram } from "../../../../packages/js/dist/index.js";
 import { diagramToShapes } from "../diagramToShapes";
 import { patchPositions, type XY } from "../patchDsl";
-import { EngineCanvas } from "./react";
+import { EngineCanvas, type Tool } from "./react";
 import { boardToSvg } from "./export";
 import { loadSnapshot, saveSnapshot } from "./persist";
-import { KymoNodeEngineUtil, KymoDiagramEngineUtil, KymoRegionEngineUtil, KymoEdgeEngineUtil } from "./shapes";
+import { KymoNodeEngineUtil, KymoDiagramEngineUtil, KymoRegionEngineUtil, KymoEdgeEngineUtil, FreedrawEngineUtil } from "./shapes";
 
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
-const utils = [new KymoNodeEngineUtil(), new KymoDiagramEngineUtil(), new KymoRegionEngineUtil(), new KymoEdgeEngineUtil()];
+const utils = [new KymoNodeEngineUtil(), new KymoDiagramEngineUtil(), new KymoRegionEngineUtil(), new KymoEdgeEngineUtil(), new FreedrawEngineUtil()];
 const EMBED_ID = createShapeId("kymo-diagram");
 
 interface EngineBoardProps {
@@ -37,6 +38,8 @@ interface EngineBoardProps {
   onPatch: (text: string) => void;
   /** Hands the host a board→SVG exporter once the editor is live (FR-J-03). */
   onReady?: (exportSvg: () => Promise<string>) => void;
+  /** Active canvas tool (canvas-jam `FR-J-05`+): `select` (default) or `draw`. */
+  tool?: Tool;
 }
 
 const kymoShapes = (editor: Editor): Shape[] =>
@@ -66,7 +69,7 @@ function syncElements(editor: Editor, diagram: Diagram): void {
   for (const p of partials) if (existingIds.has(p.id)) editor.updateShape(p);
 }
 
-export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onReady }: EngineBoardProps) {
+export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onReady, tool }: EngineBoardProps) {
   const editorRef = useRef<Editor | null>(null);
   if (!editorRef.current) editorRef.current = new Editor(new Store(), { shapeUtils: utils });
   const editor = editorRef.current;
@@ -132,7 +135,10 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onRea
         editor.setCamera(snap.camera);
         restoredRef.current = true;
       }
-      // (freeform shapes restore here once canvas-jam ships them)
+      // Restore freeform shapes (draw/sticky/text — no `meta.kymo`). `history:"ignore"`
+      // (source defaults to "remote") so they neither enter undo nor echo to the writeback.
+      const freeform = (snap?.freeform ?? []) as ShapePartial[];
+      if (freeform.length) editor.run(() => { for (const s of freeform) editor.createShape(s); }, { history: "ignore" });
       setLoaded(true);
     });
     return () => {
@@ -146,6 +152,7 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onRea
     const unsub = editor.store.listen(
       () => {
         if (applyingRef.current) return;
+        scheduleSave(); // persist freeform strokes (+ camera) on any user edit
         window.clearTimeout(writebackId.current);
         writebackId.current = window.setTimeout(() => writeback(editor), 200);
       },
@@ -192,7 +199,7 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onRea
 
   return (
     <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-      {loaded && <EngineCanvas editor={editor} shapeUtils={utils} autoFit={!restoredRef.current} onChange={scheduleSave} />}
+      {loaded && <EngineCanvas editor={editor} shapeUtils={utils} autoFit={!restoredRef.current} onChange={scheduleSave} tool={tool} />}
     </div>
   );
 }

@@ -84,6 +84,11 @@ The headline acceptance — execute **every** canvas-editor case against the tld
 
 **Gate:** all of `TC-01..19` green **before** the tldraw-removal commit (`FR-J-04`).
 
+> **`TC-J-05` — PASS (P5).** The draw/pen tool is verified by `website/app/e2e/draw.spec.ts`: a
+> pointer-drag creates a `freedraw` stroke (`meta.kymo == null`), it persists across reload via the
+> snapshot, the `.kymo` text stays byte-identical, and one undo removes the whole stroke. This begins
+> un-deferring `TC-06`'s freeform clause — **draw** is now covered; **sticky**/**text** follow in P6/P7.
+
 ## 4. Non-functional verification
 
 | NFR | Method |
