@@ -133,6 +133,27 @@ For reference, the headless `perf-compare.spec.ts` at the AIQ sample (~43 shapes
 both renderers pin ~60 fps on pan and zoom, engine pan = 0 re-renders. (Headless ⇒ relative only; listed
 for the trend, not the absolute.)
 
+### 4.4 Drag-at-high-N — per-record reactivity (`canvas-jam` P4, 2026-05-24)
+
+The §4.1–4.2 sweep measured **pan/zoom** (0 re-renders). **Drag** is the case that *does* re-render
+(`RK-EN-04`): pre-P4 a node drag re-rendered the **whole** shape list every frame; `canvas-jam` P4
+(`NFR-J-01`) refines this to **per-record reactivity** — only the dragged shape's wrapper re-renders.
+Method: real GPU, drag one mid-grid node ~2.5 s (one `updateShape` per rAF) after a 1.5 s settle +
+600 ms warm-up; **median** = steady-state frame, **avg** over the gesture. Engine-only (tldraw gone).
+
+| N | OLD (parent-wide) avg · median · re-rendered/move | NEW (per-record) avg · median · re-rendered/move |
+|----:|:--|:--|
+| 300 | 49 fps · 17 ms · **all 300** | **59 fps** · 17 ms · **1** (the dragged node) |
+| 600 | 27 fps · **33 ms (30 fps)** · **all 600** | **40 fps** · **17 ms (60 fps)** · **1** |
+
+Per-record drops the per-frame React reconciliation from **O(N) → O(1)** (verified: the test seam
+`window.__kymoRenderedIds` contains exactly the dragged id at both N). The practical payoff is the
+**median**: at 600 shapes the drag holds **60 fps** where the parent-wide build halved to 30 fps. At the
+`NFR-J-01` reference workload (AIQ, 19 nodes) both are 60 fps — per-record's benefit is at scale. The
+*absolute* ceiling at extreme N is still **paint-bound** (dragging a shape re-rasters the one shape
+layer), which is the **culling** lever — deliberately **deferred** in P4 (§6: culling would re-introduce
+pan-time re-renders, regressing the headline 0-re-render pan win, for an off-screen case kymo rarely hits).
+
 ## 5. Analysis
 
 ### 5.1 Both scale ~linearly in N — but the engine's slope is ~5× lower
@@ -196,7 +217,9 @@ close much of the gap, and the engine — until it culls — would lose that sce
 |---------|-------|
 | Engine pan/zoom = **0 React re-renders at every N (75→1000)** — cost is pure GPU paint, ~0.04 ms/shape | `RK-EN-04` mitigation (`PLAN-ENGINE-001`); `DESIGN-ENGINE-001` §8.1 |
 | Both scale ~linearly but tldraw's slope is **~5× steeper** (~0.22 ms/shape) → engine sustains ≥30 fps to ~700 shapes vs tldraw ~145 | the vendor-independence + performance case for the in-house engine (`INTRO-ENGINE-001`) |
-| Off-screen/large-board scaling still needs culling + per-record reactivity (engine cost ∝ painted N) | `NFR-J-01` (`PLAN-JAM-001`) |
+| **Drag** pre-P4 re-rendered all *N* shapes/frame; `canvas-jam` P4 per-record reactivity makes it re-render **only the dragged shape** → drag median holds 60 fps to ≥600 (§4.4) | `NFR-J-01` (`PLAN-JAM-001`) — `RK-EN-04` tail closed |
+| Extreme-N absolute ceiling stays paint-bound (engine cost ∝ painted *N*); viewport **culling deferred** (counterproductive for kymo's all-on-screen workload — would regress the 0-re-render pan) | `NFR-J-01` (`PLAN-JAM-001`) — culling open/deferred |
 
-**Next scale point to measure:** the same sweep **with culling enabled** once `canvas-jam` lands, and
-a drag-at-high-N run (drag still re-renders by design — `RK-EN-04`).
+**Done (P4, §4.4):** the drag-at-high-N run — per-record reactivity landed; drag re-render scope is now
+O(1). **Still open (deferred):** the sweep **with culling enabled** for the off-screen/large-board case
+(culling is `NFR-J-01`-`MAY` and was deferred in P4 as net-negative for on-screen workloads — see §6).

@@ -38,14 +38,6 @@ export function useEditor(): Editor {
   return editor;
 }
 
-/** Re-compute on every store change (coarse reactivity — §5.4 MVP). */
-export function useValue<T>(_name: string, compute: () => T, _deps: unknown[]): T {
-  const editor = useEditor();
-  const [, force] = useReducer((n: number) => n + 1, 0);
-  useEffect(() => editor.store.listen(() => force()), [editor]);
-  return compute();
-}
-
 /** A positioned host `<div>` for a shape's component (tldraw's HTMLContainer). */
 export function HTMLContainer({ style, children }: { style?: CSSProperties; children?: ReactNode }) {
   return <div style={{ position: "absolute", ...style }}>{children}</div>;
@@ -53,6 +45,97 @@ export function HTMLContainer({ style, children }: { style?: CSSProperties; chil
 
 /** Only `kymo-node` is interactive (the only shape with a `.kymo` position). */
 const isDraggable = (type: string): boolean => type === "kymo-node";
+
+/** A shape's local bounds — from its util's geometry, else its `w`/`h` props. */
+function boundsOf(util: RenderUtil | undefined, shape: Shape): { x: number; y: number; w: number; h: number } {
+  if (util?.getGeometry) return util.getGeometry(shape).bounds;
+  return { x: 0, y: 0, w: num(shape.props.w), h: num(shape.props.h) };
+}
+
+/**
+ * One shape's positioned wrapper (`DESIGN-ENGINE-001` §5.4 per-record reactivity,
+ * `RK-EN-04`). Subscribes to the store for **just its own id** — "subscribe to
+ * all, filter to mine" — so a drag re-renders ONLY the moved shape, never the
+ * whole list. The parent (`EngineCanvas`) re-renders only on structural changes
+ * (add/remove) + selection, so it never re-renders during a drag.
+ *
+ * NB: do NOT wrap this in `memo` — selection state lives outside props
+ * (`editor.getSelectedShapeIds()`), so a shallow-prop memo would block the
+ * click-select re-render and break the selection-outline follow.
+ */
+function ShapeView({
+  editor,
+  util,
+  shapeId,
+  draggable,
+}: {
+  editor: Editor;
+  util: RenderUtil;
+  shapeId: Shape["id"];
+  draggable: boolean;
+}) {
+  // Test seam (no-op unless a bench/E2E sets `window.__kymoBench`): counts each
+  // shape render and tallies which ids rendered. The counter lives HERE, not in
+  // EngineCanvas, because per-record reactivity means the parent no longer
+  // re-renders on a drag — only the moved ShapeView does. The render-count guard
+  // asserts pan/zoom → 0 shape renders, and a single-node drag → only that id.
+  if (typeof window !== "undefined" && (window as { __kymoBench?: boolean }).__kymoBench) {
+    const w = window as { __kymoRenders?: number; __kymoRenderedIds?: Set<string> };
+    w.__kymoRenders = (w.__kymoRenders ?? 0) + 1;
+    (w.__kymoRenderedIds ??= new Set<string>()).add(String(shapeId));
+  }
+
+  const [, force] = useReducer((n: number) => n + 1, 0);
+  useEffect(
+    () =>
+      editor.store.listen((e) => {
+        if (
+          e.updated.some((u) => u.to.id === shapeId) ||
+          e.added.some((s) => s.id === shapeId) ||
+          e.removed.some((s) => s.id === shapeId)
+        )
+          force();
+      }),
+    [editor, shapeId],
+  );
+
+  const shape = editor.getShape(shapeId);
+  if (!shape) return null; // transient: our id is mid-removal (the parent drops us next render)
+  const cam = editor.getCamera();
+  const b = boundsOf(util, shape);
+  const selected = draggable && editor.getSelectedShapeIds().includes(shapeId);
+  return (
+    <div
+      data-shape-id={shape.id}
+      data-shape-type={shape.type}
+      style={{
+        position: "absolute",
+        transform: `translate(${shape.x}px, ${shape.y}px)`,
+        ...(draggable
+          ? { width: b.w, height: b.h, pointerEvents: "auto", cursor: "grab" }
+          : { pointerEvents: "none" }),
+      }}
+    >
+      {util.component(shape)}
+      {selected && (
+        // Selection outline rides inside the wrapper (already translated to
+        // shape.x/y), so it follows the node frame-for-frame during a drag.
+        <div
+          style={{
+            position: "absolute",
+            left: b.x,
+            top: b.y,
+            width: b.w,
+            height: b.h,
+            border: `${1.5 / cam.z}px solid #3b82f6`,
+            boxSizing: "border-box",
+            pointerEvents: "none",
+          }}
+        />
+      )}
+    </div>
+  );
+}
 
 interface Gesture {
   downId: string | null;
@@ -82,14 +165,6 @@ interface EngineCanvasProps {
  * (`screen = (page + cam) * z`, §8.1) with one positioned wrapper per shape.
  */
 export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, children }: EngineCanvasProps) {
-  // Test seam (no-op unless a bench/E2E sets `window.__kymoBench`): counts each
-  // render of the shape list. The pan/zoom optimization means pan/zoom must NOT
-  // re-render here (transform-only); the render-count guard asserts that.
-  if (typeof window !== "undefined" && (window as { __kymoBench?: boolean }).__kymoBench) {
-    const w = window as { __kymoRenders?: number };
-    w.__kymoRenders = (w.__kymoRenders ?? 0) + 1;
-  }
-
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const fittedFor = useRef<Editor | null>(null);
@@ -106,8 +181,18 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
     el.style.transform = `scale(${c.z}) translate(${c.x}px, ${c.y}px)`;
   };
 
-  // Re-render on store changes (drags write the store; sync re-applies it).
-  useEffect(() => editor.store.listen(() => force()), [editor]);
+  // Structural reactivity only: re-render the LIST when shapes are added/removed
+  // (membership changed → mount/unmount a ShapeView). Pure updates (a drag) are
+  // handled per-record inside ShapeView, so the parent does NOT re-render on them
+  // — that's the per-record win (RK-EN-04). Pan/zoom touch neither the store nor
+  // `force()` (transform-only via applyCamera), so they stay at 0 re-renders.
+  useEffect(
+    () =>
+      editor.store.listen((e) => {
+        if (e.added.length || e.removed.length) force();
+      }),
+    [editor],
+  );
 
   // Measure the viewport (always), and fit ONCE per editor — only when
   // `autoFit` (a restored camera is honored, matching Board.tsx's fittedRef).
@@ -214,12 +299,6 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
   const utils = new Map(shapeUtils.map((u) => [u.type, u]));
   const cam = editor.getCamera();
 
-  const boundsOf = (shape: Shape) => {
-    const util = utils.get(shape.type);
-    if (util?.getGeometry) return util.getGeometry(shape).bounds;
-    return { x: 0, y: 0, w: num(shape.props.w), h: num(shape.props.h) };
-  };
-
   return (
     <EditorContext.Provider value={editor}>
       <div
@@ -245,42 +324,15 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
           {editor.getCurrentPageShapes().map((shape) => {
             const util = utils.get(shape.type);
             if (!util) return null;
-            const draggable = isDraggable(shape.type);
-            const b = draggable ? boundsOf(shape) : null;
+            // Each shape owns its render (per-record reactivity); the selection
+            // outline rides inside ShapeView so it follows a dragged node.
             return (
-              <div
+              <ShapeView
                 key={shape.id}
-                data-shape-id={shape.id}
-                data-shape-type={shape.type}
-                style={{
-                  position: "absolute",
-                  transform: `translate(${shape.x}px, ${shape.y}px)`,
-                  ...(draggable && b
-                    ? { width: b.w, height: b.h, pointerEvents: "auto", cursor: "grab" }
-                    : { pointerEvents: "none" }),
-                }}
-              >
-                {util.component(shape)}
-              </div>
-            );
-          })}
-
-          {editor.getSelectedShapeIds().map((id) => {
-            const s = editor.getShape(id);
-            if (!s) return null;
-            const b = boundsOf(s);
-            return (
-              <div
-                key={`sel-${id}`}
-                style={{
-                  position: "absolute",
-                  transform: `translate(${s.x + b.x}px, ${s.y + b.y}px)`,
-                  width: b.w,
-                  height: b.h,
-                  border: `${1.5 / cam.z}px solid #3b82f6`,
-                  boxSizing: "border-box",
-                  pointerEvents: "none",
-                }}
+                editor={editor}
+                util={util}
+                shapeId={shape.id}
+                draggable={isDraggable(shape.type)}
               />
             );
           })}
