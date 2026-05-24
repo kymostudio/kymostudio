@@ -1,6 +1,6 @@
 ---
 title: BPMN in the kymo DSL — Requirements
-document_id: FEAT-BPMN-DSL-REQ-001
+document_id: FEAT-BPMN-DSL-001
 version: "1.1"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers implementing and verifying the BPMN-in-kymo feature
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-DSL-001        # Introduction
-  - FEAT-BPMN-DSL-DSN-001    # Design
-  - FEAT-BPMN-DSL-TST-001    # Test documentation
-  - FEAT-BPMN-DSL-PLAN-001   # Plan
+  - INTRO-BPMN-DSL-001        # Introduction
+  - DESIGN-BPMN-DSL-001    # Design
+  - TEST-BPMN-DSL-001    # Test documentation
+  - PLAN-BPMN-DSL-001   # Plan
   - DSL-LANG-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
 authors:
@@ -34,17 +34,17 @@ iso_compliance:
 
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
-| Document ID  | FEAT-BPMN-DSL-REQ-001                              |
+| Document ID  | FEAT-BPMN-DSL-001                              |
 | Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | FEAT-BPMN-DSL-001, FEAT-BPMN-DSL-DSN-001, FEAT-BPMN-DSL-TST-001, FEAT-BPMN-DSL-PLAN-001 |
+| Related      | INTRO-BPMN-DSL-001, DESIGN-BPMN-DSL-001, TEST-BPMN-DSL-001, PLAN-BPMN-DSL-001 |
 
 The key words **SHALL**, **SHOULD**, and **MAY** are used per ISO drafting
 conventions. Each requirement carries a stable ID for traceability from
-FEAT-BPMN-DSL-TST-001. Concept and rationale: FEAT-BPMN-DSL-001; realisation:
-FEAT-BPMN-DSL-DSN-001.
+TEST-BPMN-DSL-001. Concept and rationale: INTRO-BPMN-DSL-001; realisation:
+DESIGN-BPMN-DSL-001.
 
 ## 1. Scope and stakeholder needs
 
@@ -132,7 +132,7 @@ bpmn {
 
 - LR direction only (TB/RL later); no pools/lanes inside the block; no
   constrained-pin reflow; no fenced `bpmn` code-block alias. These are deferred
-  (see FEAT-BPMN-DSL-PLAN-001 §future work).
+  (see PLAN-BPMN-DSL-001 §future work).
 
 ## Annex A — Revision History
 
@@ -148,7 +148,7 @@ bpmn {
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-dsl/02-FEATURE.md`; authoritative
+Version-controlled at `docs/specs/bpmn-dsl/02-FEATURE.md`; authoritative
 source is the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
@@ -156,7 +156,7 @@ Implicit — checked in with the feature; available to all repository readers.
 
 ### B.3 Change Control
 Adding/changing a requirement requires: edit the relevant FR/NFR (preserving
-IDs); update FEAT-BPMN-DSL-TST-001's traceability matrix; increment `version`;
+IDs); update TEST-BPMN-DSL-001's traceability matrix; increment `version`;
 append a row to Annex A; reflect any grammar change in DSL-LANG-001.
 
 ### B.4 Backwards Compatibility

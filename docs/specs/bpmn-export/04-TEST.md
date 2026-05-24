@@ -1,6 +1,6 @@
 ---
 title: BPMN 2.0 Export — Test Documentation
-document_id: FEAT-BPMN-EXPORT-TST-001
+document_id: TEST-BPMN-EXPORT-001
 version: "1.0"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers verifying the BPMN export feature
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-EXPORT-001        # Introduction
-  - FEAT-BPMN-EXPORT-REQ-001    # Requirements (traced below)
-  - FEAT-BPMN-EXPORT-DSN-001    # Design
-  - FEAT-BPMN-EXPORT-PLAN-001   # Plan
+  - INTRO-BPMN-EXPORT-001        # Introduction
+  - FEAT-BPMN-EXPORT-001    # Requirements (traced below)
+  - DESIGN-BPMN-EXPORT-001    # Design
+  - PLAN-BPMN-EXPORT-001   # Plan
   - BPMN-MAP-001                 # BPMN importer (round-trip counterpart)
 authors:
   - Vũ Anh
@@ -34,14 +34,14 @@ iso_compliance:
 
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
-| Document ID  | FEAT-BPMN-EXPORT-TST-001                           |
+| Document ID  | TEST-BPMN-EXPORT-001                           |
 | Version      | 1.0                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | FEAT-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-REQ-001, FEAT-BPMN-EXPORT-DSN-001, FEAT-BPMN-EXPORT-PLAN-001 |
+| Related      | INTRO-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, PLAN-BPMN-EXPORT-001 |
 
-Verifies FEAT-BPMN-EXPORT-REQ-001 (FR/NFR IDs). Covers 12207 Verification &
+Verifies FEAT-BPMN-EXPORT-001 (FR/NFR IDs). Covers 12207 Verification &
 Validation. The headline check is **round-trip** against the importer (BPMN-MAP-001).
 
 ## 1. Test approach and levels
@@ -108,7 +108,7 @@ BPMN corpus gate) and JS `npm test` are green. Round-trip drift on any corpus fi
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-export/04-TEST.md`; authoritative source is
+Version-controlled at `docs/specs/bpmn-export/04-TEST.md`; authoritative source is
 the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

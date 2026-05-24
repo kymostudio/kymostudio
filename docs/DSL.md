@@ -11,7 +11,7 @@ review_cycle: On grammar change, or annually (whichever first)
 supersedes: "1.0"
 related_documents:
   - BEST_PRACTICE_DIAGRAMS.md
-  - FEAT-BPMN-DSL-DSN-001    # BPMN-in-DSL design (bpmn { } block + layout)
+  - DESIGN-BPMN-DSL-001    # BPMN-in-DSL design (bpmn { } block + layout)
   - dsl.py
   - model.py
 authors:
@@ -45,7 +45,7 @@ iso_compliance:
 | Audience          | Engineers authoring or parsing `.kymo` files                |
 | Review Cycle      | On grammar change, or annually (whichever first)               |
 | Supersedes        | v1.0                                                           |
-| Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), `FEAT-BPMN-DSL-DSN-001`, [`dsl.py`](../src/dsl.py), [`model.py`](../src/model.py) |
+| Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), `DESIGN-BPMN-DSL-001`, [`dsl.py`](../src/dsl.py), [`model.py`](../src/model.py) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar productions follow ISO/IEC 14977:1996 (Extended Backus–Naur Form).
 
@@ -404,14 +404,14 @@ otherwise a **connection**. Semantics:
   layered (Sugiyama) layout — rank assignment, crossing-minimised ordering,
   coordinate assignment (the longest path is held on a straight baseline and branches
   are balanced above/below it), and orthogonal edge routing. The algorithm is
-  specified in FEAT-BPMN-DSL-DSN-001 §3.
+  specified in DESIGN-BPMN-DSL-001 §3.
 - **Pins.** A node carrying `@ (x,y)` has its centre fixed to that coordinate and its
   incident edges re-route to it; un-pinned nodes are not re-ranked.
 - **Resolution.** The block emits a fully-resolved sub-diagram (components with
   absolute position/size, edges carrying explicit `points` + flow kind), so the
   existing renderer draws it unchanged; identical input yields byte-identical output.
   The same grammar and layout exist in the Python and JS implementations
-  (FEAT-BPMN-DSL-REQ-001 FR-11).
+  (FEAT-BPMN-DSL-001 FR-11).
 
 See §10.7 for an example and `samples/order-flow.kymo` for a complete process.
 
@@ -653,7 +653,7 @@ For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kym
 |---------|------------|-------------|----------------------|
 | 1.0     | 2026-05-18 | Vũ Anh      | Initial specification. |
 | 2.0     | 2026-05-18 | Vũ Anh      | **Breaking grammar change.** Removed `component`, `region`, `layout` keywords — the parser now disambiguates by line shape (clause 6.6). Containers nest; a region body may hold inline leaves, bare-id references, and nested containers; an outer region's `contains` is flattened from nested regions (clause 7.3.1). Added `icon` region option (was implementation-only). Reserved tokens updated (clause 6.8). |
-| 2.1     | 2026-05-23 | Vũ Anh      | Added the `bpmn { }` process-block grammar (clause 6.9) — node kinds, flow arrows (`->`/`~>`/`..>`), chains, `type=`, `@` pins — with automatic left-to-right (Sugiyama) layout. Design/algorithm: FEAT-BPMN-DSL-DSN-001. |
+| 2.1     | 2026-05-23 | Vũ Anh      | Added the `bpmn { }` process-block grammar (clause 6.9) — node kinds, flow arrows (`->`/`~>`/`..>`), chains, `type=`, `@` pins — with automatic left-to-right (Sugiyama) layout. Design/algorithm: DESIGN-BPMN-DSL-001. |
 
 ---
 

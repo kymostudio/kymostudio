@@ -1,6 +1,6 @@
 ---
 title: BPMN in the kymo DSL — Design
-document_id: FEAT-BPMN-DSL-DSN-001
+document_id: DESIGN-BPMN-DSL-001
 version: "1.1"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers implementing the kymo DSL parser, layout engine, and rendere
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-DSL-001        # Introduction
-  - FEAT-BPMN-DSL-REQ-001    # Requirements (traced below)
-  - FEAT-BPMN-DSL-TST-001    # Test documentation
-  - FEAT-BPMN-DSL-PLAN-001   # Plan
+  - INTRO-BPMN-DSL-001        # Introduction
+  - FEAT-BPMN-DSL-001    # Requirements (traced below)
+  - TEST-BPMN-DSL-001    # Test documentation
+  - PLAN-BPMN-DSL-001   # Plan
   - DSL-LANG-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
   - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
@@ -36,21 +36,21 @@ iso_compliance:
 
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
-| Document ID  | FEAT-BPMN-DSL-DSN-001                             |
+| Document ID  | DESIGN-BPMN-DSL-001                             |
 | Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | FEAT-BPMN-DSL-001, FEAT-BPMN-DSL-REQ-001, FEAT-BPMN-DSL-TST-001, FEAT-BPMN-DSL-PLAN-001 |
+| Related      | INTRO-BPMN-DSL-001, FEAT-BPMN-DSL-001, TEST-BPMN-DSL-001, PLAN-BPMN-DSL-001 |
 
-Realises the requirements in FEAT-BPMN-DSL-REQ-001 (FR/NFR IDs cited per clause).
+Realises the requirements in FEAT-BPMN-DSL-001 (FR/NFR IDs cited per clause).
 Covers ISO/IEC/IEEE 12207 Architecture & Design Definition.
 
 ## 1. Scope
 
 The architecture and algorithm behind the `bpmn { }` block: how source text
 becomes a resolved sub-diagram the existing renderer can draw. The normative
-grammar is in DSL-LANG-001; behaviour requirements in FEAT-BPMN-DSL-REQ-001.
+grammar is in DSL-LANG-001; behaviour requirements in FEAT-BPMN-DSL-001.
 
 ## 2. Grammar → AST → model (FR-1…FR-7)
 
@@ -121,7 +121,7 @@ present.
 
 Every ordering and tie-break uses stable sorts; iteration counts are fixed;
 coordinates are integers. Re-running the layout on the same input yields
-byte-identical SVG, so golden tests stay stable (FEAT-BPMN-DSL-TST-001 TC-7). The
+byte-identical SVG, so golden tests stay stable (TEST-BPMN-DSL-001 TC-7). The
 P0 spike pre-validated this: re-rendering the order graph produced byte-identical
 SVG across runs.
 
@@ -140,7 +140,7 @@ SVG across runs.
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-dsl/03-DESIGN.md`; authoritative source
+Version-controlled at `docs/specs/bpmn-dsl/03-DESIGN.md`; authoritative source
 is the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
@@ -148,10 +148,10 @@ Implicit — checked in with the feature; available to all repository readers.
 
 ### B.3 Change Control
 On a design change: update the affected clause; keep the requirement IDs it
-traces (FR-8…FR-10, NFR-1) consistent with FEAT-BPMN-DSL-REQ-001; increment
+traces (FR-8…FR-10, NFR-1) consistent with FEAT-BPMN-DSL-001; increment
 `version`; append a row to Annex A; reflect any grammar change in DSL-LANG-001.
 
 ### B.4 Backwards Compatibility
 This describes the intended implementation; the normative surface is
-FEAT-BPMN-DSL-REQ-001 and DSL-LANG-001. Reconcile any deviation there before
+FEAT-BPMN-DSL-001 and DSL-LANG-001. Reconcile any deviation there before
 release.

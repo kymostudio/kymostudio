@@ -1,6 +1,6 @@
 ---
 title: BPMN 2.0 Export — Plan
-document_id: FEAT-BPMN-EXPORT-PLAN-001
+document_id: PLAN-BPMN-EXPORT-001
 version: "1.0"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers implementing the kymo BPMN emitter, CLI, and JS port
 review_cycle: On phase completion
 supersedes: null
 related_documents:
-  - FEAT-BPMN-EXPORT-001        # Introduction
-  - FEAT-BPMN-EXPORT-REQ-001    # Requirements
-  - FEAT-BPMN-EXPORT-DSN-001    # Design
-  - FEAT-BPMN-EXPORT-TST-001    # Test documentation
+  - INTRO-BPMN-EXPORT-001        # Introduction
+  - FEAT-BPMN-EXPORT-001    # Requirements
+  - DESIGN-BPMN-EXPORT-001    # Design
+  - TEST-BPMN-EXPORT-001    # Test documentation
   - BPMN-MAP-001                 # BPMN importer element mapping (inverted here)
 authors:
   - Vũ Anh
@@ -33,16 +33,16 @@ iso_compliance:
 
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
-| Document ID  | FEAT-BPMN-EXPORT-PLAN-001                          |
+| Document ID  | PLAN-BPMN-EXPORT-001                          |
 | Version      | 1.0                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | FEAT-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-REQ-001, FEAT-BPMN-EXPORT-DSN-001, FEAT-BPMN-EXPORT-TST-001 |
+| Related      | INTRO-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001 |
 
-Concept: FEAT-BPMN-EXPORT-001. Requirements (FR/NFR referenced below):
-FEAT-BPMN-EXPORT-REQ-001. Design: FEAT-BPMN-EXPORT-DSN-001. Verification:
-FEAT-BPMN-EXPORT-TST-001.
+Concept: INTRO-BPMN-EXPORT-001. Requirements (FR/NFR referenced below):
+FEAT-BPMN-EXPORT-001. Design: DESIGN-BPMN-EXPORT-001. Verification:
+TEST-BPMN-EXPORT-001.
 
 ## 1. Scope and approach
 
@@ -55,7 +55,7 @@ incrementally (P0–P4).
 
 The mapping (inverse classification + DI coordinate inverse + collaboration
 reconstruction), the emitter API, and integration are specified in
-**FEAT-BPMN-EXPORT-DSN-001**. This plan covers only scope, phases, and risks.
+**DESIGN-BPMN-EXPORT-001**. This plan covers only scope, phases, and risks.
 
 ## 3. Phases (work breakdown)
 
@@ -81,7 +81,7 @@ reconstruction), the emitter API, and integration are specified in
 ## 5. Verification
 
 Approach, levels, cases (TC-1…TC-9), and the requirements-traceability matrix are
-specified in FEAT-BPMN-EXPORT-TST-001.
+specified in TEST-BPMN-EXPORT-001.
 
 ## 6. Estimate (complexity)
 
@@ -117,7 +117,7 @@ correctness risk (round-trip over the full corpus).
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-export/05-PLAN.md`; authoritative source is
+Version-controlled at `docs/plans/bpmn-export/PLAN.md`; authoritative source is
 the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
@@ -129,8 +129,8 @@ requirement IDs and the TST traceability matrix consistent; increment `version`;
 append a row to Annex A (document edits) and Annex C (the phase's implementation worklog).
 
 ### B.4 Backwards Compatibility
-The plan is informative; the normative surface is FEAT-BPMN-EXPORT-REQ-001,
-FEAT-BPMN-EXPORT-DSN-001, and BPMN-MAP-001. Reconcile any deviation there before release.
+The plan is informative; the normative surface is FEAT-BPMN-EXPORT-001,
+DESIGN-BPMN-EXPORT-001, and BPMN-MAP-001. Reconcile any deviation there before release.
 
 ## Annex C — Worklog
 

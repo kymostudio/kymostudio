@@ -1,6 +1,6 @@
 ---
 title: BPMN in the kymo DSL — Plan
-document_id: FEAT-BPMN-DSL-PLAN-001
+document_id: PLAN-BPMN-DSL-001
 version: "1.1"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers implementing the kymo DSL, layout engine, and renderers
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-DSL-001        # Introduction
-  - FEAT-BPMN-DSL-REQ-001    # Requirements
-  - FEAT-BPMN-DSL-DSN-001    # Design
-  - FEAT-BPMN-DSL-TST-001    # Test documentation
+  - INTRO-BPMN-DSL-001        # Introduction
+  - FEAT-BPMN-DSL-001    # Requirements
+  - DESIGN-BPMN-DSL-001    # Design
+  - TEST-BPMN-DSL-001    # Test documentation
   - DSL-LANG-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
   - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
@@ -35,16 +35,16 @@ iso_compliance:
 
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
-| Document ID  | FEAT-BPMN-DSL-PLAN-001                            |
+| Document ID  | PLAN-BPMN-DSL-001                            |
 | Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | FEAT-BPMN-DSL-001, FEAT-BPMN-DSL-REQ-001, FEAT-BPMN-DSL-DSN-001, FEAT-BPMN-DSL-TST-001 |
+| Related      | INTRO-BPMN-DSL-001, FEAT-BPMN-DSL-001, DESIGN-BPMN-DSL-001, TEST-BPMN-DSL-001 |
 
-Concept: FEAT-BPMN-DSL-001. Requirements (FR/NFR referenced below):
-FEAT-BPMN-DSL-REQ-001. Design: FEAT-BPMN-DSL-DSN-001. Verification:
-FEAT-BPMN-DSL-TST-001.
+Concept: INTRO-BPMN-DSL-001. Requirements (FR/NFR referenced below):
+FEAT-BPMN-DSL-001. Design: DESIGN-BPMN-DSL-001. Verification:
+TEST-BPMN-DSL-001.
 
 ## 1. Scope and approach
 
@@ -57,7 +57,7 @@ change. Delivered incrementally (P0–P4).
 
 The architecture and algorithm (grammar → AST → model, the Sugiyama LR layout
 pipeline, integration, renderer reuse, determinism) are specified in
-**FEAT-BPMN-DSL-DSN-001**. This plan covers only scope, phases, and risks.
+**DESIGN-BPMN-DSL-001**. This plan covers only scope, phases, and risks.
 
 ## 3. Phases (work breakdown)
 
@@ -73,7 +73,7 @@ pipeline, integration, renderer reuse, determinism) are specified in
 (`packages/python/spikes/bpmn_layout_spike.py`) validated the layered LR pipeline
 on the order graph — sane LR layout, legible `xor` branch + parallel split/join,
 deterministic (byte-identical) output: verdict **PASS**, P2 greenlit. Findings
-were folded into FEAT-BPMN-DSL-DSN-001 §3 (primary-path/trunk pinning; real
+were folded into DESIGN-BPMN-DSL-001 §3 (primary-path/trunk pinning; real
 dummy-node handling) — see `packages/python/spikes/README.md`.
 
 ## 4. Risks and mitigations
@@ -89,7 +89,7 @@ dummy-node handling) — see `packages/python/spikes/README.md`.
 ## 5. Verification
 
 Approach, levels, cases, and the requirements-traceability matrix are specified
-in FEAT-BPMN-DSL-TST-001.
+in TEST-BPMN-DSL-001.
 
 ## 6. Estimate (complexity)
 
@@ -117,8 +117,8 @@ is comparatively mechanical.
 
 | Version | Date       | Author | Changes                                                |
 |---------|------------|--------|--------------------------------------------------------|
-| 0.1     | 2026-05-23 | Vũ Anh | Initial issue (design extracted to FEAT-BPMN-DSL-DSN-001). |
-| 0.2     | 2026-05-23 | Vũ Anh | Record P0 (spike) complete: phase Status column + progress notes; findings fed to FEAT-BPMN-DSL-DSN-001. |
+| 0.1     | 2026-05-23 | Vũ Anh | Initial issue (design extracted to DESIGN-BPMN-DSL-001). |
+| 0.2     | 2026-05-23 | Vũ Anh | Record P0 (spike) complete: phase Status column + progress notes; findings fed to DESIGN-BPMN-DSL-001. |
 | 0.3     | 2026-05-23 | Vũ Anh | Add Annex C (implementation worklog); B.3 now references it. |
 | 0.4     | 2026-05-23 | Vũ Anh | Record P1 (parser) complete: phase Status + progress + Annex C worklog row. |
 | 0.5     | 2026-05-23 | Vũ Anh | Record P2 (layout engine) complete: phase Status + progress + Annex C worklog row. |
@@ -129,7 +129,7 @@ is comparatively mechanical.
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-dsl/05-PLAN.md`; authoritative source is
+Version-controlled at `docs/plans/bpmn-dsl/PLAN.md`; authoritative source is
 the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
@@ -142,8 +142,8 @@ row; keep requirement IDs and the TST traceability matrix consistent; increment
 implementation worklog).
 
 ### B.4 Backwards Compatibility
-The plan is informative; the normative surface is FEAT-BPMN-DSL-REQ-001,
-FEAT-BPMN-DSL-DSN-001, and DSL-LANG-001. Reconcile any deviation there before
+The plan is informative; the normative surface is FEAT-BPMN-DSL-001,
+DESIGN-BPMN-DSL-001, and DSL-LANG-001. Reconcile any deviation there before
 release.
 
 ## Annex C — Worklog
@@ -154,7 +154,7 @@ bottom; dates ISO 8601.
 
 | Date       | Phase | Work | Outcome / artifacts |
 |------------|-------|------|---------------------|
-| 2026-05-23 | P0 — Spike | Built a throwaway layered-LR layout prototype on the order graph (rank → order → coordinates → orthogonal routing), rendered it via the existing `to_svg` back-end, eyeballed against `samples/order-fulfillment.svg`, and checked determinism. | **PASS** — sane LR layout; legible `xor` branch + parallel split/join; byte-identical SVG across runs. Artifacts in `packages/python/spikes/` (`bpmn_layout_spike.py`, `order-spike.svg`/`.png`, `README.md`). Findings (primary-path/trunk pinning; real dummy nodes) folded into FEAT-BPMN-DSL-DSN-001 §3. P2 greenlit. |
+| 2026-05-23 | P0 — Spike | Built a throwaway layered-LR layout prototype on the order graph (rank → order → coordinates → orthogonal routing), rendered it via the existing `to_svg` back-end, eyeballed against `samples/order-fulfillment.svg`, and checked determinism. | **PASS** — sane LR layout; legible `xor` branch + parallel split/join; byte-identical SVG across runs. Artifacts in `packages/python/spikes/` (`bpmn_layout_spike.py`, `order-spike.svg`/`.png`, `README.md`). Findings (primary-path/trunk pinning; real dummy nodes) folded into DESIGN-BPMN-DSL-001 §3. P2 greenlit. |
 | 2026-05-23 | P1 — Python parser | Added the file-scope `bpmn { }` parser to `dsl.py`: `BpmnNode`/`BpmnFlow`/`BpmnBlock` AST; kind→`(shape, marker)` + arrow→flow maps (mirroring `from_bpmn`); chain/`;` expansion + `: "label"`; `@ (x,y)` parsed (honoured in P2). `Diagram.bpmn_blocks` field; `to_svg.render()` + CLI raise while a block is unlaid-out. | **Done** — 8 new `test_dsl.py` cases (covering TC-1/TC-2/TC-3); full suite **220 passed, 1 skipped**, goldens + BPMN corpus baseline byte-identical. No layout yet (P2). |
 | 2026-05-23 | P2 — Python layout | Built `bpmn_layout.py`: rank → dummy nodes → barycenter order → coordinate assignment (longest path pinned to a straight baseline — finding #1) → `@` pin override (FR-9) → orthogonal routing (`Edge.points`). Wired as a cli pass; `resolve_alignments` skipped for bpmn-block diagrams. Added `samples/order-flow.kymo` + golden `.svg`. | **Done** — straight trunk, branches balanced above/below the trunk, legible split/join (eyeballed vs benchmark), deterministic. 8 new `test_bpmn_layout.py` cases; full suite **228 passed, 1 skipped**; other goldens + corpus baseline byte-identical (only the new golden minted). |
 | 2026-05-23 | P3 — JS parity | Ported the parser + layout to `packages/js`: `bpmn { }` branch in `dsl.ts`, new `bpmn-layout.ts` (same algorithm/constants), `bpmnBlocks` on the model, wired into `parseDiagram` (skips `resolveAlignments`), render-guard backstop. Also **fixed red CI**: P2's `samples/order-flow.kymo` had broken the JS `renders every sample .kymo` test. | **Done** — `npm test` **49 passed** (incl. the sample test) + 8 new bpmn cases; typecheck clean; **zero runtime deps** (NFR-3). JS render geometrically matches the Python golden (eyeballed) — functional parity (FR-11/NFR-4). |

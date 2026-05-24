@@ -10,8 +10,8 @@ audience: Engineers using or maintaining the kymo BPMN importer and exporter
 review_cycle: On BPMN-mapping change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-EXPORT-DSN-001    # BPMN export design (inverts this mapping)
-  - FEAT-BPMN-DSL-DSN-001       # BPMN-in-DSL design (bpmn { } block)
+  - DESIGN-BPMN-EXPORT-001    # BPMN export design (inverts this mapping)
+  - DESIGN-BPMN-DSL-001       # BPMN-in-DSL design (bpmn { } block)
   - DSL-LANG-001                # kymo DSL language specification
   - REF-BPMNIO-001              # bpmn.io reference (round-trip benchmark)
 authors:
@@ -42,7 +42,7 @@ iso_compliance:
 | Audience          | Engineers using or maintaining the kymo BPMN importer/exporter   |
 | Review Cycle      | On BPMN-mapping change                                            |
 | Supersedes        | —                                                                |
-| Related Documents | `FEAT-BPMN-EXPORT-DSN-001`, `FEAT-BPMN-DSL-DSN-001`, `DSL-LANG-001`, `REF-BPMNIO-001` |
+| Related Documents | `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `DSL-LANG-001`, `REF-BPMNIO-001` |
 
 kymo can **import** a standard **BPMN 2.0 XML** file (`.bpmn`) — the format
 exported by [bpmn.io](https://bpmn.io), [Camunda Modeler](https://camunda.com/download/modeler/),
@@ -212,4 +212,4 @@ Increment `version` and append a row to Annex A.
 
 ### B.4 Backwards Compatibility
 Informative reference. The normative mapping lives in code (the importer maps,
-inverted by the exporter) and in `FEAT-BPMN-EXPORT-DSN-001`.
+inverted by the exporter) and in `DESIGN-BPMN-EXPORT-001`.

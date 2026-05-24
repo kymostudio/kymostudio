@@ -1,6 +1,6 @@
 ---
 title: BPMN 2.0 Export — Introduction
-document_id: FEAT-BPMN-EXPORT-001
+document_id: INTRO-BPMN-EXPORT-001
 version: "1.0"
 issue_date: 2026-05-23
 status: Released
@@ -10,13 +10,13 @@ audience: Engineers and reviewers of the kymo renderers, BPMN importer, and DSL
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-EXPORT-REQ-001    # Requirements
-  - FEAT-BPMN-EXPORT-DSN-001    # Design
-  - FEAT-BPMN-EXPORT-TST-001    # Test documentation
-  - FEAT-BPMN-EXPORT-PLAN-001   # Plan
+  - FEAT-BPMN-EXPORT-001    # Requirements
+  - DESIGN-BPMN-EXPORT-001    # Design
+  - TEST-BPMN-EXPORT-001    # Test documentation
+  - PLAN-BPMN-EXPORT-001   # Plan
   - BPMN-MAP-001                 # BPMN importer element mapping (this feature inverts it)
   - DSL-LANG-001                # kymo DSL language specification (bpmn { } block)
-  - FEAT-BPMN-DSL-DSN-001       # BPMN-in-DSL design
+  - DESIGN-BPMN-DSL-001       # BPMN-in-DSL design
   - REF-BPMNIO-CMP-001          # bpmn.io comparison (lossless round-trip benchmark)
 authors:
   - Vũ Anh
@@ -37,20 +37,20 @@ iso_compliance:
 
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
-| Document ID  | FEAT-BPMN-EXPORT-001                                        |
+| Document ID  | INTRO-BPMN-EXPORT-001                                        |
 | Version      | 1.0                                                         |
 | Status       | Released                                                    |
 | Issue Date   | 2026-05-23                                                  |
 | Owner        | `diagrams/` project                                         |
-| Related      | FEAT-BPMN-EXPORT-REQ-001, FEAT-BPMN-EXPORT-DSN-001, FEAT-BPMN-EXPORT-TST-001, FEAT-BPMN-EXPORT-PLAN-001 |
+| Related      | FEAT-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001, PLAN-BPMN-EXPORT-001 |
 
 ## 1. Purpose and scope
 
 This document introduces the **BPMN 2.0 export** feature and is the entry point to
 its document set. It states the problem, the concept, and the terminology, and maps
-the reader to the requirements (FEAT-BPMN-EXPORT-REQ-001), the design
-(FEAT-BPMN-EXPORT-DSN-001), the test documentation (FEAT-BPMN-EXPORT-TST-001), and
-the plan (FEAT-BPMN-EXPORT-PLAN-001). The set conforms to ISO/IEC/IEEE 12207:2017
+the reader to the requirements (FEAT-BPMN-EXPORT-001), the design
+(DESIGN-BPMN-EXPORT-001), the test documentation (TEST-BPMN-EXPORT-001), and
+the plan (PLAN-BPMN-EXPORT-001). The set conforms to ISO/IEC/IEEE 12207:2017
 (life-cycle processes) and ISO/IEC/IEEE 15289:2019 (information-item content).
 
 ## 2. Background
@@ -80,8 +80,8 @@ with events, tasks, gateways, flows) and the **Diagram-Interchange** geometry
 - **Reuse**: emits a `.bpmn` from any `Diagram`; the CLI gains a `--bpmn` target and
   the Python/JS libraries gain `export` / `toBpmn`.
 
-The behaviour is specified as requirements in FEAT-BPMN-EXPORT-REQ-001; the
-architecture and mapping in FEAT-BPMN-EXPORT-DSN-001.
+The behaviour is specified as requirements in FEAT-BPMN-EXPORT-001; the
+architecture and mapping in DESIGN-BPMN-EXPORT-001.
 
 ## 4. Audience
 
@@ -103,11 +103,11 @@ Read in order:
 
 | # | Information item | Document | Standard role (15289) |
 |---|------------------|----------|-----------------------|
-| 1 | Introduction (this) | FEAT-BPMN-EXPORT-001 | Concept / overview |
-| 2 | Requirements | FEAT-BPMN-EXPORT-REQ-001 | Requirements specification |
-| 3 | Design | FEAT-BPMN-EXPORT-DSN-001 | Design / architecture |
-| 4 | Test documentation | FEAT-BPMN-EXPORT-TST-001 | Test plan / cases / traceability |
-| 5 | Plan | FEAT-BPMN-EXPORT-PLAN-001 | Plan |
+| 1 | Introduction (this) | INTRO-BPMN-EXPORT-001 | Concept / overview |
+| 2 | Requirements | FEAT-BPMN-EXPORT-001 | Requirements specification |
+| 3 | Design | DESIGN-BPMN-EXPORT-001 | Design / architecture |
+| 4 | Test documentation | TEST-BPMN-EXPORT-001 | Test plan / cases / traceability |
+| 5 | Plan | PLAN-BPMN-EXPORT-001 | Plan |
 
 ## Annex A — Revision History
 
@@ -121,7 +121,7 @@ Read in order:
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-export/01-INTRO.md`; the authoritative
+Version-controlled at `docs/specs/bpmn-export/01-INTRO.md`; the authoritative
 source is the main-branch working tree, with history via `git log`.
 
 ### B.2 Distribution
@@ -134,4 +134,4 @@ Changes require: update the relevant clause; keep the document set
 
 ### B.4 Backwards Compatibility
 This is an informative overview; on any feature change, reconcile it with
-FEAT-BPMN-EXPORT-REQ-001 (the normative requirements) before release.
+FEAT-BPMN-EXPORT-001 (the normative requirements) before release.

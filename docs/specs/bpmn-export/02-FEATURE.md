@@ -1,6 +1,6 @@
 ---
 title: BPMN 2.0 Export — Requirements
-document_id: FEAT-BPMN-EXPORT-REQ-001
+document_id: FEAT-BPMN-EXPORT-001
 version: "1.0"
 issue_date: 2026-05-23
 status: Released
@@ -10,10 +10,10 @@ audience: Engineers implementing and verifying the BPMN export feature
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes: null
 related_documents:
-  - FEAT-BPMN-EXPORT-001        # Introduction
-  - FEAT-BPMN-EXPORT-DSN-001    # Design
-  - FEAT-BPMN-EXPORT-TST-001    # Test documentation
-  - FEAT-BPMN-EXPORT-PLAN-001   # Plan
+  - INTRO-BPMN-EXPORT-001        # Introduction
+  - DESIGN-BPMN-EXPORT-001    # Design
+  - TEST-BPMN-EXPORT-001    # Test documentation
+  - PLAN-BPMN-EXPORT-001   # Plan
   - BPMN-MAP-001                 # BPMN importer element mapping (inverted here)
   - DSL-LANG-001                # kymo DSL language specification
 authors:
@@ -34,24 +34,24 @@ iso_compliance:
 
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
-| Document ID  | FEAT-BPMN-EXPORT-REQ-001                           |
+| Document ID  | FEAT-BPMN-EXPORT-001                           |
 | Version      | 1.0                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-23                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | FEAT-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-DSN-001, FEAT-BPMN-EXPORT-TST-001, FEAT-BPMN-EXPORT-PLAN-001 |
+| Related      | INTRO-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001, PLAN-BPMN-EXPORT-001 |
 
 The key words **SHALL**, **SHOULD**, and **MAY** are used per ISO drafting
 conventions. Each requirement carries a stable ID for traceability from
-FEAT-BPMN-EXPORT-TST-001. Concept: FEAT-BPMN-EXPORT-001; realisation:
-FEAT-BPMN-EXPORT-DSN-001. The mapping inverts BPMN-MAP-001.
+TEST-BPMN-EXPORT-001. Concept: INTRO-BPMN-EXPORT-001; realisation:
+DESIGN-BPMN-EXPORT-001. The mapping inverts BPMN-MAP-001.
 
 ## 1. Scope and stakeholder needs
 
 Provide a way to turn a kymo `Diagram` of BPMN glyphs (imported via `from_bpmn` or
 authored with the `bpmn { }` block) into a standard **BPMN 2.0 XML** file, so kymo
 participates in BPMN tool interchange and supports `.bpmn` → kymo → `.bpmn`
-round-trip — the gap identified in FEAT-BPMN-EXPORT-001 §2.
+round-trip — the gap identified in INTRO-BPMN-EXPORT-001 §2.
 
 ## 2. Functional requirements
 
@@ -118,7 +118,7 @@ round-trip — the gap identified in FEAT-BPMN-EXPORT-001 §2.
   equivalently, not the original file's exact bytes/formatting/comments.
 - No executable semantics — `<conditionExpression>` bodies are a placeholder or taken
   from the edge label, not evaluated; no listeners/forms/IO.
-- No animation (BPMN is static). Deferred (see FEAT-BPMN-EXPORT-PLAN-001).
+- No animation (BPMN is static). Deferred (see PLAN-BPMN-EXPORT-001).
 
 ## Annex A — Revision History
 
@@ -132,7 +132,7 @@ round-trip — the gap identified in FEAT-BPMN-EXPORT-001 §2.
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/features/bpmn-export/02-FEATURE.md`; authoritative source
+Version-controlled at `docs/specs/bpmn-export/02-FEATURE.md`; authoritative source
 is the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
@@ -140,7 +140,7 @@ Implicit — checked in with the feature; available to all repository readers.
 
 ### B.3 Change Control
 Adding/changing a requirement requires: edit the relevant FR/NFR (preserving IDs);
-update FEAT-BPMN-EXPORT-TST-001's traceability matrix; increment `version`; append a
+update TEST-BPMN-EXPORT-001's traceability matrix; increment `version`; append a
 row to Annex A.
 
 ### B.4 Backwards Compatibility
