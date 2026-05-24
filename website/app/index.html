@@ -250,6 +250,31 @@
       font: 600 9px/1 var(--mono); color: var(--text-mute);
     }
     .k-rail .sep { width: 24px; height: 1px; background: var(--border); margin: 6px 0; }
+
+    /* ── Status bar (canvas-studio P6 · FR-CS-06) — floats at the canvas bottom */
+    .k-statusbar {
+      position: absolute; bottom: 12px; left: 12px; right: 12px;
+      display: flex; align-items: center; gap: 8px;
+      pointer-events: none; z-index: 6;
+    }
+    .k-statusbar > * { pointer-events: auto; }
+    .k-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 30px; padding: 0 10px;
+      background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px;
+      font: 500 12px/1 var(--font); color: var(--text); box-shadow: var(--shadow);
+      white-space: nowrap;
+    }
+    .k-chip .dot { font-size: 9px; line-height: 1; }
+    .k-chip--zoom { gap: 2px; padding: 0 4px; }
+    .k-chip--zoom button {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 24px; border: 0; background: transparent;
+      color: var(--text-dim); border-radius: 6px; cursor: pointer;
+    }
+    .k-chip--zoom button:hover { background: var(--bg-soft); color: var(--text); }
+    .k-chip--zoom .pct { min-width: 40px; text-align: center; font-weight: 600; }
+    .k-chip--zoom .bar { width: 1px; height: 16px; background: var(--border); margin: 0 2px; }
     #preview {
       flex: 1; overflow: auto; display: grid; place-items: center;
       padding: 40px 40px 96px;

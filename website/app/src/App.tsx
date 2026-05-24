@@ -14,10 +14,11 @@ import type { Editor } from "../../../packages/js-canvas/dist/index.js";
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
 import { EngineBoard } from "./engine/EngineBoard";
-import type { Tool } from "./engine/react";
+import type { Tool, ViewApi } from "./engine/react";
 import { TopBar } from "./ui/TopBar";
 import { ToolRail } from "./ui/ToolRail";
 import { TOOL_SHORTCUTS } from "./ui/tools";
+import { StatusBar } from "./ui/StatusBar";
 
 /** Pull the intrinsic width/height off the rendered `<svg>` header. */
 function svgSize(svg: string): { w: number; h: number } {
@@ -47,6 +48,7 @@ export function App() {
   const lastSvg = useRef(""); // last successful render, the download fallback
   const exportRef = useRef<(() => Promise<string>) | null>(null); // engine board→SVG (FR-J-03)
   const engineEditor = useRef<Editor | null>(null); // live engine editor (FR-CS-02 undo/redo)
+  const viewApi = useRef<ViewApi | null>(null); // engine zoom/fit API (FR-CS-06 status bar)
   const pendingSel = useRef<number | null>(null); // caret to restore after Tab
 
   // Latest theme/transparent for closures inside the debounce timer.
@@ -254,7 +256,7 @@ export function App() {
         <section className="pane view">
           <ToolRail tool={tool} setTool={setTool} />
           <div className="canvas-wrap">
-          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} onEditorReady={(ed) => { engineEditor.current = ed; }} tool={tool} onToolReset={() => setTool("select")} />
+          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} onEditorReady={(ed) => { engineEditor.current = ed; }} onViewReady={(api) => { viewApi.current = api; }} tool={tool} onToolReset={() => setTool("select")} />
           <div id="error" hidden={error == null}>
             {error}
           </div>
@@ -309,6 +311,13 @@ export function App() {
               SVG
             </button>
           </div>
+
+          <StatusBar
+            viewApi={viewApi}
+            nodes={diagram?.components.length ?? 0}
+            edges={diagram?.edges.length ?? 0}
+            savingKey={source}
+          />
           </div>
         </section>
       </main>

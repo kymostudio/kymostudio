@@ -41,6 +41,16 @@ const TEXT_SIZE = 18;
  *  places an editable `text` label. */
 export type Tool = "select" | "hand" | "draw" | "sticky" | "text";
 
+/** Imperative zoom/fit API the canvas hands up (canvas-studio `FR-CS-06`, the
+ *  status bar). Zoom goes through `applyCamera` (DOM transform, no React render)
+ *  so it stays at 0 shape re-renders, like wheel-zoom. */
+export interface ViewApi {
+  zoomIn(): void;
+  zoomOut(): void;
+  fit(): void;
+  getZoom(): number;
+}
+
 /** The slice of a shape util the render loop needs. */
 export interface RenderUtil {
   type: string;
@@ -216,6 +226,8 @@ interface EngineCanvasProps {
   tool?: Tool;
   /** Click-to-place tools (`sticky`) call this on commit so the host reverts to `select`. */
   onToolReset?: () => void;
+  /** Hands the host an imperative zoom/fit API (canvas-studio `FR-CS-06`). */
+  onViewReady?: (api: ViewApi) => void;
   children?: ReactNode;
 }
 
@@ -223,7 +235,7 @@ interface EngineCanvasProps {
  * The viewport: a clip box holding a camera-transformed container
  * (`screen = (page + cam) * z`, §8.1) with one positioned wrapper per shape.
  */
-export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, tool = "select", onToolReset, children }: EngineCanvasProps) {
+export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, tool = "select", onToolReset, onViewReady, children }: EngineCanvasProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   // The note currently being edited (its label shows an inline <textarea> overlay).
   const [editingId, setEditingId] = useState<ShapeId | null>(null);
@@ -304,6 +316,33 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, too
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   }, [editor, onChange]);
+
+  // Mount once: hand the host an imperative zoom/fit API (FR-CS-06, the status
+  // bar). Zoom goes through applyCamera (DOM transform) + onChange — no React
+  // re-render of the shape list, so the render-guard (NFR) stays green.
+  useEffect(() => {
+    const clamp = (z: number) => Math.min(8, Math.max(0.1, z));
+    const center = () => {
+      const el = viewportRef.current;
+      return el ? { x: el.clientWidth / 2, y: el.clientHeight / 2 } : { x: 0, y: 0 };
+    };
+    const zoomBy = (f: number) => {
+      editor.zoomToPoint(clamp(editor.getCamera().z * f), center());
+      applyCamera();
+      onChange?.();
+    };
+    onViewReady?.({
+      zoomIn: () => zoomBy(1.2),
+      zoomOut: () => zoomBy(1 / 1.2),
+      fit: () => {
+        editor.zoomToFit();
+        applyCamera();
+        onChange?.();
+      },
+      getZoom: () => editor.getCamera().z,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
 
   const screenOf = (e: ReactPointerEvent): { x: number; y: number } => {
     const r = viewportRef.current!.getBoundingClientRect();
