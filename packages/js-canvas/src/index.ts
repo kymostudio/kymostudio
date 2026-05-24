@@ -3,4 +3,5 @@
  * store; later phases add the editor facade, geometry, viewport and shapes.
  */
 export * from "./store.js";
+export * from "./shape.js";
 export * from "./editor.js";
