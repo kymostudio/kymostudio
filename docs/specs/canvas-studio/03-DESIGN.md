@@ -145,19 +145,21 @@ duplication) — so there is no separate bottom tool toolbar.
 ## 5. Canvas item styling (`engine/shapes.tsx`) — FR-CS-04
 
 Item visuals live in the engine's interactive shape layer (`engine/shapes.tsx` — the `component`
-hooks), **not** in `renderSVG` (`packages/js`, which is golden-frozen). Match the prototype's
-`diagram.jsx` primitives:
+hooks), **not** in `renderSVG` (`packages/js`, which is golden-frozen). **As-built decision:** match
+**`renderSVG`** (the canonical render + export), not the prototype's `diagram.jsx` mockup — the
+engine already renders the *real* cloud-icon glyphs, which the mockup only approximated, so chasing
+the flat tile would be a downgrade and would diverge from the export.
 
-| Engine shape | Prototype analogue | Styling target |
-|--------------|--------------------|----------------|
-| `kymo-node` | `KTile` | white tile, left colour **stripe** (provider colour), inline **glyph**, bold title + dim sub |
-| `kymo-region` | `KGroup` | rounded rect, **solid** (outer) or **dashed** (inner) border in the region colour, corner badge + label |
-| `kymo-edge` | `KEdge` | orthogonal/curved path, arrowhead `<marker>`, **flow-dash** animation (`stroke-dashoffset` loop), optional pill label |
-| `note` / `text` / `freedraw` | (canvas-jam) | unchanged |
+| Engine shape | As-built styling | Source of truth |
+|--------------|------------------|-----------------|
+| `kymo-node` | the real cloud-icon **glyph** (`getIcon`) + name label — **unchanged** (already richer than the mockup) | engine `NodeView` |
+| `kymo-region` | outer = slate `#cbd5e1` solid + `rgba(15,23,42,0.02)` fill; **inner (`dash:"dashed"`) = purple `#7c3aed` dashed + `rgba(124,58,237,0.03)` fill + `#6d28d9` label** | `renderSVG` `REGION_STYLE` (`render.ts`) |
+| `kymo-edge` | `#94a3b8` width-2 line + arrowhead; **flow-dash animation** (`stroke-dasharray:6 4` + a `kymo-edge-flow` keyframe → `stroke-dashoffset:-10`); `toSvg` uses a SMIL `<animate>` so the export flows too | kymo "animated SVG" identity |
+| `note` / `text` / `freedraw` | unchanged | (canvas-jam) |
 
-Styling is driven by the design tokens (§2) so it tracks theme. The `toSvg` exporters
-(`DESIGN-JAM-001` §4) are updated in lockstep so board export keeps WYSIWYG. **Golden-safe:**
-nothing in `packages/js` changes (`NFR-CS-03`).
+The `toSvg` exporters (`DESIGN-JAM-001` §4) are updated in lockstep so board export stays WYSIWYG
+(edges animate via SMIL; static-renders fine where SMIL is unsupported). **Golden-safe:** nothing in
+`packages/js` changes (`NFR-CS-03`).
 
 ## 6. Selection affordances (`engine/react.tsx` shape wrapper) — FR-CS-05
 
@@ -230,4 +232,4 @@ Tracked in `PLAN-STUDIO-001` §6. Design-level callouts:
 
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
-| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. |
+| 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. **P4 build:** §5 as-built — match `renderSVG` not the mockup: node glyph kept, region outer-slate / inner-purple-dashed, edge flow-dash (CSS keyframe + SMIL). |
