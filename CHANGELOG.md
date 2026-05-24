@@ -46,7 +46,7 @@ packages share a version number.
   (association); chains and `;` expand to one flow per segment. The block emits
   a fully-resolved sub-diagram, so the existing renderer draws it unchanged. New
   sample [`samples/order-flow.kymo`](samples/order-flow.kymo); grammar
-  specified in `KYMO_DSL.md` §6.9 (KYMO-DSL-001 v2.1).
+  specified in `docs/formats/kymo-dsl/06-grammar.md` §6.9 (KYMO-DSL-001 v2.1).
 
 ## [0.2.7] - 2026-05-23
 

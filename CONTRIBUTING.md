@@ -15,7 +15,7 @@ packages/
   js/                 # JS/TS package (npm: kymostudio) — independent engine
   vscode-extension/   # VS Code extension (bundles the JS engine)
 website/app/          # Browser .kymo playground (React + esbuild)
-docs/                 # KYMO_DSL.md (normative spec), formats/, specs/plans/features
+docs/                 # formats/kymo-dsl/ (normative DSL spec), formats/, specs/plans/features
 icons/                # File-backed icon assets, consumed at build time
 samples/              # Example .kymo / .bpmn sources and rendered output
 tools/info.py         # Version/tagline sync across the monorepo
@@ -55,8 +55,8 @@ Notes:
 If you change DSL parsing, the diagram model, layout, alignment, or BPMN
 import/export behavior in one language, mirror the change in the other so
 `pip install kymostudio` and `npm install kymostudio` stay consistent.
-[`docs/KYMO_DSL.md`](docs/KYMO_DSL.md) is the normative specification — update it when the
-language surface changes.
+[`docs/formats/kymo-dsl/`](docs/formats/kymo-dsl/README.md) (`KYMO-DSL-001`) is the normative
+specification — update it when the language surface changes.
 
 ## Commit & pull-request conventions
 

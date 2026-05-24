@@ -10,7 +10,7 @@ audience: Engineers researching process-notation standards and prior art
 review_cycle: On OMG BPMN major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - ../../KYMO_DSL.md
+  - ../../formats/kymo-dsl/README.md
   - ../../BEST_PRACTICE_DIAGRAMS.md
   - ../../softwares/d2.md
 authors:
@@ -50,7 +50,7 @@ upstream:
 | ISO Equivalent    | ISO/IEC 19510:2013                                            |
 | Version Reviewed  | 2.0.2 (OMG, 2014) / ISO/IEC 19510:2013                        |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`KYMO_DSL.md`](../../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../../BEST_PRACTICE_DIAGRAMS.md), [`d2.md`](../../softwares/d2.md) |
+| Related Documents | [`kymo-dsl/`](../../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../../BEST_PRACTICE_DIAGRAMS.md), [`d2.md`](../../softwares/d2.md) |
 
 This is a **research reference on BPMN 2.0**, the process-modelling notation standardised by the Object Management Group (OMG) and published by ISO as ISO/IEC 19510:2013. It is **descriptive, not normative** — where this note and the OMG specification disagree, the OMG specification is authoritative. No code or behaviour in this repository depends on BPMN; this document exists so the team can consult the standard's vocabulary and structure when discussing process and flow diagrams.
 
@@ -92,7 +92,7 @@ This document records the structure and vocabulary of **Business Process Model a
 ### 1.2 What this document is — and is not
 
 - **Is** — a descriptive summary of BPMN 2.0's element taxonomy, diagram types, execution semantics, and interchange format, with citations to the authoritative sources.
-- **Is not** — the BPMN specification itself (see [§2](#2-normative-references)); a tutorial on *drawing* BPMN diagrams; a claim that this repository's DSL renders BPMN. The DSL (see [`KYMO_DSL.md`](../../KYMO_DSL.md)) targets architecture diagrams and has no native gateway (diamond), task (rounded-rectangle), or swimlane primitive; it can only approximate BPMN shapes. Mapping BPMN onto the DSL is explicitly out of scope here.
+- **Is not** — the BPMN specification itself (see [§2](#2-normative-references)); a tutorial on *drawing* BPMN diagrams; a claim that this repository's DSL renders BPMN. The DSL (see [`kymo-dsl/`](../../formats/kymo-dsl/README.md)) targets architecture diagrams and has no native gateway (diamond), task (rounded-rectangle), or swimlane primitive; it can only approximate BPMN shapes. Mapping BPMN onto the DSL is explicitly out of scope here.
 
 ### 1.3 Sources and method
 

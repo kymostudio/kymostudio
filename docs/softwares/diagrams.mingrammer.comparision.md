@@ -13,7 +13,7 @@ related_documents:
   - diagrams.mingrammer.md
   - d2.md
   - figma.md
-  - ../KYMO_DSL.md
+  - ../formats/kymo-dsl/README.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -47,7 +47,7 @@ upstream:
 | Audience          | Engineers evolving the `kymo` DSL, layout, or render pipeline   |
 | Access Date       | 2026-05-18                                                     |
 | Parent Reference  | [`diagrams.mingrammer.md`](diagrams.mingrammer.md)             |
-| Related Documents | [`d2.md`](d2.md), [`figma.md`](figma.md), [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`d2.md`](d2.md), [`figma.md`](figma.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This document isolates the **prior-art comparison** between `mingrammer/diagrams` and kymo. The factual reference (overview, install, primitives, verbatim examples) lives in [`diagrams.mingrammer.md`](diagrams.mingrammer.md); read that first if you need ground truth on how `diagrams` actually behaves.
 
@@ -248,5 +248,5 @@ These follow directly from the comparison above and are not answered by current 
 
 - Comparison subject: `mingrammer/diagrams` as documented at <https://diagrams.mingrammer.com/> on 2026-05-18.
 - Factual basis for the `diagrams` column: [`diagrams.mingrammer.md`](diagrams.mingrammer.md).
-- Factual basis for the `kymo` column: this repository's [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]).
+- Factual basis for the `kymo` column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]).
 - Edits to this document should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.
