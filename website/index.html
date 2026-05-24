@@ -273,6 +273,32 @@
       .modal-pane-source { border-right: none; border-bottom: 1px solid var(--border); }
     }
 
+    /* ── Hot-repo banner ─────────────────────────────────────────── */
+    .hot-banner {
+      max-width: var(--max);
+      margin: 0 auto 40px;
+      padding: 0 var(--pad);
+    }
+    .hot-banner-inner {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      padding: 14px 20px;
+      background: linear-gradient(90deg, rgba(118,185,0,0.12) 0%, rgba(118,185,0,0.04) 100%);
+      border: 1px solid rgba(118,185,0,0.35);
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .hot-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px;
+      background: var(--accent); color: #0a0a0f;
+      border-radius: 20px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .hot-banner-text { color: var(--text); flex: 1; min-width: 200px; }
+    .hot-banner-text strong { color: var(--accent); }
+    .hot-date { color: var(--text-dim); font-size: 13px; font-family: var(--mono); white-space: nowrap; }
+
     /* ── Footer ──────────────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
@@ -318,6 +344,17 @@
     <img
       src="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/nvidia-aiq-animated.webp"
       alt="kymo demo — NVIDIA AIQ replica, animated WebP">
+  </div>
+</div>
+
+<div class="hot-banner">
+  <div class="hot-banner-inner">
+    <span class="hot-pill">Hot Repo This Week</span>
+    <span class="hot-banner-text">
+      <strong>kymostudio</strong> — diagram-as-code DSL with animated SVG, BPMN 2.0 round-trip,
+      and an in-browser canvas editor. New sample: diagram kymostudio using kymostudio itself.
+    </span>
+    <span class="hot-date">2026-05-24</span>
   </div>
 </div>
 
@@ -368,6 +405,93 @@
         </p>
         <div class="card-meta">
           <span>aws_1.kymo</span><span>·</span><span>1280 × 680</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="card"
+      data-title="kymostudio — System Architecture"
+      data-source="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/kymostudio.kymo"
+      data-preview="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/kymostudio.svg"
+      data-github="https://github.com/kymostudio/kymostudio/blob/main/samples/kymostudio.kymo">
+      <div class="card-preview" style="background:#0a0a0f; padding:20px;">
+        <svg viewBox="0 0 480 270" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+          <!-- Hot Repo preview — kymostudio arch skeleton -->
+          <rect width="480" height="270" rx="10" fill="#0f0f18"/>
+          <!-- Input region -->
+          <rect x="10" y="40" width="60" height="80" rx="5" fill="none" stroke="#76b900" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="40" y="36" font-size="8" fill="#76b900" text-anchor="middle" font-family="monospace">Input</text>
+          <rect x="18" y="50" width="44" height="18" rx="3" fill="#1a2a00" stroke="#76b900" stroke-width="1"/>
+          <text x="40" y="63" font-size="7" fill="#a8e032" text-anchor="middle" font-family="monospace">.kymo</text>
+          <rect x="18" y="76" width="44" height="18" rx="3" fill="#1a1500" stroke="#ea580c" stroke-width="1"/>
+          <text x="40" y="89" font-size="7" fill="#ea8032" text-anchor="middle" font-family="monospace">.bpmn</text>
+          <!-- Python engine -->
+          <rect x="90" y="20" width="175" height="50" rx="5" fill="none" stroke="#76b900" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="177" y="16" font-size="7" fill="#76b900" text-anchor="middle" font-family="monospace">Python · PyPI</text>
+          <rect x="96" y="28" width="36" height="14" rx="2" fill="#1a2a00" stroke="#76b900" stroke-width="0.8"/>
+          <text x="114" y="39" font-size="5.5" fill="#a8e032" text-anchor="middle" font-family="monospace">Parser</text>
+          <rect x="138" y="28" width="36" height="14" rx="2" fill="#1a2a00" stroke="#76b900" stroke-width="0.8"/>
+          <text x="156" y="39" font-size="5.5" fill="#a8e032" text-anchor="middle" font-family="monospace">Layout</text>
+          <rect x="180" y="28" width="36" height="14" rx="2" fill="#1a1500" stroke="#ea580c" stroke-width="0.8"/>
+          <text x="198" y="39" font-size="5.5" fill="#ea8032" text-anchor="middle" font-family="monospace">BPMN I/O</text>
+          <rect x="222" y="28" width="36" height="14" rx="2" fill="#1a2a00" stroke="#76b900" stroke-width="0.8"/>
+          <text x="240" y="39" font-size="5.5" fill="#a8e032" text-anchor="middle" font-family="monospace">SVG Render</text>
+          <!-- JS engine -->
+          <rect x="90" y="90" width="175" height="50" rx="5" fill="none" stroke="#4d72f3" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="177" y="86" font-size="7" fill="#4d72f3" text-anchor="middle" font-family="monospace">JS/TS · npm</text>
+          <rect x="96" y="98" width="36" height="14" rx="2" fill="#0a0a2a" stroke="#4d72f3" stroke-width="0.8"/>
+          <text x="114" y="109" font-size="5.5" fill="#8899ff" text-anchor="middle" font-family="monospace">Parser</text>
+          <rect x="138" y="98" width="36" height="14" rx="2" fill="#0a0a2a" stroke="#4d72f3" stroke-width="0.8"/>
+          <text x="156" y="109" font-size="5.5" fill="#8899ff" text-anchor="middle" font-family="monospace">Layout</text>
+          <rect x="180" y="98" width="36" height="14" rx="2" fill="#1a1500" stroke="#ea580c" stroke-width="0.8"/>
+          <text x="198" y="109" font-size="5.5" fill="#ea8032" text-anchor="middle" font-family="monospace">BPMN I/O</text>
+          <rect x="222" y="98" width="36" height="14" rx="2" fill="#0a0a2a" stroke="#4d72f3" stroke-width="0.8"/>
+          <text x="240" y="109" font-size="5.5" fill="#8899ff" text-anchor="middle" font-family="monospace">SVG Render</text>
+          <!-- Tooling -->
+          <rect x="90" y="160" width="175" height="50" rx="5" fill="none" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="177" y="156" font-size="7" fill="#ea580c" text-anchor="middle" font-family="monospace">Tooling</text>
+          <rect x="96" y="168" width="36" height="14" rx="2" fill="#1a1000" stroke="#ea580c" stroke-width="0.8"/>
+          <text x="114" y="179" font-size="5.5" fill="#ea8032" text-anchor="middle" font-family="monospace">CLI</text>
+          <rect x="138" y="168" width="36" height="14" rx="2" fill="#1a1000" stroke="#ea580c" stroke-width="0.8"/>
+          <text x="156" y="179" font-size="5.5" fill="#ea8032" text-anchor="middle" font-family="monospace">VS Code</text>
+          <rect x="180" y="168" width="36" height="14" rx="2" fill="#1a1000" stroke="#ea580c" stroke-width="0.8"/>
+          <text x="198" y="179" font-size="5.5" fill="#ea8032" text-anchor="middle" font-family="monospace">Playground</text>
+          <rect x="222" y="168" width="36" height="14" rx="2" fill="#1a1000" stroke="#ea580c" stroke-width="0.8"/>
+          <text x="240" y="179" font-size="5.5" fill="#ea8032" text-anchor="middle" font-family="monospace">Canvas</text>
+          <!-- Outputs -->
+          <rect x="285" y="40" width="60" height="110" rx="5" fill="none" stroke="#76b900" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="315" y="36" font-size="8" fill="#76b900" text-anchor="middle" font-family="monospace">Outputs</text>
+          <rect x="293" y="50" width="44" height="14" rx="2" fill="#1a2a00" stroke="#76b900" stroke-width="1"/>
+          <text x="315" y="61" font-size="6" fill="#a8e032" text-anchor="middle" font-family="monospace">SVG</text>
+          <rect x="293" y="72" width="44" height="14" rx="2" fill="#1a2a00" stroke="#76b900" stroke-width="1"/>
+          <text x="315" y="83" font-size="6" fill="#a8e032" text-anchor="middle" font-family="monospace">Animated SVG</text>
+          <rect x="293" y="94" width="44" height="14" rx="2" fill="#1a1500" stroke="#ea580c" stroke-width="1"/>
+          <text x="315" y="105" font-size="6" fill="#ea8032" text-anchor="middle" font-family="monospace">WebP</text>
+          <rect x="293" y="116" width="44" height="14" rx="2" fill="#1a1500" stroke="#ea580c" stroke-width="1"/>
+          <text x="315" y="127" font-size="6" fill="#ea8032" text-anchor="middle" font-family="monospace">BPMN 2.0</text>
+          <!-- Arrows -->
+          <line x1="70" y1="59" x2="90" y2="35" stroke="#76b900" stroke-width="1" opacity="0.6"/>
+          <line x1="70" y1="85" x2="90" y2="105" stroke="#ea580c" stroke-width="1" opacity="0.6"/>
+          <line x1="265" y1="35" x2="285" y2="57" stroke="#76b900" stroke-width="1" opacity="0.6"/>
+          <line x1="265" y1="105" x2="285" y2="105" stroke="#4d72f3" stroke-width="1" opacity="0.5" stroke-dasharray="3,2"/>
+          <line x1="265" y1="175" x2="285" y2="120" stroke="#ea580c" stroke-width="1" opacity="0.5" stroke-dasharray="3,2"/>
+          <!-- Hot badge -->
+          <rect x="340" y="8" width="130" height="22" rx="11" fill="#76b900"/>
+          <text x="405" y="23" font-size="9" fill="#0a0a0f" text-anchor="middle" font-family="monospace" font-weight="bold">🔥 Hot Repo · 2026-05-24</text>
+          <!-- Title -->
+          <text x="240" y="250" font-size="10" fill="#8a8a98" text-anchor="middle" font-family="monospace">kymostudio — diagram-as-code, described with itself</text>
+        </svg>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">kymostudio — System Architecture</h3>
+        <p class="card-desc">
+          Meta-diagram: the kymostudio DSL engine described using its own
+          <code>.kymo</code> language — Python + JS engines, BPMN I/O,
+          CLI, VS Code extension, and canvas editor.
+          <strong style="color:var(--accent)">Hot Repo · 2026-05-24.</strong>
+        </p>
+        <div class="card-meta">
+          <span>kymostudio.kymo</span><span>·</span><span>1280 × 740</span>
         </div>
       </div>
     </article>

@@ -9,6 +9,18 @@ packages share a version number.
 
 ## [Unreleased]
 
+### Added
+
+- **`samples/kymostudio.kymo`** — meta-diagram: the kymostudio system
+  architecture described using its own DSL. Shows the Python + JS engines,
+  BPMN I/O modules, CLI, VS Code extension, playground, and canvas editor as
+  interconnected regions with annotated data-flow edges. Featured as the
+  website's "Hot Repo · 2026-05-24" sample card.
+- **Hot Repo banner** on the website (`website/index.html`) linking to the
+  new meta-diagram and summarising this week's releases (v0.2.6 – v0.3.0).
+- **README "Hot Repo" section** with a release table for the week of
+  2026-05-24 and a pointer to the new sample.
+
 ## [0.3.0] - 2026-05-24
 
 ### Added

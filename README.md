@@ -14,6 +14,20 @@
 
 ![NVIDIA AIQ replica — animated](samples/nvidia-aiq-animated.webp)
 
+## Hot Repo — Week of 2026-05-24
+
+kymostudio was the **diagram-as-code hot repo this week**. Here is what landed:
+
+| Date | Release | Highlight |
+|---|---|---|
+| 2026-05-24 | **v0.3.0** | BPMN 2.0 export — full round-trip `.bpmn → kymo → .bpmn` |
+| 2026-05-23 | **v0.2.8** | `bpmn { }` DSL block — author BPMN processes directly in `.kymo` |
+| 2026-05-23 | **v0.2.7** | Extension renamed `.diagram → .kymo`; tagline refreshed |
+| 2026-05-22 | **v0.2.6** | VS Code extension on Marketplace; website playground live |
+
+New sample this week: [`samples/kymostudio.kymo`](samples/kymostudio.kymo) — the engine
+described using its own DSL (diagram of kymostudio, in kymostudio).
+
 ## Install
 
 ```bash

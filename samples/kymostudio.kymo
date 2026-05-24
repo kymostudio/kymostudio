@@ -1,0 +1,98 @@
+# kymostudio system architecture — the DSL engine itself.
+# Hot Repo of the Week · 2026-05-24
+# This diagram describes kymostudio using kymostudio's own DSL.
+
+title:    "kymostudio — Diagram-as-Code Engine"
+subtitle: "Hot Repo · Week of 2026-05-24 · github.com/kymostudio/kymostudio"
+
+canvas: 1280 x 740
+
+# ── Input sources ──────────────────────────────────────────────────────
+sources outer "Input" padding (28, 48) padding-bottom 28 {
+  kymo_src  box/folder/green   ".kymo"   "DSL source file"
+  bpmn_src  box/folder/orange  ".bpmn"   "BPMN 2.0 XML"
+}
+
+# ── Python engine (PyPI) ──────────────────────────────────────────────
+py_pkg outer "Python Package  ·  PyPI" padding (32, 52) padding-bottom 28 {
+  py_parser  box/gear/green     "DSL Parser"    "line-oriented"
+  py_layout  box/checklist/green "Auto-Layout"  "Sugiyama LR"
+  py_bpmn    box/files/orange   "BPMN I/O"     "import + export"
+  py_svg     box/zap/green      "SVG Renderer"  "to_svg"
+}
+
+# ── JS / TS engine (npm) ──────────────────────────────────────────────
+js_pkg outer "JS / TS Package  ·  npm" padding (32, 52) padding-bottom 28 {
+  js_parser  box/gear/green     "DSL Parser"    "zero-dep TS"
+  js_layout  box/checklist/green "Auto-Layout"  "Sugiyama LR"
+  js_bpmn    box/files/orange   "BPMN I/O"     "parseBpmn · toBpmn"
+  js_svg     box/zap/green      "SVG Renderer"  "renderSVG"
+}
+
+# ── Tooling ────────────────────────────────────────────────────────────
+tooling outer "Tooling" padding (32, 52) padding-bottom 28 {
+  cli        box/send/orange    "kymo CLI"      "pip / uv install"
+  vscode     box/archive/orange "VS Code Ext"   "live SVG preview"
+  web        box/cloud/orange   "Playground"    "kymostudio.github.io"
+  canvas     hex/hex-agent/blue "Canvas Editor" "tldraw-style · in-browser"
+}
+
+# ── Output artefacts ──────────────────────────────────────────────────
+outputs outer "Outputs" padding (28, 48) padding-bottom 28 {
+  out_svg   box/folder/green   "SVG"           "static diagram"
+  out_anim  box/folder/green   "Animated SVG"  "--animate flag"
+  out_webp  box/folder/orange  "Animated WebP" "headless-free export"
+  out_bpmn  box/folder/orange  "BPMN 2.0 XML"  "--bpmn round-trip"
+}
+
+# ── Layouts ────────────────────────────────────────────────────────────
+src_col   vertical   pos (56, 230)  gap 64 { kymo_src bpmn_src }
+
+py_row    horizontal pos (220, 250) gap 56 { py_parser py_layout py_bpmn py_svg }
+js_row    horizontal pos (220, 430) gap 56 { js_parser js_layout js_bpmn js_svg }
+tool_row  horizontal pos (220, 610) gap 56 { cli vscode web canvas }
+
+out_col   vertical   pos (1100, 230) gap 56 { out_svg out_anim out_webp out_bpmn }
+
+# ── Developer (external, anchored above kymo_src) ─────────────────────
+dev  circle/user/blue  "Developer"  "writes · imports"
+
+external dev above kymo_src gap 40
+
+# ── Edges ─────────────────────────────────────────────────────────────
+# Developer → inputs
+dev --> kymo_src  : "writes"   { src=bottom, dst=top, small }
+
+# .kymo → both parsers
+kymo_src --> py_parser  { src=right, dst=left }
+kymo_src --> js_parser  { src=right, dst=left }
+
+# .bpmn → BPMN I/O modules
+bpmn_src --> py_bpmn    { src=right, dst=left }
+bpmn_src --> js_bpmn    { src=right, dst=left }
+
+# Python pipeline
+py_parser --> py_layout
+py_layout --> py_svg
+py_bpmn   --> py_svg
+
+# JS pipeline
+js_parser --> js_layout
+js_layout --> js_svg
+js_bpmn   --> js_svg
+
+# Renderers → outputs
+py_svg --> out_svg   { src=right, dst=left }
+py_svg --> out_anim  { src=right, dst=left }
+py_svg --> out_webp  { src=right, dst=left, dashed }
+js_svg --> out_svg   { src=right, dst=left, dashed }
+
+# BPMN export (round-trip)
+py_bpmn --> out_bpmn  { src=right, via=(1070,350), label_pos=(900,344), small, dashed }
+js_bpmn --> out_bpmn  { src=right, via=(1070,530), label_pos=(900,524), small, dashed }
+
+# Tooling wires (dashed = consumes the engine internally)
+cli    --> py_svg   { src=top, dst=bottom, dashed }
+vscode --> js_svg   { src=top, dst=bottom, dashed }
+web    --> js_svg   { src=top, dst=bottom, dashed }
+canvas --> js_svg   { src=top, dst=bottom, dashed }
