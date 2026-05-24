@@ -1,7 +1,7 @@
 ---
 title: BPMN 2.0.2 — Normative Reference (Index)
 document_id: BPMN-NREF-001
-version: "1.3"
+version: "1.4"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -59,7 +59,7 @@ upstream:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | BPMN-NREF-001                                                 |
-| Version           | 1.3                                                           |
+| Version           | 1.4                                                           |
 | Issue Date        | 2026-05-24                                                    |
 | Status            | Released                                                      |
 | Classification    | Internal                                                     |
@@ -83,12 +83,14 @@ OMG clause.
 > **Authoritative source.** Object Management Group. *Business Process Model and Notation
 > (BPMN), Version 2.0.2.* OMG document `formal/2013-12-09`, December 2013. PDF:
 > <https://www.omg.org/spec/BPMN/2.0.2/PDF>. Published as **ISO/IEC 19510:2013**. The
-> machine-consumable schemas (`BPMN20.xsd`, `Semantic.xsd`, `BPMNDI.xsd`, `DI.xsd`,
-> `DC.xsd`) are normative parts of the specification.
+> machine-consumable files (XSD, XMI, and XSLT — the main schema being `XSD/BPMN20.xsd`),
+> published in OMG document `dtc/2010-05-04`, are normative parts of the specification
+> (see Clause 15, `BPMN-NREF-EXCHANGE-001`).
 >
-> **Where this reference and the OMG specification disagree, the OMG specification is
-> authoritative.** These files **summarise** the standard and link to it — they do **not**
-> reproduce its text. Read the linked clauses in the official PDF for the normative wording.
+> These files state the **normative wording** for the `.bpmn` interchange format adopted by
+> this project, following the OMG standard; they do **not** reproduce the OMG specification's
+> copyrighted text. The official OMG PDF (above) is the **upstream source of record** — **where
+> this reference and the OMG specification disagree, the OMG specification is authoritative.**
 
 ## Contents — the 15 clauses
 
@@ -135,6 +137,7 @@ OMG clause.
 | 1.1     | 2026-05-24 | Vũ Anh | Restructured the set as a **1:1 mirror of the OMG specification** — one file per clause (`01`–`15`) and per annex (`annex-a`/`-b`/`-c`). |
 | 1.2     | 2026-05-24 | Vũ Anh | Removed implementation-specific notes from the clause/annex files (the set is now a pure OMG-spec reference); the element mapping stays in `kymo-mapping.md` as a companion. |
 | 1.3     | 2026-05-24 | Vũ Anh | Added an explicit "Authoritative text" pointer to the official OMG PDF in every clause/annex file; the set summarises and links to the standard rather than reproducing it. |
+| 1.4     | 2026-05-24 | Vũ Anh | **Synced the whole set against the OMG BPMN 2.0.2 PDF** (read clause-by-clause): corrected sub-clause numbers/titles, enriched every clause/annex with verified element/attribute/marker/semantic detail, and added inline **printed page numbers + figure/table citations** throughout (all 15 clause files + 3 annexes bumped to 1.3). Fixed two spec-fact errors found during the sync — §15.2's machine-readable-file list (now the actual `dtc/2010-05-04` layout, here and in `BPMN-NREF-EXCHANGE-001`) and Annex A's change list (now the spec's own notational/technical changes). `kymo-mapping.md` (`BPMN-MAP-001`) cross-checked against the verified spec facts — no changes required. Reframed each clause/annex file's lead disclaimer from a "non-verbatim summary" that deferred to the PDF for the normative wording, to **the normative wording** for the `.bpmn` format adopted by this project (still not reproducing OMG's copyrighted text; OMG remains the upstream source of record). |
 
 ## Annex B — Document Control
 
