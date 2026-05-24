@@ -58,6 +58,12 @@ export interface HistoryEntry {
   removed: Shape[];
 }
 
+/** An undo-stack step: a recorded change + whether a `mark()` sealed it as a
+ *  gesture boundary (so the next change won't coalesce into it). */
+interface UndoEntry extends HistoryEntry {
+  sealed: boolean;
+}
+
 export type StoreListener = (entry: HistoryEntry) => void;
 
 interface Transaction {
@@ -72,6 +78,8 @@ export class Store {
   private records = new Map<ShapeId, Shape>();
   private listeners: { cb: StoreListener; opts: StoreListenerOpts }[] = [];
   private history: HistoryEntry[] = [];
+  private undos: UndoEntry[] = [];
+  private redos: UndoEntry[] = [];
   private seq = 0;
   private tx: Transaction | null = null;
 
@@ -88,10 +96,18 @@ export class Store {
     );
   }
 
-  /** The recorded change log (entries with `history:"record"`). The *consuming*
-   *  undo/redo stack is a later feature (canvas-jam `FR-J-02`). */
+  /** The raw recorded change log (every `history:"record"` flush, append-only).
+   *  The undo/redo *stacks* (`undo()`/`redo()`) are derived separately. */
   getHistory(): HistoryEntry[] {
     return this.history;
+  }
+
+  get canUndo(): boolean {
+    return this.undos.length > 0;
+  }
+
+  get canRedo(): boolean {
+    return this.redos.length > 0;
   }
 
   // --- mutations (each opens an implicit `source:"user"` transaction unless
@@ -150,6 +166,33 @@ export class Store {
       const i = this.listeners.indexOf(entry);
       if (i >= 0) this.listeners.splice(i, 1);
     };
+  }
+
+  // --- undo / redo (FR-J-02) ---
+
+  /** Seal the top undo step as a gesture boundary — the next change starts a
+   *  fresh step instead of coalescing into it. (Called on a drag's pointer-up.) */
+  mark(): void {
+    const top = this.undos[this.undos.length - 1];
+    if (top) top.sealed = true;
+  }
+
+  /** Revert the most recent recordable change. Re-applied as `source:"user"` so a
+   *  `.kymo` writeback listener round-trips the text (`RK-EN-02`), but
+   *  `history:"ignore"` so the revert isn't itself re-recorded; the step moves to
+   *  the redo stack. */
+  undo(): void {
+    const entry = this.undos.pop();
+    if (!entry) return;
+    this.run(() => this.applyInverse(entry), { source: "user", history: "ignore" });
+    this.redos.push({ ...entry, sealed: true });
+  }
+
+  redo(): void {
+    const entry = this.redos.pop();
+    if (!entry) return;
+    this.run(() => this.applyForward(entry), { source: "user", history: "ignore" });
+    this.undos.push({ ...entry, sealed: true });
   }
 
   // --- internals ---
@@ -229,7 +272,10 @@ export class Store {
       updated: [...tx.updated.values()],
       removed: [...tx.removed.values()],
     };
-    if (tx.history !== "ignore") this.history.push(entry);
+    if (tx.history !== "ignore") {
+      this.history.push(entry);
+      this.pushUndo(entry);
+    }
     for (const { cb, opts } of [...this.listeners]) {
       if (opts.scope !== undefined && opts.scope !== entry.scope) continue;
       if (opts.source !== undefined && opts.source !== entry.source) continue;
@@ -237,11 +283,59 @@ export class Store {
     }
   }
 
+  /** Record a recordable change on the undo stack. A contiguous, same-source,
+   *  *update-only*, same-target run coalesces into one step (so a drag's many
+   *  per-move writes are a single undo) until a `mark()` seals it. Any new
+   *  recordable edit invalidates the redo stack. */
+  private pushUndo(entry: HistoryEntry): void {
+    this.redos = [];
+    const top = this.undos[this.undos.length - 1];
+    if (
+      top &&
+      !top.sealed &&
+      top.source === entry.source &&
+      isUpdateOnly(top) &&
+      isUpdateOnly(entry) &&
+      sameTargets(top.updated, entry.updated)
+    ) {
+      const byId = new Map(top.updated.map((u) => [u.to.id, u])); // keep earliest `from`, take latest `to`
+      for (const u of entry.updated) {
+        const m = byId.get(u.to.id);
+        if (m) m.to = u.to;
+        else top.updated.push(u);
+      }
+    } else {
+      this.undos.push({ ...entry, sealed: false });
+    }
+  }
+
+  /** Reverse a recorded change: drop adds, restore updates to `from`, re-add removes. */
+  private applyInverse(e: HistoryEntry): void {
+    for (const s of e.added) this.applyRemove(s.id);
+    for (const u of e.updated) this.applyPut(u.from);
+    for (const s of e.removed) this.applyPut(s);
+  }
+
+  /** Re-apply a recorded change: re-add adds, set updates to `to`, drop removes. */
+  private applyForward(e: HistoryEntry): void {
+    for (const s of e.added) this.applyPut(s);
+    for (const u of e.updated) this.applyPut(u.to);
+    for (const s of e.removed) this.applyRemove(s.id);
+  }
+
   /** Monotonic, fixed-width base-36 key → lexicographically sortable. */
   private nextIndex(): string {
     return (this.seq++).toString(36).padStart(10, "0");
   }
 }
+
+const isUpdateOnly = (e: HistoryEntry): boolean => e.added.length === 0 && e.removed.length === 0;
+
+const sameTargets = (a: { to: Shape }[], b: { to: Shape }[]): boolean => {
+  if (a.length !== b.length) return false;
+  const ids = new Set(a.map((u) => u.to.id));
+  return b.every((u) => ids.has(u.to.id));
+};
 
 function newTx(source: ChangeSource, history: "record" | "ignore"): Transaction {
   return { source, history, added: new Map(), updated: new Map(), removed: new Map() };

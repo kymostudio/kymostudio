@@ -114,3 +114,25 @@ test("camera ops: panBy shifts by d/z; zoomToPoint keeps the cursor's page point
   editor.zoomToPoint(1000, screen); // clamp
   assert.equal(editor.getCamera().z, 8, "zoom clamped to MAX_ZOOM");
 });
+
+test("TC-J-02: editor undo/redo facade restores x/y and re-applies", () => {
+  const editor = new Editor(new Store());
+  const a = mk("a");
+  editor.createShape(a);
+  editor.updateShape({ id: a.id, type: "kymo-node", x: 40, y: 12 });
+  assert.equal(editor.canUndo, true);
+
+  editor.undo();
+  assert.equal(editor.getShape(a.id).x, 0, "undo restored x");
+  assert.equal(editor.getShape(a.id).y, 0, "undo restored y");
+
+  editor.redo();
+  assert.equal(editor.getShape(a.id).x, 40, "redo re-applied x");
+
+  // mark() boundary: two separate updates are two undo steps.
+  editor.updateShape({ id: a.id, type: "kymo-node", x: 41 });
+  editor.mark();
+  editor.updateShape({ id: a.id, type: "kymo-node", x: 99 });
+  editor.undo();
+  assert.equal(editor.getShape(a.id).x, 41, "mark() split the two updates into separate steps");
+});

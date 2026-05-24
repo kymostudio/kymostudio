@@ -152,6 +152,29 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch }: Eng
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor]);
 
+  // Mount once: keyboard undo/redo (`FR-J-02`). Document-level so it works while
+  // the canvas has focus; skipped when a text field is focused so the `.kymo`
+  // <textarea> keeps its native Cmd+Z (the two undo domains stay separate). The
+  // undo write is `source:"user"` → the writeback listener above round-trips the text.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const t = document.activeElement as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (!(e.metaKey || e.ctrlKey)) return;
+      const k = e.key.toLowerCase();
+      if (k === "z" && !e.shiftKey) {
+        e.preventDefault();
+        editor.undo();
+      } else if (k === "y" || (k === "z" && e.shiftKey)) {
+        e.preventDefault();
+        editor.redo();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
+
   // Re-sync whenever the diagram changes (incl. the initial mount).
   useEffect(() => {
     sync(editor);
