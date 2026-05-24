@@ -1,8 +1,8 @@
 ---
 title: Diagram DSL — Language Specification
 document_id: DSL-LANG-001
-version: "2.1"
-issue_date: 2026-05-23
+version: "2.2"
+issue_date: 2026-05-24
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,7 +10,7 @@ audience: Engineers authoring or parsing `.kymo` files
 review_cycle: On grammar change, or annually (whichever first)
 supersedes: "1.0"
 related_documents:
-  - BEST_PRACTICE_DIAGRAMS.md
+  - BPD-DGM-001
   - DESIGN-BPMN-DSL-001    # BPMN-in-DSL design (bpmn { } block + layout)
   - dsl.py
   - model.py
@@ -37,15 +37,15 @@ iso_compliance:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | DSL-LANG-001                                                   |
-| Version           | 2.1                                                            |
-| Issue Date        | 2026-05-23                                                     |
+| Version           | 2.2                                                            |
+| Issue Date        | 2026-05-24                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
 | Owner             | `diagrams/` project                                            |
 | Audience          | Engineers authoring or parsing `.kymo` files                |
 | Review Cycle      | On grammar change, or annually (whichever first)               |
 | Supersedes        | v1.0                                                           |
-| Related Documents | [`BEST_PRACTICE_DIAGRAMS.md`](./BEST_PRACTICE_DIAGRAMS.md), `DESIGN-BPMN-DSL-001`, [`dsl.py`](../src/dsl.py), [`model.py`](../src/model.py) |
+| Related Documents | `BPD-DGM-001`, `DESIGN-BPMN-DSL-001`, [`dsl.py`](../packages/python/src/kymo/dsl.py), [`model.py`](../packages/python/src/kymo/model.py) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar productions follow ISO/IEC 14977:1996 (Extended Backus–Naur Form).
 
@@ -79,18 +79,18 @@ This document specifies the **Diagram DSL** — a textual surface language for d
 This specification applies to:
 
 - Source files with extension `.kymo` in this repository
-- The reference parser implementation [`dsl.py`](../src/dsl.py)
+- The reference parser implementation [`dsl.py`](../packages/python/src/kymo/dsl.py)
 - Any future tooling (linters, formatters, IDE plug-ins) operating on `.kymo` files
 
 It does **not** specify:
 
-- The SVG renderer (see [`to_svg.py`](../src/to_svg.py) and BEST_PRACTICE_DIAGRAMS.md)
-- The build/dispatch system (see [`cli.py`](../src/cli.py))
-- The graphical conventions for diagram aesthetics (see BEST_PRACTICE_DIAGRAMS.md)
+- The SVG renderer (see [`to_svg.py`](../packages/python/src/kymo/to_svg.py) and `BPD-DGM-001`)
+- The build/dispatch system (see [`cli.py`](../packages/python/src/kymo/cli.py))
+- The graphical conventions for diagram aesthetics (see `BPD-DGM-001`)
 
 ### 1.3 Reference Implementation
 
-[`dsl.py`](../src/dsl.py) is the normative reference implementation. Where this document and the reference implementation disagree, the implementation is authoritative for behaviour; this document SHALL be updated to match.
+[`dsl.py`](../packages/python/src/kymo/dsl.py) is the normative reference implementation. Where this document and the reference implementation disagree, the implementation is authoritative for behaviour; this document SHALL be updated to match.
 
 ---
 
@@ -103,7 +103,7 @@ The following documents are indispensable for the application of this specificat
 | ISO/IEC 14977:1996              | Extended Backus–Naur Form (EBNF) notation         |
 | ISO/IEC/IEEE 15289:2019         | Information item content                          |
 | ISO 8601:2019                   | Date and time format (YYYY-MM-DD)                 |
-| BEST_PRACTICE_DIAGRAMS.md §5.5  | Diagram DSL design rationale and worked examples  |
+| BPD-DGM-001 §5.5                | Diagram DSL design rationale and worked examples  |
 | `model.py`                      | Concrete data model produced by parsing           |
 
 ---
@@ -201,11 +201,11 @@ EBNF per ISO/IEC 14977:1996. Italicised terms in examples are non-terminals; lit
 
 ```
 file             = { file_line } ;
-file_line        = directive | container | leaf | edge | comment | blank ;
+file_line        = directive | container | leaf | edge | layout_tree | comment | blank ;
 directive        = canvas | title | subtitle | external ;
 ```
 
-There is no `component` or `region` or `layout` keyword. Containers and leaves are distinguished by line shape (see clauses 6.4–6.5).
+There is no `component` or `region` keyword. Containers and leaves are distinguished by line shape (see clauses 6.4–6.5). `layout` is a keyword only as the opener of an anonymous layout-tree block (`layout { … }`, clause 6.10), not as a container kind.
 
 ### 6.3 Metadata Directives
 
@@ -216,7 +216,7 @@ subtitle         = "subtitle" , ":" , STRING ;
 external         = "external" , id , "above" , id , [ "gap" , INT ] ;
 ```
 
-`canvas:` is OPTIONAL. When absent, dimensions are auto-computed (see clause 7.4). `title:` and `subtitle:` are OPTIONAL; each MAY appear at most once per file. `external` reserves vertical space above a target leaf (see `src/layout.py`).
+`canvas:` is OPTIONAL. When absent, dimensions are auto-computed (see clause 7.4). `title:` and `subtitle:` are OPTIONAL; each MAY appear at most once per file. `external` reserves vertical space above a target leaf (see `packages/python/src/kymo/layout.py`).
 
 ### 6.4 Leaf Components
 
@@ -234,6 +234,8 @@ accent           = "green" | "orange" | "blue" | "red" ;
 ```
 
 A line is a leaf if its second whitespace-separated token contains a `/` (the `shape/icon/accent` triple). When `@` is omitted, `pos` defaults to `(0, 0)` and the leaf is expected to be positioned by a layout container that references its ID.
+
+**Recognised vs enforced.** The `shape` and `accent` values listed above are the set the renderer recognises. The parser itself is permissive: it accepts any `shape` matching `[A-Za-z0-9_-]+` and any `accent` matching `[A-Za-z0-9_]+`, deferring validation to render time (an unknown value falls back to a default glyph / colour). Authors SHOULD use a recognised value.
 
 Leaves MAY appear at file scope OR inside a region container body (see clause 6.5.1). They MUST NOT appear inside a layout container body — layout bodies accept bare-id references only.
 
@@ -289,10 +291,13 @@ region_opt       = "padding"        , "(" , INT , "," , INT , ")"
                  | "stroke"         , hexcolour
                  | "label-position" , ( "above" | "inside" )
                  | "label-anchor"   , ( "start" | "middle" | "end" )
-                 | "icon"           , identifier_with_hyphens ;
+                 | "icon"           , identifier_with_hyphens
+                 | ( "horizontal" | "vertical" ) ;
 ```
 
 Region option order is insignificant. Each option SHALL appear at most once per region.
+
+A `horizontal` / `vertical` option turns the region into a Figma-style **auto-layout frame** (sets `Region.layout`): its members are stacked along the named axis, exactly as a layout container (clause 6.5) does, while the region keeps its `outer` / `inner` border and label. Such a region's body is then governed by the layout-body rules (bare-id references only — `row` and inline leaves are rejected).
 
 Default values:
 
@@ -313,11 +318,12 @@ A conforming parser MUST discriminate body lines in this order (first match wins
 1. `}` alone (possibly with whitespace) — closes the current container.
 2. `row` followed by zero or more ids — grid row (region body only; rejected in layout body or at file scope).
 3. Exactly `bpmn {` (first token `bpmn`) — opens a BPMN process block (file scope only; see §6.9).
-4. Line ending with `{` — container opener; kind selects region vs layout.
-5. Match against the arrow forms `-->` or `==>` — edge (file scope only).
-6. Second token contains `/` — leaf component.
-7. All tokens match the `id` production — bare-id reference list (container body only).
-8. Otherwise — syntax error.
+4. A line matching `layout { … }` (first token `layout`, opening and closing its braces on the one line) — anonymous layout tree (file scope only; see §6.10).
+5. Line ending with `{` — container opener; kind selects region vs layout.
+6. Match against the arrow forms `-->` or `==>` — edge (file scope only).
+7. Second token contains `/` — leaf component.
+8. All tokens match the `id` production — bare-id reference list (container body only).
+9. Otherwise — syntax error.
 
 ### 6.7 Edges
 
@@ -338,7 +344,8 @@ edge_opt         = "src"          , "=" , anchor_spec
                  | "route"        , "=" , ( "auto" | "over" | "under" | "curve" )
                  | "small"
                  | "dashed"
-                 | "curve" | "over" | "under"      (* route shorthand *)
+                 | "shared"                         (* keep src at the centre port; opt out of fan-out stagger *)
+                 | "curve" | "over" | "under" | "straight" | "elbow"   (* route shorthand; "elbow" = orthogonal auto, the default *)
                  ;
 anchor_spec      = side_or_centre , [ "(" , INT , "," , INT , ")" ] ;
 side_or_centre   = side | "center" ;
@@ -358,12 +365,12 @@ row
 top       right       bottom      left       center
 start     middle      end
 src       dst         via         route
-label_offset  label_pos  label_at  small  dashed
-auto      over        under       curve
-bpmn
+label_offset  label_pos  label_at  small  dashed  shared
+auto      over        under       curve       straight  elbow
+bpmn      layout
 ```
 
-These tokens SHALL NOT be used as user-defined leaf, container, or icon identifiers. Removed in v2.0: `component`, `region`, `layout` (no longer keywords — the parser distinguishes by line shape). Within a `bpmn { }` body, the node-kind keywords (`start`, `end`, `end!`, `task`, `xor`, `and`, `or`, `event`, `subprocess`, `note`, `data`, `store`) and the flow arrows (`->`, `~>`, `..>`) are reserved (see §6.9).
+These tokens SHALL NOT be used as user-defined leaf, container, or icon identifiers. Removed in v2.0: `component`, `region` (no longer keywords — the parser distinguishes by line shape). `layout` remains reserved **only** as the opener of an anonymous layout-tree block (`layout { … }`, clause 6.10), not as a container kind. Within a `bpmn { }` body, the node-kind keywords (`start`, `end`, `end!`, `task`, `xor`, `and`, `or`, `event`, `subprocess`, `note`, `data`, `store`) and the flow arrows (`->`, `~>`, `..>`) are reserved (see §6.9).
 
 ### 6.9 BPMN Process Blocks
 
@@ -414,6 +421,39 @@ otherwise a **connection**. Semantics:
   (FEAT-BPMN-DSL-001 FR-11).
 
 See §10.7 for an example and `samples/order-flow.kymo` for a complete process.
+
+### 6.10 Layout Tree
+
+An anonymous `layout { … }` block declares a Figma-style auto-layout **tree** on
+a single line — a nestable horizontal / vertical grouping of leaf ids. It is the
+positionless counterpart to a named layout container (clause 6.5), and is **file
+scope only**.
+
+```
+layout_tree = "layout" , "{" , layout_expr , "}" ;
+layout_expr = layout_atom , { ( "|" | "," ) , layout_atom } ;
+layout_atom = id | "{" , layout_expr , "}" ;
+```
+
+- `|` groups its operands **horizontally** (left → right); `,` groups them
+  **vertically** (top → bottom).
+- The two separators MUST NOT be mixed at the same nesting level; a conforming
+  parser rejects `a | b , c` with a diagnostic. Use braces to nest a column
+  inside a row (or vice versa): `a | { b , c }`.
+- The construct is a single logical line — it opens and closes its `{ … }` on
+  that one line, unlike the multi-line containers of clause 6.5.
+
+The referenced ids MUST be defined elsewhere in the file (as leaves or region
+members). Positions — and crossing-minimised child ordering — are computed at
+resolve time by `layout.apply_layout_tree`; the block draws no border or label.
+
+```text
+header box/files/orange "Header" ""
+a      box/files/orange "A"      ""
+b      box/files/orange "B"      ""
+
+layout { header , { a | b } }   # Header on top; A and B side-by-side below it.
+```
 
 ---
 
@@ -549,7 +589,7 @@ A conforming parser MAY:
 
 ### 9.3 Conforming Renderer
 
-Renderer conformance is outside the scope of this specification. See `to_svg.py` and BEST_PRACTICE_DIAGRAMS.md.
+Renderer conformance is outside the scope of this specification. See `to_svg.py` and `BPD-DGM-001`.
 
 ---
 
@@ -654,6 +694,7 @@ For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kym
 | 1.0     | 2026-05-18 | Vũ Anh      | Initial specification. |
 | 2.0     | 2026-05-18 | Vũ Anh      | **Breaking grammar change.** Removed `component`, `region`, `layout` keywords — the parser now disambiguates by line shape (clause 6.6). Containers nest; a region body may hold inline leaves, bare-id references, and nested containers; an outer region's `contains` is flattened from nested regions (clause 7.3.1). Added `icon` region option (was implementation-only). Reserved tokens updated (clause 6.8). |
 | 2.1     | 2026-05-23 | Vũ Anh      | Added the `bpmn { }` process-block grammar (clause 6.9) — node kinds, flow arrows (`->`/`~>`/`..>`), chains, `type=`, `@` pins — with automatic left-to-right (Sugiyama) layout. Design/algorithm: DESIGN-BPMN-DSL-001. |
+| 2.2     | 2026-05-24 | Vũ Anh      | Documented existing parser features the spec had omitted: the anonymous `layout { … }` tree block (clause 6.10; `layout` re-listed as reserved, clause 6.8), the region `horizontal`/`vertical` auto-layout option (clause 6.5.3), and the edge `shared`/`straight`/`elbow` flags (clause 6.7). Noted that `shape`/`accent` are render-validated, not parser-enforced (clause 6.4). Corrected source paths to the `packages/python/src/kymo/` monorepo layout; cite `BPD-DGM-001` by document_id. |
 
 ---
 
@@ -661,7 +702,7 @@ For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kym
 
 ### B.1 Storage and Retrieval
 
-This document is version-controlled within the project repository at `diagrams/docs/DSL.md`. The authoritative source is the working tree of the main branch; archived versions are accessible via repository history (`git log`).
+This document is version-controlled within the project repository at `docs/DSL.md`. The authoritative source is the working tree of the main branch; archived versions are accessible via repository history (`git log`).
 
 ### B.2 Distribution
 
