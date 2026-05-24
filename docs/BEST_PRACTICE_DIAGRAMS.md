@@ -1,8 +1,8 @@
 ---
 title: Architecture Diagram — Best Practices
 document_id: BPD-DGM-001
-version: "1.7"
-issue_date: 2026-05-18
+version: "1.8"
+issue_date: 2026-05-24
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers producing architecture diagrams for docs and slides
 review_cycle: On major rendering-stack change, or annually (whichever first)
 supersedes: null
 related_documents:
+  - DSL-LANG-001
   - README.md
 authors:
   - Vũ Anh
@@ -34,15 +35,15 @@ iso_compliance:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | BPD-DGM-001                                                    |
-| Version           | 1.7                                                            |
-| Issue Date        | 2026-05-18                                                     |
+| Version           | 1.8                                                            |
+| Issue Date        | 2026-05-24                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
 | Owner             | `diagrams/` project                                            |
 | Audience          | Engineers producing architecture diagrams for docs and slides  |
 | Review Cycle      | On major rendering-stack change, or annually (whichever first) |
 | Supersedes        | —                                                              |
-| Related Documents | [`README.md`](./README.md) (run/build instructions)            |
+| Related Documents | `DSL-LANG-001`, [`README.md`](../README.md) (run/build instructions) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content) and
 ISO/IEC/IEEE 26515:2018 (agile documentation): metadata header, numbered
@@ -104,19 +105,20 @@ The patterns described herein are enforced by the project in this
 directory:
 
 ```
-diagrams/
-├── src/
-│   ├── model.py       Component, Region, Edge dataclasses
+kymostudio/                          (monorepo root)
+├── packages/python/src/kymo/
+│   ├── model.py       Component, Region, Edge, Diagram dataclasses
 │   ├── icons.py       SVG icon library
+│   ├── dsl.py         .kymo DSL parser (DSL-LANG-001)
 │   ├── layout.py      Auto-layout + edge routing
+│   ├── alignment.py   Post-parse resolver (positions, region bounds)
 │   ├── to_svg.py      Diagram → SVG renderer
-│   └── cli.py         Entry point — `uv run src/cli.py`
+│   └── cli.py         Entry point — `uv run kymo <file>`
 ├── samples/
-│   ├── data.py                       Diagram instance + LAYOUT spec + edges
-│   ├── aiq.kymo                   DSL form
+│   ├── data.kymo                     DSL source
+│   ├── aiq.kymo                      DSL source
 │   └── *.svg / *.webp / *.png        Rendered outputs + reference images
-├── docs/                             Spec docs (this file, DSL.md)
-└── out/container-diagram.svg         Transient build artefact (~12 KB, 1080 × 658)
+└── docs/                             Spec docs (this file, DSL.md)
 ```
 
 ---
@@ -214,12 +216,12 @@ A `uv` project with the following module separation:
 
 | 5.4.x | Module               | Responsibility                                       |
 |-------|----------------------|------------------------------------------------------|
-| 5.4.1 | `src/model.py`       | Dataclasses; no rendering.                           |
-| 5.4.2 | `src/icons.py`       | SVG icon library; no layout knowledge.               |
-| 5.4.3 | `samples/data.py`    | The diagram instance + LAYOUT spec + edges.          |
-| 5.4.4 | `src/layout.py`      | Position computation; edge route waypoints.          |
-| 5.4.5 | `src/to_svg.py`      | Diagram → SVG string; no positioning logic.          |
-| 5.4.6 | `src/cli.py`         | Entry script. `uv run src/cli.py`. ~30 ms/cycle.     |
+| 5.4.1 | `packages/python/src/kymo/model.py`  | Dataclasses; no rendering.                  |
+| 5.4.2 | `packages/python/src/kymo/icons.py`  | SVG icon library; no layout knowledge.      |
+| 5.4.3 | `samples/data.py`                    | The diagram instance + LAYOUT spec + edges. |
+| 5.4.4 | `packages/python/src/kymo/layout.py` | Position computation; edge route waypoints. |
+| 5.4.5 | `packages/python/src/kymo/to_svg.py` | Diagram → SVG string; no positioning logic. |
+| 5.4.6 | `packages/python/src/kymo/cli.py`    | Entry script. `uv run kymo <file>`. ~30 ms/cycle. |
 
 To relocate a Component: edit `LAYOUT` in `samples/data.py` and regenerate.
 To add a connection: append an `Edge` to the `EDGES` list and regenerate.
@@ -235,7 +237,7 @@ syntax + arrows read as a flat declaration without Python boilerplate.
 form: every field on `Component`, `Region`, and `Edge` can be expressed
 in DSL, and the round-trip produces byte-identical SVG.
 
-#### 5.5.1 Grammar (synopsis — full spec in [`DSL.md`](./DSL.md) clause 6)
+#### 5.5.1 Grammar (synopsis — full spec in `DSL-LANG-001` clause 6)
 
 The DSL has **no `component`, `region`, or `layout` keywords**. Each
 line's shape determines its kind:
@@ -300,7 +302,7 @@ anchor      := ("top"|"right"|"bottom"|"left"|"center") ( "(" INT "," INT ")" )?
 
 Region containers nest. When an inner region is nested inside an outer
 region, the inner region's leaf ids flatten into the outer region's
-`contains` so its auto-bounds envelop the nested leaves (DSL.md §7.3.1).
+`contains` so its auto-bounds envelop the nested leaves (`DSL-LANG-001` §7.3.1).
 Layout containers do NOT propagate — they're positioning rules, not
 ownership.
 
@@ -403,11 +405,12 @@ researcher --> user : "Deep Research Report"  { src=top, dst=top, via=(990,45);(
 
 #### 5.5.3 Wiring into the build
 
-`.kymo` files are loaded directly by `src/cli.py`:
+`.kymo` files are loaded directly by `packages/python/src/kymo/cli.py`:
 
 ```bash
-uv run src/cli.py samples/aiq.kymo           # → samples/aiq.svg
-uv run src/cli.py samples/aiq.kymo --animate # → samples/aiq-animated.svg
+# run from packages/python (samples live at the repo root)
+uv run kymo ../../samples/aiq.kymo           # → samples/aiq.svg
+uv run kymo ../../samples/aiq.kymo --animate # → samples/aiq-animated.svg
 ```
 
 `cli.py` calls `parse_dsl(...)` → `layout(...)` → `resolve_alignments(...)` → `render(...)`.
@@ -1174,7 +1177,7 @@ This groups Cells without dominating them.
 ## 11. Iteration Process
 
 A single generate-render-review cycle takes approximately 30 ms
-(`uv run src/cli.py`) plus the browser-reload time. This permits 20+
+(`uv run kymo <file>`) plus the browser-reload time. This permits 20+
 revisions per session at acceptable cost.
 
 The five revisions that produced the greatest visual quality gain were:
@@ -1189,10 +1192,10 @@ The five revisions that produced the greatest visual quality gain were:
 
 ## 12. References
 
-- `src/model.py` — `Component`, `Region`, `Edge`, `Diagram` definitions.
-- `src/layout.py` — `_route_over`, `_route_under`, `cell_size`, layout entry point.
-- `src/to_svg.py` — `points_to_rounded_path`, `smooth_curve`, `edge_label_pos`.
-- `src/icons.py` — `_cube`, `_box`, glyph library, isometric matrix.
+- `packages/python/src/kymo/model.py` — `Component`, `Region`, `Edge`, `Diagram` definitions.
+- `packages/python/src/kymo/layout.py` — `_route_over`, `_route_under`, `cell_size`, layout entry point.
+- `packages/python/src/kymo/to_svg.py` — `points_to_rounded_path`, `smooth_curve`, `edge_label_pos`.
+- `packages/python/src/kymo/icons.py` — `_cube`, `_box`, glyph library, isometric matrix.
 - `samples/data.py` — current diagram instance.
 - `out/container-diagram.svg` — current build artefact.
 - `samples/AIQ-arch-light.png` — external reference (NVIDIA AIQ).
@@ -1214,6 +1217,7 @@ The five revisions that produced the greatest visual quality gain were:
 | 1.5     | 2026-05-18 | Vũ Anh      | §5.5.1.1 Region border overrides — `dash (X, Y)` + `stroke #hex` per-region.       |
 | 1.6     | 2026-05-18 | Vũ Anh      | §5.5.1.2 Asymmetric padding — `padding-bottom N` balances label's top visual weight.|
 | 1.7     | 2026-05-18 | Vũ Anh      | §7.6 Orthogonality rule — every routed edge segment must be H or V (no diagonals).  |
+| 1.8     | 2026-05-24 | Vũ Anh      | Corrected source paths to the `packages/python/src/kymo/` monorepo layout (§1.3 tree, §5.4 table, §5.5.3 commands, §11/§12, Annex B); `uv run kymo` replaces `uv run src/cli.py`. Cross-doc citations now by document_id (`DSL-LANG-001`); added it to `related_documents`. |
 
 ---
 
@@ -1222,7 +1226,7 @@ The five revisions that produced the greatest visual quality gain were:
 ### B.1 Storage and Retrieval
 
 This document is version-controlled within the project repository at
-`diagrams/docs/BEST_PRACTICE_DIAGRAMS.md`. Authoritative source is the
+`docs/BEST_PRACTICE_DIAGRAMS.md`. Authoritative source is the
 working tree of the main branch; archived versions are accessible via
 the repository history (`git log`).
 
@@ -1245,13 +1249,13 @@ A new revision MUST:
 2. Update the **Issue Date** field.
 3. Append a row to **Annex A — Revision History**.
 4. Bump the major version on breaking changes to interfaces in
-   `src/model.py` / `src/layout.py` / `src/to_svg.py`.
+   `packages/python/src/kymo/{model,layout,to_svg}.py`.
 
 ### B.4 Review
 
 The document is reviewed:
 
-- **Continuously** by anyone editing `diagrams/` (changes to behaviour
+- **Continuously** by anyone editing `packages/python/` (changes to behaviour
   must be reflected here).
 - **At least annually** by the project owner.
 - **Upon** any major architecture-rendering stack change (e.g., switching
