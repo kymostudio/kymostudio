@@ -1,7 +1,7 @@
 ---
 title: Kymo DSL — Language Specification
 document_id: KYMO-DSL-001
-version: "2.3"
+version: "2.5"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -13,6 +13,12 @@ related_documents:
   - BPD-DGM-001
   - DESIGN-BPMN-DSL-001    # BPMN-in-DSL design (bpmn { } block + layout)
   - KYMOJSON-MAP-001       # .kymo.json — serialization of the resolved model this DSL produces
+  - KYMO-FMT-001           # .kymo source format — catalog reference
+  - INTRO-KYMO-DSL-001     # Front-end engineering doc set — introduction
+  - FEAT-KYMO-DSL-001      # Front-end requirements
+  - DESIGN-KYMO-DSL-001    # Front-end design
+  - TEST-KYMO-DSL-001      # Front-end test documentation
+  - PLAN-KYMO-DSL-001      # Front-end plan
   - dsl.py
   - model.py
 authors:
@@ -38,7 +44,7 @@ iso_compliance:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | KYMO-DSL-001                                                   |
-| Version           | 2.3                                                            |
+| Version           | 2.5                                                            |
 | Issue Date        | 2026-05-24                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
@@ -46,7 +52,7 @@ iso_compliance:
 | Audience          | Engineers authoring or parsing `.kymo` files                |
 | Review Cycle      | On grammar change, or annually (whichever first)               |
 | Supersedes        | v1.0                                                           |
-| Related Documents | `BPD-DGM-001`, `DESIGN-BPMN-DSL-001`, `KYMOJSON-MAP-001`, [`dsl.py`](../packages/python/src/kymo/dsl.py), [`model.py`](../packages/python/src/kymo/model.py) |
+| Related Documents | `BPD-DGM-001`, `DESIGN-BPMN-DSL-001`, `KYMOJSON-MAP-001`, `KYMO-FMT-001`, `INTRO-KYMO-DSL-001`, `FEAT-KYMO-DSL-001`, `DESIGN-KYMO-DSL-001`, `TEST-KYMO-DSL-001`, `PLAN-KYMO-DSL-001`, [`dsl.py`](../packages/python/src/kymo/dsl.py), [`model.py`](../packages/python/src/kymo/model.py) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar productions follow ISO/IEC 14977:1996 (Extended Backus–Naur Form).
 
@@ -697,6 +703,8 @@ For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kym
 | 2.1     | 2026-05-23 | Vũ Anh      | Added the `bpmn { }` process-block grammar (clause 6.9) — node kinds, flow arrows (`->`/`~>`/`..>`), chains, `type=`, `@` pins — with automatic left-to-right (Sugiyama) layout. Design/algorithm: DESIGN-BPMN-DSL-001. |
 | 2.2     | 2026-05-24 | Vũ Anh      | Documented existing parser features the spec had omitted: the anonymous `layout { … }` tree block (clause 6.10; `layout` re-listed as reserved, clause 6.8), the region `horizontal`/`vertical` auto-layout option (clause 6.5.3), and the edge `shared`/`straight`/`elbow` flags (clause 6.7). Noted that `shape`/`accent` are render-validated, not parser-enforced (clause 6.4). Corrected source paths to the `packages/python/src/kymo/` monorepo layout; cite `BPD-DGM-001` by document_id. |
 | 2.3     | 2026-05-24 | Vũ Anh      | Added `KYMOJSON-MAP-001` (the `.kymo.json` serialization of the resolved model this DSL produces) to related documents. |
+| 2.4     | 2026-05-24 | Vũ Anh      | Added the kymo DSL front-end engineering doc set (`INTRO`/`FEAT`/`DESIGN`/`TEST`/`PLAN-KYMO-DSL-001`) to related documents — the descriptive REQ/DSN/TST/PLAN set for the parse → layout → alignment pipeline this grammar specifies. |
+| 2.5     | 2026-05-24 | Vũ Anh      | Added `KYMO-FMT-001` (the `.kymo` source format-catalog reference under `docs/formats/`) to related documents, completing the formats catalog alongside `KYMOJSON-MAP-001` and `BPMN-MAP-001`. |
 
 ---
 

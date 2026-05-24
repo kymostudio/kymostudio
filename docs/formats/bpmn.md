@@ -1,7 +1,7 @@
 ---
 title: BPMN 2.0 Import & Export — Element Mapping
 document_id: BPMN-MAP-001
-version: "1.2"
+version: "1.3"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -36,7 +36,7 @@ iso_compliance:
 | Field             | Value                                                              |
 |-------------------|--------------------------------------------------------------------|
 | Document ID       | BPMN-MAP-001                                                      |
-| Version           | 1.2                                                               |
+| Version           | 1.3                                                               |
 | Issue Date        | 2026-05-24                                                        |
 | Status            | Released                                                          |
 | Classification    | Internal                                                         |
@@ -46,10 +46,12 @@ iso_compliance:
 | Supersedes        | —                                                                |
 | Related Documents | `DESIGN-BPMN-PARSER-001`, `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `KYMO-DSL-001`, `KYMOJSON-MAP-001`, `REF-BPMNIO-001` |
 
-kymo can **import** a standard **BPMN 2.0 XML** file (`.bpmn`) — the format
-exported by [bpmn.io](https://bpmn.io), [Camunda Modeler](https://camunda.com/download/modeler/),
-Signavio, and most BPM tools — and render it to SVG, and can **export** any kymo
-diagram of BPMN glyphs back to BPMN 2.0 XML. The two are inverses, so a file
+kymo can **import** a standard **BPMN 2.0 XML** file (`.bpmn`) — the interchange
+format defined by the OMG *Business Process Model and Notation* specification (see
+[Normative reference](#normative-reference)) and exported by [bpmn.io](https://bpmn.io),
+[Camunda Modeler](https://camunda.com/download/modeler/), Signavio, and most BPM
+tools — and render it to SVG, and can **export** any kymo diagram of BPMN glyphs
+back to BPMN 2.0 XML. The two are inverses, so a file
 round-trips: `.bpmn` → kymo → `.bpmn` preserves the process and its geometry.
 
 ```bash
@@ -64,6 +66,21 @@ diagram = parse_bpmn(open("process.bpmn").read())   # .bpmn → Diagram
 svg = render(diagram)                                # → SVG
 bpmn_xml = to_bpmn(diagram)                          # Diagram → .bpmn (round-trip)
 ```
+
+## Normative reference
+
+The `.bpmn` format is **BPMN 2.0 XML** as defined by the Object Management Group
+(OMG) *Business Process Model and Notation (BPMN)*, Version 2.0.2 — the normative
+specification for the XML schema, element semantics, and the BPMN DI (Diagram
+Interchange) geometry kymo reads and writes:
+
+> Object Management Group. *Business Process Model and Notation (BPMN), Version
+> 2.0.2.* OMG, January 2014. PDF: <https://www.omg.org/spec/BPMN/2.0.2/PDF>.
+> Published as **ISO/IEC 19510:2013**.
+
+This document maps that standard to and from kymo's model; **where the two
+disagree, the OMG specification is authoritative**. The element-mapping and export
+tables below are the kymo-side view, not a restatement of the standard.
 
 ## How it works
 
@@ -198,6 +215,7 @@ lanes, message flows, data objects, and an annotation) for worked examples.
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — documents BPMN import **and** export; promoted to an ID-bearing reference (`BPMN-MAP-001`) and moved to `docs/formats/bpmn.md`. |
 | 1.1     | 2026-05-24 | Vũ Anh | Added `DESIGN-BPMN-PARSER-001` (the BPMN importer feature design that realises this mapping) to related documents. |
 | 1.2     | 2026-05-24 | Vũ Anh | Added `KYMOJSON-MAP-001` (the `.kymo.json` serialization of the resolved model this importer produces) to related documents. |
+| 1.3     | 2026-05-24 | Vũ Anh | Added a **Normative reference** section citing the OMG *BPMN 2.0.2* specification (PDF: <https://www.omg.org/spec/BPMN/2.0.2/PDF>; ISO/IEC 19510:2013) as the authoritative source for the `.bpmn` format, and linked it from the intro. |
 
 ## Annex B — Document Control
 
