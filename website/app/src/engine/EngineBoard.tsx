@@ -1,7 +1,7 @@
 /**
  * canvas-engine Phase 5/6 — the board behind `?engine=native`. A persistent
  * engine Store+Editor with the same two-way flow as the tldraw `Board.tsx`:
- *   - sync (text→canvas): diff-apply `diagramToShapes` inside
+ *   - sync (text→canvas): diff-apply `diagramToShapesEngine` inside
  *     `run(fn, { history:"ignore" })` → `source:"remote"` → no echo.
  *   - writeback (canvas→text): a user drag is `source:"user"` → the scoped
  *     listener fires → `patchPositions` → `onPatch`.
@@ -13,18 +13,17 @@ import {
   Editor,
   createShapeId,
   type Shape,
-  type ShapePartial,
 } from "../../../../packages/js-canvas/dist/index.js";
 import type { Diagram } from "../../../../packages/js/dist/index.js";
-import { diagramToShapes } from "../diagramToShapes";
+import { diagramToShapesEngine } from "./diagramToShapesEngine";
 import { patchPositions, type XY } from "../patchDsl";
 import { EngineCanvas } from "./react";
 import { loadSnapshot, saveSnapshot } from "./persist";
-import { KymoNodeEngineUtil, KymoDiagramEngineUtil, GeoEngineUtil, ArrowEngineUtil } from "./shapes";
+import { KymoNodeEngineUtil, KymoDiagramEngineUtil, KymoRegionEngineUtil, KymoEdgeEngineUtil } from "./shapes";
 
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
-const utils = [new KymoNodeEngineUtil(), new KymoDiagramEngineUtil(), new GeoEngineUtil(), new ArrowEngineUtil()];
+const utils = [new KymoNodeEngineUtil(), new KymoDiagramEngineUtil(), new KymoRegionEngineUtil(), new KymoEdgeEngineUtil()];
 const EMBED_ID = createShapeId("kymo-diagram");
 
 interface EngineBoardProps {
@@ -52,7 +51,7 @@ function syncEmbed(editor: Editor, svg: string, w: number, h: number): void {
 
 function syncElements(editor: Editor, diagram: Diagram): void {
   if (editor.getShape(EMBED_ID)) editor.deleteShape(EMBED_ID);
-  const partials = diagramToShapes(diagram) as unknown as ShapePartial[];
+  const partials = diagramToShapesEngine(diagram);
   const desired = new Set(partials.map((p) => p.id));
   const existing = kymoShapes(editor);
   const existingIds = new Set(existing.map((s) => s.id));

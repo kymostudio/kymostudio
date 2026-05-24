@@ -1,12 +1,13 @@
 /**
- * canvas-engine Phase 5 — engine shape utils for the read-only render path.
- * They extend the headless `ShapeUtil` (packages/js-canvas) and render the same
- * visuals as the tldraw shapes, under the engine's own `<HTMLContainer>`.
+ * canvas-engine render layer — engine shape utils. They extend the headless
+ * `ShapeUtil` (packages/js-canvas) and render under the engine's own
+ * `<HTMLContainer>`.
  *
- * Covers the four shape types `diagramToShapes` emits: `kymo-node`,
- * `kymo-diagram` (BPMN embed), `geo` (region) and `arrow` (edge). The `geo`/
- * `arrow` rendering here is a Phase-5 parity stopgap; the proper consolidation to
- * `kymo-region`/`kymo-edge` is the sibling `canvas-figjam` (FR-FJ-01).
+ * Four shape types: `kymo-node`, `kymo-diagram` (BPMN embed), `kymo-region`
+ * (region rect) and `kymo-edge` (edge). `kymo-region`/`kymo-edge` are the
+ * canvas-figjam Phase-1 consolidation (FR-FJ-01) that replaced the Phase-5
+ * tldraw-style `geo`/`arrow` stopgaps; their props come from
+ * `diagramToShapesEngine` (label is already plain text, not tldraw rich-text).
  */
 import { useEffect, useState } from "react";
 import { ShapeUtil, Rectangle2d, type Shape } from "../../../../packages/js-canvas/dist/index.js";
@@ -18,20 +19,6 @@ const num = (v: unknown, fallback = 0): number =>
 
 function svgDataUrl(svg: string): string {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
-
-/** Extract plain text from tldraw's `toRichText` doc (regions/edges keep their
- *  label there — `diagramToShapes` is reused verbatim and still calls it). */
-function richTextToPlain(rt: unknown): string {
-  if (typeof rt === "string") return rt;
-  const walk = (node: unknown): string => {
-    if (!node || typeof node !== "object") return "";
-    const n = node as { text?: string; content?: unknown[] };
-    if (typeof n.text === "string") return n.text;
-    if (Array.isArray(n.content)) return n.content.map(walk).join("");
-    return "";
-  };
-  return walk(rt);
 }
 
 // ── kymo-node ──────────────────────────────────────────────────────────────
@@ -143,12 +130,12 @@ export class KymoDiagramEngineUtil extends ShapeUtil {
   }
 }
 
-// ── geo (region rectangle) ───────────────────────────────────────────────────
+// ── kymo-region (region rectangle) ───────────────────────────────────────────
 
-export class GeoEngineUtil extends ShapeUtil {
-  static override type = "geo";
+export class KymoRegionEngineUtil extends ShapeUtil {
+  static override type = "kymo-region";
   override getDefaultProps() {
-    return {};
+    return { w: 1, h: 1, color: "grey", dash: "solid", label: "" };
   }
   override getGeometry(shape: Shape) {
     return new Rectangle2d({ width: num(shape.props.w, 1), height: num(shape.props.h, 1) });
@@ -157,7 +144,7 @@ export class GeoEngineUtil extends ShapeUtil {
     const w = num(shape.props.w, 1);
     const h = num(shape.props.h, 1);
     const dashed = shape.props.dash === "dashed";
-    const label = richTextToPlain(shape.props.richText);
+    const label = String(shape.props.label ?? "");
     return (
       <HTMLContainer style={{ width: w, height: h, pointerEvents: "none" }}>
         <div
@@ -189,7 +176,7 @@ export class GeoEngineUtil extends ShapeUtil {
   }
 }
 
-// ── arrow (edge) ─────────────────────────────────────────────────────────────
+// ── kymo-edge (edge) ─────────────────────────────────────────────────────────
 
 interface Pt {
   x: number;
@@ -201,10 +188,10 @@ const pt = (v: unknown): Pt => {
   return { x: num(p.x), y: num(p.y) };
 };
 
-export class ArrowEngineUtil extends ShapeUtil {
-  static override type = "arrow";
+export class KymoEdgeEngineUtil extends ShapeUtil {
+  static override type = "kymo-edge";
   override getDefaultProps() {
-    return {};
+    return { start: { x: 0, y: 0 }, end: { x: 0, y: 0 }, color: "grey", arrowhead: "arrow", label: "" };
   }
   override getGeometry(shape: Shape) {
     const s = pt(shape.props.start);
@@ -219,7 +206,8 @@ export class ArrowEngineUtil extends ShapeUtil {
   override component(shape: Shape) {
     const s = pt(shape.props.start);
     const e = pt(shape.props.end);
-    const label = richTextToPlain(shape.props.richText);
+    const label = String(shape.props.label ?? "");
+    const showArrow = shape.props.arrowhead !== "none";
     const markerId = `kymo-arrow-${String(shape.id).replace(/[^a-zA-Z0-9_-]/g, "")}`;
     return (
       <HTMLContainer style={{ width: 0, height: 0, overflow: "visible", pointerEvents: "none" }}>
@@ -229,7 +217,7 @@ export class ArrowEngineUtil extends ShapeUtil {
               <path d="M0,0 L6,3 L0,6 Z" fill="#9ca3af" />
             </marker>
           </defs>
-          <line x1={s.x} y1={s.y} x2={e.x} y2={e.y} stroke="#9ca3af" strokeWidth="1.5" markerEnd={`url(#${markerId})`} />
+          <line x1={s.x} y1={s.y} x2={e.x} y2={e.y} stroke="#9ca3af" strokeWidth="1.5" markerEnd={showArrow ? `url(#${markerId})` : undefined} />
         </svg>
         {label && (
           <div

@@ -211,6 +211,7 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 | Date       | Phase / area | Work | Status | Ref |
 |------------|--------------|------|--------|-----|
 | 2026-05-24 | Docs | Authored the canvas-figjam spec/plan doc set (`INTRO`/`FEATURE`/`DESIGN`/`TEST`/`PLAN`) — the engine-completion + FigJam-authoring half spun out of the canvas-engine programme at the key-free-board seam. | ✅ | `PLAN-ENGINE-001` |
+| 2026-05-24 | Phase 1 | **Built-in consolidation shipped (`FR-FJ-01`).** New engine `ShapeUtil`s `KymoRegionEngineUtil` (`kymo-region`) + `KymoEdgeEngineUtil` (`kymo-edge`) in `engine/shapes.tsx` replace the Phase-5 tldraw-style `geo`/`arrow` stopgaps. **Engine-only split** (`DESIGN-FIGJAM-001` §2): the shared `diagramToShapes.ts` stays on tldraw `geo`/`arrow` (the live `?engine=tldraw` path needs them, golden byte-identical); a thin `engine/diagramToShapesEngine.ts` reuses it then remaps → `kymo-region`/`kymo-edge`, preserving ids/`x`/`y`/`meta.kymo` (so `patchDsl` round-trip + persistence reconcile untouched). `EngineBoard` registers the two new utils. Verified: typecheck (app + js-canvas) clean; `packages/js` 59/59; `js-canvas` 13/13; Playwright render-guard + new region/edge presence assertion green; chrome-MCP A/B (AIQ + BPMN, engine default) pixel-faithful; `?engine=tldraw` byte-identical. | ✅ | `FR-FJ-01` |
 
-**Next:** **blocked on** the sibling's Phase 7 (key-free board). When that lands, execute **Phase 1**
-(built-in shape consolidation) — the smallest, lowest-risk step.
+**Next:** **Phase 2 — Undo/redo** (`FR-FJ-02`, 8 SP): a history stack over the store's tags; undo
+restores node `x/y` and `Board` writeback re-patches the `.kymo` text (`RK-EN-02`, `TC-18`/`TC-FJ-02`).
