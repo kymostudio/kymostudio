@@ -14,6 +14,7 @@ import {
   type Component, type Diagram, type Edge, type Point, type Region, type Shape,
 } from "./model.js";
 import { iterAll, parseXml, type XmlEl } from "./xml.js";
+import { pyRound } from "./round.js";
 
 const MARGIN = 30;
 
@@ -156,7 +157,7 @@ export function parseBpmn(xmlText: string): Diagram {
     track(x, y, w, h);
     const tag = el.tag;
     const name = (el.attrs.name ?? "").trim();
-    const bnd: [number, number, number, number] = [Math.round(x), Math.round(y), Math.round(w), Math.round(h)];
+    const bnd: [number, number, number, number] = [pyRound(x), pyRound(y), pyRound(w), pyRound(h)];
 
     if (tag === "participant") { regions.push(makeRegion({ id: ref, label: name, bounds: bnd, style: "pool" })); continue; }
     if (tag === "lane") { regions.push(makeRegion({ id: ref, label: name, bounds: bnd, style: "lane" })); continue; }
@@ -173,8 +174,8 @@ export function parseBpmn(xmlText: string): Diagram {
     components.push(makeComponent({
       id: ref, name: tag === "textAnnotation" ? annotationText(el) : name,
       icon: marker, shape: cshape, accent: "blue",
-      pos: [Math.round(x + w / 2), Math.round(y + h / 2)],
-      size: [Math.round(w), Math.round(h)],
+      pos: [pyRound(x + w / 2), pyRound(y + h / 2)],
+      size: [pyRound(w), pyRound(h)],
     }));
   }
 
@@ -184,7 +185,7 @@ export function parseBpmn(xmlText: string): Diagram {
     const el = ref ? byId.get(ref) : undefined;
     const wps: Point[] = de.children
       .filter((c) => c.tag === "waypoint")
-      .map((wp) => [Math.round(num(wp.attrs.x)), Math.round(num(wp.attrs.y))] as Point);
+      .map((wp) => [pyRound(num(wp.attrs.x)), pyRound(num(wp.attrs.y))] as Point);
     if (wps.length < 2) continue;
     for (const [px, py] of wps) track(px, py);
 
@@ -193,16 +194,16 @@ export function parseBpmn(xmlText: string): Diagram {
     edges.push(makeEdge({
       src: (el?.attrs.sourceRef ?? ""), dst: (el?.attrs.targetRef ?? ""),
       label: (el?.attrs.name ?? "").trim(), points: wps, bpmnFlow: flowKind(tag, el, byId),
-      labelPos: lc ? [Math.round(lc[0]), Math.round(lc[1])] : null,
+      labelPos: lc ? [pyRound(lc[0]), pyRound(lc[1])] : null,
     }));
   }
 
   // ── normalise into a tidy top-left-anchored canvas ──────────────────
   if (xs.length === 0) { xs.push(0); ys.push(0); }
   const minX = Math.min(...xs), minY = Math.min(...ys);
-  const dx = Math.round(MARGIN - minX), dy = Math.round(MARGIN - minY);
-  const width = Math.round(Math.max(...xs) - minX + 2 * MARGIN);
-  const height = Math.round(Math.max(...ys) - minY + 2 * MARGIN);
+  const dx = pyRound(MARGIN - minX), dy = pyRound(MARGIN - minY);
+  const width = pyRound(Math.max(...xs) - minX + 2 * MARGIN);
+  const height = pyRound(Math.max(...ys) - minY + 2 * MARGIN);
 
   for (const c of components) c.pos = [c.pos[0] + dx, c.pos[1] + dy];
   for (const r of regions) { const [bx, by, bw, bh] = r.bounds; r.bounds = [bx + dx, by + dy, bw, bh]; }
