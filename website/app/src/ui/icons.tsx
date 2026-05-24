@@ -40,6 +40,14 @@ export const Sun = (p: IconProps) => (
 export const Moon = (p: IconProps) => (
   <Svg {...p}><path d="M20 14.5A8 8 0 119.5 4a6.5 6.5 0 0010.5 10.5z" /></Svg>
 );
+export const Checker = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="3" width="8" height="8" rx="1.5" />
+    <rect x="13" y="13" width="8" height="8" rx="1.5" />
+    <rect x="13" y="3" width="8" height="8" rx="1.5" opacity=".4" />
+    <rect x="3" y="13" width="8" height="8" rx="1.5" opacity=".4" />
+  </Svg>
+);
 export const Download = (p: IconProps) => (
   <Svg {...p}><path d="M12 4v12M6 12l6 6 6-6M4 20h16" /></Svg>
 );

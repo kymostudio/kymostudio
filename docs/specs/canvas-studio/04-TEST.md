@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Verification & Validation
 document_id: TEST-STUDIO-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | TEST-STUDIO-001                                                  |
-| Version           | 0.1                                                            |
+| Version           | 0.2                                                            |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Related Documents | `FEAT-STUDIO-001` (requirements), `DESIGN-STUDIO-001` (design), `TEST-JAM-001` (the engine/freeform V&V this builds on), `TEST-CANVAS-001` (the editor V&V — must stay green) |
@@ -59,6 +59,8 @@ green). New surface to cover:
 4. **Item styling** — nodes/regions/edges render the prototype language (visual check).
 5. **Selection** — handles + size badge appear and track a drag.
 6. **Status bar** — counts, zoom/Fit, autosave reflect engine state.
+7. **Chrome de-dup** — one owner per control: no floating toolbar; sample + background in the top
+   bar; a single Export; truthful `Code`/`Preview` tabs.
 
 > **E2E conventions (from project memory).** Drive with **trusted events** (Playwright), **wait for
 > the tool button to show `active`** before driving the canvas, and use `elementsFromPoint` for
@@ -74,6 +76,7 @@ green). New surface to cover:
 | **TC-CS-04** | FR-CS-04 | E2E/visual | For the AIQ sample: a `kymo-node` renders the real cloud-icon glyph + name; a `kymo-region` matches `renderSVG` — inner (`dash:"dashed"`) is purple `#7c3aed` dashed + purple label, outer is slate `#cbd5e1` solid; a `kymo-edge` is `#94a3b8` with a running flow-dash (`getComputedStyle(line).animationName === "kymo-edge-flow"`, `stroke-dasharray="6 4"`). chrome-MCP screenshot visually matches `renderSVG`. |
 | **TC-CS-05** | FR-CS-05 | E2E | Selecting a `kymo-node` shows the **`selection-size`** badge (text `/^\d+ × \d+$/`) + **four `selection-handle`** corner squares; dragging the node keeps the badge tracking it (boundingBox shifts with the drag); clicking empty canvas clears it. (`e2e/selection.spec.ts`, 3 cases.) |
 | **TC-CS-06** | FR-CS-06 | E2E | `status-counts` shows non-zero `N nodes · M edges` (AIQ = 19/20); reading `status-zoom`, `status-zoom-in` raises the `%` and `status-zoom-fit` re-zooms; (chrome-anhv) wheel/buttons update the `%` with **0 shape re-renders**, and the autosave chip flips `Saving…`→`Saved` on edit. (`e2e/status.spec.ts`, 2 cases.) |
+| **TC-CS-07** | FR-CS-07 | E2E | No floating `.toolbar` exists in the DOM; the top bar holds `topbar-sample` and a 3-mode background control — `topbar-bg-light`/`-dark` flip `[data-theme]`, `topbar-bg-transparent` flips the canvas bg **without** changing `[data-theme]`; **exactly one** Export control exists (the old floating `#download` is gone); `tab-code` toggles the `.kymo` pane and `tab-preview`'s `active` is the inverse of the code pane being shown. (`e2e/chrome.spec.ts`, 4 cases.) |
 
 ## 3. Regression gates (must stay green)
 
@@ -105,6 +108,7 @@ Every requirement → ≥ 1 covering test (the `FEAT-STUDIO-001` invariant).
 | FR-CS-04 | TC-CS-04; §3 (golden gate) |
 | FR-CS-05 | TC-CS-05 |
 | FR-CS-06 | TC-CS-06 |
+| FR-CS-07 | TC-CS-07 |
 | NFR-CS-01 | §4 |
 | NFR-CS-02 | §3 (render-guard); §4 |
 | NFR-CS-03 | §4 (golden gate) |
@@ -118,3 +122,4 @@ Every requirement → ≥ 1 covering test (the `FEAT-STUDIO-001` invariant).
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial V&V: `TC-CS-01..06` (tokens/theme, top bar, tool rail, item styling, selection affordances, status bar), the regression gates (`TEST-CANVAS-001`/`TEST-JAM-001`/render-guard) + golden-safety, NFR methods, traceability. **P2 build:** `TC-CS-02` updated for the client-only top-bar trim (no breadcrumb/star/Comments/Versions/presence). **P3 build:** `TC-CS-03` updated for the left rail + `hand`/grab-pan + V/H/P/S/T shortcuts. **P4 build:** `TC-CS-04` updated for renderSVG-matched items (glyph node, purple-dashed inner region, flow-dash edge). **P5 build:** `TC-CS-05` → `e2e/selection.spec.ts` (size badge + 4 handles + drag-track + clear-on-empty). **P6 build:** `TC-CS-06` → `e2e/status.spec.ts` (counts + zoom-in/% + fit). **All `TC-CS-01..06` covered; canvas-studio complete.** |
+| 0.2     | 2026-05-25 | Vũ Anh | **P7 build:** added **`TC-CS-07`** → `e2e/chrome.spec.ts` (4 cases): no floating toolbar · single Export · sample + 3-mode background in the top bar · truthful `Code`/`Preview` tabs. Added the §1 strategy bullet 7 and the `FR-CS-07 → TC-CS-07` traceability row. |

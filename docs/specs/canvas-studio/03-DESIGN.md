@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Design
 document_id: DESIGN-STUDIO-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -36,7 +36,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | DESIGN-STUDIO-001                                                |
-| Version           | 0.1                                                             |
+| Version           | 0.2                                                             |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Audience          | Engineers building the editor chrome (`website/app/`)         |
@@ -239,8 +239,35 @@ Tracked in `PLAN-STUDIO-001` §6. Design-level callouts:
 
 ---
 
+## 11. Chrome consolidation (`FR-CS-07`) — P7
+
+The P2 top bar (§3) and the P3 tool rail (§4) each kept their own appearance/export controls, so the
+shipped chrome carried two owners for the same state: the top bar's theme toggle **and** the floating
+toolbar's light/dark both call `selectBg` (the single `theme` var themes chrome **and** canvas via
+`THEME_BG`), and the top bar's **Export** and the floating **SVG** button both call `onDownload`. P7
+collapses this to **one owner per control** — pure relocation, no engine/`renderSVG`/`svgBackground`
+change (golden-safe).
+
+- **Appearance → one top-bar control.** The standalone theme toggle (§3) is replaced by a 3-segment
+  **`light / dark / transparent`** control (`ui/TopBar.tsx`, class `.k-seg`) reusing the existing
+  `selectBg`/`bgActive` (`App.tsx`). `light`/`dark` re-theme chrome+canvas (current behaviour);
+  `transparent` flips only the canvas background (`svgBackground → null`) and leaves `[data-theme]`
+  alone. Active state uses the **soft** `--accent-soft` tint (not the floating bar's solid-green fill).
+- **Sample picker → the top bar.** The starter `<select>` moves next to the title (class `.k-sample`).
+- **Export → a single entry point.** The top-bar **Export** stays; the floating **SVG** button (the
+  same `onDownload`) is removed.
+- **Floating toolbar retired.** The whole `.toolbar` markup + CSS is deleted from `App.tsx`/
+  `index.html`; the §4 note that "the floating toolbar keeps sample/bg/export" is superseded.
+- **Truthful tabs.** `Code`/`Preview` (§3) become a real either/or indicator: `Preview` is `active`
+  ⇔ the code pane is hidden (`!showCode`), instead of being hardcoded always-active.
+
+Verified by `TC-CS-07` (`e2e/chrome.spec.ts`); regression gates (§9) unchanged.
+
+---
+
 ## Annex A — Revision History
 
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. **P4 build:** §5 as-built — match `renderSVG` not the mockup: node glyph kept, region outer-slate / inner-purple-dashed, edge flow-dash (CSS keyframe + SMIL). **P5 build:** §6 as-built — selection generalised to any selected shape; rect/handles/badge accent-green; comment-pin dropped (no data model). **P6 build:** §7 as-built — status bar via engine `ViewApi` (zoom through `applyCamera`, isolated `%` poll); autosave edit-driven. **canvas-studio complete (P1–P6).** |
+| 0.2     | 2026-05-25 | Vũ Anh | **P7 (chrome de-dup):** added §11 — one owner per control. Floating toolbar retired; appearance becomes a single top-bar 3-mode control (`.k-seg`, soft `--accent-soft` active) reusing `selectBg`/`bgActive`; sample picker (`.k-sample`) + a single Export move to the top bar; `Code`/`Preview` tabs made truthful. Supersedes the §3 theme-toggle and §4 floating-toolbar notes. Pure relocation — `renderSVG`/`svgBackground` untouched. |

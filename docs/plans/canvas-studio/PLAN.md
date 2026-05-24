@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Implementation Plan
 document_id: PLAN-STUDIO-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-STUDIO-001                                                  |
-| Version           | 0.1                                                             |
+| Version           | 0.2                                                             |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
 | Related Documents | `FEAT-STUDIO-001` (requirements), `DESIGN-STUDIO-001` (design), `TEST-STUDIO-001` (V&V), `PLAN-JAM-001` (the capability layer this builds on — **entry gate, complete**) |
@@ -108,6 +108,7 @@ capability layer (`PLAN-JAM-001`) is complete — so P1 can start now.
 | **4 — canvas-items: styling** | `kymo-node`/`kymo-region`/`kymo-edge` visual parity (tile stripe+glyph, dashed container, flow-dash) + `toSvg` lockstep (DESIGN §5). |
 | **5 — canvas-items: selection** | Selection rect + corner handles + size badge in the canvas layer; comment-pin marker (DESIGN §6). |
 | **6 — canvas-status-bar** | Counts · autosave · zoom `−/%/+` · Fit, wired to engine camera/persist (DESIGN §7). |
+| **7 — chrome de-dup** | One owner per control: remove the floating toolbar; relocate the sample picker + a 3-mode (light/dark/transparent) canvas-background control to the top bar; single Export; truthful `Code`/`Preview` tabs (DESIGN §11, `FR-CS-07`, `TC-CS-07`). |
 
 ## 5. Project plan
 
@@ -122,8 +123,9 @@ Single-maintainer OSS — **relative sizing** (T-shirt + story points), not date
 | 4 | Item styling parity on the AIQ sample (`TC-CS-04`); goldens byte-identical | P1 | M | 8 | 1 |
 | 5 | Selection handles + size badge track a drag (`TC-CS-05`) | P4 | S–M | 5 | 4 |
 | 6 | Status bar counts/zoom/Fit/autosave correct (`TC-CS-06`) | P1 | S–M | 5 | 1 |
+| 7 | One owner per control — no floating toolbar; sample + background in the top bar; single Export; truthful tabs (`TC-CS-07`) | P1–P6 | S | 5 | 1–6 |
 
-**Sequencing:** `1 → (2 ∥ 3 ∥ 4 ∥ 6) → 5`. **Regression gate every phase:** `TEST-CANVAS-001`
+**Sequencing:** `1 → (2 ∥ 3 ∥ 4 ∥ 6) → 5 → 7` (P7 is a follow-up amendment after the programme shipped). **Regression gate every phase:** `TEST-CANVAS-001`
 (`TC-01..19`) + `TEST-JAM-001` (`TC-J-01..07`) + the render-guard stay green; `packages/js` /
 `packages/python` goldens byte-identical.
 
@@ -137,12 +139,13 @@ Single-maintainer OSS — **relative sizing** (T-shirt + story points), not date
 | Canvas-item styling parity (`kymo-node`/`region`/`edge`) + `toSvg` | 4 | 8 | match prototype across themes; keep export WYSIWYG |
 | Selection handles + size badge + comment-pin | 5 | 5 | canvas-layer overlay riding the in-wrapper outline |
 | Status bar (counts, autosave, zoom, Fit) | 6 | 5 | three small sources; no canvas re-render |
+| Chrome de-dup — relocate sample/bg to the top bar, single Export, truthful tabs + `chrome.spec.ts` | 7 | 5 | pure relocation; one new e2e spec (P7.1 docs 1 · P7.2 code 2 · P7.3 e2e 1 · P7.4 verify 1) |
 | V&V build-out (`TC-CS` + regression harness) — *shared, programme-level* | all | (3) | Playwright specs + golden checks |
-| **Total (this feature)** | | **≈ 42** | **Complexity: Medium–High** |
+| **Total (this feature)** | | **≈ 47** | **Complexity: Medium–High** |
 
 - **Confidence:** range **32–55 SP**; widest variance is **item styling** (P4) if theme parity needs
   per-shape token work.
-- **Per-feature cap:** ≈ 42 SP **≤ 50** ✓. **Per-phase cap:** every phase **≤ 10 SP** ✓ (largest 8).
+- **Per-feature cap:** ≈ 47 SP **≤ 50** ✓ (incl. the P7 de-dup amendment). **Per-phase cap:** every phase **≤ 10 SP** ✓ (largest 8).
 - **Risk concentration:** P2 (wiring breadth) + P4 (styling parity) ≈ 55 % of points.
 - **T-shirt ↔ SP key:** S ≈ 2–3 · M ≈ 5–8 · L ≈ 13 · XL ≈ 20+.
 
@@ -170,6 +173,11 @@ Likelihood / impact qualitative (Low / Med / High).
   new imported `tokens.css`) — design-token migration; regenerate & commit `kymo.bundle.js`.
 - **Unchanged:** `packages/js/*` and `packages/python/*` (golden-frozen); `packages/js-canvas/*`
   (engine core); `.github/workflows/deploy-website.yml` (committed bundle, no CI build).
+- **P7 (chrome de-dup):** *new* `website/app/e2e/chrome.spec.ts`; *modify* `website/app/src/ui/TopBar.tsx`
+  (owns sample + 3-mode bg, truthful tabs), `website/app/src/ui/icons.tsx` (`Checker` glyph),
+  `website/app/src/App.tsx` (delete the floating `.toolbar`, rewire `<TopBar>` props),
+  `website/app/index.html` (drop dead toolbar CSS, add `.k-sample`/`.k-seg`); regenerate
+  `kymo.bundle.js`; clean the two inert `.closest(".toolbar")` guards in `e2e/{render-guard,selection}.spec.ts`.
 
 ## 8. Verification
 
@@ -183,6 +191,8 @@ Detailed cases + traceability in `TEST-STUDIO-001`. At the plan level:
 - **Phase 4:** `TC-CS-04` — node/region/edge styling parity; **goldens byte-identical**.
 - **Phase 5:** `TC-CS-05` — selection handles + size badge track a drag.
 - **Phase 6:** `TC-CS-06` — counts/zoom/Fit/autosave correct.
+- **Phase 7:** `TC-CS-07` — no floating toolbar; sample + 3-mode background in the top bar; single
+  Export; truthful `Code`/`Preview` tabs. **Goldens byte-identical** (pure relocation).
 - **Regression throughout:** `TEST-CANVAS-001` + `TEST-JAM-001` + render-guard green; `cd
   packages/js && npm test` and `cd packages/python && uv run --group dev python -m pytest -q` stay
   green (goldens unchanged).
@@ -194,6 +204,7 @@ Detailed cases + traceability in `TEST-STUDIO-001`. At the plan level:
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial plan: hi-fi editor UI shell over the complete engine. 1-based phases ≤ 10 SP — tokens → top bar → tool rail → item styling → selection → status bar (≈ 42 SP). Risk register (`RK-CS-01..06`), files-to-touch, golden-safe verification, deferred-sibling non-goals. |
+| 0.2     | 2026-05-25 | Vũ Anh | Added **P7 (chrome de-dup, ≈ 5 SP)** — one owner per control (`FR-CS-07`/`TC-CS-07`): remove the floating toolbar; relocate the sample picker + a 3-mode canvas-background control to the top bar; single Export; truthful tabs. Updated §4/§5/§5.1 (total ≈ 47 SP ≤ 50), §7 files, §8 verification. Pure relocation — goldens byte-identical. |
 
 ## Annex B — Open questions / pending decisions
 
@@ -229,3 +240,4 @@ presence/comments/dashboard/AI (need a backend).
 | 2026-05-24 | Phase 3 | **canvas-left-sidebar shipped (`FR-CS-03`).** New flush **left tool rail** (`website/app/src/ui/ToolRail.tsx`) driven by a **tool registry** (`website/app/src/ui/tools.ts`, `{ id, Icon, kbd, title, enabled, sepBefore }`): enabled `select`/`hand`/`draw`/`sticky`/`text` wired to the engine, **disabled placeholders** (frame/cloud/shape/diamond/edge/comment/AI, tooltips) reserving slots for `canvas-create-tools`. Added the rail icons to `ui/icons.tsx`. **`hand` is a real tool** — added to the engine `Tool` union (`engine/react.tsx`): a pan-only gesture (pan on any drag, grab cursor, never selects). Document-level **keyboard shortcuts** V/H/P/S/T (`App.tsx`, guarded on `activeElement`). The view pane is now a flex row (`ToolRail` + `.canvas-wrap`); the floating toolbar's tool buttons **moved to the rail** (it keeps sample/bg/export). CSS ported (`.k-rail`/`.tool`/`.kbd`/`.sep`, token-driven). Verified: `tsc` clean; bundle ~411 KB; chrome-anhv (light+dark) — rail renders/themes, click + V/H/P/S/T switch tools, `hand`→grab cursor, disabled placeholders inert, `S` in the textarea ignored, 0 console errors (`TC-CS-03`). Regression green: `js-canvas` 19/19, `js` 368/0-fail, `python` 649 passed (goldens byte-identical, `NFR-CS-03`). Spec (`FEAT`/`DESIGN`/`TEST-STUDIO-001`) reconciled to the as-built rail. | ✅ | `FR-CS-03`, `TC-CS-03` |
 | 2026-05-24 | Phase 2 | **canvas-topbar shipped (`FR-CS-02`).** Replaced the bare `<header>` with a hi-fi **`TopBar`** (`website/app/src/ui/TopBar.tsx`) + a ported, dependency-free icon set (`website/app/src/ui/icons.tsx`): brand, an **editable title** (local state), centre **Code/Preview tabs**, **undo/redo**, **theme toggle**, and **Export/Share** (reuse `onDownload`/`onShare`). **Trimmed** the backend-implying chrome at review (`FR-CS-02` is client-only): dropped the "Playground ›" breadcrumb, the star, the **Comments/Versions** tabs, and the **presence** avatar (boards/comments/multiuser are out of scope) — dead CSS removed too. `EngineBoard` gained an `onEditorReady` prop handing `App` the live `Editor` (drives top-bar undo/redo; also sets up P6 camera/fit). The Code tab toggles a `showCode` flag that hides the `.kymo` pane (`main.code-hidden` → single column). Topbar CSS ported into `index.html` (`.k-topbar`/`.k-logo`/`.k-btn*`/`.center-tabs`/`.k-presence`, token-driven → themes via `[data-theme]`). Verified: `tsc --noEmit` clean; `build.sh` bundle 399→**410 KB**; chrome-anhv (light **and** dark) — topbar renders + themes, Code tab hides/shows the editor pane, Comments/Versions disabled, undo/redo wired (no-throw), theme flips, title editable, 0 console errors (`TC-CS-02`). Regression green: `js-canvas` **19/19**, `js` **368 pass/0 fail**, `python` **649 passed** (goldens byte-identical — `renderSVG` untouched, `NFR-CS-03`). | ✅ | `FR-CS-02`, `TC-CS-02` |
 | 2026-05-24 | Phase 1 | **Design-token migration shipped (`FR-CS-01`).** Ported the hi-fi prototype's `tokens.css` into `website/app/index.html`'s `<style>` **additively** — two new blocks (`:root` light + `:root[data-theme="dark"]` overrides) adding `--bg-elev`, `--canvas-grid`, `--border-soft/strong`, `--text-mute`, `--text-on-canvas(-dim)`, `--accent-soft/fg`, `--accent-2-soft`, `--user-1..5`, `--aws-*`, `--tok-*` (DSL syntax), the `--r-sm..xl` scale, the `--shadow-sm/shadow/shadow-lg/shadow-glow` box-shadow scale (the unused colour `--shadow-sm` repurposed), and `--topbar-h`/`--rail-w`. **No token the current CSS references was changed** → P1 restyles nothing; no consumer yet (P2–P6). No bundle rebuild (CSS lives in `index.html`, not `kymo.bundle.js`). Verified (chrome-anhv, `npx http-server`): `/app/` 200, React mounts, screenshot **pixel-unchanged** vs before; `getComputedStyle(:root)` resolves all new tokens in **light** (`--bg-elev` #ffffff, `--tok-kw` #56880c, `--shadow-sm` light) and **dark** (`--bg-elev` #1a1a24, `--tok-kw` #76b900, `--shadow-sm` dark) — theme-neutral tokens identical across both; existing tokens still flip (`--bg` #ffffff↔#131419); 0 console errors (`TC-CS-01`). | ✅ | `FR-CS-01`, `TC-CS-01` |
+| 2026-05-25 | Phase 7 | **chrome de-dup (`FR-CS-07`).** Removing the duplicate chrome the spec baked in (top-bar theme toggle + the floating toolbar's light/dark both call `selectBg`; top-bar Export + the floating SVG button both call `onDownload`). One owner per control: the floating `.toolbar` is deleted; the **sample picker** + a **3-mode (light/dark/transparent) background control** move to the top bar (`ui/TopBar.tsx`, `.k-sample`/`.k-seg`, reusing `selectBg`/`bgActive`, soft `--accent-soft` active); a single **Export**; truthful `Code`/`Preview` tabs. Added a `Checker` icon; `App.tsx` rewired; dead toolbar CSS removed. New `e2e/chrome.spec.ts` (`TC-CS-07`, 4 cases) + the two inert `.closest(".toolbar")` guards cleaned. Pure relocation — `renderSVG`/`svgBackground` untouched. | 🚧 | `FR-CS-07`, `TC-CS-07` |
