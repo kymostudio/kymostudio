@@ -95,3 +95,22 @@ test("createShape fills missing props from the util's getDefaultProps()", () => 
   const props = editor.getShape(id)?.props;
   assert.deepEqual(props, { w: 10, h: 20, name: "given" }, "defaults filled; provided props win");
 });
+
+test("camera ops: panBy shifts by d/z; zoomToPoint keeps the cursor's page point fixed", () => {
+  const editor = new Editor(new Store());
+  editor.setCamera({ x: 0, y: 0, z: 2 });
+
+  editor.panBy(10, -4); // screen delta → page delta = d / z
+  assert.deepEqual(editor.getCamera(), { x: 5, y: -2, z: 2 }, "panBy adds d/z to the camera");
+
+  // zoom toward a screen point: the page point under it must not move.
+  const screen = { x: 300, y: 200 };
+  const before = editor.screenToPage(screen);
+  editor.zoomToPoint(4, screen);
+  const after = editor.screenToPage(screen);
+  assert.ok(Math.abs(after.x - before.x) < 1e-9 && Math.abs(after.y - before.y) < 1e-9, "cursor page point fixed");
+  assert.equal(editor.getCamera().z, 4, "zoom applied");
+
+  editor.zoomToPoint(1000, screen); // clamp
+  assert.equal(editor.getCamera().z, 8, "zoom clamped to MAX_ZOOM");
+});
