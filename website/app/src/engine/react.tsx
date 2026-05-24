@@ -82,10 +82,29 @@ interface EngineCanvasProps {
  * (`screen = (page + cam) * z`, §8.1) with one positioned wrapper per shape.
  */
 export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, children }: EngineCanvasProps) {
+  // Test seam (no-op unless a bench/E2E sets `window.__kymoBench`): counts each
+  // render of the shape list. The pan/zoom optimization means pan/zoom must NOT
+  // re-render here (transform-only); the render-count guard asserts that.
+  if (typeof window !== "undefined" && (window as { __kymoBench?: boolean }).__kymoBench) {
+    const w = window as { __kymoRenders?: number };
+    w.__kymoRenders = (w.__kymoRenders ?? 0) + 1;
+  }
+
   const viewportRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const fittedFor = useRef<Editor | null>(null);
   const gesture = useRef<Gesture | null>(null);
   const [, force] = useReducer((n: number) => n + 1, 0);
+
+  // Write the camera transform straight to the DOM. Pan/zoom move the whole
+  // shape layer (CSS children of this container) **without** a React re-render
+  // of the shape list — so FPS stays flat regardless of shape count (RK-EN-04).
+  const applyCamera = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    const c = editor.getCamera();
+    el.style.transform = `scale(${c.z}) translate(${c.x}px, ${c.y}px)`;
+  };
 
   // Re-render on store changes (drags write the store; sync re-applies it).
   useEffect(() => editor.store.listen(() => force()), [editor]);
@@ -120,7 +139,7 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
       const r = el.getBoundingClientRect();
       const factor = Math.exp(-e.deltaY * 0.0015);
       editor.zoomToPoint(editor.getCamera().z * factor, { x: e.clientX - r.left, y: e.clientY - r.top });
-      force();
+      applyCamera(); // transform-only — no shape re-render
       onChange?.();
     };
     el.addEventListener("wheel", onWheel, { passive: false });
@@ -167,12 +186,13 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
     if (!g.moved && Math.hypot(dx, dy) < 3) return; // click threshold
     g.moved = true;
     if (g.downId && g.downType && isDraggable(g.downType)) {
+      // store write → store.listen() re-renders the moved shape
       editor.updateShape({ id: g.downId as Shape["id"], type: g.downType, x: g.ox + dx / g.z, y: g.oy + dy / g.z });
     } else {
       editor.setCamera({ x: g.camX + dx / g.z, y: g.camY + dy / g.z, z: g.z });
+      applyCamera(); // transform-only — no shape re-render
       onChange?.(); // camera panned → persist (debounced)
     }
-    force();
   };
 
   const endGesture = (e: ReactPointerEvent) => {
@@ -200,6 +220,7 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
     <EditorContext.Provider value={editor}>
       <div
         ref={viewportRef}
+        data-testid="engine-viewport"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endGesture}
@@ -207,12 +228,14 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
         style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none" }}
       >
         <div
+          ref={containerRef}
           style={{
             position: "absolute",
             top: 0,
             left: 0,
             transformOrigin: "0 0",
             transform: `scale(${cam.z}) translate(${cam.x}px, ${cam.y}px)`,
+            willChange: "transform", // GPU layer → pan/zoom composite-only, not a repaint of all shapes
           }}
         >
           {editor.getCurrentPageShapes().map((shape) => {

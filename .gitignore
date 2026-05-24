@@ -13,3 +13,7 @@ node_modules/
 # transient screenshots from validation runs
 samples/_*.jpeg
 samples/_*.png
+# Playwright (engine E2E)
+test-results/
+playwright-report/
+.last-run.json

@@ -6,7 +6,8 @@
   "description": "Client-side React playground for the kymostudio DSL — bundled by esbuild into the committed kymo.bundle.js (Phase 0: parity port of the vanilla playground).",
   "scripts": {
     "build": "./build.sh",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -14,6 +15,7 @@
     "tldraw": "^5.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "esbuild": "^0.24.0",
