@@ -1,0 +1,337 @@
+{
+  "width": 448,
+  "height": 336,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "a",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        112
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "b",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        216
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "c",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        64
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "d",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        168
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "e",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        272
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [
+    {
+      "src": "a",
+      "dst": "c",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        0,
+        -16
+      ],
+      "dst_offset": [
+        0,
+        -4
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": -22,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "a",
+      "dst": "d",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        -4
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": -14,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "a",
+      "dst": "e",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        0,
+        16
+      ],
+      "dst_offset": [
+        0,
+        -4
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": -4,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "b",
+      "dst": "c",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        0,
+        -16
+      ],
+      "dst_offset": [
+        0,
+        4
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 4,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "b",
+      "dst": "d",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        4
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 14,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "b",
+      "dst": "e",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        0,
+        16
+      ],
+      "dst_offset": [
+        0,
+        4
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 22,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": [
+    {
+      "t": "group",
+      "dir": "horizontal",
+      "children": [
+        {
+          "t": "group",
+          "dir": "vertical",
+          "children": [
+            {
+              "t": "id",
+              "id": "a"
+            },
+            {
+              "t": "id",
+              "id": "b"
+            }
+          ]
+        },
+        {
+          "t": "group",
+          "dir": "vertical",
+          "children": [
+            {
+              "t": "id",
+              "id": "c"
+            },
+            {
+              "t": "id",
+              "id": "d"
+            },
+            {
+              "t": "id",
+              "id": "e"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

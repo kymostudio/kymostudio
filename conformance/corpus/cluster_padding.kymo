@@ -1,0 +1,16 @@
+# Regression: two adjacent clusters with default padding=(24, 24) must
+# NOT overlap. Before the padding-aware layout fix, cluster bounds
+# extended 24 px past their icons, while the outer gap was only 40 →
+# 24 + 24 − 40 = 8 px of overlap between cluster rects. Now the layout
+# tree carries each cluster's padding so spacing is preserved.
+a hex/hex-agent/green
+b hex/hex-agent/green
+
+left cluster "Left" vertical {
+  a
+}
+right cluster "Right" vertical {
+  b
+}
+
+layout { left | right }

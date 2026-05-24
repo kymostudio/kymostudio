@@ -1,0 +1,98 @@
+{
+  "width": 240,
+  "height": 128,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "a",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        64,
+        64
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "b",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        176,
+        64
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [
+    {
+      "src": "a",
+      "dst": "b",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": true,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": [
+    {
+      "t": "group",
+      "dir": "horizontal",
+      "children": [
+        {
+          "t": "id",
+          "id": "a"
+        },
+        {
+          "t": "id",
+          "id": "b"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# Variant of bipartite using curved edges. Same K(2,3) topology — two
+# vertical columns fully connected — but each edge renders as a cubic
+# Bezier with horizontal tangents instead of an H-V-H Z-shape.
+# `trunk_offset` lane assignment doesn't apply to curve routing; visual
+# separation comes from the natural Bezier divergence + fan-in stagger.
+a hex/hex-agent/green
+b hex/hex-agent/green
+c hex/hex-agent/green
+d hex/hex-agent/green
+e hex/hex-agent/green
+
+layout { { a , b } | { c , d , e } }
+
+a --> c { curve }
+a --> d { curve }
+a --> e { curve }
+b --> c { curve }
+b --> d { curve }
+b --> e { curve }

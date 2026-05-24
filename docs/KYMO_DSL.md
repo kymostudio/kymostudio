@@ -1,7 +1,7 @@
 ---
 title: Kymo DSL — Language Specification
 document_id: KYMO-DSL-001
-version: "2.2"
+version: "2.3"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -12,6 +12,7 @@ supersedes: "1.0"
 related_documents:
   - BPD-DGM-001
   - DESIGN-BPMN-DSL-001    # BPMN-in-DSL design (bpmn { } block + layout)
+  - KYMOJSON-MAP-001       # .kymo.json — serialization of the resolved model this DSL produces
   - dsl.py
   - model.py
 authors:
@@ -37,7 +38,7 @@ iso_compliance:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | KYMO-DSL-001                                                   |
-| Version           | 2.2                                                            |
+| Version           | 2.3                                                            |
 | Issue Date        | 2026-05-24                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
@@ -45,7 +46,7 @@ iso_compliance:
 | Audience          | Engineers authoring or parsing `.kymo` files                |
 | Review Cycle      | On grammar change, or annually (whichever first)               |
 | Supersedes        | v1.0                                                           |
-| Related Documents | `BPD-DGM-001`, `DESIGN-BPMN-DSL-001`, [`dsl.py`](../packages/python/src/kymo/dsl.py), [`model.py`](../packages/python/src/kymo/model.py) |
+| Related Documents | `BPD-DGM-001`, `DESIGN-BPMN-DSL-001`, `KYMOJSON-MAP-001`, [`dsl.py`](../packages/python/src/kymo/dsl.py), [`model.py`](../packages/python/src/kymo/model.py) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar productions follow ISO/IEC 14977:1996 (Extended Backus–Naur Form).
 
@@ -695,6 +696,7 @@ For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kym
 | 2.0     | 2026-05-18 | Vũ Anh      | **Breaking grammar change.** Removed `component`, `region`, `layout` keywords — the parser now disambiguates by line shape (clause 6.6). Containers nest; a region body may hold inline leaves, bare-id references, and nested containers; an outer region's `contains` is flattened from nested regions (clause 7.3.1). Added `icon` region option (was implementation-only). Reserved tokens updated (clause 6.8). |
 | 2.1     | 2026-05-23 | Vũ Anh      | Added the `bpmn { }` process-block grammar (clause 6.9) — node kinds, flow arrows (`->`/`~>`/`..>`), chains, `type=`, `@` pins — with automatic left-to-right (Sugiyama) layout. Design/algorithm: DESIGN-BPMN-DSL-001. |
 | 2.2     | 2026-05-24 | Vũ Anh      | Documented existing parser features the spec had omitted: the anonymous `layout { … }` tree block (clause 6.10; `layout` re-listed as reserved, clause 6.8), the region `horizontal`/`vertical` auto-layout option (clause 6.5.3), and the edge `shared`/`straight`/`elbow` flags (clause 6.7). Noted that `shape`/`accent` are render-validated, not parser-enforced (clause 6.4). Corrected source paths to the `packages/python/src/kymo/` monorepo layout; cite `BPD-DGM-001` by document_id. |
+| 2.3     | 2026-05-24 | Vũ Anh      | Added `KYMOJSON-MAP-001` (the `.kymo.json` serialization of the resolved model this DSL produces) to related documents. |
 
 ---
 

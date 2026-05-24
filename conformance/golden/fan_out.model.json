@@ -1,0 +1,214 @@
+{
+  "width": 448,
+  "height": 336,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "src",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        168
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "d1",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        64
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "d2",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        168
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "d3",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        272
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [
+    {
+      "src": "src",
+      "dst": "d1",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        -16
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "src",
+      "dst": "d2",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "src",
+      "dst": "d3",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        16
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": [
+    {
+      "t": "group",
+      "dir": "horizontal",
+      "children": [
+        {
+          "t": "id",
+          "id": "src"
+        },
+        {
+          "t": "group",
+          "dir": "vertical",
+          "children": [
+            {
+              "t": "id",
+              "id": "d1"
+            },
+            {
+              "t": "id",
+              "id": "d2"
+            },
+            {
+              "t": "id",
+              "id": "d3"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

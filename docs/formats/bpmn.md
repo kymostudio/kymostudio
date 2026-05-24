@@ -1,7 +1,7 @@
 ---
 title: BPMN 2.0 Import & Export — Element Mapping
 document_id: BPMN-MAP-001
-version: "1.0"
+version: "1.2"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -10,9 +10,11 @@ audience: Engineers using or maintaining the kymo BPMN importer and exporter
 review_cycle: On BPMN-mapping change
 supersedes: null
 related_documents:
+  - DESIGN-BPMN-PARSER-001    # BPMN import design (realises this mapping)
   - DESIGN-BPMN-EXPORT-001    # BPMN export design (inverts this mapping)
   - DESIGN-BPMN-DSL-001       # BPMN-in-DSL design (bpmn { } block)
   - KYMO-DSL-001                # kymo DSL language specification
+  - KYMOJSON-MAP-001            # .kymo.json — serialization of the model this import produces
   - REF-BPMNIO-001              # bpmn.io reference (round-trip benchmark)
 authors:
   - Vũ Anh
@@ -34,7 +36,7 @@ iso_compliance:
 | Field             | Value                                                              |
 |-------------------|--------------------------------------------------------------------|
 | Document ID       | BPMN-MAP-001                                                      |
-| Version           | 1.0                                                               |
+| Version           | 1.2                                                               |
 | Issue Date        | 2026-05-24                                                        |
 | Status            | Released                                                          |
 | Classification    | Internal                                                         |
@@ -42,7 +44,7 @@ iso_compliance:
 | Audience          | Engineers using or maintaining the kymo BPMN importer/exporter   |
 | Review Cycle      | On BPMN-mapping change                                            |
 | Supersedes        | —                                                                |
-| Related Documents | `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `KYMO-DSL-001`, `REF-BPMNIO-001` |
+| Related Documents | `DESIGN-BPMN-PARSER-001`, `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `KYMO-DSL-001`, `KYMOJSON-MAP-001`, `REF-BPMNIO-001` |
 
 kymo can **import** a standard **BPMN 2.0 XML** file (`.bpmn`) — the format
 exported by [bpmn.io](https://bpmn.io), [Camunda Modeler](https://camunda.com/download/modeler/),
@@ -194,6 +196,8 @@ lanes, message flows, data objects, and an annotation) for worked examples.
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — documents BPMN import **and** export; promoted to an ID-bearing reference (`BPMN-MAP-001`) and moved to `docs/formats/bpmn.md`. |
+| 1.1     | 2026-05-24 | Vũ Anh | Added `DESIGN-BPMN-PARSER-001` (the BPMN importer feature design that realises this mapping) to related documents. |
+| 1.2     | 2026-05-24 | Vũ Anh | Added `KYMOJSON-MAP-001` (the `.kymo.json` serialization of the resolved model this importer produces) to related documents. |
 
 ## Annex B — Document Control
 

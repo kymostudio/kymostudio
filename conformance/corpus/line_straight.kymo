@@ -1,0 +1,5 @@
+# Per-edge `{straight}` flag → direct diagonal line, no bends.
+a hex/hex-agent/green @ (60, 60)
+b hex/hex-agent/green @ (260, 160)
+
+a --> b { straight }

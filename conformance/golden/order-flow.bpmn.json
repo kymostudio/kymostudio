@@ -1,0 +1,361 @@
+{
+  "width": 1322,
+  "height": 400,
+  "components": [
+    {
+      "id": "C",
+      "shape": "bpmn-end",
+      "icon": "terminate",
+      "size": [
+        36,
+        36
+      ],
+      "pos": [
+        661,
+        70
+      ]
+    },
+    {
+      "id": "D",
+      "shape": "bpmn-end",
+      "icon": "",
+      "size": [
+        36,
+        36
+      ],
+      "pos": [
+        1274,
+        200
+      ]
+    },
+    {
+      "id": "GW",
+      "shape": "bpmn-gateway",
+      "icon": "exclusive",
+      "size": [
+        50,
+        50
+      ],
+      "pos": [
+        351,
+        200
+      ]
+    },
+    {
+      "id": "Iv",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        816,
+        330
+      ]
+    },
+    {
+      "id": "N",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        506,
+        70
+      ]
+    },
+    {
+      "id": "P",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        506,
+        200
+      ]
+    },
+    {
+      "id": "Pk",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        816,
+        200
+      ]
+    },
+    {
+      "id": "S",
+      "shape": "bpmn-start",
+      "icon": "",
+      "size": [
+        36,
+        36
+      ],
+      "pos": [
+        48,
+        200
+      ]
+    },
+    {
+      "id": "SP",
+      "shape": "bpmn-gateway",
+      "icon": "parallel",
+      "size": [
+        50,
+        50
+      ],
+      "pos": [
+        661,
+        200
+      ]
+    },
+    {
+      "id": "Sh",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        1126,
+        200
+      ]
+    },
+    {
+      "id": "Sy",
+      "shape": "bpmn-gateway",
+      "icon": "parallel",
+      "size": [
+        50,
+        50
+      ],
+      "pos": [
+        971,
+        200
+      ]
+    },
+    {
+      "id": "V",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        196,
+        200
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [
+    {
+      "src": "GW",
+      "dst": "N",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          351,
+          175
+        ],
+        [
+          351,
+          70
+        ],
+        [
+          456,
+          70
+        ]
+      ]
+    },
+    {
+      "src": "GW",
+      "dst": "P",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          376,
+          200
+        ],
+        [
+          456,
+          200
+        ]
+      ]
+    },
+    {
+      "src": "Iv",
+      "dst": "Sy",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          866,
+          330
+        ],
+        [
+          906,
+          330
+        ],
+        [
+          906,
+          200
+        ],
+        [
+          946,
+          200
+        ]
+      ]
+    },
+    {
+      "src": "N",
+      "dst": "C",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          556,
+          70
+        ],
+        [
+          643,
+          70
+        ]
+      ]
+    },
+    {
+      "src": "P",
+      "dst": "SP",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          556,
+          200
+        ],
+        [
+          636,
+          200
+        ]
+      ]
+    },
+    {
+      "src": "Pk",
+      "dst": "Sy",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          866,
+          200
+        ],
+        [
+          946,
+          200
+        ]
+      ]
+    },
+    {
+      "src": "S",
+      "dst": "V",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          66,
+          200
+        ],
+        [
+          146,
+          200
+        ]
+      ]
+    },
+    {
+      "src": "SP",
+      "dst": "Iv",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          661,
+          225
+        ],
+        [
+          661,
+          330
+        ],
+        [
+          766,
+          330
+        ]
+      ]
+    },
+    {
+      "src": "SP",
+      "dst": "Pk",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          686,
+          200
+        ],
+        [
+          766,
+          200
+        ]
+      ]
+    },
+    {
+      "src": "Sh",
+      "dst": "D",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          1176,
+          200
+        ],
+        [
+          1256,
+          200
+        ]
+      ]
+    },
+    {
+      "src": "Sy",
+      "dst": "Sh",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          996,
+          200
+        ],
+        [
+          1076,
+          200
+        ]
+      ]
+    },
+    {
+      "src": "V",
+      "dst": "GW",
+      "bpmn_flow": "sequence",
+      "points": [
+        [
+          246,
+          200
+        ],
+        [
+          326,
+          200
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# Per-edge `{curve}` flag → cubic Bezier with horizontal tangents.
+a hex/hex-agent/green @ (60, 60)
+b hex/hex-agent/green @ (260, 160)
+
+a --> b { curve }

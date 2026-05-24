@@ -1,0 +1,214 @@
+{
+  "width": 448,
+  "height": 336,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "s1",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        64
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "s2",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        168
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "s3",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        272
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dst",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        168
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [
+    {
+      "src": "s1",
+      "dst": "dst",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        -16
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "s2",
+      "dst": "dst",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "s3",
+      "dst": "dst",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        16
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": [
+    {
+      "t": "group",
+      "dir": "horizontal",
+      "children": [
+        {
+          "t": "group",
+          "dir": "vertical",
+          "children": [
+            {
+              "t": "id",
+              "id": "s1"
+            },
+            {
+              "t": "id",
+              "id": "s2"
+            },
+            {
+              "t": "id",
+              "id": "s3"
+            }
+          ]
+        },
+        {
+          "t": "id",
+          "id": "dst"
+        }
+      ]
+    }
+  ]
+}

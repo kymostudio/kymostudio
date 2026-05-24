@@ -1,0 +1,125 @@
+{
+  "width": 336,
+  "height": 176,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "a",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        88,
+        88
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "b",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        248,
+        88
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "id": "left",
+      "label": "Left",
+      "bounds": [
+        29,
+        32,
+        118,
+        112
+      ],
+      "contains": [
+        "a"
+      ],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": null,
+      "style": "cluster",
+      "icon": null,
+      "layout": "vertical",
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "right",
+      "label": "Right",
+      "bounds": [
+        189,
+        32,
+        118,
+        112
+      ],
+      "contains": [
+        "b"
+      ],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": null,
+      "style": "cluster",
+      "icon": null,
+      "layout": "vertical",
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    }
+  ],
+  "edges": [],
+  "layout_trees": [
+    {
+      "t": "group",
+      "dir": "horizontal",
+      "children": [
+        {
+          "t": "id",
+          "id": "left"
+        },
+        {
+          "t": "id",
+          "id": "right"
+        }
+      ]
+    }
+  ]
+}

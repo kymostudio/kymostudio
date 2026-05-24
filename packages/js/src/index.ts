@@ -14,6 +14,7 @@
  *     `resolveAlignments`
  *   - BPMN import: `parseBpmn` (BPMN 2.0 `.bpmn` XML → Diagram)
  *   - BPMN export: `toBpmn` (Diagram → BPMN 2.0 `.bpmn` XML; inverse of import)
+ *   - kymo.json: `toKymoJson` / `parseKymoJson` (resolved Diagram ⇄ `.kymo.json` IR)
  */
 export * from "./model.js";
 export * from "./icons-loader.js"; // ICONS, getIcon, setIconBaseURL, setManifest, registerIcon
@@ -27,3 +28,5 @@ export { resolveAlignments } from "./alignment.js";
 export { bpmnLayout } from "./bpmn-layout.js";
 export { parseBpmn } from "./from-bpmn.js";
 export { toBpmn } from "./to-bpmn.js";
+export { toKymoJson, modelDict } from "./to-kymojson.js";  // Diagram → .kymo.json
+export { parseKymoJson } from "./from-kymojson.js";          // .kymo.json → Diagram

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_kymo">
+  <bpmn:process id="Process_kymo" isExecutable="false">
+    <bpmn:startEvent id="Start" name="Order received">
+      <bpmn:messageEventDefinition />
+    </bpmn:startEvent>
+    <bpmn:userTask id="Check" name="Check order details" />
+    <bpmn:exclusiveGateway id="GW" name="In stock?" default="flow3" />
+    <bpmn:serviceTask id="Ship" name="Ship goods" />
+    <bpmn:scriptTask id="Refund" name="Issue refund" />
+    <bpmn:endEvent id="EndOk" name="Order fulfilled" />
+    <bpmn:endEvent id="EndNo" name="Order cancelled">
+      <bpmn:terminateEventDefinition />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="flow0" sourceRef="Start" targetRef="Check" />
+    <bpmn:sequenceFlow id="flow1" sourceRef="Check" targetRef="GW" />
+    <bpmn:sequenceFlow id="flow2" sourceRef="GW" targetRef="Ship" name="yes" />
+    <bpmn:sequenceFlow id="flow3" sourceRef="GW" targetRef="Refund" name="no" />
+    <bpmn:sequenceFlow id="flow4" sourceRef="Ship" targetRef="EndOk" />
+    <bpmn:sequenceFlow id="flow5" sourceRef="Refund" targetRef="EndNo" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane bpmnElement="Process_kymo">
+      <bpmndi:BPMNShape bpmnElement="Start">
+        <dc:Bounds x="30" y="52" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Check">
+        <dc:Bounds x="120" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="GW">
+        <dc:Bounds x="280" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Ship">
+        <dc:Bounds x="390" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="Refund">
+        <dc:Bounds x="280" y="182" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EndOk">
+        <dc:Bounds x="560" y="52" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EndNo">
+        <dc:Bounds x="430" y="204" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow0">
+        <di:waypoint x="66" y="70" />
+        <di:waypoint x="120" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1">
+        <di:waypoint x="220" y="70" />
+        <di:waypoint x="280" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2">
+        <di:waypoint x="330" y="70" />
+        <di:waypoint x="390" y="70" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="339" y="48" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3">
+        <di:waypoint x="305" y="95" />
+        <di:waypoint x="305" y="182" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="300" y="130" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4">
+        <di:waypoint x="490" y="70" />
+        <di:waypoint x="560" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5">
+        <di:waypoint x="330" y="222" />
+        <di:waypoint x="430" y="222" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

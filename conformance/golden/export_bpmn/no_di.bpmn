@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" id="defs_kymo">
+  <bpmn:process id="Process_kymo" isExecutable="false" />
+  <bpmndi:BPMNDiagram>
+    <bpmndi:BPMNPlane bpmnElement="Process_kymo" />
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

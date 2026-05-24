@@ -1,0 +1,31 @@
+{
+  "width": 168,
+  "height": 128,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "agent",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        80,
+        64
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [],
+  "layout_trees": []
+}
