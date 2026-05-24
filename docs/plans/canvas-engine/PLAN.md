@@ -115,7 +115,7 @@ seam — is in **`DESIGN-ENGINE-001`**. Proposed layout:
 packages/js-canvas/              # the engine home (private workspace pkg; node --test like packages/js) — Annex B §1 decided
 └── src/
     ├── store.ts        # reactive records, scoped/sourced listeners, transactions, history   (DESIGN §5) ✅ Phase 2
-    ├── editor.ts       # Editor facade: CRUD + run + zoomToFit + selection                   (DESIGN §6)
+    ├── editor.ts       # Editor facade: CRUD + run + zoomToFit + selection                   (DESIGN §6) ✅ Phase 3
     ├── shape.ts        # ShapeUtil base, Rectangle2d, T validators, BaseShape                (DESIGN §7,§9)
     ├── view/           # camera, hit-test, culling, DOM render loop                          (DESIGN §8)
     ├── tools/          # select / drag / pan / zoom  (+ later: draw / sticky / text)         (DESIGN §4)
@@ -265,6 +265,8 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 | 2026-05-24 | Docs | **Split the feature at the KEY-FREE BOARD seam** (≤50-SP/feature, ≤10-SP/phase caps): rescoped this doc-set to the render/interaction core (≈42 SP, Phases 1–7, 1-based); spun the parity-completion + FigJam-authoring half out to the new `*-FIGJAM-001` doc-set (≈44 SP). | ✅ | `PLAN-FIGJAM-001` |
 | 2026-05-24 | Phase 1 | **Adapter seam shipped.** New `website/app/src/engine/adapter.ts` re-exports the tldraw surface (+ `tldraw.css`); `Board`/`Inspector`/`KymoNodeShape`/`KymoDiagramShape`/`diagramToShapes` re-pointed to `./engine/adapter`. `@tldraw/tlschema` augmentation kept (deferred per DESIGN §9.3). Verified: `tsc --noEmit` clean; `grep '"tldraw"'` only in `adapter.ts` (`NFR-EN-04`); bundle rebuilt (CSS byte-identical); E2E smoke — board renders 43 shapes, 0 console errors; `packages/js` 59/59 green. | ✅ | — |
 | 2026-05-24 | Phase 2 | **Reactive store shipped.** New private package `packages/js-canvas` (mirrors `packages/js`: `tsc → dist`, `node --test`) with `src/store.ts` — records + CRUD, `listen(scope/source)`, `run(history/source)` transactions, the single **source-tagging choke-point** (loop-guard, `RK-EN-01`), monotonic index order, history tagging. CI gains a `js-canvas` job. Resolves Annex B §1 (engine home). Verified headless: **`TC-EN-01..04` green** (incl. the zero-echo loop-guard); `tsc --noEmit` clean; `packages/js` 59/59; `website/app` untouched. | ✅ | — |
+| 2026-05-24 | Phase 3 | **Editor facade shipped.** `packages/js-canvas/src/editor.ts` — `Editor` over the store: `getCurrentPageShapes`/`getShape`, `createShape(s)`/`updateShape`/`deleteShape(s)`, `run`, **selection** state (`select`/`getSelectedShapeIds`/`getOnlySelectedShape`), **camera** state + `zoomToFit`. Uses an optional structural `ShapeUtilLike` for `getDefaultProps`/`getGeometry`, with an `x/y`+`props.w/h` fallback until Phase 4. Verified headless: **`TC-EN-01`, `TC-EN-07`** + selection + default-fill green (8/8 in `js-canvas`); `tsc --noEmit` clean; `packages/js` 59/59; `website/app` untouched. | ✅ | — |
 
-**Next:** **Phase 3** — the editor facade (`editor.ts`): CRUD + `run` + `zoomToFit` + selection over
-the store (`DESIGN-ENGINE-001` §6). Still headless; thin imperative layer.
+**Next:** **Phase 4** — `shape.ts`: the `ShapeUtil` base class, `Rectangle2d` geometry, and the `T`
+prop validators (`DESIGN-ENGINE-001` §7,§9). Tests `TC-EN-05/06`. Real `getGeometry` then upgrades the
+editor's `zoomToFit` from the Phase-3 fallback.
