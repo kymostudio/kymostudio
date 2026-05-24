@@ -17,6 +17,7 @@ import {
   type ShapeId,
   type ShapePartial,
 } from "./store.js";
+import type { Box } from "./shape.js";
 
 export interface Camera {
   x: number;
@@ -24,19 +25,13 @@ export interface Camera {
   z: number;
 }
 
-export interface Box {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
 /** The slice of a shape util the editor needs. Phase 4's `ShapeUtil` satisfies
- *  this structurally; Phase 3 registers none for the app. */
+ *  this structurally (it adds `validateProps` + a real `getGeometry`). */
 export interface ShapeUtilLike {
   type: string;
   getDefaultProps?(): Record<string, unknown>;
   getGeometry?(shape: Shape): { bounds: Box };
+  validateProps?(props: Record<string, unknown>, opts?: { partial?: boolean }): void;
 }
 
 export interface EditorOptions {
@@ -78,16 +73,21 @@ export class Editor {
   // --- mutations ---
 
   createShape(shape: ShapePartial): void {
-    this.store.put(this.withDefaults(shape));
+    const final = this.withDefaults(shape);
+    this.validate(final);
+    this.store.put(final);
   }
 
   createShapes(shapes: ShapePartial[]): void {
+    const finals = shapes.map((s) => this.withDefaults(s));
+    for (const f of finals) this.validate(f);
     this.store.run(() => {
-      for (const s of shapes) this.store.put(this.withDefaults(s));
+      for (const f of finals) this.store.put(f);
     }, { source: "user" });
   }
 
   updateShape(partial: ShapePartial): void {
+    this.validate(partial, { partial: true });
     this.store.update(partial);
   }
 
@@ -173,6 +173,12 @@ export class Editor {
     const util = this.utils.get(shape.type);
     if (!util?.getDefaultProps) return shape;
     return { ...shape, props: { ...util.getDefaultProps(), ...(shape.props ?? {}) } };
+  }
+
+  /** Validate a shape's props against its util's declared validators (§9.2). */
+  private validate(shape: ShapePartial, opts?: { partial?: boolean }): void {
+    const util = this.utils.get(shape.type);
+    if (util?.validateProps && shape.props) util.validateProps(shape.props, opts);
   }
 
   /** World-space bounds: util geometry if available, else `x/y` + `props.w/h`. */
