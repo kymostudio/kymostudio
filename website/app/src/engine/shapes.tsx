@@ -5,7 +5,7 @@
  *
  * Four shape types: `kymo-node`, `kymo-diagram` (BPMN embed), `kymo-region`
  * (region rect) and `kymo-edge` (edge). `kymo-region`/`kymo-edge` are the
- * canvas-figjam Phase-1 consolidation (FR-FJ-01) that replaced the Phase-5
+ * canvas-jam Phase-1 consolidation (FR-J-01) that replaced the Phase-5
  * tldraw-style `geo`/`arrow` stopgaps; their props come from
  * `diagramToShapesEngine` (label is already plain text, not tldraw rich-text).
  */

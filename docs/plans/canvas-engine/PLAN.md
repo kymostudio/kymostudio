@@ -14,7 +14,7 @@ related_documents:
   - FEAT-ENGINE-001
   - DESIGN-ENGINE-001
   - TEST-ENGINE-001
-  - PLAN-FIGJAM-001
+  - PLAN-JAM-001
   - PLAN-CANVAS-001
   - DESIGN-CANVAS-001
 authors:
@@ -40,7 +40,7 @@ keywords:
 | Version           | 0.2                                                              |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
-| Related Documents | `FEAT-ENGINE-001` (requirements), `DESIGN-ENGINE-001` (design), `TEST-ENGINE-001` (V&V), `PLAN-FIGJAM-001` (sibling — engine completion + FigJam authoring), `PLAN-CANVAS-001` (parent — the editor on top) |
+| Related Documents | `FEAT-ENGINE-001` (requirements), `DESIGN-ENGINE-001` (design), `TEST-ENGINE-001` (V&V), `PLAN-JAM-001` (sibling — engine completion + FigJam authoring), `PLAN-CANVAS-001` (parent — the editor on top) |
 
 > **Implementation plan (ISO/IEC/IEEE 12207 §6.3 Technical Management).** The *delivery* layer for the
 > in-house canvas engine: mission rationale, the phased plan, the risk register, and the worklog /
@@ -75,7 +75,7 @@ The original v0.1 plan covered the whole programme (≈91 SP, Phases 0–7) in o
 - **This feature — `canvas-engine` (≈42 SP):** the render/interaction core. Adapter seam → reactive
   store → ShapeUtil + viewport → interaction + persistence → **public board renders with no license
   key** (`RK-02` closes at the render level). tldraw stays bundled behind the adapter.
-- **Sibling feature — `canvas-figjam` (`PLAN-FIGJAM-001`, ≈44 SP):** *completes* the replacement
+- **Sibling feature — `canvas-jam` (`PLAN-JAM-001`, ≈44 SP):** *completes* the replacement
   (built-in shape consolidation, undo/redo, board export, **physical tldraw removal + full
   `TEST-CANVAS-001` parity**, footprint) and adds the net-new **FigJam freeform-authoring** tools.
   Its first phase's entry gate is **this feature's Phase 7 complete**.
@@ -122,7 +122,7 @@ packages/js-canvas/              # the engine home (private workspace pkg; node 
     # (pointer interaction — select/drag/pan/zoom — lives in-app in react.tsx, not a package tools/ dir)
 
 website/app/src/engine/                                                                       # the React/DOM-coupled layer (in-app; graduates to the package later)
-    ├── adapter.ts      # the seam: re-exports tldraw (P1) → engine; tldraw deleted in canvas-figjam   (DESIGN §13) ✅ Phase 1
+    ├── adapter.ts      # the seam: re-exports tldraw (P1) → engine; tldraw deleted in canvas-jam   (DESIGN §13) ✅ Phase 1
     ├── react.tsx       # <EngineCanvas> render loop + pointer interaction, HTMLContainer, hooks (DESIGN §8,§9.4) ✅ Phase 5,6
     ├── shapes.tsx      # engine ShapeUtils (kymo-node/diagram + parity geo/arrow)             (DESIGN §8) ✅ Phase 5
     ├── persist.ts      # IndexedDB snapshot (camera + freeform) — replaces persistenceKey    (DESIGN §11) ✅ Phase 7
@@ -137,7 +137,7 @@ import `engine/adapter`, never the engine internals (`NFR-EN-04`).
 
 Phases are **1-based** and sized so **no phase exceeds 10 SP**. This feature ends at **Phase 7 — the
 KEY-FREE BOARD**; everything after it (built-in consolidation, undo, export, tldraw removal,
-footprint, FigJam authoring) is the sibling `PLAN-FIGJAM-001`.
+footprint, FigJam authoring) is the sibling `PLAN-JAM-001`.
 
 | Phase | Goal | tldraw present? |
 |-------|------|------------------|
@@ -147,7 +147,7 @@ footprint, FigJam authoring) is the sibling `PLAN-FIGJAM-001`.
 | **4 — ShapeUtil + geometry** | `shape.ts` — ShapeUtil base, `Rectangle2d`, `T` validators, `BaseShape` (DESIGN §7,§9). `TC-EN-05/06`. | Yes |
 | **5 — Viewport (render)** | `view/` camera + DOM render loop + cull, `react/` (`<Canvas>`, `HTMLContainer`, `useEditor`, `useValue`). Render the kymo shapes **read-only** behind a `?engine=native` flag, A/B against tldraw. | Yes (A/B) |
 | **6 — Interaction** | `tools/` select / drag / pan / zoom + hit-test + selection indicator — the drag that drives canvas→text. | Yes (A/B) |
-| **7 — Persistence → KEY-FREE BOARD** | `persist.ts` (IndexedDB). Round-trip (drag→`.kymo`) + reload on the engine. **Flip the public deploy to the engine: board renders, no key, no watermark — `RK-02` closes at the render level.** tldraw stays bundled behind the adapter (physically removed in `canvas-figjam`). | Yes (engine renders) |
+| **7 — Persistence → KEY-FREE BOARD** | `persist.ts` (IndexedDB). Round-trip (drag→`.kymo`) + reload on the engine. **Flip the public deploy to the engine: board renders, no key, no watermark — `RK-02` closes at the render level.** tldraw stays bundled behind the adapter (physically removed in `canvas-jam`). | Yes (engine renders) |
 
 ## 5. Project plan
 
@@ -166,7 +166,7 @@ and **each ≤ 10 SP**; **Phase 2 (store source-fidelity) is the correctness-cri
 
 **Sequencing:** `1 → 2 → 3 → 4 → 5 → 6 → 7`. **Gate before the Phase-7 flip:** `TC-EN-02`
 (zero-echo) green — never ship a round-trip that can oscillate. Full `TEST-CANVAS-001` parity and
-the physical tldraw removal are the sibling feature's gates (`PLAN-FIGJAM-001`).
+the physical tldraw removal are the sibling feature's gates (`PLAN-JAM-001`).
 
 ### 5.1 Complexity & sizing (story points)
 
@@ -185,7 +185,7 @@ the physical tldraw removal are the sibling feature's gates (`PLAN-FIGJAM-001`).
 - **Confidence:** range **35–55 SP**; widest variance is **Phase 2** (store fidelity, 8→13).
 - **Per-feature cap:** ≈42 SP **≤ 50** ✓. **Per-phase cap:** every phase **≤ 10 SP** ✓ (largest 8).
 - **Risk concentration:** Phase 2 (store source-fidelity) gates everything downstream.
-- **Sibling:** the remaining ≈44 SP (parity completion + FigJam authoring) are in `PLAN-FIGJAM-001`.
+- **Sibling:** the remaining ≈44 SP (parity completion + FigJam authoring) are in `PLAN-JAM-001`.
 - **T-shirt ↔ SP key:** S ≈ 2–3 · M ≈ 5–8 · L ≈ 13 · XL ≈ 20+.
 
 ## 6. Risk register
@@ -195,11 +195,11 @@ Likelihood / impact qualitative (Low / Med / High).
 | ID | Risk | Likelihood | Impact | Mitigation | Status |
 |----|------|-----------|--------|------------|--------|
 | RK-EN-01 | Store `source` fidelity slips → a programmatic apply leaks as `source:"user"` → round-trip oscillates (`RK-05` regression) | Med | High | Single `source`-tagging choke-point in `run` (DESIGN §5.3); `TC-EN-02` gates the Phase-7 flip; keep `Board`'s `applyingRef` belt-and-braces until proven | Open |
-| RK-EN-04 | Reactivity too coarse → broad re-renders → render jank | Med | Med | **Benchmarked 2026-05-24:** locked 60 fps at ≤ 50 shapes; **knee ~75–100** — pan dropped into the 30–60 fps band (avg ~44–52, worst ~33 ms) because a camera change `force()`-ed a **full shape re-render** even though only the container transform moves. **Mitigated:** pan/zoom now mutate the transform container's `style` directly via a ref (shapes are CSS children → move with it, no React re-render) → holds ~60 fps at any N during pan/zoom. **Guarded** by a Playwright render-count test (`website/app/e2e/render-guard.spec.ts`): pan/zoom must produce 0 shape re-renders (drag ≥ 1) — fails if `force()` regresses onto the pan/zoom path. **Remaining → `canvas-figjam` footprint pass (`NFR-FJ-01`):** viewport culling + per-record reactivity for drag-at-high-N and huge initial renders. | Mitigated (pan/zoom) |
+| RK-EN-04 | Reactivity too coarse → broad re-renders → render jank | Med | Med | **Benchmarked 2026-05-24:** locked 60 fps at ≤ 50 shapes; **knee ~75–100** — pan dropped into the 30–60 fps band (avg ~44–52, worst ~33 ms) because a camera change `force()`-ed a **full shape re-render** even though only the container transform moves. **Mitigated:** pan/zoom now mutate the transform container's `style` directly via a ref (shapes are CSS children → move with it, no React re-render) → holds ~60 fps at any N during pan/zoom. **Guarded** by a Playwright render-count test (`website/app/e2e/render-guard.spec.ts`): pan/zoom must produce 0 shape re-renders (drag ≥ 1) — fails if `force()` regresses onto the pan/zoom path. **Remaining → `canvas-jam` footprint pass (`NFR-J-01`):** viewport culling + per-record reactivity for drag-at-high-N and huge initial renders. | Mitigated (pan/zoom) |
 | RK-EN-07 | `RK-07` embed-blank regression if the render loop unmounts the diagram `<img>` | Low | Med | Preserve the data-URL `<img>` cache (DESIGN §8.2); re-run `TC-19` | Open |
-| RK-02 *(parent)* | No-key tldraw blanks the public board | — | — | **Closed at render level (Phase 7):** the engine is the default renderer and needs no key, so the deployed board renders. **Fully retired** when `canvas-figjam` physically removes tldraw. | Closed (render) |
+| RK-02 *(parent)* | No-key tldraw blanks the public board | — | — | **Closed at render level (Phase 7):** the engine is the default renderer and needs no key, so the deployed board renders. **Fully retired** when `canvas-jam` physically removes tldraw. | Closed (render) |
 
-> Risks owned by the sibling feature (`PLAN-FIGJAM-001` §6): **RK-EN-02** (undo restores `x/y` +
+> Risks owned by the sibling feature (`PLAN-JAM-001` §6): **RK-EN-02** (undo restores `x/y` +
 > round-trip text), **RK-EN-03** (freeform authoring scope blowout), **RK-EN-05** (engine bundle
 > size), **RK-EN-06** (rich-text label editing). They concern work that lands after this feature's
 > key-free board.
@@ -214,7 +214,7 @@ Likelihood / impact qualitative (Low / Med / High).
 - **Unchanged:** `packages/js/*` (the model/parser/renderer — the engine does not touch it);
   `.github/workflows/deploy-website.yml` (still uploads `website/` as-is — committed bundle, no CI
   build).
-- **Owned by the sibling feature (`PLAN-FIGJAM-001`):** `engine/shapes-builtin/` (built-in
+- **Owned by the sibling feature (`PLAN-JAM-001`):** `engine/shapes-builtin/` (built-in
   consolidation), the `diagramToShapes` re-point, undo/export, and the tldraw-removal edits
   (`package.json`, `build.sh`, `Board.tsx` `licenseKey`/`tldraw.css`, bundle regen).
 
@@ -232,7 +232,7 @@ Detailed cases + traceability in `TEST-ENGINE-001`. At the plan level (this feat
 - **Regression throughout:** `cd packages/js && npm test` stays green; `Board`/shapes/`Inspector`/
   `diagramToShapes` import only `engine/adapter` (`NFR-EN-04`).
 - **Out of scope here:** full `TEST-CANVAS-001` (`TC-01..19`) parity, undo (`TC-18`), export, and
-  the `grep -r '"tldraw"' → 0` removal check are the sibling's gates (`PLAN-FIGJAM-001` / `TEST-FIGJAM-001`).
+  the `grep -r '"tldraw"' → 0` removal check are the sibling's gates (`PLAN-JAM-001` / `TEST-JAM-001`).
 
 ---
 
@@ -241,7 +241,7 @@ Detailed cases + traceability in `TEST-ENGINE-001`. At the plan level (this feat
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial plan: decision (adapter-first, minimal, render-first), phased plan (0→7), story-point sizing (≈ 91 SP), risk register (`RK-EN-01..07`, `RK-02` closing), files, verification gates. |
-| 0.2     | 2026-05-24 | Vũ Anh | **Split at the KEY-FREE BOARD seam** to honour the ≤50-SP/feature and ≤10-SP/phase caps: this feature keeps the render/interaction core (≈42 SP); built-in consolidation, undo, export, tldraw removal, footprint and FigJam authoring spun out to `PLAN-FIGJAM-001`. Phases **renumbered 1-based** and decomposed so every phase ≤10 SP. Risks RK-EN-02/03/05/06 moved to the sibling; RK-02 now *closes at render level* here. |
+| 0.2     | 2026-05-24 | Vũ Anh | **Split at the KEY-FREE BOARD seam** to honour the ≤50-SP/feature and ≤10-SP/phase caps: this feature keeps the render/interaction core (≈42 SP); built-in consolidation, undo, export, tldraw removal, footprint and FigJam authoring spun out to `PLAN-JAM-001`. Phases **renumbered 1-based** and decomposed so every phase ≤10 SP. Risks RK-EN-02/03/05/06 moved to the sibling; RK-02 now *closes at render level* here. |
 
 ## Annex B — Open questions / pending decisions
 
@@ -252,10 +252,10 @@ Detailed cases + traceability in `TEST-ENGINE-001`. At the plan level (this feat
 2. **Reactivity granularity** — single document epoch (simplest) vs. per-record atoms (faster)?
    Start coarse in Phase 5; the formal 60 fps decision is the sibling's footprint pass (`RK-EN-04`).
 3. **A/B flag lifetime** — keep `?engine=native` as a permanent escape hatch, or delete once
-   `canvas-figjam` removes tldraw? (Decided there.)
+   `canvas-jam` removes tldraw? (Decided there.)
 
 > Decided/moved: *built-ins vs. custom* (re-point `diagramToShapes` to `kymo-region`/`kymo-edge`) and
-> *freeform tool ambition* are now the sibling feature's open questions (`PLAN-FIGJAM-001` Annex B).
+> *freeform tool ambition* are now the sibling feature's open questions (`PLAN-JAM-001` Annex B).
 
 ## Annex C — Worklog
 
@@ -265,7 +265,7 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 | Date       | Phase / area | Work | Status | Ref |
 |------------|--------------|------|--------|-----|
 | 2026-05-23 | Docs | Authored the canvas-engine spec/plan doc set (`INTRO`/`FEATURE`/`DESIGN`/`TEST`/`PLAN`) — design-before-code for the tldraw replacement; surface census from `website/app/src`, adapter-seam strategy, phased plan, risk register. | ✅ | — |
-| 2026-05-24 | Docs | **Split the feature at the KEY-FREE BOARD seam** (≤50-SP/feature, ≤10-SP/phase caps): rescoped this doc-set to the render/interaction core (≈42 SP, Phases 1–7, 1-based); spun the parity-completion + FigJam-authoring half out to the new `*-FIGJAM-001` doc-set (≈44 SP). | ✅ | `PLAN-FIGJAM-001` |
+| 2026-05-24 | Docs | **Split the feature at the KEY-FREE BOARD seam** (≤50-SP/feature, ≤10-SP/phase caps): rescoped this doc-set to the render/interaction core (≈42 SP, Phases 1–7, 1-based); spun the parity-completion + FigJam-authoring half out to the new `*-JAM-001` doc-set (≈44 SP). | ✅ | `PLAN-JAM-001` |
 | 2026-05-24 | Phase 1 | **Adapter seam shipped.** New `website/app/src/engine/adapter.ts` re-exports the tldraw surface (+ `tldraw.css`); `Board`/`Inspector`/`KymoNodeShape`/`KymoDiagramShape`/`diagramToShapes` re-pointed to `./engine/adapter`. `@tldraw/tlschema` augmentation kept (deferred per DESIGN §9.3). Verified: `tsc --noEmit` clean; `grep '"tldraw"'` only in `adapter.ts` (`NFR-EN-04`); bundle rebuilt (CSS byte-identical); E2E smoke — board renders 43 shapes, 0 console errors; `packages/js` 59/59 green. | ✅ | — |
 | 2026-05-24 | Phase 2 | **Reactive store shipped.** New private package `packages/js-canvas` (mirrors `packages/js`: `tsc → dist`, `node --test`) with `src/store.ts` — records + CRUD, `listen(scope/source)`, `run(history/source)` transactions, the single **source-tagging choke-point** (loop-guard, `RK-EN-01`), monotonic index order, history tagging. CI gains a `js-canvas` job. Resolves Annex B §1 (engine home). Verified headless: **`TC-EN-01..04` green** (incl. the zero-echo loop-guard); `tsc --noEmit` clean; `packages/js` 59/59; `website/app` untouched. | ✅ | — |
 | 2026-05-24 | Phase 3 | **Editor facade shipped.** `packages/js-canvas/src/editor.ts` — `Editor` over the store: `getCurrentPageShapes`/`getShape`, `createShape(s)`/`updateShape`/`deleteShape(s)`, `run`, **selection** state (`select`/`getSelectedShapeIds`/`getOnlySelectedShape`), **camera** state + `zoomToFit`. Uses an optional structural `ShapeUtilLike` for `getDefaultProps`/`getGeometry`, with an `x/y`+`props.w/h` fallback until Phase 4. Verified headless: **`TC-EN-01`, `TC-EN-07`** + selection + default-fill green (8/8 in `js-canvas`); `tsc --noEmit` clean; `packages/js` 59/59; `website/app` untouched. | ✅ | — |
@@ -274,10 +274,10 @@ Append-only progress log (newest at the bottom) — ISO/IEC/IEEE 12207 §6.3.2. 
 | 2026-05-24 | Phase 6 | **Interaction + round-trip shipped.** Editor gains pure camera helpers (`screenToPage`/`panBy`/`zoomToPoint`, clamped — unit-tested). `EngineCanvas` handles pointer/wheel: **drag a `kymo-node`** (`source:"user"` write), **pan** on empty-drag, **wheel-zoom** to cursor, **click-select** + indicator outline (DOM hit-test via `data-shape-id`). `EngineBoard` reworked from read-only → **persistent editor + `sync`/`writeback`/loop-guard** (mirrors Board.tsx); `App` passes `source`/`onPatch`. **E2E verified:** dragging Orchestrator patched the `.kymo` to `@ (964,278)` and the node **stayed put — no oscillation** (loop-guard held); pan/zoom/select work; 0 console errors; default path unchanged. `js-canvas` 13/13 (incl. camera ops); `packages/js` 59/59; Board.tsx untouched. | ✅ | — |
 | 2026-05-24 | Phase 7 | **Persistence + engine-default shipped — `canvas-engine` FEATURE-COMPLETE.** New in-app `engine/persist.ts` (IndexedDB snapshot `{schemaVersion, camera, freeform}`; debounced save; schema-guarded load) replaces tldraw's `persistenceKey` (`FR-EN-07`). `EngineBoard` restores the camera on mount (fit suppressed when restored); `EngineCanvas` gains `autoFit`/`onChange`, fits **once** (resize re-measures only). **`App.tsx` flips the default to the engine** (`USE_ENGINE = engine !== "tldraw"`); `?engine=tldraw` opts out. **`RK-02` closes at the render level** (engine renders with no key; live closure on the next `deploy-website` publish). **E2E verified:** default `/app/` renders via the engine (19 nodes, no tldraw); pan→reload **restores the camera** (IndexedDB snapshot present); round-trip intact; `?engine=tldraw` mounts tldraw; 0 console errors. `packages/js` 59/59; `js-canvas` 13/13; Board.tsx/adapter/core untouched. | ✅ | — |
 | 2026-05-24 | Perf | **Pan/zoom render-decoupling + render-count guard (`RK-EN-04`).** FPS stress test found a ~75–100-shape knee on pan (a camera change `force()`-ed a full shape re-render). Fix: pan/zoom now write the camera transform straight to the DOM (`applyCamera`, `will-change: transform`) — **0 shape re-renders**, FPS flat regardless of N. Locked in by a **Playwright** render-count guard (`website/app/e2e/render-guard.spec.ts`, new `playwright.yml` CI job, paths-filtered) — pan/zoom → 0 renders, drag → ≥1; the guard was confirmed to **fail** when `force()` is re-added (non-vacuous). FPS itself is deliberately **not** asserted (flaky in CI). | ✅ | `RK-EN-04` |
-| 2026-05-24 | Perf | **Engine-vs-tldraw Playwright comparison bench** (`website/app/e2e/perf-compare.spec.ts`, `@perf`-tagged → run via `npm run test:perf`, **excluded from CI**). Real Playwright input (so tldraw's input system responds) + an in-page rAF sampler + a "moved?" signature per renderer. AIQ (~43 shapes): **parity** — both pin 60 fps on pan & zoom; engine pan does **0** React re-renders (tldraw is already transform-only, so the fix reaches parity, not a lead). Headless software-GL ⇒ absolute FPS isn't real-hardware (the high-N divergence is the real-GPU stress test above + the `canvas-figjam` footprint pass). | ✅ | `RK-EN-04` |
+| 2026-05-24 | Perf | **Engine-vs-tldraw Playwright comparison bench** (`website/app/e2e/perf-compare.spec.ts`, `@perf`-tagged → run via `npm run test:perf`, **excluded from CI**). Real Playwright input (so tldraw's input system responds) + an in-page rAF sampler + a "moved?" signature per renderer. AIQ (~43 shapes): **parity** — both pin 60 fps on pan & zoom; engine pan does **0** React re-renders (tldraw is already transform-only, so the fix reaches parity, not a lead). Headless software-GL ⇒ absolute FPS isn't real-hardware (the high-N divergence is the real-GPU stress test above + the `canvas-jam` footprint pass). | ✅ | `RK-EN-04` |
 
 **Status: `canvas-engine` is complete (Phases 1–7).** The engine is the default renderer; the
 deployed board renders with no license key (`RK-02` closed at the render level). **Remaining work is
-the sibling `canvas-figjam`** (`PLAN-FIGJAM-001`): built-in `geo`/`arrow` consolidation, undo/redo,
+the sibling `canvas-jam`** (`PLAN-JAM-001`): built-in `geo`/`arrow` consolidation, undo/redo,
 board export, the **physical tldraw removal + full `TEST-CANVAS-001` parity**, footprint, and the
 FigJam freeform-authoring tools.

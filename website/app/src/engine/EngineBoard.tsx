@@ -129,7 +129,7 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch }: Eng
         editor.setCamera(snap.camera);
         restoredRef.current = true;
       }
-      // (freeform shapes restore here once canvas-figjam ships them)
+      // (freeform shapes restore here once canvas-jam ships them)
       setLoaded(true);
     });
     return () => {

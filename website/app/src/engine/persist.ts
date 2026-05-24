@@ -3,7 +3,7 @@
  * Replaces tldraw's `persistenceKey`: a small snapshot in IndexedDB, restored on
  * reload. Kymo shapes are re-derived from the `.kymo` text (and round-trip via
  * the URL), so the snapshot persists the **camera** (pan/zoom) and reserves a
- * `freeform` field for the whiteboard layer that arrives in `canvas-figjam`.
+ * `freeform` field for the whiteboard layer that arrives in `canvas-jam`.
  *
  * Browser-coupled (IndexedDB) → lives in the app, like the rest of the render
  * layer; the headless `packages/js-canvas` core stays pure.
@@ -18,7 +18,7 @@ const SAVE_DEBOUNCE_MS = 400;
 export interface Snapshot {
   schemaVersion: number;
   camera: { x: number; y: number; z: number };
-  /** Freeform (non-kymo) shapes — empty until the FigJam tools land (canvas-figjam). */
+  /** Freeform (non-kymo) shapes — empty until the FigJam tools land (canvas-jam). */
   freeform: unknown[];
 }
 

@@ -89,7 +89,7 @@ export class Store {
   }
 
   /** The recorded change log (entries with `history:"record"`). The *consuming*
-   *  undo/redo stack is a later feature (canvas-figjam `FR-FJ-02`). */
+   *  undo/redo stack is a later feature (canvas-jam `FR-J-02`). */
   getHistory(): HistoryEntry[] {
     return this.history;
   }

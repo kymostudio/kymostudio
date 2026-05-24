@@ -1,5 +1,5 @@
 /**
- * canvas-figjam Phase 1 (FR-FJ-01) — the engine's shape builder.
+ * canvas-jam Phase 1 (FR-J-01) — the engine's shape builder.
  *
  * The shared `diagramToShapes` still emits tldraw-native `geo`/`arrow` (the live
  * `?engine=tldraw` path depends on them). The engine no longer wants those: this

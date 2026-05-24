@@ -118,9 +118,9 @@ test("dragging a node re-renders (sanity: the store path still updates shapes)",
   expect(await renders(page)).toBeGreaterThan(0);
 });
 
-// canvas-figjam Phase 1 (FR-FJ-01): the engine renders regions/edges as its own
+// canvas-jam Phase 1 (FR-J-01): the engine renders regions/edges as its own
 // kymo-region / kymo-edge shapes, not the Phase-5 tldraw-style geo/arrow stopgaps.
-test("regions and edges render as kymo-region / kymo-edge (FR-FJ-01)", async ({ page }) => {
+test("regions and edges render as kymo-region / kymo-edge (FR-J-01)", async ({ page }) => {
   // The default (AIQ) diagram has regions + edges.
   expect(await page.locator('[data-shape-type="kymo-region"]').count()).toBeGreaterThan(0);
   expect(await page.locator('[data-shape-type="kymo-edge"]').count()).toBeGreaterThan(0);
