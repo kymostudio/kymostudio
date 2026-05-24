@@ -1,0 +1,164 @@
+{
+  "width": 1350,
+  "height": 550,
+  "components": [
+    {
+      "id": "Cancelled",
+      "shape": "bpmn-end",
+      "icon": "terminate",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        690,
+        70
+      ]
+    },
+    {
+      "id": "Delivered",
+      "shape": "bpmn-end",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        1270,
+        310
+      ]
+    },
+    {
+      "id": "InStock",
+      "shape": "bpmn-gateway",
+      "icon": "exclusive",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        370,
+        310
+      ]
+    },
+    {
+      "id": "Invoice",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        830,
+        480
+      ]
+    },
+    {
+      "id": "Notify",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        530,
+        70
+      ]
+    },
+    {
+      "id": "Pack",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        830,
+        140
+      ]
+    },
+    {
+      "id": "Payment",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        510,
+        310
+      ]
+    },
+    {
+      "id": "Ship",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        1130,
+        310
+      ]
+    },
+    {
+      "id": "Split",
+      "shape": "bpmn-gateway",
+      "icon": "parallel",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        670,
+        310
+      ]
+    },
+    {
+      "id": "Start",
+      "shape": "bpmn-start",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        80,
+        310
+      ]
+    },
+    {
+      "id": "Sync",
+      "shape": "bpmn-gateway",
+      "icon": "parallel",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        990,
+        310
+      ]
+    },
+    {
+      "id": "Validate",
+      "shape": "bpmn-task",
+      "icon": "",
+      "size": [
+        100,
+        80
+      ],
+      "pos": [
+        210,
+        310
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": []
+}

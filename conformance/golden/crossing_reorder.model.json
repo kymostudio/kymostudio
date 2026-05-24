@@ -1,0 +1,268 @@
+{
+  "width": 448,
+  "height": 336,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "src1",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        64
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "src2",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        168
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "src3",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        152,
+        272
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dst1",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        272
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dst2",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        168
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dst3",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        288,
+        64
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [
+    {
+      "src": "src1",
+      "dst": "dst3",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "src2",
+      "dst": "dst2",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "src3",
+      "dst": "dst1",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": [
+    {
+      "t": "group",
+      "dir": "horizontal",
+      "children": [
+        {
+          "t": "group",
+          "dir": "vertical",
+          "children": [
+            {
+              "t": "id",
+              "id": "src1"
+            },
+            {
+              "t": "id",
+              "id": "src2"
+            },
+            {
+              "t": "id",
+              "id": "src3"
+            }
+          ]
+        },
+        {
+          "t": "group",
+          "dir": "vertical",
+          "children": [
+            {
+              "t": "id",
+              "id": "dst1"
+            },
+            {
+              "t": "id",
+              "id": "dst2"
+            },
+            {
+              "t": "id",
+              "id": "dst3"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

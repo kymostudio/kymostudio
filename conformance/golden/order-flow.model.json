@@ -1,0 +1,790 @@
+{
+  "width": 1422,
+  "height": 420,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "S",
+      "name": "Order received",
+      "subtitle": "",
+      "icon": "",
+      "shape": "bpmn-start",
+      "accent": "blue",
+      "pos": [
+        138,
+        210
+      ],
+      "size": [
+        36,
+        36
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "V",
+      "name": "Validate order",
+      "subtitle": "",
+      "icon": "",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        286,
+        210
+      ],
+      "size": [
+        100,
+        80
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "GW",
+      "name": "In stock?",
+      "subtitle": "",
+      "icon": "exclusive",
+      "shape": "bpmn-gateway",
+      "accent": "blue",
+      "pos": [
+        441,
+        210
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "P",
+      "name": "Process payment",
+      "subtitle": "",
+      "icon": "",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        596,
+        210
+      ],
+      "size": [
+        100,
+        80
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "N",
+      "name": "Notify customer",
+      "subtitle": "",
+      "icon": "",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        596,
+        80
+      ],
+      "size": [
+        100,
+        80
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "C",
+      "name": "Order cancelled",
+      "subtitle": "",
+      "icon": "terminate",
+      "shape": "bpmn-end",
+      "accent": "blue",
+      "pos": [
+        751,
+        80
+      ],
+      "size": [
+        36,
+        36
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "SP",
+      "name": "Split",
+      "subtitle": "",
+      "icon": "parallel",
+      "shape": "bpmn-gateway",
+      "accent": "blue",
+      "pos": [
+        751,
+        210
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Pk",
+      "name": "Pack items",
+      "subtitle": "",
+      "icon": "",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        906,
+        210
+      ],
+      "size": [
+        100,
+        80
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Iv",
+      "name": "Generate invoice",
+      "subtitle": "",
+      "icon": "",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        906,
+        340
+      ],
+      "size": [
+        100,
+        80
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Sy",
+      "name": "Sync",
+      "subtitle": "",
+      "icon": "parallel",
+      "shape": "bpmn-gateway",
+      "accent": "blue",
+      "pos": [
+        1061,
+        210
+      ],
+      "size": [
+        50,
+        50
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Sh",
+      "name": "Ship order",
+      "subtitle": "",
+      "icon": "",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        1216,
+        210
+      ],
+      "size": [
+        100,
+        80
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "D",
+      "name": "Order delivered",
+      "subtitle": "",
+      "icon": "",
+      "shape": "bpmn-end",
+      "accent": "blue",
+      "pos": [
+        1364,
+        210
+      ],
+      "size": [
+        36,
+        36
+      ],
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [
+    {
+      "src": "S",
+      "dst": "V",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          156,
+          210
+        ],
+        [
+          236,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "V",
+      "dst": "GW",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          336,
+          210
+        ],
+        [
+          416,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "GW",
+      "dst": "P",
+      "label": "Yes",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": [
+        506,
+        202
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          466,
+          210
+        ],
+        [
+          546,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "GW",
+      "dst": "N",
+      "label": "No",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": [
+        441,
+        124
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          441,
+          185
+        ],
+        [
+          441,
+          80
+        ],
+        [
+          546,
+          80
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "N",
+      "dst": "C",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          646,
+          80
+        ],
+        [
+          733,
+          80
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "P",
+      "dst": "SP",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          646,
+          210
+        ],
+        [
+          726,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "SP",
+      "dst": "Pk",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          776,
+          210
+        ],
+        [
+          856,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "SP",
+      "dst": "Iv",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          751,
+          235
+        ],
+        [
+          751,
+          340
+        ],
+        [
+          856,
+          340
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "Pk",
+      "dst": "Sy",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          956,
+          210
+        ],
+        [
+          1036,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "Iv",
+      "dst": "Sy",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          956,
+          340
+        ],
+        [
+          996,
+          340
+        ],
+        [
+          996,
+          210
+        ],
+        [
+          1036,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "Sy",
+      "dst": "Sh",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          1086,
+          210
+        ],
+        [
+          1166,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    },
+    {
+      "src": "Sh",
+      "dst": "D",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": [
+        [
+          1266,
+          210
+        ],
+        [
+          1346,
+          210
+        ]
+      ],
+      "bpmn_flow": "sequence"
+    }
+  ],
+  "layout_trees": []
+}

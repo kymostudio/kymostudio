@@ -1,0 +1,754 @@
+{
+  "width": 1280,
+  "height": 680,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "amplify",
+      "name": "AWS Amplify",
+      "subtitle": "Website",
+      "icon": "aws-amplify",
+      "shape": "aws-tile",
+      "accent": "orange",
+      "pos": [
+        320,
+        176
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "lex",
+      "name": "Amazon Lex",
+      "subtitle": "Natural Language Chatbot",
+      "icon": "aws-lex",
+      "shape": "aws-tile",
+      "accent": "orange",
+      "pos": [
+        320,
+        344
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "lambda",
+      "name": "AWS Lambda",
+      "subtitle": "Lex Bot Logic Handler",
+      "icon": "aws-lambda",
+      "shape": "aws-tile-hero",
+      "accent": "orange",
+      "pos": [
+        568,
+        344
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "connect",
+      "name": "Amazon Connect",
+      "subtitle": "Contact Center",
+      "icon": "aws-connect",
+      "shape": "aws-tile",
+      "accent": "orange",
+      "pos": [
+        448,
+        512
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dynamodb",
+      "name": "Amazon DynamoDB",
+      "subtitle": "User Account Info",
+      "icon": "aws-dynamodb",
+      "shape": "aws-tile",
+      "accent": "blue",
+      "pos": [
+        832,
+        176
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "bedrock",
+      "name": "Amazon Bedrock",
+      "subtitle": "Anthropic Claude 2.1 FM",
+      "icon": "aws-bedrock",
+      "shape": "aws-tile",
+      "accent": "green",
+      "pos": [
+        832,
+        344
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "s3",
+      "name": "Amazon S3",
+      "subtitle": "Customer Data",
+      "icon": "aws-s3",
+      "shape": "aws-tile",
+      "accent": "green",
+      "pos": [
+        1064,
+        344
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "kendra",
+      "name": "Amazon Kendra",
+      "subtitle": "FAQ Search",
+      "icon": "aws-kendra",
+      "shape": "aws-tile",
+      "accent": "orange",
+      "pos": [
+        1024,
+        520
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "customer",
+      "name": "Customer",
+      "subtitle": "",
+      "icon": "customer-person",
+      "shape": "circle",
+      "accent": "blue",
+      "pos": [
+        72,
+        344
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "internet",
+      "name": "Internet",
+      "subtitle": "",
+      "icon": "internet-cloud",
+      "shape": "circle",
+      "accent": "blue",
+      "pos": [
+        1200,
+        424
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "slack",
+      "name": "",
+      "subtitle": "",
+      "icon": "slack",
+      "shape": "badge",
+      "accent": "blue",
+      "pos": [
+        560,
+        512
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "step1",
+      "name": "",
+      "subtitle": "",
+      "icon": "step-1",
+      "shape": "badge",
+      "accent": "orange",
+      "pos": [
+        184,
+        296
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "step2",
+      "name": "",
+      "subtitle": "",
+      "icon": "step-2",
+      "shape": "badge",
+      "accent": "orange",
+      "pos": [
+        440,
+        160
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "step3",
+      "name": "",
+      "subtitle": "",
+      "icon": "step-3",
+      "shape": "badge",
+      "accent": "orange",
+      "pos": [
+        704,
+        160
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "id": "useast1",
+      "label": "us-east-1",
+      "bounds": [
+        208,
+        88,
+        935,
+        568
+      ],
+      "contains": [
+        "amplify",
+        "lex",
+        "lambda",
+        "connect",
+        "dynamodb",
+        "bedrock",
+        "s3",
+        "kendra"
+      ],
+      "padding": [
+        40,
+        56
+      ],
+      "padding_bottom": null,
+      "style": "outer",
+      "icon": "aws-logo",
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "yourcompany",
+      "label": "<your-company>.com",
+      "bounds": [
+        224,
+        120,
+        431,
+        496
+      ],
+      "contains": [
+        "amplify",
+        "lex",
+        "lambda",
+        "connect"
+      ],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": null,
+      "style": "inner",
+      "icon": "site-globe",
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    }
+  ],
+  "edges": [
+    {
+      "src": "customer",
+      "dst": "amplify",
+      "label": "Web",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        -24
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        -40,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "customer",
+      "dst": "lex",
+      "label": "SMS",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        -50,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "customer",
+      "dst": "connect",
+      "label": "Voice",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [
+        [
+          72,
+          512
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": [
+        232,
+        504
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "amplify",
+      "dst": "lambda",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        -4
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "lambda",
+      "dst": "dynamodb",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "top",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": true,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "lex",
+      "dst": "lambda",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        -12
+      ],
+      "dst_offset": [
+        0,
+        -8
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "lambda",
+      "dst": "lex",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "left",
+      "dst_anchor": "right",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        12
+      ],
+      "dst_offset": [
+        0,
+        12
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "lambda",
+      "dst": "bedrock",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": true,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "bedrock",
+      "dst": "s3",
+      "label": "fine-tunable",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        -10
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "lambda",
+      "dst": "kendra",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [
+        [
+          568,
+          520
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": true,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "internet",
+      "dst": "kendra",
+      "label": "Web Crawler",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "right",
+      "route": "auto",
+      "via": [
+        [
+          1200,
+          520
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": [
+        1136,
+        512
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "connect",
+      "dst": "lambda",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "top",
+      "dst_anchor": "bottom",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": []
+}

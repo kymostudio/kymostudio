@@ -1,0 +1,6 @@
+# Horizontal anchors + off-axis dst → H-V-H Z-shape with midpoint bend.
+# Place a at top-left, b at bottom-right; |dx|=200 > 2·|dy|=100 → horizontal.
+a hex/hex-agent/green @ (60, 60)
+b hex/hex-agent/green @ (260, 160)
+
+a --> b

@@ -1,0 +1,655 @@
+{
+  "width": 1286,
+  "height": 550,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "Start",
+      "name": "Order received",
+      "subtitle": "",
+      "icon": "none",
+      "shape": "bpmn-start",
+      "accent": "blue",
+      "pos": [
+        48,
+        310
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Validate",
+      "name": "Validate order",
+      "subtitle": "",
+      "icon": "none",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        178,
+        310
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "InStock",
+      "name": "In stock?",
+      "subtitle": "",
+      "icon": "exclusive",
+      "shape": "bpmn-gateway",
+      "accent": "blue",
+      "pos": [
+        338,
+        310
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Notify",
+      "name": "Notify customer",
+      "subtitle": "",
+      "icon": "none",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        498,
+        70
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Cancelled",
+      "name": "Order cancelled",
+      "subtitle": "",
+      "icon": "terminate",
+      "shape": "bpmn-end",
+      "accent": "blue",
+      "pos": [
+        658,
+        70
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Payment",
+      "name": "Process payment",
+      "subtitle": "",
+      "icon": "none",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        478,
+        310
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Split",
+      "name": "Split",
+      "subtitle": "",
+      "icon": "parallel",
+      "shape": "bpmn-gateway",
+      "accent": "blue",
+      "pos": [
+        638,
+        310
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Pack",
+      "name": "Pack items",
+      "subtitle": "",
+      "icon": "none",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        798,
+        140
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Invoice",
+      "name": "Generate invoice",
+      "subtitle": "",
+      "icon": "none",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        798,
+        480
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Sync",
+      "name": "Sync",
+      "subtitle": "",
+      "icon": "parallel",
+      "shape": "bpmn-gateway",
+      "accent": "blue",
+      "pos": [
+        958,
+        310
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Ship",
+      "name": "Ship order",
+      "subtitle": "",
+      "icon": "none",
+      "shape": "bpmn-task",
+      "accent": "blue",
+      "pos": [
+        1098,
+        310
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "Delivered",
+      "name": "Order delivered",
+      "subtitle": "",
+      "icon": "none",
+      "shape": "bpmn-end",
+      "accent": "blue",
+      "pos": [
+        1238,
+        310
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [],
+  "edges": [
+    {
+      "src": "Start",
+      "dst": "Validate",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Validate",
+      "dst": "InStock",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "InStock",
+      "dst": "Payment",
+      "label": "Yes",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": [
+        397,
+        298
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "InStock",
+      "dst": "Notify",
+      "label": "No",
+      "style": "gray",
+      "src_anchor": "top",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [
+        [
+          338,
+          70
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": [
+        350,
+        180
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Notify",
+      "dst": "Cancelled",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Payment",
+      "dst": "Split",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Split",
+      "dst": "Pack",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "top",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [
+        [
+          638,
+          140
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Split",
+      "dst": "Invoice",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [
+        [
+          638,
+          480
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Pack",
+      "dst": "Sync",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [
+        [
+          958,
+          140
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Invoice",
+      "dst": "Sync",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "bottom",
+      "route": "auto",
+      "via": [
+        [
+          958,
+          480
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Sync",
+      "dst": "Ship",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "Ship",
+      "dst": "Delivered",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": []
+}

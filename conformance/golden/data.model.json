@@ -1,0 +1,542 @@
+{
+  "width": 1080,
+  "height": 658,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "user",
+      "name": "Agent / User",
+      "subtitle": "Bootcamp participant",
+      "icon": "user",
+      "shape": "circle",
+      "accent": "blue",
+      "pos": [
+        239,
+        82
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "jupyter",
+      "name": "Jupyter Notebook",
+      "subtitle": "Python 3.13  ·  điều phối 2 luồng",
+      "icon": "notebook",
+      "shape": "cube",
+      "accent": "green",
+      "pos": [
+        239,
+        244
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "http_client",
+      "name": "HTTP Client",
+      "subtitle": "requests  →  API Catalog",
+      "icon": "send",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        120,
+        414
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "chat_nvidia",
+      "name": "ChatNVIDIA",
+      "subtitle": "langchain-nvidia  ·  luồng LOCAL",
+      "icon": "zap",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        333,
+        414
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "docker",
+      "name": "Docker Engine",
+      "subtitle": "daemon  ·  quản lý NIM",
+      "icon": "boxes",
+      "shape": "cube",
+      "accent": "green",
+      "pos": [
+        630,
+        244
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "nim",
+      "name": "NIM Microservice",
+      "subtitle": "Uvicorn  ·  llama-3.2-3b  ·  :8000",
+      "icon": "neural",
+      "shape": "cube-big",
+      "accent": "green",
+      "pos": [
+        630,
+        414
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "cache",
+      "name": "NIM Cache",
+      "subtitle": "~/.cache/nim → /opt/nim/.cache",
+      "icon": "cylinder",
+      "shape": "cylinder",
+      "accent": "orange",
+      "pos": [
+        630,
+        579
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "nvcr",
+      "name": "nvcr.io",
+      "subtitle": "Container Registry",
+      "icon": "archive",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        931,
+        244
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "api_catalog",
+      "name": "API Catalog",
+      "subtitle": "integrate.api.nvidia.com  ←  HTTP",
+      "icon": "cloud",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        931,
+        414
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "auth",
+      "name": "Auth",
+      "subtitle": "NVIDIA_API_KEY  ·  NGC_API_KEY",
+      "icon": "key",
+      "shape": "annotation",
+      "accent": "orange",
+      "pos": [
+        931,
+        579
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "id": "code_server",
+      "label": "code-server (IDE)",
+      "bounds": [
+        18,
+        156,
+        443,
+        356
+      ],
+      "contains": [],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": null,
+      "style": "outer",
+      "icon": null,
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "brev",
+      "label": "NVIDIA Brev (GPU pod)",
+      "bounds": [
+        496,
+        156,
+        269,
+        506
+      ],
+      "contains": [],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": null,
+      "style": "outer",
+      "icon": null,
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "cloud",
+      "label": "NVIDIA Cloud (SaaS)",
+      "bounds": [
+        800,
+        156,
+        263,
+        506
+      ],
+      "contains": [],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": null,
+      "style": "outer",
+      "icon": null,
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    }
+  ],
+  "edges": [
+    {
+      "src": "user",
+      "dst": "jupyter",
+      "label": "Mở browser",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        60,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "jupyter",
+      "dst": "docker",
+      "label": "docker run  ·  SSH",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "docker",
+      "dst": "nvcr",
+      "label": "Pull image",
+      "style": "orange",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "jupyter",
+      "dst": "http_client",
+      "label": "Cloud cell",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "top",
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        -22,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        -14
+      ],
+      "label_anchor": "dst",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "jupyter",
+      "dst": "chat_nvidia",
+      "label": "Local cell",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "top",
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        22,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        -14
+      ],
+      "label_anchor": "dst",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "chat_nvidia",
+      "dst": "nim",
+      "label": "POST  ·  local",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "docker",
+      "dst": "nim",
+      "label": "Khởi tạo pod",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        48,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "nim",
+      "dst": "cache",
+      "label": "Mount weights",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        50,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": []
+}

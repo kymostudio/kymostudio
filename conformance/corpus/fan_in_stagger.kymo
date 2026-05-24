@@ -1,0 +1,13 @@
+# 3 srcs → 1 dst. `_stagger_fanin_edges` should offset dst anchors so
+# the arrowheads enter the dst's left edge at distinct Y positions
+# instead of piling up at one pixel.
+s1  hex/hex-agent/green
+s2  hex/hex-agent/green
+s3  hex/hex-agent/green
+dst hex/hex-agent/green
+
+layout { { s1 , s2 , s3 } | dst }
+
+s1 --> dst
+s2 --> dst
+s3 --> dst

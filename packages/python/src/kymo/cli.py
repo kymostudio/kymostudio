@@ -8,11 +8,18 @@ Excalidraw scene) written next to the input file:
     kymo samples/aws_1.kymo --animate      → samples/aws_1-animated.svg
     kymo samples/aws_1.kymo --figma        → samples/aws_1.figma.js
     kymo samples/aws_1.kymo --excalidraw   → samples/aws_1.excalidraw
+    kymo samples/aws_1.kymo --json         → samples/aws_1.kymo.json
+    kymo samples/aws_1.kymo.json               → samples/aws_1.svg
     kymo samples/order.bpmn                    → samples/order.svg
 
 `.bpmn` files are imported via their Diagram-Interchange geometry
 (`from_bpmn.py`), so positions come straight from the file — no layout
-pass is run.
+pass is run. `.kymo.json` files (the serialized resolved model, see
+`from_kymojson.py`) are likewise already resolved — no layout pass.
+
+`--json` emits a `.kymo.json` file: a versioned, lossless JSON serialization
+of the resolved `Diagram` (the model both the DSL parser and the BPMN
+importer produce). It can be re-loaded as a source and rendered to any target.
 
 `--animate` emits a `-animated.svg` companion with flowing edge dashes
 (CSS `stroke-dashoffset` animation). Static SVG (no JS); animation runs
@@ -35,6 +42,7 @@ from .layout import layout
 from .to_bpmn import export as render_bpmn
 from .to_excalidraw import render as render_excalidraw
 from .to_figma import render as render_figma
+from .to_kymojson import export as render_kymojson
 from .to_svg import render
 
 
@@ -44,6 +52,10 @@ def load(source: Path) -> tuple[object, object | None, object | None]:
         from .from_bpmn import parse as parse_bpmn
         # BPMN files carry their own geometry — already resolved, no layout.
         return parse_bpmn(source.read_text(encoding="utf-8")), None, None
+    if source.suffix == ".json":
+        from .from_kymojson import parse as parse_kymojson
+        # .kymo.json holds a fully-resolved model — already positioned, no layout.
+        return parse_kymojson(source.read_text(encoding="utf-8")), None, None
     if source.suffix == ".kymo":
         return parse_dsl(source.read_text(encoding="utf-8"))
     # For .py sources, the file's parent directory must be on sys.path so the
@@ -65,14 +77,15 @@ def main() -> None:
     if not src.exists():
         print(f"not found: {src}")
         sys.exit(1)
-    if src.suffix not in (".kymo", ".py", ".bpmn"):
-        print(f"unsupported source: {src} (expected .kymo, .bpmn or .py)")
+    if src.suffix not in (".kymo", ".py", ".bpmn", ".json"):
+        print(f"unsupported source: {src} (expected .kymo, .kymo.json, .bpmn or .py)")
         sys.exit(1)
 
     animate    = "--animate"    in flags
     figma      = "--figma"      in flags
     excalidraw = "--excalidraw" in flags
     bpmn       = "--bpmn"       in flags
+    json_out   = "--json"       in flags
 
     diagram, layout_spec, external_layout = load(src)
     had_bpmn = bool(getattr(diagram, "bpmn_blocks", None))
@@ -81,11 +94,12 @@ def main() -> None:
         layout_bpmn(diagram)
     if layout_spec:
         layout(diagram, layout_spec, external_layout)
-    # BPMN diagrams arrive fully positioned — from DI geometry (`.bpmn`) or our
-    # `bpmn { }` block layout. The alignment/auto-size passes assume
-    # DSL-authored nodes and would perturb the already-absolute geometry
-    # (and `_auto_size_canvas` ignores `Edge.points`), so skip them.
-    if src.suffix != ".bpmn" and not had_bpmn:
+    # `.bpmn` (DI geometry) and `.kymo.json` (serialized resolved model) arrive
+    # fully positioned, as does a `bpmn { }` block after its own layout. The
+    # alignment/auto-size passes assume DSL-authored nodes and would perturb the
+    # already-absolute geometry (and `_auto_size_canvas` ignores `Edge.points`),
+    # so skip them for resolved sources.
+    if src.suffix not in (".bpmn", ".json") and not had_bpmn:
         resolve_alignments(diagram)
 
     if excalidraw:
@@ -112,6 +126,16 @@ def main() -> None:
         out.write_text(payload, encoding="utf-8")
         rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
         print(f"✓ wrote {rel} (bpmn 2.0 xml)  ({diagram.width}×{diagram.height}, {len(payload):,} bytes)")
+        return
+
+    if json_out:
+        payload = render_kymojson(diagram)
+        out = src.with_name(src.stem + ".kymo.json")   # aiq.kymo / order.bpmn → *.kymo.json
+        if out.resolve() == src.resolve():             # don't clobber a .kymo.json input
+            out = src.with_name(src.stem + ".reexport.kymo.json")
+        out.write_text(payload, encoding="utf-8")
+        rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
+        print(f"✓ wrote {rel} (kymo.json)  ({diagram.width}×{diagram.height}, {len(payload):,} bytes)")
         return
 
     svg = render(diagram, animate=animate)

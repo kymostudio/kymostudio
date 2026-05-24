@@ -1,0 +1,180 @@
+{
+  "width": 368,
+  "height": 280,
+  "title": "",
+  "subtitle": "",
+  "components": [
+    {
+      "id": "parent",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        96,
+        136
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "a",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        248,
+        88
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "b",
+      "name": "",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        248,
+        192
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "id": "services",
+      "label": "Services",
+      "bounds": [
+        189,
+        32,
+        118,
+        216
+      ],
+      "contains": [
+        "a",
+        "b"
+      ],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": null,
+      "style": "cluster",
+      "icon": null,
+      "layout": "vertical",
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    }
+  ],
+  "edges": [
+    {
+      "src": "parent",
+      "dst": "a",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "parent",
+      "dst": "b",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "curve",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": [
+    {
+      "t": "group",
+      "dir": "horizontal",
+      "children": [
+        {
+          "t": "id",
+          "id": "parent"
+        },
+        {
+          "t": "id",
+          "id": "services"
+        }
+      ]
+    }
+  ]
+}

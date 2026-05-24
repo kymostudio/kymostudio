@@ -1,0 +1,7 @@
+# Default `-->` between two same-row nodes → straight horizontal arrow.
+a hex/hex-agent/green
+b hex/hex-agent/green
+
+layout { a | b }
+
+a --> b

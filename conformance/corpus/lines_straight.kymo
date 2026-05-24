@@ -1,0 +1,12 @@
+# Line shape: straight. Direct diagonal from src.right to dst.left,
+# no bends — `trunk_offset` ignored.
+orch hex/hex-agent/green
+a    hex/hex-agent/green
+b    hex/hex-agent/green
+c    hex/hex-agent/green
+
+layout { orch | { a , b , c } }
+
+orch --> a { straight }
+orch --> b { straight }
+orch --> c { straight }

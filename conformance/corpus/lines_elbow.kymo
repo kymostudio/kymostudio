@@ -1,0 +1,12 @@
+# Line shape: elbow (default). orch fan-out to 3 children, all edges
+# H-V-H Z-shape with lane assignment.
+orch hex/hex-agent/green
+a    hex/hex-agent/green
+b    hex/hex-agent/green
+c    hex/hex-agent/green
+
+layout { orch | { a , b , c } }
+
+orch --> a { elbow }
+orch --> b { elbow }
+orch --> c { elbow }

@@ -1,0 +1,1291 @@
+{
+  "width": 1368,
+  "height": 760,
+  "title": "Autonomous Deep Researcher — Reference Architecture",
+  "subtitle": "NVIDIA AIQ • Vietnam Agentic AI Bootcamp 2026",
+  "components": [
+    {
+      "id": "orch",
+      "name": "Orchestrator",
+      "subtitle": "",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        840,
+        200
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "researcher",
+      "name": "Researcher",
+      "subtitle": "Sub-Agents",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        976,
+        200
+      ],
+      "size": null,
+      "parent": "orch",
+      "align": "right",
+      "align_gap": 60,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "planner",
+      "name": "Planning",
+      "subtitle": "Sub-Agents",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        840,
+        384
+      ],
+      "size": null,
+      "parent": "orch",
+      "align": "bottom",
+      "align_gap": 76,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "fs",
+      "name": "File System",
+      "subtitle": "Workspace",
+      "icon": "folder",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        1144,
+        200
+      ],
+      "size": null,
+      "parent": "researcher",
+      "align": "right",
+      "align_gap": 100,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "todo",
+      "name": "ToDo List",
+      "subtitle": "",
+      "icon": "checklist",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        1264,
+        200
+      ],
+      "size": null,
+      "parent": "fs",
+      "align": "right",
+      "align_gap": 50,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "web",
+      "name": "Web Search",
+      "subtitle": "Tavily API",
+      "icon": "magnifier",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        288,
+        384
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "papers",
+      "name": "Academic Papers",
+      "subtitle": "Serper API",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        416,
+        384
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "kbapi",
+      "name": "Knowledge Layer",
+      "subtitle": "API",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        568,
+        384
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "extract",
+      "name": "Extraction",
+      "subtitle": "NeMo Retriever",
+      "icon": "neural-sm",
+      "shape": "cube",
+      "accent": "green",
+      "pos": [
+        288,
+        616
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "embed",
+      "name": "Embedding",
+      "subtitle": "NeMo Retriever",
+      "icon": "neural-sm",
+      "shape": "cube",
+      "accent": "green",
+      "pos": [
+        424,
+        616
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "vecdb",
+      "name": "Vector Database",
+      "subtitle": "NVIDIA cuVS",
+      "icon": "cylinder",
+      "shape": "cylinder",
+      "accent": "orange",
+      "pos": [
+        568,
+        616
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "rerank",
+      "name": "Reranking",
+      "subtitle": "NeMo Retriever",
+      "icon": "neural-sm",
+      "shape": "cube",
+      "accent": "green",
+      "pos": [
+        712,
+        616
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "gen",
+      "name": "Generate",
+      "subtitle": "Nemotron 3 Nano",
+      "icon": "neural-sm",
+      "shape": "cube",
+      "accent": "green",
+      "pos": [
+        848,
+        616
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "user",
+      "name": "Agent/User",
+      "subtitle": "Bootcamp participant",
+      "icon": "user",
+      "shape": "circle",
+      "accent": "blue",
+      "pos": [
+        96,
+        200
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "router",
+      "name": "Intent Router",
+      "subtitle": "Shallow / Deep",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        248,
+        200
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "shallow",
+      "name": "Shallow Research",
+      "subtitle": "Single-tool answer",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "green",
+      "pos": [
+        400,
+        200
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "escalate",
+      "name": "Escalation",
+      "subtitle": "needs HITL?",
+      "icon": "gear",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        536,
+        200
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "hitl",
+      "name": "HITL Clarification",
+      "subtitle": "and Planning",
+      "icon": "hex-agent",
+      "shape": "hex",
+      "accent": "red",
+      "pos": [
+        688,
+        200
+      ],
+      "size": null,
+      "parent": null,
+      "align": null,
+      "align_gap": 24,
+      "align_offset": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "entdata",
+      "name": "Enterprise Data",
+      "subtitle": "",
+      "icon": "files",
+      "shape": "box",
+      "accent": "orange",
+      "pos": [
+        96,
+        616
+      ],
+      "size": null,
+      "parent": "user",
+      "align": "bottom",
+      "align_gap": 304,
+      "align_offset": [
+        0,
+        0
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "id": "adr",
+      "label": "Autonomous Deep Researcher",
+      "bounds": [
+        758,
+        133,
+        581,
+        363
+      ],
+      "contains": [
+        "orch",
+        "researcher",
+        "planner",
+        "fs",
+        "todo"
+      ],
+      "padding": [
+        40,
+        32
+      ],
+      "padding_bottom": 40,
+      "style": "outer",
+      "icon": null,
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "start",
+      "label_position": null
+    },
+    {
+      "id": "svfs",
+      "label": "Shared Virtual File System",
+      "bounds": [
+        1082,
+        141,
+        241,
+        156
+      ],
+      "contains": [
+        "fs",
+        "todo"
+      ],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": null,
+      "style": "inner",
+      "icon": null,
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "tools",
+      "label": "Data Source Tools",
+      "bounds": [
+        229,
+        325,
+        415,
+        164
+      ],
+      "contains": [
+        "web",
+        "papers",
+        "kbapi"
+      ],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": 32,
+      "style": "outer",
+      "icon": null,
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "rag",
+      "label": "RAG Knowledge Layer",
+      "bounds": [
+        222,
+        552,
+        695,
+        178
+      ],
+      "contains": [
+        "extract",
+        "embed",
+        "vecdb",
+        "rerank",
+        "gen"
+      ],
+      "padding": [
+        24,
+        24
+      ],
+      "padding_bottom": 32,
+      "style": "outer",
+      "icon": null,
+      "layout": null,
+      "pos": null,
+      "gap": 24,
+      "align": "center",
+      "visible": true,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "routing_chain",
+      "label": "",
+      "bounds": [
+        36,
+        162,
+        846,
+        114
+      ],
+      "contains": [
+        "user",
+        "router",
+        "shallow",
+        "escalate",
+        "hitl",
+        "orch"
+      ],
+      "padding": [
+        0,
+        0
+      ],
+      "padding_bottom": null,
+      "style": "outer",
+      "icon": null,
+      "layout": "horizontal",
+      "pos": [
+        32,
+        162
+      ],
+      "gap": 50,
+      "align": "center",
+      "visible": false,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "tools_layout",
+      "label": "",
+      "bounds": [
+        253,
+        349,
+        367,
+        108
+      ],
+      "contains": [
+        "web",
+        "papers",
+        "kbapi"
+      ],
+      "padding": [
+        0,
+        0
+      ],
+      "padding_bottom": null,
+      "style": "outer",
+      "icon": null,
+      "layout": "horizontal",
+      "pos": [
+        250,
+        345
+      ],
+      "gap": 45,
+      "align": "center",
+      "visible": false,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    },
+    {
+      "id": "rag_layout",
+      "label": "",
+      "bounds": [
+        246,
+        576,
+        647,
+        122
+      ],
+      "contains": [
+        "extract",
+        "embed",
+        "vecdb",
+        "rerank",
+        "gen"
+      ],
+      "padding": [
+        0,
+        0
+      ],
+      "padding_bottom": null,
+      "style": "outer",
+      "icon": null,
+      "layout": "horizontal",
+      "pos": [
+        250,
+        575
+      ],
+      "gap": 50,
+      "align": "center",
+      "visible": false,
+      "border_dash": null,
+      "border_stroke": null,
+      "label_anchor": "middle",
+      "label_position": null
+    }
+  ],
+  "edges": [
+    {
+      "src": "user",
+      "dst": "router",
+      "label": "Query",
+      "style": "gray",
+      "src_anchor": "right",
+      "dst_anchor": "left",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        -10
+      ],
+      "dst_offset": [
+        0,
+        -10
+      ],
+      "label_offset": [
+        0,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "router",
+      "dst": "user",
+      "label": "Chat Response",
+      "style": "gray",
+      "src_anchor": "left",
+      "dst_anchor": "right",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        10
+      ],
+      "dst_offset": [
+        0,
+        10
+      ],
+      "label_offset": [
+        0,
+        14
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "router",
+      "dst": "shallow",
+      "label": "No",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "shallow",
+      "dst": "escalate",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "escalate",
+      "dst": "hitl",
+      "label": "Yes",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        -8
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "hitl",
+      "dst": "orch",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "orch",
+      "dst": "researcher",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "orch",
+      "dst": "planner",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "planner",
+      "dst": "fs",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "adr",
+      "dst": "tools",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "left",
+      "dst_anchor": "right",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        91
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "kbapi",
+      "dst": "rag",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        12
+      ],
+      "dst_offset": [
+        -7,
+        -30
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "extract",
+      "dst": "embed",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "embed",
+      "dst": "vecdb",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "vecdb",
+      "dst": "rerank",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "rerank",
+      "dst": "gen",
+      "label": "",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "user",
+      "dst": "entdata",
+      "label": "",
+      "style": "gray",
+      "src_anchor": "bottom",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": false,
+      "label_pos": null,
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "entdata",
+      "dst": "rag",
+      "label": "File Upload",
+      "style": "gray",
+      "src_anchor": null,
+      "dst_anchor": null,
+      "route": "auto",
+      "via": [
+        [
+          128,
+          640
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": [
+        176,
+        632
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "orch",
+      "dst": "user",
+      "label": "Deep Research Report",
+      "style": "gray",
+      "src_anchor": "top",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [
+        [
+          840,
+          48
+        ],
+        [
+          104,
+          48
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        31,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": [
+        472,
+        48
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "hitl",
+      "dst": "user",
+      "label": "Clarifying Questions and Responses",
+      "style": "gray",
+      "src_anchor": "top",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [
+        [
+          688,
+          88
+        ],
+        [
+          96,
+          88
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        0,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": [
+        392,
+        88
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    },
+    {
+      "src": "shallow",
+      "dst": "user",
+      "label": "Short Answer",
+      "style": "gray",
+      "src_anchor": "top",
+      "dst_anchor": "top",
+      "route": "auto",
+      "via": [
+        [
+          400,
+          128
+        ],
+        [
+          80,
+          128
+        ]
+      ],
+      "src_offset": [
+        0,
+        0
+      ],
+      "dst_offset": [
+        -31,
+        0
+      ],
+      "label_offset": [
+        0,
+        0
+      ],
+      "label_anchor": "mid",
+      "label_small": true,
+      "label_pos": [
+        240,
+        128
+      ],
+      "dashed": false,
+      "no_arrow": false,
+      "trunk_offset": 0,
+      "shared_port": false,
+      "points": null,
+      "bpmn_flow": null
+    }
+  ],
+  "layout_trees": []
+}
