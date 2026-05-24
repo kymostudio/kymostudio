@@ -13,6 +13,7 @@ import { parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packa
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
 import { EngineBoard } from "./engine/EngineBoard";
+import type { Tool } from "./engine/react";
 
 /** Pull the intrinsic width/height off the rendered `<svg>` header. */
 function svgSize(svg: string): { w: number; h: number } {
@@ -26,6 +27,7 @@ export function App() {
   const [theme, setTheme] = useState<Theme>("light");
   const [transparent, setTransparent] = useState(false);
   const [sampleKey, setSampleKey] = useState(DEFAULT_SAMPLE);
+  const [tool, setTool] = useState<Tool>("select");
   const [svg, setSvg] = useState("");
   const [diagram, setDiagram] = useState<Diagram | null>(null);
   const [isBpmnState, setIsBpmnState] = useState(false);
@@ -225,7 +227,7 @@ export function App() {
         </section>
 
         <section className="pane view">
-          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} />
+          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} tool={tool} />
           <div id="error" hidden={error == null}>
             {error}
           </div>
@@ -244,6 +246,25 @@ export function App() {
                 <path d="m6 9 6 6 6-6" />
               </svg>
             </span>
+
+            <span className="sep" />
+
+            {/* Canvas tools (canvas-jam) — select (default) · draw (freehand pen) */}
+            <div className="tool-toggle" title="Canvas tool">
+              <button className={`tbtn${tool === "select" ? " active" : ""}`} title="Select / move" aria-label="Select tool" onClick={() => setTool("select")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 3l7.5 18 2.4-7.1L20 11.5 3 3z" />
+                </svg>
+              </button>
+              <button className={`tbtn${tool === "draw" ? " active" : ""}`} title="Draw (freehand pen)" aria-label="Draw tool" onClick={() => setTool("draw")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                  <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                  <path d="M2 2l7.586 7.586" />
+                  <circle cx="11" cy="11" r="2" />
+                </svg>
+              </button>
+            </div>
 
             <span className="sep" />
 

@@ -18,10 +18,19 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
-import type { Editor, Shape } from "../../../../packages/js-canvas/dist/index.js";
+import { createShapeId, type Editor, type Shape, type ShapeId } from "../../../../packages/js-canvas/dist/index.js";
 
 const num = (v: unknown, fallback = 0): number =>
   typeof v === "number" && Number.isFinite(v) ? v : fallback;
+
+/** The draw tool's default stroke (mirrors `shapes.tsx`; inlined to avoid a
+ *  circular import — `shapes.tsx` imports `HTMLContainer` from this module). */
+const DRAW_COLOR = "#1e293b";
+const DRAW_SIZE = 3;
+
+/** Which tool owns the pointer (canvas-jam `DESIGN-JAM-001` §7). `select` is the
+ *  default; `draw` creates freeform `freedraw` strokes. */
+export type Tool = "select" | "draw";
 
 /** The slice of a shape util the render loop needs. */
 export interface RenderUtil {
@@ -148,6 +157,9 @@ interface Gesture {
   camY: number;
   z: number;
   moved: boolean;
+  /** Set when the draw tool owns this gesture: the in-progress freedraw stroke
+   *  (`ox/oy` = page-space origin; `pts` = points relative to it). */
+  draw?: { id: ShapeId; ox: number; oy: number; pts: { x: number; y: number }[] };
 }
 
 interface EngineCanvasProps {
@@ -157,6 +169,8 @@ interface EngineCanvasProps {
   autoFit?: boolean;
   /** Called after a camera change (pan/zoom) so the host can persist it. */
   onChange?: () => void;
+  /** Active tool (default `select`). `draw` makes a pointer-drag a freedraw stroke. */
+  tool?: Tool;
   children?: ReactNode;
 }
 
@@ -164,7 +178,7 @@ interface EngineCanvasProps {
  * The viewport: a clip box holding a camera-transformed container
  * (`screen = (page + cam) * z`, §8.1) with one positioned wrapper per shape.
  */
-export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, children }: EngineCanvasProps) {
+export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, tool = "select", children }: EngineCanvasProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const fittedFor = useRef<Editor | null>(null);
@@ -238,6 +252,24 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
 
   const onPointerDown = (e: ReactPointerEvent) => {
     const p = screenOf(e);
+    if (tool === "draw") {
+      // Start a freedraw stroke. Built live with `history:"ignore"` (preview only)
+      // and sealed as ONE undo step on pointer-up (endGesture). No `meta.kymo` →
+      // freeform layer (persists via the snapshot, never enters `.kymo`).
+      const pg = editor.screenToPage(p);
+      const id = createShapeId();
+      editor.run(
+        () => editor.createShape({ id, type: "freedraw", x: pg.x, y: pg.y, props: { points: [{ x: 0, y: 0 }], color: DRAW_COLOR, size: DRAW_SIZE }, meta: {} }),
+        { source: "user", history: "ignore" },
+      );
+      gesture.current = { downId: null, downType: null, startSx: p.x, startSy: p.y, ox: 0, oy: 0, camX: 0, camY: 0, z: editor.getCamera().z, moved: false, draw: { id, ox: pg.x, oy: pg.y, pts: [{ x: 0, y: 0 }] } };
+      try {
+        viewportRef.current!.setPointerCapture(e.pointerId);
+      } catch {
+        // best-effort
+      }
+      return;
+    }
     const el = (e.target as HTMLElement).closest("[data-shape-id]");
     const downId = el?.getAttribute("data-shape-id") ?? null;
     const downType = el?.getAttribute("data-shape-type") ?? null;
@@ -266,6 +298,15 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
     const g = gesture.current;
     if (!g) return;
     const p = screenOf(e);
+    if (g.draw) {
+      const pg = editor.screenToPage(p);
+      g.draw.pts.push({ x: pg.x - g.draw.ox, y: pg.y - g.draw.oy });
+      const id = g.draw.id;
+      const points = [...g.draw.pts];
+      editor.run(() => editor.updateShape({ id, type: "freedraw", props: { points } }), { source: "user", history: "ignore" });
+      g.moved = true;
+      return;
+    }
     const dx = p.x - g.startSx;
     const dy = p.y - g.startSy;
     if (!g.moved && Math.hypot(dx, dy) < 3) return; // click threshold
@@ -285,6 +326,19 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
     if (!g) return;
     gesture.current = null;
     if (viewportRef.current?.hasPointerCapture(e.pointerId)) viewportRef.current.releasePointerCapture(e.pointerId);
+    if (g.draw) {
+      // The live stroke was built with `history:"ignore"`; re-stamp the final
+      // shape as a single recorded add so one undo removes the whole stroke (and
+      // redo restores it in full). The tool stays in `draw` for the next stroke.
+      const drawId = g.draw.id;
+      const final = editor.getShape(drawId);
+      if (final) {
+        editor.run(() => editor.deleteShape(drawId), { history: "ignore" });
+        editor.run(() => editor.createShape(final), { source: "user", history: "record" });
+        editor.mark();
+      }
+      return;
+    }
     if (!g.moved) {
       // A click: select the shape under the pointer, or clear.
       editor.select(g.downId ? [g.downId as Shape["id"]] : []);
@@ -308,7 +362,7 @@ export function EngineCanvas({ editor, shapeUtils, autoFit = true, onChange, chi
         onPointerMove={onPointerMove}
         onPointerUp={endGesture}
         onPointerCancel={endGesture}
-        style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none" }}
+        style={{ position: "absolute", inset: 0, overflow: "hidden", touchAction: "none", cursor: tool === "draw" ? "crosshair" : undefined }}
       >
         <div
           ref={containerRef}
