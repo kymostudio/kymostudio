@@ -30,9 +30,3 @@ kymo sample.kymo --figma      # → sample.figma.js
 kymo sample.kymo --excalidraw # → sample.excalidraw
 kymo process.bpmn             # → process.svg (BPMN 2.0 import)
 ```
-
-kymo also imports standard **BPMN 2.0 XML** (`.bpmn` from bpmn.io / Camunda
-Modeler / Signavio) and renders it to SVG using the file's own geometry —
-see [`docs/formats/bpmn.md`](./docs/formats/bpmn.md) and the
-[`samples/order.bpmn`](./samples/order.bpmn) /
-[`samples/collaboration.bpmn`](./samples/collaboration.bpmn) examples.
