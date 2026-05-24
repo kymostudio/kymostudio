@@ -14,7 +14,7 @@ related_documents:
   - DESIGN-BPMN-DSL-001    # Design
   - TEST-BPMN-DSL-001    # Test documentation
   - PLAN-BPMN-DSL-001   # Plan
-  - DSL-LANG-001             # kymo DSL language specification (normative)
+  - KYMO-DSL-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
   - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
 authors:
@@ -63,7 +63,7 @@ automatically (cf. RES-MERMAID-D2-001). kymo can already *import* BPMN 2.0 XML
 
 ## 3. Feature concept
 
-A new file-scope `bpmn { … }` block in the kymo DSL (DSL-LANG-001) lets an author
+A new file-scope `bpmn { … }` block in the kymo DSL (KYMO-DSL-001) lets an author
 describe a process as typed nodes and flows — *declare-then-connect* — and have
 the engine lay it out:
 
@@ -77,7 +77,7 @@ the engine lay it out:
   positions + edge waypoints) exactly like the BPMN importer, so the existing
   `bpmn-*` glyphs and flow renderer draw it unchanged.
 
-The normative grammar is in DSL-LANG-001; the surface and behaviour are
+The normative grammar is in KYMO-DSL-001; the surface and behaviour are
 specified as requirements in FEAT-BPMN-DSL-001; the architecture and
 algorithm in DESIGN-BPMN-DSL-001.
 
@@ -89,7 +89,7 @@ the Python/JS renderers; and maintainers verifying conformance.
 ## 5. Terms and abbreviations
 
 - **BPMN** — Business Process Model and Notation 2.0.
-- **DSL** — the kymo domain-specific language (`.kymo`); see DSL-LANG-001.
+- **DSL** — the kymo domain-specific language (`.kymo`); see KYMO-DSL-001.
 - **Block** — the brace-delimited `bpmn { … }` construct.
 - **Leaf / node** — a single rendered element (a `bpmn-*` `Component`).
 - **Flow** — a directed edge (sequence / message / association).
@@ -117,7 +117,7 @@ Read in order:
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
 | 0.2     | 2026-05-23 | Vũ Anh | Doc-set version sync after P0 (spike) complete; no normative change to this item. |
-| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in DSL-LANG-001 §6.9). |
+| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in KYMO-DSL-001 §6.9). |
 | 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
 
 ## Annex B — Document Control

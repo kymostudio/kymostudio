@@ -17,7 +17,7 @@
  * {@link Diagram} ready for {@link renderSVG}.
  *
  * Independent implementation kept at parity with the Python parser, which
- * remains the normative reference alongside `docs/DSL.md`.
+ * remains the normative reference.
  */
 import {
   makeComponent, makeEdge, makeRegion, makeDiagram,

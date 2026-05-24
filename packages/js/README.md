@@ -24,9 +24,7 @@ const svg = await renderSVG(parseDiagram(readFileSync("arch.kymo", "utf8")));
 
 For finer control the stages are exported individually — `parse(src)` returns
 `{ diagram, layout, external }` (unresolved), then `layout(diagram, …)` and
-`resolveAlignments(diagram)` mutate it into place. See
-[`docs/DSL.md`](https://github.com/kymostudio/kymostudio/blob/main/docs/DSL.md)
-for the grammar.
+`resolveAlignments(diagram)` mutate it into place.
 
 ## Convert a BPMN file
 

@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: DSL documentation & usage
-    url: https://github.com/kymostudio/kymostudio/blob/main/docs/DSL.md
+    url: https://github.com/kymostudio/kymostudio/blob/main/docs/KYMO_DSL.md
     about: How to write .kymo diagrams — check the DSL spec before filing an issue.

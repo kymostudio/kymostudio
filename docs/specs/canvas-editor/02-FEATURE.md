@@ -14,7 +14,7 @@ related_documents:
   - PLAN-CANVAS-001
   - DESIGN-CANVAS-001
   - TEST-CANVAS-001
-  - DSL-LANG-001
+  - KYMO-DSL-001
 authors:
   - Vũ Anh
 language: en
@@ -39,7 +39,7 @@ keywords:
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers implementing & verifying the editor                   |
-| Related Documents | `PLAN-CANVAS-001` (plan/risk), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `DSL-LANG-001` |
+| Related Documents | `PLAN-CANVAS-001` (plan/risk), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `KYMO-DSL-001` |
 
 > This is the **requirements specification** (ISO/IEC/IEEE 12207 §6.4.2/§6.4.3). Each requirement is
 > atomic, verifiable, and stably identified so `TEST-CANVAS-001` can trace a test case to it.
@@ -71,7 +71,7 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 | FR-CE-02 | Sync canvas edits back to text | Dragging/renaming a kymo shape updates the `.kymo` text such that re-parsing reproduces the change | §7, §8 |
 | FR-CE-03 | Two-layer model | kymo-layer shapes are tagged `meta.kymo`; freeform shapes are not; sync only ever touches tagged shapes | §3, §5 |
 | FR-CE-04 | Freeform whiteboard tools | User can add sticky notes, freehand strokes, and frames on the same board as the diagram | §3 |
-| FR-CE-05 | `Diagram → .kymo` serializer (Tier-1) | `shapesToDsl` emits a conformant `.kymo` (`DSL-LANG-001`) that `parseDiagram` accepts; node positions round-trip | §8.1 |
+| FR-CE-05 | `Diagram → .kymo` serializer (Tier-1) | `shapesToDsl` emits a conformant `.kymo` (`KYMO-DSL-001`) that `parseDiagram` accepts; node positions round-trip | §8.1 |
 | FR-CE-06 | Surgical patch preserves source (Tier-2) | After moving one node, comments and all untouched lines in `.kymo` are byte-identical | §8.2, §9 |
 | FR-CE-07 | `?script=` share compatibility | A link produced by the current playground still loads; new links round-trip the `.kymo` text | §3 (`share.ts`), §11 |
 | FR-CE-08 | Sample loading | Built-in samples load into the editor and render | §3 (`samples.ts`) |
@@ -98,7 +98,7 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 - Tooling: esbuild bundles `.tsx` (automatic JSX); deps are devDeps; `node_modules` git-ignored.
 - The `packages/js` public API (`parseDiagram`, `renderSVG`, `getIcon`, model types) is reused as-is.
 - tldraw licensing must be resolved before Phase 1 (`PLAN-CANVAS-001` RK-02).
-- Serializer targets `DSL-LANG-001` v2.0 (not a future v3) for now.
+- Serializer targets `KYMO-DSL-001` v2.0 (not a future v3) for now.
 
 ## 6. Out of scope
 

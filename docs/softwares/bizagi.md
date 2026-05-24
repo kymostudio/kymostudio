@@ -12,7 +12,7 @@ supersedes: null
 related_documents:
   - bizagi.comparision.md
   - ../diagrams/bpmn/README.md
-  - ../DSL.md
+  - ../KYMO_DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -48,7 +48,7 @@ upstream:
 | License           | Free (proprietary freeware)                                   |
 | Version Reviewed  | Bizagi Modeler (desktop, 2026)                               |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bizagi.comparision.md`](./bizagi.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`bizagi.comparision.md`](./bizagi.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Bizagi Modeler's design choices so the team can consult them when reasoning about approachable BPMN authoring. No code or behaviour in this repository depends on Bizagi. Bizagi Modeler is a **process-modelling tool** — a different category from kymo (a static diagram DSL).
 

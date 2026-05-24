@@ -10,7 +10,7 @@ audience: Engineers producing architecture diagrams for docs and slides
 review_cycle: On major rendering-stack change, or annually (whichever first)
 supersedes: null
 related_documents:
-  - DSL-LANG-001
+  - KYMO-DSL-001
   - README.md
 authors:
   - Vũ Anh
@@ -43,7 +43,7 @@ iso_compliance:
 | Audience          | Engineers producing architecture diagrams for docs and slides  |
 | Review Cycle      | On major rendering-stack change, or annually (whichever first) |
 | Supersedes        | —                                                              |
-| Related Documents | `DSL-LANG-001`, [`README.md`](../README.md) (run/build instructions) |
+| Related Documents | `KYMO-DSL-001`, [`README.md`](../README.md) (run/build instructions) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content) and
 ISO/IEC/IEEE 26515:2018 (agile documentation): metadata header, numbered
@@ -109,7 +109,7 @@ kymostudio/                          (monorepo root)
 ├── packages/python/src/kymo/
 │   ├── model.py       Component, Region, Edge, Diagram dataclasses
 │   ├── icons.py       SVG icon library
-│   ├── dsl.py         .kymo DSL parser (DSL-LANG-001)
+│   ├── dsl.py         .kymo DSL parser (KYMO-DSL-001)
 │   ├── layout.py      Auto-layout + edge routing
 │   ├── alignment.py   Post-parse resolver (positions, region bounds)
 │   ├── to_svg.py      Diagram → SVG renderer
@@ -118,7 +118,7 @@ kymostudio/                          (monorepo root)
 │   ├── data.kymo                     DSL source
 │   ├── aiq.kymo                      DSL source
 │   └── *.svg / *.webp / *.png        Rendered outputs + reference images
-└── docs/                             Spec docs (this file, DSL.md)
+└── docs/                             Spec docs (this file, KYMO_DSL.md)
 ```
 
 ---
@@ -237,7 +237,7 @@ syntax + arrows read as a flat declaration without Python boilerplate.
 form: every field on `Component`, `Region`, and `Edge` can be expressed
 in DSL, and the round-trip produces byte-identical SVG.
 
-#### 5.5.1 Grammar (synopsis — full spec in `DSL-LANG-001` clause 6)
+#### 5.5.1 Grammar (synopsis — full spec in `KYMO-DSL-001` clause 6)
 
 The DSL has **no `component`, `region`, or `layout` keywords**. Each
 line's shape determines its kind:
@@ -302,7 +302,7 @@ anchor      := ("top"|"right"|"bottom"|"left"|"center") ( "(" INT "," INT ")" )?
 
 Region containers nest. When an inner region is nested inside an outer
 region, the inner region's leaf ids flatten into the outer region's
-`contains` so its auto-bounds envelop the nested leaves (`DSL-LANG-001` §7.3.1).
+`contains` so its auto-bounds envelop the nested leaves (`KYMO-DSL-001` §7.3.1).
 Layout containers do NOT propagate — they're positioning rules, not
 ownership.
 
@@ -1217,7 +1217,7 @@ The five revisions that produced the greatest visual quality gain were:
 | 1.5     | 2026-05-18 | Vũ Anh      | §5.5.1.1 Region border overrides — `dash (X, Y)` + `stroke #hex` per-region.       |
 | 1.6     | 2026-05-18 | Vũ Anh      | §5.5.1.2 Asymmetric padding — `padding-bottom N` balances label's top visual weight.|
 | 1.7     | 2026-05-18 | Vũ Anh      | §7.6 Orthogonality rule — every routed edge segment must be H or V (no diagonals).  |
-| 1.8     | 2026-05-24 | Vũ Anh      | Corrected source paths to the `packages/python/src/kymo/` monorepo layout (§1.3 tree, §5.4 table, §5.5.3 commands, §11/§12, Annex B); `uv run kymo` replaces `uv run src/cli.py`. Cross-doc citations now by document_id (`DSL-LANG-001`); added it to `related_documents`. |
+| 1.8     | 2026-05-24 | Vũ Anh      | Corrected source paths to the `packages/python/src/kymo/` monorepo layout (§1.3 tree, §5.4 table, §5.5.3 commands, §11/§12, Annex B); `uv run kymo` replaces `uv run src/cli.py`. Cross-doc citations now by document_id (`KYMO-DSL-001`); added it to `related_documents`. |
 
 ---
 

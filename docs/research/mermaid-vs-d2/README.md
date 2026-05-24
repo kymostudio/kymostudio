@@ -13,7 +13,7 @@ related_documents:
   - RES-LANG-EVAL-001
   - REF-D2-001
   - REF-D2-CMP-001
-  - DSL-LANG-001
+  - KYMO-DSL-001
   - BPD-DGM-001
 authors:
   - Vũ Anh
@@ -56,7 +56,7 @@ upstream:
 | Subjects          | [`mermaid-js/mermaid`](https://github.com/mermaid-js/mermaid) · [`terrastruct/d2`](https://github.com/terrastruct/d2) |
 | Licenses          | MIT (Mermaid) · MPL-2.0 (D2)                                                                 |
 | Versions Reviewed | Mermaid 11.x (2026-05-23) · D2 0.7.1 (2026-05-18)                                            |
-| Related Documents | `RES-LANG-EVAL-001`, `REF-D2-001`, `REF-D2-CMP-001`, `DSL-LANG-001`, `BPD-DGM-001` |
+| Related Documents | `RES-LANG-EVAL-001`, `REF-D2-001`, `REF-D2-CMP-001`, `KYMO-DSL-001`, `BPD-DGM-001` |
 
 This is a **research note on two pieces of prior art**, not a specification of kymo. It compares Mermaid and D2 *against each other* — the two most widely used text-to-diagram languages — so the team can borrow the right ideas when evolving kymo's DSL, layout, and render pipeline. The opinionated *D2-vs-kymo* scoring lives separately in `REF-D2-CMP-001`; this document does **not** re-score against kymo (it ties back only in §11). No code or behaviour in this repository depends on either tool.
 

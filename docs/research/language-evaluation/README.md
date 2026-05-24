@@ -13,7 +13,7 @@ related_documents:
   - RES-MERMAID-D2-001
   - REF-D2-CMP-001
   - REF-D2-001
-  - DSL-LANG-001
+  - KYMO-DSL-001
   - BPD-DGM-001
 authors:
   - Vũ Anh
@@ -49,7 +49,7 @@ references:
 | Status            | Released                                                              |
 | Classification    | Internal                                                             |
 | Audience          | Anyone evaluating a language / DSL / notation; authors of tool comparisons under `docs/` |
-| Related Documents | `RES-MERMAID-D2-001`, `REF-D2-CMP-001`, `REF-D2-001`, `DSL-LANG-001`, `BPD-DGM-001` |
+| Related Documents | `RES-MERMAID-D2-001`, `REF-D2-CMP-001`, `REF-D2-001`, `KYMO-DSL-001`, `BPD-DGM-001` |
 
 This is a **research note on evaluation methodology** — it defines *how* to judge a **language** (a programming language, a domain-specific language, or a notation), grounded in the published literature. It is **general first**: §2–§4 give a language-agnostic framework; §5 then shows the recipe for *specializing* it to a domain, worked through for the **diagram-as-code** languages this repo compares (Mermaid, D2, kymo, …). It is not a comparison of any specific tool, nor a spec of kymo. Its job is to give every comparison under `docs/` one defensible rubric so a score means the same thing across documents.
 
@@ -276,7 +276,7 @@ In-repo documents that apply this rubric (cite by `document_id`):
 - `RES-MERMAID-D2-001` — Mermaid vs D2 language comparison (uses the §5.1 diagram specialization, collapsed).
 - `REF-D2-CMP-001` — D2 vs kymo comparison (the reference scoring instance).
 - `REF-D2-001` — D2 external reference (factual basis for D2 scores).
-- `DSL-LANG-001` — kymo DSL specification (factual basis for kymo's A/B-category scores).
+- `KYMO-DSL-001` — kymo DSL specification (factual basis for kymo's A/B-category scores).
 - `BPD-DGM-001` — architecture-diagram best practices (informs D2 / H3 judgements).
 
 ---

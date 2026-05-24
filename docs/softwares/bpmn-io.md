@@ -12,7 +12,7 @@ supersedes: null
 related_documents:
   - bpmn-io.comparision.md
   - ../diagrams/bpmn/README.md
-  - ../DSL.md
+  - ../KYMO_DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -49,7 +49,7 @@ upstream:
 | License           | bpmn.io license (core libs MIT + attribution)                 |
 | Version Reviewed  | bpmn-js 18.16.1 (2026-05-05)                                  |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn-io.comparision.md`](./bpmn-io.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`bpmn-io.comparision.md`](./bpmn-io.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures bpmn.io's design choices so the team can consult them when evolving kymo's render pipeline and any future web-embeddable output. No code or behaviour in this repository depends on bpmn.io. Of all the BPMN tools surveyed, bpmn-js is the **closest analogue to kymo's renderer**: a client-side, SVG-based engine that turns a notation model into an interactive diagram in the browser.
 

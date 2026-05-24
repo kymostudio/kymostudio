@@ -2,7 +2,7 @@
 
 Line-based, brace-delimited surface for `model.Diagram`. There is no
 `component` or `region` keyword — the parser disambiguates by line
-shape (see `docs/DSL.md` §6):
+shape:
 
   • line ending in `{` and second token ∈ outer|inner → region container
   • line ending in `{` and second token ∈ horizontal|vertical → layout container

@@ -14,7 +14,7 @@ related_documents:
   - DESIGN-BPMN-DSL-001    # Design
   - TEST-BPMN-DSL-001    # Test documentation
   - PLAN-BPMN-DSL-001   # Plan
-  - DSL-LANG-001             # kymo DSL language specification (normative)
+  - KYMO-DSL-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
 authors:
   - Vũ Anh
@@ -56,7 +56,7 @@ waypoints, while preserving the ability to pin positions when needed.
 
 **Block & grammar**
 - **FR-1** The DSL SHALL accept a file-scope `bpmn { … }` block; its body uses a
-  *declare-then-connect* sub-grammar. Normative EBNF lives in DSL-LANG-001.
+  *declare-then-connect* sub-grammar. Normative EBNF lives in KYMO-DSL-001.
 - **FR-2** A node declaration SHALL be `<kind> <id> "Label" [type=<subtype>] [@ (x,y)]`.
 
 Example (informative):
@@ -142,7 +142,7 @@ bpmn {
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
 | 0.2     | 2026-05-23 | Vũ Anh | Doc-set version sync after P0 (spike) complete; requirements unchanged. |
-| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in DSL-LANG-001 §6.9). |
+| 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in KYMO-DSL-001 §6.9). |
 | 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
 
 ## Annex B — Document Control
@@ -157,7 +157,7 @@ Implicit — checked in with the feature; available to all repository readers.
 ### B.3 Change Control
 Adding/changing a requirement requires: edit the relevant FR/NFR (preserving
 IDs); update TEST-BPMN-DSL-001's traceability matrix; increment `version`;
-append a row to Annex A; reflect any grammar change in DSL-LANG-001.
+append a row to Annex A; reflect any grammar change in KYMO-DSL-001.
 
 ### B.4 Backwards Compatibility
 Requirement IDs are stable across revisions; a removed requirement SHALL be

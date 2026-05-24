@@ -12,7 +12,7 @@ supersedes: null
 related_documents:
   - sparx-enterprise-architect.comparision.md
   - ../diagrams/bpmn/README.md
-  - ../DSL.md
+  - ../KYMO_DSL.md
   - ../BEST_PRACTICE_DIAGRAMS.md
 authors:
   - Vũ Anh
@@ -49,7 +49,7 @@ upstream:
 | License           | Commercial proprietary                                        |
 | Version Reviewed  | Enterprise Architect 16/17 line (2026)                       |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`sparx-enterprise-architect.comparision.md`](./sparx-enterprise-architect.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`DSL.md`](../DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`sparx-enterprise-architect.comparision.md`](./sparx-enterprise-architect.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`KYMO_DSL.md`](../KYMO_DSL.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Enterprise Architect's design choices so the team can consult them when reasoning about multi-notation modelling. No code or behaviour in this repository depends on it. Enterprise Architect is a broad **modelling tool** — a different category from kymo (a static diagram DSL); BPMN is one of many notations it supports.
 

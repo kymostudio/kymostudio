@@ -1,6 +1,6 @@
 ---
-title: Diagram DSL — Language Specification
-document_id: DSL-LANG-001
+title: Kymo DSL — Language Specification
+document_id: KYMO-DSL-001
 version: "2.2"
 issue_date: 2026-05-24
 status: Released
@@ -32,11 +32,11 @@ iso_compliance:
 # clause 5.10 — change information SHALL be a numbered annex, not metadata).
 ---
 
-# Diagram DSL — Language Specification
+# Kymo DSL — Language Specification
 
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
-| Document ID       | DSL-LANG-001                                                   |
+| Document ID       | KYMO-DSL-001                                                   |
 | Version           | 2.2                                                            |
 | Issue Date        | 2026-05-24                                                     |
 | Status            | Released                                                       |
@@ -72,7 +72,7 @@ Structured per ISO/IEC/IEEE 15289:2019 (information item content). Grammar produ
 
 ### 1.1 Purpose
 
-This document specifies the **Diagram DSL** — a textual surface language for declaring architecture diagrams. A conforming source file (`.kymo`) declares the leaves, containers (region and layout), and edges of a single diagram. A conforming parser produces an in-memory `model.Diagram` value semantically equivalent to the source.
+This document specifies the **Kymo DSL** — a textual surface language for declaring architecture diagrams. A conforming source file (`.kymo`) declares the leaves, containers (region and layout), and edges of a single diagram. A conforming parser produces an in-memory `model.Diagram` value semantically equivalent to the source.
 
 ### 1.2 Applicability
 
@@ -702,7 +702,7 @@ For full real-world examples, see [`aiq.kymo`](../samples/aiq.kymo), [`aws_1.kym
 
 ### B.1 Storage and Retrieval
 
-This document is version-controlled within the project repository at `docs/DSL.md`. The authoritative source is the working tree of the main branch; archived versions are accessible via repository history (`git log`).
+This document is version-controlled within the project repository at `docs/KYMO_DSL.md`. The authoritative source is the working tree of the main branch; archived versions are accessible via repository history (`git log`).
 
 ### B.2 Distribution
 
