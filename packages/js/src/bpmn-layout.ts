@@ -14,6 +14,7 @@ import {
   makeComponent, makeEdge,
   type BpmnBlock, type BpmnFlow, type Component, type Diagram, type Edge, type Point,
 } from "./model.js";
+import { pyRound } from "./round.js";
 
 // Box sizes by resolved shape (event 36, task 100×80, gateway 50).
 const SIZE: Record<string, Point> = {
@@ -74,8 +75,8 @@ export function bpmnLayout(diagram: Diagram): void {
     bottom = Math.max(bottom, bot);
     topY = bot + BLOCK_GAP;
   }
-  diagram.width = Math.round(maxRight + MARGIN);
-  diagram.height = Math.round(bottom + MARGIN);
+  diagram.width = pyRound(maxRight + MARGIN);
+  diagram.height = pyRound(bottom + MARGIN);
   diagram.bpmnBlocks = [];
 }
 
@@ -292,7 +293,7 @@ function layoutBlock(block: BpmnBlock, topY: number): BlockResult {
   const comps: Component[] = nodes.map((n) => makeComponent({
     id: n.id, name: n.label, subtitle: "", icon: n.marker,
     shape: n.shape, accent: "blue",
-    pos: [Math.round(cx[n.id]), Math.round(cy[n.id])],
+    pos: [pyRound(cx[n.id]), pyRound(cy[n.id])],
     size: SIZE[n.shape] ?? DEFAULT_SIZE,
   }));
 
@@ -414,7 +415,7 @@ function route(
     if (pts.length === 0) pts.push(...seg);
     else pts.push(...seg.slice(1));
   }
-  pts = dedupe(pts.map(([x, y]) => [Math.round(x), Math.round(y)] as Point));
+  pts = dedupe(pts.map(([x, y]) => [pyRound(x), pyRound(y)] as Point));
   if (reverse) pts.reverse();
   return pts;
 }
@@ -438,5 +439,5 @@ function labelPos(pts: Point[]): Point | null {
   if (pts.length < 2) return null;
   const [x0, y0] = pts[0];
   const [x1, y1] = pts[1];
-  return [Math.round((x0 + x1) / 2), Math.round((y0 + y1) / 2) - 8];
+  return [pyRound((x0 + x1) / 2), pyRound((y0 + y1) / 2) - 8];
 }

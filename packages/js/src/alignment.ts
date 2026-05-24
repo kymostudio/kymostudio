@@ -17,22 +17,12 @@ import {
   LABEL_HEIGHT, componentHalf, regionHalf, anchor, resolveAnchors, getComponent,
   type Component, type Diagram, type Edge, type Region, type Point, type Side,
 } from "./model.js";
+import { pyRound } from "./round.js";
 
 type Node = Component | Region;
 
 const NAME_CHAR_W = 7;   // 14px bold sans ≈ 7 px/char
 const SUB_CHAR_W = 6;    // 11.5px regular sans ≈ 6 px/char
-
-/** Round half-to-even, matching Python's built-in `round()` — so grid snapping
- *  and lane offsets land on the same pixels as the Python implementation
- *  (`Math.round` differs only at exact .5 boundaries, where it rounds up). */
-function pyRound(x: number): number {
-  const f = Math.floor(x);
-  const diff = x - f;
-  if (diff < 0.5) return f;
-  if (diff > 0.5) return f + 1;
-  return f % 2 === 0 ? f : f + 1;   // exactly .5 → nearest even
-}
 
 function isRegion(n: Node): n is Region {
   return "bounds" in n;

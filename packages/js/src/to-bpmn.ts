@@ -27,6 +27,7 @@
  */
 import { EVENT_DEF, EVENT_SHAPE, GATEWAY_MARKER, TASK_MARKER } from "./from-bpmn.js";
 import type { Component, Diagram, Point } from "./model.js";
+import { pyRound } from "./round.js";
 
 // ── Namespaces ──────────────────────────────────────────────────────────
 const BPMN = "http://www.omg.org/spec/BPMN/20100524/MODEL";
@@ -205,7 +206,7 @@ export function toBpmn(diagram: Diagram): string {
     const shape = sub(plane, "bpmndi:BPMNShape", { bpmnElement: c.id });
     if (c.shape === "bpmn-gateway" && c.icon === "exclusive") shape.attrs.isMarkerVisible = "true";
     sub(shape, "dc:Bounds", {
-      x: Math.round(c.pos[0] - w / 2), y: Math.round(c.pos[1] - h / 2), width: w, height: h,
+      x: pyRound(c.pos[0] - w / 2), y: pyRound(c.pos[1] - h / 2), width: w, height: h,
     });
   }
   diagram.edges.forEach((e, i) => {
@@ -215,7 +216,7 @@ export function toBpmn(diagram: Diagram): string {
       const [lw, lh] = [40, 14];
       const label = sub(edge, "bpmndi:BPMNLabel");
       sub(label, "dc:Bounds", {
-        x: Math.round(e.labelPos[0] - lw / 2), y: Math.round(e.labelPos[1] - lh / 2), width: lw, height: lh,
+        x: pyRound(e.labelPos[0] - lw / 2), y: pyRound(e.labelPos[1] - lh / 2), width: lw, height: lh,
       });
     }
   });
