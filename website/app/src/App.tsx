@@ -16,6 +16,8 @@ import { syncURL, loadFromURL } from "./share";
 import { EngineBoard } from "./engine/EngineBoard";
 import type { Tool } from "./engine/react";
 import { TopBar } from "./ui/TopBar";
+import { ToolRail } from "./ui/ToolRail";
+import { TOOL_SHORTCUTS } from "./ui/tools";
 
 /** Pull the intrinsic width/height off the rendered `<svg>` header. */
 function svgSize(svg: string): { w: number; h: number } {
@@ -59,6 +61,23 @@ export function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  // FR-CS-03: tool-rail keyboard shortcuts (V/H/P/S/T), guarded so the `.kymo`
+  // <textarea> / inputs keep their keys (mirrors EngineBoard's undo guard).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = document.activeElement as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      const next = TOOL_SHORTCUTS[e.key.toLowerCase()];
+      if (next) {
+        e.preventDefault();
+        setTool(next);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   // Restore the caret after a Tab-insert mutates the controlled value.
   useLayoutEffect(() => {
@@ -233,6 +252,8 @@ export function App() {
         )}
 
         <section className="pane view">
+          <ToolRail tool={tool} setTool={setTool} />
+          <div className="canvas-wrap">
           <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} onEditorReady={(ed) => { engineEditor.current = ed; }} tool={tool} onToolReset={() => setTool("select")} />
           <div id="error" hidden={error == null}>
             {error}
@@ -252,38 +273,6 @@ export function App() {
                 <path d="m6 9 6 6 6-6" />
               </svg>
             </span>
-
-            <span className="sep" />
-
-            {/* Canvas tools (canvas-jam) — select (default) · draw (freehand pen) */}
-            <div className="tool-toggle" title="Canvas tool">
-              <button className={`tbtn${tool === "select" ? " active" : ""}`} title="Select / move" aria-label="Select tool" onClick={() => setTool("select")}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 3l7.5 18 2.4-7.1L20 11.5 3 3z" />
-                </svg>
-              </button>
-              <button className={`tbtn${tool === "draw" ? " active" : ""}`} title="Draw (freehand pen)" aria-label="Draw tool" onClick={() => setTool("draw")}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 19l7-7 3 3-7 7-3-3z" />
-                  <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
-                  <path d="M2 2l7.586 7.586" />
-                  <circle cx="11" cy="11" r="2" />
-                </svg>
-              </button>
-              <button className={`tbtn${tool === "sticky" ? " active" : ""}`} title="Sticky note (click to place)" aria-label="Sticky tool" onClick={() => setTool("sticky")}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10l6-6V5a2 2 0 0 0-2-2z" />
-                  <path d="M15 21v-6h6" />
-                </svg>
-              </button>
-              <button className={`tbtn${tool === "text" ? " active" : ""}`} title="Text (click to place)" aria-label="Text tool" onClick={() => setTool("text")}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 7V5h16v2" />
-                  <path d="M12 5v14" />
-                  <path d="M9 19h6" />
-                </svg>
-              </button>
-            </div>
 
             <span className="sep" />
 
@@ -319,6 +308,7 @@ export function App() {
               </svg>
               SVG
             </button>
+          </div>
           </div>
         </section>
       </main>

@@ -80,3 +80,42 @@ export const Dots = (p: IconProps) => (
     <circle cx="19" cy="12" r="1.4" fill="currentColor" />
   </Svg>
 );
+
+// — Tool-rail icons (canvas-studio P3, FR-CS-03) —————————————————————————————
+export const Select = (p: IconProps) => (
+  <Svg {...p}><path d="M5 3l13 6-5.5 2L9 18z" /></Svg>
+);
+export const Hand = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M8 11V6a1.5 1.5 0 113 0v5" />
+    <path d="M11 11V5a1.5 1.5 0 113 0v6" />
+    <path d="M14 11V7a1.5 1.5 0 113 0v9a5 5 0 01-9 2l-3.5-6c-.5-.9-.2-2 .7-2.5.9-.5 2-.2 2.5.7l1.3 2" />
+  </Svg>
+);
+export const Frame = (p: IconProps) => (
+  <Svg {...p}><path d="M3 8h18M3 16h18M8 3v18M16 3v18" /></Svg>
+);
+export const Cloud = (p: IconProps) => (
+  <Svg {...p}><path d="M7 19a4 4 0 010-8 6 6 0 0111.8 1.5A4 4 0 0117 19z" /></Svg>
+);
+export const Square = (p: IconProps) => (
+  <Svg {...p}><rect x="4" y="4" width="16" height="16" rx="2" /></Svg>
+);
+export const Diamond = (p: IconProps) => (
+  <Svg {...p}><path d="M12 3l9 9-9 9-9-9z" /></Svg>
+);
+export const Arrow = (p: IconProps) => (
+  <Svg {...p}><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></Svg>
+);
+export const Text = (p: IconProps) => (
+  <Svg {...p}><path d="M5 6V4h14v2" /><path d="M12 4v16" /><path d="M9 20h6" /></Svg>
+);
+export const Sticky = (p: IconProps) => (
+  <Svg {...p}><path d="M4 4h12l4 4v12H4z" /><path d="M14 4v6h6" /></Svg>
+);
+export const Pen = (p: IconProps) => (
+  <Svg {...p}><path d="M4 20l4-1 9.5-9.5a2.1 2.1 0 00-3-3L5 16l-1 4z" /></Svg>
+);
+export const Sparkle = (p: IconProps) => (
+  <Svg {...p}><path d="M12 3v6M12 15v6M3 12h6M15 12h6M6 6l4 4M14 14l4 4M18 6l-4 4M10 14l-4 4" /></Svg>
+);
