@@ -105,13 +105,19 @@ The store already **tags** each write `history:"ignore"|"record"` at write time
   domains stay separate). **Out of MVP scope:** selection restore on undo; text-editor edits are not on
   the canvas undo stack.
 
-## 4. Board export (`engine/view` + `ShapeUtil.toSvg`) — FR-J-03
+## 4. Board export (`engine/export.ts` + `ShapeUtil.toSvg`) — FR-J-03
 
-`KymoDiagramShapeUtil.toSvg` (`KymoDiagramShape.tsx:69`) returns an `<image>`; the per-shape `toSvg`
-hook lives on the engine's `ShapeUtil` base (`DESIGN-ENGINE-001` §9.1). The exporter here walks
-shapes in `index` order, calls `util.toSvg(shape)` (or rasterises `component()` as a fallback), wraps
-them in an `<svg>` sized to the `zoomToFit` bounds, and offers SVG/PNG download. MVP ships SVG-only;
-PNG via canvas `drawImage` follows.
+**As implemented (P3).** Each engine `ShapeUtil` (`engine/shapes.tsx`) implements a sync
+`toSvg(shape): string` that emits an SVG fragment in shape-local coords (node = glyph at box-centre +
+label `<text>`; region = `<rect>` + corner label; edge = `<line>` + per-shape arrowhead `<marker>` + mid
+label; BPMN = `<image href=dataUrl>`). `engine/export.ts:boardToSvg(editor, utils)` walks
+`getCurrentPageShapes()` (already `index`-ordered), wraps each `util.toSvg(s)` in
+`<g transform="translate(x,y)">`, and frames them in one `<svg viewBox>` sized to the union of
+`getGeometry(s).bounds + s.x/y` (+16px pad). Node glyphs are fetched async, so `boardToSvg` is **async**
+and **pre-warms** the shared `glyphCache` (via `getIcon`) before the sync `toSvg` reads it. `EngineBoard`
+hands the exporter to `App` via an `onReady(exportSvg)` callback; the "⬇ SVG" toolbar button calls it
+(falling back to the DSL render). SVG-only MVP; PNG via canvas `drawImage` follows. (`TC-J-03`,
+`export.test.ts`, uses fake utils so it stays headless.)
 
 ## 5. tldraw removal + parity (`Board.tsx`, `package.json`, `build.sh`) — FR-J-04
 

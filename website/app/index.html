@@ -9,8 +9,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- tldraw styles — esbuild emits this from `import "tldraw/tldraw.css"`. -->
-  <link rel="stylesheet" href="kymo.bundle.css">
   <style>
     :root {
       /* Light theme (base) — FigJam-flavoured: white board, dotted canvas,
@@ -168,7 +166,7 @@
     }
 
     /* ── Floating toolbelt (bottom-centre of the board) ──────────── */
-    /* Top-centre so it clears tldraw's own bottom toolbar (Phase 1). */
+    /* Top-centre, clear of the canvas. */
     .toolbar {
       position: absolute; left: 50%; top: 14px; transform: translateX(-50%);
       z-index: 200;

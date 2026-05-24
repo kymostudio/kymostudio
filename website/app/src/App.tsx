@@ -12,13 +12,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packages/js/dist/index.js";
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
-import { Board } from "./Board";
 import { EngineBoard } from "./engine/EngineBoard";
-
-// canvas-engine (Phase 7): the in-house engine is the DEFAULT renderer — it needs
-// no license key, so the deployed board renders (RK-02 closes). `?engine=tldraw`
-// opts back into tldraw for comparison. Read once at load.
-const USE_ENGINE = new URL(location.href).searchParams.get("engine") !== "tldraw";
 
 /** Pull the intrinsic width/height off the rendered `<svg>` header. */
 function svgSize(svg: string): { w: number; h: number } {
@@ -42,7 +36,8 @@ export function App() {
   const renderToken = useRef(0);
   const debounceId = useRef<number | undefined>(undefined);
   const toastId = useRef<number | undefined>(undefined);
-  const lastSvg = useRef(""); // last successful render, used for download
+  const lastSvg = useRef(""); // last successful render, the download fallback
+  const exportRef = useRef<(() => Promise<string>) | null>(null); // engine board→SVG (FR-J-03)
   const pendingSel = useRef<number | null>(null); // caret to restore after Tab
 
   // Latest theme/transparent for closures inside the debounce timer.
@@ -168,9 +163,12 @@ export function App() {
     }
   }
 
-  function onDownload(): void {
-    if (!lastSvg.current) return;
-    const blob = new Blob([lastSvg.current], { type: "image/svg+xml" });
+  async function onDownload(): Promise<void> {
+    // FR-J-03: export the live board (WYSIWYG); fall back to the DSL render.
+    const board = exportRef.current ? await exportRef.current() : "";
+    const out = board || lastSvg.current;
+    if (!out) return;
+    const blob = new Blob([out], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -227,11 +225,7 @@ export function App() {
         </section>
 
         <section className="pane view">
-          {USE_ENGINE ? (
-            <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
-          ) : (
-            <Board diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} />
-          )}
+          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} />
           <div id="error" hidden={error == null}>
             {error}
           </div>

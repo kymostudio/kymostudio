@@ -1,7 +1,7 @@
 /**
  * canvas-engine Phase 5/6 — the board behind `?engine=native`. A persistent
  * engine Store+Editor with the same two-way flow as the tldraw `Board.tsx`:
- *   - sync (text→canvas): diff-apply `diagramToShapesEngine` inside
+ *   - sync (text→canvas): diff-apply `diagramToShapes` inside
  *     `run(fn, { history:"ignore" })` → `source:"remote"` → no echo.
  *   - writeback (canvas→text): a user drag is `source:"user"` → the scoped
  *     listener fires → `patchPositions` → `onPatch`.
@@ -15,9 +15,10 @@ import {
   type Shape,
 } from "../../../../packages/js-canvas/dist/index.js";
 import type { Diagram } from "../../../../packages/js/dist/index.js";
-import { diagramToShapesEngine } from "./diagramToShapesEngine";
+import { diagramToShapes } from "../diagramToShapes";
 import { patchPositions, type XY } from "../patchDsl";
 import { EngineCanvas } from "./react";
+import { boardToSvg } from "./export";
 import { loadSnapshot, saveSnapshot } from "./persist";
 import { KymoNodeEngineUtil, KymoDiagramEngineUtil, KymoRegionEngineUtil, KymoEdgeEngineUtil } from "./shapes";
 
@@ -34,6 +35,8 @@ interface EngineBoardProps {
   isBpmn: boolean;
   source: string;
   onPatch: (text: string) => void;
+  /** Hands the host a board→SVG exporter once the editor is live (FR-J-03). */
+  onReady?: (exportSvg: () => Promise<string>) => void;
 }
 
 const kymoShapes = (editor: Editor): Shape[] =>
@@ -51,7 +54,7 @@ function syncEmbed(editor: Editor, svg: string, w: number, h: number): void {
 
 function syncElements(editor: Editor, diagram: Diagram): void {
   if (editor.getShape(EMBED_ID)) editor.deleteShape(EMBED_ID);
-  const partials = diagramToShapesEngine(diagram);
+  const partials = diagramToShapes(diagram);
   const desired = new Set(partials.map((p) => p.id));
   const existing = kymoShapes(editor);
   const existingIds = new Set(existing.map((s) => s.id));
@@ -63,7 +66,7 @@ function syncElements(editor: Editor, diagram: Diagram): void {
   for (const p of partials) if (existingIds.has(p.id)) editor.updateShape(p);
 }
 
-export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch }: EngineBoardProps) {
+export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch, onReady }: EngineBoardProps) {
   const editorRef = useRef<Editor | null>(null);
   if (!editorRef.current) editorRef.current = new Editor(new Store(), { shapeUtils: utils });
   const editor = editorRef.current;
@@ -172,6 +175,12 @@ export function EngineBoard({ diagram, svg, w, h, isBpmn, source, onPatch }: Eng
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
+
+  // Mount once: hand the host a board→SVG exporter bound to this editor (FR-J-03).
+  useEffect(() => {
+    onReady?.(() => boardToSvg(editor, utils));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor]);
 
