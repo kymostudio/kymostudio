@@ -1,8 +1,8 @@
 ---
 title: Architecture Diagram — Best Practices
 document_id: BPD-DGM-001
-version: "1.8"
-issue_date: 2026-05-24
+version: "1.9"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -35,15 +35,15 @@ iso_compliance:
 | Field             | Value                                                          |
 |-------------------|----------------------------------------------------------------|
 | Document ID       | BPD-DGM-001                                                    |
-| Version           | 1.8                                                            |
-| Issue Date        | 2026-05-24                                                     |
+| Version           | 1.9                                                            |
+| Issue Date        | 2026-05-25                                                     |
 | Status            | Released                                                       |
 | Classification    | Internal                                                       |
 | Owner             | `diagrams/` project                                            |
 | Audience          | Engineers producing architecture diagrams for docs and slides  |
 | Review Cycle      | On major rendering-stack change, or annually (whichever first) |
 | Supersedes        | —                                                              |
-| Related Documents | `KYMO-DSL-001`, [`README.md`](../README.md) (run/build instructions) |
+| Related Documents | `KYMO-DSL-001`, [`README.md`](../../README.md) (run/build instructions) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content) and
 ISO/IEC/IEEE 26515:2018 (agile documentation): metadata header, numbered
@@ -1218,6 +1218,7 @@ The five revisions that produced the greatest visual quality gain were:
 | 1.6     | 2026-05-18 | Vũ Anh      | §5.5.1.2 Asymmetric padding — `padding-bottom N` balances label's top visual weight.|
 | 1.7     | 2026-05-18 | Vũ Anh      | §7.6 Orthogonality rule — every routed edge segment must be H or V (no diagonals).  |
 | 1.8     | 2026-05-24 | Vũ Anh      | Corrected source paths to the `packages/python/src/kymo/` monorepo layout (§1.3 tree, §5.4 table, §5.5.3 commands, §11/§12, Annex B); `uv run kymo` replaces `uv run src/cli.py`. Cross-doc citations now by document_id (`KYMO-DSL-001`); added it to `related_documents`. |
+| 1.9     | 2026-05-25 | Vũ Anh      | Relocated `docs/BEST_PRACTICE_DIAGRAMS.md` → `docs/diagrams/best-practices.md` (topical home under `diagrams/`); updated B.1 storage path and the root-`README.md` link depth. `document_id` `BPD-DGM-001` unchanged. |
 
 ---
 
@@ -1226,7 +1227,7 @@ The five revisions that produced the greatest visual quality gain were:
 ### B.1 Storage and Retrieval
 
 This document is version-controlled within the project repository at
-`docs/BEST_PRACTICE_DIAGRAMS.md`. Authoritative source is the
+`docs/diagrams/best-practices.md`. Authoritative source is the
 working tree of the main branch; archived versions are accessible via
 the repository history (`git log`).
 
