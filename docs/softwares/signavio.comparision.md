@@ -12,7 +12,7 @@ supersedes: null
 related_documents:
   - signavio.md
   - ../formats/kymo-dsl/README.md
-  - ../BEST_PRACTICE_DIAGRAMS.md
+  - ../diagrams/best-practices.md
 authors:
   - Vũ Anh
 language: en
@@ -45,7 +45,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-20                                                     |
 | Parent Reference  | [`signavio.md`](signavio.md)                                 |
-| Related Documents | [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
 
 This document isolates the **prior-art comparison** between [SAP Signavio](https://www.signavio.com/) and kymo. The factual reference (editions, capabilities beyond drawing, BPMN conformance) lives in [`signavio.md`](signavio.md); read that first if you need ground truth on how Signavio actually behaves.
 
@@ -211,5 +211,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`signav
 
 - Comparison subject: SAP Signavio cloud as documented in [`signavio.md`](signavio.md) on 2026-05-20.
 - Factual basis for the Signavio column: [`signavio.md`](signavio.md).
-- Factual basis for the kymo column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]] at B3). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]] at B3). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - This is a **cross-category** comparison: the matrix views an enterprise process-governance suite through kymo's diagram-rendering + authoring lens. Edits should restate that caveat and the underlying tradeoff, not just the conclusion — a future reader needs the *why* to avoid mistaking a lens artefact for a verdict.

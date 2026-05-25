@@ -11,7 +11,7 @@ review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
   - ../formats/kymo-dsl/README.md
-  - ../BEST_PRACTICE_DIAGRAMS.md
+  - ../diagrams/best-practices.md
   - d2.md
   - figma.md
   - diagrams.mingrammer.comparision.md
@@ -55,7 +55,7 @@ upstream:
 | Hard Dependency   | Graphviz (`dot` binary on `$PATH`)                             |
 | Access Date       | 2026-05-18                                                     |
 | Primary Source    | [Examples page](https://diagrams.mingrammer.com/docs/getting-started/examples) |
-| Related Documents | [`diagrams.mingrammer.comparision.md`](diagrams.mingrammer.comparision.md) (kymo comparison), [`d2.md`](d2.md), [`figma.md`](figma.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`diagrams.mingrammer.comparision.md`](diagrams.mingrammer.comparision.md) (kymo comparison), [`d2.md`](d2.md), [`figma.md`](figma.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures the design choices in `mingrammer/diagrams` so the team can consult them when evolving kymo's DSL, layout, and render pipeline. No code or behavior in this repository depends on `diagrams`.
 

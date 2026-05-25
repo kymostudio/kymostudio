@@ -35,6 +35,6 @@ see the SVG on the right, share via URL:
 - **[BPMN element mapping](../formats/bpmn/kymo-mapping.md)** (`BPMN-MAP-001`) — how `.bpmn`
   files map to kymo shapes on import and export; part of the
   [BPMN 2.0.2 normative-reference set](../formats/bpmn/) (`BPMN-NREF-001`).
-- **[Best-practice diagrams](../BEST_PRACTICE_DIAGRAMS.md)** — design principles for diagrams
+- **[Best-practice diagrams](../diagrams/best-practices.md)** — design principles for diagrams
   that read well.
 - **[`samples/`](../../samples)** — complete `.kymo` and `.bpmn` files, each with its rendered SVG.

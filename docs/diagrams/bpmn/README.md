@@ -11,7 +11,7 @@ review_cycle: On OMG BPMN major release, or annually (whichever first)
 supersedes: null
 related_documents:
   - ../../formats/kymo-dsl/README.md
-  - ../../BEST_PRACTICE_DIAGRAMS.md
+  - ../best-practices.md
   - ../../softwares/d2.md
 authors:
   - Vũ Anh
@@ -50,7 +50,7 @@ upstream:
 | ISO Equivalent    | ISO/IEC 19510:2013                                            |
 | Version Reviewed  | 2.0.2 (OMG, 2014) / ISO/IEC 19510:2013                        |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`kymo-dsl/`](../../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../../BEST_PRACTICE_DIAGRAMS.md), [`d2.md`](../../softwares/d2.md) |
+| Related Documents | [`kymo-dsl/`](../../formats/kymo-dsl/README.md), [`best-practices.md`](../best-practices.md), [`d2.md`](../../softwares/d2.md) |
 
 This is a **research reference on BPMN 2.0**, the process-modelling notation standardised by the Object Management Group (OMG) and published by ISO as ISO/IEC 19510:2013. It is **descriptive, not normative** — where this note and the OMG specification disagree, the OMG specification is authoritative. No code or behaviour in this repository depends on BPMN; this document exists so the team can consult the standard's vocabulary and structure when discussing process and flow diagrams.
 

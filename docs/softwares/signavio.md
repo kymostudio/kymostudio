@@ -13,7 +13,7 @@ related_documents:
   - signavio.comparision.md
   - ../diagrams/bpmn/README.md
   - ../formats/kymo-dsl/README.md
-  - ../BEST_PRACTICE_DIAGRAMS.md
+  - ../diagrams/best-practices.md
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +48,7 @@ upstream:
 | License           | Commercial SaaS (30-day trial)                                |
 | Version Reviewed  | SAP Signavio cloud (2026)                                    |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`signavio.comparision.md`](./signavio.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`BEST_PRACTICE_DIAGRAMS.md`](../BEST_PRACTICE_DIAGRAMS.md) |
+| Related Documents | [`signavio.comparision.md`](./signavio.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures SAP Signavio's design choices so the team can consult them when reasoning about collaborative modelling and process governance. No code or behaviour in this repository depends on Signavio. Signavio is an enterprise **process-management suite** — a different category and price point from kymo (a static diagram DSL).
 
