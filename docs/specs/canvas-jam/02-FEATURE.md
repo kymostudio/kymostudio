@@ -1,8 +1,8 @@
 ---
 title: Canvas Jam — Feature & Requirements (SRS)
 document_id: FEAT-JAM-001
-version: "0.1"
-issue_date: 2026-05-24
+version: "0.2"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers implementing the engine completion + freeform tools; reviewe
 review_cycle: On scope change, or when a phase completes
 supersedes: null
 related_documents:
+  - PROD-JAM-001
   - INTRO-JAM-001
   - DESIGN-JAM-001
   - TEST-JAM-001
@@ -35,10 +36,10 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | FEAT-JAM-001                                                 |
-| Version           | 0.1                                                             |
+| Version           | 0.2                                                             |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
-| Related Documents | `DESIGN-JAM-001` (how), `TEST-JAM-001` (V&V), `FEAT-ENGINE-001` (sibling — the render core), `FEAT-CANVAS-001` (the editor on top) |
+| Related Documents | `PROD-JAM-001` (stakeholder needs), `DESIGN-JAM-001` (how), `TEST-JAM-001` (V&V), `FEAT-ENGINE-001` (sibling — the render core), `FEAT-CANVAS-001` (the editor on top) |
 
 > Requirements per **ISO/IEC/IEEE 29148**. IDs: functional **`FR-J-NN`**, non-functional
 > **`NFR-J-NN`**. This feature **completes** the in-house engine begun in `FEAT-ENGINE-001` and adds
@@ -47,14 +48,11 @@ keywords:
 
 ---
 
-## 1. Stakeholder needs (ISO 29148 §6.4.2)
+## 1. Stakeholder needs
 
-| ID | Need |
-|----|------|
-| SN-1 | The project must depend on **no tldraw code at all** — no license key, no watermark, no `@tldraw/assets`, nothing in `package.json` (finishes `RK-02`). |
-| SN-2 | The canvas-editor's **full** behaviour (`FEAT-CANVAS-001`, `TC-01..19` incl. undo and export) must be **preserved** once tldraw is gone — zero regression. |
-| SN-3 | The committed `kymo.bundle.js` should **shrink** materially from the ~2.0 MB tldraw baseline. |
-| SN-4 | Users must be able to **author freeform content** (draw, sticky notes, text) on the board — the FigJam half — without tldraw. |
+Stakeholder needs (`SN-J-01..04`, ISO 29148 §6.4.2 ConOps) are owned by the product description
+**`PROD-JAM-001`** (`00-PRODUCT.md`). Each requirement below traces back to them via the
+**Source need** column.
 
 ## 2. Re-homed requirements (from `FEAT-ENGINE-001`)
 
@@ -75,13 +73,13 @@ The engine's store already **tags** writes recordable/ignored (`FR-EN-02`, `DESI
 
 | ID | Requirement | Source need | Phase |
 |----|-------------|-------------|-------|
-| **FR-J-01** | The engine SHALL **consolidate the built-in shapes** to two tiny custom shapes **`kymo-region`** / **`kymo-edge`** carrying only the props kymo sets, rendered by the engine's own `ShapeUtil`s. *As implemented (engine-only split):* the shared `diagramToShapes.ts` keeps emitting tldraw `geo`/`arrow` (the live `?engine=tldraw` path needs them); a thin `engine/diagramToShapesEngine.ts` reuses it and remaps to `kymo-region`/`kymo-edge` — so re-pointing doesn't break the tldraw board. The `patchDsl` round-trip is unaffected (it reads `meta.kymo`, not the shape type). | SN-1 | P1 |
-| **FR-J-02** | The engine SHALL provide **undo/redo** across the document, consuming the store's history tags: `{history:"ignore"}` writes are excluded; a default write pushes one undo entry; undo restores the exact prior record (incl. node `x/y`) and `Board`'s writeback re-patches the `.kymo` text. | SN-2 | P2 |
-| **FR-J-03** | The engine SHALL provide a **board export** that walks shapes in `index` order, aggregates each util's `toSvg()` (or a `component()` raster fallback) into one `<svg>` sized to the fit bounds, and offers SVG/PNG download. | SN-2 | P3 |
-| **FR-J-04** | The build SHALL **remove tldraw entirely**. *As built (P3):* dropped the `tldraw` dep; deleted `Board.tsx`/`KymoNodeShape.tsx`/`KymoDiagramShape.tsx`/`engine/adapter.ts` + the `@tldraw/tlschema` augmentations + the `?engine=tldraw` switch; removed the (now-empty) `kymo.bundle.css` link from `index.html`. **`grep -r '"tldraw"' website/app/src` → 0**; bundle 2.09 MB → 399 KB raw (107 KB gzip). `TEST-CANVAS-001` `TC-01..05/07..19` pass green on the engine; **`TC-06`'s freeform clause is deferred to P5–7** (no freeform tools yet — the `meta.kymo`-exclusion invariant + reserved `persist.freeform` are in place). | SN-1, SN-2 | P3 |
-| **FR-J-05** | The engine SHALL provide a **draw/pen tool**: a freehand tool that creates a freeform stroke shape (`meta.kymo == null`) on pointer-drag, with the tool state machine (`engine/tools`) that activates/deactivates it. | SN-4 | P5 |
-| **FR-J-06** | The engine SHALL provide a **sticky-note tool**: click-to-place a resizable sticky shape with an editable plain-text label. | SN-4 | P6 |
-| **FR-J-07** | The engine SHALL provide a **text tool**: click-to-place an editable plain-text shape. | SN-4 | P7 |
+| **FR-J-01** | The engine SHALL **consolidate the built-in shapes** to two tiny custom shapes **`kymo-region`** / **`kymo-edge`** carrying only the props kymo sets, rendered by the engine's own `ShapeUtil`s. *As implemented (engine-only split):* the shared `diagramToShapes.ts` keeps emitting tldraw `geo`/`arrow` (the live `?engine=tldraw` path needs them); a thin `engine/diagramToShapesEngine.ts` reuses it and remaps to `kymo-region`/`kymo-edge` — so re-pointing doesn't break the tldraw board. The `patchDsl` round-trip is unaffected (it reads `meta.kymo`, not the shape type). | SN-J-01 | P1 |
+| **FR-J-02** | The engine SHALL provide **undo/redo** across the document, consuming the store's history tags: `{history:"ignore"}` writes are excluded; a default write pushes one undo entry; undo restores the exact prior record (incl. node `x/y`) and `Board`'s writeback re-patches the `.kymo` text. | SN-J-02 | P2 |
+| **FR-J-03** | The engine SHALL provide a **board export** that walks shapes in `index` order, aggregates each util's `toSvg()` (or a `component()` raster fallback) into one `<svg>` sized to the fit bounds, and offers SVG/PNG download. | SN-J-02 | P3 |
+| **FR-J-04** | The build SHALL **remove tldraw entirely**. *As built (P3):* dropped the `tldraw` dep; deleted `Board.tsx`/`KymoNodeShape.tsx`/`KymoDiagramShape.tsx`/`engine/adapter.ts` + the `@tldraw/tlschema` augmentations + the `?engine=tldraw` switch; removed the (now-empty) `kymo.bundle.css` link from `index.html`. **`grep -r '"tldraw"' website/app/src` → 0**; bundle 2.09 MB → 399 KB raw (107 KB gzip). `TEST-CANVAS-001` `TC-01..05/07..19` pass green on the engine; **`TC-06`'s freeform clause is deferred to P5–7** (no freeform tools yet — the `meta.kymo`-exclusion invariant + reserved `persist.freeform` are in place). | SN-J-01, SN-J-02 | P3 |
+| **FR-J-05** | The engine SHALL provide a **draw/pen tool**: a freehand tool that creates a freeform stroke shape (`meta.kymo == null`) on pointer-drag, with the tool state machine (`engine/tools`) that activates/deactivates it. | SN-J-04 | P5 |
+| **FR-J-06** | The engine SHALL provide a **sticky-note tool**: click-to-place a resizable sticky shape with an editable plain-text label. | SN-J-04 | P6 |
+| **FR-J-07** | The engine SHALL provide a **text tool**: click-to-place an editable plain-text shape. | SN-J-04 | P7 |
 
 > Freeform shapes (`FR-J-05..07`) are always **freeform-layer** (`meta.kymo == null`) and MUST never
 > serialise into `.kymo` (`NFR-CE-07`, `FR-CE-03`) — they persist via `engine/persist` only.
@@ -125,3 +123,4 @@ Annex B).
 | Version | Date       | Author | Changes                          |
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial requirements: re-homed `FR-J-01..03`/`NFR-J-01/02` from `FEAT-ENGINE-001`, added `FR-J-04` (tldraw removal + full parity) and `FR-J-05..07` (freeform draw/sticky/text), scope & acceptance. |
+| 0.2     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-JAM-001` (renamed `SN-1..4` → `SN-J-01..04`); §1 now points there and the `FR-J` Source-need column cites the new IDs. No requirement content changed. |

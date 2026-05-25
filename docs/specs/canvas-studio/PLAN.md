@@ -1,8 +1,8 @@
 ---
 title: Canvas Studio — Implementation Plan
 document_id: PLAN-STUDIO-001
-version: "0.2"
-issue_date: 2026-05-24
+version: "0.3"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-STUDIO-001                                                  |
-| Version           | 0.2                                                             |
+| Version           | 0.3                                                             |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
 | Related Documents | `FEAT-STUDIO-001` (requirements), `DESIGN-STUDIO-001` (design), `TEST-STUDIO-001` (V&V), `PLAN-JAM-001` (the capability layer this builds on — **entry gate, complete**) |
@@ -199,12 +199,21 @@ Detailed cases + traceability in `TEST-STUDIO-001`. At the plan level:
 
 ---
 
+## 9. Change requests
+
+Changes to the baselined spec (`docs/specs/canvas-studio/`) are raised, assessed, and logged
+in [`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
+---
+
 ## Annex A — Revision History
 
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial plan: hi-fi editor UI shell over the complete engine. 1-based phases ≤ 10 SP — tokens → top bar → tool rail → item styling → selection → status bar (≈ 42 SP). Risk register (`RK-CS-01..06`), files-to-touch, golden-safe verification, deferred-sibling non-goals. |
 | 0.2     | 2026-05-25 | Vũ Anh | Added **P7 (chrome de-dup, ≈ 5 SP)** — one owner per control (`FR-CS-07`/`TC-CS-07`): remove the floating toolbar; relocate the sample picker + a 3-mode canvas-background control to the top bar; single Export; truthful tabs. Updated §4/§5/§5.1 (total ≈ 47 SP ≤ 50), §7 files, §8 verification. Pure relocation — goldens byte-identical. |
+| 0.3     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §9 Change-requests (`CR/`); plan consolidated into the feature folder under `docs/specs/`. |
 
 ## Annex B — Open questions / pending decisions
 

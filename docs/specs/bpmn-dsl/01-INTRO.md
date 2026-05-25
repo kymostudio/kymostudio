@@ -1,8 +1,8 @@
 ---
 title: BPMN in the kymo DSL — Introduction
 document_id: INTRO-BPMN-DSL-001
-version: "1.1"
-issue_date: 2026-05-23
+version: "1.2"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers and reviewers of the kymo DSL, layout engine, and renderers
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
+  - PROD-BPMN-DSL-001    # Product description (ConOps & stakeholder needs)
   - FEAT-BPMN-DSL-001    # Requirements
   - DESIGN-BPMN-DSL-001    # Design
   - TEST-BPMN-DSL-001    # Test documentation
@@ -37,11 +38,11 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | INTRO-BPMN-DSL-001                                           |
-| Version      | 1.1                                                         |
+| Version      | 1.2                                                         |
 | Status       | Released                                                    |
-| Issue Date   | 2026-05-23                                                  |
+| Issue Date   | 2026-05-25                                                  |
 | Owner        | `diagrams/` project                                         |
-| Related      | FEAT-BPMN-DSL-001, DESIGN-BPMN-DSL-001, TEST-BPMN-DSL-001, PLAN-BPMN-DSL-001 |
+| Related      | PROD-BPMN-DSL-001, FEAT-BPMN-DSL-001, DESIGN-BPMN-DSL-001, TEST-BPMN-DSL-001, PLAN-BPMN-DSL-001 |
 
 ## 1. Purpose and scope
 
@@ -99,15 +100,24 @@ the Python/JS renderers; and maintainers verifying conformance.
 
 ## 6. Document map
 
-Read in order:
+This feature's docs use a two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`) and a **living plan** (`PLAN.md` + `CR/`). The documents for bpmn-dsl:
 
-| # | Information item | Document | Standard role (15289) |
-|---|------------------|----------|-----------------------|
-| 1 | Introduction (this) | INTRO-BPMN-DSL-001 | Concept / overview |
-| 2 | Requirements | FEAT-BPMN-DSL-001 | Requirements specification |
-| 3 | Design | DESIGN-BPMN-DSL-001 | Design / architecture |
-| 4 | Test documentation | TEST-BPMN-DSL-001 | Test plan / cases / traceability |
-| 5 | Plan | PLAN-BPMN-DSL-001 | Plan |
+| # | Document | document_id | Answers |
+|---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | PROD-BPMN-DSL-001 | *what product problem & whose needs (`SN-BPMN-DSL`)?* |
+| 01 | `01-INTRO.md` (this) | INTRO-BPMN-DSL-001 | *where do I start?* |
+| 02 | `02-FEATURE.md` | FEAT-BPMN-DSL-001 | *what must it do? (requirements, `FR`/`NFR`)* |
+| 03 | `03-DESIGN.md` | DESIGN-BPMN-DSL-001 | *how is it built?* |
+| 04 | `04-TEST.md` | TEST-BPMN-DSL-001 | *how do we know it's right?* |
+| — | `docs/specs/bpmn-dsl/PLAN.md` | PLAN-BPMN-DSL-001 | *why, in what order, at what risk, what's done? (+ `CR/`)* |
+
+Reading order: **`01-INTRO`** (this) → **`00-PRODUCT`** (product context + `SN-BPMN-DSL` needs) →
+**`02-FEATURE`** → **`03-DESIGN`** → **`04-TEST`**; for delivery status read `PLAN-BPMN-DSL-001`.
+Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
+reading-order aid only.
+
+- **Change management:** a change to this baselined spec is raised as a change-request in
+  `docs/specs/bpmn-dsl/CR/` and re-baselined (bump version + record in Annex A).
 
 ## Annex A — Revision History
 
@@ -119,6 +129,7 @@ Read in order:
 | 0.2     | 2026-05-23 | Vũ Anh | Doc-set version sync after P0 (spike) complete; no normative change to this item. |
 | 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in KYMO-DSL-001 §6.9). |
 | 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
+| 1.2 | 2026-05-25 | Vũ Anh | **Doc reorganization.** §6 trimmed to a document map and adds `00-PRODUCT` (`PROD-BPMN-DSL-001`); reading order + change-management updated. |
 
 ## Annex B — Document Control
 

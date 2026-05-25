@@ -1,8 +1,8 @@
 ---
 title: In-House Canvas Engine — Specification: Overview & Document Map
 document_id: INTRO-ENGINE-001
-version: "0.2"
-issue_date: 2026-05-23
+version: "0.3"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Anyone new to the canvas-engine effort; engineers, reviewers
 review_cycle: On scope change, or via a change-request against the baseline
 supersedes: null
 related_documents:
+  - PROD-ENGINE-001
   - FEAT-ENGINE-001
   - DESIGN-ENGINE-001
   - TEST-ENGINE-001
@@ -36,12 +37,12 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | INTRO-ENGINE-001                                                  |
-| Version           | 0.2                                                               |
-| Issue Date        | 2026-05-23                                                        |
+| Version           | 0.3                                                               |
+| Issue Date        | 2026-05-25                                                        |
 | Status            | Draft                                                             |
 | Classification    | Internal                                                          |
 | Owner             | `diagrams/` project                                              |
-| Related Documents | `FEAT-ENGINE-001`, `DESIGN-ENGINE-001`, `TEST-ENGINE-001`, `PLAN-ENGINE-001`, `INTRO-JAM-001` (sibling) |
+| Related Documents | `PROD-ENGINE-001`, `FEAT-ENGINE-001`, `DESIGN-ENGINE-001`, `TEST-ENGINE-001`, `PLAN-ENGINE-001`, `INTRO-JAM-001` (sibling) |
 
 > Start here. This folder (`docs/specs/canvas-engine/`) specifies the **render/interaction core** of
 > an in-house canvas engine that replaces the **tldraw** dependency behind the already-delivered
@@ -50,7 +51,7 @@ keywords:
 > while preserving the canvas-editor's behaviour. This feature lands the **key-free rendering board**
 > (Phases 1–7); the parity completion (tldraw removal) and the **FigJam freeform-authoring** half are
 > the sibling feature **`INTRO-JAM-001`** (`docs/specs/canvas-jam/`). The implementation plan
-> that delivers this feature (phases, risks, worklog) lives in `docs/plans/canvas-engine/`
+> that delivers this feature (phases, risks, worklog) lives in `docs/specs/canvas-engine/`
 > (`PLAN-ENGINE-001`).
 
 ---
@@ -73,27 +74,20 @@ Documented to the spirit of **ISO/IEC/IEEE 12207** (life-cycle processes), with 
 42010**, quality attributes per **ISO/IEC 25010**, test structure per **ISO/IEC/IEEE 29119** —
 **tailored** to a single-maintainer OSS feature.
 
-## 2. Two document layers (ISO 15289 information-item classes)
+## 2. Document map
 
-| Layer | Folder | 15289 class | 12207 processes | Answers |
-|-------|--------|-------------|-----------------|---------|
-| **Specification** (this folder) | `docs/specs/canvas-engine/` | Specification / Description | §6.4 Technical Processes | *what must it be / how is it built / how is it verified?* |
-| **Implementation plan** | `docs/plans/canvas-engine/` | Plan + Records — **living** | §6.3 Technical Management | *why, in what order, at what risk, what's done?* |
+This feature's docs use a two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`)
+and a **living plan** (`PLAN.md` + `CR/`). The documents for canvas-engine:
 
-### 2.1 Specification layer — document map (this folder)
-
-| # | Document | document_id | ISO/IEC/IEEE 12207 process | Answers |
-|---|----------|-------------|----------------------------|---------|
-| 01 | `01-INTRO.md` | `INTRO-ENGINE-001` | 6.3.6 Information Management | *where do I start?* |
-| 02 | `02-FEATURE.md` | `FEAT-ENGINE-001` | 6.4.2 Stakeholder Needs + 6.4.3 Requirements (SRS, 29148) | *what must it do?* |
-| 03 | `03-DESIGN.md` | `DESIGN-ENGINE-001` | 6.4.4 Architecture (42010) + 6.4.5 Design Definition | *how is it built?* |
-| 04 | `04-TEST.md` | `TEST-ENGINE-001` | 6.4.9 Verification + 6.4.11 Validation + 6.3.6 Traceability | *how do we know it's right?* |
-
-### 2.2 Implementation-plan layer (separate folder)
-
-| Document | document_id | ISO/IEC/IEEE 12207 process | Answers |
-|----------|-------------|----------------------------|---------|
-| `docs/plans/canvas-engine/PLAN.md` | `PLAN-ENGINE-001` | 6.4.1 Mission Analysis + 6.3.1 Project Planning + 6.3.4 Risk + 6.3.2 Worklog | *why, in what order, at what risk, what's done?* |
+| # | Document | document_id | Answers |
+|---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | `PROD-ENGINE-001` | *what product problem & whose needs (`SN-EN`)?* |
+| 01 | `01-INTRO.md` | `INTRO-ENGINE-001` | *where do I start?* |
+| 02 | `02-FEATURE.md` | `FEAT-ENGINE-001` | *what must it do? (SRS, `FR-EN`/`NFR-EN`)* |
+| 03 | `03-DESIGN.md` | `DESIGN-ENGINE-001` | *how is it built?* |
+| 04 | `04-TEST.md` | `TEST-ENGINE-001` | *how do we know it's right? (`TC-EN`)* |
+| 05 | `05-BENCHMARK.md` | `BENCH-ENGINE-001` | *how fast is it? (performance benchmark)* |
+| — | `docs/specs/canvas-engine/PLAN.md` | `PLAN-ENGINE-001` | *why, in what order, at what risk, what's done? (+ `CR/`)* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -124,12 +118,13 @@ re-homed there (`FR-EN-06/10/11`, `NFR-EN-01/02`) become `FR-J-`/`NFR-J-` and ar
 
 ## 4. Reading guide
 
-Spec, in numeric order: **`01-INTRO`** (this doc) → **`02-FEATURE`** (the `FR-EN`/`NFR-EN`
-requirements, incl. the tldraw-surface parity contract) → **`03-DESIGN`** (store, editor facade,
-viewport, ShapeUtil parity, interaction, persistence, the adapter seam) → **`04-TEST`** (V&V,
-`TC-EN-NN`, traceability). For delivery status & history, read **`PLAN-ENGINE-001`**.
+Spec: **`01-INTRO`** (this doc) → **`00-PRODUCT`** (the product context + `SN-EN` needs) →
+**`02-FEATURE`** (the `FR-EN`/`NFR-EN` requirements, incl. the tldraw-surface parity contract) →
+**`03-DESIGN`** (store, editor facade, viewport, ShapeUtil parity, interaction, persistence, the
+adapter seam) → **`04-TEST`** (V&V, `TC-EN-NN`, traceability). For delivery status & history, read
+**`PLAN-ENGINE-001`**.
 
-Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *stakeholder* → `PLAN`.
+Quick paths: *implementer* → 00 → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *stakeholder* → 00 → `PLAN`.
 
 ## 5. Status & ownership
 
@@ -139,6 +134,8 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 - **Owner:** `diagrams/` project (Vũ Anh).
 - **Traceability invariant:** every requirement in `FEAT-ENGINE-001` will have ≥ 1 covering test in
   `TEST-ENGINE-001` §5 before the engine is declared at parity.
+- **Change management:** a change to this baselined spec is raised as a change-request in
+  `docs/specs/canvas-engine/CR/` and re-baselined (bump version + record in Annex A).
 
 ---
 
@@ -148,3 +145,4 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial introduction + document map for the in-house canvas engine. |
 | 0.2     | 2026-05-24 | Vũ Anh | **Feature split** at the key-free-board seam: rescoped to the render/interaction core; added §3.1 sibling-feature relationship to `INTRO-JAM-001`; `RK-02` now closes at render level here. |
+| 0.3     | 2026-05-25 | Vũ Anh | **Doc reorganization.** §2 trimmed to a document map and adds `00-PRODUCT` (`PROD-ENGINE-001`) + a `05` benchmark row; reading guide + change-management updated; docs consolidated per feature under `docs/specs/`. |

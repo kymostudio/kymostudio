@@ -1,8 +1,8 @@
 ---
 title: In-House Canvas Engine — Implementation Plan
 document_id: PLAN-ENGINE-001
-version: "0.2"
-issue_date: 2026-05-23
+version: "0.3"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -37,7 +37,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-ENGINE-001                                                  |
-| Version           | 0.2                                                              |
+| Version           | 0.3                                                              |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
 | Related Documents | `FEAT-ENGINE-001` (requirements), `DESIGN-ENGINE-001` (design), `TEST-ENGINE-001` (V&V), `PLAN-JAM-001` (sibling — engine completion + FigJam authoring), `PLAN-CANVAS-001` (parent — the editor on top) |
@@ -236,12 +236,21 @@ Detailed cases + traceability in `TEST-ENGINE-001`. At the plan level (this feat
 
 ---
 
+## 9. Change requests
+
+Changes to the baselined spec (`docs/specs/canvas-engine/`) are raised, assessed, and logged
+in [`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
+---
+
 ## Annex A — Revision History
 
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial plan: decision (adapter-first, minimal, render-first), phased plan (0→7), story-point sizing (≈ 91 SP), risk register (`RK-EN-01..07`, `RK-02` closing), files, verification gates. |
 | 0.2     | 2026-05-24 | Vũ Anh | **Split at the KEY-FREE BOARD seam** to honour the ≤50-SP/feature and ≤10-SP/phase caps: this feature keeps the render/interaction core (≈42 SP); built-in consolidation, undo, export, tldraw removal, footprint and FigJam authoring spun out to `PLAN-JAM-001`. Phases **renumbered 1-based** and decomposed so every phase ≤10 SP. Risks RK-EN-02/03/05/06 moved to the sibling; RK-02 now *closes at render level* here. |
+| 0.3     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §9 Change-requests (`CR/`); plan consolidated per feature under `docs/specs/`. |
 
 ## Annex B — Open questions / pending decisions
 

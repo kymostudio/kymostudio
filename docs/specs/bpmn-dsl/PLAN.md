@@ -1,8 +1,8 @@
 ---
 title: BPMN in the kymo DSL — Plan
 document_id: PLAN-BPMN-DSL-001
-version: "1.1"
-issue_date: 2026-05-23
+version: "1.2"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -36,9 +36,9 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-BPMN-DSL-001                            |
-| Version      | 1.1                                                |
+| Version      | 1.2                                                |
 | Status       | Released                                           |
-| Issue Date   | 2026-05-23                                         |
+| Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | INTRO-BPMN-DSL-001, FEAT-BPMN-DSL-001, DESIGN-BPMN-DSL-001, TEST-BPMN-DSL-001 |
 
@@ -111,6 +111,12 @@ is comparatively mechanical.
 
 **Progress:** P0–P4 complete (3 + 5 + 13 + 8 + 3 = **32 / 32 pts**, 2026-05-23) — feature shipped. 🎉
 
+## 7. Change requests
+
+Changes to the baselined spec (`docs/specs/bpmn-dsl/`) are raised, assessed, and logged in
+[`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
 ## Annex A — Revision History
 
 **Table A.1 — Document revisions**
@@ -125,11 +131,12 @@ is comparatively mechanical.
 | 0.6     | 2026-05-23 | Vũ Anh | Record P3 (JS parity) complete: phase Status + progress + Annex C worklog row. |
 | 1.0     | 2026-05-23 | Vũ Anh | Released — P4 complete: added KYMO-DSL-001 §6.9 clause; marked the feature doc set Released (status + version 1.0). |
 | 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
+| 1.2 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §7 Change-requests (`CR/`); plan gathered under `docs/specs/`. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/plans/bpmn-dsl/PLAN.md`; authoritative source is
+Version-controlled at `docs/specs/bpmn-dsl/PLAN.md`; authoritative source is
 the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

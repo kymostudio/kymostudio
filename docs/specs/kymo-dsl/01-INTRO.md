@@ -1,8 +1,8 @@
 ---
 title: Kymo DSL Front-End — Introduction
 document_id: INTRO-KYMO-DSL-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers and reviewers of the kymo DSL parser, layout engine, alignme
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
+  - PROD-KYMO-DSL-001        # Product description (ConOps + StRS)
   - FEAT-KYMO-DSL-001        # Requirements
   - DESIGN-KYMO-DSL-001      # Design
   - TEST-KYMO-DSL-001        # Test documentation
@@ -38,11 +39,11 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | INTRO-KYMO-DSL-001                                          |
-| Version      | 1.0                                                         |
+| Version      | 1.1                                                         |
 | Status       | Released                                                    |
-| Issue Date   | 2026-05-24                                                  |
+| Issue Date   | 2026-05-25                                                  |
 | Owner        | `diagrams/` project                                         |
-| Related      | FEAT-KYMO-DSL-001, DESIGN-KYMO-DSL-001, TEST-KYMO-DSL-001, PLAN-KYMO-DSL-001 |
+| Related      | PROD-KYMO-DSL-001, FEAT-KYMO-DSL-001, DESIGN-KYMO-DSL-001, TEST-KYMO-DSL-001, PLAN-KYMO-DSL-001 |
 
 ## 1. Purpose and scope
 
@@ -50,10 +51,10 @@ This document introduces the **kymo DSL front-end** — the `.kymo` source-to-mo
 pipeline that turns declarative diagram text into a fully-resolved `Diagram` the
 renderers can draw. It is the entry point to the feature's document set: it states
 the problem, the concept, and the terminology, and maps the reader to the
-requirements (FEAT-KYMO-DSL-001), the design (DESIGN-KYMO-DSL-001), the test
-documentation (TEST-KYMO-DSL-001), and the plan (PLAN-KYMO-DSL-001). The set
-conforms to ISO/IEC/IEEE 12207:2017 (life-cycle processes) and ISO/IEC/IEEE
-15289:2019 (information-item content).
+product description (PROD-KYMO-DSL-001), the requirements (FEAT-KYMO-DSL-001),
+the design (DESIGN-KYMO-DSL-001), the test documentation (TEST-KYMO-DSL-001),
+and the plan (PLAN-KYMO-DSL-001). The set conforms to ISO/IEC/IEEE 12207:2017
+(life-cycle processes) and ISO/IEC/IEEE 15289:2019 (information-item content).
 
 **In scope:** the file-scope grammar surface (metadata directives, leaf
 components, region containers, layout containers, edges, anonymous layout trees,
@@ -128,18 +129,24 @@ cross-language conformance.
 
 ## 6. Document map
 
-Read in order:
+This feature's docs use a two-layer model in this folder — a **baselined spec**
+(`00-PRODUCT`–`04-TEST`) and a **living plan** (`PLAN.md` + `CR/`). The documents for kymo-dsl:
 
-| # | Information item | Document | Standard role (15289) |
-|---|------------------|----------|-----------------------|
-| 1 | Introduction (this) | INTRO-KYMO-DSL-001 | Concept / overview |
-| 2 | Requirements | FEAT-KYMO-DSL-001 | Requirements specification |
-| 3 | Design | DESIGN-KYMO-DSL-001 | Design / architecture |
-| 4 | Test documentation | TEST-KYMO-DSL-001 | Test plan / cases / traceability |
-| 5 | Plan | PLAN-KYMO-DSL-001 | Plan |
+| # | Document | document_id | Answers |
+|---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | `PROD-KYMO-DSL-001` | *what product problem & whose needs (`SN-KYMO-DSL`)?* |
+| 01 | `01-INTRO.md` | `INTRO-KYMO-DSL-001` | *where do I start?* |
+| 02 | `02-FEATURE.md` | `FEAT-KYMO-DSL-001` | *what must it do? (SRS, `FR`/`NFR`)* |
+| 03 | `03-DESIGN.md` | `DESIGN-KYMO-DSL-001` | *how is it built?* |
+| 04 | `04-TEST.md` | `TEST-KYMO-DSL-001` | *how do we know it's right?* |
+| — | `docs/specs/kymo-dsl/PLAN.md` | `PLAN-KYMO-DSL-001` | *why, in what order, at what risk, what's done? (+ `CR/`)* |
 
-The normative grammar (EBNF + statement semantics) is **KYMO-DSL-001**; this set
-references it rather than restating it.
+Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
+reading-order aid only. The normative grammar (EBNF + statement semantics) is **KYMO-DSL-001**; this
+set references it rather than restating it.
+
+**Change management:** a change to this baselined spec is raised as a change-request in
+`docs/specs/kymo-dsl/CR/` and re-baselined (bump version + record in Annex A).
 
 ## Annex A — Revision History
 
@@ -148,6 +155,7 @@ references it rather than restating it.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — descriptive spec set for the shipped `.kymo` front-end. |
+| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** §6 reworked to a document map that defers the ISO/lifecycle model to the standard and adds `00-PRODUCT` (`PROD-KYMO-DSL-001`) + a change-management pointer to `docs/specs/kymo-dsl/CR/`; §1 reading map updated to include the product description. |
 
 ## Annex B — Document Control
 

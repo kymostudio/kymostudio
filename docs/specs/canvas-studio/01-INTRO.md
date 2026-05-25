@@ -1,8 +1,8 @@
 ---
 title: Canvas Studio — Specification: Overview & Document Map
 document_id: INTRO-STUDIO-001
-version: "0.1"
-issue_date: 2026-05-24
+version: "0.2"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Anyone new to the canvas-studio effort; engineers, reviewers
 review_cycle: On scope change, or via a change-request against the baseline
 supersedes: null
 related_documents:
+  - PROD-STUDIO-001
   - FEAT-STUDIO-001
   - DESIGN-STUDIO-001
   - TEST-STUDIO-001
@@ -36,12 +37,12 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | INTRO-STUDIO-001                                                  |
-| Version           | 0.1                                                               |
-| Issue Date        | 2026-05-24                                                        |
+| Version           | 0.2                                                               |
+| Issue Date        | 2026-05-25                                                        |
 | Status            | Draft                                                             |
 | Classification    | Internal                                                          |
 | Owner             | `diagrams/` project                                              |
-| Related Documents | `FEAT-STUDIO-001`, `DESIGN-STUDIO-001`, `TEST-STUDIO-001`, `PLAN-STUDIO-001`, `INTRO-JAM-001` (sibling — the capability layer), `INTRO-ENGINE-001` (the render core) |
+| Related Documents | `PROD-STUDIO-001`, `FEAT-STUDIO-001`, `DESIGN-STUDIO-001`, `TEST-STUDIO-001`, `PLAN-STUDIO-001`, `INTRO-JAM-001` (sibling — the capability layer), `INTRO-ENGINE-001` (the render core) |
 
 > Start here. This folder (`docs/specs/canvas-studio/`) specifies the **hi-fi editor UI shell**
 > that wraps the finished canvas engine. The engine renders and round-trips a diagram today
@@ -49,7 +50,7 @@ keywords:
 > live playground (`website/app/`, `FEAT-CANVAS-001`) still lacks is a **product chrome** — the
 > top bar, the tool rail, the on-canvas item styling, and the status bar that the hi-fi design
 > prototype shows. This feature builds that chrome over the existing engine. The implementation
-> plan that delivers it (phases, risks, worklog) lives in `docs/plans/canvas-studio/`
+> plan that delivers it (phases, risks, worklog) lives in `docs/specs/canvas-studio/`
 > (`PLAN-STUDIO-001`).
 
 ---
@@ -78,27 +79,19 @@ Documented to the spirit of **ISO/IEC/IEEE 12207**, with requirements per **2914
 per **42010**, quality attributes per **25010**, test structure per **29119** — tailored to a
 single-maintainer OSS feature, as the sibling doc-sets.
 
-## 2. Two document layers (ISO 15289 information-item classes)
+## 2. Document map
 
-| Layer | Folder | 15289 class | 12207 processes | Answers |
-|-------|--------|-------------|-----------------|---------|
-| **Specification** (this folder) | `docs/specs/canvas-studio/` | Specification / Description | §6.4 Technical Processes | *what must it be / how is it built / how is it verified?* |
-| **Implementation plan** | `docs/plans/canvas-studio/` | Plan + Records — **living** | §6.3 Technical Management | *why, in what order, at what risk, what's done?* |
+This feature's docs use a two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`)
+and a **living plan** (`PLAN.md` + `CR/`). The documents for canvas-studio:
 
-### 2.1 Specification layer — document map (this folder)
-
-| # | Document | document_id | ISO/IEC/IEEE 12207 process | Answers |
-|---|----------|-------------|----------------------------|---------|
-| 01 | `01-INTRO.md` | `INTRO-STUDIO-001` | 6.3.6 Information Management | *where do I start?* |
-| 02 | `02-FEATURE.md` | `FEAT-STUDIO-001` | 6.4.2 Stakeholder Needs + 6.4.3 Requirements (SRS, 29148) | *what must it do?* |
-| 03 | `03-DESIGN.md` | `DESIGN-STUDIO-001` | 6.4.4 Architecture (42010) + 6.4.5 Design Definition | *how is it built?* |
-| 04 | `04-TEST.md` | `TEST-STUDIO-001` | 6.4.9 Verification + 6.4.11 Validation + 6.3.6 Traceability | *how do we know it's right?* |
-
-### 2.2 Implementation-plan layer (separate folder)
-
-| Document | document_id | ISO/IEC/IEEE 12207 process | Answers |
-|----------|-------------|----------------------------|---------|
-| `docs/plans/canvas-studio/PLAN.md` | `PLAN-STUDIO-001` | 6.4.1 Mission Analysis + 6.3.1 Project Planning + 6.3.4 Risk + 6.3.2 Worklog | *why, in what order, at what risk, what's done?* |
+| # | Document | document_id | Answers |
+|---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | `PROD-STUDIO-001` | *what product problem & whose needs (`SN-CS`)?* |
+| 01 | `01-INTRO.md` | `INTRO-STUDIO-001` | *where do I start?* |
+| 02 | `02-FEATURE.md` | `FEAT-STUDIO-001` | *what must it do? (SRS, `FR-CS`/`NFR-CS`)* |
+| 03 | `03-DESIGN.md` | `DESIGN-STUDIO-001` | *how is it built?* |
+| 04 | `04-TEST.md` | `TEST-STUDIO-001` | *how do we know it's right? (`TC-CS`)* |
+| — | `docs/specs/canvas-studio/PLAN.md` | `PLAN-STUDIO-001` | *why, in what order, at what risk, what's done? (+ `CR/`)* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -126,12 +119,12 @@ canvas-studio (this spec)          →  hi-fi editor CHROME over the engine     
 
 ## 4. Reading guide
 
-Spec, in numeric order: **`01-INTRO`** (this doc) → **`02-FEATURE`** (the `FR-CS`/`NFR-CS`
-requirements per region) → **`03-DESIGN`** (region→file mapping, tool-registry seam, item styling,
-token migration) → **`04-TEST`** (V&V, `TC-CS-NN`, golden-safety, traceability). For delivery
-status & history, read **`PLAN-STUDIO-001`**.
+Spec: **`01-INTRO`** (this doc) → **`00-PRODUCT`** (the product context + `SN-CS` needs) →
+**`02-FEATURE`** (the `FR-CS`/`NFR-CS` requirements per region) → **`03-DESIGN`** (region→file
+mapping, tool-registry seam, item styling, token migration) → **`04-TEST`** (V&V, `TC-CS-NN`,
+golden-safety, traceability). For delivery status & history, read **`PLAN-STUDIO-001`**.
 
-Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *stakeholder* → `PLAN`.
+Quick paths: *implementer* → 00 → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *stakeholder* → 00 → `PLAN`.
 
 ## 5. Status & ownership
 
@@ -140,6 +133,8 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 - **Owner:** `diagrams/` project (Vũ Anh).
 - **Traceability invariant:** every requirement in `FEAT-STUDIO-001` will have ≥ 1 covering test in
   `TEST-STUDIO-001` before the feature is declared done.
+- **Change management:** a change to this baselined spec is raised as a change-request in
+  `docs/specs/canvas-studio/CR/` and re-baselined (bump version + record in Annex A).
 
 ---
 
@@ -148,3 +143,4 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial introduction + document map for canvas-studio (the hi-fi editor UI shell over the complete engine + freeform tools; decomposed by canvas region). |
+| 0.2     | 2026-05-25 | Vũ Anh | **Doc reorganization.** §2 trimmed to a self-contained document map adding `00-PRODUCT` (`PROD-STUDIO-001`); reading guide + change-management updated; docs consolidated per feature under `docs/specs/`. |

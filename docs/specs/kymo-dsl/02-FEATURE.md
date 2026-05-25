@@ -1,8 +1,8 @@
 ---
 title: Kymo DSL Front-End — Requirements
 document_id: FEAT-KYMO-DSL-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers implementing and verifying the kymo DSL front-end
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
+  - PROD-KYMO-DSL-001        # Product description (owns the SN- stakeholder needs)
   - INTRO-KYMO-DSL-001       # Introduction
   - DESIGN-KYMO-DSL-001      # Design
   - TEST-KYMO-DSL-001        # Test documentation
@@ -38,11 +39,11 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-KYMO-DSL-001                                  |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
-| Issue Date   | 2026-05-24                                         |
+| Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | INTRO-KYMO-DSL-001, DESIGN-KYMO-DSL-001, TEST-KYMO-DSL-001, PLAN-KYMO-DSL-001 |
+| Related      | PROD-KYMO-DSL-001 (stakeholder needs), INTRO-KYMO-DSL-001, DESIGN-KYMO-DSL-001, TEST-KYMO-DSL-001, PLAN-KYMO-DSL-001 |
 
 The key words **SHALL**, **SHOULD**, and **MAY** are used per ISO/IEC/IEEE
 29148:2018 drafting conventions. Each requirement carries a stable ID for
@@ -53,12 +54,12 @@ behaviour and surface, not the grammar productions.
 
 ## 1. Scope and stakeholder needs
 
-Provide a declarative, line-oriented `.kymo` language whose source compiles into
-a fully-resolved `Diagram` the renderers can draw — so an author describes *what*
-the diagram contains (components, containers, connectors, grouping) without
-hand-computing layout coordinates, and the engine resolves geometry
-deterministically and identically across the Python and JavaScript
-implementations.
+Stakeholder needs (`SN-KYMO-DSL-01..04`, ISO 29148 §6.4.2 ConOps) are owned by the product
+description **`PROD-KYMO-DSL-001`** (`00-PRODUCT.md`): an author describes *what* a diagram contains
+(components, containers, connectors, grouping) without hand-computing layout coordinates, and the
+engine resolves geometry deterministically and identically across the Python and JavaScript
+implementations. This document specifies the front-end's behaviour and surface that meets those needs;
+the scope/out-of-scope boundary is in §4.
 
 ## 2. Functional requirements
 
@@ -184,6 +185,7 @@ implementations.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — requirements for the shipped `.kymo` front-end. |
+| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to the new product description `PROD-KYMO-DSL-001` (minted `SN-KYMO-DSL-01..04`); §1 now points there. Added `PROD-KYMO-DSL-001` to related documents. No requirement content changed. |
 
 ## Annex B — Document Control
 

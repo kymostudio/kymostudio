@@ -1,8 +1,8 @@
 ---
 title: kymo.json Interchange Format — Requirements
 document_id: FEAT-KYMOJSON-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers implementing and verifying the kymo.json serializer/loader
 review_cycle: On phase completion, or on schema change
 supersedes: null
 related_documents:
+  - PROD-KYMOJSON-001           # Product description (owns the SN- stakeholder needs)
   - INTRO-KYMOJSON-001          # Introduction
   - DESIGN-KYMOJSON-001         # Design
   - TEST-KYMOJSON-001           # Test documentation
@@ -35,11 +36,11 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-KYMOJSON-001                                  |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
-| Issue Date   | 2026-05-24                                         |
+| Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | INTRO-KYMOJSON-001, DESIGN-KYMOJSON-001, TEST-KYMOJSON-001, PLAN-KYMOJSON-001 |
+| Related      | PROD-KYMOJSON-001 (stakeholder needs), INTRO-KYMOJSON-001, DESIGN-KYMOJSON-001, TEST-KYMOJSON-001, PLAN-KYMOJSON-001 |
 
 The key words **SHALL**, **SHOULD**, **MAY** are used per ISO drafting conventions.
 Each requirement carries a stable ID for traceability from TEST-KYMOJSON-001. Concept:
@@ -47,9 +48,12 @@ INTRO-KYMOJSON-001; schema: KYMOJSON-MAP-001; realisation: DESIGN-KYMOJSON-001.
 
 ## 1. Scope and stakeholder needs
 
-Persist the resolved kymo `Diagram` to a versioned JSON file and load it back, so the
-model can be cached, diffed, inspected, exchanged between the Python and JS
-implementations, and fed to any back-end without re-parsing the original source.
+Stakeholder needs (`SN-KYMOJSON-01..04`, ISO 29148 §6.4.2 ConOps) are owned by the product
+description **`PROD-KYMOJSON-001`** (`00-PRODUCT.md`): persist the resolved kymo `Diagram` to a
+versioned JSON file and load it back, so the model can be cached, diffed, inspected, exchanged between
+the Python and JS implementations, and fed to any back-end without re-parsing the original source.
+This document specifies the serializer/loader behaviour and surface that meets those needs; the
+scope/out-of-scope boundary is in §4.
 
 ## 2. Functional requirements
 
@@ -104,6 +108,7 @@ implementations, and fed to any back-end without re-parsing the original source.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — requirements for the bidirectional, lossless `.kymo.json` format, traced in TEST-KYMOJSON-001. |
+| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to the new product description `PROD-KYMOJSON-001` (minted `SN-KYMOJSON-01..04`); §1 now points there. Added `PROD-KYMOJSON-001` to related documents. No requirement content changed. |
 
 ## Annex B — Document Control
 

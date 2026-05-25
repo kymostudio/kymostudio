@@ -1,8 +1,8 @@
 ---
 title: In-House Canvas Engine — Feature & Requirements (SRS)
 document_id: FEAT-ENGINE-001
-version: "0.2"
-issue_date: 2026-05-23
+version: "0.3"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers implementing the engine; reviewers verifying parity
 review_cycle: On scope change, or when a phase completes
 supersedes: null
 related_documents:
+  - PROD-ENGINE-001
   - INTRO-ENGINE-001
   - DESIGN-ENGINE-001
   - TEST-ENGINE-001
@@ -35,10 +36,10 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | FEAT-ENGINE-001                                                   |
-| Version           | 0.2                                                               |
+| Version           | 0.3                                                               |
 | Status            | Draft                                                             |
 | Owner             | `diagrams/` project                                              |
-| Related Documents | `DESIGN-ENGINE-001` (how), `TEST-ENGINE-001` (V&V), `FEAT-JAM-001` (sibling — the deferred half), `FEAT-CANVAS-001` (parent feature) |
+| Related Documents | `PROD-ENGINE-001` (stakeholder needs), `DESIGN-ENGINE-001` (how), `TEST-ENGINE-001` (V&V), `FEAT-JAM-001` (sibling — the deferred half), `FEAT-CANVAS-001` (parent feature) |
 
 > Requirements per **ISO/IEC/IEEE 29148**. IDs: functional **`FR-EN-NN`**, non-functional
 > **`NFR-EN-NN`**. The engine is judged by **behavioural parity** with the tldraw-backed canvas-editor
@@ -53,15 +54,11 @@ keywords:
 
 ---
 
-## 1. Stakeholder needs (ISO 29148 §6.4.2)
+## 1. Stakeholder needs
 
-| ID | Need |
-|----|------|
-| SN-1 | The deployed public board must **render** (today it is blank — `RK-02`). |
-| SN-2 | The project must not depend on a **third-party license key**, **watermark**, or **CDN-hosted assets** for the canvas to work. |
-| SN-3 | The existing canvas-editor behaviour (two-way `.kymo` sync, freeform layer, persistence, undo) must be **preserved** — no regression in `FEAT-CANVAS-001`. |
-| SN-4 | The committed `kymo.bundle.js` should **shrink** materially from the ~2.0 MB tldraw baseline. |
-| SN-5 | The swap should be **incremental and reversible** — never a big-bang that breaks the editor for the duration. |
+Stakeholder needs (`SN-EN-01..05`, ISO 29148 §6.4.2 ConOps) are owned by the product description
+**`PROD-ENGINE-001`** (`00-PRODUCT.md`). Each requirement below traces back to them via the
+**Source need** column.
 
 ## 2. The parity contract — tldraw surface to reproduce
 
@@ -87,15 +84,15 @@ not listed is **out of scope** for parity.
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-EN-01** | The engine SHALL expose an **`Editor` facade** with the query/mutate/control methods in §2, with semantics identical to tldraw's as relied upon by `Board.tsx` (centre/top-left conventions, deterministic ids). | SN-3 |
-| **FR-EN-02** | The engine SHALL provide a **reactive store** whose change subscription distinguishes **`source: "user"`** (direct user interaction) from programmatic writes, and supports a **`scope: "document"`** filter. Programmatic mutations made inside `run(fn, { history: "ignore" })` MUST NOT notify `source:"user"` listeners. *(This is the load-bearing guarantee behind the round-trip loop-guard, `DESIGN-CANVAS-001` §7 / `RK-05`.)* | SN-3 |
-| **FR-EN-03** | The engine SHALL provide a **custom-shape API** (`ShapeUtil` parity) covering every override in §2, so `KymoNodeShapeUtil` and `KymoDiagramShapeUtil` port with **no behavioural change** (incl. `getGeometry`→rectangle, `component()` rendered in an `HTMLContainer`-equivalent, `getIndicatorPath`, `toSvg`, and the `canResize/canEdit/hideRotateHandle` flags). | SN-3 |
-| **FR-EN-04** | The engine SHALL render shapes in an **infinite, pannable, zoomable viewport**; each shape positioned by `x/y` and drawn via its util's `component()` under a camera transform. | SN-1, SN-3 |
-| **FR-EN-05** | The engine SHALL support pointer interaction: **single/multi selection**, **drag-move** of shapes (the action that drives canvas→text), **pan** (space/middle-drag), and **wheel/pinch zoom**, with a selection **indicator** outline from `getIndicatorPath`/`getGeometry`. | SN-3 |
-| **FR-EN-07** | The engine SHALL **persist** the document (all shapes + camera) to **IndexedDB** under a key, restoring on mount — replacing tldraw's `persistenceKey` (`DESIGN-CANVAS-001` §11, `FR-CE-11`). Freeform shapes survive verbatim; kymo shapes reconcile by deterministic id. | SN-2, SN-3 |
-| **FR-EN-08** | The engine SHALL provide **React bindings**: a `<Canvas>` mount component (accepting `shapeUtils`, `onMount`, persistence key — **no `licenseKey`**), plus `useEditor` and a reactive `useValue(name, compute, deps)` selector, and an `HTMLContainer` render host. | SN-1, SN-2 |
-| **FR-EN-09** | The engine SHALL provide the **helpers/types** in §2 (`createShapeId`, `toRichText`; `Editor`, `Shape`/`ShapeId`/`ShapePartial`/`BaseShape` types) so call sites type-check unchanged. | SN-3 |
-| **FR-EN-12** | The engine SHALL render with **zero network** at runtime — no CDN fonts/icons/translations. Any required font/asset is self-contained or system-default. | SN-2 |
+| **FR-EN-01** | The engine SHALL expose an **`Editor` facade** with the query/mutate/control methods in §2, with semantics identical to tldraw's as relied upon by `Board.tsx` (centre/top-left conventions, deterministic ids). | SN-EN-03 |
+| **FR-EN-02** | The engine SHALL provide a **reactive store** whose change subscription distinguishes **`source: "user"`** (direct user interaction) from programmatic writes, and supports a **`scope: "document"`** filter. Programmatic mutations made inside `run(fn, { history: "ignore" })` MUST NOT notify `source:"user"` listeners. *(This is the load-bearing guarantee behind the round-trip loop-guard, `DESIGN-CANVAS-001` §7 / `RK-05`.)* | SN-EN-03 |
+| **FR-EN-03** | The engine SHALL provide a **custom-shape API** (`ShapeUtil` parity) covering every override in §2, so `KymoNodeShapeUtil` and `KymoDiagramShapeUtil` port with **no behavioural change** (incl. `getGeometry`→rectangle, `component()` rendered in an `HTMLContainer`-equivalent, `getIndicatorPath`, `toSvg`, and the `canResize/canEdit/hideRotateHandle` flags). | SN-EN-03 |
+| **FR-EN-04** | The engine SHALL render shapes in an **infinite, pannable, zoomable viewport**; each shape positioned by `x/y` and drawn via its util's `component()` under a camera transform. | SN-EN-01, SN-EN-03 |
+| **FR-EN-05** | The engine SHALL support pointer interaction: **single/multi selection**, **drag-move** of shapes (the action that drives canvas→text), **pan** (space/middle-drag), and **wheel/pinch zoom**, with a selection **indicator** outline from `getIndicatorPath`/`getGeometry`. | SN-EN-03 |
+| **FR-EN-07** | The engine SHALL **persist** the document (all shapes + camera) to **IndexedDB** under a key, restoring on mount — replacing tldraw's `persistenceKey` (`DESIGN-CANVAS-001` §11, `FR-CE-11`). Freeform shapes survive verbatim; kymo shapes reconcile by deterministic id. | SN-EN-02, SN-EN-03 |
+| **FR-EN-08** | The engine SHALL provide **React bindings**: a `<Canvas>` mount component (accepting `shapeUtils`, `onMount`, persistence key — **no `licenseKey`**), plus `useEditor` and a reactive `useValue(name, compute, deps)` selector, and an `HTMLContainer` render host. | SN-EN-01, SN-EN-02 |
+| **FR-EN-09** | The engine SHALL provide the **helpers/types** in §2 (`createShapeId`, `toRichText`; `Editor`, `Shape`/`ShapeId`/`ShapePartial`/`BaseShape` types) so call sites type-check unchanged. | SN-EN-03 |
+| **FR-EN-12** | The engine SHALL render with **zero network** at runtime — no CDN fonts/icons/translations. Any required font/asset is self-contained or system-default. | SN-EN-02 |
 
 > **Deferred to `FEAT-JAM-001`** (re-homed IDs): `FR-EN-06` built-in shape consolidation →
 > `FR-J-01`; `FR-EN-10` undo/redo → `FR-J-02`; `FR-EN-11` board export → `FR-J-03`. The store's
@@ -149,3 +146,4 @@ rich-text styling beyond plain labels.
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial requirements: parity contract (§2), `FR-EN-01..12`, `NFR-EN-01..06`, scope & acceptance. |
 | 0.2     | 2026-05-24 | Vũ Anh | **Feature split.** Re-homed `FR-EN-06/10/11` and `NFR-EN-01/02` to `FEAT-JAM-001` (as `FR-J-`/`NFR-J-`); rescoped §5 to the render/interaction core and §6 acceptance to the key-free board + core round-trip (full `TC-01..19` parity → sibling). |
+| 0.3     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-ENGINE-001` (renamed `SN-1..5` → `SN-EN-01..05`); §1 now points there and the `FR-EN` Source-need column cites the new IDs. No requirement content changed. |

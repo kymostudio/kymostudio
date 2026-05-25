@@ -1,8 +1,8 @@
 ---
 title: BPMN 2.0 Export — Plan
 document_id: PLAN-BPMN-EXPORT-001
-version: "1.0"
-issue_date: 2026-05-23
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -34,9 +34,9 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-BPMN-EXPORT-001                          |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
-| Issue Date   | 2026-05-23                                         |
+| Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | INTRO-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001 |
 
@@ -101,6 +101,12 @@ correctness risk (round-trip over the full corpus).
 
 **Progress:** P0 + P1 + P2 (2026-05-23) + P3 + P4 (2026-05-24) = 3 + 8 + 5 + 5 + 3 = **24 / 24 pts — feature complete**.
 
+## 7. Change requests
+
+Changes to the baselined spec (`docs/specs/bpmn-export/`) are raised, assessed, and logged in
+[`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
 ## Annex A — Revision History
 
 **Table A.1 — Document revisions**
@@ -113,11 +119,12 @@ correctness risk (round-trip over the full corpus).
 | 0.4     | 2026-05-23 | Vũ Anh | Record P2 (containers: pools/lanes/groups/subprocess + full-corpus round-trip gate) complete: phase Status + progress + Annex C worklog. |
 | 0.5     | 2026-05-24 | Vũ Anh | Record P3 (JS parity: `to-bpmn.ts` + `toBpmn` export + round-trip tests) complete: phase Status + progress + Annex C worklog. |
 | 1.0 | 2026-05-24 | Vũ Anh | Released — P4 complete: P4 row Done; BPMN-MAP-001 Export section; doc set Released; Annex C worklog row. |
+| 1.1 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §7 Change-requests (`CR/`); plan gathered under `docs/specs/`. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/plans/bpmn-export/PLAN.md`; authoritative source is
+Version-controlled at `docs/specs/bpmn-export/PLAN.md`; authoritative source is
 the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

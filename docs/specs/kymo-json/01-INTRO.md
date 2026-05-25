@@ -1,8 +1,8 @@
 ---
 title: kymo.json Interchange Format — Introduction
 document_id: INTRO-KYMOJSON-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers and reviewers of the kymo model, serializers, and front/back
 review_cycle: On phase completion, or on schema change
 supersedes: null
 related_documents:
+  - PROD-KYMOJSON-001           # Product description (ConOps + StRS)
   - FEAT-KYMOJSON-001           # Requirements
   - DESIGN-KYMOJSON-001         # Design
   - TEST-KYMOJSON-001           # Test documentation
@@ -38,20 +39,21 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | INTRO-KYMOJSON-001                                          |
-| Version      | 1.0                                                         |
+| Version      | 1.1                                                         |
 | Status       | Released                                                    |
-| Issue Date   | 2026-05-24                                                  |
+| Issue Date   | 2026-05-25                                                  |
 | Owner        | `diagrams/` project                                         |
-| Related      | FEAT-KYMOJSON-001, DESIGN-KYMOJSON-001, TEST-KYMOJSON-001, PLAN-KYMOJSON-001 |
+| Related      | PROD-KYMOJSON-001, FEAT-KYMOJSON-001, DESIGN-KYMOJSON-001, TEST-KYMOJSON-001, PLAN-KYMOJSON-001 |
 
 ## 1. Purpose and scope
 
 This document introduces the **`.kymo.json`** format — a serialization of the
 resolved kymo `Diagram` — and is the entry point to its document set. It states the
-problem, the concept, and the terminology, and maps the reader to the requirements
-(FEAT-KYMOJSON-001), the design (DESIGN-KYMOJSON-001), the test documentation
-(TEST-KYMOJSON-001), and the plan (PLAN-KYMOJSON-001). The normative schema is
-KYMOJSON-MAP-001; this set conforms to ISO/IEC/IEEE 12207:2017 and 15289:2019.
+problem, the concept, and the terminology, and maps the reader to the product
+description (PROD-KYMOJSON-001), the requirements (FEAT-KYMOJSON-001), the design
+(DESIGN-KYMOJSON-001), the test documentation (TEST-KYMOJSON-001), and the plan
+(PLAN-KYMOJSON-001). The normative schema is KYMOJSON-MAP-001; this set conforms to
+ISO/IEC/IEEE 12207:2017 and 15289:2019.
 
 ## 2. Background
 
@@ -98,15 +100,23 @@ maintainers verifying round-trip fidelity and cross-language parity.
 
 ## 6. Document map
 
-| # | Information item | Document | Standard role (15289) |
-|---|------------------|----------|-----------------------|
-| 1 | Introduction (this) | INTRO-KYMOJSON-001 | Concept / overview |
-| 2 | Requirements | FEAT-KYMOJSON-001 | Requirements specification |
-| 3 | Design | DESIGN-KYMOJSON-001 | Design / architecture |
-| 4 | Test documentation | TEST-KYMOJSON-001 | Test plan / cases / traceability |
-| 5 | Plan | PLAN-KYMOJSON-001 | Plan |
+This feature's docs use a two-layer model in this folder — a **baselined spec**
+(`00-PRODUCT`–`04-TEST`) and a **living plan** (`PLAN.md` + `CR/`). The documents for kymo-json:
 
-The normative schema is KYMOJSON-MAP-001.
+| # | Document | document_id | Answers |
+|---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | `PROD-KYMOJSON-001` | *what product problem & whose needs (`SN-KYMOJSON`)?* |
+| 01 | `01-INTRO.md` | `INTRO-KYMOJSON-001` | *where do I start?* |
+| 02 | `02-FEATURE.md` | `FEAT-KYMOJSON-001` | *what must it do? (SRS, `FR`/`NFR`)* |
+| 03 | `03-DESIGN.md` | `DESIGN-KYMOJSON-001` | *how is it built?* |
+| 04 | `04-TEST.md` | `TEST-KYMOJSON-001` | *how do we know it's right?* |
+| — | `docs/specs/kymo-json/PLAN.md` | `PLAN-KYMOJSON-001` | *why, in what order, at what risk, what's done? (+ `CR/`)* |
+
+Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
+reading-order aid only. The normative schema is **KYMOJSON-MAP-001**.
+
+**Change management:** a change to this baselined spec is raised as a change-request in
+`docs/specs/kymo-json/CR/` and re-baselined (bump version + record in Annex A).
 
 ## Annex A — Revision History
 
@@ -115,6 +125,7 @@ The normative schema is KYMOJSON-MAP-001.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — introduces the `.kymo.json` bidirectional, lossless resolved-model interchange format. |
+| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** §6 reworked to a document map that defers the ISO/lifecycle model to the standard and adds `00-PRODUCT` (`PROD-KYMOJSON-001`) + a change-management pointer to `docs/specs/kymo-json/CR/`; §1 reading map updated to include the product description. |
 
 ## Annex B — Document Control
 
