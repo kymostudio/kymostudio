@@ -1,0 +1,45 @@
+# Các tiêu chuẩn trong ngành sản xuất ô tô.
+# Bốn nhóm tiêu chuẩn, mỗi nhóm là một dải ngang (region) xếp chồng dọc.
+# Leaf đặt bằng @ tương đối (tâm icon), region tự bọc quanh các thành viên.
+
+title:    "Các tiêu chuẩn trong ngành sản xuất ô tô"
+subtitle: "Chất lượng · Công cụ cốt lõi · An toàn & Phần mềm · Môi trường"
+
+# ── Dải 1: Hệ thống quản lý chất lượng (QMS) ──────────────────────────
+iso9001 box/checklist/orange "ISO 9001"   "Nền tảng QMS"     @ (180, 150)
+iatf    box/gear/orange      "IATF 16949" "QMS ngành ô tô"   @ iso9001 right 150
+
+# ── Dải 2: Bộ công cụ cốt lõi (AIAG & VDA Core Tools) ─────────────────
+apqp box/checklist/orange "APQP" "Hoạch định CL sản phẩm"  @ (180, 360)
+ppap box/files/orange     "PPAP" "Phê duyệt sản xuất"      @ apqp right 110
+fmea box/magnifier/orange "FMEA" "Phân tích lỗi & tác động" @ ppap right 110
+msa  box/gear/orange      "MSA"  "Phân tích hệ đo"          @ fmea right 110
+spc  box/zap/orange       "SPC"  "Kiểm soát thống kê"       @ msa right 110
+
+# ── Dải 3: An toàn chức năng & Phần mềm ───────────────────────────────
+iso26262 box/gear/orange      "ISO 26262"        "An toàn chức năng · ASIL" @ (180, 570)
+sotif    box/magnifier/orange "ISO 21448"        "SOTIF"                    @ iso26262 right 150
+cyber    box/key/orange       "ISO/SAE 21434"    "An ninh mạng"             @ sotif right 150
+aspice   box/folder/orange    "Automotive SPICE" "Quy trình phần mềm"       @ cyber right 150
+
+# ── Dải 4: Môi trường & An toàn – Sức khỏe nghề nghiệp ────────────────
+iso14001 box/cloud/orange     "ISO 14001" "Quản lý môi trường" @ (180, 780)
+iso45001 box/checklist/orange "ISO 45001" "ATSK nghề nghiệp"   @ iso14001 right 160
+
+# ── Region bọc từng dải (bare-id membership), viền màu theo nhóm ───────
+qms outer "Hệ thống quản lý chất lượng (QMS)" stroke #2563eb {
+  iso9001 iatf
+}
+core outer "Bộ công cụ cốt lõi — AIAG & VDA" stroke #d97706 {
+  apqp ppap fmea msa spc
+}
+safety outer "An toàn chức năng & Phần mềm" stroke #dc2626 {
+  iso26262 sotif cyber aspice
+}
+env outer "Môi trường & An toàn – Sức khỏe" stroke #16a34a {
+  iso14001 iso45001
+}
+
+# ── Edges: quan hệ giữa các tiêu chuẩn ────────────────────────────────
+iso9001 --> iatf : "mở rộng"
+iatf    --> core : "yêu cầu áp dụng" { src=bottom, dst=top }
