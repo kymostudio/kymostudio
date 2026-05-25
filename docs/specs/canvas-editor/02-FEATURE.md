@@ -1,8 +1,8 @@
 ---
 title: Interactive Canvas Editor — Features & Requirements
 document_id: FEAT-CANVAS-001
-version: "1.0"
-issue_date: 2026-05-23
+version: "1.1"
+issue_date: 2026-05-25
 status: Baselined
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers implementing & verifying the canvas editor (`website/app/`)
 review_cycle: On scope change, or when a phase completes
 supersedes: null
 related_documents:
+  - PROD-CANVAS-001
   - INTRO-CANVAS-001
   - PLAN-CANVAS-001
   - DESIGN-CANVAS-001
@@ -33,13 +34,13 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | FEAT-CANVAS-001                                                 |
-| Version           | 1.0                                                              |
-| Issue Date        | 2026-05-23                                                       |
+| Version           | 1.1                                                              |
+| Issue Date        | 2026-05-25                                                       |
 | Status            | Baselined                                                       |
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers implementing & verifying the editor                   |
-| Related Documents | `PLAN-CANVAS-001` (plan/risk), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `KYMO-DSL-001` |
+| Related Documents | `PROD-CANVAS-001` (stakeholder needs), `PLAN-CANVAS-001` (plan/risk), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `KYMO-DSL-001` |
 
 > This is the **requirements specification** (ISO/IEC/IEEE 12207 §6.4.2/§6.4.3). Each requirement is
 > atomic, verifiable, and stably identified so `TEST-CANVAS-001` can trace a test case to it.
@@ -53,6 +54,9 @@ keywords:
 Requirements for evolving the playground (`website/app/`) into an interactive canvas editor: a kymo
 diagram, editable both as `.kymo` text and directly on a tldraw canvas (two-way synced), coexisting
 with a freeform whiteboard. Single-player, static. Rationale and phasing: `PLAN-CANVAS-001`.
+
+Stakeholder needs (`SN-CE-01..06`, ISO 29148 §6.4.2 ConOps) are owned by the product description
+**`PROD-CANVAS-001`** (`00-PRODUCT.md`); each requirement below traces back to them.
 
 ## 2. Definitions
 
@@ -117,3 +121,4 @@ Each `FR-CE-NN` has an acceptance criterion (AC) and the `DESIGN-CANVAS-001` sec
 | 0.3     | 2026-05-23 | Vũ Anh | Added FR-CE-11 (board persistence) for Phase 4. |
 | 0.4     | 2026-05-23 | Vũ Anh | Added FR-CE-12 (undo/redo across layers); Phase 4 closed (reduced scope). |
 | 1.0     | 2026-05-23 | Vũ Anh | **Baselined** & relocated to `docs/specs/canvas-editor/` (single-source spec; owns FR-CE/NFR-CE ids). |
+| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-CANVAS-001` (SN ids feature-scoped, `SN-CE-01..06`); §1 (Scope) now points there. No requirement content changed. |

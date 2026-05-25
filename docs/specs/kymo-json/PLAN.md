@@ -1,8 +1,8 @@
 ---
 title: kymo.json Interchange Format — Plan
 document_id: PLAN-KYMOJSON-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -34,7 +34,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-KYMOJSON-001                                  |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
@@ -99,6 +99,12 @@ cross-language model conformance gate.
 
 **Progress:** P1+P2+P3+P4+P5 (2026-05-24) = **15 / 15 pts — feature complete.**
 
+## 7. Change requests
+
+Changes to the baselined spec (`docs/specs/kymo-json/`) are raised, assessed, and logged in
+[`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
 ## Annex A — Revision History
 
 **Table A.1 — Document revisions**
@@ -106,11 +112,12 @@ cross-language model conformance gate.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — records the `.kymo.json` feature (P1–P5) complete, cross-language byte parity incl. `layout_trees`. |
+| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §7 Change-requests (`CR/`). |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/plans/kymo-json/PLAN.md`; authoritative source is the
+Version-controlled at `docs/specs/kymo-json/PLAN.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

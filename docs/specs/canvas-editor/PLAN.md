@@ -1,8 +1,8 @@
 ---
 title: Interactive Canvas Editor — Implementation Plan
 document_id: PLAN-CANVAS-001
-version: "0.12"
-issue_date: 2026-05-23
+version: "0.13"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -39,8 +39,8 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-CANVAS-001                                                 |
-| Version           | 0.12                                                             |
-| Issue Date        | 2026-05-23                                                       |
+| Version           | 0.13                                                             |
+| Issue Date        | 2026-05-25                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
@@ -260,6 +260,14 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 
 ---
 
+## 9. Change requests
+
+Changes to the baselined spec (`docs/specs/canvas-editor/`) are raised, assessed, and logged
+in [`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
+---
+
 ## Annex A — Revision History
 
 | Version | Date       | Author | Changes                                                                 |
@@ -276,6 +284,7 @@ Detailed test cases + traceability are in `TEST-CANVAS-001`. At the plan level:
 | 0.10    | 2026-05-23 | Vũ Anh | RK-07 resolved — embed renders as a cached `<img>` data-URL (+ `toSvg`); Worklog + Next; new TC-19 (TEST 0.5). |
 | 0.11    | 2026-05-23 | Vũ Anh | RK-02 Accepted (skipped) — blank public board accepted for now; canvas-editor risk register closed (only external RK-04 + deferred backlog remain). |
 | 0.12    | 2026-05-23 | Vũ Anh | Reframed as the **implementation plan** (§6.3) and moved to `docs/plans/canvas-editor/PLAN.md`; the spec is now the baseline in `docs/specs/canvas-editor/`. |
+| 0.13    | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §9 Change-requests (`CR/`); plan consolidated per feature under `docs/specs/`. |
 
 ## Annex B — Open questions / pending decisions
 

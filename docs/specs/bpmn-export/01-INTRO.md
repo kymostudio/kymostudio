@@ -1,8 +1,8 @@
 ---
 title: BPMN 2.0 Export — Introduction
 document_id: INTRO-BPMN-EXPORT-001
-version: "1.0"
-issue_date: 2026-05-23
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers and reviewers of the kymo renderers, BPMN importer, and DSL
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes: null
 related_documents:
+  - PROD-BPMN-EXPORT-001    # Product description (ConOps & stakeholder needs)
   - FEAT-BPMN-EXPORT-001    # Requirements
   - DESIGN-BPMN-EXPORT-001    # Design
   - TEST-BPMN-EXPORT-001    # Test documentation
@@ -38,11 +39,11 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | INTRO-BPMN-EXPORT-001                                        |
-| Version      | 1.0                                                         |
+| Version      | 1.1                                                         |
 | Status       | Released                                                    |
-| Issue Date   | 2026-05-23                                                  |
+| Issue Date   | 2026-05-25                                                  |
 | Owner        | `diagrams/` project                                         |
-| Related      | FEAT-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001, PLAN-BPMN-EXPORT-001 |
+| Related      | PROD-BPMN-EXPORT-001, FEAT-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001, PLAN-BPMN-EXPORT-001 |
 
 ## 1. Purpose and scope
 
@@ -99,15 +100,24 @@ maintainers verifying round-trip fidelity against real-world `.bpmn` corpora.
 
 ## 6. Document map
 
-Read in order:
+This feature's docs use a two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`) and a **living plan** (`PLAN.md` + `CR/`). The documents for bpmn-export:
 
-| # | Information item | Document | Standard role (15289) |
-|---|------------------|----------|-----------------------|
-| 1 | Introduction (this) | INTRO-BPMN-EXPORT-001 | Concept / overview |
-| 2 | Requirements | FEAT-BPMN-EXPORT-001 | Requirements specification |
-| 3 | Design | DESIGN-BPMN-EXPORT-001 | Design / architecture |
-| 4 | Test documentation | TEST-BPMN-EXPORT-001 | Test plan / cases / traceability |
-| 5 | Plan | PLAN-BPMN-EXPORT-001 | Plan |
+| # | Document | document_id | Answers |
+|---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | PROD-BPMN-EXPORT-001 | *what product problem & whose needs (`SN-BPMN-EXPORT`)?* |
+| 01 | `01-INTRO.md` (this) | INTRO-BPMN-EXPORT-001 | *where do I start?* |
+| 02 | `02-FEATURE.md` | FEAT-BPMN-EXPORT-001 | *what must it do? (requirements, `FR`/`NFR`)* |
+| 03 | `03-DESIGN.md` | DESIGN-BPMN-EXPORT-001 | *how is it built?* |
+| 04 | `04-TEST.md` | TEST-BPMN-EXPORT-001 | *how do we know it's right?* |
+| — | `docs/specs/bpmn-export/PLAN.md` | PLAN-BPMN-EXPORT-001 | *why, in what order, at what risk, what's done? (+ `CR/`)* |
+
+Reading order: **`01-INTRO`** (this) → **`00-PRODUCT`** (product context + `SN-BPMN-EXPORT` needs) →
+**`02-FEATURE`** → **`03-DESIGN`** → **`04-TEST`**; for delivery status read `PLAN-BPMN-EXPORT-001`.
+Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
+reading-order aid only.
+
+- **Change management:** a change to this baselined spec is raised as a change-request in
+  `docs/specs/bpmn-export/CR/` and re-baselined (bump version + record in Annex A).
 
 ## Annex A — Revision History
 
@@ -117,6 +127,7 @@ Read in order:
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
 | 1.0 | 2026-05-24 | Vũ Anh | Released — P4 complete: BPMN-MAP-001 Export section added; doc set marked Released; importer-mapping citations repointed. |
+| 1.1 | 2026-05-25 | Vũ Anh | **Doc reorganization.** §6 trimmed to a document map and adds `00-PRODUCT` (`PROD-BPMN-EXPORT-001`); reading order + change-management updated. |
 
 ## Annex B — Document Control
 

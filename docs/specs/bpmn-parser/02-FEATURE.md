@@ -1,8 +1,8 @@
 ---
 title: BPMN 2.0 Import — Requirements
 document_id: FEAT-BPMN-PARSER-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers implementing and verifying the BPMN importer
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes: null
 related_documents:
+  - PROD-BPMN-PARSER-001         # Product description (stakeholder needs)
   - INTRO-BPMN-PARSER-001        # Introduction
   - DESIGN-BPMN-PARSER-001       # Design
   - TEST-BPMN-PARSER-001         # Test documentation
@@ -36,11 +37,11 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-PARSER-001                               |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
-| Issue Date   | 2026-05-24                                         |
+| Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | INTRO-BPMN-PARSER-001, DESIGN-BPMN-PARSER-001, TEST-BPMN-PARSER-001, PLAN-BPMN-PARSER-001 |
+| Related      | PROD-BPMN-PARSER-001 (stakeholder needs), INTRO-BPMN-PARSER-001, DESIGN-BPMN-PARSER-001, TEST-BPMN-PARSER-001, PLAN-BPMN-PARSER-001 |
 
 The key words **SHALL**, **SHOULD**, and **MAY** are used per ISO drafting
 conventions. Each requirement carries a stable ID for traceability from
@@ -50,15 +51,18 @@ import direction; DESIGN-BPMN-EXPORT-001 is the inverse).
 
 ## 1. Scope and stakeholder needs
 
-Turn a standard **BPMN 2.0 XML** file — as emitted by Camunda, bpmn.io, Signavio and
-peers — into a fully-resolved kymo `Diagram`, so kymo can render, convert, and
-re-export real-world process models and participate in BPMN tool interchange. Geometry
-is authored in the file's Diagram-Interchange section, so import *reads* layout rather
-than computing it.
+Stakeholder needs (`SN-BPMN-PARSER-01..04`, ISO 29148 §6.4.2 ConOps) are owned by the product
+description **`PROD-BPMN-PARSER-001`** (`00-PRODUCT.md`); each requirement below traces back to them
+via the **Source need** annotation on its requirement group.
+
+**Scope (this SRS):** turn a standard **BPMN 2.0 XML** file — as emitted by Camunda, bpmn.io, Signavio
+and peers — into a fully-resolved kymo `Diagram`, so kymo can render, convert, and re-export
+real-world process models and participate in BPMN tool interchange. Geometry is authored in the file's
+Diagram-Interchange section, so import *reads* layout rather than computing it.
 
 ## 2. Functional requirements
 
-**Entry & resolution**
+**Entry & resolution** *(Source need: `SN-BPMN-PARSER-01`, `SN-BPMN-PARSER-02`, `SN-BPMN-PARSER-03`)*
 - **FR-1** A `from_bpmn` parser SHALL turn a BPMN 2.0 XML string into a **fully-resolved**
   `Diagram` (components, regions, edges with absolute geometry). Because the file carries
   its own coordinates, the parser SHALL NOT run a layout or alignment pass — `cli` SHALL
@@ -68,7 +72,7 @@ than computing it.
   *local* tag name so the `bpmn:`, `bpmn2:`, or default-namespace prefix emitted by any
   tool is accepted.
 
-**Semantic mapping (the import direction of BPMN-MAP-001)**
+**Semantic mapping (the import direction of BPMN-MAP-001)** *(Source need: `SN-BPMN-PARSER-01`)*
 - **FR-3** Each flow-node element SHALL map to a `bpmn-*` `(shape, marker)` per
   `from_bpmn`'s classification tables — events (`startEvent`/`endEvent`/
   `intermediate*Event`/`boundaryEvent` → `bpmn-start`/`bpmn-end`/`bpmn-intermediate`/
@@ -85,7 +89,7 @@ than computing it.
   gateway), `messageFlow` → `message`, `association`/data-associations → `association`.
   `Edge.src`/`dst` SHALL be `sourceRef`/`targetRef`; `label` from `name`.
 
-**Diagram-Interchange geometry**
+**Diagram-Interchange geometry** *(Source need: `SN-BPMN-PARSER-02`)*
 - **FR-5** Geometry SHALL be read from DI: `<bpmndi:BPMNShape>` `<dc:Bounds>` → a
   component **centre** `pos` (top-left + size/2) and explicit `size`; `<bpmndi:BPMNEdge>`
   `<di:waypoint>`s → `Edge.points`; a flow's `<bpmndi:BPMNLabel>` bounds → `Edge.label_pos`.
@@ -93,13 +97,13 @@ than computing it.
   geometry so the top-left extent sits at `(MARGIN, MARGIN)`; the canvas `width`/`height`
   SHALL be derived from the shifted content extents.
 
-**Containers**
+**Containers** *(Source need: `SN-BPMN-PARSER-01`)*
 - **FR-7** `<participant>` (pool), `<lane>`, `<group>`, and **expanded** sub-processes
   SHALL map to `Region`s (`pool` / `lane` / `outer` / `inner`); a `<subProcess>` SHALL be
   treated as expanded (→ `Region`) when DI says `isExpanded="true"` (or, absent the hint,
   when its box is large), and otherwise as a collapsed `bpmn-subprocess` component.
 
-**Interface & parity**
+**Interface & parity** *(Source need: `SN-BPMN-PARSER-04`)*
 - **FR-8** The feature SHALL exist with equivalent functionality in both
   `packages/python` (`from_bpmn.parse(xml) -> Diagram`, dispatched by the `kymo` CLI for
   `.bpmn` inputs) and `packages/js` (`parseBpmn(xml): Diagram`, exported from `index.ts`
@@ -141,6 +145,7 @@ than computing it.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — requirements for the shipped BPMN importer, traced in TEST-BPMN-PARSER-001. |
+| 1.1 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-BPMN-PARSER-001`; minted `SN-BPMN-PARSER-01..04` and annotated each FR group with its Source need; §1 now points to the product description and keeps only scope. No requirement content changed. |
 
 ## Annex B — Document Control
 

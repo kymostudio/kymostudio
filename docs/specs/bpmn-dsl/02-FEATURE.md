@@ -1,8 +1,8 @@
 ---
 title: BPMN in the kymo DSL — Requirements
 document_id: FEAT-BPMN-DSL-001
-version: "1.1"
-issue_date: 2026-05-23
+version: "1.2"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers implementing and verifying the BPMN-in-kymo feature
 review_cycle: On phase completion, or on grammar change
 supersedes: null
 related_documents:
+  - PROD-BPMN-DSL-001         # Product description (stakeholder needs)
   - INTRO-BPMN-DSL-001        # Introduction
   - DESIGN-BPMN-DSL-001    # Design
   - TEST-BPMN-DSL-001    # Test documentation
@@ -35,11 +36,11 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-DSL-001                              |
-| Version      | 1.1                                                |
+| Version      | 1.2                                                |
 | Status       | Released                                           |
-| Issue Date   | 2026-05-23                                         |
+| Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | INTRO-BPMN-DSL-001, DESIGN-BPMN-DSL-001, TEST-BPMN-DSL-001, PLAN-BPMN-DSL-001 |
+| Related      | PROD-BPMN-DSL-001 (stakeholder needs), INTRO-BPMN-DSL-001, DESIGN-BPMN-DSL-001, TEST-BPMN-DSL-001, PLAN-BPMN-DSL-001 |
 
 The key words **SHALL**, **SHOULD**, and **MAY** are used per ISO drafting
 conventions. Each requirement carries a stable ID for traceability from
@@ -48,13 +49,17 @@ DESIGN-BPMN-DSL-001.
 
 ## 1. Scope and stakeholder needs
 
-Provide a concise, auto-laid-out way to author BPMN diagrams directly in `.kymo`,
-so a process can be expressed as nodes + flows without manual coordinates or
-waypoints, while preserving the ability to pin positions when needed.
+Stakeholder needs (`SN-BPMN-DSL-01..04`, ISO 29148 §6.4.2 ConOps) are owned by the product
+description **`PROD-BPMN-DSL-001`** (`00-PRODUCT.md`); each requirement below traces back to them via
+the **Source need** annotation on its requirement group.
+
+**Scope (this SRS):** provide a concise, auto-laid-out way to author BPMN diagrams directly in
+`.kymo`, so a process can be expressed as nodes + flows without manual coordinates or waypoints, while
+preserving the ability to pin positions when needed.
 
 ## 2. Functional requirements
 
-**Block & grammar**
+**Block & grammar** *(Source need: `SN-BPMN-DSL-01`)*
 - **FR-1** The DSL SHALL accept a file-scope `bpmn { … }` block; its body uses a
   *declare-then-connect* sub-grammar. Normative EBNF lives in KYMO-DSL-001.
 - **FR-2** A node declaration SHALL be `<kind> <id> "Label" [type=<subtype>] [@ (x,y)]`.
@@ -85,7 +90,7 @@ bpmn {
 }
 ```
 
-**Nodes**
+**Nodes** *(Source need: `SN-BPMN-DSL-01`, `SN-BPMN-DSL-03`)*
 - **FR-3** Node kinds SHALL map to `(shape, marker)`: `start`→bpmn-start,
   `end`→bpmn-end, `end!`→bpmn-end+terminate, `task`→bpmn-task,
   `xor`→gateway/exclusive, `and`→gateway/parallel, `or`→gateway/inclusive,
@@ -97,13 +102,13 @@ bpmn {
 - **FR-5** Node box sizes SHALL come from `model.SHAPE_HALF` (event 36 / task
   100×80 / gateway 50), set on `Component.size`.
 
-**Connections**
+**Connections** *(Source need: `SN-BPMN-DSL-01`)*
 - **FR-6** Connections SHALL support flow kinds: `->` sequence, `~>` message
   (dashed), `..>` association (dotted, no head).
 - **FR-7** A chain `A -> B -> C` SHALL expand to segments; `;` SHALL separate
   statements on one line; a `: "label"` SHALL be permitted on single segments.
 
-**Layout & coordinates**
+**Layout & coordinates** *(Source need: `SN-BPMN-DSL-02`, `SN-BPMN-DSL-03`)*
 - **FR-8** Nodes without `@` SHALL be auto-laid-out by a left-to-right layered
   (Sugiyama/DAG) layout: rank assignment, crossing-minimised ordering,
   coordinate assignment, orthogonal routing.
@@ -114,7 +119,7 @@ bpmn {
   absolute `pos`/`size` and `Edge`s carrying `points` + `bpmn_flow` — so the
   existing renderer draws it unchanged (no `to_svg`/`render` change).
 
-**Parity**
+**Parity** *(Source need: `SN-BPMN-DSL-04`)*
 - **FR-11** The feature SHALL exist with equivalent functionality in both
   `packages/python` and `packages/js`.
 
@@ -144,6 +149,7 @@ bpmn {
 | 0.2     | 2026-05-23 | Vũ Anh | Doc-set version sync after P0 (spike) complete; requirements unchanged. |
 | 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in KYMO-DSL-001 §6.9). |
 | 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
+| 1.2 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-BPMN-DSL-001`; minted `SN-BPMN-DSL-01..04` and annotated each FR group with its Source need; §1 now points to the product description and keeps only scope. No requirement content changed. |
 
 ## Annex B — Document Control
 

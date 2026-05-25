@@ -1,8 +1,8 @@
 ---
 title: BPMN 2.0 Import — Introduction
 document_id: INTRO-BPMN-PARSER-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers and reviewers of the kymo BPMN importer, renderers, and DSL
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes: null
 related_documents:
+  - PROD-BPMN-PARSER-001         # Product description (ConOps & stakeholder needs)
   - FEAT-BPMN-PARSER-001         # Requirements
   - DESIGN-BPMN-PARSER-001       # Design
   - TEST-BPMN-PARSER-001         # Test documentation
@@ -39,11 +40,11 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | INTRO-BPMN-PARSER-001                                       |
-| Version      | 1.0                                                         |
+| Version      | 1.1                                                         |
 | Status       | Released                                                    |
-| Issue Date   | 2026-05-24                                                  |
+| Issue Date   | 2026-05-25                                                  |
 | Owner        | `diagrams/` project                                         |
-| Related      | FEAT-BPMN-PARSER-001, DESIGN-BPMN-PARSER-001, TEST-BPMN-PARSER-001, PLAN-BPMN-PARSER-001 |
+| Related      | PROD-BPMN-PARSER-001, FEAT-BPMN-PARSER-001, DESIGN-BPMN-PARSER-001, TEST-BPMN-PARSER-001, PLAN-BPMN-PARSER-001 |
 
 ## 1. Purpose and scope
 
@@ -113,18 +114,25 @@ corpora.
 
 ## 6. Document map
 
-Read in order:
+This feature's docs use a two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`) and a **living plan** (`PLAN.md` + `CR/`). The documents for bpmn-parser:
 
-| # | Information item | Document | Standard role (15289) |
-|---|------------------|----------|-----------------------|
-| 1 | Introduction (this) | INTRO-BPMN-PARSER-001 | Concept / overview |
-| 2 | Requirements | FEAT-BPMN-PARSER-001 | Requirements specification |
-| 3 | Design | DESIGN-BPMN-PARSER-001 | Design / architecture |
-| 4 | Test documentation | TEST-BPMN-PARSER-001 | Test plan / cases / traceability |
-| 5 | Plan | PLAN-BPMN-PARSER-001 | Plan |
+| # | Document | document_id | Answers |
+|---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | PROD-BPMN-PARSER-001 | *what product problem & whose needs (`SN-BPMN-PARSER`)?* |
+| 01 | `01-INTRO.md` (this) | INTRO-BPMN-PARSER-001 | *where do I start?* |
+| 02 | `02-FEATURE.md` | FEAT-BPMN-PARSER-001 | *what must it do? (requirements, `FR`/`NFR`)* |
+| 03 | `03-DESIGN.md` | DESIGN-BPMN-PARSER-001 | *how is it built?* |
+| 04 | `04-TEST.md` | TEST-BPMN-PARSER-001 | *how do we know it's right?* |
+| — | `docs/specs/bpmn-parser/PLAN.md` | PLAN-BPMN-PARSER-001 | *why, in what order, at what risk, what's done? (+ `CR/`)* |
 
-The element mapping shared with export is BPMN-MAP-001; the standard itself is
-REF-BPMN-001.
+Reading order: **`01-INTRO`** (this) → **`00-PRODUCT`** (product context + `SN-BPMN-PARSER` needs) →
+**`02-FEATURE`** → **`03-DESIGN`** → **`04-TEST`**; for delivery status read `PLAN-BPMN-PARSER-001`.
+Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
+reading-order aid only. The element mapping shared with export is `BPMN-MAP-001`; the standard itself
+is `REF-BPMN-001`.
+
+- **Change management:** a change to this baselined spec is raised as a change-request in
+  `docs/specs/bpmn-parser/CR/` and re-baselined (bump version + record in Annex A).
 
 ## Annex A — Revision History
 
@@ -133,6 +141,7 @@ REF-BPMN-001.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — retroactive spec of the shipped BPMN importer; cross-language Python↔JS parity locked by the conformance suite (TEST-BPMN-PARSER-001). |
+| 1.1 | 2026-05-25 | Vũ Anh | **Doc reorganization.** §6 trimmed to a document map and adds `00-PRODUCT` (`PROD-BPMN-PARSER-001`); reading order + change-management updated. |
 
 ## Annex B — Document Control
 

@@ -1,8 +1,8 @@
 ---
 title: BPMN 2.0 Import — Plan
 document_id: PLAN-BPMN-PARSER-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -36,9 +36,9 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-BPMN-PARSER-001                               |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
-| Issue Date   | 2026-05-24                                         |
+| Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | INTRO-BPMN-PARSER-001, FEAT-BPMN-PARSER-001, DESIGN-BPMN-PARSER-001, TEST-BPMN-PARSER-001 |
 
@@ -104,6 +104,12 @@ Relative complexity in **story points** (Fibonacci):
 
 **Progress:** P0 + P1 (pre-existing) + P2 + P3 (2026-05-24) = 8 + 5 + 5 + 2 = **20 / 20 pts — feature complete and parity-locked**.
 
+## 7. Change requests
+
+Changes to the baselined spec (`docs/specs/bpmn-parser/`) are raised, assessed, and logged in
+[`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
 ## Annex A — Revision History
 
 **Table A.1 — Document revisions**
@@ -111,11 +117,12 @@ Relative complexity in **story points** (Fibonacci):
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — retroactive plan for the BPMN importer; records the cross-language conformance lock (P2) and the doc set (P3). |
+| 1.1 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §7 Change-requests (`CR/`); plan gathered under `docs/specs/`. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/plans/bpmn-parser/PLAN.md`; authoritative source is the
+Version-controlled at `docs/specs/bpmn-parser/PLAN.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

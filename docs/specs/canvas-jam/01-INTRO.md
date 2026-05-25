@@ -1,8 +1,8 @@
 ---
 title: Canvas Jam — Specification: Overview & Document Map
 document_id: INTRO-JAM-001
-version: "0.1"
-issue_date: 2026-05-24
+version: "0.2"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Anyone new to the canvas-jam effort; engineers, reviewers
 review_cycle: On scope change, or via a change-request against the baseline
 supersedes: null
 related_documents:
+  - PROD-JAM-001
   - FEAT-JAM-001
   - DESIGN-JAM-001
   - TEST-JAM-001
@@ -36,19 +37,19 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | INTRO-JAM-001                                                 |
-| Version           | 0.1                                                              |
-| Issue Date        | 2026-05-24                                                       |
+| Version           | 0.2                                                              |
+| Issue Date        | 2026-05-25                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                            |
-| Related Documents | `FEAT-JAM-001`, `DESIGN-JAM-001`, `TEST-JAM-001`, `PLAN-JAM-001`, `INTRO-ENGINE-001` (sibling) |
+| Related Documents | `PROD-JAM-001`, `FEAT-JAM-001`, `DESIGN-JAM-001`, `TEST-JAM-001`, `PLAN-JAM-001`, `INTRO-ENGINE-001` (sibling) |
 
 > Start here. This folder (`docs/specs/canvas-jam/`) specifies the **second half** of the in-house
 > canvas-engine programme: it **completes** the tldraw replacement begun in `INTRO-ENGINE-001`
 > (built-in shape consolidation, undo/redo, board export, the **physical tldraw removal + full
 > `TEST-CANVAS-001` parity**, footprint) and then adds the **FigJam freeform-authoring** tools —
 > draw/pen, sticky notes, and text — the "whiteboard half" tldraw gave for free. The implementation
-> plan that delivers it (phases, risks, worklog) lives in `docs/plans/canvas-jam/`
+> plan that delivers it (phases, risks, worklog) lives in `docs/specs/canvas-jam/`
 > (`PLAN-JAM-001`).
 
 ---
@@ -70,27 +71,19 @@ Documented to the spirit of **ISO/IEC/IEEE 12207**, with requirements per **2914
 per **42010**, quality attributes per **25010**, test structure per **29119** — tailored to a
 single-maintainer OSS feature, exactly as the sibling doc-set.
 
-## 2. Two document layers (ISO 15289 information-item classes)
+## 2. Document map
 
-| Layer | Folder | 15289 class | 12207 processes | Answers |
-|-------|--------|-------------|-----------------|---------|
-| **Specification** (this folder) | `docs/specs/canvas-jam/` | Specification / Description | §6.4 Technical Processes | *what must it be / how is it built / how is it verified?* |
-| **Implementation plan** | `docs/plans/canvas-jam/` | Plan + Records — **living** | §6.3 Technical Management | *why, in what order, at what risk, what's done?* |
+This feature's docs use a two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`)
+and a **living plan** (`PLAN.md` + `CR/`). The documents for canvas-jam:
 
-### 2.1 Specification layer — document map (this folder)
-
-| # | Document | document_id | ISO/IEC/IEEE 12207 process | Answers |
-|---|----------|-------------|----------------------------|---------|
-| 01 | `01-INTRO.md` | `INTRO-JAM-001` | 6.3.6 Information Management | *where do I start?* |
-| 02 | `02-FEATURE.md` | `FEAT-JAM-001` | 6.4.2 Stakeholder Needs + 6.4.3 Requirements (SRS, 29148) | *what must it do?* |
-| 03 | `03-DESIGN.md` | `DESIGN-JAM-001` | 6.4.4 Architecture (42010) + 6.4.5 Design Definition | *how is it built?* |
-| 04 | `04-TEST.md` | `TEST-JAM-001` | 6.4.9 Verification + 6.4.11 Validation + 6.3.6 Traceability | *how do we know it's right?* |
-
-### 2.2 Implementation-plan layer (separate folder)
-
-| Document | document_id | ISO/IEC/IEEE 12207 process | Answers |
-|----------|-------------|----------------------------|---------|
-| `docs/plans/canvas-jam/PLAN.md` | `PLAN-JAM-001` | 6.4.1 Mission Analysis + 6.3.1 Project Planning + 6.3.4 Risk + 6.3.2 Worklog | *why, in what order, at what risk, what's done?* |
+| # | Document | document_id | Answers |
+|---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | `PROD-JAM-001` | *what product problem & whose needs (`SN-J`)?* |
+| 01 | `01-INTRO.md` | `INTRO-JAM-001` | *where do I start?* |
+| 02 | `02-FEATURE.md` | `FEAT-JAM-001` | *what must it do? (SRS, `FR-J`/`NFR-J`)* |
+| 03 | `03-DESIGN.md` | `DESIGN-JAM-001` | *how is it built?* |
+| 04 | `04-TEST.md` | `TEST-JAM-001` | *how do we know it's right? (`TC-J`)* |
+| — | `docs/specs/canvas-jam/PLAN.md` | `PLAN-JAM-001` | *why, in what order, at what risk, what's done? (+ `CR/`)* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -113,12 +106,12 @@ one programme, split at the **KEY-FREE BOARD** milestone:
 
 ## 4. Reading guide
 
-Spec, in numeric order: **`01-INTRO`** (this doc) → **`02-FEATURE`** (the `FR-J`/`NFR-J`
-requirements + the re-homing map) → **`03-DESIGN`** (consolidation, undo stack, export, removal,
-footprint, freeform tools) → **`04-TEST`** (V&V, `TC-J-NN`, the full parity re-run, traceability).
-For delivery status & history, read **`PLAN-JAM-001`**.
+Spec: **`01-INTRO`** (this doc) → **`00-PRODUCT`** (the product context + `SN-J` needs) →
+**`02-FEATURE`** (the `FR-J`/`NFR-J` requirements + the re-homing map) → **`03-DESIGN`**
+(consolidation, undo stack, export, removal, footprint, freeform tools) → **`04-TEST`** (V&V,
+`TC-J-NN`, the full parity re-run, traceability). For delivery status & history, read **`PLAN-JAM-001`**.
 
-Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *stakeholder* → `PLAN`.
+Quick paths: *implementer* → 00 → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *stakeholder* → 00 → `PLAN`.
 
 ## 5. Status & ownership
 
@@ -126,6 +119,8 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 - **Owner:** `diagrams/` project (Vũ Anh).
 - **Traceability invariant:** every requirement in `FEAT-JAM-001` will have ≥ 1 covering test in
   `TEST-JAM-001` before the feature is declared done.
+- **Change management:** a change to this baselined spec is raised as a change-request in
+  `docs/specs/canvas-jam/CR/` and re-baselined (bump version + record in Annex A).
 
 ---
 
@@ -134,3 +129,4 @@ Quick paths: *implementer* → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial introduction + document map for canvas-jam (the engine-completion + FigJam-authoring half spun out of `INTRO-ENGINE-001` at the key-free-board seam). |
+| 0.2     | 2026-05-25 | Vũ Anh | **Doc reorganization.** §2 trimmed to a document map and adds `00-PRODUCT` (`PROD-JAM-001`); reading guide + change-management updated; docs consolidated per feature under `docs/specs/`. |

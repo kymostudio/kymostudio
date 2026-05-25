@@ -1,8 +1,8 @@
 ---
 title: Canvas Jam — Implementation Plan
 document_id: PLAN-JAM-001
-version: "0.1"
-issue_date: 2026-05-24
+version: "0.2"
+issue_date: 2026-05-25
 status: Draft
 classification: Internal
 owner: diagrams/ project
@@ -35,7 +35,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-JAM-001                                                 |
-| Version           | 0.1                                                             |
+| Version           | 0.2                                                             |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
 | Related Documents | `FEAT-JAM-001` (requirements), `DESIGN-JAM-001` (design), `TEST-JAM-001` (V&V), `PLAN-ENGINE-001` (sibling — the render core; **entry gate**) |
@@ -188,11 +188,20 @@ Detailed cases + traceability in `TEST-JAM-001`. At the plan level:
 
 ---
 
+## 9. Change requests
+
+Changes to the baselined spec (`docs/specs/canvas-jam/`) are raised, assessed, and logged
+in [`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
+---
+
 ## Annex A — Revision History
 
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial plan: spun out of `PLAN-ENGINE-001` at the key-free-board seam (≈44 SP). 1-based phases ≤10 SP — consolidation, undo, export+removal, footprint, then draw/sticky/text. Risk register (inherited `RK-EN-02/03/05/06` + new `RK-J-01`, `RK-02` closing). |
+| 0.2     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §9 Change-requests (`CR/`); plan consolidated per feature under `docs/specs/`. |
 
 ## Annex B — Open questions / pending decisions
 

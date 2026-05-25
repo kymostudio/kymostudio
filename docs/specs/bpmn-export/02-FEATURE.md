@@ -1,8 +1,8 @@
 ---
 title: BPMN 2.0 Export — Requirements
 document_id: FEAT-BPMN-EXPORT-001
-version: "1.0"
-issue_date: 2026-05-23
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -10,6 +10,7 @@ audience: Engineers implementing and verifying the BPMN export feature
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes: null
 related_documents:
+  - PROD-BPMN-EXPORT-001         # Product description (stakeholder needs)
   - INTRO-BPMN-EXPORT-001        # Introduction
   - DESIGN-BPMN-EXPORT-001    # Design
   - TEST-BPMN-EXPORT-001    # Test documentation
@@ -35,11 +36,11 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-EXPORT-001                           |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
-| Issue Date   | 2026-05-23                                         |
+| Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | INTRO-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001, PLAN-BPMN-EXPORT-001 |
+| Related      | PROD-BPMN-EXPORT-001 (stakeholder needs), INTRO-BPMN-EXPORT-001, DESIGN-BPMN-EXPORT-001, TEST-BPMN-EXPORT-001, PLAN-BPMN-EXPORT-001 |
 
 The key words **SHALL**, **SHOULD**, and **MAY** are used per ISO drafting
 conventions. Each requirement carries a stable ID for traceability from
@@ -48,20 +49,24 @@ DESIGN-BPMN-EXPORT-001. The mapping inverts BPMN-MAP-001.
 
 ## 1. Scope and stakeholder needs
 
-Provide a way to turn a kymo `Diagram` of BPMN glyphs (imported via `from_bpmn` or
-authored with the `bpmn { }` block) into a standard **BPMN 2.0 XML** file, so kymo
-participates in BPMN tool interchange and supports `.bpmn` → kymo → `.bpmn`
-round-trip — the gap identified in INTRO-BPMN-EXPORT-001 §2.
+Stakeholder needs (`SN-BPMN-EXPORT-01..04`, ISO 29148 §6.4.2 ConOps) are owned by the product
+description **`PROD-BPMN-EXPORT-001`** (`00-PRODUCT.md`); each requirement below traces back to them
+via the **Source need** annotation on its requirement group.
+
+**Scope (this SRS):** provide a way to turn a kymo `Diagram` of BPMN glyphs (imported via `from_bpmn`
+or authored with the `bpmn { }` block) into a standard **BPMN 2.0 XML** file, so kymo participates in
+BPMN tool interchange and supports `.bpmn` → kymo → `.bpmn` round-trip — the gap identified in
+INTRO-BPMN-EXPORT-001 §2.
 
 ## 2. Functional requirements
 
-**Entry & document**
+**Entry & document** *(Source need: `SN-BPMN-EXPORT-01`)*
 - **FR-1** A `to_bpmn` emitter SHALL turn a `Diagram` into a well-formed BPMN 2.0
   XML string: a `<definitions>` root with the `bpmn` / `bpmndi` / `dc` / `di`
   namespaces, a semantic body (`<process>`, or `<collaboration>` + per-pool
   `<process>` when pools are present), and a `<bpmndi:BPMNDiagram>` DI section.
 
-**Semantic mapping (inverse of BPMN-MAP-001)**
+**Semantic mapping (inverse of BPMN-MAP-001)** *(Source need: `SN-BPMN-EXPORT-01`, `SN-BPMN-EXPORT-03`)*
 - **FR-2** Each `bpmn-*` `Component` SHALL map back to its BPMN element by the
   inverse of `from_bpmn`'s classification: events (`bpmn-start`/`bpmn-end`/
   `bpmn-intermediate`/`bpmn-boundary`) with the matching `*EventDefinition` child
@@ -77,21 +82,21 @@ round-trip — the gap identified in INTRO-BPMN-EXPORT-001 §2.
   `<conditionExpression>` child. `sourceRef`/`targetRef` SHALL be `Edge.src`/`Edge.dst`;
   `name` from `Edge.label`.
 
-**Diagram-Interchange geometry**
+**Diagram-Interchange geometry** *(Source need: `SN-BPMN-EXPORT-02`)*
 - **FR-4** The DI section SHALL be derived from kymo geometry: a `<bpmndi:BPMNShape>`
   with `<dc:Bounds>` per component (top-left = `pos − size/2`, width/height = `size`);
   a `<bpmndi:BPMNEdge>` with `<di:waypoint>`s from `Edge.points`; a `<bpmndi:BPMNLabel>`
   `<dc:Bounds>` from `Edge.label_pos`. Coordinates SHALL **de-normalise** the importer's
   `MARGIN` shift so exported geometry sits in a tidy positive plane.
 
-**Containers**
+**Containers** *(Source need: `SN-BPMN-EXPORT-02`, `SN-BPMN-EXPORT-03`)*
 - **FR-5** Pools / lanes / groups (`Region` style `pool`/`lane`/`outer`) SHALL emit a
   `<collaboration>` with `<participant>` (and per-pool `<process>`), `<laneSet>` /
   `<lane>` with `<flowNodeRef>` membership, and `<group>` respectively; an expanded
   sub-process (`Region`) SHALL emit `<subProcess isExpanded="true">` containing its
   member elements.
 
-**Interface & parity**
+**Interface & parity** *(Source need: `SN-BPMN-EXPORT-03`, `SN-BPMN-EXPORT-04`)*
 - **FR-6** Element `id`s SHALL be preserved, and output SHALL be deterministic
   (stable element ordering) so re-export of the same `Diagram` is byte-identical.
 - **FR-7** The CLI SHALL gain a `--bpmn` target writing a `.bpmn` file (mirroring
@@ -128,6 +133,7 @@ round-trip — the gap identified in INTRO-BPMN-EXPORT-001 §2.
 |---------|------------|--------|----------------|
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
 | 1.0 | 2026-05-24 | Vũ Anh | Released — P4 complete: BPMN-MAP-001 Export section added; doc set marked Released; importer-mapping citations repointed. |
+| 1.1 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-BPMN-EXPORT-001`; minted `SN-BPMN-EXPORT-01..04` and annotated each FR group with its Source need; §1 now points to the product description and keeps only scope. No requirement content changed. |
 
 ## Annex B — Document Control
 

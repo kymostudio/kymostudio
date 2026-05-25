@@ -1,8 +1,8 @@
 ---
 title: Kymo DSL Front-End — Plan
 document_id: PLAN-KYMO-DSL-001
-version: "1.0"
-issue_date: 2026-05-24
+version: "1.1"
+issue_date: 2026-05-25
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -34,7 +34,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-KYMO-DSL-001                                  |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
@@ -113,6 +113,12 @@ alignment resolver, the dominant geometry effort).
 **P4** (an independent JS implementation kept at byte-level parity) carry most of
 the effort and risk; everything else is comparatively mechanical.
 
+## 7. Change requests
+
+Changes to the baselined spec (`docs/specs/kymo-dsl/`) are raised, assessed, and logged in
+[`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CR/README.md`](CR/README.md).
+
 ## Annex A — Revision History
 
 **Table A.1 — Document revisions**
@@ -120,11 +126,12 @@ the effort and risk; everything else is comparatively mechanical.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — descriptive plan for the shipped `.kymo` front-end. |
+| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §7 Change-requests (`CR/`). |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/plans/kymo-dsl/PLAN.md`; authoritative source is the
+Version-controlled at `docs/specs/kymo-dsl/PLAN.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
