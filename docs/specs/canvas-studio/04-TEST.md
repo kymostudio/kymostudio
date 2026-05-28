@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Verification & Validation
 document_id: TEST-STUDIO-001
-version: "0.4"
+version: "0.5"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | TEST-STUDIO-001                                                  |
-| Version           | 0.4                                                            |
+| Version           | 0.5                                                            |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Related Documents | `FEAT-STUDIO-001` (requirements), `DESIGN-STUDIO-001` (design), `TEST-JAM-001` (the engine/freeform V&V this builds on), `TEST-CANVAS-001` (the editor V&V — must stay green) |
@@ -125,3 +125,4 @@ Every requirement → ≥ 1 covering test (the `FEAT-STUDIO-001` invariant).
 | 0.2     | 2026-05-25 | Vũ Anh | **P7 build:** added **`TC-CS-07`** → `e2e/chrome.spec.ts` (4 cases): no floating toolbar · single Export · sample + 3-mode background in the top bar · truthful `Code`/`Preview` tabs. Added the §1 strategy bullet 7 and the `FR-CS-07 → TC-CS-07` traceability row. |
 | 0.3     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `04-TEST.md` → `05-TEST.md` so the `NN-` prefix follows the reading order (`01-INTRO` first); content unchanged. See `INTRO-STUDIO-001` §2. |
 | 0.4     | 2026-05-25 | Vũ Anh | **TC-CS-07 now backed by a real test (`CR-STUDIO-001`).** `e2e/chrome.spec.ts` (4 cases) exists and passes — the 0.2 "P7 build" entry is now factual (previously design-ahead, the file did not exist). Full suite **21/21** green. No test scope change. |
+| 0.5     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout.** Renamed `05-TEST.md` → `04-TEST.md`; the §5 traceability matrix is retained as the RTM (ISO/IEC/IEEE 29148 / 15289, right-sized as a section). No test scope change. See `INTRO-STUDIO-001` Annex A 0.4. |

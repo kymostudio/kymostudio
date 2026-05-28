@@ -1,7 +1,7 @@
 ---
 title: Canvas Toolbar — Specification: Overview & Document Map
 document_id: INTRO-TOOLBAR-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-27
 status: Draft
 classification: Internal
@@ -41,14 +41,14 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | INTRO-TOOLBAR-001                                                |
-| Version           | 0.1                                                              |
+| Version           | 0.2                                                              |
 | Issue Date        | 2026-05-27                                                       |
 | Status            | Draft                                                            |
 | Classification    | Internal                                                         |
 | Owner             | `diagrams/` project                                              |
 | Related Documents | `PROD-TOOLBAR-001`, `FEAT-TOOLBAR-001`, `DESIGN-TOOLBAR-001`, `TEST-TOOLBAR-001`, `PLAN-TOOLBAR-001`, `INTRO-EXPORT-001` (sibling), `INTRO-ITEMS-001` (sibling), `INTRO-STUDIO-001` (the umbrella), `INTRO-JAM-001` / `INTRO-ENGINE-001` (the render core, complete) |
 
-> Start here. This folder (`docs/specs/canvas-studio/canvas-toolbar/`) specifies the editor **chrome frame** of the
+> Start here. This folder (`docs/specs/canvas-studio/modules/canvas-toolbar/`) specifies the editor **chrome frame** of the
 > live playground (`website/app/`, `FEAT-CANVAS-001`): the design-token surface, the top bar, the left
 > tool rail, the status bar, and the chrome de-dup / 3-mode appearance control. It is a **module
 > carved out of `canvas-studio` (`INTRO-STUDIO-001`)** — the hi-fi editor shell, which is being split
@@ -84,18 +84,18 @@ single-maintainer OSS module, as the sibling doc-sets.
 
 ## 2. Document map
 
-This module's docs use the two-layer model in this folder — a **baselined spec** (`01-INTRO`–`05-TEST`)
-and a **living plan** (`06-PLAN` + `CHANGE-REQUESTS/`). The documents for canvas-toolbar:
+This module's docs use the two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`)
+and a **living plan** (`PLAN.md` + `CHANGE-REQUESTS/`). The documents for canvas-toolbar:
 
 | # | Document | document_id | Answers |
 |---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | `PROD-TOOLBAR-001` | *what product problem & whose needs (`SN-TB`)?* |
 | 01 | `01-INTRO.md` | `INTRO-TOOLBAR-001` | *where do I start?* |
-| 02 | `02-PRODUCT.md` | `PROD-TOOLBAR-001` | *what product problem & whose needs (`SN-TB`)?* |
-| 03 | `03-FEATURE.md` | `FEAT-TOOLBAR-001` | *what must it do? (SRS, `FR-TB`/`NFR-TB`)* |
-| 04 | `04-DESIGN.md` | `DESIGN-TOOLBAR-001` | *how is it built?* |
-| 05 | `05-TEST.md` | `TEST-TOOLBAR-001` | *how do we know it's right? (`TC-TB`)* |
-| 06 | `06-PLAN.md` | `PLAN-TOOLBAR-001` | *why, in what order, at what risk, what's done?* |
-| 07 | `CHANGE-REQUESTS/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
+| 02 | `02-FEATURE.md` | `FEAT-TOOLBAR-001` | *what must it do? (SRS, `FR-TB`/`NFR-TB`)* |
+| 03 | `03-DESIGN.md` | `DESIGN-TOOLBAR-001` | *how is it built?* |
+| 04 | `04-TEST.md` | `TEST-TOOLBAR-001` | *how do we know it's right? (`TC-TB`)* |
+| — | `PLAN.md` | `PLAN-TOOLBAR-001` | *why, in what order, at what risk, what's done?* |
+| — | `CHANGE-REQUESTS/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -150,12 +150,12 @@ behaviour the top bar hosts re-homes to **`canvas-export`** (`FR-EX-01`/`FR-EX-0
 
 ## 4. Reading guide
 
-Spec: **`01-INTRO`** (this doc) → **`02-PRODUCT`** (the product context + `SN-TB` needs) →
-**`03-FEATURE`** (the `FR-TB`/`NFR-TB` requirements + the re-homing map) → **`04-DESIGN`** (tokens, top
-bar, tool rail, status bar, chrome consolidation) → **`05-TEST`** (V&V, `TC-TB-NN`, golden-safety,
+Spec: **`00-PRODUCT`** (the product context + `SN-TB` needs) → **`01-INTRO`** (this doc) →
+**`02-FEATURE`** (the `FR-TB`/`NFR-TB` requirements + the re-homing map) → **`03-DESIGN`** (tokens, top
+bar, tool rail, status bar, chrome consolidation) → **`04-TEST`** (V&V, `TC-TB-NN`, golden-safety,
 traceability). For delivery status & history, read **`PLAN-TOOLBAR-001`**.
 
-Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05; *stakeholder* → 02 → 06.
+Quick paths: *implementer* → 00 → 02 → 03 → PLAN; *reviewer* → 02 → 04; *stakeholder* → 00 → PLAN.
 
 ## 5. Status & ownership
 
@@ -165,7 +165,7 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 - **Traceability invariant:** every requirement in `FEAT-TOOLBAR-001` has ≥ 1 covering test in
   `TEST-TOOLBAR-001`.
 - **Change management:** a change to this baselined spec is raised as a change-request in
-  `docs/specs/canvas-studio/canvas-toolbar/CHANGE-REQUESTS/` and re-baselined (bump version + record in Annex A). The two
+  `docs/specs/canvas-studio/modules/canvas-toolbar/CHANGE-REQUESTS/` and re-baselined (bump version + record in Annex A). The two
   open/closed CRs migrating from canvas-studio are logged there.
 
 ---
@@ -175,3 +175,4 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-27 | Vũ Anh | Initial introduction + document map for canvas-toolbar — the editor **chrome frame** (tokens, top bar, tool rail, status bar, chrome de-dup) carved out of `canvas-studio` (`INTRO-STUDIO-001`) via an umbrella + re-home decomposition; sibling of `canvas-export` / `canvas-items`. As-built (P1/P2/P3/P6/P7 shipped under canvas-studio); re-homes `FR-CS-01/02/03/06/07 → FR-TB-01..05`. |
+| 0.2     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout.** Realigned the module files to the repo's canonical order (`02-PRODUCT`→`00-PRODUCT`, `03-FEATURE`→`02-FEATURE`, `04-DESIGN`→`03-DESIGN`, `05-TEST`→`04-TEST`, `06-PLAN`→`PLAN.md`); the module now lives under `docs/specs/canvas-studio/modules/canvas-toolbar/`. Updated §2 document map + §4 reading guide + the self-paths. `document_id`s unchanged. See `INTRO-STUDIO-001` Annex A 0.4. |

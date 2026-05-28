@@ -55,7 +55,7 @@ keywords:
 ## 1. Stakeholder needs
 
 Stakeholder needs (`SN-EX-01..02`, ISO 29148 §6.4.2 ConOps) are owned by the product description
-**`PROD-EXPORT-001`** (`02-PRODUCT.md`). Each requirement below traces back via the **Source need**
+**`PROD-EXPORT-001`** (`00-PRODUCT.md`). Each requirement below traces back via the **Source need**
 column, and to its umbrella origin via **⊇ former**.
 
 ## 2. Functional requirements (`FR-EX`)
