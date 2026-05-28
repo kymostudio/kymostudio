@@ -117,7 +117,7 @@ parent `FR-CS`/`TC-CS` clauses they amend (see `FEAT-STUDIO-002 §5`).
 **Status: Open** · Severity **Low–Medium** · Type **Enhancement**. Doc-only at this stage: no
 `website/app/` code, no bundle rebuild, parent `STUDIO-001` baseline intact. On approval, the code +
 parent re-baseline land under `PLAN-STUDIO-002`, after which this status flips **Open → Closed** and the
-`07-CR/README.md` register row follows.
+`CHANGE-REQUESTS/README.md` register row follows.
 
 | Date | Actor | Decision |
 |------|-------|----------|

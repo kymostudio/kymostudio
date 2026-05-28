@@ -202,8 +202,8 @@ Detailed cases + traceability in `TEST-STUDIO-001`. At the plan level:
 ## 9. Change requests
 
 Changes to the baselined spec (`docs/specs/canvas-studio/`) are raised, assessed, and logged
-in [`07-CR/`](07-CR/) (raise → assess → approve → implement → re-baseline). None raised
-yet — see [`07-CR/README.md`](07-CR/README.md).
+in [`CHANGE-REQUESTS/`](CHANGE-REQUESTS/) (raise → assess → approve → implement → re-baseline). None raised
+yet — see [`CHANGE-REQUESTS/README.md`](CHANGE-REQUESTS/README.md).
 
 ---
 

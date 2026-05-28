@@ -85,7 +85,7 @@ single-maintainer OSS module, as the sibling doc-sets.
 ## 2. Document map
 
 This module's docs use the two-layer model in this folder — a **baselined spec** (`01-INTRO`–`05-TEST`)
-and a **living plan** (`06-PLAN` + `07-CR/`). The documents for canvas-toolbar:
+and a **living plan** (`06-PLAN` + `CHANGE-REQUESTS/`). The documents for canvas-toolbar:
 
 | # | Document | document_id | Answers |
 |---|----------|-------------|---------|
@@ -95,7 +95,7 @@ and a **living plan** (`06-PLAN` + `07-CR/`). The documents for canvas-toolbar:
 | 04 | `04-DESIGN.md` | `DESIGN-TOOLBAR-001` | *how is it built?* |
 | 05 | `05-TEST.md` | `TEST-TOOLBAR-001` | *how do we know it's right? (`TC-TB`)* |
 | 06 | `06-PLAN.md` | `PLAN-TOOLBAR-001` | *why, in what order, at what risk, what's done?* |
-| 07 | `07-CR/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
+| 07 | `CHANGE-REQUESTS/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -165,7 +165,7 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 - **Traceability invariant:** every requirement in `FEAT-TOOLBAR-001` has ≥ 1 covering test in
   `TEST-TOOLBAR-001`.
 - **Change management:** a change to this baselined spec is raised as a change-request in
-  `docs/specs/canvas-studio/canvas-toolbar/07-CR/` and re-baselined (bump version + record in Annex A). The two
+  `docs/specs/canvas-studio/canvas-toolbar/CHANGE-REQUESTS/` and re-baselined (bump version + record in Annex A). The two
   open/closed CRs migrating from canvas-studio are logged there.
 
 ---

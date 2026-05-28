@@ -74,7 +74,7 @@ Sequencing `1 → 2 → 3`. Story points (~4 SP total).
 - **P3:** edit the parent baseline — `FEAT-STUDIO-001` (`FR-CS-02`/`FR-CS-07`/§5 #6),
   `DESIGN-STUDIO-001` (§1/§3/§8/§11), `TEST-STUDIO-001` (`TC-CS-02`/`TC-CS-07`), `PLAN-STUDIO-001`
   (§4 P2/P7 note), bumping each version + Annex A; flip `INTRO-STUDIO-002` status **Open → Closed** and
-  fill its §5 decision log; update the `07-CR/README.md` register row to **Closed**.
+  fill its §5 decision log; update the `CHANGE-REQUESTS/README.md` register row to **Closed**.
 
 ## 4. Risk register
 
@@ -94,7 +94,7 @@ Sequencing `1 → 2 → 3`. Story points (~4 SP total).
 | `website/app/index.html` | Grid `1fr minmax(280px, 38%)` (`:194`); `.pane.editor` `border-left` (`:198`) + responsive flip (`~:353`). |
 | `website/app/e2e/chrome.spec.ts` | Revise case (4) → `TC-CR2-01`; add `TC-CR2-02`/`TC-CR2-03`. |
 | `website/app/kymo.bundle.js` | Rebuild (committed-bundle deploy). |
-| parent `STUDIO-001` docs + `07-CR/README.md` | P3 re-baseline + register close. |
+| parent `STUDIO-001` docs + `CHANGE-REQUESTS/README.md` | P3 re-baseline + register close. |
 
 ## 6. Verification (close-out gate)
 
@@ -107,7 +107,7 @@ goldens byte-identical; render-guard green; parent `STUDIO-001` re-baselined; `I
 
 CR-002 is a change against the baselined `STUDIO-001` (`INTRO-STUDIO-001 §5`). At close-out the parent
 clauses named in `INTRO-STUDIO-002 §3` are reconciled, each parent doc's version + Annex A updated, and
-the `07-CR/README.md` register row flipped to **Closed** with the close date.
+the `CHANGE-REQUESTS/README.md` register row flipped to **Closed** with the close date.
 
 ---
 

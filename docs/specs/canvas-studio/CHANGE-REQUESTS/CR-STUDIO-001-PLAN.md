@@ -104,7 +104,7 @@ on its own).
   reconcile the `FR-CS-02`/`FR-CS-03` parentheticals (no longer self-contradicting).
 - `PLAN-STUDIO-001` worklog: P7 row **🚧 → ✅**; move P7 SP into the delivered total.
 - `CR-STUDIO-001`: status **Raised → Implemented → Closed**; fill the §6 decision log.
-- `07-CR/README.md`: update the register row status.
+- `CHANGE-REQUESTS/README.md`: update the register row status.
 
 ## 3. Risk register
 
