@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Design
 document_id: DESIGN-STUDIO-001
-version: "0.2"
+version: "0.4"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -36,7 +36,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | DESIGN-STUDIO-001                                                |
-| Version           | 0.2                                                             |
+| Version           | 0.4                                                             |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Audience          | Engineers building the editor chrome (`website/app/`)         |
@@ -271,3 +271,5 @@ Verified by `TC-CS-07` (`e2e/chrome.spec.ts`); regression gates (§9) unchanged.
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial design: token migration (§2), top bar (§3), tool rail + registry (§4), canvas-item styling (§5), selection handles/size badge in the canvas layer + the reactive-selection gap (§6), status bar (§7), component/state structure (§8), golden-safety + unchanged build/deploy (§9). Builds on `DESIGN-ENGINE-001`/`DESIGN-JAM-001`/`DESIGN-CANVAS-001`. **P2 build:** trimmed the top bar (§3) to client-only — dropped breadcrumb/star/Comments/Versions/presence. **P3 build:** §4 as-built — left `ToolRail` only (registry in `ui/tools.ts`); `hand` added to the engine `Tool` union (pan-anywhere); floating toolbar keeps sample/bg/export. **P4 build:** §5 as-built — match `renderSVG` not the mockup: node glyph kept, region outer-slate / inner-purple-dashed, edge flow-dash (CSS keyframe + SMIL). **P5 build:** §6 as-built — selection generalised to any selected shape; rect/handles/badge accent-green; comment-pin dropped (no data model). **P6 build:** §7 as-built — status bar via engine `ViewApi` (zoom through `applyCamera`, isolated `%` poll); autosave edit-driven. **canvas-studio complete (P1–P6).** |
 | 0.2     | 2026-05-25 | Vũ Anh | **P7 (chrome de-dup):** added §11 — one owner per control. Floating toolbar retired; appearance becomes a single top-bar 3-mode control (`.k-seg`, soft `--accent-soft` active) reusing `selectBg`/`bgActive`; sample picker (`.k-sample`) + a single Export move to the top bar; `Code`/`Preview` tabs made truthful. Supersedes the §3 theme-toggle and §4 floating-toolbar notes. Pure relocation — `renderSVG`/`svgBackground` untouched. |
+| 0.3     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `03-DESIGN.md` → `04-DESIGN.md` so the `NN-` prefix follows the reading order (`01-INTRO` first); content unchanged. See `INTRO-STUDIO-001` §2. |
+| 0.4     | 2026-05-25 | Vũ Anh | **P7 verified as built (`CR-STUDIO-001`).** §11 was design-ahead; P7 is now implemented exactly as specified — `.k-sample` + `.k-seg` in `ui/TopBar.tsx`, the floating `.toolbar` deleted from `App.tsx`/`index.html`, single Export, truthful tabs — and verified (21/21 e2e; `js`/`python` goldens byte-identical). No design change. |

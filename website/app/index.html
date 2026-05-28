@@ -12,10 +12,10 @@
   <style>
     :root {
       /* Light theme (base) — FigJam-flavoured: white board, dotted canvas,
-         soft rounding, floating toolbelt. The Light/Dark/None toggle flips
-         [data-theme] on <html>, re-theming the whole app, while the bottom
-         toolbar's three buttons drive the SVG canvas background. kymo green
-         stays the accent. */
+         soft rounding. The top bar's 3-mode appearance control (P7) flips
+         [data-theme] on <html> for light/dark (re-theming the whole app) and
+         drives the SVG canvas background; transparent flips only the canvas.
+         kymo green stays the accent. */
       --bg:          #ffffff;
       --bg-soft:     #f4f5f7;
       --canvas:      #ffffff;
@@ -170,7 +170,7 @@
     .center-tabs button.active { background: var(--bg-elev); color: var(--text); box-shadow: var(--shadow-sm); }
     .center-tabs button:disabled { opacity: .45; cursor: not-allowed; }
 
-    /* Top-bar buttons (shared chip system; the floating toolbar keeps .tbtn). */
+    /* Top-bar buttons (shared chip system). */
     .k-btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
       height: 30px; padding: 0 12px; border-radius: var(--r);
@@ -299,47 +299,32 @@
       background-position: 0 0, 0 11px, 11px -11px, -11px 0;
     }
 
-    /* ── Floating toolbelt (bottom-centre of the board) ──────────── */
-    /* Top-centre, clear of the canvas. */
-    .toolbar {
-      position: absolute; left: 50%; top: 14px; transform: translateX(-50%);
-      z-index: 200;
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px; border-radius: 18px;
-      background: var(--panel); box-shadow: var(--shadow-bar);
-    }
-    .toolbar .sep { width: 1px; align-self: stretch; margin: 4px 3px; background: var(--border); }
-
-    /* Sample picker, styled as a pill select. */
-    .toolbar .pick { position: relative; display: inline-flex; align-items: center; }
-    .toolbar select {
+    /* ── Top-bar sample picker + appearance control (P7 · FR-CS-07) ──
+       The floating toolbar was retired (CR-STUDIO-001); its non-duplicate
+       controls — the sample picker and a 3-mode canvas-background control —
+       live in the top bar now, with one owner per control. */
+    .k-sample { position: relative; display: inline-flex; align-items: center; }
+    .k-sample select {
       appearance: none; -webkit-appearance: none;
-      font-family: var(--font); font-size: 13px; font-weight: 600;
-      color: var(--text); background: var(--panel-hov);
-      border: 0; border-radius: 11px;
-      padding: 9px 30px 9px 13px; cursor: pointer;
+      font: 600 12.5px/1 var(--font); color: var(--text);
+      background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px;
+      height: 30px; padding: 0 26px 0 11px; cursor: pointer;
     }
-    .toolbar select:hover { background: var(--border); }
-    .toolbar .pick svg { position: absolute; right: 10px; pointer-events: none; opacity: .55; }
+    .k-sample select:hover { border-color: var(--border-strong); }
+    .k-sample svg { position: absolute; right: 8px; pointer-events: none; opacity: .55; color: var(--text-dim); }
 
-    /* Icon buttons (theme + download). */
-    .tbtn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-      min-width: 38px; height: 38px; padding: 0 10px;
-      border: 0; border-radius: 11px; cursor: pointer;
-      color: var(--text-dim); background: transparent;
-      font-family: var(--font); font-size: 12.5px; font-weight: 600;
-      transition: background .12s ease, color .12s ease;
+    /* 3-mode background/appearance segmented control — light/dark re-theme the
+       whole app (via [data-theme]), transparent flips only the canvas bg.
+       Subsumes the old standalone theme toggle (soft accent = active). */
+    .k-seg { display: inline-flex; gap: 2px; background: var(--bg-soft); border-radius: 8px; padding: 3px; }
+    .k-seg button {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 24px; border: 0; background: transparent;
+      color: var(--text-dim); border-radius: 6px; cursor: pointer;
+      transition: background .12s, color .12s;
     }
-    .tbtn:hover { background: var(--panel-hov); color: var(--text); }
-    .tbtn svg { width: 18px; height: 18px; }
-    .tbtn.active { background: var(--accent); color: var(--on-accent); }
-    .tbtn.active:hover { background: var(--accent); color: var(--on-accent); }
-
-    /* The theme triplet shares the .bg-toggle group; JS toggles .active. */
-    .bg-toggle { display: inline-flex; gap: 4px; }
-    /* Canvas tool group (select · draw) — same chip layout as .bg-toggle. */
-    .tool-toggle { display: inline-flex; gap: 4px; }
+    .k-seg button:hover { color: var(--text); }
+    .k-seg button.active { background: var(--accent-soft); color: var(--accent); }
 
     /* ── Error card ──────────────────────────────────────────────── */
     #error {
@@ -368,9 +353,6 @@
     @media (max-width: 760px) {
       main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
       .pane.editor { border-right: 0; border-bottom: 1px solid var(--border); }
-      .toolbar { gap: 4px; padding: 6px; top: 12px; }
-      .toolbar select { padding: 8px 28px 8px 11px; }
-      .tbtn { min-width: 34px; height: 34px; }
     }
   </style>
 </head>
