@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Design
 document_id: DESIGN-STUDIO-001
-version: "0.4"
+version: "0.5"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -36,7 +36,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | DESIGN-STUDIO-001                                                |
-| Version           | 0.4                                                             |
+| Version           | 0.5                                                             |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Audience          | Engineers building the editor chrome (`website/app/`)         |
@@ -273,3 +273,17 @@ Verified by `TC-CS-07` (`e2e/chrome.spec.ts`); regression gates (§9) unchanged.
 | 0.2     | 2026-05-25 | Vũ Anh | **P7 (chrome de-dup):** added §11 — one owner per control. Floating toolbar retired; appearance becomes a single top-bar 3-mode control (`.k-seg`, soft `--accent-soft` active) reusing `selectBg`/`bgActive`; sample picker (`.k-sample`) + a single Export move to the top bar; `Code`/`Preview` tabs made truthful. Supersedes the §3 theme-toggle and §4 floating-toolbar notes. Pure relocation — `renderSVG`/`svgBackground` untouched. |
 | 0.3     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `03-DESIGN.md` → `04-DESIGN.md` so the `NN-` prefix follows the reading order (`01-INTRO` first); content unchanged. See `INTRO-STUDIO-001` §2. |
 | 0.4     | 2026-05-25 | Vũ Anh | **P7 verified as built (`CR-STUDIO-001`).** §11 was design-ahead; P7 is now implemented exactly as specified — `.k-sample` + `.k-seg` in `ui/TopBar.tsx`, the floating `.toolbar` deleted from `App.tsx`/`index.html`, single Export, truthful tabs — and verified (21/21 e2e; `js`/`python` goldens byte-identical). No design change. |
+| 0.5     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout + Decision log.** Renamed `04-DESIGN.md` → `03-DESIGN.md`; added **Annex B — Decision log (ADR)** promoting decisions already stated in the design prose (ISO/IEC/IEEE 42010 §5.5, right-sized). No design change. See `INTRO-STUDIO-001` Annex A 0.4. |
+
+## Annex B — Decision log (ADR)
+
+Architecture decisions, promoted from the design prose above (ISO/IEC/IEEE 42010 §5.5). Status of all: **Accepted** (as-built).
+
+| ID | Decision | Rationale | Source |
+|----|----------|-----------|--------|
+| `AD-CS-01` | On-canvas item styling lives in the **engine layer** (`engine/shapes.tsx`, `component` + `toSvg` in lockstep), not a new `ui/` component. | Per-record reactivity (`NFR-J-01`) requires the item component in the engine layer; keeps the board and the export in lockstep. | §5 |
+| `AD-CS-02` | Status-bar zoom `%` is read by an **isolated poll** in `StatusBar`, not a reactive signal. | The engine exposes no reactive zoom; an isolated poll updates the readout without re-rendering the canvas shape layer (`NFR-CS-02`). | §7 |
+| `AD-CS-03` | Design tokens are migrated **additively**, not rewritten wholesale. | Minimise regression risk and preserve the existing playground look (golden-safe; risk `RK-CS-03`). | §2 |
+| `AD-CS-04` | Selection affordances are drawn in the **canvas layer**, not a reactive React panel. | The engine lacks a reactive selection signal; the canvas layer already re-renders the selected shape (the `FR-CS-05` reactivity constraint). | §6 |
+| `AD-CS-05` | Undo/redo enabled-state is recomputed from the **store-change tick** (chosen over an always-enabled no-op). | Reflect true `canUndo`/`canRedo` without a reactive selection signal (`RK-CS-02`); resolved in `PLAN-STUDIO-001` 0.5. | §3, §10 |
+| `AD-CS-06` | `renderSVG` (`packages/js`) is **out of scope and untouched**. | Golden-safe boundary — the byte-identical export gate must hold (`NFR-CS-03`). | §1, §9 |

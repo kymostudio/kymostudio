@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Implementation Plan
 document_id: PLAN-STUDIO-001
-version: "0.5"
+version: "0.6"
 issue_date: 2026-05-25
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-STUDIO-001                                                  |
-| Version           | 0.5                                                             |
+| Version           | 0.6                                                             |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
 | Related Documents | `FEAT-STUDIO-001` (requirements), `DESIGN-STUDIO-001` (design), `TEST-STUDIO-001` (V&V), `PLAN-JAM-001` (the capability layer this builds on — **entry gate, complete**) |
@@ -216,6 +216,7 @@ yet — see [`CHANGE-REQUESTS/README.md`](CHANGE-REQUESTS/README.md).
 | 0.3     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §9 Change-requests (`CR/`); plan consolidated into the feature folder under `docs/specs/`. |
 | 0.4     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `PLAN.md` → `06-PLAN.md` and `CR/` → `07-CR/`, extending the folder's `NN-` numbering to the living-plan layer; updated the §9 change-request links. `PLAN-STUDIO-001` unchanged. See `INTRO-STUDIO-001` §2. |
 | 0.5     | 2026-05-25 | Vũ Anh | **P7 implemented + worklog reconciled (`CR-STUDIO-001`, Path A).** P7 chrome de-dup built & verified (21/21 e2e; `js`/`python` goldens byte-identical) → worklog P7 🚧→✅; removed the stray mid-table "Programme complete" paragraph and relocated a corrected **P1–P7** summary below the phases; de-duplicated the P6 lead; §5 sequencing note updated; resolved Annex B open questions (title cosmetic · undo/redo always-enabled · left-rail-only · comment-pin deferred). |
+| 0.6     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout.** Renamed `06-PLAN.md` → un-numbered `PLAN.md` (matches the repo's leaf model); `CHANGE-REQUESTS/` links unchanged; `PLAN-STUDIO-001` content unchanged. See `INTRO-STUDIO-001` Annex A 0.4. |
 
 ## Annex B — Open questions / pending decisions
 

@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Feature & Requirements (SRS)
 document_id: FEAT-STUDIO-001
-version: "0.5"
+version: "0.6"
 issue_date: 2026-05-25
 status: Draft
 classification: Internal
@@ -38,7 +38,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | FEAT-STUDIO-001                                                   |
-| Version           | 0.5                                                              |
+| Version           | 0.6                                                              |
 | Status            | Draft                                                            |
 | Owner             | `diagrams/` project                                             |
 | Related Documents | `PROD-STUDIO-001` (stakeholder needs), `DESIGN-STUDIO-001` (how), `TEST-STUDIO-001` (V&V), `FEAT-JAM-001` (the capability layer), `FEAT-CANVAS-001` (the playground host), `KYMO-DSL-001` (the DSL it renders) |
@@ -53,7 +53,7 @@ keywords:
 ## 1. Stakeholder needs
 
 Stakeholder needs (`SN-CS-01..05`, ISO 29148 §6.4.2 ConOps) are owned by the product description
-**`PROD-STUDIO-001`** (`02-PRODUCT.md`). Each requirement below traces back to them via the
+**`PROD-STUDIO-001`** (`00-PRODUCT.md`). Each requirement below traces back to them via the
 **Source need** column.
 
 ## 2. Functional requirements (`FR-CS`)
@@ -132,3 +132,4 @@ comment-pin marker; the status bar (counts, autosave, zoom, fit). All **client-o
 | 0.3     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-STUDIO-001` (renamed `SN-1..5` → `SN-CS-01..05`); §1 now points there and the `FR-CS` Source-need column cites the new IDs. No requirement content changed. |
 | 0.4     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `02-FEATURE.md` → `03-FEATURE.md`; updated the §1 `PROD-STUDIO-001` pointer to `02-PRODUCT.md`. Numbering now follows the reading order (`01-INTRO` first). See `INTRO-STUDIO-001` §2. |
 | 0.5     | 2026-05-25 | Vũ Anh | **P7 reconciled to as-built (`CR-STUDIO-001`).** P7 is now implemented & verified, so the `FR-CS-02`/`FR-CS-03` supersession notes moved from pending to **realized** (past tense): the standalone theme toggle is subsumed by the top-bar 3-mode appearance control, and the floating toolbar P3 had kept for sample/bg/export was retired (those controls live in the top bar). §5 acceptance #6 now holds. No requirement scope changed. |
+| 0.6     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout.** Renamed `03-FEATURE.md` → `02-FEATURE.md`; updated the §1 `PROD-STUDIO-001` pointer to `00-PRODUCT.md`. No requirement scope changed. See `INTRO-STUDIO-001` Annex A 0.4. |

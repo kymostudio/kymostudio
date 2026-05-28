@@ -1,7 +1,7 @@
 ---
 title: Canvas Export — Specification: Overview & Document Map
 document_id: INTRO-EXPORT-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-27
 status: Draft
 classification: Internal
@@ -39,14 +39,14 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | INTRO-EXPORT-001                                                  |
-| Version           | 0.1                                                              |
+| Version           | 0.2                                                              |
 | Issue Date        | 2026-05-27                                                       |
 | Status            | Draft                                                           |
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                            |
 | Related Documents | `PROD-EXPORT-001`, `FEAT-EXPORT-001`, `DESIGN-EXPORT-001`, `TEST-EXPORT-001`, `PLAN-EXPORT-001`, `INTRO-STUDIO-001` (umbrella), `INTRO-TOOLBAR-001` (sibling), `INTRO-ITEMS-001` (sibling) |
 
-> Start here. This folder (`docs/specs/canvas-studio/canvas-export/`) specifies the editor's **output** — the one
+> Start here. This folder (`docs/specs/canvas-studio/modules/canvas-export/`) specifies the editor's **output** — the one
 > way to get a diagram *out* of the playground: **export the board to SVG** (a single entry point) and
 > **share it via a `?script=` URL**. It is a small module **carved out of `canvas-studio`**
 > (`INTRO-STUDIO-001`) — the shipped, baselined hi-fi editor chrome — when that feature was split into
@@ -84,18 +84,18 @@ single-maintainer OSS module, exactly as the umbrella + sibling doc-sets.
 
 ## 2. Document map
 
-This module's docs use the two-layer model in this folder — a **baselined spec** (`01-INTRO`–`05-TEST`)
-and a **living plan** (`06-PLAN` + `CHANGE-REQUESTS/`). The documents for canvas-export:
+This module's docs use the two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`)
+and a **living plan** (`PLAN.md` + `CHANGE-REQUESTS/`). The documents for canvas-export:
 
 | # | Document | document_id | Answers |
 |---|----------|-------------|---------|
+| 00 | `00-PRODUCT.md` | `PROD-EXPORT-001` | *what product problem & whose needs (`SN-EX`)?* |
 | 01 | `01-INTRO.md` | `INTRO-EXPORT-001` | *where do I start?* |
-| 02 | `02-PRODUCT.md` | `PROD-EXPORT-001` | *what product problem & whose needs (`SN-EX`)?* |
-| 03 | `03-FEATURE.md` | `FEAT-EXPORT-001` | *what must it do? (SRS, `FR-EX`/`NFR-EX`)* |
-| 04 | `04-DESIGN.md` | `DESIGN-EXPORT-001` | *how is it built?* |
-| 05 | `05-TEST.md` | `TEST-EXPORT-001` | *how do we know it's right? (`TC-EX`)* |
-| 06 | `06-PLAN.md` | `PLAN-EXPORT-001` | *why, in what order, at what risk, what's done?* |
-| 07 | `CHANGE-REQUESTS/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
+| 02 | `02-FEATURE.md` | `FEAT-EXPORT-001` | *what must it do? (SRS, `FR-EX`/`NFR-EX`)* |
+| 03 | `03-DESIGN.md` | `DESIGN-EXPORT-001` | *how is it built?* |
+| 04 | `04-TEST.md` | `TEST-EXPORT-001` | *how do we know it's right? (`TC-EX`)* |
+| — | `PLAN.md` | `PLAN-EXPORT-001` | *why, in what order, at what risk, what's done?* |
+| — | `CHANGE-REQUESTS/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -132,12 +132,12 @@ canvas-studio (INTRO-STUDIO-001)   →  umbrella: the hi-fi editor chrome (shipp
 
 ## 4. Reading guide
 
-Spec: **`01-INTRO`** (this doc) → **`02-PRODUCT`** (the product context + `SN-EX` needs) →
-**`03-FEATURE`** (the `FR-EX`/`NFR-EX` requirements + the re-homing map) → **`04-DESIGN`** (the export
-flow, the share flow, the button-render seam, golden-safety) → **`05-TEST`** (V&V, `TC-EX-NN`,
+Spec: **`00-PRODUCT`** (the product context + `SN-EX` needs) → **`01-INTRO`** (this doc) →
+**`02-FEATURE`** (the `FR-EX`/`NFR-EX` requirements + the re-homing map) → **`03-DESIGN`** (the export
+flow, the share flow, the button-render seam, golden-safety) → **`04-TEST`** (V&V, `TC-EX-NN`,
 regression gates, traceability). For delivery status & history, read **`PLAN-EXPORT-001`**.
 
-Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05; *stakeholder* → 02 → 06.
+Quick paths: *implementer* → 00 → 02 → 03 → PLAN; *reviewer* → 02 → 04; *stakeholder* → 00 → PLAN.
 
 ## 5. Status & ownership
 
@@ -147,7 +147,7 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 - **Traceability invariant:** every requirement in `FEAT-EXPORT-001` has ≥ 1 covering test in
   `TEST-EXPORT-001` (it does — `FR-EX-01`/`02` → `TC-EX-01`/`02`).
 - **Change management:** a change to this baselined spec is raised as a change-request in
-  `docs/specs/canvas-studio/canvas-export/CHANGE-REQUESTS/` and re-baselined (bump version + record in Annex A).
+  `docs/specs/canvas-studio/modules/canvas-export/CHANGE-REQUESTS/` and re-baselined (bump version + record in Annex A).
 
 ---
 
@@ -156,3 +156,4 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-27 | Vũ Anh | Initial introduction + document map for canvas-export — the editor's output (board→SVG export + `?script=` URL share), carved from `canvas-studio` (`INTRO-STUDIO-001`) via an umbrella + re-home decomposition. Sibling of `canvas-toolbar` (`INTRO-TOOLBAR-001`) + `canvas-items` (`INTRO-ITEMS-001`); built on canvas-jam's `toSvg` (`INTRO-JAM-001`). AS-BUILT (shipped under canvas-studio P2/P7). |
+| 0.2     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout.** Realigned the module files to the repo's canonical order (`02-PRODUCT`→`00-PRODUCT`, `03-FEATURE`→`02-FEATURE`); the module now lives under `docs/specs/canvas-studio/modules/canvas-export/`. Updated §2 document map + §4 reading guide + the self-paths. `document_id`s unchanged. See `INTRO-STUDIO-001` Annex A 0.4. |
