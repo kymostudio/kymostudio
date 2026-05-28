@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Specification: Overview & Document Map
 document_id: INTRO-STUDIO-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-05-25
 status: Draft
 classification: Internal
@@ -37,7 +37,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | INTRO-STUDIO-001                                                  |
-| Version           | 0.2                                                               |
+| Version           | 0.3                                                               |
 | Issue Date        | 2026-05-25                                                        |
 | Status            | Draft                                                             |
 | Classification    | Internal                                                          |
@@ -81,17 +81,18 @@ single-maintainer OSS feature, as the sibling doc-sets.
 
 ## 2. Document map
 
-This feature's docs use a two-layer model in this folder — a **baselined spec** (`00-PRODUCT`–`04-TEST`)
-and a **living plan** (`PLAN.md` + `CR/`). The documents for canvas-studio:
+This feature's docs use a two-layer model in this folder — a **baselined spec** (`01-INTRO`–`05-TEST`)
+and a **living plan** (`06-PLAN` + `07-CR/`). The documents for canvas-studio:
 
 | # | Document | document_id | Answers |
 |---|----------|-------------|---------|
-| 00 | `00-PRODUCT.md` | `PROD-STUDIO-001` | *what product problem & whose needs (`SN-CS`)?* |
 | 01 | `01-INTRO.md` | `INTRO-STUDIO-001` | *where do I start?* |
-| 02 | `02-FEATURE.md` | `FEAT-STUDIO-001` | *what must it do? (SRS, `FR-CS`/`NFR-CS`)* |
-| 03 | `03-DESIGN.md` | `DESIGN-STUDIO-001` | *how is it built?* |
-| 04 | `04-TEST.md` | `TEST-STUDIO-001` | *how do we know it's right? (`TC-CS`)* |
-| — | `docs/specs/canvas-studio/PLAN.md` | `PLAN-STUDIO-001` | *why, in what order, at what risk, what's done? (+ `CR/`)* |
+| 02 | `02-PRODUCT.md` | `PROD-STUDIO-001` | *what product problem & whose needs (`SN-CS`)?* |
+| 03 | `03-FEATURE.md` | `FEAT-STUDIO-001` | *what must it do? (SRS, `FR-CS`/`NFR-CS`)* |
+| 04 | `04-DESIGN.md` | `DESIGN-STUDIO-001` | *how is it built?* |
+| 05 | `05-TEST.md` | `TEST-STUDIO-001` | *how do we know it's right? (`TC-CS`)* |
+| 06 | `06-PLAN.md` | `PLAN-STUDIO-001` | *why, in what order, at what risk, what's done?* |
+| 07 | `07-CR/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -119,12 +120,12 @@ canvas-studio (this spec)          →  hi-fi editor CHROME over the engine     
 
 ## 4. Reading guide
 
-Spec: **`01-INTRO`** (this doc) → **`00-PRODUCT`** (the product context + `SN-CS` needs) →
-**`02-FEATURE`** (the `FR-CS`/`NFR-CS` requirements per region) → **`03-DESIGN`** (region→file
-mapping, tool-registry seam, item styling, token migration) → **`04-TEST`** (V&V, `TC-CS-NN`,
+Spec: **`01-INTRO`** (this doc) → **`02-PRODUCT`** (the product context + `SN-CS` needs) →
+**`03-FEATURE`** (the `FR-CS`/`NFR-CS` requirements per region) → **`04-DESIGN`** (region→file
+mapping, tool-registry seam, item styling, token migration) → **`05-TEST`** (V&V, `TC-CS-NN`,
 golden-safety, traceability). For delivery status & history, read **`PLAN-STUDIO-001`**.
 
-Quick paths: *implementer* → 00 → 02 → 03 → `PLAN`; *reviewer* → 02 → 04; *stakeholder* → 00 → `PLAN`.
+Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05; *stakeholder* → 02 → 06.
 
 ## 5. Status & ownership
 
@@ -134,7 +135,7 @@ Quick paths: *implementer* → 00 → 02 → 03 → `PLAN`; *reviewer* → 02 �
 - **Traceability invariant:** every requirement in `FEAT-STUDIO-001` will have ≥ 1 covering test in
   `TEST-STUDIO-001` before the feature is declared done.
 - **Change management:** a change to this baselined spec is raised as a change-request in
-  `docs/specs/canvas-studio/CR/` and re-baselined (bump version + record in Annex A).
+  `docs/specs/canvas-studio/07-CR/` and re-baselined (bump version + record in Annex A).
 
 ---
 
@@ -143,4 +144,5 @@ Quick paths: *implementer* → 00 → 02 → 03 → `PLAN`; *reviewer* → 02 �
 | Version | Date       | Author | Changes                                  |
 |---------|------------|--------|------------------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial introduction + document map for canvas-studio (the hi-fi editor UI shell over the complete engine + freeform tools; decomposed by canvas region). |
-| 0.2     | 2026-05-25 | Vũ Anh | **Doc reorganization.** §2 trimmed to a self-contained document map adding `00-PRODUCT` (`PROD-STUDIO-001`); reading guide + change-management updated; docs consolidated per feature under `docs/specs/`. |
+| 0.2     | 2026-05-25 | Vũ Anh | **Doc reorganization.** §2 trimmed to a self-contained document map adding `PROD-STUDIO-001`; reading guide + change-management updated; docs consolidated per feature under `docs/specs/`. |
+| 0.3     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** The `NN-` prefixes now follow the reading order across the whole folder: `01-INTRO` (start here) → `02-PRODUCT` → `03-FEATURE` → `04-DESIGN` → `05-TEST` → `06-PLAN` → `07-CR/` (was `00-PRODUCT` / `01-INTRO` / … with un-numbered `PLAN.md` + `CR/`). Updated §2 document map, §4 reading guide + quick paths, §5 change-management. `document_id`s unchanged (stable across renames). |

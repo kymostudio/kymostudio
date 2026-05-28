@@ -33,8 +33,9 @@ const cameraTransform = (page: Page) =>
     return cam?.getAttribute("style")?.match(/transform:[^;]+/)?.[0] ?? "";
   });
 
-/** A viewport point that is genuinely empty (no shape, not the toolbar) so a
- *  drag there pans rather than grabbing a node. */
+/** A viewport point that is genuinely empty (no shape under it) so a drag there
+ *  pans rather than grabbing a node. (The floating toolbar that used to overlap
+ *  the canvas top was retired in P7 / CR-STUDIO-001.) */
 const emptyPoint = (page: Page) =>
   page.evaluate(() => {
     const vp = document.querySelector('[data-testid="engine-viewport"]')!.getBoundingClientRect();
@@ -50,12 +51,7 @@ const emptyPoint = (page: Page) =>
       const x = vp.left + vp.width * fx;
       const y = vp.top + vp.height * fy;
       const el = document.elementFromPoint(x, y);
-      if (
-        el &&
-        el.closest('[data-testid="engine-viewport"]') &&
-        !el.closest("[data-shape-id]") &&
-        !el.closest(".toolbar")
-      ) {
+      if (el && el.closest('[data-testid="engine-viewport"]') && !el.closest("[data-shape-id]")) {
         return { x, y };
       }
     }

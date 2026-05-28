@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Verification & Validation
 document_id: TEST-STUDIO-001
-version: "0.2"
+version: "0.4"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | TEST-STUDIO-001                                                  |
-| Version           | 0.2                                                            |
+| Version           | 0.4                                                            |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Related Documents | `FEAT-STUDIO-001` (requirements), `DESIGN-STUDIO-001` (design), `TEST-JAM-001` (the engine/freeform V&V this builds on), `TEST-CANVAS-001` (the editor V&V — must stay green) |
@@ -123,3 +123,5 @@ Every requirement → ≥ 1 covering test (the `FEAT-STUDIO-001` invariant).
 |---------|------------|--------|----------------------------------|
 | 0.1     | 2026-05-24 | Vũ Anh | Initial V&V: `TC-CS-01..06` (tokens/theme, top bar, tool rail, item styling, selection affordances, status bar), the regression gates (`TEST-CANVAS-001`/`TEST-JAM-001`/render-guard) + golden-safety, NFR methods, traceability. **P2 build:** `TC-CS-02` updated for the client-only top-bar trim (no breadcrumb/star/Comments/Versions/presence). **P3 build:** `TC-CS-03` updated for the left rail + `hand`/grab-pan + V/H/P/S/T shortcuts. **P4 build:** `TC-CS-04` updated for renderSVG-matched items (glyph node, purple-dashed inner region, flow-dash edge). **P5 build:** `TC-CS-05` → `e2e/selection.spec.ts` (size badge + 4 handles + drag-track + clear-on-empty). **P6 build:** `TC-CS-06` → `e2e/status.spec.ts` (counts + zoom-in/% + fit). **All `TC-CS-01..06` covered; canvas-studio complete.** |
 | 0.2     | 2026-05-25 | Vũ Anh | **P7 build:** added **`TC-CS-07`** → `e2e/chrome.spec.ts` (4 cases): no floating toolbar · single Export · sample + 3-mode background in the top bar · truthful `Code`/`Preview` tabs. Added the §1 strategy bullet 7 and the `FR-CS-07 → TC-CS-07` traceability row. |
+| 0.3     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `04-TEST.md` → `05-TEST.md` so the `NN-` prefix follows the reading order (`01-INTRO` first); content unchanged. See `INTRO-STUDIO-001` §2. |
+| 0.4     | 2026-05-25 | Vũ Anh | **TC-CS-07 now backed by a real test (`CR-STUDIO-001`).** `e2e/chrome.spec.ts` (4 cases) exists and passes — the 0.2 "P7 build" entry is now factual (previously design-ahead, the file did not exist). Full suite **21/21** green. No test scope change. |

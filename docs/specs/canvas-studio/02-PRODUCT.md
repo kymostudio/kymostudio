@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Product Description (ConOps & Stakeholder Requirements)
 document_id: PROD-STUDIO-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-25
 status: Draft
 classification: Internal
@@ -32,7 +32,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `PROD-STUDIO-001` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | Draft |
 | Owner             | `diagrams/` project |
 | Related Documents | `INTRO-STUDIO-001`, `FEAT-STUDIO-001` (the SRS derived from the needs below) |
@@ -98,3 +98,4 @@ backend-implying capabilities (see §3 non-goals; the SRS §4 maps each to its s
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-05-25 | Vũ Anh | Initial product description. Extracted from `INTRO-STUDIO-001` §1 (purpose/substrate) and `FEAT-STUDIO-001` §1 (stakeholder needs); renamed needs `SN-1..5` → `SN-CS-01..05` (feature-scoped). |
+| 0.2     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `00-PRODUCT.md` → `02-PRODUCT.md` so the `NN-` prefix follows the actual reading order (`01-INTRO` first); content unchanged. See `INTRO-STUDIO-001` §2. |

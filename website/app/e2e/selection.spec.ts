@@ -59,15 +59,16 @@ test("TC-CS-05: clicking empty canvas clears the selection", async ({ page }) =>
   await expect(page.getByTestId("selection-size")).toHaveCount(1);
 
   // Click a genuinely empty viewport point — no shape AND no floating chrome
-  // (top toolbar / bottom status bar / left rail) under it, so the click reaches
-  // the canvas and clears the selection. Candidates stay clear of top/bottom.
+  // (bottom status bar / left rail) under it, so the click reaches the canvas
+  // and clears the selection. Candidates stay clear of top/bottom. (The floating
+  // toolbar was retired in P7 / CR-STUDIO-001.)
   const empty = await page.evaluate(() => {
     const vp = document.querySelector('[data-testid="engine-viewport"]')!.getBoundingClientRect();
     for (const [fx, fy] of [[0.04, 0.45], [0.96, 0.45], [0.04, 0.25], [0.96, 0.72]]) {
       const x = vp.left + vp.width * fx, y = vp.top + vp.height * fy;
       const blocked = document.elementsFromPoint(x, y).some((e) => {
         const el = e as HTMLElement;
-        return el.closest?.("[data-shape-id]") || el.closest?.(".k-statusbar, .toolbar, .k-rail");
+        return el.closest?.("[data-shape-id]") || el.closest?.(".k-statusbar, .k-rail");
       });
       if (!blocked) return { x, y };
     }
