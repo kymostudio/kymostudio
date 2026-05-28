@@ -46,7 +46,7 @@ keywords:
 | Owner             | `diagrams/` project                                            |
 | Related Documents | `PROD-EXPORT-001`, `FEAT-EXPORT-001`, `DESIGN-EXPORT-001`, `TEST-EXPORT-001`, `PLAN-EXPORT-001`, `INTRO-STUDIO-001` (umbrella), `INTRO-TOOLBAR-001` (sibling), `INTRO-ITEMS-001` (sibling) |
 
-> Start here. This folder (`docs/specs/canvas-export/`) specifies the editor's **output** — the one
+> Start here. This folder (`docs/specs/canvas-studio/canvas-export/`) specifies the editor's **output** — the one
 > way to get a diagram *out* of the playground: **export the board to SVG** (a single entry point) and
 > **share it via a `?script=` URL**. It is a small module **carved out of `canvas-studio`**
 > (`INTRO-STUDIO-001`) — the shipped, baselined hi-fi editor chrome — when that feature was split into
@@ -147,7 +147,7 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 - **Traceability invariant:** every requirement in `FEAT-EXPORT-001` has ≥ 1 covering test in
   `TEST-EXPORT-001` (it does — `FR-EX-01`/`02` → `TC-EX-01`/`02`).
 - **Change management:** a change to this baselined spec is raised as a change-request in
-  `docs/specs/canvas-export/07-CR/` and re-baselined (bump version + record in Annex A).
+  `docs/specs/canvas-studio/canvas-export/07-CR/` and re-baselined (bump version + record in Annex A).
 
 ---
 

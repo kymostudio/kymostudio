@@ -48,7 +48,7 @@ keywords:
 | Owner             | `diagrams/` project                                              |
 | Related Documents | `PROD-TOOLBAR-001`, `FEAT-TOOLBAR-001`, `DESIGN-TOOLBAR-001`, `TEST-TOOLBAR-001`, `PLAN-TOOLBAR-001`, `INTRO-EXPORT-001` (sibling), `INTRO-ITEMS-001` (sibling), `INTRO-STUDIO-001` (the umbrella), `INTRO-JAM-001` / `INTRO-ENGINE-001` (the render core, complete) |
 
-> Start here. This folder (`docs/specs/canvas-toolbar/`) specifies the editor **chrome frame** of the
+> Start here. This folder (`docs/specs/canvas-studio/canvas-toolbar/`) specifies the editor **chrome frame** of the
 > live playground (`website/app/`, `FEAT-CANVAS-001`): the design-token surface, the top bar, the left
 > tool rail, the status bar, and the chrome de-dup / 3-mode appearance control. It is a **module
 > carved out of `canvas-studio` (`INTRO-STUDIO-001`)** — the hi-fi editor shell, which is being split
@@ -165,7 +165,7 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 - **Traceability invariant:** every requirement in `FEAT-TOOLBAR-001` has ≥ 1 covering test in
   `TEST-TOOLBAR-001`.
 - **Change management:** a change to this baselined spec is raised as a change-request in
-  `docs/specs/canvas-toolbar/07-CR/` and re-baselined (bump version + record in Annex A). The two
+  `docs/specs/canvas-studio/canvas-toolbar/07-CR/` and re-baselined (bump version + record in Annex A). The two
   open/closed CRs migrating from canvas-studio are logged there.
 
 ---
