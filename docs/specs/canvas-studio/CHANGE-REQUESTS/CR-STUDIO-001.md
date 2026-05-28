@@ -41,7 +41,7 @@ keywords:
 > **Why a CR.** P7 (chrome de-dup) was written into the baselined spec via version bumps
 > (`FEAT`/`DESIGN`/`TEST` 0.2) **without** a change-request, and it supersedes clauses of two
 > already-baselined requirements (`FR-CS-02`, `FR-CS-03`). `01-INTRO §5` requires exactly this to go
-> through `07-CR/`. This CR retroactively brings P7 under change control and proposes how to close the
+> through `CHANGE-REQUESTS/`. This CR retroactively brings P7 under change control and proposes how to close the
 > spec↔code gap.
 
 ---
@@ -69,7 +69,7 @@ shows the floating toolbar P7 claims to have removed.
   core function of a baseline is void while this stands.
 - **Traceability invariant breached** (`01-INTRO §5`: every `FR` has ≥1 covering test before "done"):
   `FR-CS-07`'s covering test is fictional, so the invariant is satisfied only on paper.
-- **Process:** the `07-CR/` apparatus was bypassed for the one change that required it; this CR is also
+- **Process:** the `CHANGE-REQUESTS/` apparatus was bypassed for the one change that required it; this CR is also
   the corrective for that process gap.
 
 ## 4. Proposed resolution

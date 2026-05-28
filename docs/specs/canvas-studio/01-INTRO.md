@@ -82,7 +82,7 @@ single-maintainer OSS feature, as the sibling doc-sets.
 ## 2. Document map
 
 This feature's docs use a two-layer model in this folder — a **baselined spec** (`01-INTRO`–`05-TEST`)
-and a **living plan** (`06-PLAN` + `07-CR/`). The documents for canvas-studio:
+and a **living plan** (`06-PLAN` + `CHANGE-REQUESTS/`). The documents for canvas-studio:
 
 | # | Document | document_id | Answers |
 |---|----------|-------------|---------|
@@ -92,7 +92,7 @@ and a **living plan** (`06-PLAN` + `07-CR/`). The documents for canvas-studio:
 | 04 | `04-DESIGN.md` | `DESIGN-STUDIO-001` | *how is it built?* |
 | 05 | `05-TEST.md` | `TEST-STUDIO-001` | *how do we know it's right? (`TC-CS`)* |
 | 06 | `06-PLAN.md` | `PLAN-STUDIO-001` | *why, in what order, at what risk, what's done?* |
-| 07 | `07-CR/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
+| 07 | `CHANGE-REQUESTS/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -135,7 +135,7 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 - **Traceability invariant:** every requirement in `FEAT-STUDIO-001` will have ≥ 1 covering test in
   `TEST-STUDIO-001` before the feature is declared done.
 - **Change management:** a change to this baselined spec is raised as a change-request in
-  `docs/specs/canvas-studio/07-CR/` and re-baselined (bump version + record in Annex A).
+  `docs/specs/canvas-studio/CHANGE-REQUESTS/` and re-baselined (bump version + record in Annex A).
 
 ---
 

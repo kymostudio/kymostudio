@@ -85,7 +85,7 @@ single-maintainer OSS module, exactly as the umbrella + sibling doc-sets.
 ## 2. Document map
 
 This module's docs use the two-layer model in this folder — a **baselined spec** (`01-INTRO`–`05-TEST`)
-and a **living plan** (`06-PLAN` + `07-CR/`). The documents for canvas-export:
+and a **living plan** (`06-PLAN` + `CHANGE-REQUESTS/`). The documents for canvas-export:
 
 | # | Document | document_id | Answers |
 |---|----------|-------------|---------|
@@ -95,7 +95,7 @@ and a **living plan** (`06-PLAN` + `07-CR/`). The documents for canvas-export:
 | 04 | `04-DESIGN.md` | `DESIGN-EXPORT-001` | *how is it built?* |
 | 05 | `05-TEST.md` | `TEST-EXPORT-001` | *how do we know it's right? (`TC-EX`)* |
 | 06 | `06-PLAN.md` | `PLAN-EXPORT-001` | *why, in what order, at what risk, what's done?* |
-| 07 | `07-CR/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
+| 07 | `CHANGE-REQUESTS/` | — | *change-requests against the baseline (raise → assess → re-baseline).* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only.
@@ -147,7 +147,7 @@ Quick paths: *implementer* → 02 → 03 → 04 → 06; *reviewer* → 03 → 05
 - **Traceability invariant:** every requirement in `FEAT-EXPORT-001` has ≥ 1 covering test in
   `TEST-EXPORT-001` (it does — `FR-EX-01`/`02` → `TC-EX-01`/`02`).
 - **Change management:** a change to this baselined spec is raised as a change-request in
-  `docs/specs/canvas-studio/canvas-export/07-CR/` and re-baselined (bump version + record in Annex A).
+  `docs/specs/canvas-studio/canvas-export/CHANGE-REQUESTS/` and re-baselined (bump version + record in Annex A).
 
 ---
 
