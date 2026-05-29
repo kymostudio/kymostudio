@@ -9,6 +9,8 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-05-29
+
 ### Changed
 
 - **BPMN format docs restructured into a normative-reference set** — the single
