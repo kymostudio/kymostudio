@@ -66,3 +66,38 @@ test("TC-CS-07: Code/Preview tabs reflect true panel state", async ({ page }) =>
   await expect(editor).toHaveCount(1);
   await expect(codeTab).toHaveClass(/active/);
 });
+
+/**
+ * TC-CR3-01 (canvas-studio CR-STUDIO-003, `FR-CR3-01`) — the .kymo source pane
+ * docks to the RIGHT of the canvas: `.pane.view` precedes `.pane.editor` in DOM
+ * order and the editor's box sits to the right of the canvas. The code-hidden
+ * state still collapses to a single full-width canvas column (no regression).
+ */
+test("TC-CR3-01: the code pane docks to the right of the canvas", async ({ page }) => {
+  const view = page.locator(".pane.view");
+  const editor = page.locator(".pane.editor");
+
+  // boot: both panes present (code shown by default — CR-002 not in scope here)
+  await expect(view).toHaveCount(1);
+  await expect(editor).toHaveCount(1);
+
+  // DOM order inside <main>: view first, editor second
+  const order = await page.evaluate(() => {
+    const kids = Array.from(document.querySelector("main")!.children);
+    return kids.map((el) => el.className);
+  });
+  const viewIdx = order.findIndex((c) => c.includes("view"));
+  const editorIdx = order.findIndex((c) => c.includes("editor"));
+  expect(viewIdx).toBeGreaterThanOrEqual(0);
+  expect(editorIdx).toBeGreaterThan(viewIdx);
+
+  // geometry: the editor sits to the right of the canvas
+  const vBox = (await view.boundingBox())!;
+  const eBox = (await editor.boundingBox())!;
+  expect(eBox.x).toBeGreaterThan(vBox.x);
+
+  // code-hidden regression: hiding code collapses to a single full-width column
+  await page.getByTestId("tab-code").click();
+  await expect(editor).toHaveCount(0);
+  await expect(page.locator("main.code-hidden")).toHaveCount(1);
+});
