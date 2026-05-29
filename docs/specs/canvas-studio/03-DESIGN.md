@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Design
 document_id: DESIGN-STUDIO-001
-version: "0.5"
+version: "0.6"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -66,11 +66,11 @@ Target layout (replaces today's `header` + `main.{editor|view}`):
 ┌──────────────────────────── TopBar (FR-CS-02) ───────────────────────────┐
 │ ◧ kymo · Untitled diagram        │ Code  Preview │  ↶ ↷  ☾  ⤓ Export  Share │
 ├──────┬──────────────────────────────────────────────────┬──────(reserved)─┤
-│ Tool │  .kymo code pane          ░ Canvas (EngineBoard) ░ │  right panel    │
-│ rail │  (toggle via Code tab)    ░  items (FR-CS-04)    ░ │  → canvas-      │
-│(FR-  │                           ░  selection (FR-CS-05)░ │    inspector    │
-│ CS-  │                           ░                      ░ │  (OUT of scope) │
-│ 03)  │                           └ BottomToolbar (alt) ──┘ │                 │
+│ Tool │ ░ Canvas (EngineBoard) ░   .kymo code pane         │  right panel    │
+│ rail │ ░  items (FR-CS-04)    ░   (toggle via Code tab —  │  → canvas-      │
+│(FR-  │ ░  selection (FR-CS-05)░    CR-STUDIO-003: the      │    inspector    │
+│ CS-  │ ░                      ░    code pane docks RIGHT)  │  (OUT of scope) │
+│ 03)  │ └ BottomToolbar (alt) ──┘                           │                 │
 ├──────┴──────────────────────────────────────────────────┴─────────────────┤
 │ StatusBar (FR-CS-06):  12 nodes · 11 edges │ ● saved │   − 72% +   ⤢ Fit    │
 └────────────────────────────────────────────────────────────────────────────┘
@@ -208,8 +208,9 @@ A floating strip at the canvas bottom (prototype `.k-statusbar`/`.k-chip`), a **
 
 - **New components:** `website/app/src/ui/{TopBar,ToolRail,BottomToolbar,StatusBar}.tsx` +
   `engine/tools-registry.ts` + an icon set (port the prototype's `icons.jsx` as a small TS module).
-- **`App.tsx` changes:** swap `<header>`+`<main>` for `TopBar` + a 3-column flex
-  (`code | canvas | reserved`) + `StatusBar`; add layout flags (`showCode`, editable `title`); keep
+- **`App.tsx` changes:** swap `<header>`+`<main>` for `TopBar` + a grid of panes
+  (`canvas | code` — the `.pane.view` canvas leads, the `.pane.editor` code pane docks on the **right**
+  per `CR-STUDIO-003`/`FR-CR3-01`) + `StatusBar`; add layout flags (`showCode`, editable `title`); keep
   the `tool` state and pass it to the rail + `EngineBoard` (already threaded). Reuse `onShare` /
   `onDownload` / theme effect untouched.
 - **Engine layer:** `engine/shapes.tsx` (item styling, §5), `engine/react.tsx` (selection-handle
@@ -274,6 +275,7 @@ Verified by `TC-CS-07` (`e2e/chrome.spec.ts`); regression gates (§9) unchanged.
 | 0.3     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `03-DESIGN.md` → `04-DESIGN.md` so the `NN-` prefix follows the reading order (`01-INTRO` first); content unchanged. See `INTRO-STUDIO-001` §2. |
 | 0.4     | 2026-05-25 | Vũ Anh | **P7 verified as built (`CR-STUDIO-001`).** §11 was design-ahead; P7 is now implemented exactly as specified — `.k-sample` + `.k-seg` in `ui/TopBar.tsx`, the floating `.toolbar` deleted from `App.tsx`/`index.html`, single Export, truthful tabs — and verified (21/21 e2e; `js`/`python` goldens byte-identical). No design change. |
 | 0.5     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout + Decision log.** Renamed `04-DESIGN.md` → `03-DESIGN.md`; added **Annex B — Decision log (ADR)** promoting decisions already stated in the design prose (ISO/IEC/IEEE 42010 §5.5, right-sized). No design change. See `INTRO-STUDIO-001` Annex A 0.4. |
+| 0.6     | 2026-05-29 | Vũ Anh | **`CR-STUDIO-003` re-baseline — code pane on the right.** §1 layout ASCII + §8 column order updated from `code \| canvas` to `canvas \| code`: the `.pane.view` canvas leads and the `.pane.editor` code pane docks on the **right** (`FR-CR3-01`). As-built — `App.tsx` renders `.pane.view` before `.pane.editor`; `index.html` grid `1fr minmax(280px, 38%)`, `.pane.editor { border-left }` (+ responsive `border-top`). Verified (22/22 e2e incl. `TC-CR3-01`; `js`/`python` goldens byte-identical). |
 
 ## Annex B — Decision log (ADR)
 

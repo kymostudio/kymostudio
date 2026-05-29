@@ -191,11 +191,12 @@
     .k-btn--icon.k-btn--sm { width: 28px; }
 
     /* ── Split panes ─────────────────────────────────────────────── */
-    main { flex: 1 1 auto; display: grid; grid-template-columns: minmax(280px, 38%) 1fr; min-height: 0; }
+    /* CR-STUDIO-003 (FR-CR3-01): canvas column leads; the code pane docks right. */
+    main { flex: 1 1 auto; display: grid; grid-template-columns: 1fr minmax(280px, 38%); min-height: 0; }
     /* FR-CS-02: the top-bar Code tab hides the editor pane → canvas spans full width. */
     main.code-hidden { grid-template-columns: 1fr; }
     .pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; position: relative; }
-    .pane.editor { border-right: 1px solid var(--border); background: var(--editor-bg); }
+    .pane.editor { border-left: 1px solid var(--border); background: var(--editor-bg); }
 
     /* Editor header strip — a small "source" chip for polish. */
     .editor-bar {
@@ -352,7 +353,8 @@
 
     @media (max-width: 760px) {
       main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
-      .pane.editor { border-right: 0; border-bottom: 1px solid var(--border); }
+      /* CR-STUDIO-003: canvas stacks on top, code below → divider on top of the editor. */
+      .pane.editor { border-left: 0; border-top: 1px solid var(--border); }
     }
   </style>
 </head>

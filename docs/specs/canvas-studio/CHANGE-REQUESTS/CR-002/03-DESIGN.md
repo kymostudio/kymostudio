@@ -1,7 +1,7 @@
 ---
 title: "Canvas Studio CR-002 — Design"
 document_id: DESIGN-STUDIO-002
-version: "0.1"
+version: "0.2"
 issue_date: 2026-05-27
 status: Open
 classification: Internal
@@ -33,7 +33,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `DESIGN-STUDIO-002` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | **Open** |
 | Owner             | `diagrams/` project |
 | Audience          | Engineer implementing the chrome change (`website/app/`) |
@@ -49,10 +49,10 @@ is untouched (`NFR-CR2-01`). The current chrome, verified:
 | Concern | As-built | Evidence |
 |---|---|---|
 | Default pane state | `showCode` initial = `true` (code shown) | `App.tsx:36` |
-| DOM order | `.pane.editor` first, `.pane.view` (rail + canvas) second | `App.tsx:239`, `App.tsx:258` |
-| Grid | `grid-template-columns: minmax(280px, 38%) 1fr` (collapses to `1fr` when `main.code-hidden`) | `index.html:194` / `:196` |
-| Editor border / responsive | `.pane.editor { border-right }`; flips to `border-bottom` at `max-width:760px` | `index.html:198` / `~:353` |
+| Code-hidden collapse | `main.code-hidden { grid-template-columns: 1fr }` (canvas full-width when code hidden) | `index.html:196`; `App.tsx:237` |
 | Tabs | `tab-code` (`onToggleCode`) + `tab-preview` (no-op when code hidden) | `ui/TopBar.tsx:86–105` |
+
+> The code-pane *side* (DOM order, grid columns, border) is handled in `CR-STUDIO-003` (`DESIGN-STUDIO-003 §2`), not here.
 
 ## 2. Single `Code` toggle — `FR-CR2-01`
 
@@ -71,40 +71,25 @@ columns: 1fr; }` (`index.html:196`) and `<main className={showCode ? undefined :
 further layout change. **Supersedes** the implicit code-shown default (`DESIGN-STUDIO-001 §8` `showCode`
 flag description).
 
-## 4. Code pane on the right — `FR-CR2-03`
-
-Three coordinated edits so the canvas leads and code docks right:
-
-- **DOM order** (`App.tsx:237–274`): render `<section className="pane view">` (rail + canvas)
-  **before** `<section className="pane editor">` inside `<main>` — swap the two blocks; keep `{showCode
-  && ( … editor … )}` guarding the editor block.
-- **Grid** (`index.html:194`): `minmax(280px, 38%) 1fr` → `1fr minmax(280px, 38%)` (canvas column
-  first, code column second). `main.code-hidden { grid-template-columns: 1fr; }` (`:196`) is unchanged.
-- **Border** (`index.html:198`): `.pane.editor { border-right … }` → `border-left …`; flip the
-  `max-width:760px` responsive rule (`~:353`) so the stacked editor's divider stays correct.
-
-**Supersedes** `DESIGN-STUDIO-001 §1` (layout ASCII — code pane left of canvas) and `§8` (the
-`code | canvas | reserved` column order).
-
-## 5. Component structure & state
+## 4. Component structure & state
 
 No new components or state. `App.tsx` keeps the single `showCode` boolean (default now `false`) and the
 `onToggleCode` handler; `TopBar` loses the `Preview` button and its conditional handler. The `tool`
 state, rail, status bar, sample picker and 3-mode background control (from P3/P7) are unchanged.
 
-## 6. Golden-safety, build & deploy
+## 5. Golden-safety, build & deploy
 
 All change is in `website/app/*` (React + CSS). `renderSVG`/`svgBackground` are not imported by the
 edited code paths, so the Python/JS render goldens stay byte-identical (`NFR-CR2-01`) and the
 render-guard stays green (`NFR-CR2-02`). Deploy is unchanged: rebuild and commit
 `website/app/kymo.bundle.js` (the committed-bundle deploy contract — no CI build).
 
-## 7. Risks / open questions
+## 6. Risks / open questions
 
 | ID | Risk / question | Mitigation / decision |
 |----|------------------|------------------------|
 | `RK-CR2-01` | Rebuilt bundle / CSS churns committed `kymo.bundle.js` beyond intent | Diff the bundle; change confined to chrome React + CSS; `renderSVG` untouched. |
-| `RK-CR2-02` | Removing `tab-preview` / reordering panes breaks existing E2E selectors | Update `e2e/chrome.spec.ts` in lockstep; run `test:e2e` before ship. |
+| `RK-CR2-02` | Removing `tab-preview` breaks existing E2E selectors | Update `e2e/chrome.spec.ts` in lockstep; run `test:e2e` before ship. |
 | `RK-CR2-03` | A layout/styling tweak leaks into `renderSVG` → golden churn | All change in `website/app/*`; goldens run in V&V (`TEST-STUDIO-002 §3`). |
 | `RK-CR2-Q1` | Should the `Code` label/icon change now it is a sole toggle? | **Open** — keep the `Code` label + icon (least churn); revisit only if UX review asks. |
 
@@ -115,3 +100,4 @@ render-guard stays green (`NFR-CR2-02`). Deploy is unchanged: rebuild and commit
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-05-27 | Vũ Anh | Initial design for CR-002: §2 single `Code` toggle (remove `tab-preview`, drop `Play` import) — `FR-CR2-01`; §3 default code-hidden (`App.tsx:36`) — `FR-CR2-02`; §4 code pane right (DOM reorder + grid swap + border flip) — `FR-CR2-03`; golden-safety (§6) and risks `RK-CR2-01..03` + open question `RK-CR2-Q1`. Maps onto baselined `DESIGN-STUDIO-001 §1/§3/§8/§11`. |
+| 0.2     | 2026-05-29 | Vũ Anh | Removed §4 (code pane on the right) — moved to `DESIGN-STUDIO-003 §2` (`CR-STUDIO-003`); renumbered §5→§4, §6→§5, §7→§6. Trimmed the as-built table to default-pane / code-hidden-collapse / tabs (DOM-order/grid/border rows moved to CR-003). `RK-CR2-02` no longer mentions pane reorder. Now maps onto `DESIGN-STUDIO-001 §3/§8/§11` only (§1 layout = CR-003). |

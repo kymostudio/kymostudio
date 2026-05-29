@@ -234,7 +234,27 @@ export function App() {
         onShare={onShare}
       />
 
+      {/* CR-STUDIO-003 (FR-CR3-01): canvas leads; the code pane docks on the
+          right — `.pane.view` is rendered before `.pane.editor` (the grid's
+          right-hand column, see index.html `.pane.editor`). */}
       <main className={showCode ? undefined : "code-hidden"}>
+        <section className="pane view">
+          <ToolRail tool={tool} setTool={setTool} />
+          <div className="canvas-wrap">
+          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} onEditorReady={(ed) => { engineEditor.current = ed; }} onViewReady={(api) => { viewApi.current = api; }} tool={tool} onToolReset={() => setTool("select")} />
+          <div id="error" hidden={error == null}>
+            {error}
+          </div>
+
+          <StatusBar
+            viewApi={viewApi}
+            nodes={diagram?.components.length ?? 0}
+            edges={diagram?.edges.length ?? 0}
+            savingKey={source}
+          />
+          </div>
+        </section>
+
         {showCode && (
           <section className="pane editor">
             <div className="editor-bar">
@@ -254,23 +274,6 @@ export function App() {
             />
           </section>
         )}
-
-        <section className="pane view">
-          <ToolRail tool={tool} setTool={setTool} />
-          <div className="canvas-wrap">
-          <EngineBoard diagram={diagram} svg={svg} w={size.w} h={size.h} isBpmn={isBpmnState} source={source} onPatch={onPatch} onReady={(fn) => { exportRef.current = fn; }} onEditorReady={(ed) => { engineEditor.current = ed; }} onViewReady={(api) => { viewApi.current = api; }} tool={tool} onToolReset={() => setTool("select")} />
-          <div id="error" hidden={error == null}>
-            {error}
-          </div>
-
-          <StatusBar
-            viewApi={viewApi}
-            nodes={diagram?.components.length ?? 0}
-            edges={diagram?.edges.length ?? 0}
-            savingKey={source}
-          />
-          </div>
-        </section>
       </main>
 
       <div id="toast" className={toast.show ? "show" : undefined}>
