@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Design
 document_id: DESIGN-STUDIO-001
-version: "0.6"
+version: "0.7"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -36,7 +36,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | DESIGN-STUDIO-001                                                |
-| Version           | 0.5                                                             |
+| Version           | 0.7                                                             |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Audience          | Engineers building the editor chrome (`website/app/`)         |
@@ -64,7 +64,7 @@ Target layout (replaces today's `header` + `main.{editor|view}`):
 
 ```
 ┌──────────────────────────── TopBar (FR-CS-02) ───────────────────────────┐
-│ ◧ kymo · Untitled diagram        │ Code  Preview │  ↶ ↷  ☾  ⤓ Export  Share │
+│ ◧ kymo · Untitled diagram        │     Code      │  ↶ ↷  ☾  ⤓ Export  Share │
 ├──────┬──────────────────────────────────────────────────┬──────(reserved)─┤
 │ Tool │ ░ Canvas (EngineBoard) ░   .kymo code pane         │  right panel    │
 │ rail │ ░  items (FR-CS-04)    ░   (toggle via Code tab —  │  → canvas-      │
@@ -92,8 +92,8 @@ existing playground before/after to confirm no unintended restyle (`RK-CS-03`).
 ## 3. Top bar (`ui/TopBar.tsx`) — FR-CS-02
 
 Replaces `App.tsx:196` `<header>`. A flex row of: brand (`KLogo`), an **editable title**
-(controlled input, **local state only** — no persistence backend), the center **panel-toggle
-tabs**, and the right action cluster. **Trimmed to client-only at the P2 build:** the bar carries
+(controlled input, **local state only** — no persistence backend), the center **`Code` panel
+toggle**, and the right action cluster. **Trimmed to client-only at the P2 build:** the bar carries
 **no** breadcrumb, star, comments, version-history, or presence/account chrome — those imply a
 backend (boards, comments, multiuser) and are out of scope (`FEAT-STUDIO-001` §4).
 
@@ -105,9 +105,10 @@ backend (boards, comments, multiuser) and are out of scope (`FEAT-STUDIO-001` §
   (`App.tsx:54`). Icon swaps sun/moon.
 - **Export / Share** → reuse `onDownload` (board `toSvg` from `DESIGN-JAM-001` §4, DSL-render
   fallback) and `onShare` (`?script=` link copy) verbatim (`App.tsx:158-180`).
-- **Center tabs** → just `Code` (toggles the `.kymo` pane via a new `showCode` layout flag) and
-  `Preview` (the canvas, always on). `Comments` / `Versions` were **removed** — they need a backend
-  (out of scope, `FEAT-STUDIO-001` §4).
+- **Center toggle** → a single `Code` control toggles the `.kymo` pane via the `showCode` layout flag;
+  its `active` state tracks pane visibility. *(`CR-STUDIO-002`: the `Preview` tab — a no-op once code
+  is hidden by default — was removed; the canvas is always present behind the pane.)* `Comments` /
+  `Versions` were **removed** — they need a backend (out of scope, `FEAT-STUDIO-001` §4).
 
 ## 4. Tool rail + registry (`ui/ToolRail.tsx`, `ui/tools.ts`) — FR-CS-03
 
@@ -210,7 +211,8 @@ A floating strip at the canvas bottom (prototype `.k-statusbar`/`.k-chip`), a **
   `engine/tools-registry.ts` + an icon set (port the prototype's `icons.jsx` as a small TS module).
 - **`App.tsx` changes:** swap `<header>`+`<main>` for `TopBar` + a grid of panes
   (`canvas | code` — the `.pane.view` canvas leads, the `.pane.editor` code pane docks on the **right**
-  per `CR-STUDIO-003`/`FR-CR3-01`) + `StatusBar`; add layout flags (`showCode`, editable `title`); keep
+  per `CR-STUDIO-003`/`FR-CR3-01`) + `StatusBar`; add layout flags (`showCode` — **default `false`**,
+  canvas-first on first load per `CR-STUDIO-002`/`FR-CR2-02`; editable `title`); keep
   the `tool` state and pass it to the rail + `EngineBoard` (already threaded). Reuse `onShare` /
   `onDownload` / theme effect untouched.
 - **Engine layer:** `engine/shapes.tsx` (item styling, §5), `engine/react.tsx` (selection-handle
@@ -259,8 +261,9 @@ change (golden-safe).
   same `onDownload`) is removed.
 - **Floating toolbar retired.** The whole `.toolbar` markup + CSS is deleted from `App.tsx`/
   `index.html`; the §4 note that "the floating toolbar keeps sample/bg/export" is superseded.
-- **Truthful tabs.** `Code`/`Preview` (§3) become a real either/or indicator: `Preview` is `active`
-  ⇔ the code pane is hidden (`!showCode`), instead of being hardcoded always-active.
+- **Single `Code` toggle.** *(Originally a truthful `Code`/`Preview` pair; superseded by
+  `CR-STUDIO-002`.)* The center chrome is one `Code` control (§3) whose `active` state ⇔ the code pane
+  is shown (`showCode`). The `Preview` tab was removed — redundant once code is hidden by default.
 
 Verified by `TC-CS-07` (`e2e/chrome.spec.ts`); regression gates (§9) unchanged.
 
@@ -276,6 +279,7 @@ Verified by `TC-CS-07` (`e2e/chrome.spec.ts`); regression gates (§9) unchanged.
 | 0.4     | 2026-05-25 | Vũ Anh | **P7 verified as built (`CR-STUDIO-001`).** §11 was design-ahead; P7 is now implemented exactly as specified — `.k-sample` + `.k-seg` in `ui/TopBar.tsx`, the floating `.toolbar` deleted from `App.tsx`/`index.html`, single Export, truthful tabs — and verified (21/21 e2e; `js`/`python` goldens byte-identical). No design change. |
 | 0.5     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout + Decision log.** Renamed `04-DESIGN.md` → `03-DESIGN.md`; added **Annex B — Decision log (ADR)** promoting decisions already stated in the design prose (ISO/IEC/IEEE 42010 §5.5, right-sized). No design change. See `INTRO-STUDIO-001` Annex A 0.4. |
 | 0.6     | 2026-05-29 | Vũ Anh | **`CR-STUDIO-003` re-baseline — code pane on the right.** §1 layout ASCII + §8 column order updated from `code \| canvas` to `canvas \| code`: the `.pane.view` canvas leads and the `.pane.editor` code pane docks on the **right** (`FR-CR3-01`). As-built — `App.tsx` renders `.pane.view` before `.pane.editor`; `index.html` grid `1fr minmax(280px, 38%)`, `.pane.editor { border-left }` (+ responsive `border-top`). Verified (22/22 e2e incl. `TC-CR3-01`; `js`/`python` goldens byte-identical). |
+| 0.7     | 2026-05-31 | Vũ Anh | **`CR-STUDIO-002` re-baseline — editor-chrome simplification.** §1 layout ASCII center cell `Code  Preview` → `Code`; §3 center "panel-toggle tabs" → a single `Code` toggle (the `Preview` tab removed); §8 `showCode` flag now **defaults `false`** (canvas-first first load, `FR-CR2-02`); §11 "truthful tabs" → single `Code` toggle (`active` ⇔ `showCode`). As-built — `ui/TopBar.tsx` drops the `tab-preview` button + `Play` import; `App.tsx` `useState(false)`. Verified (23/23 e2e incl. `TC-CR2-01/02`; `js` goldens byte-identical). |
 
 ## Annex B — Decision log (ADR)
 

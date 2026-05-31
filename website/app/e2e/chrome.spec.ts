@@ -4,9 +4,10 @@
  *
  * P7 retired the floating canvas toolbar and moved its non-duplicate controls
  * (the sample/starter picker + a 3-mode canvas-background control) into the top
- * bar. There is a single Export entry point, and the Code/Preview tabs reflect
- * true panel state (Preview active ⇔ the code pane is hidden). `renderSVG` /
- * `svgBackground` are untouched (golden-safe) — this is pure relocation.
+ * bar. There is a single Export entry point. CR-STUDIO-002 then simplified the
+ * center chrome to a single `Code` toggle (the redundant `Preview` tab is gone)
+ * and made the editor canvas-first (code hidden on first load). `renderSVG` /
+ * `svgBackground` are untouched (golden-safe) — this is pure chrome.
  */
 import { test, expect, type Page } from "@playwright/test";
 
@@ -41,30 +42,42 @@ test("TC-CS-07: the sample picker + 3-mode background live in the top bar", asyn
   await expect(html).toHaveAttribute("data-theme", themeBefore);
 });
 
-test("TC-CS-07: Code/Preview tabs reflect true panel state", async ({ page }) => {
+/**
+ * TC-CR2-01 (canvas-studio CR-STUDIO-002, `FR-CR2-01`) — a single `Code` toggle
+ * owns the source pane; the redundant `Preview` tab is gone. `tab-code.active`
+ * tracks pane visibility and the toggle works both ways.
+ */
+test("TC-CR2-01: a single Code toggle owns the pane; no Preview tab", async ({ page }) => {
   const editor = page.locator("#editor");
   const codeTab = page.getByTestId("tab-code");
-  const previewTab = page.getByTestId("tab-preview");
 
-  // boot: code pane shown → Code active, Preview not
-  await expect(editor).toHaveCount(1);
-  await expect(codeTab).toHaveClass(/active/);
-  await expect(previewTab).not.toHaveClass(/active/);
+  // the Preview tab is removed from the chrome entirely
+  await expect(page.getByTestId("tab-preview")).toHaveCount(0);
 
-  // hide the code pane → Preview active, Code not, editor gone
-  await codeTab.click();
+  // boot: code hidden (canvas-first) → Code not active, editor absent
   await expect(editor).toHaveCount(0);
-  await expect(previewTab).toHaveClass(/active/);
   await expect(codeTab).not.toHaveClass(/active/);
 
-  // clicking Preview while already preview-only is a no-op
-  await previewTab.click();
-  await expect(editor).toHaveCount(0);
-
-  // bring the code pane back
+  // show the code pane → Code active, editor present
   await codeTab.click();
   await expect(editor).toHaveCount(1);
   await expect(codeTab).toHaveClass(/active/);
+
+  // hide it again → editor gone, Code not active (toggles both ways)
+  await codeTab.click();
+  await expect(editor).toHaveCount(0);
+  await expect(codeTab).not.toHaveClass(/active/);
+});
+
+/**
+ * TC-CR2-02 (canvas-studio CR-STUDIO-002, `FR-CR2-02`) — first load is
+ * canvas-first: <main> carries `code-hidden`, the `.pane.editor` is absent and
+ * the canvas spans the full width, before any interaction.
+ */
+test("TC-CR2-02: first load is canvas-first (code hidden)", async ({ page }) => {
+  await expect(page.locator("main.code-hidden")).toHaveCount(1);
+  await expect(page.locator(".pane.editor")).toHaveCount(0);
+  await expect(page.getByTestId("tab-code")).not.toHaveClass(/active/);
 });
 
 /**
@@ -77,7 +90,9 @@ test("TC-CR3-01: the code pane docks to the right of the canvas", async ({ page 
   const view = page.locator(".pane.view");
   const editor = page.locator(".pane.editor");
 
-  // boot: both panes present (code shown by default — CR-002 not in scope here)
+  // canvas-first on boot (CR-002); reveal the code pane to inspect docking
+  await expect(editor).toHaveCount(0);
+  await page.getByTestId("tab-code").click();
   await expect(view).toHaveCount(1);
   await expect(editor).toHaveCount(1);
 

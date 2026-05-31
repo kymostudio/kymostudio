@@ -22,11 +22,18 @@ async function freshBoard(page: Page): Promise<void> {
   await page.waitForSelector('[data-shape-type="kymo-node"]'); // board mounted + fitted
 }
 
+/** CR-002: the code pane is hidden on first load — reveal it to read the `.kymo` source. */
+async function showCode(page: Page): Promise<void> {
+  await page.getByTestId("tab-code").click();
+  await page.locator("textarea#editor").waitFor();
+}
+
 test.beforeEach(async ({ page }) => {
   await freshBoard(page);
 });
 
 test("TC-J-05: draw creates a persisted freedraw stroke that never enters .kymo", async ({ page }) => {
+  await showCode(page);
   const editor = page.locator("textarea#editor");
   const kymoBefore = await editor.inputValue();
   expect(await page.locator('[data-shape-type="freedraw"]').count()).toBe(0);
@@ -51,6 +58,7 @@ test("TC-J-05: draw creates a persisted freedraw stroke that never enters .kymo"
   await page.reload();
   await page.waitForSelector('[data-shape-type="kymo-node"]');
   await expect(page.locator('[data-shape-type="freedraw"]')).toHaveCount(1);
+  await showCode(page);
   expect(await page.locator("textarea#editor").inputValue()).toBe(kymoBefore);
 });
 

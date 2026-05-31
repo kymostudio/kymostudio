@@ -1,9 +1,9 @@
 ---
 title: "Canvas Studio CR-002 — Design"
 document_id: DESIGN-STUDIO-002
-version: "0.2"
+version: "0.3"
 issue_date: 2026-05-27
-status: Open
+status: Closed
 classification: Internal
 owner: diagrams/ project
 audience: Engineer implementing the CR-002 chrome change (`website/app/`)
@@ -33,8 +33,8 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `DESIGN-STUDIO-002` |
-| Version           | 0.2 |
-| Status            | **Open** |
+| Version           | 0.3 |
+| Status            | **Closed** |
 | Owner             | `diagrams/` project |
 | Audience          | Engineer implementing the chrome change (`website/app/`) |
 | Related Documents | `FEAT-STUDIO-002` (requirements), `TEST-STUDIO-002` (V&V), `PLAN-STUDIO-002` (phases), `DESIGN-STUDIO-001` (the baselined design this amends — §1/§3/§8/§11) |
@@ -101,3 +101,4 @@ render-guard stays green (`NFR-CR2-02`). Deploy is unchanged: rebuild and commit
 |---------|------------|--------|---------|
 | 0.1     | 2026-05-27 | Vũ Anh | Initial design for CR-002: §2 single `Code` toggle (remove `tab-preview`, drop `Play` import) — `FR-CR2-01`; §3 default code-hidden (`App.tsx:36`) — `FR-CR2-02`; §4 code pane right (DOM reorder + grid swap + border flip) — `FR-CR2-03`; golden-safety (§6) and risks `RK-CR2-01..03` + open question `RK-CR2-Q1`. Maps onto baselined `DESIGN-STUDIO-001 §1/§3/§8/§11`. |
 | 0.2     | 2026-05-29 | Vũ Anh | Removed §4 (code pane on the right) — moved to `DESIGN-STUDIO-003 §2` (`CR-STUDIO-003`); renumbered §5→§4, §6→§5, §7→§6. Trimmed the as-built table to default-pane / code-hidden-collapse / tabs (DOM-order/grid/border rows moved to CR-003). `RK-CR2-02` no longer mentions pane reorder. Now maps onto `DESIGN-STUDIO-001 §3/§8/§11` only (§1 layout = CR-003). |
+| 0.3     | 2026-05-31 | Vũ Anh | **Closed** (status Open → Closed). Design realised as specified — `ui/TopBar.tsx` removed the `tab-preview` button + `Play` import (§2); `App.tsx:36` `useState(false)` (§3); `RK-CR2-Q1` resolved (kept the `Code` label + icon). Parent `DESIGN-STUDIO-001 §3/§8/§11` re-baselined (v0.7). |

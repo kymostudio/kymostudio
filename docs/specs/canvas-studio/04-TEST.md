@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Verification & Validation
 document_id: TEST-STUDIO-001
-version: "0.5"
+version: "0.6"
 issue_date: 2026-05-24
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | TEST-STUDIO-001                                                  |
-| Version           | 0.5                                                            |
+| Version           | 0.6                                                            |
 | Status            | Draft                                                          |
 | Owner             | `diagrams/` project                                           |
 | Related Documents | `FEAT-STUDIO-001` (requirements), `DESIGN-STUDIO-001` (design), `TEST-JAM-001` (the engine/freeform V&V this builds on), `TEST-CANVAS-001` (the editor V&V — must stay green) |
@@ -60,7 +60,8 @@ green). New surface to cover:
 5. **Selection** — handles + size badge appear and track a drag.
 6. **Status bar** — counts, zoom/Fit, autosave reflect engine state.
 7. **Chrome de-dup** — one owner per control: no floating toolbar; sample + background in the top
-   bar; a single Export; truthful `Code`/`Preview` tabs.
+   bar; a single Export; a single `Code` toggle (no `Preview` tab, code hidden on first load —
+   `CR-STUDIO-002`).
 
 > **E2E conventions (from project memory).** Drive with **trusted events** (Playwright), **wait for
 > the tool button to show `active`** before driving the canvas, and use `elementsFromPoint` for
@@ -71,12 +72,12 @@ green). New surface to cover:
 | TC | Requirement | Ring | Assertion |
 |----|-------------|------|-----------|
 | **TC-CS-01** | FR-CS-01 | unit/E2E | With `[data-theme="dark"]` then `"light"`, the ported token custom-properties resolve to the expected values on `:root`; key chrome surfaces (`--bg`, `--accent`, `--tok-*`) are non-empty in both; toggling theme flips them. |
-| **TC-CS-02** | FR-CS-02 | E2E | The top bar renders. **Undo/redo:** drag a `kymo-node` → Undo restores its origin **and** the `.kymo` text round-trips (re-uses `TC-18`/`TC-J-02` behaviour); Redo re-applies. **Theme** toggle flips `[data-theme]`. **Export** downloads a board `<svg>`; **Share** writes a `?script=` link. The **Code** tab hides/shows the `.kymo` pane (`Preview` stays). The bar is **client-only** — it has **no** breadcrumb/star/Comments/Versions/presence chrome. |
+| **TC-CS-02** | FR-CS-02 | E2E | The top bar renders. **Undo/redo:** drag a `kymo-node` → Undo restores its origin **and** the `.kymo` text round-trips (re-uses `TC-18`/`TC-J-02` behaviour); Redo re-applies. **Theme** toggle flips `[data-theme]`. **Export** downloads a board `<svg>`; **Share** writes a `?script=` link. The **Code** toggle hides/shows the `.kymo` pane (single control — no `Preview` tab, `CR-STUDIO-002`/`TC-CR2-01`; default code-hidden, `TC-CR2-02`). The bar is **client-only** — it has **no** breadcrumb/star/Comments/Versions/presence chrome. |
 | **TC-CS-03** | FR-CS-03 | E2E | Clicking an enabled rail tool sets it active **and** the canvas enters that tool (draw → pointer-drag makes a `freedraw`; `hand` → grab cursor, drag pans); its keyboard shortcut (V/H/P/S/T) selects the same tool; a shortcut typed **inside** the `.kymo` `<textarea>` does **not** switch tools; a disabled placeholder tool does not activate on click. |
 | **TC-CS-04** | FR-CS-04 | E2E/visual | For the AIQ sample: a `kymo-node` renders the real cloud-icon glyph + name; a `kymo-region` matches `renderSVG` — inner (`dash:"dashed"`) is purple `#7c3aed` dashed + purple label, outer is slate `#cbd5e1` solid; a `kymo-edge` is `#94a3b8` with a running flow-dash (`getComputedStyle(line).animationName === "kymo-edge-flow"`, `stroke-dasharray="6 4"`). chrome-MCP screenshot visually matches `renderSVG`. |
 | **TC-CS-05** | FR-CS-05 | E2E | Selecting a `kymo-node` shows the **`selection-size`** badge (text `/^\d+ × \d+$/`) + **four `selection-handle`** corner squares; dragging the node keeps the badge tracking it (boundingBox shifts with the drag); clicking empty canvas clears it. (`e2e/selection.spec.ts`, 3 cases.) |
 | **TC-CS-06** | FR-CS-06 | E2E | `status-counts` shows non-zero `N nodes · M edges` (AIQ = 19/20); reading `status-zoom`, `status-zoom-in` raises the `%` and `status-zoom-fit` re-zooms; (chrome-anhv) wheel/buttons update the `%` with **0 shape re-renders**, and the autosave chip flips `Saving…`→`Saved` on edit. (`e2e/status.spec.ts`, 2 cases.) |
-| **TC-CS-07** | FR-CS-07 | E2E | No floating `.toolbar` exists in the DOM; the top bar holds `topbar-sample` and a 3-mode background control — `topbar-bg-light`/`-dark` flip `[data-theme]`, `topbar-bg-transparent` flips the canvas bg **without** changing `[data-theme]`; **exactly one** Export control exists (the old floating `#download` is gone); `tab-code` toggles the `.kymo` pane and `tab-preview`'s `active` is the inverse of the code pane being shown. (`e2e/chrome.spec.ts`, 4 cases.) |
+| **TC-CS-07** | FR-CS-07 | E2E | No floating `.toolbar` exists in the DOM; the top bar holds `topbar-sample` and a 3-mode background control — `topbar-bg-light`/`-dark` flip `[data-theme]`, `topbar-bg-transparent` flips the canvas bg **without** changing `[data-theme]`; **exactly one** Export control exists (the old floating `#download` is gone); a single `tab-code` toggles the `.kymo` pane both ways (its `active` ⇔ pane shown) with **no** `tab-preview` in the DOM, and first load is canvas-first (code hidden) — `CR-STUDIO-002`/`TC-CR2-01`/`TC-CR2-02`. (`e2e/chrome.spec.ts`.) |
 
 ## 3. Regression gates (must stay green)
 
@@ -126,3 +127,4 @@ Every requirement → ≥ 1 covering test (the `FEAT-STUDIO-001` invariant).
 | 0.3     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `04-TEST.md` → `05-TEST.md` so the `NN-` prefix follows the reading order (`01-INTRO` first); content unchanged. See `INTRO-STUDIO-001` §2. |
 | 0.4     | 2026-05-25 | Vũ Anh | **TC-CS-07 now backed by a real test (`CR-STUDIO-001`).** `e2e/chrome.spec.ts` (4 cases) exists and passes — the 0.2 "P7 build" entry is now factual (previously design-ahead, the file did not exist). Full suite **21/21** green. No test scope change. |
 | 0.5     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout.** Renamed `05-TEST.md` → `04-TEST.md`; the §5 traceability matrix is retained as the RTM (ISO/IEC/IEEE 29148 / 15289, right-sized as a section). No test scope change. See `INTRO-STUDIO-001` Annex A 0.4. |
+| 0.6     | 2026-05-31 | Vũ Anh | **`CR-STUDIO-002` re-baseline — editor-chrome simplification.** `TC-CS-02` Code-tab assertion → single `Code` toggle (no `Preview`; default code-hidden), citing `TC-CR2-01`/`TC-CR2-02`. `TC-CS-07` updated: a single `tab-code` toggles both ways with **no** `tab-preview` in the DOM and first load is canvas-first (dropped the `tab-preview`-inverse assertion + the stale "4 cases" count). §1 strategy bullet 7 reworded. Full suite **23/23** green; `js` goldens byte-identical. |
