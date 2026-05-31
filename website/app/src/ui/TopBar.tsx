@@ -7,11 +7,12 @@
  * retired floating toolbar, and the old standalone theme toggle is *subsumed*
  * by that control (light/dark re-theme chrome+canvas via the single `theme`
  * var; transparent flips only the canvas bg). Export has one entry point, and
- * the Code/Preview tabs reflect true panel state (Preview active ⇔ code pane
- * hidden). Presentational; classes are token-driven (index.html) → themes via
- * [data-theme].
+ * a single `Code` toggle shows/hides the .kymo source pane (CR-STUDIO-002:
+ * the redundant `Preview` tab was removed — the canvas is always present
+ * behind the pane). Presentational; classes are token-driven (index.html) →
+ * themes via [data-theme].
  */
-import { Undo, Redo, Sun, Moon, Checker, Download, Share, Code, Play, ChevronDown } from "./icons";
+import { Undo, Redo, Sun, Moon, Checker, Download, Share, Code, ChevronDown } from "./icons";
 
 type Bg = "light" | "dark" | "transparent";
 
@@ -91,16 +92,6 @@ export function TopBar({
           title="Toggle code panel (⌘/)"
         >
           <Code size={12} /> Code
-        </button>
-        <button
-          data-testid="tab-preview"
-          className={!showCode ? "active" : ""}
-          onClick={() => {
-            if (showCode) onToggleCode();
-          }}
-          title="Canvas preview"
-        >
-          <Play size={12} /> Preview
         </button>
       </div>
 

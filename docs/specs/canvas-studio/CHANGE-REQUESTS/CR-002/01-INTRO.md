@@ -3,7 +3,7 @@ title: "Canvas Studio CR-002 — Editor-Chrome Simplification: Overview & Change
 document_id: INTRO-STUDIO-002
 version: "0.2"
 issue_date: 2026-05-27
-status: Open
+status: Closed
 classification: Internal
 owner: diagrams/ project
 audience: canvas-studio maintainers / reviewers; the approver of the baseline; the engineer closing CR-002
@@ -38,8 +38,8 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `INTRO-STUDIO-002` |
-| Version           | 0.2 |
-| Status            | **Open** — raised, awaiting assessment / approval |
+| Version           | 0.3 |
+| Status            | **Closed** — implemented + re-baselined (2026-05-31) |
 | Classification    | Internal |
 | Owner             | `diagrams/` project |
 | Severity          | **Low–Medium** — UX-polish / deliberate design change (no integrity defect) |
@@ -116,15 +116,16 @@ parent `FR-CS`/`TC-CS` clauses they amend (see `FEAT-STUDIO-002 §5`).
 
 ## 5. Status & change record
 
-**Status: Open** · Severity **Low–Medium** · Type **Enhancement**. Doc-only at this stage: no
-`website/app/` code, no bundle rebuild, parent `STUDIO-001` baseline intact. On approval, the code +
-parent re-baseline land under `PLAN-STUDIO-002`, after which this status flips **Open → Closed** and the
-`CHANGE-REQUESTS/README.md` register row follows.
+**Status: Closed** · Severity **Low–Medium** · Type **Enhancement**. Implemented and re-baselined: the
+single `Code` toggle (no `Preview` tab) + canvas-first default shipped in `website/app/`, the bundle was
+rebuilt, the parent `STUDIO-001` clauses named in §3 were reconciled, and the `CHANGE-REQUESTS/README.md`
+register row flipped to **Closed**.
 
 | Date | Actor | Decision |
 |------|-------|----------|
 | 2026-05-27 | Vũ Anh | **Raised.** Awaiting assessment / approval. Mini-spec authored (`02`–`05`). |
 | 2026-05-29 | Vũ Anh | **Scope narrowed.** Code-pane-on-the-right (`FR-CR2-03`) carved out into `CR-STUDIO-003`. CR-002 now covers only the single `Code` toggle (drop `Preview`) + default code-hidden. Still **Open**, awaiting approval. |
+| 2026-05-31 | Vũ Anh | **Closed — implemented + re-baselined.** P1 (`ui/TopBar.tsx` drops the `tab-preview` button + `Play` import; `App.tsx` `showCode` default `false`; bundle rebuilt 413.3 kb) → P2 (`TC-CR2-01`/`TC-CR2-02` in `e2e/chrome.spec.ts`; full suite **23/23**; `js` goldens byte-identical; three canvas-jam specs that read `textarea#editor` reveal the now-hidden pane first) → P3 (re-baselined `FEAT-STUDIO-001` 0.7, `DESIGN-STUDIO-001` 0.7, `TEST-STUDIO-001` 0.6, `PLAN-STUDIO-001` 0.7; register row Closed). |
 
 ---
 
@@ -134,3 +135,4 @@ parent re-baseline land under `PLAN-STUDIO-002`, after which this status flips *
 |---------|------------|--------|---------|
 | 0.1     | 2026-05-27 | Vũ Anh | Raised. Restructured CR-STUDIO-002 into a self-contained `CR-002/` mini-spec (`01-INTRO`/`02-REQUIREMENT`/`03-DESIGN`/`04-TEST`/`05-PLAN`, `STUDIO-002` series); this `01-INTRO` carries the change record. Proposes: single `Code` toggle (drop `Preview`), default code-hidden (canvas-first), code pane on the right. Names superseded parent clauses (`FR-CS-02`/`FR-CS-07`/§5 #6; `DESIGN §1/§3/§8/§11`; `TC-CS-02`/`TC-CS-07`; `PLAN §4 P2/P7`); cites verified as-built `file:line` evidence. No code / no parent edits yet. |
 | 0.2     | 2026-05-29 | Vũ Anh | **Scope narrowed:** code-pane-on-the-right (`FR-CR2-03`, `DESIGN §4`, `TC-CR2-03`) carved out into `CR-STUDIO-003`. Removed it from §1 motivation, §1 as-built table, intended outcome and the §3 supersession table (CR-002 no longer supersedes `DESIGN §1`; §8 here = `showCode` default only). CR-002 now scopes to: single `Code` toggle (drop `Preview`) + default code-hidden. Change-record row added. |
+| 0.3     | 2026-05-31 | Vũ Anh | **Closed.** Control-table + frontmatter status **Open → Closed**; §5 status sentence rewritten to past-tense (implemented + re-baselined) and a 2026-05-31 decision-log row added. Mirrors the close-out recorded in `PLAN-STUDIO-002` Annex B and the parent re-baseline (`FEAT`/`DESIGN`/`TEST`/`PLAN-STUDIO-001`). |

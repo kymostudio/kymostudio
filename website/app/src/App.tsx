@@ -33,7 +33,7 @@ export function App() {
   const [transparent, setTransparent] = useState(false);
   const [sampleKey, setSampleKey] = useState(DEFAULT_SAMPLE);
   const [tool, setTool] = useState<Tool>("select");
-  const [showCode, setShowCode] = useState(true); // FR-CS-02: Code tab toggles the .kymo pane
+  const [showCode, setShowCode] = useState(false); // FR-CR2-02: canvas-first — code hidden on first load; the Code toggle (FR-CR2-01) reveals the .kymo pane
   const [title, setTitle] = useState("Untitled diagram"); // FR-CS-02: local breadcrumb title
   const [svg, setSvg] = useState("");
   const [diagram, setDiagram] = useState<Diagram | null>(null);

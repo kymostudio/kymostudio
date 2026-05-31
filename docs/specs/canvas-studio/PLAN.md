@@ -1,7 +1,7 @@
 ---
 title: Canvas Studio — Implementation Plan
 document_id: PLAN-STUDIO-001
-version: "0.6"
+version: "0.7"
 issue_date: 2026-05-25
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | PLAN-STUDIO-001                                                  |
-| Version           | 0.6                                                             |
+| Version           | 0.7                                                             |
 | Status            | Draft                                                           |
 | Owner             | `diagrams/` project                                            |
 | Related Documents | `FEAT-STUDIO-001` (requirements), `DESIGN-STUDIO-001` (design), `TEST-STUDIO-001` (V&V), `PLAN-JAM-001` (the capability layer this builds on — **entry gate, complete**) |
@@ -108,7 +108,7 @@ capability layer (`PLAN-JAM-001`) is complete — so P1 can start now.
 | **4 — canvas-items: styling** | `kymo-node`/`kymo-region`/`kymo-edge` visual parity (tile stripe+glyph, dashed container, flow-dash) + `toSvg` lockstep (DESIGN §5). |
 | **5 — canvas-items: selection** | Selection rect + corner handles + size badge in the canvas layer; comment-pin marker (DESIGN §6). |
 | **6 — canvas-status-bar** | Counts · autosave · zoom `−/%/+` · Fit, wired to engine camera/persist (DESIGN §7). |
-| **7 — chrome de-dup** | One owner per control: remove the floating toolbar; relocate the sample picker + a 3-mode (light/dark/transparent) canvas-background control to the top bar; single Export; truthful `Code`/`Preview` tabs (DESIGN §11, `FR-CS-07`, `TC-CS-07`). |
+| **7 — chrome de-dup** | One owner per control: remove the floating toolbar; relocate the sample picker + a 3-mode (light/dark/transparent) canvas-background control to the top bar; single Export; a single `Code` toggle (DESIGN §11, `FR-CS-07`, `TC-CS-07`). *(`CR-STUDIO-002`: the `Preview` tab was later removed and code defaulted hidden — canvas-first.)* |
 
 ## 5. Project plan
 
@@ -192,7 +192,8 @@ Detailed cases + traceability in `TEST-STUDIO-001`. At the plan level:
 - **Phase 5:** `TC-CS-05` — selection handles + size badge track a drag.
 - **Phase 6:** `TC-CS-06` — counts/zoom/Fit/autosave correct.
 - **Phase 7:** `TC-CS-07` — no floating toolbar; sample + 3-mode background in the top bar; single
-  Export; truthful `Code`/`Preview` tabs. **Goldens byte-identical** (pure relocation).
+  Export; a single `Code` toggle (no `Preview` tab, code hidden on first load — `CR-STUDIO-002`).
+  **Goldens byte-identical** (pure relocation).
 - **Regression throughout:** `TEST-CANVAS-001` + `TEST-JAM-001` + render-guard green; `cd
   packages/js && npm test` and `cd packages/python && uv run --group dev python -m pytest -q` stay
   green (goldens unchanged).
@@ -217,6 +218,7 @@ yet — see [`CHANGE-REQUESTS/README.md`](CHANGE-REQUESTS/README.md).
 | 0.4     | 2026-05-25 | Vũ Anh | **Renumber for reading order.** Renamed `PLAN.md` → `06-PLAN.md` and `CR/` → `07-CR/`, extending the folder's `NN-` numbering to the living-plan layer; updated the §9 change-request links. `PLAN-STUDIO-001` unchanged. See `INTRO-STUDIO-001` §2. |
 | 0.5     | 2026-05-25 | Vũ Anh | **P7 implemented + worklog reconciled (`CR-STUDIO-001`, Path A).** P7 chrome de-dup built & verified (21/21 e2e; `js`/`python` goldens byte-identical) → worklog P7 🚧→✅; removed the stray mid-table "Programme complete" paragraph and relocated a corrected **P1–P7** summary below the phases; de-duplicated the P6 lead; §5 sequencing note updated; resolved Annex B open questions (title cosmetic · undo/redo always-enabled · left-rail-only · comment-pin deferred). |
 | 0.6     | 2026-05-28 | Vũ Anh | **Restructure to repo-norm layout.** Renamed `06-PLAN.md` → un-numbered `PLAN.md` (matches the repo's leaf model); `CHANGE-REQUESTS/` links unchanged; `PLAN-STUDIO-001` content unchanged. See `INTRO-STUDIO-001` Annex A 0.4. |
+| 0.7     | 2026-05-31 | Vũ Anh | **`CR-STUDIO-002` re-baseline note.** §4 P7 phase row + §8 P7 verification: "truthful `Code`/`Preview` tabs" → a single `Code` toggle (no `Preview` tab, code hidden on first load — canvas-first). The append-only Annex C worklog (Phase 2 / Phase 7) is unchanged as historical record. |
 
 ## Annex B — Open questions / pending decisions
 

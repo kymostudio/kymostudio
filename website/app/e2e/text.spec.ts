@@ -35,11 +35,18 @@ async function placeText(page: Page, fx = 0.4, fy = 0.5) {
   return page.getByTestId("inline-editor"); // auto-waits for the auto-focused editor
 }
 
+/** CR-002: the code pane is hidden on first load — reveal it to read the `.kymo` source. */
+async function showCode(page: Page): Promise<void> {
+  await page.getByTestId("tab-code").click();
+  await page.locator("textarea#editor").waitFor();
+}
+
 test.beforeEach(async ({ page }) => {
   await freshBoard(page);
 });
 
 test("TC-J-07: text tool places an editable text shape that persists and never enters .kymo", async ({ page }) => {
+  await showCode(page);
   const editor = page.locator("textarea#editor");
   const kymoBefore = await editor.inputValue();
   expect(await page.locator('[data-shape-type="text"]').count()).toBe(0);
@@ -60,6 +67,7 @@ test("TC-J-07: text tool places an editable text shape that persists and never e
   await page.waitForSelector('[data-shape-type="kymo-node"]');
   await expect(page.locator('[data-shape-type="text"]')).toHaveCount(1);
   expect(await page.locator('[data-shape-type="text"]').innerText()).toContain("Hello text ✦");
+  await showCode(page);
   expect(await page.locator("textarea#editor").inputValue()).toBe(kymoBefore);
 });
 

@@ -1,9 +1,9 @@
 ---
 title: "Canvas Studio CR-002 — Verification & Validation"
 document_id: TEST-STUDIO-002
-version: "0.2"
+version: "0.3"
 issue_date: 2026-05-27
-status: Open
+status: Closed
 classification: Internal
 owner: diagrams/ project
 audience: Engineer verifying the CR-002 chrome change; reviewers
@@ -33,8 +33,8 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `TEST-STUDIO-002` |
-| Version           | 0.2 |
-| Status            | **Open** |
+| Version           | 0.3 |
+| Status            | **Closed** |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-STUDIO-002` (requirements), `DESIGN-STUDIO-002` (design), `TEST-STUDIO-001` (the baselined V&V this amends — `TC-CS-02`/`TC-CS-07`) |
 
@@ -95,3 +95,4 @@ and the `selection`/`render-guard` specs are regression gates that must stay gre
 |---------|------------|--------|---------|
 | 0.1     | 2026-05-27 | Vũ Anh | Initial V&V for CR-002: `TC-CR2-01..03` (single `Code` toggle / no `tab-preview`; first-load code-hidden; code pane right) in `e2e/chrome.spec.ts`; regression gates (goldens byte-identical, render-guard, remaining `TC-CS-07` cases); NFR methods; traceability matrix mapping `FR-CR2-*`→`TC-CR2-*` and noting the parent `TC-CS-02`/`TC-CS-07` updates at close-out. |
 | 0.2     | 2026-05-29 | Vũ Anh | Removed `TC-CR2-03` (code docks right) — moved to `TEST-STUDIO-003 TC-CR3-01` (`CR-STUDIO-003`); dropped its traceability row; §1 strategy no longer adds a code-on-right assertion; close-out note drops `code-right`. CR-002 V&V = `TC-CR2-01`/`TC-CR2-02`. |
+| 0.3     | 2026-05-31 | Vũ Anh | **Closed** (status Open → Closed). `TC-CR2-01`/`TC-CR2-02` landed in `e2e/chrome.spec.ts` and pass; the old `TC-CS-07` Code/Preview case was rewritten to assert no `tab-preview` + canvas-first boot, `TC-CR3-01` updated to reveal the now-hidden pane, and three canvas-jam specs (`draw`/`sticky`/`text`) reveal it before reading `textarea#editor`. Full suite **23/23**; `js` goldens byte-identical. Parent `TC-CS-02`/`TC-CS-07` re-baselined (`TEST-STUDIO-001` v0.6). |

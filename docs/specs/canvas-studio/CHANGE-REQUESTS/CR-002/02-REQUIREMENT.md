@@ -1,9 +1,9 @@
 ---
 title: "Canvas Studio CR-002 — Requirements (SRS delta)"
 document_id: FEAT-STUDIO-002
-version: "0.2"
+version: "0.3"
 issue_date: 2026-05-27
-status: Open
+status: Closed
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing the chrome change (`website/app/`); reviewers
@@ -35,8 +35,8 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-STUDIO-002` |
-| Version           | 0.2 |
-| Status            | **Open** |
+| Version           | 0.3 |
+| Status            | **Closed** |
 | Owner             | `diagrams/` project |
 | Related Documents | `INTRO-STUDIO-002` (change record), `DESIGN-STUDIO-002` (how), `TEST-STUDIO-002` (V&V), `FEAT-STUDIO-001` (the baselined SRS this amends), `PROD-STUDIO-001` (stakeholder needs) |
 
@@ -101,3 +101,4 @@ persistence backend, or change to the render core. CR-002 is chrome-simplificati
 |---------|------------|--------|---------|
 | 0.1     | 2026-05-27 | Vũ Anh | Initial delta SRS for CR-002: `FR-CR2-01` single `Code` toggle (drop `Preview`), `FR-CR2-02` default code-hidden, `FR-CR2-03` code pane on the right; `NFR-CR2-01/-02` (golden-safe / render-guard); scope + acceptance + supersession table mapping to parent `FR-CS-02`/`FR-CS-07` and `DESIGN §1/§3/§8/§11`. |
 | 0.2     | 2026-05-29 | Vũ Anh | Removed `FR-CR2-03` (code pane on the right) — carved into `CR-STUDIO-003` as `FR-CR3-01`. Dropped its acceptance criterion + supersession row; scope reduced to `TopBar.tsx`/`App.tsx` (no `index.html`); out-of-scope now names the code-pane side as `CR-STUDIO-003`. CR-002 = single `Code` toggle + default code-hidden. |
+| 0.3     | 2026-05-31 | Vũ Anh | **Closed** (status Open → Closed). No requirement scope change — `FR-CR2-01`/`FR-CR2-02` shipped and verified (`TC-CR2-01`/`TC-CR2-02`, 23/23 e2e; goldens byte-identical); parent `FEAT-STUDIO-001` clauses re-baselined (v0.7). |
