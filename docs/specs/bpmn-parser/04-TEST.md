@@ -74,7 +74,7 @@ the shared conformance corpus + goldens under `conformance/`, and the MIWG corpu
 |----|-------|----------|----------------|
 | **TC-1** | Node classification | FR-3 | Each element tag → expected `(shape, marker)`; `*EventDefinition` → marker; exclusive `X` only when `isMarkerVisible="true"` |
 | **TC-2** | Flow mapping | FR-4 | `sequence`/`message`/`association`; `default` from source `default=`; `conditional` from `<conditionExpression>` (source not a gateway) |
-| **TC-3** | DI geometry | FR-5 | `<dc:Bounds>` → centre `pos` + `size`; `<di:waypoint>`s → `Edge.points`; `<BPMNLabel>` → `label_pos` |
+| **TC-3** | DI geometry | FR-5 | `<dc:Bounds>` → centre `pos` + `size`; `<di:waypoint>`s → `Edge.points`; `<BPMNLabel>` → flow `label_pos` + node `label_box` |
 | **TC-4** | Coordinate normalisation | FR-6 | Geometry shifted so the top-left extent is `(MARGIN, MARGIN)`; canvas sized from shifted extents |
 | **TC-5** | Containers | FR-7 | Pools/lanes/groups/expanded subprocess → regions (`pool`/`lane`/`outer`/`inner`); collapsed subprocess → `bpmn-subprocess` component |
 | **TC-6** | Namespace-agnostic | FR-2 | The same model is produced whether tags use `bpmn:` / `bpmn2:` / default namespace |

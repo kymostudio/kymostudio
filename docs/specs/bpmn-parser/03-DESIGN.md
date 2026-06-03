@@ -100,7 +100,9 @@ has a `<conditionExpression>` and its source is not a gateway, else `sequence`.
 kymo stores a component's **centre** in `pos`; BPMN DI gives a **top-left**
 `<dc:Bounds>`. Conversion: `pos = (x + w/2, y + h/2)`, `size = (w, h)`. Edge polylines
 come verbatim from the ordered `<di:waypoint>`s; a flow's `<bpmndi:BPMNLabel>` `<dc:Bounds>`
-centre becomes `Edge.label_pos`. After collecting every coordinate, the importer computes
+centre becomes `Edge.label_pos`; a node's `<bpmndi:BPMNLabel>` `<dc:Bounds>` centre + size
+becomes `Component.label_box`, so its external label renders at the authored position and
+width rather than a default spot below the glyph. After collecting every coordinate, the importer computes
 `dx, dy = MARGIN − min_x, MARGIN − min_y` and shifts all components, regions, and edge
 points by `(dx, dy)` so the top-left extent sits at `(MARGIN, MARGIN)`; the canvas is the
 shifted content extent plus `MARGIN` on each side.
