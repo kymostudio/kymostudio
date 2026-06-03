@@ -1,7 +1,7 @@
 ---
 title: draw.io Interoperability — Design (umbrella)
 document_id: DESIGN-DRAWIO-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-03
 status: Draft
 classification: Internal
@@ -21,8 +21,8 @@ authors:
 language: en
 keywords:
   - drawio
-  - mxgraph
-  - jsdom
+  - zero-dependency
+  - node-builtins
   - design
   - architecture
   - umbrella
@@ -37,50 +37,58 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | DESIGN-DRAWIO-001                                  |
-| Version      | 0.1                                                |
+| Version      | 0.2                                                |
 | Status       | Draft                                              |
 | Issue Date   | 2026-06-03                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | INTRO-DRAWIO-001, FEAT-DRAWIO-001, TEST-DRAWIO-001, PLAN-DRAWIO-001, DESIGN-DRAWIO-SVG-001 |
 
 Realises FEAT-DRAWIO-001 (family FR/NFR). **Umbrella architecture** — the shared substrate and the
-module plug-in model; per-module detail (e.g. the engine-on-jsdom gotchas) lives in each module's
-`03-DESIGN` (`DESIGN-DRAWIO-SVG-001`). Covers ISO/IEC/IEEE 12207 Architecture & Design Definition.
+module plug-in model; per-module detail lives in each module's `03-DESIGN` (`DESIGN-DRAWIO-SVG-001`).
+Covers ISO/IEC/IEEE 12207 Architecture & Design Definition.
+
+> **Direction note (v0.2).** The target architecture is **dependency-free** (`SN-DRW-02`): a decode-only
+> substrate built on Node built-ins + per-module own emitters. The mxGraph-on-jsdom architecture
+> described in earlier revisions is now the `drawio-svg` **as-is gap**, documented (for the current
+> code) in `DESIGN-DRAWIO-SVG-001`, not the target.
 
 ## 1. Scope
 
-How the `drawio` family is structured: **one substrate** (wrapper decode + mxGraph-on-jsdom) consumed
-by independent **modules** (render / import / rasterise), all kept isolated from the published package.
+How the `drawio` family is structured: **one dependency-free decode substrate** (Node-built-in wrapper
+decode) consumed by independent **modules** (render / import / rasterise) that add their own transform
+(rendering modules bring their own SVG emitter), all using **Node built-ins only**.
 
 ## 2. Family architecture
 
 ```
               .drawio (mxfile)
                     │
-        ┌───────────▼───────────┐   shared substrate (established by drawio-svg)
-        │  wrapper decode        │   <mxfile>/<diagram> · plain | base64+raw-deflate · per page
-        │  + mxGraph-on-jsdom    │   engine boot (navigator/window/location shims) · mxCodec decode
+        ┌───────────▼───────────┐   shared substrate — DEPENDENCY-FREE (Node built-ins only)
+        │  wrapper decode        │   <mxfile>/<diagram> · plain | base64(Buffer)+raw-deflate(node:zlib)
+        │  (own XML scan)        │   · per page → [{ name, modelXml }]
         └───────────┬───────────┘
         ┌───────────┼───────────────────────────────┐
         ▼           ▼                                ▼
    drawio-svg   drawio-import (proposed)      drawio-raster (proposed)
    → SVG        → kymo Diagram/model          → PNG/WebP (rasterise SVG)
-   [delivered]  (reuse decode; map mxCell→     (consume drawio-svg output via
-                Component/Edge, à la from-bpmn) resvg/rsvg, à la to_webp.py)
+   own SVG      (reuse decode; map mxCell→     (consume drawio-svg output via
+   emitter      Component/Edge, à la from-bpmn) resvg/rsvg, à la to_webp.py)
 ```
 
 ## 3. The shared substrate (FR-DRW-2)
 
-Two reusable pieces, specified in detail in **DESIGN-DRAWIO-SVG-001**:
+**One reusable piece — a dependency-free wrapper decoder** (the rendering transform is per-module, not
+shared substrate):
 
 1. **Wrapper decode** — parse `<mxfile>`, enumerate `<diagram>` pages; a page body is plain
-   `<mxGraphModel>` XML or **base64 + raw-deflate (`pako`) + URI-decode**. Pure, dependency-light;
-   every module that reads `.drawio` reuses it (`parseDrawioPages`).
-2. **mxGraph-on-jsdom** — boot the npm `mxgraph` factory on a jsdom DOM; the four browser-compat
-   gotchas (navigator shim; classes-on-`window`; `location`/`getBBox` stubs; single `xmlns`) are
-   solved once in the module and documented in `DESIGN-DRAWIO-SVG-001` §3. Modules needing
-   geometry/rendering (svg, raster) consume the engine; a pure-data module (import) may need only the
-   decode + `mxCodec` model, not SVG export.
+   `<mxGraphModel>` XML or **base64 (`Buffer.from(b64,'base64')`) + raw-deflate (`node:zlib`
+   `inflateRawSync`) + URI-decode** — **no `pako`**. Pure, **zero-dependency** (Node built-ins only);
+   every module that reads `.drawio` reuses it (`parseDrawioPages`). A pure-data module (import) needs
+   only this decode + an own mxCell walk; rendering modules add their own SVG emitter.
+
+> The current `drawio-svg` code instead boots the npm `mxgraph` factory on a **jsdom** DOM and uses
+> `pako` for decode — the as-is gap against `SN-DRW-02`; its four browser-compat gotchas are recorded
+> in `DESIGN-DRAWIO-SVG-001` §3 for reference only.
 
 ## 4. Module plug-in model (FR-DRW-3)
 
@@ -92,17 +100,21 @@ umbrella tracks them in the `INTRO-DRAWIO-001` §3 registry.
 
 ## 5. Isolation & zero-dep (FR-DRW-4, NFR-DRW-1)
 
-Family-wide rule: interop deps (`mxgraph`/`jsdom`/`pako`, …) are **`devDependencies` of `packages/js`**;
-module sources live under `packages/js/src/<module>` and are **excluded** from the `tsc` build and
-eslint, and not published (`files: ["dist/"]`). Thus no module enters `kymostudio`'s **runtime**
-dependency tree. (As implemented for `drawio-svg` — `DESIGN-DRAWIO-SVG-001` §5.)
+Family-wide rule (target): interop modules take **no third-party npm dependency at all** — runtime or
+dev — for `.drawio` work; they use **Node built-ins only**. Module sources live under
+`packages/js/src/<module>`, are **excluded** from the `tsc` build and eslint, and are not published
+(`files: ["dist/"]`), so nothing enters `kymostudio`'s **runtime** tree either. **Gap:** the current
+`drawio-svg` code still declares `mxgraph`/`jsdom`/`pako` as `packages/js` `devDependencies`
+(`DESIGN-DRAWIO-SVG-001` §5) — to be removed in the zero-dependency redesign.
 
 ## 6. Prior art
 
-The substrate's distinction — running the **real mxGraph engine on jsdom, no browser/desktop** — and
-the engine/format background (archived `jgraph/mxgraph`, vendored engine, maxGraph successor) are in
-`REF-DRAWIO-001` and `DESIGN-DRAWIO-SVG-001` §7. The proposed `drawio-import` follows kymo's existing
-foreign-XML importer pattern (`BPMN-MAP-001` / `from-bpmn`).
+draw.io's own paths run mxGraph under the **desktop app** or a **headless browser**; the obvious Node
+shortcut (which the `drawio-svg` as-is code took) is mxGraph-on-jsdom. The family's target distinction
+is to skip the engine entirely and read/emit `.drawio` with **Node built-ins only**. The engine/format
+background (archived `jgraph/mxgraph`, vendored engine, maxGraph successor) is in `REF-DRAWIO-001` and
+`DESIGN-DRAWIO-SVG-001` §7. The proposed `drawio-import` follows kymo's existing foreign-XML importer
+pattern (`BPMN-MAP-001` / `from-bpmn`).
 
 ## Annex A — Revision History
 
@@ -111,6 +123,7 @@ foreign-XML importer pattern (`BPMN-MAP-001` / `from-bpmn`).
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-06-03 | Vũ Anh | Initial umbrella design: family architecture, the shared substrate (decode + mxGraph-on-jsdom), module plug-in model, isolation. |
+| 0.2     | 2026-06-03 | Vũ Anh | **Zero-dependency target.** Substrate is now decode-only and dependency-free (own XML scan; `Buffer` base64; `node:zlib` raw-inflate — no `pako`); rendering modules add an own SVG emitter (no mxGraph/jsdom). §5 isolation widened to forbid third-party dev deps; mxGraph-on-jsdom demoted to the documented as-is gap. |
 
 ## Annex B — Document Control
 

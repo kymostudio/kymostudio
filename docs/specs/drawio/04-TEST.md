@@ -1,7 +1,7 @@
 ---
 title: draw.io Interoperability — Test Documentation (umbrella)
 document_id: TEST-DRAWIO-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-03
 status: Draft
 classification: Internal
@@ -35,7 +35,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | TEST-DRAWIO-001                                    |
-| Version      | 0.1                                                |
+| Version      | 0.2                                                |
 | Status       | Draft                                              |
 | Issue Date   | 2026-06-03                                         |
 | Owner        | `diagrams/` project                                |
@@ -51,7 +51,12 @@ suites up to the family requirements.
 - **Module suites (primary)** — each module ships its own unit/integration cases (e.g.
   `TEST-DRAWIO-SVG-001`). The umbrella does **not** duplicate them.
 - **Family invariants (here)** — cross-module checks asserted on **every** delivered module: pure-Node
-  execution, the zero-runtime-dep guarantee, additivity to existing kymo paths, and substrate reuse.
+  execution, the **zero-dependency** guarantee (no third-party npm dep, runtime *or* dev), additivity
+  to existing kymo paths, and decode-substrate reuse.
+
+> **Note (v0.2).** The `drawio-svg` *current code* fails `TC-DRW-3` under the new dependency rule (it
+> still uses `mxgraph`/`jsdom`/`pako` dev deps). Its module evidence below is the **as-is** mapping; the
+> zero-dependency redesign must make `TC-DRW-3` pass with Node built-ins only.
 
 ## 2. Test items, environment, tooling
 
@@ -64,8 +69,8 @@ to the family cases below.
 | ID | Title | Verifies | Pass criterion |
 |----|-------|----------|----------------|
 | **TC-DRW-1** | Pure-Node interop | FR-DRW-1, NFR-DRW-2 | Each delivered module runs `.drawio` interop headless (no desktop binary, no browser) |
-| **TC-DRW-2** | Substrate reuse | FR-DRW-2 | Each module that reads `.drawio` uses the shared wrapper decode / mxGraph-on-jsdom (no re-implementation); multi-page + compressed inputs handled |
-| **TC-DRW-3** | Zero-runtime-dep | FR-DRW-4, NFR-DRW-1 | After installing any module's deps, `kymostudio` (`packages/js`) runtime `dependencies` stays **empty**; deps are dev-only; module sources excluded from build + not published |
+| **TC-DRW-2** | Decode-substrate reuse | FR-DRW-2 | Each module that reads `.drawio` uses the shared **dependency-free** wrapper decoder (Node built-ins; no re-implementation); multi-page + compressed (base64 + `node:zlib` raw-inflate) inputs handled |
+| **TC-DRW-3** | Zero-dependency (end-to-end) | FR-DRW-4, NFR-DRW-1 | The module adds **no third-party npm dependency** (runtime *or* dev) for interop — only Node built-ins; `kymostudio` (`packages/js`) runtime `dependencies` stays **empty**; module sources excluded from build + not published |
 | **TC-DRW-4** | Additivity | NFR-DRW-3 | Existing kymo render/import paths stay byte-identical (golden-SVG + BPMN-corpus baselines unchanged) when a module is added |
 | **TC-DRW-5** | Determinism | NFR-DRW-4 | Each module yields deterministic output for a given input + options |
 
@@ -83,8 +88,8 @@ drift on existing paths, is a **failure**.
 | FR-DRW-1 | TC-DRW-1 | TC-DS-9 |
 | FR-DRW-2 | TC-DRW-2 | TC-DS-1, TC-DS-2, TC-DS-3 |
 | FR-DRW-3 | (module delivery) | the `drawio-svg` doc-set |
-| FR-DRW-4 | TC-DRW-3 | TC-DS-6 |
-| NFR-DRW-1 | TC-DRW-3 | TC-DS-6 |
+| FR-DRW-4 | TC-DRW-3 | TC-DS-6 *(as-is: passes for runtime-only; **fails** the dev-dep rule — redesign open)* |
+| NFR-DRW-1 | TC-DRW-3 | TC-DS-6 *(as above)* |
 | NFR-DRW-2 | TC-DRW-1 | TC-DS-9 |
 | NFR-DRW-3 | TC-DRW-4 | TC-DS-6 (golden-safety scope) |
 | NFR-DRW-4 | TC-DRW-5 | TC-DS-8 |
@@ -96,6 +101,7 @@ drift on existing paths, is a **failure**.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-06-03 | Vũ Anh | Initial umbrella test doc: family invariants `TC-DRW-1..5` + traceability rolling up the `drawio-svg` module suite. |
+| 0.2     | 2026-06-03 | Vũ Anh | Aligned to the zero-dependency target: `TC-DRW-2` reuse is the dependency-free decoder; `TC-DRW-3` widened to forbid third-party **dev** deps (Node built-ins only). Flagged `drawio-svg` as-is code as failing `TC-DRW-3` pending redesign. |
 
 ## Annex B — Document Control
 

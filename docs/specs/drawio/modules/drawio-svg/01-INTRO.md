@@ -1,9 +1,9 @@
 ---
 title: drawio → SVG — Introduction
 document_id: INTRO-DRAWIO-SVG-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-06-03
-status: Baselined
+status: Under revision
 classification: Internal
 owner: diagrams/ project
 audience: Engineers and reviewers of the drawio2svg utility and the kymo JS package
@@ -23,8 +23,8 @@ authors:
 language: en
 keywords:
   - drawio
-  - mxgraph
-  - jsdom
+  - zero-dependency
+  - node-builtins
   - svg
   - pure-node
   - introduction
@@ -39,8 +39,8 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | INTRO-DRAWIO-SVG-001                                        |
-| Version      | 1.1                                                         |
-| Status       | Baselined                                                  |
+| Version      | 1.2                                                         |
+| Status       | Under revision                                             |
 | Issue Date   | 2026-06-03                                                 |
 | Owner        | `diagrams/` project                                         |
 | Related      | PROD-DRAWIO-SVG-001, FEAT-DRAWIO-SVG-001, DESIGN-DRAWIO-SVG-001, TEST-DRAWIO-SVG-001, PLAN-DRAWIO-SVG-001, REF-DRAWIO-001 |
@@ -53,38 +53,49 @@ states the problem, the concept, and the terminology, and maps the reader to the
 test documentation (TEST-DRAWIO-SVG-001), and the plan (PLAN-DRAWIO-SVG-001). The set conforms to
 ISO/IEC/IEEE 12207:2017 and ISO/IEC/IEEE 15289:2019.
 
-The feature is **already implemented** (the `drawio2svg` tool, `packages/js/src/drawio2svg/`); this
-set is an **as-built baseline**. Later changes are raised as change-requests (`CR/`) — see §6 and
-PLAN-DRAWIO-SVG-001 §7.
+> **Direction note (v1.2).** The goal is now **converting `.drawio` → SVG with zero npm dependencies**
+> (own decoder via Node built-ins + own SVG emitter), per the family target (`SN-DRW-02`). The shipped
+> `drawio2svg` code (`packages/js/src/drawio2svg/`) still uses **mxGraph + jsdom + pako** — that is the
+> **as-is gap**, retained as a reference pending the zero-dependency rewrite (`CR-DRAWIO-SVG-003`). The
+> mxGraph-on-jsdom material below describes the *current code* (the gap), not the target.
+
+The original feature is **already implemented** (the `drawio2svg` tool, `packages/js/src/drawio2svg/`);
+the v1.0/1.1 set was its **as-built baseline**, now superseded as the target by the zero-dependency
+redesign. Changes are raised as change-requests (`CR/`) — see §6 and PLAN-DRAWIO-SVG-001 §7.
 
 ## 2. Background
 
 draw.io's render engine is **mxGraph**, which manipulates a live SVG DOM and reads browser text
 metrics. The public `jgraph/mxgraph` npm/repo was **archived in 2020**; the engine is now **vendored
 inside the draw.io source** (`src/main/webapp/mxgraph/`, ~133 client JS files), and the community
-successor **maxGraph** is a separate TypeScript project draw.io does **not** use. Consequently every
-existing `.drawio → image` path either runs the **draw.io desktop binary** or drives a **headless
-browser** (Puppeteer/Playwright); there is **no pure-Node renderer**. This feature fills that gap by
-running the npm **`mxgraph` factory build** (the same engine, able to accept an injected DOM) on
-**jsdom**.
+successor **maxGraph** is a separate TypeScript project draw.io does **not** use. Existing
+`.drawio → image` paths either run the **draw.io desktop binary** or drive a **headless browser**
+(Puppeteer/Playwright), and the obvious Node shortcut — which the **current code** takes — is to run
+the npm `mxgraph` factory build on **jsdom**. The target, however, is to skip the engine entirely:
+read and emit `.drawio` with **Node built-ins only**, taking **no third-party dependency**.
 
 ## 3. Feature concept
 
-Convert a `.drawio` to SVG **in pure Node**:
+Convert a `.drawio` to SVG **in pure Node, with zero npm dependencies**:
 
 - **Decode the wrapper** — parse `<mxfile>`, enumerate `<diagram>` pages; each page body is either
-  plain `<mxGraphModel>` XML or **base64 + raw-deflate + URI-encoding** (decompressed with `pako`).
-- **Render with mxGraph on jsdom** — boot a jsdom DOM and the globals mxClient expects; `mxCodec`
-  decodes the model; `mxImageExport` + `mxSvgCanvas2D` walk the cell states into an `<svg>`,
-  serialised per page.
+  plain `<mxGraphModel>` XML or **base64 + raw-deflate + URI-encoding**, decoded with **Node built-ins**
+  (`Buffer.from(b64,'base64')` + **`node:zlib` `inflateRawSync`** + `decodeURIComponent`) — **no
+  `pako`**.
+- **Emit SVG ourselves** — walk the `<mxCell>` geometry/style and write SVG (shapes, edges, labels)
+  directly, serialised per page — **no mxGraph, no jsdom**. Fidelity is best-effort.
 - **Library + CLI** — `drawioToSvg` / `drawioToSvgPages` / `parseDrawioPages` as a library;
   `node index.mjs <input.drawio> [prefix]` writes one `<prefix>-<page>.svg` per page.
 
-The tool lives under `packages/js/src/drawio2svg/` (an `.mjs`, no `package.json` of its own); its deps
-(`mxgraph`/`jsdom`/`pako`) are **`devDependencies` of `packages/js`**. It stays **isolated** so the
-published `kymostudio` package stays **zero-runtime-dependency** (dev-only deps; the `tsc` build and
-eslint both exclude it; only `dist/` ships). Behaviour: FEAT-DRAWIO-SVG-001; architecture and the
-engine-on-jsdom gotchas: DESIGN-DRAWIO-SVG-001.
+The tool lives under `packages/js/src/drawio2svg/`; the target takes **no npm dependency** (Node
+built-ins only) and stays **isolated** so the published `kymostudio` package stays
+**zero-runtime-dependency** (the `tsc` build and eslint both exclude it; only `dist/` ships). Target
+behaviour: FEAT-DRAWIO-SVG-001.
+
+> **As-is gap.** The shipped code decodes with `pako` and renders by booting the npm `mxgraph` factory
+> on **jsdom** (`mxCodec` → `mxImageExport`/`mxSvgCanvas2D`); those deps are `packages/js`
+> `devDependencies`. The four engine-on-jsdom gotchas it solves are recorded in DESIGN-DRAWIO-SVG-001
+> §3 **for the current code** — the redesign (`CR-DRAWIO-SVG-003`) removes all three deps.
 
 ## 4. Audience
 
@@ -96,15 +107,16 @@ kymo's own renderers (`REF-DRAWIO-CMP-001`).
 
 - **`.drawio` / mxGraph XML** — draw.io's native format: an `<mxfile>` of one or more `<diagram>`
   pages, each an `<mxGraphModel>` of `<mxCell>`s (`REF-DRAWIO-001`).
-- **mxGraph** — the client-side diagramming engine draw.io is built on; renders via SVG/HTML and reads
-  browser text metrics. Used here via the npm **factory build** (`require('mxgraph')(opts)`).
-- **jsdom** — a Node DOM implementation; supplies the `window`/`document` mxGraph needs (no layout
-  engine — see caveats).
+- **mxGraph** — the client-side diagramming engine draw.io is built on. The **target** does **not** use
+  it; it appears only as the format's origin and as what the **as-is code** still runs (the gap).
+- **jsdom** — a Node DOM implementation used by the **as-is code** to host mxGraph. The target removes
+  it.
 - **Page** — one `<diagram>` in the `<mxfile>`; emitted as one SVG.
-- **Compressed body** — a `<diagram>` whose content is base64 + raw-deflate + URI-encoded (decompressed
-  with **pako**); the default for desktop-saved files.
-- **Stencil** — a draw.io shape definition (e.g. BPMN/AWS glyphs); registered into `mxStencilRegistry`.
-  Best-effort: unregistered custom shapes fall back to built-ins or render empty.
+- **Compressed body** — a `<diagram>` whose content is base64 + raw-deflate + URI-encoded (decoded with
+  **`node:zlib`** in the target; the as-is code uses **pako**); the default for desktop-saved files.
+- **Own SVG emitter** — the target's renderer: walks `<mxCell>` geometry/style and writes SVG directly,
+  Node-built-in only. Best-effort: complex/custom shapes degrade gracefully (built-in approximation or
+  empty glyph) without crashing.
 - **Library API / CLI** — `drawioToSvg(xml,{pageIndex})`, `drawioToSvgPages(xml)`,
   `parseDrawioPages(xml)`, `modelXmlToSvg(xml,opts)`; `node index.mjs <input> [prefix]`.
 
@@ -138,6 +150,7 @@ Reading order: **`01-INTRO`** (this) → **`00-PRODUCT`** → **`02-FEATURE`** �
 |---------|------------|--------|----------------|
 | 1.0     | 2026-06-03 | Vũ Anh | Initial as-built baseline. Introduced the pure-Node mxGraph-on-jsdom `.drawio → SVG` converter; cited the archived-mxGraph / vendored-engine background. |
 | 1.1     | 2026-06-03 | Vũ Anh | §3: deps moved to `packages/js` **devDependencies** (no nested `package.json`). |
+| 1.2     | 2026-06-03 | Vũ Anh | **Direction change to zero npm dependency.** Reframed §2/§3/§5 to own decoder (`node:zlib`) + own SVG emitter; mxGraph/jsdom/pako demoted to the documented **as-is gap** (`CR-DRAWIO-SVG-003`). Status → *Under revision*. |
 
 ## Annex B — Document Control
 
