@@ -157,3 +157,29 @@ test("MIWG corpus is a round-trip fixpoint", { skip: !existsSync(CORPUS_DIR) }, 
   }
   assert.ok(checked > 50, `expected to check many corpus files, only checked ${checked}`);
 });
+
+test("node label_box round-trips as a shape BPMNLabel", () => {
+  // Regression: an event/gateway/data external-label box survives export ->
+  // re-import as a shape <bpmndi:BPMNLabel>, a fixpoint within +/-1px.
+  const comp = makeComponent({
+    id: "E1", name: "Nhan xac nhan thong luong", icon: "",
+    shape: "bpmn-start", accent: "blue", pos: [300, 200], size: [36, 36],
+    labelBox: [300, 150, 80, 27],
+  });
+  const d1 = makeDiagram({ width: 600, height: 400, components: [comp], edges: [] });
+
+  const xml1 = toBpmn(d1);
+  const shape = [...iterAll(parseXml(xml1))].find(
+    (e) => e.tag === "BPMNShape" && e.attrs.bpmnElement === "E1");
+  assert.ok(shape, "exported shape present");
+  assert.ok(shape.children.some((ch) => ch.tag === "BPMNLabel"), "shape has its own BPMNLabel");
+
+  const d2 = parseBpmn(xml1);
+  const d3 = parseBpmn(toBpmn(d2));
+  const lb2 = d2.components[0].labelBox, lb3 = d3.components[0].labelBox;
+  assert.ok(lb2 && lb3, "label_box read back");
+  for (let i = 0; i < 4; i++) assert.ok(Math.abs(lb2[i] - lb3[i]) <= 1, "fixpoint within 1px");
+  const [cx, cy] = d2.components[0].pos;
+  assert.ok(Math.abs(lb2[0] - cx) <= 1 && Math.abs(lb2[1] - cy + 50) <= 1, "offset above glyph kept");
+  assert.equal(lb2[2], 80); assert.equal(lb2[3], 27);
+});
