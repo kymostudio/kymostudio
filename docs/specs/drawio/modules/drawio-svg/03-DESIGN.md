@@ -1,9 +1,9 @@
 ---
 title: drawio → SVG — Design
 document_id: DESIGN-DRAWIO-SVG-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-06-03
-status: Baselined
+status: Under revision (documents as-is; target pending CR-DRAWIO-SVG-003)
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing/maintaining the drawio2svg utility
@@ -20,8 +20,8 @@ authors:
 language: en
 keywords:
   - drawio
-  - mxgraph
-  - jsdom
+  - zero-dependency
+  - as-is
   - design
   - architecture
   - svg-export
@@ -36,14 +36,22 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | DESIGN-DRAWIO-SVG-001                              |
-| Version      | 1.1                                                |
-| Status       | Baselined                                          |
+| Version      | 1.2                                                |
+| Status       | Under revision (as-is; target pending CR-003)     |
 | Issue Date   | 2026-06-03                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | INTRO-DRAWIO-SVG-001, FEAT-DRAWIO-SVG-001, TEST-DRAWIO-SVG-001, PLAN-DRAWIO-SVG-001, REF-DRAWIO-001 |
 
 Realises FEAT-DRAWIO-SVG-001 (FR/NFR cited per clause). Describes the **as-built** implementation in
 `packages/js/src/drawio2svg/index.mjs`. Covers ISO/IEC/IEEE 12207 Architecture & Design Definition.
+
+> **Direction note (v1.2) — this design documents the AS-IS GAP, not the target.** Since v1.2 the
+> requirements target a **zero-dependency** converter (own decoder via `node:zlib` + **own SVG
+> emitter**, no `mxgraph`/`jsdom`/`pako`). The pipeline and the "four engine-on-jsdom gotchas" below
+> describe the **current code**, which is the gap to be removed. The **target design** (own SVG emitter
+> over the dependency-free decoder) will be authored in **`CR-DRAWIO-SVG-003`**; until then this design
+> is retained as the as-is reference. Decode reframes simply (`pako.inflateRaw` → `node:zlib`
+> `inflateRawSync`); the render path (§2.3, §3) is fully replaced.
 
 ## 1. Scope
 
@@ -140,6 +148,7 @@ REF-DRAWIO-001.
 |---------|------------|--------|----------------|
 | 1.0     | 2026-06-03 | Vũ Anh | Initial as-built design: pipeline, the four engine-on-jsdom gotchas, stencils, isolation, determinism/limits, prior art. |
 | 1.1     | 2026-06-03 | Vũ Anh | §5 Isolation: deps moved to `packages/js` **devDependencies** (no nested `package.json`); base paths now resolved via `require.resolve('mxgraph')`. §1/§4 of `getEngine` unchanged. |
+| 1.2     | 2026-06-03 | Vũ Anh | **Re-scoped to as-is.** Added a direction banner: this design now documents the **gap** (mxGraph-on-jsdom + pako), not the target. The zero-dependency target design (own `node:zlib` decode + own SVG emitter) moves to `CR-DRAWIO-SVG-003`. Status → *Under revision (as-is)*. |
 
 ## Annex B — Document Control
 

@@ -1,9 +1,9 @@
 ---
 title: drawio → SVG — Test Documentation
 document_id: TEST-DRAWIO-SVG-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-06-03
-status: Baselined
+status: Under revision
 classification: Internal
 owner: diagrams/ project
 audience: Engineers verifying the drawio2svg utility
@@ -20,7 +20,7 @@ authors:
 language: en
 keywords:
   - drawio
-  - mxgraph
+  - zero-dependency
   - svg
   - test
   - verification
@@ -36,15 +36,20 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | TEST-DRAWIO-SVG-001                                |
-| Version      | 1.1                                                |
-| Status       | Baselined                                          |
+| Version      | 1.2                                                |
+| Status       | Under revision                                     |
 | Issue Date   | 2026-06-03                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | INTRO-DRAWIO-SVG-001, FEAT-DRAWIO-SVG-001, DESIGN-DRAWIO-SVG-001, PLAN-DRAWIO-SVG-001 |
 
-Verifies FEAT-DRAWIO-SVG-001 (FR/NFR IDs). Covers 12207 Verification & Validation. Headline checks:
-**wrapper decode** (multi-page + compressed), **mxGraph-on-jsdom render**, **valid SVG**, and
-**isolation** (the published package stays zero-dep).
+Verifies FEAT-DRAWIO-SVG-001 (FR/NFR IDs). Covers 12207 Verification & Validation. Headline checks
+(v1.2 target): **wrapper decode** (multi-page + compressed, via `node:zlib`), **own-emitter render**,
+**valid SVG**, and **zero dependency** (no third-party npm dep, runtime *or* dev).
+
+> **Direction note (v1.2).** These cases state the **zero-dependency target**. The as-is code still
+> uses `mxGraph`/`jsdom`/`pako`, so today `TC-DS-2` (decode lib), `TC-DS-3` (render path) and `TC-DS-6`
+> (zero-dep) describe what the **redesign** (`CR-DRAWIO-SVG-003`) must satisfy; the as-is code passes
+> them only under the old engine-based wording, which is now retired.
 
 ## 1. Test approach and levels
 
@@ -55,8 +60,9 @@ Verifies FEAT-DRAWIO-SVG-001 (FR/NFR IDs). Covers 12207 Verification & Validatio
   bounds non-empty, geometry emitted); the CLI writes one `<prefix>-<page>.svg` per page.
 - **Output validity** — the SVG parses in a strict reader (`rsvg-convert`), i.e. single SVG root, no
   duplicate `xmlns`.
-- **Isolation (key)** — `packages/js` build/typecheck/lint **exclude** the tool; `kymostudio`'s
-  published dependency tree is unchanged (no `mxgraph`/`jsdom`/`pako`).
+- **Zero dependency (key)** — `packages/js` build/typecheck/lint **exclude** the tool; **no** third-party
+  npm dependency is declared for it (runtime *or* dev) — `mxgraph`/`jsdom`/`pako` absent from both
+  `dependencies` and `devDependencies`; only Node built-ins are imported.
 
 ## 2. Test items, environment, tooling
 
@@ -69,21 +75,22 @@ plus a small inline **plain** `<mxGraphModel>` fixture and a minimal stencil XML
 | ID | Title | Verifies | Pass criterion |
 |----|-------|----------|----------------|
 | **TC-DS-1** | Parse pages | FR-DS-1 | A multi-page `<mxfile>` enumerates the expected pages with their names; a bare `<mxGraphModel>` → exactly one page |
-| **TC-DS-2** | Decompression | FR-DS-1 | A compressed `<diagram>` body inflates (base64 → raw-deflate → URI-decode) to a `<mxGraphModel>` with real cells; a plain body passes through unchanged |
-| **TC-DS-3** | Render via mxGraph | FR-DS-2 | A decoded page renders to SVG with non-trivial geometry (rects/paths/text/ellipses), built **without** the desktop binary or a browser |
+| **TC-DS-2** | Decompression (Node built-ins) | FR-DS-1 | A compressed `<diagram>` body inflates via `Buffer` + **`node:zlib` `inflateRawSync`** + URI-decode to a `<mxGraphModel>` with real cells; a plain body passes through unchanged; **no `pako`** import |
+| **TC-DS-3** | Render via own emitter | FR-DS-2 | A decoded page renders to SVG with non-trivial geometry (rects/paths/text/ellipses) using the **own SVG emitter**, built **without** the desktop binary, a browser, or **mxGraph/jsdom** |
 | **TC-DS-4** | CLI per-page output | FR-DS-3 | `node index.mjs <input> <prefix>` writes one `<prefix>-<page>.svg` per page; library `drawioToSvg`/`drawioToSvgPages`/`parseDrawioPages` return the documented shapes |
 | **TC-DS-5** | Valid SVG | FR-DS-2, NFR-DS-5 | Output rasterises under `rsvg-convert` (no duplicate `xmlns`; single SVG root; sane `width`/`height`/`viewBox`) |
-| **TC-DS-6** | Isolation / zero-dep | FR-DS-5, NFR-DS-1 | `mxgraph`/`jsdom`/`pako` are in `packages/js` **`devDependencies`** and **absent** from runtime `dependencies` (which stays empty); `tsconfig` excludes `src/drawio2svg`; eslint ignores it; only `dist/` is published; no nested `package.json` under `src/drawio2svg` |
-| **TC-DS-7** | Stencils best-effort | FR-DS-4, NFR-DS-4 | A registered stencil XML renders its shape; with the stencil absent, the page still renders (built-in/empty fallback) and does **not** crash |
+| **TC-DS-6** | Zero dependency (end-to-end) | FR-DS-5, NFR-DS-1 | `mxgraph`/`jsdom`/`pako` (and any third-party package) are **absent** from **both** `packages/js` `dependencies` **and** `devDependencies`; the tool imports **only Node built-ins**; runtime `dependencies` stays empty; `tsconfig` excludes `src/drawio2svg`; eslint ignores it; only `dist/` is published |
+| **TC-DS-7** | Shape coverage best-effort | FR-DS-4, NFR-DS-4 | A common built-in shape renders correctly; an unmodelled custom shape still renders (approximation/empty fallback) and does **not** crash |
 | **TC-DS-8** | Determinism | NFR-DS-3 | The same input + options yields byte-identical SVG across runs |
-| **TC-DS-9** | Pure-Node / Node ≥21 | NFR-DS-2 | Conversion runs headless (no GUI/browser); the `navigator` shim lets the engine boot on Node ≥21 |
+| **TC-DS-9** | Pure-Node, built-ins only | NFR-DS-2 | Conversion runs headless (no GUI/browser) importing only Node built-ins (`node:fs`/`node:path`/`node:zlib`/`Buffer`) |
 
 ## 4. Pass/fail criteria
 
-The feature passes when TC-DS-1..TC-DS-9 pass. **Any** appearance of `mxgraph`/`jsdom`/`pako` in the
-published `kymostudio` dependency tree, or any duplicate-`xmlns`/parse failure of the emitted SVG, is a
-**failure**. Fidelity gaps that are **documented** (approximate text metrics; unregistered stencils →
-empty glyphs) are **expected**, not failures (NFR-DS-4).
+The feature passes when TC-DS-1..TC-DS-9 pass. **Any** appearance of `mxgraph`/`jsdom`/`pako` (or any
+third-party package) in `packages/js`'s dependency tree — **runtime or dev** — or any
+duplicate-`xmlns`/parse failure of the emitted SVG, is a **failure**. Fidelity gaps that are
+**documented** (approximate text metrics; unmodelled custom shapes → approximations/empty) are
+**expected**, not failures (NFR-DS-4).
 
 ## 5. Requirements traceability matrix
 
@@ -108,6 +115,7 @@ empty glyphs) are **expected**, not failures (NFR-DS-4).
 |---------|------------|--------|----------------|
 | 1.0     | 2026-06-03 | Vũ Anh | Initial as-built test set (`TC-DS-1..9`) + traceability; isolation/valid-SVG headline. |
 | 1.1     | 2026-06-03 | Vũ Anh | `TC-DS-6` updated: deps asserted in `packages/js` **devDependencies** (not runtime); no nested `package.json`. |
+| 1.2     | 2026-06-03 | Vũ Anh | **Zero-dependency target.** `TC-DS-2` decode → `node:zlib` (no pako); `TC-DS-3` render → **own emitter** (no mxGraph/jsdom); `TC-DS-6` → **no third-party dep, runtime or dev**; `TC-DS-7`/`TC-DS-9` reworded off stencils/jsdom. These now gate `CR-DRAWIO-SVG-003`. Status → *Under revision*. |
 
 ## Annex B — Document Control
 

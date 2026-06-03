@@ -1,9 +1,9 @@
 ---
 title: drawio → SVG — Requirements
 document_id: FEAT-DRAWIO-SVG-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-06-03
-status: Baselined
+status: Under revision
 classification: Internal
 owner: diagrams/ project
 audience: Engineers implementing and verifying the drawio2svg utility
@@ -21,7 +21,7 @@ authors:
 language: en
 keywords:
   - drawio
-  - mxgraph
+  - zero-dependency
   - svg
   - requirements
   - pure-node
@@ -37,8 +37,8 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-DRAWIO-SVG-001                                |
-| Version      | 1.1                                                |
-| Status       | Baselined                                          |
+| Version      | 1.2                                                |
+| Status       | Under revision                                     |
 | Issue Date   | 2026-06-03                                         |
 | Owner        | `diagrams/` project                                |
 | Related      | PROD-DRAWIO-SVG-001 (stakeholder needs), INTRO-DRAWIO-SVG-001, DESIGN-DRAWIO-SVG-001, TEST-DRAWIO-SVG-001, PLAN-DRAWIO-SVG-001 |
@@ -52,10 +52,14 @@ INTRO-DRAWIO-SVG-001; realisation: DESIGN-DRAWIO-SVG-001.
 Stakeholder needs (`SN-DS-01..05`, ISO 29148 §6.4.2 ConOps) are owned by **`PROD-DRAWIO-SVG-001`**;
 each requirement traces back via the **Source need** annotation.
 
-**Scope (this SRS):** specify how a `.drawio` file is **decoded** (multi-page, compressed), **rendered
-to SVG using the mxGraph engine in pure Node** (on jsdom), the **library API + CLI**, **best-effort
-stencil** coverage, and the **isolation** that keeps the published `kymostudio` package
-zero-dependency. **As-built baseline SRS**; later deltas live in change-requests (§5).
+**Scope (this SRS):** specify how a `.drawio` file is **decoded** (multi-page, compressed) and
+**rendered to SVG with an own emitter in pure Node**, the **library API + CLI**, **best-effort**
+shape/text coverage, and the **zero-dependency** rule that keeps both the converter and the published
+`kymostudio` package free of any npm dependency. Later deltas live in change-requests (§5).
+
+> **Direction note (v1.2).** These requirements state the **zero-dependency target** (`SN-DRW-02`).
+> The shipped code still uses `mxGraph`/`jsdom`/`pako`; clauses below mark, per requirement, what the
+> **as-is code** does vs. the **target**. The redesign is `CR-DRAWIO-SVG-003`.
 
 ## 2. Functional requirements
 
@@ -64,14 +68,18 @@ zero-dependency. **As-built baseline SRS**; later deltas live in change-requests
   (`<diagram>`), exposing each page's name and its `<mxGraphModel>` XML. A **bare `<mxGraphModel>`**
   (no `<mxfile>` wrapper) SHALL be treated as a single page. For each page body the feature SHALL
   handle **both** encodings: **plain** `<mxGraphModel>` XML, and the **compressed** form
-  (**base64 → raw-deflate (`pako.inflateRaw`) → `decodeURIComponent`**).
+  (**base64 → raw-deflate → `decodeURIComponent`**). The decode SHALL use **Node built-ins only** —
+  `Buffer` for base64 and **`node:zlib` `inflateRawSync`** for raw-deflate. *(Target. As-is code uses
+  `pako.inflateRaw`.)*
 
-**Render via mxGraph** *(Source need: `SN-DS-01`, `SN-DS-02`)*
-- **FR-DS-2** The feature SHALL render each page's model to **SVG using the mxGraph engine** — the npm
-  `mxgraph` **factory build** running on a **jsdom** DOM — via `mxCodec` decode → `mxImageExport` +
-  `mxSvgCanvas2D` → serialisation. It SHALL require **neither the draw.io desktop binary nor a
-  headless browser**. Output SHALL be **well-formed SVG** (single SVG root, single `xmlns`, with
-  `width`/`height`/`viewBox` from the graph bounds plus a border).
+**Render with an own SVG emitter** *(Source need: `SN-DS-01`, `SN-DS-02`)*
+- **FR-DS-2** The feature SHALL render each page's model to **SVG with its own emitter** — walking the
+  `<mxCell>` geometry/style and writing SVG (shapes, edges, labels) directly, using **Node built-ins
+  only**, with **no mxGraph, no jsdom, and no third-party dependency**. It SHALL require **neither the
+  draw.io desktop binary nor a headless browser**. Output SHALL be **well-formed SVG** (single SVG
+  root, single `xmlns`, with `width`/`height`/`viewBox` from the content bounds plus a border).
+  Fidelity is **best-effort** (see §4). *(Target. As-is code renders via the npm `mxgraph` factory on
+  jsdom — `mxCodec` → `mxImageExport`/`mxSvgCanvas2D` — the gap this FR replaces.)*
 
 **Library API & CLI** *(Source need: `SN-DS-05`)*
 - **FR-DS-3** The feature SHALL expose a **library API** — `drawioToSvg(xml, { pageIndex })` (one page
@@ -80,46 +88,50 @@ zero-dependency. **As-built baseline SRS**; later deltas live in change-requests
   `node index.mjs <input.drawio> [out-prefix]`, that writes **one `<prefix>-<page>.svg` per page**
   (prefix defaulting to the input path without extension; page names slugified).
 
-**Stencils (best-effort)** *(Source need: `SN-DS-02`)*
-- **FR-DS-4** The feature SHALL register **stencil-set XML** found in its `stencils/` directory into
-  `mxStencilRegistry` (a `<shapes>` set or a single `<shape>`), widening custom-shape coverage. Where
-  a shape's stencil is **not** registered it SHALL fall back to mxGraph's built-in rendering (or an
-  empty glyph) **without error**.
+**Shape/text coverage (best-effort)** *(Source need: `SN-DS-02`)*
+- **FR-DS-4** The own emitter SHALL cover draw.io's **common built-in shapes** (rectangles, ellipses,
+  rhombus, edges, labels) directly. For shapes it does **not** model — custom stencils, exotic styles —
+  it SHALL **degrade gracefully** (a bounding-box/built-in approximation or an empty glyph) **without
+  error**. *(Target. As-is code instead registers stencil XML into mxGraph's `mxStencilRegistry`.)*
 
-**Isolation** *(Source need: `SN-DS-04`)*
-- **FR-DS-5** The feature (`packages/js/src/drawio2svg/`) SHALL declare its deps (`mxgraph`, `jsdom`,
-  `pako`) as **`devDependencies` of `packages/js`** (it has no `package.json` of its own), resolving
-  them from `packages/js/node_modules` via `require.resolve`. It SHALL be **excluded** from the
-  `packages/js` `tsc` build (`tsconfig` `exclude`) and from eslint (`eslint.config` `ignores`), and
-  SHALL NOT be published (only `dist/` ships). It SHALL add **no runtime dependency** to the
-  `kymostudio` (`packages/js`) `package.json` — its runtime `dependencies` stays empty.
+**Isolation & zero dependency** *(Source need: `SN-DS-04`)*
+- **FR-DS-5** The feature (`packages/js/src/drawio2svg/`) SHALL take **no third-party npm dependency**
+  for `.drawio` conversion — neither runtime nor dev — using **Node built-ins only**. It SHALL be
+  **excluded** from the `packages/js` `tsc` build (`tsconfig` `exclude`) and from eslint
+  (`eslint.config` `ignores`), and SHALL NOT be published (only `dist/` ships). The `kymostudio`
+  (`packages/js`) runtime `dependencies` SHALL stay empty **and** `mxgraph`/`jsdom`/`pako` SHALL be
+  removed from its `devDependencies`. *(Target. As-is code declares those three as `packages/js`
+  devDependencies — the gap this FR closes.)*
 
 ## 3. Non-functional requirements
 
-- **NFR-DS-1** **Zero-dep preserved.** The published `kymostudio` package SHALL remain
-  zero-runtime-dependency; `mxgraph`/`jsdom`/`pako` SHALL NOT appear in `packages/js`'s published
-  dependency tree (FR-DS-5).
+- **NFR-DS-1** **Zero-dependency, end-to-end.** The converter SHALL add **no third-party npm
+  dependency** (runtime *or* dev); `mxgraph`/`jsdom`/`pako` SHALL NOT appear anywhere in `packages/js`'s
+  dependency tree, and the published runtime `dependencies` SHALL stay empty (FR-DS-5).
 - **NFR-DS-2** **Pure-Node runtime.** Conversion SHALL run headless on macOS/Linux/CI with Node only
-  (no GUI, no browser). It SHALL accommodate Node ≥21's read-only `navigator` global by overriding it
-  with a shim carrying `appVersion` (which mxClient reads).
+  (no GUI, no browser) using only Node built-ins (`node:fs`/`node:path`/`node:zlib`/`Buffer`). *(The
+  as-is code additionally needs a Node ≥21 `navigator` shim for mxClient; the target drops that need.)*
 - **NFR-DS-3** **Determinism.** For a given input file and options, the emitted SVG SHALL be
   deterministic (byte-stable across runs).
-- **NFR-DS-4** **Graceful degradation.** jsdom has no layout engine, so text-metric-driven sizing is
-  **approximate** (`getBBox`/`getComputedTextLength` are stubbed to zero) and missing custom stencils
-  render as built-ins/empty; these limits SHALL be **documented** and SHALL NOT crash the conversion.
+- **NFR-DS-4** **Graceful degradation.** Text-metric-driven sizing is **approximate** (no browser
+  layout engine) and unmodelled custom shapes render as approximations/empty; these limits SHALL be
+  **documented** and SHALL NOT crash the conversion.
 - **NFR-DS-5** **Valid output.** Emitted SVG SHALL parse in a strict SVG reader (e.g. `librsvg` /
   `rsvg-convert`) — in particular it SHALL NOT contain a duplicate `xmlns` attribute.
 
 ## 4. Constraints, assumptions, out-of-scope
 
-- **Best-effort fidelity, not desktop parity.** Custom stencil icons and exact text wrapping are
-  approximate; for pixel-perfect output use the draw.io desktop CLI (`drawio -x -f svg`). This tool
-  exists specifically to render *with mxGraph in pure Node*.
+- **Best-effort fidelity, not desktop parity.** An own emitter (no mxGraph) approximates custom shapes
+  and text wrapping; this is the **deliberate cost** of the zero-dependency goal. For pixel-perfect
+  output use the draw.io desktop CLI (`drawio -x -f svg`). This tool exists specifically to convert
+  *with Node built-ins only*.
 - **One-way conversion.** The feature reads `.drawio` and writes SVG; it does **not** edit or write
   `.drawio`.
 - **SVG only.** No PNG/raster output — rasterise the SVG separately (`rsvg-convert`/`resvg`).
-- **No Python mirror.** This is a JS-only utility built on `mxgraph`+`jsdom`; the
-  two-implementation parity norm (core kymo renderers) does **not** apply.
+- **No Python mirror.** This is a JS-only, Node-built-in-only utility; the two-implementation parity
+  norm (core kymo renderers) does **not** apply.
+- **No third-party dependency.** `mxgraph`/`jsdom`/`pako` (and any other npm package) are out of scope
+  for the target; their presence in the as-is code is the gap being removed.
 
 ## 5. Change-request roadmap (delivery increments)
 
@@ -128,8 +140,9 @@ The baseline (`-001`) is the **as-built** tool. Future increments are self-conta
 
 | CR | Increment | Realises (baseline FR) | Status |
 |----|-----------|------------------------|--------|
-| — (`-001`) | **As-built**: wrapper decode + mxGraph-on-jsdom SVG export + library/CLI + stencil loader + isolation | FR-DS-1..FR-DS-5; NFR-DS-1..NFR-DS-5 | **Baselined** (implemented) |
-| `CR-DRAWIO-SVG-002` (`CR-002/`) | **Bundled BPMN/AWS stencils** — ship draw.io stencil XML so event/marker glyphs render (raise fidelity toward FR-DS-4) | FR-DS-4 | Proposed |
+| — (`-001`) | **As-is code** (non-conformant to the v1.2 target): wrapper decode (`pako`) + mxGraph-on-jsdom SVG export + library/CLI + stencil loader | (was FR-DS-1..5) | **Superseded** by the zero-dep target; retained as reference |
+| `CR-DRAWIO-SVG-003` (`CR-003/`) | **Zero-dependency rewrite** — replace `pako` decode with `node:zlib`, replace mxGraph/jsdom rendering with an **own SVG emitter**; remove all three deps | FR-DS-1, FR-DS-2, FR-DS-4, FR-DS-5; NFR-DS-1..5 | **Proposed** (the redesign) |
+| `CR-DRAWIO-SVG-002` (`CR-002/`) | **Bundled BPMN/AWS stencils** — raise custom-shape fidelity (now within the own emitter, not mxGraph) | FR-DS-4 | Proposed (re-scope onto the own emitter, after CR-003) |
 
 ## Annex A — Revision History
 
@@ -139,6 +152,7 @@ The baseline (`-001`) is the **as-built** tool. Future increments are self-conta
 |---------|------------|--------|----------------|
 | 1.0     | 2026-06-03 | Vũ Anh | Initial as-built SRS (`FR-DS-1..5`, `NFR-DS-1..5`); constraints; CR roadmap (CR-002 bundled stencils, Proposed). |
 | 1.1     | 2026-06-03 | Vũ Anh | `FR-DS-5` reworded: deps moved from a nested `package.json` to **`devDependencies` of `packages/js`** (resolved via `require.resolve`); runtime `dependencies` stays empty. |
+| 1.2     | 2026-06-03 | Vũ Anh | **Zero-dependency target** (`SN-DRW-02`). `FR-DS-1` decode → `node:zlib` (not pako); `FR-DS-2` render → **own SVG emitter** (not mxGraph/jsdom); `FR-DS-4` → own-emitter shape coverage; `FR-DS-5`/`NFR-DS-1` → **no third-party dep, runtime or dev**; `NFR-DS-2`/`NFR-DS-4` reworded off jsdom. As-is `-001` marked superseded; added `CR-DRAWIO-SVG-003` (the rewrite). Status → *Under revision*. |
 
 ## Annex B — Document Control
 
