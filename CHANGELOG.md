@@ -9,6 +9,16 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-06-03
+
+### Fixed
+
+- **BPMN node labels no longer truncate to two lines** — event, gateway,
+  data-object and data-store labels now wrap onto up to **three lines**
+  (matching tasks), so longer multi-word labels (e.g. the Vietnamese
+  "Nhận xác nhận thông luồng" / "Phát sinh vấn đề nghiệp vụ") render in
+  full instead of being cut off with an ellipsis (`…`).
+
 ## [0.3.1] - 2026-05-29
 
 ### Changed

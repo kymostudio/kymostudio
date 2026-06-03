@@ -356,7 +356,7 @@ def _render_event(c: Component, cx: float, cy: float, r: float,
     glyph_g = f'<g transform="translate({_f(cx)}, {_f(cy)})">{glyph}</g>' if glyph else ""
     label = ""
     if c.name:
-        lines = _wrap(c.name, max(70, 2 * r + 40), 11.5, 2)
+        lines = _wrap(c.name, max(70, 2 * r + 40), 11.5, 3)
         label = _centered_lines(lines, cx, cy + r + 13, 11.5, "bpmn-label--out")
     return f'{rings}{glyph_g}{label}'
 
@@ -390,7 +390,7 @@ def _render_gateway(c: Component, cx: float, cy: float, hw: float, hh: float,
     mk = _gateway_marker(marker, cx, cy, min(hw, hh) * 0.42)
     label = ""
     if c.name:
-        lines = _wrap(c.name, max(90, 2 * hw + 60), 11.5, 2)
+        lines = _wrap(c.name, max(90, 2 * hw + 60), 11.5, 3)
         label = _centered_lines(lines, cx, cy + hh + 13, 11.5, "bpmn-label--out")
     return f'{diamond}{mk}{label}'
 
@@ -406,7 +406,7 @@ def _render_data_object(c: Component, cx: float, cy: float, hw: float, hh: float
     )
     label = ""
     if c.name:
-        lines = _wrap(c.name, max(90, w + 50), 11.5, 2)
+        lines = _wrap(c.name, max(90, w + 50), 11.5, 3)
         label = _centered_lines(lines, cx, cy + hh + 13, 11.5, "bpmn-label--out")
     return f'{page}{label}'
 
@@ -425,7 +425,7 @@ def _render_data_store(c: Component, cx: float, cy: float, hw: float, hh: float)
     )
     label = ""
     if c.name:
-        lines = _wrap(c.name, max(90, w + 50), 11.5, 2)
+        lines = _wrap(c.name, max(90, w + 50), 11.5, 3)
         label = _centered_lines(lines, cx, cy + hh + 13, 11.5, "bpmn-label--out")
     return f'{body}{label}'
 

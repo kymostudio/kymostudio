@@ -52,7 +52,7 @@
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "8f98b654d361",
+  "sha": "20cbbaebaa48",
   "status": "ok"
  },
  "Activiti_Designer_5.14.1_A.1.0-export": {
@@ -129,14 +129,14 @@
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "1d9f09852ff6",
+  "sha": "30514e53343c",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "4089db65f3a5",
+  "sha": "cafdba17873a",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.1.0-export": {
@@ -185,7 +185,7 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "85110a0b34c3",
+  "sha": "a898ab4d108b",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.1.0-export": {
@@ -276,7 +276,7 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "4214bd202b2b",
+  "sha": "ae1b01ae642d",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_A.1.0-export": {
@@ -332,7 +332,7 @@
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "45091b31c4e7",
+  "sha": "21b13bc75105",
   "status": "ok"
  },
  "GenMyModel_0.47_C.1.1-export": {
@@ -626,7 +626,7 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "7f6fcc2c8eb0",
+  "sha": "b5353658c0eb",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.1.0-export": {
@@ -689,7 +689,7 @@
   "err": "",
   "n_edges": 13,
   "n_nodes": 12,
-  "sha": "fce8b71a7027",
+  "sha": "b7cf0c9322aa",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.1.0-export": {
@@ -731,7 +731,7 @@
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "24a52e8c709a",
+  "sha": "4bd0d3d1dd2b",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.1.0-export": {
@@ -815,7 +815,7 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "c6983ef1ada8",
+  "sha": "6c03f6a98282",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.0-export": {
