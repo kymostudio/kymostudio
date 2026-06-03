@@ -131,8 +131,8 @@ Fibonacci SP; calibration: **3 ≈ the descriptive 5-doc `kymo-dsl` set**
 ## 7. Files to create / modify
 
 - **Create** — `docs/formats/kymo-dsl/README.md` + `01-scope.md` … `10-examples.md`
-  (11); `docs/specs/kymo-dsl-nref/{01-INTRO,02-FEATURE,03-DESIGN,04-TEST}.md`;
-  `docs/plans/kymo-dsl-nref/PLAN.md` (this).
+  (11); `docs/specs/kymo-dsl-nref/{01-INTRO,02-FEATURE,03-DESIGN,04-TEST,PLAN}.md`
+  (this is `PLAN.md`).
 - **Modify** — `docs/softwares/*.md` (~26); `docs/guide/{dsl-guide,faq,README}.md`;
   `docs/diagrams/bpmn/README.md`; `docs/BEST_PRACTICE_DIAGRAMS.md`;
   `CONTRIBUTING.md`; `.github/PULL_REQUEST_TEMPLATE.md`; `CHANGELOG.md`;
