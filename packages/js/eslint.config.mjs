@@ -5,7 +5,7 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist/", "node_modules/", "scripts/"] },
+  { ignores: ["dist/", "node_modules/", "scripts/", "src/drawio2svg/"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
