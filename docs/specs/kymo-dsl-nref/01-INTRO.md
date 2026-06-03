@@ -77,7 +77,7 @@ items) and ISO/IEC/IEEE 12207 (life-cycle processes):
 | Layer | Folder | 15289 class | 12207 processes | Answers |
 |-------|--------|-------------|-----------------|---------|
 | **Specification** (this folder) | `docs/specs/kymo-dsl-nref/` | Specification / Description | §6.4 Technical Processes | *what must it be / how is it built / how is it verified?* |
-| **Implementation plan** | `docs/plans/kymo-dsl-nref/` | Plan + Records — **living** | §6.3 Technical Management | *why, in what order, at what risk, what's done?* |
+| **Implementation plan** | `docs/specs/kymo-dsl-nref/PLAN.md` | Plan + Records — **living** | §6.3 Technical Management | *why, in what order, at what risk, what's done?* |
 
 ### 2.1 Specification layer — document map
 
@@ -90,7 +90,7 @@ Read in order:
 | 03 | `03-DESIGN.md` | `DESIGN-KYMO-NREF-001` | 6.4.4 Architecture (42010) + 6.4.5 Design Definition | *how is it built?* |
 | 04 | `04-TEST.md` | `TEST-KYMO-NREF-001` | 6.4.9 Verification + 6.4.11 Validation + 6.3.6 Traceability | *how do we know it's right?* |
 
-The implementation plan (`PLAN-KYMO-NREF-001`, `docs/plans/kymo-dsl-nref/PLAN.md`)
+The implementation plan (`PLAN-KYMO-NREF-001`, `docs/specs/kymo-dsl-nref/PLAN.md`)
 carries the phasing, sizing, risk register, and worklog. The **restructured
 specification itself** is `KYMO-DSL-001` (the set at `docs/formats/kymo-dsl/`); this
 engineering set documents the restructure, it does not restate the grammar.

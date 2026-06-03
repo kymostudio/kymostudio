@@ -59,7 +59,7 @@ Verifies the requirements in FEAT-KYMO-NREF-001 (FR/NFR ids). Covers ISO/IEC/IEE
 
 The new set under `docs/formats/kymo-dsl/`; the repointed links across `docs/`,
 `CONTRIBUTING.md`, `CHANGELOG.md`, `.github/`; the spec set under
-`docs/specs/kymo-dsl-nref/` + `docs/plans/kymo-dsl-nref/`. Tooling: `grep`/`git
+`docs/specs/kymo-dsl-nref/` (spec set + `PLAN.md`). Tooling: `grep`/`git
 grep`, `git show HEAD:docs/KYMO_DSL.md` for the diff baseline, and the package test
 runners (`uv run --group dev python -m pytest -q`; `npm test`).
 

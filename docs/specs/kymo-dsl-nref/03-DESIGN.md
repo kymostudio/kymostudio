@@ -92,7 +92,7 @@ file carries.
 ## 3. ID-preservation scheme (FR-2)
 
 The single highest-traffic identifier in the repository is `KYMO-DSL-001` (≈50
-citations: engineering sets under `docs/specs/`, `docs/plans/`,
+citations: engineering sets under `docs/specs/`,
 `docs/formats/kymo*.md`, `docs/research/`, `BEST_PRACTICE_DIAGRAMS.md`). To avoid
 churning all of them, the **index README inherits `KYMO-DSL-001`** — it *is* the
 canonical spec, now expressed as an index over clause files. Every existing
