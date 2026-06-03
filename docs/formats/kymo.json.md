@@ -90,7 +90,7 @@ Snake_case keys; points and bounds are arrays; integral floats collapse to ints
 The transient `bpmn_blocks` AST is **not** serialized (it is always empty in a
 resolved diagram). Field lists per object (mirroring `kymo.model`):
 
-- **component** — `id`, `name`, `subtitle`, `icon`, `shape`, `accent`, `pos` `[cx,cy]`, `size` `[w,h]|null`, `parent`, `align`, `align_gap`, `align_offset` `[dx,dy]`.
+- **component** — `id`, `name`, `subtitle`, `icon`, `shape`, `accent`, `pos` `[cx,cy]`, `size` `[w,h]|null`, `parent`, `align`, `align_gap`, `align_offset` `[dx,dy]`, `label_box` `[cx,cy,w,h]|null` (external-label box from the source's `BPMNLabel` DI bounds; `null` → label placed at the default spot below the glyph).
 - **region** — `id`, `label`, `bounds` `[x,y,w,h]`, `contains` `[id…]`, `padding` `[h,v]`, `padding_bottom`, `style`, `icon`, `layout`, `pos` `[x,y]|null`, `gap`, `align`, `visible`, `border_dash`, `border_stroke`, `label_anchor`, `label_position`.
 - **edge** — `src`, `dst`, `label`, `style`, `src_anchor`, `dst_anchor`, `route`, `via` `[[x,y]…]`, `src_offset`, `dst_offset`, `label_offset`, `label_anchor`, `label_small`, `label_pos` `[x,y]|null`, `dashed`, `no_arrow`, `trunk_offset`, `shared_port`, `points` `[[x,y]…]|null`, `bpmn_flow`.
 

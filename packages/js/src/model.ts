@@ -89,6 +89,10 @@ export interface Component {
   align: string | null;
   alignGap: number;
   alignOffset: Point;
+  /** External label box [cx, cy, w, h] from the element's BPMNLabel DI
+   *  bounds; the renderer places + wraps the outside label here (matching
+   *  bpmn.io) instead of below the glyph. null -> default placement. */
+  labelBox: [number, number, number, number] | null;
 }
 
 // "pool" / "lane" are BPMN swimlanes (label band down the left edge).
@@ -183,15 +187,16 @@ export interface Diagram {
 export function makeComponent({
   id, name = "", subtitle = "", icon = "", shape = "box", accent = "green",
   pos = [0, 0], size = null,
-  parent = null, align = null, alignGap = 24, alignOffset = [0, 0],
+  parent = null, align = null, alignGap = 24, alignOffset = [0, 0], labelBox = null,
 }: {
   id: string; name?: string; subtitle?: string; icon?: string;
   shape?: Shape; accent?: string; pos?: Point; size?: Point | null;
   parent?: string | null; align?: string | null; alignGap?: number; alignOffset?: Point;
+  labelBox?: [number, number, number, number] | null;
 }): Component {
   return {
     id, name, subtitle, icon, shape, accent, pos, size,
-    parent, align, alignGap, alignOffset,
+    parent, align, alignGap, alignOffset, labelBox,
   };
 }
 

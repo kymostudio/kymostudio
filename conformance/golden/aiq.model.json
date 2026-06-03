@@ -22,7 +22,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "researcher",
@@ -42,7 +43,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "planner",
@@ -62,7 +64,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "fs",
@@ -82,7 +85,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "todo",
@@ -102,7 +106,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "web",
@@ -122,7 +127,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "papers",
@@ -142,7 +148,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "kbapi",
@@ -162,7 +169,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "extract",
@@ -182,7 +190,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "embed",
@@ -202,7 +211,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "vecdb",
@@ -222,7 +232,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "rerank",
@@ -242,7 +253,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "gen",
@@ -262,7 +274,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "user",
@@ -282,7 +295,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "router",
@@ -302,7 +316,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "shallow",
@@ -322,7 +337,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "escalate",
@@ -342,7 +358,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "hitl",
@@ -362,7 +379,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "entdata",
@@ -382,7 +400,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     }
   ],
   "regions": [

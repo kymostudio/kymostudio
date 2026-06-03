@@ -91,7 +91,9 @@ Diagram-Interchange section, so import *reads* layout rather than computing it.
 **Diagram-Interchange geometry** *(Source need: `SN-BPMN-PARSER-02`)*
 - **FR-5** Geometry SHALL be read from DI: `<bpmndi:BPMNShape>` `<dc:Bounds>` → a
   component **centre** `pos` (top-left + size/2) and explicit `size`; `<bpmndi:BPMNEdge>`
-  `<di:waypoint>`s → `Edge.points`; a flow's `<bpmndi:BPMNLabel>` bounds → `Edge.label_pos`.
+  `<di:waypoint>`s → `Edge.points`; a flow's `<bpmndi:BPMNLabel>` bounds → `Edge.label_pos`,
+  and a node's `<bpmndi:BPMNLabel>` bounds → `Component.label_box` (its external-label box,
+  centre + size) so the label keeps its authored position and width.
 - **FR-6** Coordinates SHALL be **normalised** into a tidy positive plane by shifting all
   geometry so the top-left extent sits at `(MARGIN, MARGIN)`; the canvas `width`/`height`
   SHALL be derived from the shifted content extents.

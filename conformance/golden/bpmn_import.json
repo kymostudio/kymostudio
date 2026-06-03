@@ -11,6 +11,7 @@
         ],
         "icon": "",
         "id": "_10060a5f-3a22-43bf-9b4d-7b398e738055",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -34,6 +35,7 @@
         ],
         "icon": "",
         "id": "_12270b22-30c9-42d0-8818-4b2fc84b0306",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -57,6 +59,7 @@
         ],
         "icon": "",
         "id": "_1743c0d6-8bc8-46b7-87cb-4e754b7b1188",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -80,6 +83,7 @@
         ],
         "icon": "",
         "id": "_437324db-2a58-4212-80e1-a1ebfb2c3464",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -103,6 +107,7 @@
         ],
         "icon": "",
         "id": "_82560e77-88b1-4182-8e49-51b2cb48248e",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -310,6 +315,7 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -333,6 +339,7 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -356,6 +363,7 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -379,6 +387,7 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -402,6 +411,7 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -609,6 +619,7 @@
         ],
         "icon": "",
         "id": "_074eabf4-ce27-4614-88bd-2a9aff0f1337",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -632,6 +643,7 @@
         ],
         "icon": "",
         "id": "_0b6d38cb-b2f3-4266-8b7b-43a8d0f258be",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -655,6 +667,7 @@
         ],
         "icon": "",
         "id": "_32651d8a-acae-42ff-9861-4e671d5e62b1",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -678,6 +691,7 @@
         ],
         "icon": "",
         "id": "_72408556-ffc7-4035-83ec-588f0b3f19ba",
+        "label_box": null,
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -701,6 +715,7 @@
         ],
         "icon": "",
         "id": "_aaa3496c-2bd9-452c-93c9-522951b0953a",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -724,6 +739,7 @@
         ],
         "icon": "",
         "id": "_b4ee49d4-a7ca-4a93-906c-fd97359dab3e",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -747,6 +763,7 @@
         ],
         "icon": "",
         "id": "_dd3c810e-3fea-4708-88d1-8df2322782c0",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -770,6 +787,7 @@
         ],
         "icon": "",
         "id": "_dd62b522-610a-4222-bac5-f35d3f9387ae",
+        "label_box": null,
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -1189,6 +1207,7 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -1212,6 +1231,7 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -1235,6 +1255,7 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -1258,6 +1279,7 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -1281,6 +1303,7 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -1304,6 +1327,7 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": null,
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -1327,6 +1351,7 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -1350,6 +1375,7 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": null,
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -1792,6 +1818,12 @@
         ],
         "icon": "",
         "id": "ID-cce357fc-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          47,
+          88,
+          48,
+          11
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -1815,6 +1847,12 @@
         ],
         "icon": "",
         "id": "ID-cce357f9-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          146,
+          62,
+          29,
+          11
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -1838,6 +1876,12 @@
         ],
         "icon": "",
         "id": "ID-cce357ff-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          288,
+          62,
+          29,
+          11
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -1861,6 +1905,12 @@
         ],
         "icon": "",
         "id": "ID-cce35802-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          430,
+          62,
+          29,
+          11
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -1884,6 +1934,12 @@
         ],
         "icon": "",
         "id": "ID-cce357f6-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          529,
+          87,
+          45,
+          11
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -2079,6 +2135,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          42,
+          75,
+          71,
+          10
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -2102,6 +2164,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          116,
+          55,
+          22,
+          8
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -2125,6 +2193,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          215,
+          55,
+          22,
+          8
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -2148,6 +2222,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          314,
+          55,
+          22,
+          8
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -2171,6 +2251,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          389,
+          76,
+          71,
+          10
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -2366,6 +2452,12 @@
         ],
         "icon": "",
         "id": "ID-cce35824-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          47,
+          201,
+          48,
+          11
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -2389,6 +2481,12 @@
         ],
         "icon": "",
         "id": "ID-cce35815-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          161,
+          175,
+          29,
+          11
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -2412,6 +2510,12 @@
         ],
         "icon": "",
         "id": "ID-272d2d00-70be-11e9-69f8-f48e38b53512",
+        "label_box": [
+          260,
+          218,
+          61,
+          23
+        ],
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -2435,6 +2539,12 @@
         ],
         "icon": "",
         "id": "ID-cce3581e-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          458,
+          175,
+          29,
+          11
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -2458,6 +2568,12 @@
         ],
         "icon": "",
         "id": "ID-cce3581b-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          642,
+          266,
+          74,
+          23
+        ],
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -2481,6 +2597,12 @@
         ],
         "icon": "",
         "id": "ID-cce35821-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          628,
+          133,
+          45,
+          11
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -2504,6 +2626,12 @@
         ],
         "icon": "",
         "id": "ID-272d2d03-70be-11e9-69f8-f48e38b53512",
+        "label_box": [
+          458,
+          289,
+          29,
+          11
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -2527,6 +2655,12 @@
         ],
         "icon": "",
         "id": "ID-cce35818-70ba-11e9-69f8-f48e38b53512",
+        "label_box": [
+          458,
+          62,
+          29,
+          11
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -2946,6 +3080,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          42,
+          139,
+          71,
+          10
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -2969,6 +3109,12 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": [
+          111,
+          119,
+          22,
+          8
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -2992,6 +3138,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          419,
+          99,
+          71,
+          10
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -3015,6 +3167,12 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": [
+          282,
+          55,
+          22,
+          8
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -3038,6 +3196,12 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": [
+          282,
+          119,
+          22,
+          8
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -3061,6 +3225,12 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": [
+          179,
+          144,
+          71,
+          19
+        ],
         "name": "Gateway\r\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -3084,6 +3254,12 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": [
+          282,
+          190,
+          22,
+          8
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -3107,6 +3283,12 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": [
+          417,
+          171,
+          71,
+          19
+        ],
         "name": "Gateway\r\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -3526,6 +3708,7 @@
         ],
         "icon": "",
         "id": "startevent1",
+        "label_box": null,
         "name": "Start",
         "parent": null,
         "pos": [
@@ -3549,6 +3732,7 @@
         ],
         "icon": "user",
         "id": "usertask1",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -3572,6 +3756,7 @@
         ],
         "icon": "user",
         "id": "usertask2",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -3595,6 +3780,7 @@
         ],
         "icon": "user",
         "id": "usertask3",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -3618,6 +3804,7 @@
         ],
         "icon": "",
         "id": "endevent1",
+        "label_box": null,
         "name": "End",
         "parent": null,
         "pos": [
@@ -3641,6 +3828,7 @@
         ],
         "icon": "",
         "id": "textannotation1",
+        "label_box": null,
         "name": "1. Cannot create tasks with no task type (here shown as user tasks).\n2. Start and Event labels not displayed on diagram.",
         "parent": null,
         "pos": [
@@ -3836,6 +4024,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -3859,6 +4053,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          64,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -3882,6 +4082,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -3905,6 +4111,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          64,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -3928,6 +4140,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          92,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -4131,6 +4349,7 @@
         ],
         "icon": "",
         "id": "startevent1",
+        "label_box": null,
         "name": "Start",
         "parent": null,
         "pos": [
@@ -4154,6 +4373,7 @@
         ],
         "icon": "user",
         "id": "usertask1",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -4177,6 +4397,7 @@
         ],
         "icon": "",
         "id": "exclusivegateway1",
+        "label_box": null,
         "name": "Gateway (split flow)",
         "parent": null,
         "pos": [
@@ -4200,6 +4421,7 @@
         ],
         "icon": "user",
         "id": "usertask2",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -4223,6 +4445,7 @@
         ],
         "icon": "user",
         "id": "usertask3",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -4246,6 +4469,7 @@
         ],
         "icon": "user",
         "id": "usertask4",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -4269,6 +4493,7 @@
         ],
         "icon": "",
         "id": "exclusivegateway2",
+        "label_box": null,
         "name": "Gateway (merge flows)",
         "parent": null,
         "pos": [
@@ -4292,6 +4517,7 @@
         ],
         "icon": "",
         "id": "endevent1",
+        "label_box": null,
         "name": "End",
         "parent": null,
         "pos": [
@@ -4315,6 +4541,7 @@
         ],
         "icon": "",
         "id": "textannotation1",
+        "label_box": null,
         "name": "3. Gateways display the X symbol in all cases (no user control) but actually do not write it to the file. Always displaying it seems quite reasonable if the attribute is stored in the model. \n4. Gateway labels not displayed on diagram.",
         "parent": null,
         "pos": [
@@ -4734,6 +4961,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          45,
+          176,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -4757,6 +4990,12 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": [
+          138,
+          149,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -4780,6 +5019,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          548,
+          122,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -4803,6 +5048,12 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": [
+          366,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -4826,6 +5077,12 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": [
+          366,
+          149,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -4849,6 +5106,12 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": [
+          228,
+          182,
+          95,
+          26
+        ],
         "name": "Gateway  (Split Flow)",
         "parent": null,
         "pos": [
@@ -4872,6 +5135,12 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": [
+          366,
+          244,
+          72,
+          13
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -4895,6 +5164,12 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": [
+          546,
+          218,
+          95,
+          26
+        ],
         "name": "Gateway  (Merge Flows)",
         "parent": null,
         "pos": [
@@ -5326,6 +5601,12 @@
         ],
         "icon": "",
         "id": "_f694c873-bde9-4922-a774-c809c43d8861_964bc83e-23f6-4961-945e-190a680c0d79",
+        "label_box": [
+          389,
+          58,
+          87,
+          50
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -5349,6 +5630,12 @@
         ],
         "icon": "",
         "id": "_f694c873-bde9-4922-a774-c809c43d8861_63cfe18e-c238-4158-9792-d70ef708f60f",
+        "label_box": [
+          267,
+          58,
+          87,
+          50
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -5372,6 +5659,12 @@
         ],
         "icon": "",
         "id": "_f694c873-bde9-4922-a774-c809c43d8861_5554efbe-5388-4eb9-bbb6-05e822da4f7e",
+        "label_box": [
+          144,
+          58,
+          87,
+          50
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -5395,6 +5688,12 @@
         ],
         "icon": "",
         "id": "_f694c873-bde9-4922-a774-c809c43d8861_dfe6ad6c-7860-46a0-b9e5-2bdacd4eb116",
+        "label_box": [
+          483,
+          88,
+          59,
+          19
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -5418,6 +5717,12 @@
         ],
         "icon": "",
         "id": "_f694c873-bde9-4922-a774-c809c43d8861_520ff7ad-a07a-4d7d-b70b-1780888bf934",
+        "label_box": [
+          58,
+          88,
+          64,
+          19
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -5645,6 +5950,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          439,
+          91,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -5668,6 +5979,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          353,
+          65,
+          75,
+          63
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -5691,6 +6008,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          242,
+          65,
+          75,
+          63
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -5714,6 +6037,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          130,
+          65,
+          75,
+          63
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -5737,6 +6066,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          46,
+          90,
+          30,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -5964,6 +6299,12 @@
         ],
         "icon": "",
         "id": "_31439c18-7768-4939-9417-5e6c12e04093_b9564704-6aa4-49f1-b5a3-8833f25ef81a",
+        "label_box": [
+          541,
+          133,
+          54,
+          19
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -5987,6 +6328,12 @@
         ],
         "icon": "",
         "id": "_31439c18-7768-4939-9417-5e6c12e04093_9695c8e3-8d41-4854-9a1f-f33c65eb296e",
+        "label_box": [
+          562,
+          206,
+          77,
+          32
+        ],
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -6010,6 +6357,12 @@
         ],
         "icon": "",
         "id": "_31439c18-7768-4939-9417-5e6c12e04093_a4ac3824-ae5c-4f70-b6b7-0ab5c389dc2a",
+        "label_box": [
+          375,
+          236,
+          87,
+          50
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -6033,6 +6386,12 @@
         ],
         "icon": "",
         "id": "_31439c18-7768-4939-9417-5e6c12e04093_19909695-e8e5-49a9-b9e9-c65dcc677519",
+        "label_box": [
+          375,
+          134,
+          87,
+          50
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -6056,6 +6415,12 @@
         ],
         "icon": "",
         "id": "_31439c18-7768-4939-9417-5e6c12e04093_59851b2a-3fee-44ca-a61a-33680030d550",
+        "label_box": [
+          375,
+          58,
+          87,
+          50
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -6079,6 +6444,12 @@
         ],
         "icon": "",
         "id": "_31439c18-7768-4939-9417-5e6c12e04093_40144875-14c0-4de6-bf56-e290a1eb5132",
+        "label_box": [
+          218,
+          170,
+          64,
+          32
+        ],
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -6102,6 +6473,12 @@
         ],
         "icon": "",
         "id": "_31439c18-7768-4939-9417-5e6c12e04093_f7d80368-4e7a-480f-baf3-41af355fc36d",
+        "label_box": [
+          144,
+          134,
+          87,
+          50
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -6125,6 +6502,12 @@
         ],
         "icon": "",
         "id": "_31439c18-7768-4939-9417-5e6c12e04093_7af5b01c-1c59-4fcc-8312-0ada4440d54e",
+        "label_box": [
+          48,
+          166,
+          39,
+          19
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -6608,6 +6991,12 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": [
+          484,
+          228,
+          95,
+          26
+        ],
         "name": "Gateway  (Merge Flows)",
         "parent": null,
         "pos": [
@@ -6631,6 +7020,12 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": [
+          322,
+          258,
+          75,
+          63
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -6654,6 +7049,12 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": [
+          185,
+          184,
+          95,
+          26
+        ],
         "name": "Gateway  (Split Flow)",
         "parent": null,
         "pos": [
@@ -6677,6 +7078,12 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": [
+          322,
+          152,
+          75,
+          63
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -6700,6 +7107,12 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": [
+          322,
+          65,
+          75,
+          63
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -6723,6 +7136,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          449,
+          155,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -6746,6 +7165,12 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": [
+          130,
+          152,
+          75,
+          63
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -6769,6 +7194,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          46,
+          177,
+          30,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -7252,6 +7683,7 @@
         ],
         "icon": "",
         "id": "UUID_4c4fdade-b7d7-4310-b937-1264012c18ca",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -7275,6 +7707,7 @@
         ],
         "icon": "",
         "id": "UUID_ddd64190-a1d8-4880-8d88-ffc53595fd3c",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -7298,6 +7731,7 @@
         ],
         "icon": "",
         "id": "UUID_a6281109-3ed6-4936-bf36-5bc8516f369d",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -7321,6 +7755,7 @@
         ],
         "icon": "",
         "id": "UUID_ec078a17-c1ca-4df1-bd01-71bf4f7d02ec",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -7344,6 +7779,7 @@
         ],
         "icon": "",
         "id": "UUID_f391b9de-6415-46c5-b043-c51938dc9f83",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -7555,6 +7991,7 @@
         ],
         "icon": "",
         "id": "UUID_9d59f316-98d5-41fa-b210-bc1fcace361d",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -7578,6 +8015,7 @@
         ],
         "icon": "",
         "id": "UUID_5246965f-d2b3-4a38-b8bd-6fb5237a0c07",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -7601,6 +8039,7 @@
         ],
         "icon": "",
         "id": "UUID_c4fff050-c750-4299-b0cc-ad488959fe18",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -7624,6 +8063,7 @@
         ],
         "icon": "",
         "id": "UUID_71c38cc3-b8c3-4cdf-80a9-e46f2371b103",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -7647,6 +8087,7 @@
         ],
         "icon": "",
         "id": "UUID_d6276308-9696-48e5-8873-624602ad811e",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -7858,6 +8299,7 @@
         ],
         "icon": "",
         "id": "UUID_217f6712-1015-4247-86e6-6be1ea975bea",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -7881,6 +8323,7 @@
         ],
         "icon": "",
         "id": "UUID_73809d78-ccef-4bb7-b839-bf188ea68365",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -7904,6 +8347,7 @@
         ],
         "icon": "",
         "id": "UUID_afd3e1ad-9b93-4d7c-a822-b4e1816e5eb4",
+        "label_box": null,
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -7927,6 +8371,7 @@
         ],
         "icon": "",
         "id": "UUID_f56cf641-ffd3-48bc-904b-fc7fe1924fb4",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -7950,6 +8395,7 @@
         ],
         "icon": "",
         "id": "UUID_0df13459-ba35-4ca9-bcc5-08fdbf1ed832",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -7973,6 +8419,7 @@
         ],
         "icon": "",
         "id": "UUID_d5ec094b-c183-42be-afea-fe5b86cdcad5",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -7996,6 +8443,7 @@
         ],
         "icon": "",
         "id": "UUID_db90d6e0-63f6-4d9e-b97d-1eb143c10aba",
+        "label_box": null,
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -8019,6 +8467,7 @@
         ],
         "icon": "",
         "id": "UUID_2e4bd5b3-87c2-4cea-8835-fb9b53ce6879",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -8474,6 +8923,7 @@
         ],
         "icon": "",
         "id": "UUID_2474a89b-0206-4edc-8b6e-0704e5b042ab",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -8497,6 +8947,7 @@
         ],
         "icon": "",
         "id": "UUID_a0a1177a-3e86-493d-a6c0-528b67a7e847",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -8520,6 +8971,7 @@
         ],
         "icon": "",
         "id": "UUID_5aee01c6-8868-4299-a1b9-ebd98969ec67",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -8543,6 +8995,7 @@
         ],
         "icon": "",
         "id": "UUID_4befdf2e-a4df-414f-9007-63a2297324d2",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -8566,6 +9019,7 @@
         ],
         "icon": "",
         "id": "UUID_c6e2cac7-ecfd-4491-a3b3-5426447f81f3",
+        "label_box": null,
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -8589,6 +9043,7 @@
         ],
         "icon": "",
         "id": "UUID_3809ffaf-70b1-4dc3-a1db-44b2f432a64a",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -8612,6 +9067,7 @@
         ],
         "icon": "",
         "id": "UUID_88a89582-0152-4003-8bc5-cb8a1333ab7b",
+        "label_box": null,
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -8635,6 +9091,7 @@
         ],
         "icon": "",
         "id": "UUID_d35b2c50-58fb-4c49-9294-ec47b8a28dd9",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -9090,6 +9547,12 @@
         ],
         "icon": "",
         "id": "StartEvent_1",
+        "label_box": [
+          48,
+          102,
+          54,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -9113,6 +9576,7 @@
         ],
         "icon": "",
         "id": "Task_08hfu7q",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -9136,6 +9600,7 @@
         ],
         "icon": "",
         "id": "Task_0bsf1fl",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -9159,6 +9624,7 @@
         ],
         "icon": "",
         "id": "Task_1jwr5fa",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -9182,6 +9648,12 @@
         ],
         "icon": "",
         "id": "EndEvent_0il62vq",
+        "label_box": [
+          618,
+          102,
+          49,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -9377,6 +9849,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -9400,6 +9878,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          64,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -9423,6 +9907,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -9446,6 +9936,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          64,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -9469,6 +9965,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          92,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -9672,6 +10174,12 @@
         ],
         "icon": "",
         "id": "StartEvent_1",
+        "label_box": [
+          48,
+          222,
+          54,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -9695,6 +10203,7 @@
         ],
         "icon": "",
         "id": "Task_1ghpxqj",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -9718,6 +10227,7 @@
         ],
         "icon": "exclusive",
         "id": "ExclusiveGateway_100qlyu",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -9741,6 +10251,7 @@
         ],
         "icon": "",
         "id": "Task_091piaa",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -9764,6 +10275,7 @@
         ],
         "icon": "",
         "id": "Task_15ejvz1",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -9787,6 +10299,7 @@
         ],
         "icon": "",
         "id": "Task_1mvvkte",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -9810,6 +10323,12 @@
         ],
         "icon": "exclusive",
         "id": "ExclusiveGateway_1sxg7ag",
+        "label_box": [
+          628,
+          340,
+          83,
+          27
+        ],
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -9833,6 +10352,12 @@
         ],
         "icon": "",
         "id": "EndEvent_0zjwe22",
+        "label_box": [
+          716,
+          167,
+          49,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -10252,6 +10777,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          45,
+          176,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -10275,6 +10806,12 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": [
+          138,
+          149,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -10298,6 +10835,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          548,
+          122,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -10321,6 +10864,12 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": [
+          366,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -10344,6 +10893,12 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": [
+          366,
+          149,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -10367,6 +10922,12 @@
         ],
         "icon": "exclusive",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": [
+          228,
+          182,
+          95,
+          26
+        ],
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -10390,6 +10951,12 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": [
+          366,
+          244,
+          72,
+          13
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -10413,6 +10980,12 @@
         ],
         "icon": "exclusive",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": [
+          546,
+          218,
+          95,
+          26
+        ],
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -10844,6 +11417,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          88,
+          124,
+          0,
+          0
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -10867,6 +11446,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          197,
+          98,
+          0,
+          0
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -10890,6 +11475,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          329,
+          98,
+          0,
+          0
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -10913,6 +11504,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          461,
+          98,
+          0,
+          0
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -10936,6 +11533,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          551,
+          125,
+          0,
+          0
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -11206,6 +11809,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          88,
+          209,
+          0,
+          0
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -11229,6 +11838,12 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": [
+          191,
+          183,
+          0,
+          0
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -11252,6 +11867,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          591,
+          156,
+          0,
+          0
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -11275,6 +11896,12 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": [
+          419,
+          98,
+          0,
+          0
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -11298,6 +11925,12 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": [
+          419,
+          183,
+          0,
+          0
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -11321,6 +11954,12 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": [
+          271,
+          209,
+          0,
+          0
+        ],
         "name": "Gateway  (Split Flow)",
         "parent": null,
         "pos": [
@@ -11344,6 +11983,12 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": [
+          419,
+          278,
+          0,
+          0
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -11367,6 +12012,12 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": [
+          588,
+          245,
+          0,
+          0
+        ],
         "name": "Gateway  (Merge Flows)",
         "parent": null,
         "pos": [
@@ -11880,6 +12531,12 @@
         ],
         "icon": "",
         "id": "_1ac4b759-40e3-4dfb-b0e3-ad1d201d6c3d",
+        "label_box": [
+          88,
+          242,
+          0,
+          0
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -11903,6 +12560,12 @@
         ],
         "icon": "",
         "id": "_65f5459f-44ae-436d-a089-a91d6d78075b",
+        "label_box": [
+          198,
+          216,
+          0,
+          0
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -11926,6 +12589,12 @@
         ],
         "icon": "",
         "id": "_1ae31d1b-2559-4f78-a3ec-47986a49db48",
+        "label_box": [
+          335,
+          209,
+          0,
+          0
+        ],
         "name": "Collapsed  Sub-Process",
         "parent": null,
         "pos": [
@@ -11949,6 +12618,12 @@
         ],
         "icon": "message",
         "id": "_428dcbf5-8e5e-48e0-9c0c-d93003fa8c82",
+        "label_box": [
+          300,
+          120,
+          0,
+          0
+        ],
         "name": "Boundary Intermediate Event Non-Interrupting Message",
         "parent": null,
         "pos": [
@@ -11972,6 +12647,12 @@
         ],
         "icon": "escalation",
         "id": "_178e16eb-4c9e-4ea0-9644-7c5fb2b71825",
+        "label_box": [
+          313,
+          282,
+          0,
+          0
+        ],
         "name": "Boundary Intermediate Event Interrupting Escalation",
         "parent": null,
         "pos": [
@@ -11995,6 +12676,12 @@
         ],
         "icon": "",
         "id": "_9fad8da5-a28c-4b6b-bb71-fbd5c65b9681",
+        "label_box": [
+          462,
+          338,
+          0,
+          0
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -12018,6 +12705,12 @@
         ],
         "icon": "",
         "id": "_ce253897-4300-4b24-b71f-4c9535698c70",
+        "label_box": [
+          584,
+          243,
+          0,
+          0
+        ],
         "name": "End Event 1",
         "parent": null,
         "pos": [
@@ -12041,6 +12734,12 @@
         ],
         "icon": "",
         "id": "_72204cd7-709c-4656-9554-3ae29b3844ce",
+        "label_box": [
+          467,
+          98,
+          0,
+          0
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -12064,6 +12763,12 @@
         ],
         "icon": "",
         "id": "_2d2d0d29-896f-49f9-8109-77a7304309c5",
+        "label_box": [
+          479,
+          216,
+          0,
+          0
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -12087,6 +12792,12 @@
         ],
         "icon": "",
         "id": "_10ce0b26-1b3e-46a2-85a5-62538ed2da13",
+        "label_box": [
+          542,
+          365,
+          0,
+          0
+        ],
         "name": "End Event 2",
         "parent": null,
         "pos": [
@@ -12545,6 +13256,12 @@
         ],
         "icon": "",
         "id": "_mBBMg7WNEeaTvLEWv0tJ7A",
+        "label_box": [
+          123,
+          138,
+          46,
+          11
+        ],
         "name": "Start event",
         "parent": null,
         "pos": [
@@ -12568,6 +13285,12 @@
         ],
         "icon": "",
         "id": "_hMie8LWPEeaTvLEWv0tJ7A",
+        "label_box": [
+          771,
+          138,
+          42,
+          11
+        ],
         "name": "End event",
         "parent": null,
         "pos": [
@@ -12591,6 +13314,7 @@
         ],
         "icon": "",
         "id": "_qu1JALWZEeaTvLEWv0tJ7A",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -12614,6 +13338,7 @@
         ],
         "icon": "",
         "id": "_rRLBELWZEeaTvLEWv0tJ7A",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -12637,6 +13362,7 @@
         ],
         "icon": "",
         "id": "_sCctALWZEeaTvLEWv0tJ7A",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -12872,6 +13598,12 @@
         ],
         "icon": "",
         "id": "_rqBR8LZ1EeawX8E3Bjsrfw",
+        "label_box": [
+          230,
+          410,
+          37,
+          9
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -12895,6 +13627,7 @@
         ],
         "icon": "",
         "id": "_rqnH0LZ1EeawX8E3Bjsrfw",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -12918,6 +13651,7 @@
         ],
         "icon": "",
         "id": "_rq6p0LZ1EeawX8E3Bjsrfw",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -12941,6 +13675,7 @@
         ],
         "icon": "",
         "id": "_rrBXgLZ1EeawX8E3Bjsrfw",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -12964,6 +13699,12 @@
         ],
         "icon": "",
         "id": "_rrIsQLZ1EeawX8E3Bjsrfw",
+        "label_box": [
+          692,
+          412,
+          34,
+          9
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -13171,6 +13912,12 @@
         ],
         "icon": "",
         "id": "_YJpXk7WOEeaTvLEWv0tJ7A",
+        "label_box": [
+          123,
+          244,
+          46,
+          11
+        ],
         "name": "Start event",
         "parent": null,
         "pos": [
@@ -13194,6 +13941,12 @@
         ],
         "icon": "",
         "id": "_YJpXp7WOEeaTvLEWv0tJ7A",
+        "label_box": [
+          350,
+          244,
+          84,
+          11
+        ],
         "name": "Gateway (Split flow)",
         "parent": null,
         "pos": [
@@ -13217,6 +13970,12 @@
         ],
         "icon": "",
         "id": "_YJpXyrWOEeaTvLEWv0tJ7A",
+        "label_box": [
+          819,
+          212,
+          42,
+          11
+        ],
         "name": "End event",
         "parent": null,
         "pos": [
@@ -13240,6 +13999,12 @@
         ],
         "icon": "",
         "id": "_YJpXz7WOEeaTvLEWv0tJ7A",
+        "label_box": [
+          762,
+          296,
+          97,
+          11
+        ],
         "name": "Gateway (Merge flows)",
         "parent": null,
         "pos": [
@@ -13263,6 +14028,7 @@
         ],
         "icon": "",
         "id": "_vn1fULWZEeaTvLEWv0tJ7A",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -13286,6 +14052,7 @@
         ],
         "icon": "",
         "id": "_we_w0LWZEeaTvLEWv0tJ7A",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -13309,6 +14076,7 @@
         ],
         "icon": "",
         "id": "_xJRc4LWZEeaTvLEWv0tJ7A",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -13332,6 +14100,7 @@
         ],
         "icon": "",
         "id": "_xuH2YLWZEeaTvLEWv0tJ7A",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -13806,6 +14575,7 @@
         ],
         "icon": "",
         "id": "StartEvent_1",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -13829,6 +14599,7 @@
         ],
         "icon": "",
         "id": "Task_1",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -13852,6 +14623,7 @@
         ],
         "icon": "",
         "id": "Task_2",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -13875,6 +14647,7 @@
         ],
         "icon": "",
         "id": "Task_3",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -13898,6 +14671,7 @@
         ],
         "icon": "",
         "id": "EndEvent_1",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -14093,6 +14867,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -14116,6 +14896,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          64,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -14139,6 +14925,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -14162,6 +14954,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          64,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -14185,6 +14983,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          92,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -14388,6 +15192,7 @@
         ],
         "icon": "",
         "id": "StartEvent_1",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -14411,6 +15216,7 @@
         ],
         "icon": "",
         "id": "Task_1",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -14434,6 +15240,12 @@
         ],
         "icon": "exclusive",
         "id": "ExclusiveGateway_1",
+        "label_box": [
+          258,
+          226,
+          71,
+          38
+        ],
         "name": "Gateway\r\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -14457,6 +15269,7 @@
         ],
         "icon": "",
         "id": "Task_2",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -14480,6 +15293,7 @@
         ],
         "icon": "",
         "id": "Task_3",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -14503,6 +15317,7 @@
         ],
         "icon": "",
         "id": "Task_4",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -14526,6 +15341,12 @@
         ],
         "icon": "exclusive",
         "id": "ExclusiveGateway_2",
+        "label_box": [
+          675,
+          283,
+          88,
+          38
+        ],
         "name": "Gateway\r\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -14549,6 +15370,12 @@
         ],
         "icon": "",
         "id": "EndEvent_1",
+        "label_box": [
+          664,
+          155,
+          65,
+          22
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -15005,6 +15832,12 @@
         ],
         "icon": "",
         "id": "startEvents_188e2d1e-310a-70e4-b8b4-4fbdaf893125",
+        "label_box": [
+          46,
+          98,
+          78,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -15028,6 +15861,12 @@
         ],
         "icon": "",
         "id": "tasks_5fffaee9-1f02-398d-ece9-d9d19495ef48",
+        "label_box": [
+          184,
+          60,
+          120,
+          14
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -15051,6 +15890,12 @@
         ],
         "icon": "",
         "id": "tasks_7a848bbd-66d4-3d96-2a4c-078d6d88d47e",
+        "label_box": [
+          366,
+          60,
+          120,
+          14
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -15074,6 +15919,12 @@
         ],
         "icon": "",
         "id": "tasks_eb6b08f4-0a32-c3c9-8f5c-76c3b0b6c83e",
+        "label_box": [
+          548,
+          60,
+          120,
+          14
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -15097,6 +15948,12 @@
         ],
         "icon": "",
         "id": "endEvents_b2ea9c51-6370-d9d6-f008-def7aa46c55a",
+        "label_box": [
+          686,
+          93,
+          72,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -15292,6 +16149,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -15315,6 +16178,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          92,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -15338,6 +16207,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          64,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -15361,6 +16236,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -15384,6 +16265,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          64,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -15587,6 +16474,12 @@
         ],
         "icon": "",
         "id": "startEvents_928d8632-6ea4-b6d7-a5a9-33063150f848",
+        "label_box": [
+          46,
+          248,
+          78,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -15610,6 +16503,12 @@
         ],
         "icon": "",
         "id": "tasks_31706927-4844-fed3-6a81-325fab042a71",
+        "label_box": [
+          173,
+          210,
+          120,
+          14
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -15633,6 +16532,12 @@
         ],
         "icon": "",
         "id": "exclusiveGateways_b7aa7f3e-3691-3152-9897-943122ec9b32",
+        "label_box": [
+          266,
+          255,
+          116,
+          29
+        ],
         "name": "Gateway \n(Split Flow)",
         "parent": null,
         "pos": [
@@ -15656,6 +16561,12 @@
         ],
         "icon": "",
         "id": "tasks_0f53d58c-a50a-70d0-6c7f-3af1657e0ae3",
+        "label_box": [
+          460,
+          60,
+          120,
+          14
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -15679,6 +16590,7 @@
         ],
         "icon": "",
         "id": "endEvents_81a35621-6400-13b5-6e43-c4aab97bded5",
+        "label_box": null,
         "name": "End Event_40",
         "parent": null,
         "pos": [
@@ -15702,6 +16614,12 @@
         ],
         "icon": "",
         "id": "tasks_27835e08-c764-5eda-cead-141626835c83",
+        "label_box": [
+          460,
+          210,
+          120,
+          14
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -15725,6 +16643,12 @@
         ],
         "icon": "",
         "id": "tasks_30a081e4-decd-9352-b253-1f25e63b32e2",
+        "label_box": [
+          460,
+          360,
+          120,
+          14
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -15748,6 +16672,12 @@
         ],
         "icon": "",
         "id": "exclusiveGateways_8d010724-d30c-e85b-fede-cc5b95084515",
+        "label_box": [
+          674,
+          318,
+          116,
+          29
+        ],
         "name": "Gateway \n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -16167,6 +17097,12 @@
         ],
         "icon": "",
         "id": "EAID_8CDB8192_D731_482a_89A2_CDCFDA67538A",
+        "label_box": [
+          66,
+          89,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -16190,6 +17126,7 @@
         ],
         "icon": "",
         "id": "EAID_E966FCDC_5445_4c18_875B_9666CCC73501",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -16213,6 +17150,7 @@
         ],
         "icon": "",
         "id": "EAID_12193148_F616_4c0e_8874_80B2D05EAF5E",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -16236,6 +17174,7 @@
         ],
         "icon": "",
         "id": "EAID_184C568B_C31F_45c2_B142_8614F191AF57",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -16259,6 +17198,12 @@
         ],
         "icon": "",
         "id": "EAID_D443C4FA_969B_450e_A3EA_951092A9FABC",
+        "label_box": [
+          530,
+          91,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -16462,6 +17407,12 @@
         ],
         "icon": "",
         "id": "EAID_402AC3DD_8D0B_424e_8192_64A308630487",
+        "label_box": [
+          66,
+          174,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -16485,6 +17436,7 @@
         ],
         "icon": "",
         "id": "EAID_655EA7CD_935A_430f_B15D_36AD8058E629",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -16508,6 +17460,12 @@
         ],
         "icon": "",
         "id": "EAID_87D7933B_E37E_4b2b_B29F_C483129F382B",
+        "label_box": [
+          570,
+          120,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -16531,6 +17489,7 @@
         ],
         "icon": "",
         "id": "EAID_6CC6CBE3_DF2C_4a59_B192_11D6998192BC",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -16554,6 +17513,7 @@
         ],
         "icon": "",
         "id": "EAID_8AF7B035_832D_4ef3_8E5F_FD7430A1DC17",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -16577,6 +17537,12 @@
         ],
         "icon": "",
         "id": "EAID_00853A3E_CE22_49ba_A7A7_AF94799657CE",
+        "label_box": [
+          236,
+          181,
+          95,
+          26
+        ],
         "name": "Gateway  (Split Flow)",
         "parent": null,
         "pos": [
@@ -16600,6 +17566,7 @@
         ],
         "icon": "",
         "id": "EAID_68C060A3_E51F_465a_A227_B773148957A6",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -16623,6 +17590,12 @@
         ],
         "icon": "",
         "id": "EAID_6ABEA575_D06A_4f2f_B137_FC540462FBEB",
+        "label_box": [
+          550,
+          217,
+          95,
+          26
+        ],
         "name": "Gateway  (Merge Flows)",
         "parent": null,
         "pos": [
@@ -17054,6 +18027,12 @@
         ],
         "icon": "",
         "id": "EAID_90ADCD9B_F4F7_4e5b_9420_7DCD5B19A950",
+        "label_box": [
+          66,
+          208,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -17077,6 +18056,7 @@
         ],
         "icon": "",
         "id": "EAID_A2560EBF_5100_4fa5_BB19_2BF6EB8E3FBA",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -17100,6 +18080,7 @@
         ],
         "icon": "",
         "id": "EAID_5BEC1212_2E1A_4101_885C_6CD48F9A127B",
+        "label_box": null,
         "name": "Collapsed  Sub-Process",
         "parent": null,
         "pos": [
@@ -17123,6 +18104,7 @@
         ],
         "icon": "",
         "id": "EAID_C2B70965_5D88_4865_A9BA_219CE189C17E",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -17146,6 +18128,12 @@
         ],
         "icon": "",
         "id": "EAID_53E3B8BA_0851_4e0d_842D_5039A0964733",
+        "label_box": [
+          558,
+          208,
+          95,
+          13
+        ],
         "name": "End Event 1",
         "parent": null,
         "pos": [
@@ -17169,6 +18157,7 @@
         ],
         "icon": "",
         "id": "EAID_E67D785A_C100_495c_BFEC_FD6FF2A3EE91",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -17192,6 +18181,7 @@
         ],
         "icon": "",
         "id": "EAID_C2C32799_6881_4d1d_B729_D33F0B66DF07",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -17215,6 +18205,12 @@
         ],
         "icon": "",
         "id": "EAID_472A7820_589D_438c_8F45_30489D877994",
+        "label_box": [
+          516,
+          330,
+          95,
+          13
+        ],
         "name": "End Event 2",
         "parent": null,
         "pos": [
@@ -17238,6 +18234,12 @@
         ],
         "icon": "message",
         "id": "EAID_F770C055_AC65_429a_8370_8971C49FD29E",
+        "label_box": [
+          260,
+          105,
+          97,
+          52
+        ],
         "name": "Boundary Intermediate Event Non-Interrupting Message",
         "parent": null,
         "pos": [
@@ -17261,6 +18263,12 @@
         ],
         "icon": "escalation",
         "id": "EAID_D2808E6E_A8B9_4ed8_B6AE_7DEFDD23F324",
+        "label_box": [
+          274,
+          267,
+          97,
+          52
+        ],
         "name": "Boundary Intermediate Event Interrupting Escalation",
         "parent": null,
         "pos": [
@@ -17640,6 +18648,7 @@
         ],
         "icon": "",
         "id": "_1733f085-7677-4aca-8df0-2de0157cb51e",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -17663,6 +18672,7 @@
         ],
         "icon": "",
         "id": "_8178c994-d3d2-4b2b-a2c6-5a80196be7a5",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -17686,6 +18696,7 @@
         ],
         "icon": "",
         "id": "_50173386-a3b8-4372-b615-df0fc634abd1",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -17709,6 +18720,7 @@
         ],
         "icon": "",
         "id": "_cdcb0246-df3c-4ca4-8c04-ddfd55a32aab",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -17732,6 +18744,7 @@
         ],
         "icon": "",
         "id": "_45f3ccbd-8a47-4c2f-896d-289d8c393ad2",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -17927,6 +18940,7 @@
         ],
         "icon": "",
         "id": "_675d9636-829d-4990-9d56-25a55dc7aab1",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -17950,6 +18964,7 @@
         ],
         "icon": "",
         "id": "_eda429b5-ab32-4383-89f6-ddf2b027d3b4",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -17973,6 +18988,7 @@
         ],
         "icon": "",
         "id": "_1d49743f-ebb7-41eb-b26e-90d7b0c240c4",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -17996,6 +19012,7 @@
         ],
         "icon": "",
         "id": "_0dd4c128-cabb-4744-94ea-1aba338cdb82",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -18019,6 +19036,7 @@
         ],
         "icon": "",
         "id": "_5a86c7e5-0900-443b-ae2a-4b05b3b733ae",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -18042,6 +19060,7 @@
         ],
         "icon": "",
         "id": "_8794e63d-202f-4d7e-9240-17f7e9eb0d69",
+        "label_box": null,
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -18065,6 +19084,7 @@
         ],
         "icon": "",
         "id": "_b6575e25-bfe8-48ad-b043-c45a9c121fd5",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -18088,6 +19108,7 @@
         ],
         "icon": "",
         "id": "_3133457e-229f-4d5c-b799-c582c68fcf38",
+        "label_box": null,
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -18507,6 +19528,7 @@
         ],
         "icon": "",
         "id": "_0dcdb7c6-b848-45a7-92b1-9e5853a457ce",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -18530,6 +19552,7 @@
         ],
         "icon": "",
         "id": "_4810e8e6-ee67-418c-9819-d967fc3d169f",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -18553,6 +19576,7 @@
         ],
         "icon": "",
         "id": "_566194a5-3db4-482e-89b6-b82c596dad34",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -18576,6 +19600,7 @@
         ],
         "icon": "",
         "id": "_01ccf015-a327-46af-b2b0-f68d54047bfb",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -18599,6 +19624,7 @@
         ],
         "icon": "",
         "id": "_74ffdf57-64b4-4631-894f-7d85fc0f896b",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -18622,6 +19648,7 @@
         ],
         "icon": "",
         "id": "_e8f86f9a-51f9-4584-a59b-9139026047de",
+        "label_box": null,
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -18645,6 +19672,7 @@
         ],
         "icon": "",
         "id": "_05782077-15b0-404f-98d2-31e015d148bf",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -18668,6 +19696,7 @@
         ],
         "icon": "",
         "id": "_45d6d303-d01c-4d79-8855-1c2fabdcb613",
+        "label_box": null,
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -19290,6 +20319,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          48,
+          93,
+          102,
+          11
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -19313,6 +20348,7 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -19336,6 +20372,7 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -19359,6 +20396,7 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -19382,6 +20420,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          510,
+          93,
+          102,
+          11
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -21275,6 +22319,12 @@
         ],
         "icon": "message",
         "id": "sid-36EA43D1-0FE6-4197-AC57-7A43785B784B",
+        "label_box": [
+          133,
+          177,
+          65,
+          22
+        ],
         "name": "Invoice\nreceived",
         "parent": null,
         "pos": [
@@ -21298,6 +22348,7 @@
         ],
         "icon": "",
         "id": "sid-05039C4F-59F7-4CBD-8C84-D35E27C7B5EF",
+        "label_box": null,
         "name": "Scan Invoice",
         "parent": null,
         "pos": [
@@ -21321,6 +22372,7 @@
         ],
         "icon": "",
         "id": "sid-CFAC8502-0E69-4F08-BE36-8499B8C0FA44",
+        "label_box": null,
         "name": "Archive\noriginal",
         "parent": null,
         "pos": [
@@ -21344,6 +22396,7 @@
         ],
         "icon": "",
         "id": "sid-BC9AC0B6-1785-4E35-A974-7FEF1A586B9D",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -21367,6 +22420,12 @@
         ],
         "icon": "message",
         "id": "sid-40EC6574-E644-425C-8CE7-EE384F0C3520",
+        "label_box": [
+          489,
+          113,
+          81,
+          22
+        ],
         "name": "Approver to \nbe assigned",
         "parent": null,
         "pos": [
@@ -21390,6 +22449,7 @@
         ],
         "icon": "",
         "id": "sid-64AFCE49-96A2-4A51-96CB-9DF689C37DAD",
+        "label_box": null,
         "name": "Assign approver",
         "parent": null,
         "pos": [
@@ -21413,6 +22473,7 @@
         ],
         "icon": "event",
         "id": "sid-F0D29912-929D-491C-8D23-73BD80CF980A",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -21436,6 +22497,12 @@
         ],
         "icon": "message",
         "id": "sid-B548B980-12E3-408E-9AC4-7031B85A8F2D",
+        "label_box": [
+          764,
+          154,
+          98,
+          22
+        ],
         "name": "Invoice review\n needed",
         "parent": null,
         "pos": [
@@ -21459,6 +22526,7 @@
         ],
         "icon": "",
         "id": "sid-6FC20E19-AF3A-4A77-8588-2D671C98D93D",
+        "label_box": null,
         "name": "Review and document result",
         "parent": null,
         "pos": [
@@ -21482,6 +22550,12 @@
         ],
         "icon": "timer",
         "id": "sid-0E349B8B-14A7-4565-988A-38F3A9B624D2",
+        "label_box": [
+          764,
+          69,
+          50,
+          11
+        ],
         "name": "7 days",
         "parent": null,
         "pos": [
@@ -21505,6 +22579,7 @@
         ],
         "icon": "",
         "id": "sid-282524E6-660F-431D-8F19-1C3E9E9DE817",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -21528,6 +22603,7 @@
         ],
         "icon": "user",
         "id": "approveInvoice",
+        "label_box": null,
         "name": "Approve Invoice",
         "parent": null,
         "pos": [
@@ -21551,6 +22627,12 @@
         ],
         "icon": "",
         "id": "invoice_approved",
+        "label_box": [
+          538,
+          581,
+          72,
+          22
+        ],
         "name": "Invoice\napproved?",
         "parent": null,
         "pos": [
@@ -21574,6 +22656,7 @@
         ],
         "icon": "user",
         "id": "assignApprover",
+        "label_box": null,
         "name": "Assign\nApprover",
         "parent": null,
         "pos": [
@@ -21597,6 +22680,7 @@
         ],
         "icon": "user",
         "id": "reviewInvoice",
+        "label_box": null,
         "name": "Rechnung kl�ren",
         "parent": null,
         "pos": [
@@ -21620,6 +22704,12 @@
         ],
         "icon": "",
         "id": "reviewSuccessful_gw",
+        "label_box": [
+          743,
+          408,
+          83,
+          22
+        ],
         "name": "Review\nsuccessful?",
         "parent": null,
         "pos": [
@@ -21643,6 +22733,12 @@
         ],
         "icon": "",
         "id": "invoiceNotProcessed",
+        "label_box": [
+          974,
+          406,
+          80,
+          22
+        ],
         "name": "Invoice not\nprocessed",
         "parent": null,
         "pos": [
@@ -21666,6 +22762,12 @@
         ],
         "icon": "message",
         "id": "StartEvent_1",
+        "label_box": [
+          143,
+          406,
+          65,
+          22
+        ],
         "name": "Invoice\nreceived",
         "parent": null,
         "pos": [
@@ -21689,6 +22791,7 @@
         ],
         "icon": "user",
         "id": "prepareBankTransfer",
+        "label_box": null,
         "name": "Prepare\r\nBank\r\nTransfer",
         "parent": null,
         "pos": [
@@ -21712,6 +22815,12 @@
         ],
         "icon": "",
         "id": "invoiceProcessed",
+        "label_box": [
+          975,
+          739,
+          71,
+          22
+        ],
         "name": "Invoice\nprocessed",
         "parent": null,
         "pos": [
@@ -21735,6 +22844,7 @@
         ],
         "icon": "service",
         "id": "archiveInvoice",
+        "label_box": null,
         "name": "Archive\nInvoice",
         "parent": null,
         "pos": [
@@ -24509,6 +25619,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          615,
+          110,
+          90,
+          20
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -24532,6 +25648,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          355,
+          90,
+          70,
+          20
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -24555,6 +25677,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          35,
+          100,
+          90,
+          20
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -24578,6 +25706,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          515,
+          90,
+          70,
+          20
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -24601,6 +25735,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          185,
+          90,
+          70,
+          20
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -24808,6 +25948,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          45,
+          180,
+          90,
+          20
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -24831,6 +25977,12 @@
         ],
         "icon": "exclusive",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": [
+          240,
+          190,
+          100,
+          40
+        ],
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -24854,6 +26006,12 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": [
+          395,
+          180,
+          70,
+          20
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -24877,6 +26035,12 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": [
+          165,
+          180,
+          70,
+          20
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -24900,6 +26064,12 @@
         ],
         "icon": "exclusive",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": [
+          550,
+          220,
+          100,
+          40
+        ],
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -24923,6 +26093,12 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": [
+          395,
+          90,
+          70,
+          20
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -24946,6 +26122,12 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": [
+          395,
+          270,
+          70,
+          20
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -24969,6 +26151,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          545,
+          120,
+          90,
+          20
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -25415,6 +26603,12 @@
         ],
         "icon": "",
         "id": "_To9ZojOCEeSknpIVFCxNIQ",
+        "label_box": [
+          40,
+          160,
+          60,
+          20
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -25438,6 +26632,12 @@
         ],
         "icon": "",
         "id": "_To9ZsTOCEeSknpIVFCxNIQ",
+        "label_box": [
+          640,
+          130,
+          60,
+          20
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -25461,6 +26661,12 @@
         ],
         "icon": "exclusive",
         "id": "_To9Z2TOCEeSknpIVFCxNIQ",
+        "label_box": [
+          600,
+          230,
+          80,
+          40
+        ],
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -25484,6 +26690,12 @@
         ],
         "icon": "",
         "id": "_To9ZzzOCEeSknpIVFCxNIQ",
+        "label_box": [
+          450,
+          260,
+          40,
+          20
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -25507,6 +26719,12 @@
         ],
         "icon": "",
         "id": "_To9ZwDOCEeSknpIVFCxNIQ",
+        "label_box": [
+          450,
+          170,
+          40,
+          20
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -25530,6 +26748,12 @@
         ],
         "icon": "",
         "id": "_To9ZtjOCEeSknpIVFCxNIQ",
+        "label_box": [
+          450,
+          80,
+          40,
+          20
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -25553,6 +26777,12 @@
         ],
         "icon": "exclusive",
         "id": "_To9ZyjOCEeSknpIVFCxNIQ",
+        "label_box": [
+          270,
+          180,
+          80,
+          40
+        ],
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -25576,6 +26806,12 @@
         ],
         "icon": "",
         "id": "_To9ZpzOCEeSknpIVFCxNIQ",
+        "label_box": [
+          180,
+          170,
+          40,
+          20
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -26102,6 +27338,12 @@
         ],
         "icon": "",
         "id": "StartEvent_1_c9ab2e80-3687-4bd7-8ee3-5b0557564ee3",
+        "label_box": [
+          51,
+          102,
+          56,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -26125,6 +27367,7 @@
         ],
         "icon": "",
         "id": "Task_0wit7fr",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -26148,6 +27391,7 @@
         ],
         "icon": "",
         "id": "Task_017drfa",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -26171,6 +27415,7 @@
         ],
         "icon": "",
         "id": "Task_0qzyx7u",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -26194,6 +27439,12 @@
         ],
         "icon": "",
         "id": "EndEvent_03mw0lg",
+        "label_box": [
+          585,
+          102,
+          52,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -26389,6 +27640,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -26412,6 +27669,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          64,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -26435,6 +27698,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -26458,6 +27727,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          64,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -26481,6 +27756,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          92,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -26684,6 +27965,12 @@
         ],
         "icon": "",
         "id": "StartEvent_1_5079544c-5607-4d01-9243-aaf7dde2c011",
+        "label_box": [
+          50,
+          210,
+          56,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -26707,6 +27994,7 @@
         ],
         "icon": "",
         "id": "Task_00dc0rw",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -26730,6 +28018,12 @@
         ],
         "icon": "exclusive",
         "id": "ExclusiveGateway_0mczbaf",
+        "label_box": [
+          260,
+          208,
+          73,
+          27
+        ],
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -26753,6 +28047,7 @@
         ],
         "icon": "",
         "id": "Task_0o43cjj",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -26776,6 +28071,12 @@
         ],
         "icon": "exclusive",
         "id": "ExclusiveGateway_1ttx3vs",
+        "label_box": [
+          638,
+          258,
+          82,
+          27
+        ],
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -26799,6 +28100,7 @@
         ],
         "icon": "",
         "id": "Task_1fvgfx7",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -26822,6 +28124,12 @@
         ],
         "icon": "",
         "id": "EndEvent_1srq4k4",
+        "label_box": [
+          698,
+          131,
+          52,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -26845,6 +28153,7 @@
         ],
         "icon": "",
         "id": "Task_1bb5z5d",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -27264,6 +28573,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -27287,6 +28602,7 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -27310,6 +28626,7 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -27333,6 +28650,7 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -27356,6 +28674,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          92,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -27559,6 +28883,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          45,
+          176,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -27582,6 +28912,7 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -27605,6 +28936,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          548,
+          122,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -27628,6 +28965,7 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -27651,6 +28989,7 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -27674,6 +29013,7 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": null,
         "name": "Gateway  (Split Flow)",
         "parent": null,
         "pos": [
@@ -27697,6 +29037,7 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -27720,6 +29061,7 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": null,
         "name": "Gateway  (Merge Flows)",
         "parent": null,
         "pos": [
@@ -28151,6 +29493,12 @@
         ],
         "icon": "",
         "id": "_To9ZojOCEeSknpIVFCxNIQ",
+        "label_box": [
+          46,
+          162,
+          63,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -28174,6 +29522,7 @@
         ],
         "icon": "",
         "id": "_To9ZpzOCEeSknpIVFCxNIQ",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -28197,6 +29546,12 @@
         ],
         "icon": "",
         "id": "_To9ZsTOCEeSknpIVFCxNIQ",
+        "label_box": [
+          640,
+          130,
+          56,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -28220,6 +29575,7 @@
         ],
         "icon": "",
         "id": "_To9ZtjOCEeSknpIVFCxNIQ",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -28243,6 +29599,7 @@
         ],
         "icon": "",
         "id": "_To9ZwDOCEeSknpIVFCxNIQ",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -28266,6 +29623,7 @@
         ],
         "icon": "",
         "id": "_To9ZyjOCEeSknpIVFCxNIQ",
+        "label_box": null,
         "name": "Gateway\r\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -28289,6 +29647,7 @@
         ],
         "icon": "",
         "id": "_To9ZzzOCEeSknpIVFCxNIQ",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -28312,6 +29671,7 @@
         ],
         "icon": "",
         "id": "_To9Z2TOCEeSknpIVFCxNIQ",
+        "label_box": null,
         "name": "Gateway  \r\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -28731,6 +30091,7 @@
         ],
         "icon": "",
         "id": "MO-b43a9342-dd0a-412d-a437-d7ab8505b242",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -28754,6 +30115,7 @@
         ],
         "icon": "",
         "id": "MO-e8040a88-da67-4ca7-8bb8-14fec10a4cb0",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -28777,6 +30139,7 @@
         ],
         "icon": "",
         "id": "MO-989159db-1fe7-4475-a49c-53ef452c8716",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -28800,6 +30163,7 @@
         ],
         "icon": "",
         "id": "MO-4338319d-11bd-4c0b-b2fa-4a140505fe63",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -28823,6 +30187,7 @@
         ],
         "icon": "",
         "id": "MO-3e7db174-3dd6-4818-984e-4c4370b5fec9",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -29026,6 +30391,7 @@
         ],
         "icon": "",
         "id": "MO-9d5708f3-d4d2-4858-b2d0-89a055004389",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -29049,6 +30415,7 @@
         ],
         "icon": "",
         "id": "MO-eea4ec79-7538-4dfe-9c5b-bd4fc64e6c2c",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -29072,6 +30439,7 @@
         ],
         "icon": "",
         "id": "MO-f688da27-ce0e-495c-bcc7-f6a97395ee2d",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -29095,6 +30463,7 @@
         ],
         "icon": "",
         "id": "MO-f6e7fcee-d4c8-4ebc-8256-43e0bf2a01ed",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -29118,6 +30487,7 @@
         ],
         "icon": "",
         "id": "MO-0ff9894b-b9c1-4b6a-bac7-37c631c060ea",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -29321,6 +30691,7 @@
         ],
         "icon": "",
         "id": "MO-51a2f147-1ba0-46b6-ace7-f4fb0aea7d8b",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -29344,6 +30715,7 @@
         ],
         "icon": "",
         "id": "MO-48bd1751-062a-481b-a79e-886c9a466cc8",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -29367,6 +30739,7 @@
         ],
         "icon": "",
         "id": "MO-ba954506-aa70-4e32-823c-37bd48e6ef61",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -29390,6 +30763,7 @@
         ],
         "icon": "",
         "id": "MO-563b1508-e4b5-4f3f-adb4-c98492c7f202",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -29413,6 +30787,7 @@
         ],
         "icon": "",
         "id": "MO-6529d36a-f19a-488b-9a92-a8cf943ae981",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -29436,6 +30811,7 @@
         ],
         "icon": "",
         "id": "MO-494fe7a8-6951-4d94-8375-2ae2a2bfdf46",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -29459,6 +30835,7 @@
         ],
         "icon": "parallel",
         "id": "MO-c517a7f8-5f7f-4a8e-aeb2-fbd424b301dc",
+        "label_box": null,
         "name": "Gateway",
         "parent": null,
         "pos": [
@@ -29482,6 +30859,7 @@
         ],
         "icon": "parallel",
         "id": "MO-6fea8dc1-0f3e-4d41-94b0-8d8f0985151b",
+        "label_box": null,
         "name": "Gateway",
         "parent": null,
         "pos": [
@@ -29897,6 +31275,7 @@
         ],
         "icon": "",
         "id": "_7",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -29920,6 +31299,7 @@
         ],
         "icon": "",
         "id": "_6",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -29943,6 +31323,7 @@
         ],
         "icon": "",
         "id": "_9",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -29966,6 +31347,7 @@
         ],
         "icon": "",
         "id": "_11",
+        "label_box": null,
         "name": "Task1",
         "parent": null,
         "pos": [
@@ -29989,6 +31371,7 @@
         ],
         "icon": "",
         "id": "_13",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -30184,6 +31567,7 @@
         ],
         "icon": "",
         "id": "_7",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -30207,6 +31591,7 @@
         ],
         "icon": "",
         "id": "_6",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -30230,6 +31615,7 @@
         ],
         "icon": "",
         "id": "_9",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -30253,6 +31639,7 @@
         ],
         "icon": "",
         "id": "_11",
+        "label_box": null,
         "name": "Task1",
         "parent": null,
         "pos": [
@@ -30276,6 +31663,7 @@
         ],
         "icon": "",
         "id": "_13",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -30471,6 +31859,7 @@
         ],
         "icon": "",
         "id": "_7",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -30494,6 +31883,7 @@
         ],
         "icon": "",
         "id": "_9",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -30517,6 +31907,7 @@
         ],
         "icon": "",
         "id": "_10",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -30540,6 +31931,7 @@
         ],
         "icon": "exclusive",
         "id": "_12",
+        "label_box": null,
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -30563,6 +31955,7 @@
         ],
         "icon": "",
         "id": "_6",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -30586,6 +31979,7 @@
         ],
         "icon": "",
         "id": "_14",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -30609,6 +32003,7 @@
         ],
         "icon": "",
         "id": "_17",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -30632,6 +32027,7 @@
         ],
         "icon": "exclusive",
         "id": "_19",
+        "label_box": null,
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -31051,6 +32447,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -31074,6 +32476,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          64,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -31097,6 +32505,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -31120,6 +32534,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          64,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -31143,6 +32563,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          92,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -31346,6 +32772,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -31369,6 +32801,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          64,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -31392,6 +32830,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -31415,6 +32859,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          64,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -31438,6 +32888,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          92,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -31661,6 +33117,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          45,
+          176,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -31684,6 +33146,12 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": [
+          138,
+          149,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -31707,6 +33175,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          548,
+          122,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -31730,6 +33204,12 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": [
+          366,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -31753,6 +33233,12 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": [
+          366,
+          149,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -31776,6 +33262,12 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": [
+          228,
+          182,
+          95,
+          26
+        ],
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -31799,6 +33291,12 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": [
+          366,
+          244,
+          72,
+          13
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -31822,6 +33320,12 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": [
+          546,
+          218,
+          95,
+          26
+        ],
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -32253,6 +33757,12 @@
         ],
         "icon": "",
         "id": "sid-C069430A-FCD2-404F-B0F8-3A4D85BBB31F",
+        "label_box": [
+          45,
+          93,
+          57,
+          11
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -32276,6 +33786,12 @@
         ],
         "icon": "",
         "id": "sid-35027A00-C747-43EC-A8BB-9F8BA65FC08C",
+        "label_box": [
+          185,
+          68,
+          36,
+          12
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -32299,6 +33815,12 @@
         ],
         "icon": "",
         "id": "sid-28CA9418-A686-4DD4-9576-2611515C414F",
+        "label_box": [
+          360,
+          68,
+          36,
+          12
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -32322,6 +33844,12 @@
         ],
         "icon": "",
         "id": "sid-14AEB3ED-8880-4C11-9E6C-B866FBDF9351",
+        "label_box": [
+          535,
+          68,
+          36,
+          12
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -32345,6 +33873,12 @@
         ],
         "icon": "",
         "id": "sid-0B227E38-4B4F-4AEF-85C8-29828C1DFF38",
+        "label_box": [
+          674,
+          91,
+          51,
+          11
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -32540,6 +34074,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          26,
+          90,
+          57,
+          11
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -32563,6 +34103,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          63,
+          33,
+          11
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -32586,6 +34132,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          63,
+          33,
+          11
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -32609,6 +34161,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          63,
+          33,
+          11
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -32632,6 +34190,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          486,
+          91,
+          51,
+          11
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -32835,6 +34399,12 @@
         ],
         "icon": "",
         "id": "sid-C069430A-FCD2-404F-B0F8-3A4D85BBB31F",
+        "label_box": [
+          45,
+          222,
+          57,
+          11
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -32858,6 +34428,12 @@
         ],
         "icon": "",
         "id": "sid-35027A00-C747-43EC-A8BB-9F8BA65FC08C",
+        "label_box": [
+          185,
+          198,
+          36,
+          12
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -32881,6 +34457,12 @@
         ],
         "icon": "",
         "id": "sid-28CA9418-A686-4DD4-9576-2611515C414F",
+        "label_box": [
+          496,
+          68,
+          36,
+          12
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -32904,6 +34486,12 @@
         ],
         "icon": "",
         "id": "sid-0B227E38-4B4F-4AEF-85C8-29828C1DFF38",
+        "label_box": [
+          759,
+          172,
+          51,
+          11
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -32927,6 +34515,12 @@
         ],
         "icon": "",
         "id": "sid-A18FB91D-A854-460E-A012-6DB0628FB5DB",
+        "label_box": [
+          390,
+          222,
+          61,
+          24
+        ],
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -32950,6 +34544,12 @@
         ],
         "icon": "",
         "id": "sid-9C797D74-EF57-4E27-8933-984D257F72A8",
+        "label_box": [
+          496,
+          198,
+          36,
+          12
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -32973,6 +34573,12 @@
         ],
         "icon": "",
         "id": "sid-32FA64AE-D938-49BA-B86D-265DEB089639",
+        "label_box": [
+          496,
+          328,
+          36,
+          12
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -32996,6 +34602,12 @@
         ],
         "icon": "",
         "id": "sid-F8DDD239-8DD8-46F7-BA9B-C95C316715E3",
+        "label_box": [
+          657,
+          290,
+          76,
+          24
+        ],
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -33415,6 +35027,7 @@
         ],
         "icon": "",
         "id": "_a3df15ad-7bdd-425a-80b5-46cb23b21ee9",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -33438,6 +35051,7 @@
         ],
         "icon": "",
         "id": "_d25d2c4c-9952-421e-9aa4-d5bb4b41e81c",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -33461,6 +35075,7 @@
         ],
         "icon": "",
         "id": "_25beb840-5dec-4f64-82d5-80eba90cb611",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -33484,6 +35099,7 @@
         ],
         "icon": "",
         "id": "_e75e5bfb-8763-49d5-b6f4-c396a0d14ef1",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -33507,6 +35123,7 @@
         ],
         "icon": "",
         "id": "_547a42e1-5a67-4873-b307-1361545b5ce5",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -33718,6 +35335,7 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -33741,6 +35359,7 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -33764,6 +35383,7 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -33787,6 +35407,7 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -33810,6 +35431,7 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -34005,6 +35627,7 @@
         ],
         "icon": "",
         "id": "_89c4d6da-e9db-4ce4-a70f-725015bec46b",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -34028,6 +35651,7 @@
         ],
         "icon": "",
         "id": "_67ece5c8-fb0a-4819-8d7e-d6979d5a3549",
+        "label_box": null,
         "name": "Gateway&#xA;(Split Flow)",
         "parent": null,
         "pos": [
@@ -34051,6 +35675,7 @@
         ],
         "icon": "",
         "id": "_ef342c21-59b8-43d3-bc85-5ac981ed86a4",
+        "label_box": null,
         "name": "Gateway&#xA;(Merge Flows)",
         "parent": null,
         "pos": [
@@ -34074,6 +35699,7 @@
         ],
         "icon": "",
         "id": "_bde187ab-5552-4546-8051-557b600c409e",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -34097,6 +35723,7 @@
         ],
         "icon": "",
         "id": "_abb8320b-094a-4f51-be10-f04b90a19f94",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -34120,6 +35747,7 @@
         ],
         "icon": "",
         "id": "_3c86dfd6-858f-401a-8b38-0261b031a582",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -34143,6 +35771,7 @@
         ],
         "icon": "",
         "id": "_eee27f94-f4a3-4220-82f4-2a9a840d0bdf",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -34166,6 +35795,7 @@
         ],
         "icon": "",
         "id": "_fe565175-4b64-45f8-b8bf-4a9062358662",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -34601,6 +36231,12 @@
         ],
         "icon": "",
         "id": "_c7f433b9-beb1-4ae5-96b1-800e5197c609",
+        "label_box": [
+          46,
+          101,
+          110,
+          16
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -34624,6 +36260,12 @@
         ],
         "icon": "",
         "id": "_8c2c7458-bcfb-411a-8521-f57679841e4f",
+        "label_box": [
+          152,
+          68,
+          90,
+          16
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -34647,6 +36289,12 @@
         ],
         "icon": "",
         "id": "_404e7295-388b-44ac-bfb6-d88f2256fcb6",
+        "label_box": [
+          301,
+          68,
+          90,
+          16
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -34670,6 +36318,12 @@
         ],
         "icon": "",
         "id": "_8ccc1869-b233-4c22-a49f-67ba0554089a",
+        "label_box": [
+          450,
+          68,
+          90,
+          16
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -34693,6 +36347,12 @@
         ],
         "icon": "",
         "id": "_add1aa41-fc62-446a-b3e1-7623dc35bbc2",
+        "label_box": [
+          559,
+          101,
+          110,
+          16
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -34888,6 +36548,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          92,
+          95,
+          16
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -34911,6 +36577,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          64,
+          72,
+          16
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -34934,6 +36606,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          64,
+          72,
+          16
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -34957,6 +36635,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          64,
+          72,
+          16
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -34980,6 +36664,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          93,
+          95,
+          16
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -35183,6 +36873,12 @@
         ],
         "icon": "",
         "id": "_9784ff37-b56b-45ee-87ab-25897c06bb40",
+        "label_box": [
+          46,
+          200,
+          110,
+          16
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -35206,6 +36902,12 @@
         ],
         "icon": "",
         "id": "_8dc1f50b-1762-4733-887c-d5358584bb2a",
+        "label_box": [
+          152,
+          167,
+          90,
+          16
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -35229,6 +36931,12 @@
         ],
         "icon": "",
         "id": "_e3c03b52-b407-4d04-b6cc-651dceb460d4",
+        "label_box": [
+          239,
+          215,
+          110,
+          31
+        ],
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -35252,6 +36960,12 @@
         ],
         "icon": "",
         "id": "_ad7cce06-07cb-4323-af51-f322fc87ee50",
+        "label_box": [
+          417,
+          68,
+          90,
+          16
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -35275,6 +36989,12 @@
         ],
         "icon": "",
         "id": "_c3de7cfc-61a4-4d8a-b9d1-3b6f6fce48d4",
+        "label_box": [
+          417,
+          267,
+          90,
+          16
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -35298,6 +37018,12 @@
         ],
         "icon": "",
         "id": "_48a55822-4a82-4249-af62-e09f71d73eed",
+        "label_box": [
+          417,
+          167,
+          90,
+          16
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -35321,6 +37047,12 @@
         ],
         "icon": "",
         "id": "_2b58a326-34e7-4b55-bc3f-5cc6281cb942",
+        "label_box": [
+          616,
+          147,
+          110,
+          16
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -35344,6 +37076,12 @@
         ],
         "icon": "",
         "id": "_ea06a0d9-93fe-44bc-bb74-fcd99b7247d8",
+        "label_box": [
+          544,
+          250,
+          110,
+          31
+        ],
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -35763,6 +37501,7 @@
         ],
         "icon": "",
         "id": "_93c466ab_b271_4376_a427_f4c353d55ce8",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -35786,6 +37525,7 @@
         ],
         "icon": "",
         "id": "_ec59e164_68b4_4f94_98de_ffb1c58a84af",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -35809,6 +37549,7 @@
         ],
         "icon": "",
         "id": "_820c21c0_45f3_473b_813f_06381cc637cd",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -35832,6 +37573,7 @@
         ],
         "icon": "",
         "id": "_e70a6fcb_913c_4a7b_a65d_e83adc73d69c",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -35855,6 +37597,7 @@
         ],
         "icon": "",
         "id": "_a47df184_085b_49f7_bb82_031c84625821",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -36050,6 +37793,7 @@
         ],
         "icon": "",
         "id": "_6b5db6a9_037a_49ad_9201_09201e2aaa97",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -36073,6 +37817,7 @@
         ],
         "icon": "",
         "id": "_5a972b87_735d_454a_b31c_f52fb3afc5c7",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -36096,6 +37841,7 @@
         ],
         "icon": "",
         "id": "_258f51eb_b764_4a71_b681_3a01cca14143",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -36119,6 +37865,7 @@
         ],
         "icon": "",
         "id": "_4f7d62d7_f0e6_46bc_be00_69e02da38f65",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -36142,6 +37889,7 @@
         ],
         "icon": "",
         "id": "_e6eb725a_34bc_45c7_aed0_9f9596cd7bee",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -36165,6 +37913,7 @@
         ],
         "icon": "",
         "id": "_35fe57a7_1302_44e2_bf58_032f11af7ecb",
+        "label_box": null,
         "name": "Gateway  (Split Flow)",
         "parent": null,
         "pos": [
@@ -36188,6 +37937,7 @@
         ],
         "icon": "",
         "id": "_7d399717_1aba_47ac_8d7d_8aaa033255e0",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -36211,6 +37961,7 @@
         ],
         "icon": "",
         "id": "_33c66216_391c_49c2_aa19_d8f0b7f5f91d",
+        "label_box": null,
         "name": "Gateway  (Merge Flows)",
         "parent": null,
         "pos": [
@@ -36630,6 +38381,7 @@
         ],
         "icon": "",
         "id": "_1ac4b759_40e3_4dfb_b0e3_ad1d201d6c3d",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -36653,6 +38405,7 @@
         ],
         "icon": "",
         "id": "_65f5459f_44ae_436d_a089_a91d6d78075b",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -36676,6 +38429,7 @@
         ],
         "icon": "",
         "id": "_1ae31d1b_2559_4f78_a3ec_47986a49db48",
+        "label_box": null,
         "name": "Collapsed  Sub-Process",
         "parent": null,
         "pos": [
@@ -36699,6 +38453,7 @@
         ],
         "icon": "message",
         "id": "_1ae31d1b_2559_4f78_a3ec_47986a49db48__428dcbf5_8e5e_48e0_9c0c_d93003fa8c82",
+        "label_box": null,
         "name": "Boundary Intermediate Event Non-Interrupting Message",
         "parent": null,
         "pos": [
@@ -36722,6 +38477,7 @@
         ],
         "icon": "escalation",
         "id": "_1ae31d1b_2559_4f78_a3ec_47986a49db48__178e16eb_4c9e_4ea0_9644_7c5fb2b71825",
+        "label_box": null,
         "name": "Boundary Intermediate Event Interrupting Escalation",
         "parent": null,
         "pos": [
@@ -36745,6 +38501,7 @@
         ],
         "icon": "",
         "id": "_9fad8da5_a28c_4b6b_bb71_fbd5c65b9681",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -36768,6 +38525,7 @@
         ],
         "icon": "",
         "id": "_ce253897_4300_4b24_b71f_4c9535698c70",
+        "label_box": null,
         "name": "End Event 1",
         "parent": null,
         "pos": [
@@ -36791,6 +38549,7 @@
         ],
         "icon": "",
         "id": "_72204cd7_709c_4656_9554_3ae29b3844ce",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -36814,6 +38573,7 @@
         ],
         "icon": "",
         "id": "_2d2d0d29_896f_49f9_8109_77a7304309c5",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -36837,6 +38597,7 @@
         ],
         "icon": "",
         "id": "_10ce0b26_1b3e_46a2_85a5_62538ed2da13",
+        "label_box": null,
         "name": "End Event 2",
         "parent": null,
         "pos": [
@@ -37204,6 +38965,12 @@
         ],
         "icon": "",
         "id": "Bpmn_StartEvent_96gY5DdFEeiW3v9acRxPOA",
+        "label_box": [
+          46,
+          88,
+          88,
+          17
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -37227,6 +38994,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_96g_20e98TdFEeiW3v9acRxPOA",
+        "label_box": [
+          198,
+          64,
+          57,
+          17
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -37250,6 +39023,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_201rBUB5cDdGEeiW3v9acRxPOA",
+        "label_box": [
+          374,
+          62,
+          57,
+          17
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -37273,6 +39052,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_er19B9u9wzdGEeiW3v9acRxPOA",
+        "label_box": [
+          558,
+          62,
+          57,
+          17
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -37296,6 +39081,12 @@
         ],
         "icon": "",
         "id": "Bpmn_EndEvent_C5_KozdGEeiW3v9acRxPOA",
+        "label_box": [
+          694,
+          88,
+          74,
+          17
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -37503,6 +39294,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          46,
+          85,
+          59,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -37526,6 +39323,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          157,
+          65,
+          40,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -37549,6 +39352,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          301,
+          65,
+          40,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -37572,6 +39381,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          437,
+          65,
+          40,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -37595,6 +39410,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          548,
+          91,
+          56,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -37802,6 +39623,12 @@
         ],
         "icon": "",
         "id": "Bpmn_StartEvent_LB00dDdGEeiW3v9acRxPOA",
+        "label_box": [
+          46,
+          187,
+          85,
+          17
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -37825,6 +39652,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_78r9LB00dzdGEeiW3v9acRxPOA",
+        "label_box": [
+          174,
+          163,
+          50,
+          17
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -37848,6 +39681,12 @@
         ],
         "icon": "",
         "id": "Bpmn_ExclusiveGateway_OE8AIjdGEeiW3v9acRxPOA",
+        "label_box": [
+          261,
+          204,
+          92,
+          34
+        ],
         "name": "Gateway\r\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -37871,6 +39710,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_89r9QJfR0zdGEeiW3v9acRxPOA",
+        "label_box": [
+          466,
+          63,
+          50,
+          17
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -37894,6 +39739,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_289rRmO8pzdGEeiW3v9acRxPOA",
+        "label_box": [
+          470,
+          165,
+          50,
+          17
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -37917,6 +39768,12 @@
         ],
         "icon": "",
         "id": "Bpmn_ExclusiveGateway_Sf4hcjdGEeiW3v9acRxPOA",
+        "label_box": [
+          668,
+          269,
+          60,
+          51
+        ],
         "name": "Gateway\r\n(Merge Flow)",
         "parent": null,
         "pos": [
@@ -37940,6 +39797,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_VXxUkzdGEeiW3v9acRxPOA",
+        "label_box": [
+          470,
+          283,
+          57,
+          17
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -37963,6 +39826,12 @@
         ],
         "icon": "",
         "id": "Bpmn_EndEvent_3ZRrFDdGEeiW3v9acRxPOA",
+        "label_box": [
+          705,
+          125,
+          74,
+          17
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -38406,6 +40275,12 @@
         ],
         "icon": "",
         "id": "Bpmn_StartEvent_F98FhAcNEeaGyLSh4_ROsw",
+        "label_box": [
+          46,
+          85,
+          75,
+          15
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -38429,6 +40304,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_F98FhwcNEeaGyLSh4_ROsw",
+        "label_box": [
+          190,
+          63,
+          39,
+          15
+        ],
         "name": "Task",
         "parent": null,
         "pos": [
@@ -38452,6 +40333,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_IYD-kwcNEeaGyLSh4_ROsw",
+        "label_box": [
+          388,
+          63,
+          48,
+          15
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -38475,6 +40362,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_JDrHYwcNEeaGyLSh4_ROsw",
+        "label_box": [
+          582,
+          63,
+          48,
+          15
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -38498,6 +40391,12 @@
         ],
         "icon": "",
         "id": "Bpmn_EndEvent_Kw2a4wcNEeaGyLSh4_ROsw",
+        "label_box": [
+          734,
+          85,
+          63,
+          15
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -38705,6 +40604,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          46,
+          86,
+          63,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -38728,6 +40633,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          143,
+          64,
+          44,
+          14
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -38751,6 +40662,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          275,
+          64,
+          44,
+          14
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -38774,6 +40691,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          407,
+          64,
+          44,
+          14
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -38797,6 +40720,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          87,
+          56,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -38995,6 +40924,12 @@
         ],
         "icon": "",
         "id": "Bpmn_StartEvent_wbYbpAcPEeaGyLSh4_ROsw",
+        "label_box": [
+          46,
+          174,
+          75,
+          15
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -39018,6 +40953,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_wbYbpwcPEeaGyLSh4_ROsw",
+        "label_box": [
+          190,
+          150,
+          48,
+          15
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -39041,6 +40982,12 @@
         ],
         "icon": "",
         "id": "Bpmn_ExclusiveGateway_nD5SYgcQEeaGyLSh4_ROsw",
+        "label_box": [
+          290,
+          189,
+          81,
+          30
+        ],
         "name": "Gateway \r\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -39064,6 +41011,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_Bu7xogcREeaGyLSh4_ROsw",
+        "label_box": [
+          462,
+          62,
+          48,
+          15
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -39087,6 +41040,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_Copn4gcREeaGyLSh4_ROsw",
+        "label_box": [
+          462,
+          150,
+          48,
+          15
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -39110,6 +41069,12 @@
         ],
         "icon": "",
         "id": "Bpmn_Task_DbPicgcREeaGyLSh4_ROsw",
+        "label_box": [
+          462,
+          238,
+          48,
+          15
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -39133,6 +41098,12 @@
         ],
         "icon": "",
         "id": "Bpmn_ExclusiveGateway_OZwecgcREeaGyLSh4_ROsw",
+        "label_box": [
+          666,
+          233,
+          87,
+          30
+        ],
         "name": "Gateway\r\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -39156,6 +41127,12 @@
         ],
         "icon": "",
         "id": "Bpmn_EndEvent_dfoRYgcREeaGyLSh4_ROsw",
+        "label_box": [
+          654,
+          132,
+          63,
+          15
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -39599,6 +41576,12 @@
         ],
         "icon": "",
         "id": "startEvent",
+        "label_box": [
+          45,
+          91,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -39622,6 +41605,12 @@
         ],
         "icon": "user",
         "id": "task1",
+        "label_box": [
+          138,
+          64,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -39645,6 +41634,12 @@
         ],
         "icon": "service",
         "id": "task2",
+        "label_box": [
+          257,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -39668,6 +41663,12 @@
         ],
         "icon": "user",
         "id": "task3",
+        "label_box": [
+          376,
+          64,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -39691,6 +41692,12 @@
         ],
         "icon": "",
         "id": "endEvent",
+        "label_box": [
+          470,
+          92,
+          106,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -39894,6 +41901,12 @@
         ],
         "icon": "message",
         "id": "startEvent",
+        "label_box": [
+          96,
+          192,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -39917,6 +41930,12 @@
         ],
         "icon": "user",
         "id": "task1",
+        "label_box": [
+          189,
+          165,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -39940,6 +41959,12 @@
         ],
         "icon": "service",
         "id": "task2",
+        "label_box": [
+          308,
+          165,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -39963,6 +41988,12 @@
         ],
         "icon": "user",
         "id": "task3",
+        "label_box": [
+          427,
+          165,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -39986,6 +42017,12 @@
         ],
         "icon": "message",
         "id": "endEvent",
+        "label_box": [
+          521,
+          193,
+          106,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -40009,6 +42046,12 @@
         ],
         "icon": "",
         "id": "dataObject1Ref1",
+        "label_box": [
+          83,
+          77,
+          106,
+          13
+        ],
         "name": "Data Object 1",
         "parent": null,
         "pos": [
@@ -40032,6 +42075,12 @@
         ],
         "icon": "",
         "id": "dataObject1Ref2",
+        "label_box": [
+          240,
+          77,
+          106,
+          13
+        ],
         "name": "Data Object 1",
         "parent": null,
         "pos": [
@@ -40055,6 +42104,12 @@
         ],
         "icon": "",
         "id": "dataObject2Ref1",
+        "label_box": [
+          387,
+          77,
+          106,
+          13
+        ],
         "name": "Data Object 2",
         "parent": null,
         "pos": [
@@ -40078,6 +42133,12 @@
         ],
         "icon": "",
         "id": "dataObject2Ref2",
+        "label_box": [
+          533,
+          77,
+          106,
+          13
+        ],
         "name": "Data Object 2",
         "parent": null,
         "pos": [
@@ -40537,6 +42598,12 @@
         ],
         "icon": "message",
         "id": "Bpmn_StartEvent_JfLstH8bEeWffp5A82Iu3A",
+        "label_box": [
+          126,
+          426,
+          115,
+          17
+        ],
         "name": "Receive week menu",
         "parent": null,
         "pos": [
@@ -40560,6 +42627,12 @@
         ],
         "icon": "user",
         "id": "Bpmn_UserTask_NGd8cX8bEeWffp5A82Iu3A",
+        "label_box": [
+          290,
+          402,
+          84,
+          34
+        ],
         "name": "Select canteen-days",
         "parent": null,
         "pos": [
@@ -40583,6 +42656,12 @@
         ],
         "icon": "manual",
         "id": "Bpmn_ManualTask_k3NYUX8cEeWffp5A82Iu3A",
+        "label_box": [
+          790,
+          96,
+          114,
+          17
+        ],
         "name": "Eat at the canteen",
         "parent": null,
         "pos": [
@@ -40606,6 +42685,12 @@
         ],
         "icon": "",
         "id": "Bpmn_EndEvent_D9TGk38dEeWffp5A82Iu3A",
+        "label_box": [
+          998,
+          166,
+          1,
+          16
+        ],
         "name": "",
         "parent": null,
         "pos": [
@@ -40629,6 +42714,12 @@
         ],
         "icon": "",
         "id": "Bpmn_ExclusiveGateway_i-gfYn8eEeWffp5A82Iu3A",
+        "label_box": [
+          584,
+          175,
+          1,
+          16
+        ],
         "name": "",
         "parent": null,
         "pos": [
@@ -40652,6 +42743,12 @@
         ],
         "icon": "",
         "id": "Bpmn_ExclusiveGateway_mSUZgn8eEeWffp5A82Iu3A",
+        "label_box": [
+          918,
+          175,
+          1,
+          16
+        ],
         "name": "",
         "parent": null,
         "pos": [
@@ -40675,6 +42772,12 @@
         ],
         "icon": "manual",
         "id": "Bpmn_ManualTask_rf8U8X8eEeWffp5A82Iu3A",
+        "label_box": [
+          814,
+          198,
+          82,
+          17
+        ],
         "name": "Eat at home",
         "parent": null,
         "pos": [
@@ -40698,6 +42801,12 @@
         ],
         "icon": "",
         "id": "Bpmn_DataStoreReference_5Hcscn8eEeWffp5A82Iu3A",
+        "label_box": [
+          336,
+          338,
+          63,
+          17
+        ],
         "name": "Timetable",
         "parent": null,
         "pos": [
@@ -40721,6 +42830,12 @@
         ],
         "icon": "manual",
         "id": "Bpmn_ManualTask_CYjEYX8fEeWffp5A82Iu3A",
+        "label_box": [
+          675,
+          392,
+          76,
+          17
+        ],
         "name": "Cook lunch",
         "parent": null,
         "pos": [
@@ -40744,6 +42859,12 @@
         ],
         "icon": "timer",
         "id": "Bpmn_BoundaryEvent_CzcQon8fEeWffp5A82Iu3A",
+        "label_box": [
+          674,
+          380,
+          39,
+          17
+        ],
         "name": "Noon",
         "parent": null,
         "pos": [
@@ -40767,6 +42888,12 @@
         ],
         "icon": "timer",
         "id": "Bpmn_IntermediateCatchEvent_OSrUFH8fEeWffp5A82Iu3A",
+        "label_box": [
+          462,
+          168,
+          105,
+          17
+        ],
         "name": "Everyday of week",
         "parent": null,
         "pos": [
@@ -40790,6 +42917,12 @@
         ],
         "icon": "message",
         "id": "Bpmn_IntermediateThrowEvent_dlNNjn8gEeWffp5A82Iu3A",
+        "label_box": [
+          404,
+          433,
+          116,
+          34
+        ],
         "name": "Send participating days",
         "parent": null,
         "pos": [
@@ -41461,6 +43594,12 @@
         ],
         "icon": "",
         "id": "_2",
+        "label_box": [
+          46,
+          92,
+          59,
+          20
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -41484,6 +43623,12 @@
         ],
         "icon": "",
         "id": "_3",
+        "label_box": [
+          165,
+          59,
+          38,
+          20
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -41507,6 +43652,12 @@
         ],
         "icon": "",
         "id": "_5",
+        "label_box": [
+          309,
+          59,
+          38,
+          20
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -41530,6 +43681,12 @@
         ],
         "icon": "",
         "id": "_7",
+        "label_box": [
+          455,
+          59,
+          38,
+          20
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -41553,6 +43710,12 @@
         ],
         "icon": "",
         "id": "_9",
+        "label_box": [
+          573,
+          92,
+          54,
+          20
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -41760,6 +43923,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          45,
+          91,
+          61,
+          19
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -41783,6 +43952,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          144,
+          66,
+          37,
+          19
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -41806,6 +43981,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          276,
+          66,
+          37,
+          19
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -41829,6 +44010,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          408,
+          66,
+          37,
+          19
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -41852,6 +44039,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          508,
+          95,
+          55,
+          19
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -42067,6 +44260,12 @@
         ],
         "icon": "",
         "id": "_2",
+        "label_box": [
+          46,
+          187,
+          59,
+          20
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -42090,6 +44289,12 @@
         ],
         "icon": "",
         "id": "_3",
+        "label_box": [
+          164,
+          154,
+          38,
+          20
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -42113,6 +44318,12 @@
         ],
         "icon": "",
         "id": "_5",
+        "label_box": [
+          248,
+          183,
+          78,
+          35
+        ],
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -42136,6 +44347,12 @@
         ],
         "icon": "",
         "id": "_7",
+        "label_box": [
+          412,
+          59,
+          38,
+          20
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -42159,6 +44376,12 @@
         ],
         "icon": "",
         "id": "_9",
+        "label_box": [
+          412,
+          154,
+          38,
+          20
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -42182,6 +44405,12 @@
         ],
         "icon": "",
         "id": "_11",
+        "label_box": [
+          412,
+          249,
+          38,
+          20
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -42205,6 +44434,12 @@
         ],
         "icon": "",
         "id": "_13",
+        "label_box": [
+          590,
+          226,
+          88,
+          35
+        ],
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -42228,6 +44463,12 @@
         ],
         "icon": "",
         "id": "_16",
+        "label_box": [
+          585,
+          119,
+          54,
+          20
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -42674,6 +44915,12 @@
         ],
         "icon": "",
         "id": "_2",
+        "label_box": [
+          -19,
+          -69,
+          32,
+          32
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -42697,6 +44944,12 @@
         ],
         "icon": "user",
         "id": "_3",
+        "label_box": [
+          7,
+          -57,
+          85,
+          55
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -42720,6 +44973,12 @@
         ],
         "icon": "user",
         "id": "_6",
+        "label_box": [
+          7,
+          -57,
+          85,
+          55
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -42743,6 +45002,12 @@
         ],
         "icon": "user",
         "id": "_8",
+        "label_box": [
+          7,
+          -57,
+          85,
+          55
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -42766,6 +45031,12 @@
         ],
         "icon": "",
         "id": "_9",
+        "label_box": [
+          -19,
+          -69,
+          32,
+          32
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -42973,6 +45244,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          -140,
+          -271,
+          32,
+          32
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -42996,6 +45273,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          -114,
+          -253,
+          85,
+          68
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -43019,6 +45302,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          -114,
+          -253,
+          85,
+          68
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -43042,6 +45331,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          -114,
+          -253,
+          85,
+          68
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -43065,6 +45360,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          -140,
+          -271,
+          32,
+          32
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -43280,6 +45581,12 @@
         ],
         "icon": "",
         "id": "_2",
+        "label_box": [
+          -39,
+          21,
+          32,
+          32
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -43303,6 +45610,12 @@
         ],
         "icon": "user",
         "id": "_3",
+        "label_box": [
+          -13,
+          33,
+          85,
+          55
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -43326,6 +45639,12 @@
         ],
         "icon": "",
         "id": "_4",
+        "label_box": [
+          -39,
+          21,
+          32,
+          32
+        ],
         "name": "Gateway\n(Sprilt Flows)",
         "parent": null,
         "pos": [
@@ -43349,6 +45668,12 @@
         ],
         "icon": "user",
         "id": "_5",
+        "label_box": [
+          -13,
+          33,
+          85,
+          55
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -43372,6 +45697,12 @@
         ],
         "icon": "user",
         "id": "_6",
+        "label_box": [
+          -13,
+          33,
+          85,
+          55
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -43395,6 +45726,12 @@
         ],
         "icon": "user",
         "id": "_7",
+        "label_box": [
+          -13,
+          33,
+          85,
+          55
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -43418,6 +45755,12 @@
         ],
         "icon": "",
         "id": "_11",
+        "label_box": [
+          -39,
+          21,
+          32,
+          32
+        ],
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -43441,6 +45784,12 @@
         ],
         "icon": "",
         "id": "_14",
+        "label_box": [
+          -39,
+          21,
+          32,
+          32
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -43863,6 +46212,12 @@
         ],
         "icon": "",
         "id": "Event_1pmxsnn",
+        "label_box": [
+          48,
+          102,
+          55,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -43886,6 +46241,7 @@
         ],
         "icon": "",
         "id": "Activity_10i3hk7",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -43909,6 +46265,7 @@
         ],
         "icon": "",
         "id": "Activity_1eb0bmc",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -43932,6 +46289,7 @@
         ],
         "icon": "",
         "id": "Activity_1m3q7qr",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -43955,6 +46313,12 @@
         ],
         "icon": "",
         "id": "Event_0ki4ik8",
+        "label_box": [
+          618,
+          102,
+          51,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -44150,6 +46514,12 @@
         ],
         "icon": "",
         "id": "Event_072o7cv",
+        "label_box": [
+          48,
+          212,
+          55,
+          14
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -44173,6 +46543,7 @@
         ],
         "icon": "",
         "id": "Activity_0opq70y",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -44196,6 +46567,12 @@
         ],
         "icon": "exclusive",
         "id": "Gateway_03s9abx",
+        "label_box": [
+          258,
+          226,
+          72,
+          27
+        ],
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -44219,6 +46596,7 @@
         ],
         "icon": "",
         "id": "Activity_1ljp29t",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -44242,6 +46620,7 @@
         ],
         "icon": "",
         "id": "Activity_0jhawx0",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -44265,6 +46644,7 @@
         ],
         "icon": "",
         "id": "Activity_0ddly78",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -44288,6 +46668,12 @@
         ],
         "icon": "",
         "id": "Event_1d5wxn1",
+        "label_box": [
+          608,
+          190,
+          51,
+          14
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -44311,6 +46697,12 @@
         ],
         "icon": "exclusive",
         "id": "Gateway_03haizn",
+        "label_box": [
+          638,
+          260,
+          82,
+          27
+        ],
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -44730,6 +47122,12 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": [
+          45,
+          176,
+          95,
+          13
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -44753,6 +47151,12 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": [
+          138,
+          149,
+          72,
+          13
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -44776,6 +47180,12 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": [
+          548,
+          122,
+          95,
+          13
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -44799,6 +47209,12 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": [
+          366,
+          64,
+          72,
+          13
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -44822,6 +47238,12 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": [
+          366,
+          149,
+          72,
+          13
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -44845,6 +47267,12 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": [
+          228,
+          182,
+          95,
+          26
+        ],
         "name": "Gateway\n(Split Flow)",
         "parent": null,
         "pos": [
@@ -44868,6 +47296,12 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": [
+          366,
+          244,
+          72,
+          13
+        ],
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -44891,6 +47325,12 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": [
+          546,
+          218,
+          95,
+          26
+        ],
         "name": "Gateway\n(Merge Flows)",
         "parent": null,
         "pos": [
@@ -45322,6 +47762,7 @@
         ],
         "icon": "message",
         "id": "Start_Order",
+        "label_box": null,
         "name": "Order received",
         "parent": null,
         "pos": [
@@ -45345,6 +47786,7 @@
         ],
         "icon": "user",
         "id": "Task_Review",
+        "label_box": null,
         "name": "Review order",
         "parent": null,
         "pos": [
@@ -45368,6 +47810,7 @@
         ],
         "icon": "",
         "id": "GW_Approved",
+        "label_box": null,
         "name": "Approved?",
         "parent": null,
         "pos": [
@@ -45391,6 +47834,7 @@
         ],
         "icon": "user",
         "id": "Task_Notify",
+        "label_box": null,
         "name": "Notify customer",
         "parent": null,
         "pos": [
@@ -45414,6 +47858,7 @@
         ],
         "icon": "",
         "id": "End_Rejected",
+        "label_box": null,
         "name": "Order rejected",
         "parent": null,
         "pos": [
@@ -45437,6 +47882,7 @@
         ],
         "icon": "service",
         "id": "Task_Reserve",
+        "label_box": null,
         "name": "Reserve stock",
         "parent": null,
         "pos": [
@@ -45460,6 +47906,7 @@
         ],
         "icon": "manual",
         "id": "Task_Pack",
+        "label_box": null,
         "name": "Pack items",
         "parent": null,
         "pos": [
@@ -45483,6 +47930,7 @@
         ],
         "icon": "send",
         "id": "Task_Dispatch",
+        "label_box": null,
         "name": "Dispatch shipment",
         "parent": null,
         "pos": [
@@ -45506,6 +47954,7 @@
         ],
         "icon": "",
         "id": "End_Shipped",
+        "label_box": null,
         "name": "Shipped",
         "parent": null,
         "pos": [
@@ -45529,6 +47978,7 @@
         ],
         "icon": "",
         "id": "DataStore_Inv",
+        "label_box": null,
         "name": "Inventory",
         "parent": null,
         "pos": [
@@ -45552,6 +48002,7 @@
         ],
         "icon": "",
         "id": "DataObj_Label",
+        "label_box": null,
         "name": "Shipping label",
         "parent": null,
         "pos": [
@@ -45575,6 +48026,7 @@
         ],
         "icon": "",
         "id": "Anno_QC",
+        "label_box": null,
         "name": "Fragile goods — manual quality check",
         "parent": null,
         "pos": [
@@ -46173,6 +48625,7 @@
         ],
         "icon": "message",
         "id": "S",
+        "label_box": null,
         "name": "Order in",
         "parent": null,
         "pos": [
@@ -46196,6 +48649,7 @@
         ],
         "icon": "user",
         "id": "T",
+        "label_box": null,
         "name": "Handle",
         "parent": null,
         "pos": [
@@ -46219,6 +48673,7 @@
         ],
         "icon": "timer",
         "id": "I",
+        "label_box": null,
         "name": "Wait",
         "parent": null,
         "pos": [
@@ -46242,6 +48697,7 @@
         ],
         "icon": "terminate",
         "id": "E",
+        "label_box": null,
         "name": "Stop",
         "parent": null,
         "pos": [
@@ -46397,6 +48853,7 @@
         ],
         "icon": "",
         "id": "S",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -46420,6 +48877,7 @@
         ],
         "icon": "exclusive",
         "id": "X",
+        "label_box": null,
         "name": "X?",
         "parent": null,
         "pos": [
@@ -46443,6 +48901,7 @@
         ],
         "icon": "parallel",
         "id": "P1",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -46466,6 +48925,7 @@
         ],
         "icon": "inclusive",
         "id": "O",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -46489,6 +48949,7 @@
         ],
         "icon": "",
         "id": "E",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -46684,6 +49145,7 @@
         ],
         "icon": "",
         "id": "shape_IDADPREG",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -46707,6 +49169,7 @@
         ],
         "icon": "",
         "id": "shape_IDA5CKFB",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -46730,6 +49193,7 @@
         ],
         "icon": "",
         "id": "shape_IDAOQWEG",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -46753,6 +49217,7 @@
         ],
         "icon": "",
         "id": "shape_IDA0VWEG",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -46776,6 +49241,7 @@
         ],
         "icon": "",
         "id": "shape_IDASKXEG",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -46971,6 +49437,7 @@
         ],
         "icon": "",
         "id": "shape_IDAJDMGE",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -46994,6 +49461,7 @@
         ],
         "icon": "",
         "id": "shape_IDA5DMGE",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47017,6 +49485,7 @@
         ],
         "icon": "",
         "id": "shape_IDASEMGE",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47040,6 +49509,7 @@
         ],
         "icon": "",
         "id": "shape_IDADSBFB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47063,6 +49533,7 @@
         ],
         "icon": "",
         "id": "shape_IDABUBFB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47258,6 +49729,7 @@
         ],
         "icon": "",
         "id": "shape_IDA2OFKB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47281,6 +49753,7 @@
         ],
         "icon": "user",
         "id": "shape_IDA1JAFB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47304,6 +49777,7 @@
         ],
         "icon": "service",
         "id": "shape_IDAKOAFB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47327,6 +49801,7 @@
         ],
         "icon": "user",
         "id": "shape_IDA2KBFB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47350,6 +49825,7 @@
         ],
         "icon": "",
         "id": "shape_IDAKPBFB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47545,6 +50021,7 @@
         ],
         "icon": "",
         "id": "shape_IDA4WYHB",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -47568,6 +50045,7 @@
         ],
         "icon": "",
         "id": "shape_IDA5B1HB",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -47591,6 +50069,7 @@
         ],
         "icon": "",
         "id": "shape_IDA3E1HB",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -47614,6 +50093,7 @@
         ],
         "icon": "",
         "id": "shape_IDA1H1HB",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -47637,6 +50117,7 @@
         ],
         "icon": "",
         "id": "shape_IDAUPIFF",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -47832,6 +50313,7 @@
         ],
         "icon": "",
         "id": "shape_IDAA44XB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47855,6 +50337,7 @@
         ],
         "icon": "",
         "id": "shape_IDA5IMCC",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47878,6 +50361,7 @@
         ],
         "icon": "",
         "id": "shape_IDA1LMCC",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47901,6 +50385,7 @@
         ],
         "icon": "",
         "id": "shape_IDAXOMCC",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -47924,6 +50409,7 @@
         ],
         "icon": "",
         "id": "shape_IDAVJDYB",
+        "label_box": null,
         "name": "",
         "parent": null,
         "pos": [
@@ -48119,6 +50605,7 @@
         ],
         "icon": "",
         "id": "shape_IDA4G0HB",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -48142,6 +50629,7 @@
         ],
         "icon": "",
         "id": "shape_IDA5RIFF",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -48165,6 +50653,7 @@
         ],
         "icon": "",
         "id": "shape_IDA3UIFF",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -48188,6 +50677,7 @@
         ],
         "icon": "",
         "id": "shape_IDA1XIFF",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -48211,6 +50701,7 @@
         ],
         "icon": "",
         "id": "shape_IDA20JFF",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -48234,6 +50725,7 @@
         ],
         "icon": "",
         "id": "shape_IDAZ3JFF",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -48257,6 +50749,7 @@
         ],
         "icon": "inclusive",
         "id": "shape_IDAFBKFF",
+        "label_box": null,
         "name": "Gateway (Merge Flows)",
         "parent": null,
         "pos": [
@@ -48280,6 +50773,7 @@
         ],
         "icon": "inclusive",
         "id": "shape_IDAOEKFF",
+        "label_box": null,
         "name": "Gateway (Split Flow)",
         "parent": null,
         "pos": [
@@ -48691,6 +51185,7 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -48714,6 +51209,7 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -48737,6 +51233,7 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -48760,6 +51257,7 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -48783,6 +51281,7 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -48978,6 +51477,7 @@
         ],
         "icon": "",
         "id": "_6b5db6a9-037a-49ad-9201-09201e2aaa97",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -49001,6 +51501,7 @@
         ],
         "icon": "",
         "id": "_5a972b87-735d-454a-b31c-f52fb3afc5c7",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -49024,6 +51525,7 @@
         ],
         "icon": "",
         "id": "_258f51eb-b764-4a71-b681-3a01cca14143",
+        "label_box": null,
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -49047,6 +51549,7 @@
         ],
         "icon": "",
         "id": "_4f7d62d7-f0e6-46bc-be00-69e02da38f65",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -49070,6 +51573,7 @@
         ],
         "icon": "",
         "id": "_e6eb725a-34bc-45c7-aed0-9f9596cd7bee",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -49093,6 +51597,7 @@
         ],
         "icon": "",
         "id": "_35fe57a7-1302-44e2-bf58-032f11af7ecb",
+        "label_box": null,
         "name": "Gateway  (Split Flow)",
         "parent": null,
         "pos": [
@@ -49116,6 +51621,7 @@
         ],
         "icon": "",
         "id": "_7d399717-1aba-47ac-8d7d-8aaa033255e0",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -49139,6 +51645,7 @@
         ],
         "icon": "",
         "id": "_33c66216-391c-49c2-aa19-d8f0b7f5f91d",
+        "label_box": null,
         "name": "Gateway  (Merge Flows)",
         "parent": null,
         "pos": [
@@ -49558,6 +52065,7 @@
         ],
         "icon": "",
         "id": "_1ac4b759-40e3-4dfb-b0e3-ad1d201d6c3d",
+        "label_box": null,
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -49581,6 +52089,7 @@
         ],
         "icon": "",
         "id": "_65f5459f-44ae-436d-a089-a91d6d78075b",
+        "label_box": null,
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -49604,6 +52113,7 @@
         ],
         "icon": "",
         "id": "_1ae31d1b-2559-4f78-a3ec-47986a49db48",
+        "label_box": null,
         "name": "Collapsed  Sub-Process",
         "parent": null,
         "pos": [
@@ -49627,6 +52137,7 @@
         ],
         "icon": "message",
         "id": "_428dcbf5-8e5e-48e0-9c0c-d93003fa8c82",
+        "label_box": null,
         "name": "Boundary Intermediate Event Non-Interrupting Message",
         "parent": null,
         "pos": [
@@ -49650,6 +52161,7 @@
         ],
         "icon": "escalation",
         "id": "_178e16eb-4c9e-4ea0-9644-7c5fb2b71825",
+        "label_box": null,
         "name": "Boundary Intermediate Event Interrupting Escalation",
         "parent": null,
         "pos": [
@@ -49673,6 +52185,7 @@
         ],
         "icon": "",
         "id": "_9fad8da5-a28c-4b6b-bb71-fbd5c65b9681",
+        "label_box": null,
         "name": "Task 4",
         "parent": null,
         "pos": [
@@ -49696,6 +52209,7 @@
         ],
         "icon": "",
         "id": "_ce253897-4300-4b24-b71f-4c9535698c70",
+        "label_box": null,
         "name": "End Event 1",
         "parent": null,
         "pos": [
@@ -49719,6 +52233,7 @@
         ],
         "icon": "",
         "id": "_72204cd7-709c-4656-9554-3ae29b3844ce",
+        "label_box": null,
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -49742,6 +52257,7 @@
         ],
         "icon": "",
         "id": "_2d2d0d29-896f-49f9-8109-77a7304309c5",
+        "label_box": null,
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -49765,6 +52281,7 @@
         ],
         "icon": "",
         "id": "_10ce0b26-1b3e-46a2-85a5-62538ed2da13",
+        "label_box": null,
         "name": "End Event 2",
         "parent": null,
         "pos": [
@@ -50132,6 +52649,12 @@
         ],
         "icon": "",
         "id": "_dac9fc06-f61d-4e0d-81e7-b3e6f9e4a5de",
+        "label_box": [
+          38,
+          67,
+          42,
+          11
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -50155,6 +52678,12 @@
         ],
         "icon": "",
         "id": "_010a7281-ac6a-4449-95c2-8d40a5aac047",
+        "label_box": [
+          110,
+          51,
+          37,
+          14
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -50178,6 +52707,12 @@
         ],
         "icon": "",
         "id": "_512b4707-3eb5-4fc9-a641-057b31ee63dc",
+        "label_box": [
+          217,
+          51,
+          37,
+          14
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -50201,6 +52736,12 @@
         ],
         "icon": "",
         "id": "_93b9d6a7-8bf7-49a0-91bd-806107cb1f77",
+        "label_box": [
+          323,
+          51,
+          37,
+          14
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -50224,6 +52765,12 @@
         ],
         "icon": "",
         "id": "_b460bd0f-4ca3-4bdd-8325-fc42220afe16",
+        "label_box": [
+          395,
+          67,
+          39,
+          11
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -50431,6 +52978,12 @@
         ],
         "icon": "",
         "id": "_93c466ab-b271-4376-a427-f4c353d55ce8",
+        "label_box": [
+          42,
+          76,
+          42,
+          9
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -50454,6 +53007,12 @@
         ],
         "icon": "",
         "id": "_ec59e164-68b4-4f94-98de-ffb1c58a84af",
+        "label_box": [
+          116,
+          55,
+          26,
+          8
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -50477,6 +53036,12 @@
         ],
         "icon": "",
         "id": "_820c21c0-45f3-473b-813f-06381cc637cd",
+        "label_box": [
+          215,
+          55,
+          26,
+          8
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -50500,6 +53065,12 @@
         ],
         "icon": "",
         "id": "_e70a6fcb-913c-4a7b-a65d-e83adc73d69c",
+        "label_box": [
+          314,
+          55,
+          26,
+          8
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -50523,6 +53094,12 @@
         ],
         "icon": "",
         "id": "_a47df184-085b-49f7-bb82-031c84625821",
+        "label_box": [
+          389,
+          76,
+          39,
+          9
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -50730,6 +53307,12 @@
         ],
         "icon": "",
         "id": "_dac9fc06-f61d-4e0d-81e7-b3e6f9e4a5de",
+        "label_box": [
+          38,
+          67,
+          42,
+          11
+        ],
         "name": "Start Event",
         "parent": null,
         "pos": [
@@ -50753,6 +53336,12 @@
         ],
         "icon": "",
         "id": "_b460bd0f-4ca3-4bdd-8325-fc42220afe16",
+        "label_box": [
+          395,
+          67,
+          39,
+          11
+        ],
         "name": "End Event",
         "parent": null,
         "pos": [
@@ -50776,6 +53365,12 @@
         ],
         "icon": "user",
         "id": "_010a7281-ac6a-4449-95c2-8d40a5aac047",
+        "label_box": [
+          110,
+          51,
+          37,
+          14
+        ],
         "name": "Task 1",
         "parent": null,
         "pos": [
@@ -50799,6 +53394,12 @@
         ],
         "icon": "service",
         "id": "_512b4707-3eb5-4fc9-a641-057b31ee63dc",
+        "label_box": [
+          217,
+          51,
+          37,
+          14
+        ],
         "name": "Task 2",
         "parent": null,
         "pos": [
@@ -50822,6 +53423,12 @@
         ],
         "icon": "user",
         "id": "_93b9d6a7-8bf7-49a0-91bd-806107cb1f77",
+        "label_box": [
+          323,
+          51,
+          37,
+          14
+        ],
         "name": "Task 3",
         "parent": null,
         "pos": [
@@ -51039,6 +53646,7 @@
         ],
         "icon": "message",
         "id": "Start",
+        "label_box": null,
         "name": "Order received",
         "parent": null,
         "pos": [
@@ -51062,6 +53670,7 @@
         ],
         "icon": "user",
         "id": "Check",
+        "label_box": null,
         "name": "Check order details",
         "parent": null,
         "pos": [
@@ -51085,6 +53694,7 @@
         ],
         "icon": "",
         "id": "GW",
+        "label_box": null,
         "name": "In stock?",
         "parent": null,
         "pos": [
@@ -51108,6 +53718,7 @@
         ],
         "icon": "service",
         "id": "Ship",
+        "label_box": null,
         "name": "Ship goods",
         "parent": null,
         "pos": [
@@ -51131,6 +53742,7 @@
         ],
         "icon": "script",
         "id": "Refund",
+        "label_box": null,
         "name": "Issue refund",
         "parent": null,
         "pos": [
@@ -51154,6 +53766,7 @@
         ],
         "icon": "",
         "id": "EndOk",
+        "label_box": null,
         "name": "Order fulfilled",
         "parent": null,
         "pos": [
@@ -51177,6 +53790,7 @@
         ],
         "icon": "terminate",
         "id": "EndNo",
+        "label_box": null,
         "name": "Order cancelled",
         "parent": null,
         "pos": [
@@ -51458,6 +54072,7 @@
         ],
         "icon": "",
         "id": "Start",
+        "label_box": null,
         "name": "Order received",
         "parent": null,
         "pos": [
@@ -51481,6 +54096,7 @@
         ],
         "icon": "",
         "id": "Validate",
+        "label_box": null,
         "name": "Validate order",
         "parent": null,
         "pos": [
@@ -51504,6 +54120,7 @@
         ],
         "icon": "exclusive",
         "id": "InStock",
+        "label_box": null,
         "name": "In stock?",
         "parent": null,
         "pos": [
@@ -51527,6 +54144,7 @@
         ],
         "icon": "",
         "id": "Notify",
+        "label_box": null,
         "name": "Notify customer",
         "parent": null,
         "pos": [
@@ -51550,6 +54168,7 @@
         ],
         "icon": "terminate",
         "id": "Cancelled",
+        "label_box": null,
         "name": "Order cancelled",
         "parent": null,
         "pos": [
@@ -51573,6 +54192,7 @@
         ],
         "icon": "",
         "id": "Payment",
+        "label_box": null,
         "name": "Process payment",
         "parent": null,
         "pos": [
@@ -51596,6 +54216,7 @@
         ],
         "icon": "parallel",
         "id": "Split",
+        "label_box": null,
         "name": "Split",
         "parent": null,
         "pos": [
@@ -51619,6 +54240,7 @@
         ],
         "icon": "",
         "id": "Pack",
+        "label_box": null,
         "name": "Pack items",
         "parent": null,
         "pos": [
@@ -51642,6 +54264,7 @@
         ],
         "icon": "",
         "id": "Invoice",
+        "label_box": null,
         "name": "Generate invoice",
         "parent": null,
         "pos": [
@@ -51665,6 +54288,7 @@
         ],
         "icon": "parallel",
         "id": "Sync",
+        "label_box": null,
         "name": "Sync",
         "parent": null,
         "pos": [
@@ -51688,6 +54312,7 @@
         ],
         "icon": "",
         "id": "Ship",
+        "label_box": null,
         "name": "Ship order",
         "parent": null,
         "pos": [
@@ -51711,6 +54336,7 @@
         ],
         "icon": "",
         "id": "Delivered",
+        "label_box": null,
         "name": "Order delivered",
         "parent": null,
         "pos": [

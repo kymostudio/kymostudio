@@ -65,7 +65,7 @@ XML well-formedness via the standard library.
 |----|-------|----------|----------------|
 | **TC-1** | Node mapping | FR-2 | Each `(shape, marker)` emits the expected element tag + `*EventDefinition` / task / gateway form |
 | **TC-2** | Flow mapping | FR-3 | `bpmn_flow` → `sequenceFlow`/`messageFlow`/`association`; `default` sets `default="…"` on source; `conditional` adds `<conditionExpression>` |
-| **TC-3** | DI geometry | FR-4 | `<dc:Bounds>` = centre−size/2 + size; `<di:waypoint>`s from `points`; `<BPMNLabel>` from `label_pos` |
+| **TC-3** | DI geometry | FR-4 | `<dc:Bounds>` = centre−size/2 + size; `<di:waypoint>`s from `points`; `<BPMNLabel>` from flow `label_pos` + node `label_box` |
 | **TC-4** | Containers | FR-5 | Pools/lanes → `collaboration`+`participant`+`laneSet`/`lane`(`flowNodeRef`); group → `group`; expanded subprocess nests members |
 | **TC-5** | Well-formed + valid | FR-1, NFR-2 | Exported XML parses; re-imports via `from_bpmn` without error |
 | **TC-6** | Round-trip structure | NFR-1 | `import → export → re-import` preserves component/edge/region counts + per-id shape/marker/flow/geometry (within rounding) across `samples/` + corpus |

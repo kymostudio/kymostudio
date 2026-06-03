@@ -30,7 +30,7 @@ def _component(d: dict) -> Component:
         id=d["id"], name=d["name"], subtitle=d["subtitle"], icon=d["icon"],
         shape=d["shape"], accent=d["accent"], pos=_pt(d["pos"]), size=_pt(d["size"]),
         parent=d["parent"], align=d["align"], align_gap=d["align_gap"],
-        align_offset=_pt(d["align_offset"]),
+        align_offset=_pt(d["align_offset"]), label_box=_pt(d.get("label_box")),
     )
 
 

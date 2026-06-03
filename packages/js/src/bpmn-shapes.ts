@@ -57,9 +57,9 @@ export const BPMN_STYLE = `
     .region-label--inner { font-size: 12px; font-weight: 600; fill: #6d28d9; }`;
 
 // ── text wrapping ─────────────────────────────────────────────────────────
-function wrap(text: string, widthPx: number, fontPx: number, maxLines: number): string[] {
+function wrap(text: string, widthPx: number, fontPx: number, maxLines: number, factor = 0.55): string[] {
   if (!text) return [];
-  const maxChars = Math.max(3, Math.floor((widthPx - 8) / (fontPx * 0.55)));
+  const maxChars = Math.max(3, Math.floor((widthPx - 8) / (fontPx * factor)));
   const words = text.split(/\s+/).filter(Boolean);
   const lines: string[] = [];
   let cur = "";
@@ -84,6 +84,19 @@ function centeredLines(lines: string[], cx: number, cy: number, fontPx: number, 
   const lh = fontPx + 2.5;
   const top = cy - ((lines.length - 1) * lh) / 2 + fontPx * 0.35;
   return lines.map((ln, i) => `<text class="${cls}" x="${f(cx)}" y="${f(top + i * lh)}">${esc(ln)}</text>`).join("");
+}
+
+// External (below-glyph) label for events / gateways / data nodes. When the
+// source carried a BPMNLabel DI box, place + wrap the label there (matching
+// bpmn.io's authored position and width, ~0.46em metrics, never truncated);
+// otherwise fall back to a centred label just below the glyph.
+function outsideLabel(c: Component, defCx: number, defCy: number, defW: number, maxLines = 3): string {
+  if (!c.name) return "";
+  if (c.labelBox) {
+    const [lcx, lcy, lw] = c.labelBox;
+    return centeredLines(wrap(c.name, lw + 16, 11.5, 6, 0.46), lcx, lcy, 11.5, "bpmn-label--out");
+  }
+  return centeredLines(wrap(c.name, defW, 11.5, maxLines), defCx, defCy, 11.5, "bpmn-label--out");
 }
 
 // ── event-definition marker glyphs (centred on 0,0) ─────────────────────────
@@ -203,8 +216,7 @@ function renderEvent(c: Component, cx: number, cy: number, r: number, shape: str
     + `<circle class="bpmn-event bpmn-event--ring" cx="${f(cx)}" cy="${f(cy)}" r="${f(r - 3.2)}"/>`;
   const glyph = eventMarker(marker, r * 0.42, INK);
   const glyphG = glyph ? `<g transform="translate(${f(cx)}, ${f(cy)})">${glyph}</g>` : "";
-  let label = "";
-  if (c.name) label = centeredLines(wrap(c.name, Math.max(70, 2 * r + 40), 11.5, 2), cx, cy + r + 13, 11.5, "bpmn-label--out");
+  const label = outsideLabel(c, cx, cy + r + 13, Math.max(70, 2 * r + 40));
   return `${rings}${glyphG}${label}`;
 }
 
@@ -227,8 +239,7 @@ function renderGateway(c: Component, cx: number, cy: number, hw: number, hh: num
   const pts = `${f(cx)},${f(cy - hh)} ${f(cx + hw)},${f(cy)} ${f(cx)},${f(cy + hh)} ${f(cx - hw)},${f(cy)}`;
   const diamond = `<polygon class="bpmn-gateway" points="${pts}"/>`;
   const mk = gatewayMarker(marker, cx, cy, Math.min(hw, hh) * 0.42);
-  let label = "";
-  if (c.name) label = centeredLines(wrap(c.name, Math.max(90, 2 * hw + 60), 11.5, 2), cx, cy + hh + 13, 11.5, "bpmn-label--out");
+  const label = outsideLabel(c, cx, cy + hh + 13, Math.max(90, 2 * hw + 60));
   return `${diamond}${mk}${label}`;
 }
 
@@ -237,8 +248,7 @@ function renderDataObject(c: Component, cx: number, cy: number, hw: number, hh: 
   const fold = Math.min(w, h) * 0.32;
   const page = `<path class="bpmn-data" d="M${f(x)},${f(y)} L${f(x + w - fold)},${f(y)} L${f(x + w)},${f(y + fold)} L${f(x + w)},${f(y + h)} L${f(x)},${f(y + h)} Z"/>`
     + `<path class="bpmn-data" d="M${f(x + w - fold)},${f(y)} L${f(x + w - fold)},${f(y + fold)} L${f(x + w)},${f(y + fold)}"/>`;
-  let label = "";
-  if (c.name) label = centeredLines(wrap(c.name, Math.max(90, w + 50), 11.5, 2), cx, cy + hh + 13, 11.5, "bpmn-label--out");
+  const label = outsideLabel(c, cx, cy + hh + 13, Math.max(90, w + 50));
   return `${page}${label}`;
 }
 
@@ -248,8 +258,7 @@ function renderDataStore(c: Component, cx: number, cy: number, hw: number, hh: n
   const ry = Math.min(hh * 0.45, hw * 0.4);
   const body = `<path class="bpmn-data" d="M${f(x)},${f(top + ry)} A${f(hw)},${f(ry)} 0 0 0 ${f(x + w)},${f(top + ry)} L${f(x + w)},${f(bot - ry)} A${f(hw)},${f(ry)} 0 0 1 ${f(x)},${f(bot - ry)} Z"/>`
     + `<path class="bpmn-data" fill="none" d="M${f(x)},${f(top + ry)} A${f(hw)},${f(ry)} 0 0 0 ${f(x + w)},${f(top + ry)}"/>`;
-  let label = "";
-  if (c.name) label = centeredLines(wrap(c.name, Math.max(90, w + 50), 11.5, 2), cx, cy + hh + 13, 11.5, "bpmn-label--out");
+  const label = outsideLabel(c, cx, cy + hh + 13, Math.max(90, w + 50));
   return `${body}${label}`;
 }
 

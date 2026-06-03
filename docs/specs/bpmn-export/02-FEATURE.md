@@ -85,7 +85,9 @@ INTRO-BPMN-EXPORT-001 §2.
 - **FR-4** The DI section SHALL be derived from kymo geometry: a `<bpmndi:BPMNShape>`
   with `<dc:Bounds>` per component (top-left = `pos − size/2`, width/height = `size`);
   a `<bpmndi:BPMNEdge>` with `<di:waypoint>`s from `Edge.points`; a `<bpmndi:BPMNLabel>`
-  `<dc:Bounds>` from `Edge.label_pos`. Coordinates SHALL **de-normalise** the importer's
+  `<dc:Bounds>` from `Edge.label_pos`, plus a per-node `<bpmndi:BPMNLabel>` `<dc:Bounds>`
+  from `Component.label_box` (top-left = `label_box.centre − size/2`) so positioned node
+  labels round-trip. Coordinates SHALL **de-normalise** the importer's
   `MARGIN` shift so exported geometry sits in a tidy positive plane.
 
 **Containers** *(Source need: `SN-BPMN-EXPORT-02`, `SN-BPMN-EXPORT-03`)*

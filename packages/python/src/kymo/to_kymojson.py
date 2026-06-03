@@ -39,7 +39,7 @@ def _norm(value):
 # Field order matches the dataclass definitions in `kymo.model` (snake_case).
 _COMPONENT_FIELDS = [
     "id", "name", "subtitle", "icon", "shape", "accent", "pos", "size",
-    "parent", "align", "align_gap", "align_offset",
+    "parent", "align", "align_gap", "align_offset", "label_box",
 ]
 _REGION_FIELDS = [
     "id", "label", "bounds", "contains", "padding", "padding_bottom", "style",

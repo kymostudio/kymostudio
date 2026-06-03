@@ -93,7 +93,8 @@ than duplicated.
 kymo stores a component's **centre** in `pos` and its box in `size`; BPMN DI uses a
 **top-left** `<dc:Bounds>`. Inverse: `x = pos.x − size.w/2`, `y = pos.y − size.h/2`,
 `width=size.w`, `height=size.h`. Edge `points` → ordered `<di:waypoint>`s. `label_pos`
-(centre) → `<BPMNLabel><dc:Bounds>` (top-left, fixed label box). The importer shifts
+(centre) → a flow `<BPMNLabel><dc:Bounds>`; `Component.label_box` (centre + size) → a
+per-node `<BPMNLabel><dc:Bounds>` (top-left = `centre − size/2`), so node labels round-trip. The importer shifts
 all geometry by `MARGIN` so the top-left glyph sits at `(MARGIN, MARGIN)`; export keeps
 the laid-out plane as-is (already positive) — no re-normalisation is required beyond
 the centre→top-left conversion, matching `from_bpmn`'s output extents.

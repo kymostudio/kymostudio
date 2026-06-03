@@ -99,10 +99,11 @@ BPMN_STYLE = """
 
 
 # ── Text wrapping (greedy, char-width estimate) ─────────────────────────
-def _wrap(text: str, width_px: float, font_px: float, max_lines: int) -> list[str]:
+def _wrap(text: str, width_px: float, font_px: float, max_lines: int,
+          factor: float = 0.55) -> list[str]:
     if not text:
         return []
-    max_chars = max(3, int((width_px - 8) / (font_px * 0.55)))
+    max_chars = max(3, int((width_px - 8) / (font_px * factor)))
     words, lines, cur = text.split(), [], ""
     for w in words:
         cand = f"{cur} {w}".strip()
@@ -135,6 +136,26 @@ def _centered_lines(lines: list[str], cx: float, cy: float, font_px: float,
         y = top + i * lh
         out.append(f'<text class="{cls}" x="{_f(cx)}" y="{_f(y)}">{_esc(ln)}</text>')
     return "".join(out)
+
+
+def _outside_label(c: Component, def_cx: float, def_cy: float,
+                   def_w: float, max_lines: int = 3) -> str:
+    """External (below-glyph) label for events / gateways / data nodes.
+    When the source carried a BPMNLabel DI box, place + wrap the label
+    exactly there (so it matches bpmn.io's authored position and width);
+    otherwise fall back to a centred label just below the glyph."""
+    if not c.name:
+        return ""
+    box = c.label_box
+    if box is not None:
+        lcx, lcy, lw, lh = box
+        # bpmn.io authored this label box; reproduce its width with metrics
+        # tuned to this font (~0.46em, vs the coarse 0.55 default) so the
+        # text wraps to the same line count and is never truncated.
+        lines = _wrap(c.name, lw + 16, 11.5, 6, factor=0.46)
+        return _centered_lines(lines, lcx, lcy, 11.5, "bpmn-label--out")
+    lines = _wrap(c.name, def_w, 11.5, max_lines)
+    return _centered_lines(lines, def_cx, def_cy, 11.5, "bpmn-label--out")
 
 
 # ── Event-definition marker glyphs ──────────────────────────────────────
@@ -354,10 +375,7 @@ def _render_event(c: Component, cx: float, cy: float, r: float,
         )
     glyph = _event_marker(marker, r * 0.42, color)
     glyph_g = f'<g transform="translate({_f(cx)}, {_f(cy)})">{glyph}</g>' if glyph else ""
-    label = ""
-    if c.name:
-        lines = _wrap(c.name, max(70, 2 * r + 40), 11.5, 3)
-        label = _centered_lines(lines, cx, cy + r + 13, 11.5, "bpmn-label--out")
+    label = _outside_label(c, cx, cy + r + 13, max(70, 2 * r + 40))
     return f'{rings}{glyph_g}{label}'
 
 
@@ -388,10 +406,7 @@ def _render_gateway(c: Component, cx: float, cy: float, hw: float, hh: float,
     pts = f"{_f(cx)},{_f(cy-hh)} {_f(cx+hw)},{_f(cy)} {_f(cx)},{_f(cy+hh)} {_f(cx-hw)},{_f(cy)}"
     diamond = f'<polygon class="bpmn-gateway" points="{pts}"/>'
     mk = _gateway_marker(marker, cx, cy, min(hw, hh) * 0.42)
-    label = ""
-    if c.name:
-        lines = _wrap(c.name, max(90, 2 * hw + 60), 11.5, 3)
-        label = _centered_lines(lines, cx, cy + hh + 13, 11.5, "bpmn-label--out")
+    label = _outside_label(c, cx, cy + hh + 13, max(90, 2 * hw + 60))
     return f'{diamond}{mk}{label}'
 
 
@@ -404,10 +419,7 @@ def _render_data_object(c: Component, cx: float, cy: float, hw: float, hh: float
         f'<path class="bpmn-data" d="M{_f(x+w-fold)},{_f(y)} L{_f(x+w-fold)},{_f(y+fold)}'
         f' L{_f(x+w)},{_f(y+fold)}"/>'
     )
-    label = ""
-    if c.name:
-        lines = _wrap(c.name, max(90, w + 50), 11.5, 3)
-        label = _centered_lines(lines, cx, cy + hh + 13, 11.5, "bpmn-label--out")
+    label = _outside_label(c, cx, cy + hh + 13, max(90, w + 50))
     return f'{page}{label}'
 
 
@@ -423,10 +435,7 @@ def _render_data_store(c: Component, cx: float, cy: float, hw: float, hh: float)
         f'<path class="bpmn-data" fill="none" d="M{_f(x)},{_f(top+ry)} '
         f'A{_f(hw)},{_f(ry)} 0 0 0 {_f(x+w)},{_f(top+ry)}"/>'
     )
-    label = ""
-    if c.name:
-        lines = _wrap(c.name, max(90, w + 50), 11.5, 3)
-        label = _centered_lines(lines, cx, cy + hh + 13, 11.5, "bpmn-label--out")
+    label = _outside_label(c, cx, cy + hh + 13, max(90, w + 50))
     return f'{body}{label}'
 
 

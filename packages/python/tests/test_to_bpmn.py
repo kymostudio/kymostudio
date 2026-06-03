@@ -177,3 +177,31 @@ def test_roundtrip_corpus(path):
     assert len(d1.edges) == len(d2.edges)
     assert len(d1.regions) == len(d2.regions)
     assert _geom(d1) == _geom(d2)
+
+
+def test_node_label_box_round_trips():
+    """Regression: a node carrying an external-label box (from a shape-level
+    `BPMNLabel` DI bounds) is re-exported as a shape `<bpmndi:BPMNLabel>` and
+    survives re-import as a round-trip fixpoint, within the +/-1px
+    centre<->top-left rounding the format guarantees."""
+    comp = Component(id="E1", name="Nhan xac nhan thong luong", subtitle="",
+                     icon="", shape="bpmn-start", accent="blue", pos=(300, 200),
+                     size=(36, 36), label_box=(300, 150, 80, 27))
+    d1 = Diagram(width=600, height=400, components=[comp], edges=[])
+
+    xml1 = export(d1)
+    # the shape carries its OWN <BPMNLabel> (previously only flows did)
+    shape = _find(ET.fromstring(xml1), tag="BPMNShape", bpmnElement="E1")
+    assert shape is not None
+    assert any(_local(ch.tag) == "BPMNLabel" for ch in shape)
+
+    # importer reads it back; a second round trip is a fixpoint within +/-1px
+    d2 = parse_bpmn(xml1)
+    d3 = parse_bpmn(export(d2))
+    lb2, lb3 = d2.components[0].label_box, d3.components[0].label_box
+    assert lb2 is not None and lb3 is not None
+    assert all(abs(a - b) <= 1 for a, b in zip(lb2, lb3))
+    # box keeps its offset above the glyph centre and its size
+    cx, cy = d2.components[0].pos
+    assert abs((lb2[0] - cx) - 0) <= 1 and abs((lb2[1] - cy) - (-50)) <= 1
+    assert lb2[2] == 80 and lb2[3] == 27
