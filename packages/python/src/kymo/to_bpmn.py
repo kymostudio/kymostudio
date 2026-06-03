@@ -188,6 +188,11 @@ def export(diagram: Diagram) -> str:
             shape.set("isMarkerVisible", "true")        # a DI attribute, read by from_bpmn
         _sub(shape, DC, "Bounds",
              x=round(c.pos[0] - w / 2), y=round(c.pos[1] - h / 2), width=w, height=h)
+        if c.label_box:
+            lcx, lcy, lw, lh = c.label_box
+            label = _sub(shape, BPMNDI, "BPMNLabel")
+            _sub(label, DC, "Bounds",
+                 x=round(lcx - lw / 2), y=round(lcy - lh / 2), width=lw, height=lh)
     for e, fid in zip(diagram.edges, flow_ids):
         edge = _sub(plane, BPMNDI, "BPMNEdge", bpmnElement=fid)
         for px, py in (e.points or []):

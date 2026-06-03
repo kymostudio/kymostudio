@@ -98,7 +98,7 @@ from the DI section:
 | --- | --- |
 | `bpmndi:BPMNShape` → `dc:Bounds x y width height` | each node's box (centre + size) |
 | `bpmndi:BPMNEdge` → `di:waypoint x y` (×n) | each flow's exact polyline |
-| `bpmndi:BPMNLabel` → `dc:Bounds` | flow-label position |
+| `bpmndi:BPMNLabel` → `dc:Bounds` | label box (centre + size): a flow's label position, **and** an event / gateway / data node's external-label box (`Component.label_box`) — so node labels render at their authored position + width, not a default spot below the glyph |
 | `isHorizontal`, `isExpanded` | pool orientation, sub-process expand state |
 
 Because the coordinates are authored in the file, **no layout/auto-routing
@@ -183,7 +183,7 @@ truth), so the two never drift:
 
 **Geometry.** A component's centre (`pos`) + box (`size`) become a top-left
 `<dc:Bounds>` (`x = pos.x − w/2`, `y = pos.y − h/2`); edge `points` become
-`<di:waypoint>`s; a flow label becomes a `<bpmndi:BPMNLabel>`. The DI plane is
+`<di:waypoint>`s; a flow label — and a node's `label_box` external label — becomes a `<bpmndi:BPMNLabel>`. The DI plane is
 referenced to the collaboration when pools exist, else to the process. Output is
 deterministic (stable order, ids preserved verbatim).
 

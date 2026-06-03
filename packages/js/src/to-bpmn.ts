@@ -208,6 +208,13 @@ export function toBpmn(diagram: Diagram): string {
     sub(shape, "dc:Bounds", {
       x: pyRound(c.pos[0] - w / 2), y: pyRound(c.pos[1] - h / 2), width: w, height: h,
     });
+    if (c.labelBox) {
+      const [lcx, lcy, lw, lh] = c.labelBox;
+      const label = sub(shape, "bpmndi:BPMNLabel");
+      sub(label, "dc:Bounds", {
+        x: pyRound(lcx - lw / 2), y: pyRound(lcy - lh / 2), width: lw, height: lh,
+      });
+    }
   }
   diagram.edges.forEach((e, i) => {
     const edge = sub(plane, "bpmndi:BPMNEdge", { bpmnElement: flowIds[i] });
