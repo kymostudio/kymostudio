@@ -15,7 +15,6 @@ related_documents:
   - DESIGN-BPMN-EDITOR-CR-003
   - PLAN-BPMN-EDITOR-CR-003
   - TEST-BPMN-EDITOR-001
-  - RES-BPMN-LINT-001
 authors:
   - Vũ Anh
 language: en
@@ -37,7 +36,7 @@ keywords:
 | Version           | 0.1 |
 | Status            | **Proposed** |
 | Owner             | `diagrams/` project |
-| Related Documents | `FEAT-BPMN-EDITOR-CR-003`, `DESIGN-BPMN-EDITOR-CR-003`, `PLAN-BPMN-EDITOR-CR-003`, `TEST-BPMN-EDITOR-001`, `RES-BPMN-LINT-001` |
+| Related Documents | `FEAT-BPMN-EDITOR-CR-003`, `DESIGN-BPMN-EDITOR-CR-003`, `PLAN-BPMN-EDITOR-CR-003`, `TEST-BPMN-EDITOR-001` |
 
 > **Delta V&V.** Test cases for CR-003 only; folded into `TEST-BPMN-EDITOR-001` on re-baseline.
 

@@ -10,10 +10,8 @@ audience: Engineers authoring or parsing `.kymo` files
 review_cycle: On grammar change, or annually (whichever first)
 supersedes: null
 related_documents:
-  - KYMO-DSL-001             # Language specification (index)
   - KYMO-DSL-GRAMMAR-001     # Clause 6 — Grammar (EBNF per ISO 14977)
   - BPD-DGM-001              # Diagram DSL design rationale (§5.5)
-  - model.py
 authors:
   - Vũ Anh
 language: en
@@ -38,7 +36,7 @@ iso_compliance:
 | Issue Date        | 2026-05-25                                         |
 | Status            | Released                                           |
 | Owner             | `diagrams/` project                                |
-| Related Documents | `KYMO-DSL-001`, `KYMO-DSL-GRAMMAR-001`, `BPD-DGM-001` |
+| Related Documents | `KYMO-DSL-GRAMMAR-001`, `BPD-DGM-001` |
 
 ## 2. Normative References
 

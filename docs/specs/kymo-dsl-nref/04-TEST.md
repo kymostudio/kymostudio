@@ -14,7 +14,6 @@ related_documents:
   - FEAT-KYMO-NREF-001       # Requirements (traced below)
   - DESIGN-KYMO-NREF-001     # Design
   - PLAN-KYMO-NREF-001       # Plan
-  - KYMO-DSL-001             # the spec this set reorganises (now the index)
 authors:
   - Vũ Anh
 language: en

@@ -133,7 +133,7 @@ realizes it.
 
 - **Pools / participants and lanes** (the laning model) — deferred; tracked as `CR-BPMN-EDITOR-001`.
 - **`Set color`** action — deferred (needs DI color in `toBpmn`); tracked as `CR-BPMN-EDITOR-002`.
-- **BPMN validation / linting** — deferred (`RES-BPMN-LINT-001`); tracked as `CR-BPMN-EDITOR-003`.
+- **BPMN validation / linting** — deferred; tracked as `CR-BPMN-EDITOR-003`.
 - **Copy / paste, duplicate, keyboard-only modeling** — deferred; tracked as `CR-BPMN-EDITOR-004`.
 - **One-click auto-layout** (`bpmnLayout`) — deferred; tracked as `CR-BPMN-EDITOR-005`.
 - **Multiplayer / real-time collaboration** and any **Python editor UI**.

@@ -16,9 +16,7 @@ related_documents:
   - TEST-BPMN-PARSER-001         # Test documentation
   - PLAN-BPMN-PARSER-001         # Plan
   - BPMN-MAP-001                 # BPMN element mapping (this feature realises the import direction)
-  - REF-BPMN-001                 # BPMN 2.0 research reference (OMG / ISO 19510)
   - DESIGN-BPMN-EXPORT-001       # BPMN export design (the inverse / round-trip counterpart)
-  - KYMO-DSL-001                 # kymo DSL language specification (bpmn { } block)
   - REF-BPMNIO-CMP-001           # bpmn.io comparison (round-trip benchmark)
 authors:
   - Vũ Anh

@@ -14,7 +14,6 @@ related_documents:
   - FEAT-KYMO-DSL-001        # Requirements
   - DESIGN-KYMO-DSL-001      # Design
   - TEST-KYMO-DSL-001        # Test documentation
-  - KYMO-DSL-001             # kymo DSL language specification (normative grammar)
 authors:
   - Vũ Anh
 language: en
@@ -38,7 +37,7 @@ iso_compliance:
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | INTRO-KYMO-DSL-001, FEAT-KYMO-DSL-001, DESIGN-KYMO-DSL-001, TEST-KYMO-DSL-001 |
+| Related      | INTRO-FEAT-DESIGN-TEST-KYMO-DSL-001 |
 
 Concept: INTRO-KYMO-DSL-001. Requirements (FR/NFR referenced below):
 FEAT-KYMO-DSL-001. Design: DESIGN-KYMO-DSL-001. Verification: TEST-KYMO-DSL-001.
@@ -144,8 +143,7 @@ append a row to Annex A (document edits) and Annex C (the phase's implementation
 worklog).
 
 ### B.4 Backwards Compatibility
-The plan is informative; the normative surface is FEAT-KYMO-DSL-001,
-DESIGN-KYMO-DSL-001, and KYMO-DSL-001. Reconcile any deviation there before
+The plan is informative; the normative surface is FEAT-DESIGN-and KYMO-DSL-001. Reconcile any deviation there before
 release.
 
 ## Annex C — Worklog

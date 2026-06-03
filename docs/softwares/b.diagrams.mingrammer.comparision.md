@@ -10,13 +10,12 @@ audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
 review_cycle: On upstream `diagrams` major release, on kymo DSL/layout change, or annually
 supersedes: null
 related_documents:
-  - b.diagrams.mingrammer.md
-  - b.d2.md
-  - a.figma.md
-  - a.mermaid.comparision.md
-  - a.plantuml.comparision.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-DIAGRAMS-MINGRAMMER-001
+  - REF-D2-001
+  - REF-FIGMA-001
+  - REF-MERMAID-CMP-001
+  - REF-PLANTUML-CMP-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -49,7 +48,7 @@ upstream:
 | Audience          | Engineers evolving the `kymo` DSL, layout, or render pipeline   |
 | Access Date       | 2026-05-18                                                     |
 | Parent Reference  | [`diagrams.mingrammer.md`](b.diagrams.mingrammer.md)             |
-| Related Documents | [`d2.md`](b.d2.md), [`figma.md`](a.figma.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`d2.md`](b.d2.md), [`figma.md`](a.figma.md), `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This document isolates the **prior-art comparison** between `mingrammer/diagrams` and kymo. The factual reference (overview, install, primitives, verbatim examples) lives in [`diagrams.mingrammer.md`](b.diagrams.mingrammer.md); read that first if you need ground truth on how `diagrams` actually behaves.
 
@@ -75,7 +74,7 @@ The comparison is here so it can evolve at a different cadence than the factual 
 
 ### 2.1 Host-language DSL vs. external grammar
 
-`diagrams` makes Python *be* the DSL. The wins are real: free `for` loops (used in [`diagrams.mingrammer.md` §4.6](diagrams.mingrammer.md#46-stateful-architecture-on-kubernetes) to generate per-replica pods), free conditionals, pip/poetry/uv for package management, and IDE completion via existing Python tooling.
+`diagrams` makes Python *be* the DSL. The wins are real: free `for` loops (used in [`diagrams.mingrammer.md` §4.6](b.diagrams.mingrammer.md#46-stateful-architecture-on-kubernetes) to generate per-replica pods), free conditionals, pip/poetry/uv for package management, and IDE completion via existing Python tooling.
 
 The costs are equally real:
 
@@ -98,7 +97,7 @@ Most `diagrams` adoption comes from the **node catalog**, not the language. AWS/
 
 Kymo will not match that catalog on its own and should not try to. Two practical consequences:
 
-1. **A `Custom`-equivalent is table stakes.** Without an icon escape hatch (load arbitrary PNG/SVG by path), every gap in the first-party catalog becomes a hard "kymo can't draw that" — which is the failure mode `diagrams` solved with [`Custom`](diagrams.mingrammer.md#35-custom).
+1. **A `Custom`-equivalent is table stakes.** Without an icon escape hatch (load arbitrary PNG/SVG by path), every gap in the first-party catalog becomes a hard "kymo can't draw that" — which is the failure mode `diagrams` solved with [`Custom`](b.diagrams.mingrammer.md#35-custom).
 2. **The Figma/Excalidraw exporters are the real catalog story.** They let users source iconography from environments that already have it, which is a different — and probably better — bet than building a competing catalog in tree.
 
 ### 2.4 `Cluster` minimalism vs. semantic containers
@@ -109,7 +108,7 @@ Kymo's container vocabulary (`region`, …) trades that simplicity for **semanti
 
 ### 2.5 Edge decoration via a sidecar object
 
-`Edge(color=…, style=…, label=…)` injected mid-chain ([`diagrams.mingrammer.md` §4.8](diagrams.mingrammer.md#48-advanced-web-service-with-on-premises-colored)) is a clean way to attach attributes without bloating operators. If kymo grows per-edge styling, this is a strong shape to copy: keep the connection operator pure, attach attributes via an explicit object.
+`Edge(color=…, style=…, label=…)` injected mid-chain ([`diagrams.mingrammer.md` §4.8](b.diagrams.mingrammer.md#48-advanced-web-service-with-on-premises-colored)) is a clean way to attach attributes without bloating operators. If kymo grows per-edge styling, this is a strong shape to copy: keep the connection operator pure, attach attributes via an explicit object.
 
 ## 3. Detailed scoring by category
 
@@ -133,7 +132,7 @@ How the user writes a diagram, how safe that writing is, and what the source can
 
 | # | Criterion | diagrams | kymo | Why |
 |---|-----------|:--------:|:---:|-----|
-| A1 | Concision on small diagrams | 9 | 7 | `diagrams` chains like §4.5 of [diagrams.mingrammer.md](diagrams.mingrammer.md#45-exposed-pod-with-3-replicas-on-kubernetes) are hard to beat for line-count; kymo is clean but slightly more verbose. |
+| A1 | Concision on small diagrams | 9 | 7 | `diagrams` chains like §4.5 of [diagrams.mingrammer.md](b.diagrams.mingrammer.md#45-exposed-pod-with-3-replicas-on-kubernetes) are hard to beat for line-count; kymo is clean but slightly more verbose. |
 | A2 | Safety (no precedence footguns) | 4 | 9 | `diagrams` inherits Python's `-` vs `>>` precedence pitfall and forbids list-to-list (`TypeError`); kymo's external grammar designs around both. |
 | A3 | Extensibility (loops, conditionals) | 10 | 3 | `for`/`if`/any-library come free in `diagrams` (§4.6); kymo has no host-language escape today. |
 | A4 | Grouping/container semantics | 6 | 7 | `Cluster` is a labeled box with no kind; kymo's typed containers drive layout/styling decisions, though the surface is still settling (keyword cleanup in `d271d08`). |
@@ -250,5 +249,5 @@ These follow directly from the comparison above and are not answered by current 
 
 - Comparison subject: `mingrammer/diagrams` as documented at <https://diagrams.mingrammer.com/> on 2026-05-18.
 - Factual basis for the `diagrams` column: [`diagrams.mingrammer.md`](b.diagrams.mingrammer.md).
-- Factual basis for the `kymo` column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]).
+- Factual basis for the `kymo` column: this repository's `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]).
 - Edits to this document should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

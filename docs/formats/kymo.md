@@ -10,7 +10,6 @@ audience: Engineers and authors using or maintaining the .kymo source format and
 review_cycle: On grammar change, or on format-identification change
 supersedes: null
 related_documents:
-  - KYMO-DSL-001                # kymo DSL language specification (normative grammar)
   - INTRO-KYMO-DSL-001          # Front-end engineering doc set — introduction
   - FEAT-KYMO-DSL-001           # Front-end requirements
   - DESIGN-KYMO-DSL-001         # Front-end design
@@ -45,7 +44,7 @@ iso_compliance:
 | Audience          | Engineers and authors using or maintaining the `.kymo` format    |
 | Review Cycle      | On grammar change, or on format-identification change            |
 | Supersedes        | —                                                               |
-| Related Documents | `KYMO-DSL-001`, `INTRO-KYMO-DSL-001`, `FEAT-KYMO-DSL-001`, `DESIGN-KYMO-DSL-001`, `TEST-KYMO-DSL-001`, `KYMOJSON-MAP-001`, `BPMN-MAP-001` |
+| Related Documents | `INTRO-`FEAT-`DESIGN-`TEST-`KYMOJSON-MAP-001`, `BPMN-MAP-001` |
 
 `.kymo` is kymo's **hand-authored, diagram-as-code source format** — a line-oriented
 text file that declares a diagram (components, containers, connectors, grouping)

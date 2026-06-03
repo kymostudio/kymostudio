@@ -10,7 +10,6 @@ audience: Engineers authoring or parsing `.kymo` files
 review_cycle: On grammar change, or annually (whichever first)
 supersedes: null
 related_documents:
-  - KYMO-DSL-001             # Language specification (index)
   - KYMO-DSL-GRAMMAR-001     # Clause 6 — Grammar
   - KYMO-DSL-TERMS-001       # Clause 3 — Terms and Definitions
   - DESIGN-KYMO-DSL-001      # Front-end design (resolution pipeline)
@@ -37,7 +36,7 @@ iso_compliance:
 | Issue Date        | 2026-05-25                                         |
 | Status            | Released                                           |
 | Owner             | `diagrams/` project                                |
-| Related Documents | `KYMO-DSL-001`, `KYMO-DSL-GRAMMAR-001`, `KYMO-DSL-TERMS-001`, `DESIGN-KYMO-DSL-001` |
+| Related Documents | `KYMO-DSL-GRAMMAR-001`, `KYMO-DSL-TERMS-001`, `DESIGN-KYMO-DSL-001` |
 
 ## 7. Semantics
 

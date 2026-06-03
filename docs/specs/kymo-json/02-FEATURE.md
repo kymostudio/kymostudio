@@ -16,7 +16,6 @@ related_documents:
   - TEST-KYMOJSON-001           # Test documentation
   - PLAN-KYMOJSON-001           # Plan
   - KYMOJSON-MAP-001            # The normative schema
-  - KYMO-DSL-001                # kymo DSL front-end
 authors:
   - Vũ Anh
 language: en

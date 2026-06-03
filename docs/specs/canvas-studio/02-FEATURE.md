@@ -18,7 +18,6 @@ related_documents:
   - FEAT-JAM-001
   - FEAT-CANVAS-001
   - FEAT-ENGINE-001
-  - KYMO-DSL-001
 authors:
   - Vũ Anh
 language: en

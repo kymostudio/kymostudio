@@ -16,7 +16,6 @@ related_documents:
   - TEST-BPMN-EXPORT-001    # Test documentation
   - PLAN-BPMN-EXPORT-001   # Plan
   - BPMN-MAP-001                 # BPMN importer element mapping (this feature inverts it)
-  - KYMO-DSL-001                # kymo DSL language specification (bpmn { } block)
   - DESIGN-BPMN-DSL-001       # BPMN-in-DSL design
   - REF-BPMNIO-CMP-001          # bpmn.io comparison (lossless round-trip benchmark)
 authors:

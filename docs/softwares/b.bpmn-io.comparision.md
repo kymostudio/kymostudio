@@ -10,9 +10,8 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream bpmn.io (bpmn-js) major release, on kymo DSL/layout change, or annually
 supersedes: null
 related_documents:
-  - b.bpmn-io.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-BPMNIO-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -45,7 +44,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-20                                                     |
 | Parent Reference  | [`bpmn-io.md`](b.bpmn-io.md)                                     |
-| Related Documents | [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This document isolates the **prior-art comparison** between [bpmn.io / bpmn-js](https://bpmn.io/) and kymo. The factual reference (architecture, the diagram-js/bpmn-moddle split, BPMN DI, embedding) lives in [`bpmn-io.md`](b.bpmn-io.md); read that first if you need ground truth on how bpmn-js actually behaves.
 
@@ -215,5 +214,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`bpmn-i
 
 - Comparison subject: bpmn.io / bpmn-js 18.16.1 as documented at <https://bpmn.io/> on 2026-05-20.
 - Factual basis for the bpmn-js column: [`bpmn-io.md`](b.bpmn-io.md).
-- Factual basis for the kymo column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

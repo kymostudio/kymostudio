@@ -17,7 +17,6 @@ related_documents:
   - PLAN-BPMN-EXPORT-001     # records the animation deferral this feature picks up
   - FEAT-BPMN-EXPORT-001     # §4 deferral note
   - BPMN-MAP-001             # BPMN element mapping (node type ↔ bpmn-* shapes; flow kinds)
-  - KYMO-DSL-001             # kymo DSL (bpmn { } authoring block)
   - REF-BPMNIO-CMP-001       # bpmn.io comparison ("no animation" gap)
 authors:
   - Vũ Anh

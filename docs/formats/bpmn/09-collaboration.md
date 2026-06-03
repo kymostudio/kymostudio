@@ -10,11 +10,9 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-PROCESS-001  # Clause 10 — Process (Lanes §10.8)
   - BPMN-NREF-CHOREO-001   # Clause 11 — Choreography
   - BPMN-NREF-CORE-001     # Clause 8 — Core (Correlation, Message)
-  - REF-BPMN-001           # BPMN 2.0 research reference (swimlanes §12)
 authors:
   - Vũ Anh
 language: en
@@ -47,7 +45,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§9 Collaboration** (pp.107–142) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-PROCESS-001`, `BPMN-NREF-CHOREO-001`, `BPMN-NREF-CORE-001`, `REF-BPMN-001` |
+| Related Documents | `BPMN-NREF-PROCESS-001`, `BPMN-NREF-CHOREO-001`, `BPMN-NREF-CORE-001` |
 
 Mirrors **Clause 9 (Collaboration)** of the OMG BPMN 2.0.2 specification (§9.1–§9.8,
 pp.107–142). Part of the normative-reference set `BPMN-NREF-001`. Where this note and the OMG

@@ -15,7 +15,6 @@ related_documents:
   - TEST-BPMN-EDITOR-CR-003
   - PLAN-BPMN-EDITOR-CR-003
   - DESIGN-BPMN-EDITOR-001
-  - RES-BPMN-LINT-001
 authors:
   - Vũ Anh
 language: en
@@ -36,7 +35,7 @@ keywords:
 | Version           | 0.1 |
 | Status            | **Proposed** |
 | Owner             | `diagrams/` project |
-| Related Documents | `FEAT-BPMN-EDITOR-CR-003`, `TEST-BPMN-EDITOR-CR-003`, `DESIGN-BPMN-EDITOR-001` (extended), `RES-BPMN-LINT-001` |
+| Related Documents | `FEAT-BPMN-EDITOR-CR-003`, `TEST-BPMN-EDITOR-CR-003`, `DESIGN-BPMN-EDITOR-001` (extended) |
 
 > **Delta design.** A rule engine + a non-blocking marker overlay, layered over the editor model.
 
@@ -45,7 +44,7 @@ keywords:
 ## 1. Rule engine (FR-CR3-01)
 
 A new `bpmn-lint.ts` runs a **data-driven** rule set over the current `Diagram` model. Per
-`RES-BPMN-LINT-001`, two options: vendor `bpmnlint` (mature, but expects a `bpmn-js` moddle model — an
+two options: vendor `bpmnlint` (mature, but expects a `bpmn-js` moddle model — an
 adapter would map kymo's model to it) or a **small in-house checker** over the kymo model (lighter,
 no dep — preferred for the initial rule set). Decision recorded at implementation; the initial rules
 (start/end flow constraints, disconnected nodes, gateway fan-in/out, dangling endpoints) are simple
@@ -76,4 +75,4 @@ edit or export. A toggle turns the overlay off → it does nothing (zero behavio
 
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
-| 0.1     | 2026-05-31 | Vũ Anh | Proposed. Data-driven rule engine (`bpmn-lint.ts`) + non-blocking `ui/LintOverlay.tsx` (debounced); in-house checker preferred over vendoring `bpmnlint` for the initial set (`RES-BPMN-LINT-001`). |
+| 0.1     | 2026-05-31 | Vũ Anh | Proposed. Data-driven rule engine (`bpmn-lint.ts`) + non-blocking `ui/LintOverlay.tsx` (debounced); in-house checker preferred over vendoring `bpmnlint` for the initial set. |

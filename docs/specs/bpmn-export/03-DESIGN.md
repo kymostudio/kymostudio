@@ -15,7 +15,6 @@ related_documents:
   - TEST-BPMN-EXPORT-001    # Test documentation
   - PLAN-BPMN-EXPORT-001   # Plan
   - BPMN-MAP-001                 # BPMN importer element mapping (inverted here)
-  - KYMO-DSL-001                # kymo DSL language specification
 authors:
   - Vũ Anh
 language: en

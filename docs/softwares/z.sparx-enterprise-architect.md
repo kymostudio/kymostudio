@@ -10,10 +10,8 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - z.sparx-enterprise-architect.comparision.md
-  - ../diagrams/bpmn/README.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-SPARX-EA-CMP-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -49,7 +47,7 @@ upstream:
 | License           | Commercial proprietary                                        |
 | Version Reviewed  | Enterprise Architect 16/17 line (2026)                       |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`sparx-enterprise-architect.comparision.md`](./z.sparx-enterprise-architect.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`sparx-enterprise-architect.comparision.md`](./z.sparx-enterprise-architect.comparision.md), `bpmn/README.md`, `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Enterprise Architect's design choices so the team can consult them when reasoning about multi-notation modelling. No code or behaviour in this repository depends on it. Enterprise Architect is a broad **modelling tool** — a different category from kymo (a static diagram DSL); BPMN is one of many notations it supports.
 

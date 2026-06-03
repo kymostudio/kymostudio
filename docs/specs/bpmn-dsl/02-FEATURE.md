@@ -15,7 +15,6 @@ related_documents:
   - DESIGN-BPMN-DSL-001    # Design
   - TEST-BPMN-DSL-001    # Test documentation
   - PLAN-BPMN-DSL-001   # Plan
-  - KYMO-DSL-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
 authors:
   - Vũ Anh

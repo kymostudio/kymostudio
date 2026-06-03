@@ -10,9 +10,8 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream Visual Paradigm major release, on kymo DSL/layout change, or annually
 supersedes: null
 related_documents:
-  - a.visual-paradigm.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-VISUAL-PARADIGM-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -45,7 +44,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-20                                                     |
 | Parent Reference  | [`visual-paradigm.md`](a.visual-paradigm.md)                    |
-| Related Documents | [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This document isolates the **prior-art comparison** between [Visual Paradigm](https://www.visual-paradigm.com/) and kymo. The factual reference (editions, multi-notation support, round-trip engineering, BPMN conformance) lives in [`visual-paradigm.md`](a.visual-paradigm.md); read that first if you need ground truth on how Visual Paradigm actually behaves.
 
@@ -206,5 +205,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`visual
 
 - Comparison subject: Visual Paradigm (17 line, 2026) as documented at <https://www.visual-paradigm.com/> on 2026-05-20.
 - Factual basis for the Visual Paradigm column: [`visual-paradigm.md`](a.visual-paradigm.md).
-- Factual basis for the kymo column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

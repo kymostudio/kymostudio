@@ -10,9 +10,7 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-NOTATION-001 # Clause 12 — Notation & Diagrams (depiction library)
-  - REF-BPMN-001           # BPMN 2.0 research reference (notation/semantics)
 authors:
   - Vũ Anh
 language: en
@@ -42,7 +40,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Source            | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§5 Symbols** (p.16) / ISO/IEC 19510:2013 |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-NOTATION-001`, `REF-BPMN-001`     |
+| Related Documents | `BPMN-NREF-NOTATION-001`     |
 
 ## 5 Symbols (p.16)
 

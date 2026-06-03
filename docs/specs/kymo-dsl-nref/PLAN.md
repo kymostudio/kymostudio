@@ -14,8 +14,6 @@ related_documents:
   - FEAT-KYMO-NREF-001       # Requirements
   - DESIGN-KYMO-NREF-001     # Design
   - TEST-KYMO-NREF-001       # Test documentation
-  - KYMO-DSL-001             # the spec this set reorganises (now the index)
-  - BPMN-NREF-001            # BPMN normative-reference set (the structural model mirrored)
 authors:
   - Vũ Anh
 language: en
@@ -47,10 +45,9 @@ FEAT-KYMO-NREF-001. Design: DESIGN-KYMO-NREF-001. Verification: TEST-KYMO-NREF-0
 
 ## 1. Context
 
-The kymo DSL specification (`KYMO-DSL-001`) lived in one monolithic file
+The kymo DSL specification lived in one monolithic file
 (`docs/KYMO_DSL.md`, v2.5). The repository already organises the `.bpmn` interchange
-spec as a **clause-per-file normative-reference set** (`docs/formats/bpmn/`,
-`BPMN-NREF-001`). This plan brings the kymo DSL — the repo's own normative language —
+spec as a **clause-per-file normative-reference set** (`docs/formats/bpmn/`). This plan brings the kymo DSL — the repo's own normative language —
 to the same organisation so each clause is independently citable and versioned,
 without changing the language or breaking any cross-reference.
 
@@ -170,7 +167,7 @@ Annex A, which records edits to *this document*. Newest at the bottom; dates ISO
 
 | Date       | Phase / area | Work | Status | Ref |
 |------------|--------------|------|--------|-----|
-| 2026-05-25 | P1 — Build set | Created `docs/formats/kymo-dsl/`: `README.md` (`KYMO-DSL-001`, v2.6 index with Contents table + full Annex A 1.0→2.6) + `01-scope.md`…`10-examples.md` (`KYMO-DSL-<X>-001`), §1–§10 lifted verbatim, headings preserved, per-file Annex A/B, `../`→`../../../` path fix. Verified 11 files, unique ids, anchors present. | ✅ | `TC-1`,`TC-3`,`TC-4`,`TC-7` |
+| 2026-05-25 | P1 — Build set | Created `docs/formats/kymo-dsl/`: `README.md` (v2.6 index with Contents table + full Annex A 1.0→2.6) + `01-scope.md`…`10-examples.md` (`KYMO-DSL-<X>-001`), §1–§10 lifted verbatim, headings preserved, per-file Annex A/B, `../`→`../../../` path fix. Verified 11 files, unique ids, anchors present. | ✅ | `TC-1`,`TC-3`,`TC-4`,`TC-7` |
 | 2026-05-25 | P2 — Repoint + delete | Repointed all `../KYMO_DSL.md` path/anchor links: ~26 `docs/softwares/*`, `docs/guide/*` deep anchors → `06-grammar.md`/`07-semantics.md`, `docs/diagrams/bpmn/README.md` (depth-two), `BEST_PRACTICE_DIAGRAMS.md`, `CONTRIBUTING.md`, PR template, `CHANGELOG.md`, `.github/ISSUE_TEMPLATE/config.yml`. Deleted `docs/KYMO_DSL.md`. Verified zero `KYMO_DSL` tokens repo-wide; `KYMO-DSL-001` defined once. | ✅ | `TC-2`,`TC-5` |
 | 2026-05-25 | P3 — Spec set | Authored this engineering set (`INTRO`/`FEATURE`/`DESIGN`/`TEST`/`PLAN-KYMO-NREF-001`) at the detailed `canvas-studio` format — stakeholder needs, FR/NFR tables, anchor/link-rewrite design, TC + traceability, phased plan + sizing + risk register. | ✅ | `INTRO-KYMO-NREF-001` |
 | 2026-05-25 | P4 — Verify | Integrity greps + `pytest -q` + `npm test`. | ⏳ | `TC-6` |

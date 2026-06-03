@@ -10,10 +10,8 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-NOTATION-001 # Clause 12 — BPMN DI (the BPMN specialisation)
   - BPMN-NREF-EXCHANGE-001 # Clause 15 — Exchange Formats
-  - REF-BPMN-001           # BPMN 2.0 research reference (interchange §16)
 authors:
   - Vũ Anh
 language: en
@@ -46,7 +44,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **Annex B — Diagram Interchange** *(non-normative)* (pp.481–498) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-NOTATION-001`, `BPMN-NREF-EXCHANGE-001`, `REF-BPMN-001` |
+| Related Documents | `BPMN-NREF-NOTATION-001`, `BPMN-NREF-EXCHANGE-001` |
 
 Mirrors **Annex B (Diagram Interchange)** — a **non-normative** annex — of the OMG BPMN 2.0.2
 specification (§B.1–§B.4, pp.481–498). It documents the shared OMG **Diagram Definition (DD)**

@@ -17,7 +17,6 @@ related_documents:
   - PLAN-BPMN-PARSER-001         # Plan
   - BPMN-MAP-001                 # BPMN element mapping (the normative import table)
   - DESIGN-BPMN-EXPORT-001       # BPMN export design (the inverse)
-  - KYMO-DSL-001                 # kymo DSL language specification
 authors:
   - Vũ Anh
 language: en

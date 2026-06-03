@@ -13,9 +13,7 @@ related_documents:
   - INTRO-BPMN-PARSER-001
   - FEAT-BPMN-PARSER-001
   - BPMN-MAP-001
-  - REF-BPMN-001
   - DESIGN-BPMN-EXPORT-001
-  - KYMO-DSL-001
   - REF-BPMNIO-CMP-001
 authors:
   - Vũ Anh

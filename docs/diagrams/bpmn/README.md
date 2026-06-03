@@ -1,56 +1,4 @@
----
-title: BPMN 2.0 — Research Reference
-document_id: REF-BPMN-001
-version: "1.0"
-issue_date: 2026-05-20
-status: Released
-classification: Internal
-owner: diagrams/ project
-audience: Engineers researching process-notation standards and prior art
-review_cycle: On OMG BPMN major release, or annually (whichever first)
-supersedes: null
-related_documents:
-  - ../../formats/kymo-dsl/README.md
-  - ../best-practices.md
-  - ../../softwares/b.d2.md
-authors:
-  - Vũ Anh
-language: en
-keywords:
-  - bpmn
-  - business-process-model-and-notation
-  - iso-19510
-  - omg
-  - workflow
-  - process-diagram
-  - choreography
-  - prior-art
-upstream:
-  project: OMG Business Process Model and Notation (BPMN)
-  homepage: https://www.omg.org/spec/BPMN/
-  specification: https://www.omg.org/spec/BPMN/2.0.2/PDF
-  iso_equivalent: ISO/IEC 19510:2013
-  license: OMG specification (royalty-free); ISO/IEC 19510:2013 (purchasable)
-  version_reviewed: "2.0.2 (OMG, 2014) / ISO/IEC 19510:2013"
-  access_date: 2026-05-20
----
-
 # BPMN 2.0 — Research Reference
-
-| Field             | Value                                                          |
-|-------------------|----------------------------------------------------------------|
-| Document ID       | REF-BPMN-001                                                   |
-| Version           | 1.0                                                            |
-| Issue Date        | 2026-05-20                                                     |
-| Status            | Released                                                       |
-| Classification    | Internal                                                       |
-| Owner             | `diagrams/` project                                            |
-| Audience          | Engineers researching process-notation standards and prior art |
-| Upstream          | [OMG BPMN](https://www.omg.org/spec/BPMN/)                     |
-| ISO Equivalent    | ISO/IEC 19510:2013                                            |
-| Version Reviewed  | 2.0.2 (OMG, 2014) / ISO/IEC 19510:2013                        |
-| Access Date       | 2026-05-20                                                     |
-| Related Documents | [`kymo-dsl/`](../../formats/kymo-dsl/README.md), [`best-practices.md`](../best-practices.md), [`d2.md`](../../softwares/b.d2.md) |
 
 This is a **research reference on BPMN 2.0**, the process-modelling notation standardised by the Object Management Group (OMG) and published by ISO as ISO/IEC 19510:2013. It is **descriptive, not normative** — where this note and the OMG specification disagree, the OMG specification is authoritative. No code or behaviour in this repository depends on BPMN; this document exists so the team can consult the standard's vocabulary and structure when discussing process and flow diagrams.
 
@@ -92,7 +40,7 @@ This document records the structure and vocabulary of **Business Process Model a
 ### 1.2 What this document is — and is not
 
 - **Is** — a descriptive summary of BPMN 2.0's element taxonomy, diagram types, execution semantics, and interchange format, with citations to the authoritative sources.
-- **Is not** — the BPMN specification itself (see [§2](#2-normative-references)); a tutorial on *drawing* BPMN diagrams; a claim that this repository's DSL renders BPMN. The DSL (see [`kymo-dsl/`](../../formats/kymo-dsl/README.md)) targets architecture diagrams and has no native gateway (diamond), task (rounded-rectangle), or swimlane primitive; it can only approximate BPMN shapes. Mapping BPMN onto the DSL is explicitly out of scope here.
+- **Is not** — the BPMN specification itself (see [§2](#2-normative-references)); a tutorial on *drawing* BPMN diagrams; a claim that this repository's DSL renders BPMN. The DSL (see `kymo-dsl/`) targets architecture diagrams and has no native gateway (diamond), task (rounded-rectangle), or swimlane primitive; it can only approximate BPMN shapes. Mapping BPMN onto the DSL is explicitly out of scope here.
 
 ### 1.3 Sources and method
 

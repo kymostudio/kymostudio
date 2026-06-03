@@ -1,74 +1,4 @@
----
-title: Kymo DSL — Language Specification (Index)
-document_id: KYMO-DSL-001
-version: "2.6"
-issue_date: 2026-05-25
-status: Released
-classification: Internal
-owner: diagrams/ project
-audience: Engineers authoring or parsing `.kymo` files
-review_cycle: On grammar change, or annually (whichever first)
-supersedes: "2.5"
-related_documents:
-  - KYMO-DSL-SCOPE-001       # Clause 1 — Scope
-  - KYMO-DSL-NORMREF-001     # Clause 2 — Normative References
-  - KYMO-DSL-TERMS-001       # Clause 3 — Terms and Definitions
-  - KYMO-DSL-ABBR-001        # Clause 4 — Abbreviations
-  - KYMO-DSL-LEX-001         # Clause 5 — Lexical Conventions
-  - KYMO-DSL-GRAMMAR-001     # Clause 6 — Grammar
-  - KYMO-DSL-SEMANTICS-001   # Clause 7 — Semantics
-  - KYMO-DSL-AUTHORING-001   # Clause 8 — Authoring Conventions
-  - KYMO-DSL-CONF-001        # Clause 9 — Conformance
-  - KYMO-DSL-EXAMPLES-001    # Clause 10 — Examples
-  - BPD-DGM-001              # Architecture-diagram best practices (design rationale)
-  - DESIGN-BPMN-DSL-001      # BPMN-in-DSL design (bpmn { } block + layout)
-  - KYMOJSON-MAP-001         # .kymo.json — serialization of the resolved model this DSL produces
-  - KYMO-FMT-001             # .kymo source format — catalog reference
-  - INTRO-KYMO-DSL-001       # Front-end engineering doc set — introduction
-  - FEAT-KYMO-DSL-001        # Front-end requirements
-  - DESIGN-KYMO-DSL-001      # Front-end design
-  - TEST-KYMO-DSL-001        # Front-end test documentation
-  - PLAN-KYMO-DSL-001        # Front-end plan
-  - INTRO-KYMO-NREF-001      # This set's engineering doc — introduction
-  - FEAT-KYMO-NREF-001       # This set's requirements
-  - DESIGN-KYMO-NREF-001     # This set's design
-  - TEST-KYMO-NREF-001       # This set's test documentation
-  - PLAN-KYMO-NREF-001       # This set's plan
-  - dsl.py
-  - model.py
-authors:
-  - Vũ Anh
-language: en
-keywords:
-  - dsl
-  - diagram
-  - grammar
-  - ebnf
-  - svg
-  - normative-reference
-iso_compliance:
-  - ISO/IEC/IEEE 15289:2019      # information item content (metadata + structure)
-  - ISO/IEC 14977:1996           # EBNF notation
-  - ISO/IEC/IEEE 26515:2018      # agile documentation
-  - ISO 8601:2019                # date format
-# Revision history is maintained in Annex A (per ISO/IEC/IEEE 15289:2019
-# clause 5.10 — change information SHALL be a numbered annex, not metadata).
----
-
 # Kymo DSL — Language Specification (Index)
-
-| Field             | Value                                                          |
-|-------------------|----------------------------------------------------------------|
-| Document ID       | KYMO-DSL-001                                                   |
-| Version           | 2.6                                                           |
-| Issue Date        | 2026-05-25                                                    |
-| Status            | Released                                                      |
-| Classification    | Internal                                                     |
-| Owner             | `diagrams/` project                                          |
-| Audience          | Engineers authoring or parsing `.kymo` files                |
-| Review Cycle      | On grammar change, or annually (whichever first)             |
-| Supersedes        | v2.5 (the prior single-file specification)                   |
-| Related Documents | the 10 clause files below, plus `BPD-DGM-001`, `KYMOJSON-MAP-001`, `KYMO-FMT-001`, the `*-KYMO-DSL-001` and `*-KYMO-NREF-001` engineering sets, [`dsl.py`](../../../packages/python/src/kymo/dsl.py), [`model.py`](../../../packages/python/src/kymo/model.py) |
 
 This folder is the **normative reference for the Kymo DSL** — the textual surface
 language for declaring architecture diagrams. A conforming source file (`.kymo`)
@@ -78,7 +8,7 @@ the source.
 
 Its structure follows **ISO/IEC/IEEE 15289:2019**, organised **clause-by-clause** —
 one file per clause — so a reader can go straight from a clause number to its file
-(the same layout as the BPMN normative set, `BPMN-NREF-001`). Grammar productions
+(the same layout as the BPMN normative set). Grammar productions
 follow **ISO/IEC 14977:1996** (Extended Backus–Naur Form); the full grammar is
 clause 6.
 
@@ -127,7 +57,7 @@ clause 6.
 | 2.3     | 2026-05-24 | Vũ Anh      | Added `KYMOJSON-MAP-001` (the `.kymo.json` serialization of the resolved model this DSL produces) to related documents. |
 | 2.4     | 2026-05-24 | Vũ Anh      | Added the kymo DSL front-end engineering doc set (`INTRO`/`FEAT`/`DESIGN`/`TEST`/`PLAN-KYMO-DSL-001`) to related documents — the descriptive REQ/DSN/TST/PLAN set for the parse → layout → alignment pipeline this grammar specifies. |
 | 2.5     | 2026-05-24 | Vũ Anh      | Added `KYMO-FMT-001` (the `.kymo` source format-catalog reference under `docs/formats/`) to related documents, completing the formats catalog alongside `KYMOJSON-MAP-001` and `BPMN-MAP-001`. |
-| 2.6     | 2026-05-25 | Vũ Anh      | **Restructured into a clause-per-file normative-reference set** under `docs/formats/kymo-dsl/`, mirroring the BPMN set (`BPMN-NREF-001`): this index (retaining `document_id: KYMO-DSL-001`) + ten clause files (`KYMO-DSL-<X>-001`), each carrying its own doc-control Annex A/B. The prior monolithic single-file specification is superseded; every link to it in the repository was repointed here. No grammar or semantic change (the §1–§10 content is lifted verbatim from v2.5). Engineering doc set: `*-KYMO-NREF-001`. |
+| 2.6     | 2026-05-25 | Vũ Anh      | **Restructured into a clause-per-file normative-reference set** under `docs/formats/kymo-dsl/`, mirroring the BPMN set: this index (retaining `document_id: KYMO-DSL-001`) + ten clause files (`KYMO-DSL-<X>-001`), each carrying its own doc-control Annex A/B. The prior monolithic single-file specification is superseded; every link to it in the repository was repointed here. No grammar or semantic change (the §1–§10 content is lifted verbatim from v2.5). Engineering doc set: `*-KYMO-NREF-001`. |
 
 ## Annex B — Document Control
 

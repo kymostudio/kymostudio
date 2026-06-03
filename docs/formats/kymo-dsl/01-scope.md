@@ -10,10 +10,8 @@ audience: Engineers authoring or parsing `.kymo` files
 review_cycle: On grammar change, or annually (whichever first)
 supersedes: null
 related_documents:
-  - KYMO-DSL-001             # Language specification (index)
   - KYMO-DSL-NORMREF-001     # Clause 2 — Normative References
   - BPD-DGM-001              # Architecture-diagram best practices
-  - dsl.py
 authors:
   - Vũ Anh
 language: en
@@ -36,7 +34,7 @@ iso_compliance:
 | Issue Date        | 2026-05-25                                         |
 | Status            | Released                                           |
 | Owner             | `diagrams/` project                                |
-| Related Documents | `KYMO-DSL-001`, `KYMO-DSL-NORMREF-001`, `BPD-DGM-001` |
+| Related Documents | `KYMO-DSL-NORMREF-001`, `BPD-DGM-001` |
 
 ## 1. Scope
 

@@ -10,10 +10,8 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - z.jbpm.comparision.md
-  - ../diagrams/bpmn/README.md
-  - ./z.activiti.md
-  - ../formats/kymo-dsl/README.md
+  - REF-JBPM-CMP-001
+  - REF-ACTIVITI-001
 authors:
   - Vũ Anh
 language: en
@@ -49,7 +47,7 @@ upstream:
 | License           | Apache-2.0                                                    |
 | Version Reviewed  | jBPM 7.x (KIE); Kogito successor                             |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`jbpm.comparision.md`](./z.jbpm.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`activiti.md`](./z.activiti.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md) |
+| Related Documents | [`jbpm.comparision.md`](./z.jbpm.comparision.md), `bpmn/README.md`, [`activiti.md`](./z.activiti.md), `kymo-dsl/` |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures jBPM's design choices and its place in the history of open-source BPM. No code or behaviour in this repository depends on jBPM. jBPM is a **process-execution toolkit**, a different category from kymo (a static diagram DSL).
 

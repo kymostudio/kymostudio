@@ -15,7 +15,6 @@ related_documents:
   - TEST-BPMN-EDITOR-CR-003
   - PLAN-BPMN-EDITOR-CR-003
   - FEAT-BPMN-EDITOR-001
-  - RES-BPMN-LINT-001
 authors:
   - Vũ Anh
 language: en
@@ -90,4 +89,4 @@ checker (decided in design).
 
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
-| 0.1     | 2026-05-31 | Vũ Anh | Proposed. `FR-CR3-01` non-blocking lint overlay + initial rule set (`RES-BPMN-LINT-001`); `NFR-CR3-01` non-intrusive/cheap. |
+| 0.1     | 2026-05-31 | Vũ Anh | Proposed. `FR-CR3-01` non-blocking lint overlay + initial rule set; `NFR-CR3-01` non-intrusive/cheap. |

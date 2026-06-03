@@ -10,10 +10,8 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - b.camunda.comparision.md
-  - ../diagrams/bpmn/README.md
-  - ./b.bpmn-io.md
-  - ../formats/kymo-dsl/README.md
+  - REF-CAMUNDA-CMP-001
+  - REF-BPMNIO-001
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +46,7 @@ upstream:
 | License           | C7 CE: Apache-2.0 (EoL) · C8: source-available + proprietary  |
 | Version Reviewed  | Camunda 8 (current); Camunda 7 CE (EoL)                       |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`camunda.comparision.md`](./b.camunda.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`bpmn-io.md`](./b.bpmn-io.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md) |
+| Related Documents | [`camunda.comparision.md`](./b.camunda.comparision.md), `bpmn/README.md`, [`bpmn-io.md`](./b.bpmn-io.md), `kymo-dsl/` |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Camunda's design choices so the team can consult them when reasoning about process notation and model interchange. No code or behaviour in this repository depends on Camunda. Camunda is a **process-execution platform**, a different category from kymo (a static diagram DSL); it is included because it authored bpmn.io and exemplifies BPMN's "executable model" ambition.
 
@@ -77,7 +75,7 @@ The shift from Camunda 7's permissive, embeddable OSS engine to Camunda 8's sour
 
 ## 4. BPMN support and conformance
 
-- Executes the **Common Executable** subset of BPMN 2.0 (see [`bpmn/README.md` §6](../diagrams/bpmn/README.md)): the engine interprets the operational semantics — token flow, gateway routing, event handling — not merely the symbols.
+- Executes the **Common Executable** subset of BPMN 2.0 (see `bpmn/README.md` §6): the engine interprets the operational semantics — token flow, gateway routing, event handling — not merely the symbols.
 - Pairs BPMN with **DMN** for decision logic (Business Rule tasks) and historically with CMMN for case management.
 - Consumes standard **BPMN 2.0 XML**; the diagram layout (BPMN DI) authored in bpmn.io round-trips alongside the executable model.
 

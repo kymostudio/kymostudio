@@ -15,9 +15,7 @@ related_documents:
   - DESIGN-BPMN-DSL-001    # Design
   - TEST-BPMN-DSL-001    # Test documentation
   - PLAN-BPMN-DSL-001   # Plan
-  - KYMO-DSL-001             # kymo DSL language specification (normative)
   - BPMN-MAP-001              # BPMN importer element mapping
-  - RES-MERMAID-D2-001       # Mermaid vs D2 (auto-layout prior art)
 authors:
   - Vũ Anh
 language: en
@@ -64,7 +62,7 @@ automatically (cf. RES-MERMAID-D2-001). kymo can already *import* BPMN 2.0 XML
 
 ## 3. Feature concept
 
-A new file-scope `bpmn { … }` block in the kymo DSL (KYMO-DSL-001) lets an author
+A new file-scope `bpmn { … }` block in the kymo DSL lets an author
 describe a process as typed nodes and flows — *declare-then-connect* — and have
 the engine lay it out:
 

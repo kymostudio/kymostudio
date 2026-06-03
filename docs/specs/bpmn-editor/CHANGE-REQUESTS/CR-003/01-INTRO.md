@@ -16,7 +16,6 @@ related_documents:
   - PLAN-BPMN-EDITOR-CR-003
   - FEAT-BPMN-EDITOR-001
   - DESIGN-BPMN-EDITOR-001
-  - RES-BPMN-LINT-001
 authors:
   - Vũ Anh
 language: en

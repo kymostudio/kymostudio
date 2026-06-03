@@ -12,7 +12,6 @@ supersedes: null
 related_documents:
   - INTRO-KYMO-DSL-001          # Introduction
   - FEAT-KYMO-DSL-001           # Requirements (SRS derived from the needs below)
-  - KYMO-DSL-001                # kymo DSL language specification (normative grammar)
   - KYMOJSON-MAP-001            # .kymo.json — serialization of the resolved model
 authors:
   - Vũ Anh
@@ -39,7 +38,7 @@ iso_compliance:
 | Version           | 0.1 |
 | Status            | Draft |
 | Owner             | `diagrams/` project |
-| Related Documents | `INTRO-KYMO-DSL-001`, `FEAT-KYMO-DSL-001` (the SRS derived from the needs below) |
+| Related Documents | `INTRO-`FEAT-KYMO-DSL-001` (the SRS derived from the needs below) |
 
 > This doc owns the `SN-KYMO-DSL-NN`
 > stakeholder needs; the SRS (`FEAT-KYMO-DSL-001`) derives `FR`/`NFR` from them.
@@ -51,7 +50,7 @@ it to animated SVG (plus Figma / Excalidraw / WebP). The `.kymo` DSL is the **pr
 front-end** — the first thing a new user touches and the most-exercised code path in the toolchain.
 The problem it solves is that an author should describe *what* the diagram contains — components,
 containers, connectors, grouping — **without hand-computing layout coordinates**; the engine resolves
-geometry deterministically. Its language reference (`KYMO-DSL-001`, EBNF + statement semantics) already
+geometry deterministically. Its language reference (EBNF + statement semantics) already
 exists; what this product description (and its sibling spec set) captures is the **engineering context**
 the shipped front-end already satisfies.
 
@@ -74,7 +73,7 @@ the shipped front-end already satisfies.
 - **Goals:** a declarative, line-oriented `.kymo` language whose source compiles into a fully-resolved
   `Diagram` the renderers can draw; deterministic geometry resolution; functional parity across the
   Python and JavaScript implementations; the grammar dual-sourced with `KYMO-DSL-001`.
-- **Non-goals (delegated):** the normative EBNF grammar and per-statement semantics (`KYMO-DSL-001`);
+- **Non-goals (delegated):** the normative EBNF grammar and per-statement semantics;
   the `bpmn { … }` block and its auto-layout (`FEAT-BPMN-DSL-001`); the BPMN 2.0 XML
   importer/exporter (`BPMN-MAP-001` and the `bpmn-parser`/`bpmn-export` sets); the `.kymo.json`
   interchange format (`KYMOJSON-MAP-001`); and the canvas editor (`canvas-*` sets).

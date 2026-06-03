@@ -1,59 +1,8 @@
----
-title: Language Evaluation — Criteria & Methodology (Research)
-document_id: RES-LANG-EVAL-001
-version: "1.0"
-issue_date: 2026-05-23
-status: Released
-classification: Internal
-owner: diagrams/ project
-audience: Engineers evaluating any language / DSL / notation; authors of tool comparisons under docs/; engineers evolving kymo
-review_cycle: On a change to the rubric, or annually (whichever first)
-supersedes: null
-related_documents:
-  - RES-MERMAID-D2-001
-  - REF-D2-CMP-001
-  - REF-D2-001
-  - KYMO-DSL-001
-  - BPD-DGM-001
-authors:
-  - Vũ Anh
-language: en
-keywords:
-  - language-evaluation
-  - programming-languages
-  - dsl
-  - notation
-  - cognitive-dimensions
-  - iso-25010
-  - rubric
-  - methodology
-  - diagram-as-code
-references:
-  - "Sebesta, R.W. Concepts of Programming Languages — language evaluation criteria (readability, writability, reliability, cost)."
-  - "Green, T.R.G. & Petre, M. (1996). Usability analysis of visual programming environments: a 'cognitive dimensions' framework. J. Visual Languages & Computing 7(2): 131–174."
-  - "Blackwell, A. & Green, T. (2000). A Cognitive Dimensions questionnaire optimised for users."
-  - "Karsai, G. et al. (2009/2014). Design Guidelines for Domain Specific Languages. arXiv:1409.2378."
-  - "Mernik, M., Heering, J. & Sloane, A.M. (2005). When and how to develop domain-specific languages. ACM Computing Surveys 37(4): 316–344."
-  - "Kosar, T., Oliveira, N., Mernik, M. et al. (2010). Comparing general-purpose and domain-specific languages: an empirical study. ComSIS 7(2)."
-  - "Fowler, M. (2010). Domain-Specific Languages. Addison-Wesley."
-  - "ISO/IEC 25010:2011 (rev. 2023) — Systems and software Quality Requirements and Evaluation (SQuaRE)."
----
-
 # Language Evaluation — Criteria & Methodology (Research)
-
-| Field             | Value                                                                  |
-|-------------------|------------------------------------------------------------------------|
-| Document ID       | RES-LANG-EVAL-001                                                     |
-| Version           | 1.0                                                                   |
-| Issue Date        | 2026-05-23                                                            |
-| Status            | Released                                                              |
-| Classification    | Internal                                                             |
-| Audience          | Anyone evaluating a language / DSL / notation; authors of tool comparisons under `docs/` |
-| Related Documents | `RES-MERMAID-D2-001`, `REF-D2-CMP-001`, `REF-D2-001`, `KYMO-DSL-001`, `BPD-DGM-001` |
 
 This is a **research note on evaluation methodology** — it defines *how* to judge a **language** (a programming language, a domain-specific language, or a notation), grounded in the published literature. It is **general first**: §2–§4 give a language-agnostic framework; §5 then shows the recipe for *specializing* it to a domain, worked through for the **diagram-as-code** languages this repo compares (Mermaid, D2, kymo, …). It is not a comparison of any specific tool, nor a spec of kymo. Its job is to give every comparison under `docs/` one defensible rubric so a score means the same thing across documents.
 
-The existing per-tool comparisons (`REF-D2-CMP-001`, `RES-MERMAID-D2-001`) use ad-hoc category sets; this note is the **canonical rubric they should converge on**.
+The existing per-tool comparisons (`REF-D2-CMP-001`) use ad-hoc category sets; this note is the **canonical rubric they should converge on**.
 
 ## 1. What "evaluating a language" means
 

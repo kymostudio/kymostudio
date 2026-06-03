@@ -10,12 +10,9 @@ audience: Engineers using or maintaining the kymo BPMN importer and exporter
 review_cycle: On BPMN-mapping change
 supersedes: null
 related_documents:
-  - BPMN-NREF-001             # BPMN 2.0.2 normative-reference set (this file is its kymo-mapping part)
-  - REF-BPMN-001              # BPMN 2.0 research reference (notation/semantics)
   - DESIGN-BPMN-PARSER-001    # BPMN import design (realises this mapping)
   - DESIGN-BPMN-EXPORT-001    # BPMN export design (inverts this mapping)
   - DESIGN-BPMN-DSL-001       # BPMN-in-DSL design (bpmn { } block)
-  - KYMO-DSL-001                # kymo DSL language specification
   - KYMOJSON-MAP-001            # .kymo.json — serialization of the model this import produces
   - REF-BPMNIO-001              # bpmn.io reference (round-trip benchmark)
 authors:
@@ -46,7 +43,7 @@ iso_compliance:
 | Audience          | Engineers using or maintaining the kymo BPMN importer/exporter   |
 | Review Cycle      | On BPMN-mapping change                                            |
 | Supersedes        | —                                                                |
-| Related Documents | `BPMN-NREF-001`, `REF-BPMN-001`, `DESIGN-BPMN-PARSER-001`, `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `KYMO-DSL-001`, `KYMOJSON-MAP-001`, `REF-BPMNIO-001` |
+| Related Documents | `DESIGN-BPMN-PARSER-001`, `DESIGN-BPMN-EXPORT-001`, `DESIGN-BPMN-DSL-001`, `KYMOJSON-MAP-001`, `REF-BPMNIO-001` |
 
 kymo can **import** a standard **BPMN 2.0 XML** file (`.bpmn`) — the interchange
 format defined by the OMG *Business Process Model and Notation* specification (see
@@ -85,7 +82,7 @@ disagree, the OMG specification is authoritative**. The element-mapping and expo
 tables below are the kymo-side view, not a restatement of the standard.
 
 This file is the kymo-mapping part of the **BPMN 2.0.2 normative-reference set**
-(`BPMN-NREF-001`) under `docs/formats/bpmn/`; that set mirrors the OMG specification
+ under `docs/formats/bpmn/`; that set mirrors the OMG specification
 clause by clause — its **15 clauses** (`01-scope` … `15-exchange-formats`) and **3
 annexes** (`annex-a` … `annex-c`). The notation's behavioural semantics (token flow,
 conformance classes) are also covered descriptively by `REF-BPMN-001`.
@@ -143,7 +140,7 @@ Unrecognised element types are skipped rather than failing the import.
 ## Export
 
 Any diagram made of BPMN glyphs — imported from a `.bpmn`, or authored with the
-`bpmn { }` DSL block (KYMO-DSL-001) — exports back to BPMN 2.0 XML: a
+`bpmn { }` DSL block — exports back to BPMN 2.0 XML: a
 `<bpmn:process>` (semantic model) plus a `<bpmndi:BPMNDiagram>` (DI geometry).
 When the diagram has pools, the process is wrapped in a `<bpmn:collaboration>`.
 

@@ -12,7 +12,6 @@ supersedes: null
 related_documents:
   - DESIGN-KYMOJSON-001         # kymo.json feature design (serializer/loader/CLI)
   - FEAT-KYMOJSON-001           # kymo.json requirements
-  - KYMO-DSL-001                # kymo DSL (a front-end that produces this model)
   - BPMN-MAP-001                # BPMN import/export (the other front-end + a back-end)
   - DESIGN-BPMN-PARSER-001      # BPMN importer (produces this model)
 authors:
@@ -39,7 +38,7 @@ iso_compliance:
 | Status            | Released                                                           |
 | Classification    | Internal                                                           |
 | Owner             | `diagrams/` project                                               |
-| Related Documents | `DESIGN-KYMOJSON-001`, `FEAT-KYMOJSON-001`, `KYMO-DSL-001`, `BPMN-MAP-001`, `DESIGN-BPMN-PARSER-001` |
+| Related Documents | `DESIGN-KYMOJSON-001`, `FEAT-KYMOJSON-001`, `BPMN-MAP-001`, `DESIGN-BPMN-PARSER-001` |
 
 `.kymo.json` is a **versioned, lossless JSON serialization of a resolved kymo
 `Diagram`** — the model that every front-end produces (the `.kymo` DSL parser, the

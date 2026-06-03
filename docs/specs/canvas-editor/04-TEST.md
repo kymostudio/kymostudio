@@ -14,7 +14,6 @@ related_documents:
   - FEAT-CANVAS-001
   - PLAN-CANVAS-001
   - DESIGN-CANVAS-001
-  - KYMO-DSL-001
 authors:
   - Vũ Anh
 language: en
@@ -39,7 +38,7 @@ keywords:
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers verifying & validating the editor                     |
-| Related Documents | `FEAT-CANVAS-001` (requirements), `DESIGN-CANVAS-001` (design), `PLAN-CANVAS-001` (plan), `KYMO-DSL-001` |
+| Related Documents | `FEAT-CANVAS-001` (requirements), `DESIGN-CANVAS-001` (design), `PLAN-CANVAS-001` (plan) |
 
 > Covers ISO/IEC/IEEE 12207 **Verification** (§6.4.9), **Validation** (§6.4.11), **Quality
 > Assurance** (§6.3.8), and the requirement **traceability** (§6.3.6) — the matrix is merged in (§5).

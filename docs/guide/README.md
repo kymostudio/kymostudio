@@ -8,7 +8,7 @@ processes — and can also export to Figma, Excalidraw, and WebP, or import stan
 BPMN 2.0 files. You write *what* to draw; kymo decides *how* and *where*.
 
 This guide is the friendly, example-first companion to the formal
-[DSL Language Specification](../formats/kymo-dsl/README.md). Start here if you want to draw a diagram;
+DSL Language Specification. Start here if you want to draw a diagram;
 reach for the spec when you need the exact grammar.
 
 ## Contents
@@ -29,12 +29,12 @@ see the SVG on the right, share via URL:
 
 ## Where to go next
 
-- **[DSL Language Specification](../formats/kymo-dsl/README.md)** (`KYMO-DSL-001`) — the normative grammar (EBNF),
+- **DSL Language Specification** — the normative grammar (EBNF),
   semantics, and conformance rules. The reference implementation is
   [`packages/python/src/kymo/dsl.py`](../../packages/python/src/kymo/dsl.py).
 - **[BPMN element mapping](../formats/bpmn/kymo-mapping.md)** (`BPMN-MAP-001`) — how `.bpmn`
   files map to kymo shapes on import and export; part of the
-  [BPMN 2.0.2 normative-reference set](../formats/bpmn/) (`BPMN-NREF-001`).
+  [BPMN 2.0.2 normative-reference set](../formats/bpmn/).
 - **[Best-practice diagrams](../diagrams/best-practices.md)** — design principles for diagrams
   that read well.
 - **[`samples/`](../../samples)** — complete `.kymo` and `.bpmn` files, each with its rendered SVG.
