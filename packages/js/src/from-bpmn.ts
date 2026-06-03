@@ -78,6 +78,16 @@ function labelCenter(el: XmlEl): Point | null {
   return null;
 }
 
+function labelBox(el: XmlEl): [number, number, number, number] | null {
+  for (const ch of el.children) {
+    if (ch.tag === "BPMNLabel") {
+      const b = bounds(ch);
+      if (b) return [b[0] + b[2] / 2, b[1] + b[3] / 2, b[2], b[3]];
+    }
+  }
+  return null;
+}
+
 function eventMarker(el: XmlEl): string {
   for (const ch of el.children) {
     const m = EVENT_DEF[ch.tag];
@@ -171,11 +181,13 @@ export function parseBpmn(xmlText: string): Diagram {
     if (cls === null) continue;
 
     const [cshape, marker] = cls;
+    const lb = labelBox(shape);
     components.push(makeComponent({
       id: ref, name: tag === "textAnnotation" ? annotationText(el) : name,
       icon: marker, shape: cshape, accent: "blue",
       pos: [pyRound(x + w / 2), pyRound(y + h / 2)],
       size: [pyRound(w), pyRound(h)],
+      labelBox: lb ? [pyRound(lb[0]), pyRound(lb[1]), pyRound(lb[2]), pyRound(lb[3])] : null,
     }));
   }
 
@@ -205,7 +217,10 @@ export function parseBpmn(xmlText: string): Diagram {
   const width = pyRound(Math.max(...xs) - minX + 2 * MARGIN);
   const height = pyRound(Math.max(...ys) - minY + 2 * MARGIN);
 
-  for (const c of components) c.pos = [c.pos[0] + dx, c.pos[1] + dy];
+  for (const c of components) {
+    c.pos = [c.pos[0] + dx, c.pos[1] + dy];
+    if (c.labelBox) { const [lx, ly, lw, lh] = c.labelBox; c.labelBox = [lx + dx, ly + dy, lw, lh]; }
+  }
   for (const r of regions) { const [bx, by, bw, bh] = r.bounds; r.bounds = [bx + dx, by + dy, bw, bh]; }
   for (const e of edges) {
     e.points = (e.points ?? []).map(([px, py]) => [px + dx, py + dy] as Point);

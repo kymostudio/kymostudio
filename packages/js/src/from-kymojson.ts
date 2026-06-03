@@ -34,6 +34,7 @@ export function parseKymoJson(text: string): Diagram {
       id: c.id, name: c.name, subtitle: c.subtitle, icon: c.icon, shape: c.shape as Shape,
       accent: c.accent, pos: c.pos as Point, size: c.size as Point | null, parent: c.parent,
       align: c.align, alignGap: c.align_gap, alignOffset: c.align_offset as Point,
+      labelBox: c.label_box ?? null,
     })),
     regions: (d.regions as Obj[]).map((r) => makeRegion({
       id: r.id, label: r.label, bounds: r.bounds, contains: r.contains,

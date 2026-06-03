@@ -29,7 +29,7 @@ function norm(value: unknown): unknown {
 const COMPONENT_FIELDS: Record<string, string> = {
   id: "id", name: "name", subtitle: "subtitle", icon: "icon", shape: "shape",
   accent: "accent", pos: "pos", size: "size", parent: "parent", align: "align",
-  alignGap: "align_gap", alignOffset: "align_offset",
+  alignGap: "align_gap", alignOffset: "align_offset", labelBox: "label_box",
 };
 const REGION_FIELDS: Record<string, string> = {
   id: "id", label: "label", bounds: "bounds", contains: "contains",
