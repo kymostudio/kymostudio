@@ -22,7 +22,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Validate",
@@ -42,7 +43,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "InStock",
@@ -62,7 +64,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Notify",
@@ -82,7 +85,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Cancelled",
@@ -102,7 +106,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Payment",
@@ -122,7 +127,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Split",
@@ -142,7 +148,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Pack",
@@ -162,7 +169,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Invoice",
@@ -182,7 +190,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Sync",
@@ -202,7 +211,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Ship",
@@ -222,7 +232,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "Delivered",
@@ -242,7 +253,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     }
   ],
   "regions": [],

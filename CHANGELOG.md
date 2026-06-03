@@ -9,6 +9,19 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-06-03
+
+### Fixed
+
+- **BPMN external labels (events / gateways / data objects & stores) now
+  render at their authored `BPMNLabel` DI position and width** instead of
+  always being forced centered below the glyph. The importer reads each
+  shape's `<bpmndi:BPMNLabel><dc:Bounds>` (new `Component.label_box`),
+  and the renderer places + wraps the label there with font metrics tuned
+  to the label font (~0.46em) so multi-word labels match bpmn.io's line
+  breaks and are never truncated with an ellipsis. Diagrams without label
+  bounds keep the previous below-glyph fallback.
+
 ## [0.3.2] - 2026-06-03
 
 ### Fixed

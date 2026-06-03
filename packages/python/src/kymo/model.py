@@ -113,6 +113,12 @@ class Component:
     # Diagram-Interchange bounds so glyphs render at their authored size.
     size: tuple[int, int] | None = None
 
+    # External label box (cx, cy, w, h) from the element's BPMNLabel DI
+    # bounds, when the source positions the label explicitly. The renderer
+    # places + wraps the outside label here (matching bpmn.io) instead of
+    # the default spot below the glyph. None -> default placement.
+    label_box: tuple[int, int, int, int] | None = None
+
     @property
     def half(self) -> tuple[int, int]:
         if self.size is not None:

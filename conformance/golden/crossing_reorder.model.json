@@ -22,7 +22,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "src2",
@@ -42,7 +43,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "src3",
@@ -62,7 +64,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "dst1",
@@ -82,7 +85,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "dst2",
@@ -102,7 +106,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "dst3",
@@ -122,7 +127,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     }
   ],
   "regions": [],

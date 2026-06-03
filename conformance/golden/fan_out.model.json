@@ -22,7 +22,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "d1",
@@ -42,7 +43,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "d2",
@@ -62,7 +64,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "d3",
@@ -82,7 +85,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     }
   ],
   "regions": [],

@@ -22,7 +22,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "lex",
@@ -42,7 +43,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "lambda",
@@ -62,7 +64,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "connect",
@@ -82,7 +85,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "dynamodb",
@@ -102,7 +106,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "bedrock",
@@ -122,7 +127,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "s3",
@@ -142,7 +148,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "kendra",
@@ -162,7 +169,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "customer",
@@ -182,7 +190,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "internet",
@@ -202,7 +211,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "slack",
@@ -222,7 +232,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "step1",
@@ -242,7 +253,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "step2",
@@ -262,7 +274,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     },
     {
       "id": "step3",
@@ -282,7 +295,8 @@
       "align_offset": [
         0,
         0
-      ]
+      ],
+      "label_box": null
     }
   ],
   "regions": [

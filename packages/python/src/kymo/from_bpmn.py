@@ -105,6 +105,17 @@ def _label_center(edge_or_shape: ET.Element):
     return None
 
 
+def _label_box(edge_or_shape: ET.Element):
+    """Return (cx, cy, w, h) of a child <BPMNLabel>'s bounds, or None."""
+    for ch in edge_or_shape:
+        if _local(ch.tag) == "BPMNLabel":
+            b = _bounds(ch)
+            if b:
+                x, y, w, h = b
+                return (x + w / 2, y + h / 2, w, h)
+    return None
+
+
 # ── Classification ──────────────────────────────────────────────────────
 def _event_marker(elem: ET.Element) -> str:
     for ch in elem:
@@ -225,10 +236,13 @@ def parse(xml_text: str) -> Diagram:
         cshape, marker = classified
         if tag == "textAnnotation":
             name = _annotation_text(elem)
+        lb = _label_box(shape)
         components.append(Component(
             id=ref, name=name, subtitle="", icon=marker, shape=cshape,
             accent="blue", pos=(round(x + w / 2), round(y + h / 2)),
             size=(round(w), round(h)),
+            label_box=(round(lb[0]), round(lb[1]), round(lb[2]), round(lb[3]))
+                      if lb else None,
         ))
 
     # ── Edges → flows ───────────────────────────────────────────────────
@@ -265,6 +279,9 @@ def parse(xml_text: str) -> Diagram:
     idx, idy = round(dx), round(dy)
     for c in components:
         c.pos = (c.pos[0] + idx, c.pos[1] + idy)
+        if c.label_box is not None:
+            lx, ly, lw, lh = c.label_box
+            c.label_box = (lx + idx, ly + idy, lw, lh)
     for r in regions:
         bx, by, bw, bh = r.bounds
         r.bounds = (bx + idx, by + idy, bw, bh)
