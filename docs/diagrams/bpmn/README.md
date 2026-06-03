@@ -12,7 +12,7 @@ supersedes: null
 related_documents:
   - ../../formats/kymo-dsl/README.md
   - ../best-practices.md
-  - ../../softwares/d2.md
+  - ../../softwares/b.d2.md
 authors:
   - Vũ Anh
 language: en
@@ -50,7 +50,7 @@ upstream:
 | ISO Equivalent    | ISO/IEC 19510:2013                                            |
 | Version Reviewed  | 2.0.2 (OMG, 2014) / ISO/IEC 19510:2013                        |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`kymo-dsl/`](../../formats/kymo-dsl/README.md), [`best-practices.md`](../best-practices.md), [`d2.md`](../../softwares/d2.md) |
+| Related Documents | [`kymo-dsl/`](../../formats/kymo-dsl/README.md), [`best-practices.md`](../best-practices.md), [`d2.md`](../../softwares/b.d2.md) |
 
 This is a **research reference on BPMN 2.0**, the process-modelling notation standardised by the Object Management Group (OMG) and published by ISO as ISO/IEC 19510:2013. It is **descriptive, not normative** — where this note and the OMG specification disagree, the OMG specification is authoritative. No code or behaviour in this repository depends on BPMN; this document exists so the team can consult the standard's vocabulary and structure when discussing process and flow diagrams.
 
@@ -402,8 +402,8 @@ The model/diagram split mirrors a broader principle: the *meaning* of a process 
 
 BPMN 2.0's standard XML format supports a broad ecosystem of interoperable tools. Each tool below has a per-tool reference note under [`docs/softwares/`](../../softwares/). Representative categories:
 
-- **Modelers and web renderers** — [bpmn.io / `bpmn-js`](../../softwares/bpmn-io.md) (the embeddable JavaScript renderer/editor behind many products), [SAP Signavio](../../softwares/signavio.md), [Bizagi Modeler](../../softwares/bizagi.md), [Sparx Enterprise Architect](../../softwares/sparx-enterprise-architect.md), [Visual Paradigm](../../softwares/visual-paradigm.md), [Lucidchart](../../softwares/lucidchart.md), [draw.io](../../softwares/drawio.md).
-- **Process / execution engines** — [Camunda](../../softwares/camunda.md), [Flowable](../../softwares/flowable.md), [Activiti](../../softwares/activiti.md), [jBPM](../../softwares/jbpm.md): they import BPMN XML and execute it, relying on the Common Executable conformance subset.
+- **Modelers and web renderers** — [bpmn.io / `bpmn-js`](../../softwares/b.bpmn-io.md) (the embeddable JavaScript renderer/editor behind many products), [SAP Signavio](../../softwares/z.signavio.md), [Bizagi Modeler](../../softwares/z.bizagi.md), [Sparx Enterprise Architect](../../softwares/z.sparx-enterprise-architect.md), [Visual Paradigm](../../softwares/a.visual-paradigm.md), [Lucidchart](../../softwares/a.lucidchart.md), [draw.io](../../softwares/a.drawio.md).
+- **Process / execution engines** — [Camunda](../../softwares/b.camunda.md), [Flowable](../../softwares/z.flowable.md), [Activiti](../../softwares/z.activiti.md), [jBPM](../../softwares/z.jbpm.md): they import BPMN XML and execute it, relying on the Common Executable conformance subset.
 - **Standards bridges** — BPMN-to-WS-BPEL mapping (the **BPEL Process Execution** conformance type) for engines built on the BPEL stack; **DMN** (Decision Model and Notation, also OMG) is frequently paired with BPMN Business Rule tasks.
 
 Because the interchange format is standardised, a model authored in one modeler can, in principle, be opened, edited, and executed in another — the practical payoff of the metamodel + DI design in [§16](#16-interchange--bpmn-xml-and-diagram-interchange).
