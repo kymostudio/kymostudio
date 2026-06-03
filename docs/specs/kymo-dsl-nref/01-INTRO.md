@@ -14,9 +14,7 @@ related_documents:
   - DESIGN-KYMO-NREF-001     # Design
   - TEST-KYMO-NREF-001       # Test documentation
   - PLAN-KYMO-NREF-001       # Plan
-  - KYMO-DSL-001             # the spec this set reorganises (now the index)
   - KYMO-FMT-001             # .kymo source format — catalog reference
-  - BPMN-NREF-001            # BPMN normative-reference set (the structural model mirrored)
 authors:
   - Vũ Anh
 language: en
@@ -46,7 +44,7 @@ iso_compliance:
 ## 1. Purpose and scope
 
 This document introduces the **kymo DSL normative-reference set** — the
-reorganisation of the kymo DSL language specification (`KYMO-DSL-001`) from a single
+reorganisation of the kymo DSL language specification from a single
 monolithic file into a **clause-per-file normative-reference set** under
 `docs/formats/kymo-dsl/`. It is the entry point to this feature's document set: it
 states the problem, the concept, and the terminology, and maps the reader to the
@@ -98,12 +96,12 @@ engineering set documents the restructure, it does not restate the grammar.
 ## 3. Background
 
 The kymo DSL is the product's primary hand-authored front-end; its language
-reference, `KYMO-DSL-001`, was a single ISO/IEC/IEEE 15289–structured file
+reference, was a single ISO/IEC/IEEE 15289–structured file
 (`docs/KYMO_DSL.md`, v2.5, ~730 lines) covering Scope through Examples plus
 doc-control annexes.
 
 The repository already carries a sibling **normative-reference set for the `.bpmn`
-interchange format** at `docs/formats/bpmn/` (`BPMN-NREF-001`): a README index plus
+interchange format** at `docs/formats/bpmn/`: a README index plus
 one file per clause, each independently versioned with its own doc-control annexes.
 The kymo DSL — being the repository's *own* normative language — warranted the same
 clause-per-file organisation, so a reader can go straight from a clause number to

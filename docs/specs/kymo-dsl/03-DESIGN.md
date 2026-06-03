@@ -14,7 +14,6 @@ related_documents:
   - FEAT-KYMO-DSL-001        # Requirements (traced below)
   - TEST-KYMO-DSL-001        # Test documentation
   - PLAN-KYMO-DSL-001        # Plan
-  - KYMO-DSL-001             # kymo DSL language specification (normative grammar)
   - DESIGN-BPMN-DSL-001      # bpmn { } block design (delegated subset)
   - KYMOJSON-MAP-001         # .kymo.json — serialization of the resolved model
 authors:
@@ -42,7 +41,7 @@ iso_compliance:
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | INTRO-KYMO-DSL-001, FEAT-KYMO-DSL-001, TEST-KYMO-DSL-001, PLAN-KYMO-DSL-001 |
+| Related      | INTRO-FEAT-TEST-PLAN-KYMO-DSL-001 |
 
 Realises the requirements in FEAT-KYMO-DSL-001 (FR/NFR IDs cited per clause).
 Covers ISO/IEC/IEEE 12207 Architecture & Design Definition. The normative

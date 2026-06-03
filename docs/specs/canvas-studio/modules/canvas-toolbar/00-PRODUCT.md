@@ -11,7 +11,6 @@ review_cycle: On scope change, or via a change-request against the baseline
 supersedes: null
 related_documents:
   - INTRO-TOOLBAR-001
-  - FEAT-TOOLBAR-001
   - INTRO-EXPORT-001
   - INTRO-ITEMS-001
   - INTRO-STUDIO-001

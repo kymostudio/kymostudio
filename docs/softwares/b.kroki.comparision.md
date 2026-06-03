@@ -10,12 +10,11 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream Kroki major release, on kymo DSL/layout change, or annually
 supersedes: null
 related_documents:
-  - b.kroki.md
-  - b.d2.comparision.md
-  - a.mermaid.comparision.md
-  - a.plantuml.comparision.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-KROKI-001
+  - REF-D2-CMP-001
+  - REF-MERMAID-CMP-001
+  - REF-PLANTUML-CMP-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +47,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-28                                                     |
 | Parent Reference  | [REF-KROKI-001](b.kroki.md)                                      |
-| Related Documents | [REF-D2-CMP-001](b.d2.comparision.md), [KYMO-DSL-001](../formats/kymo-dsl/README.md), [BPD-DGM-001](../diagrams/best-practices.md) |
+| Related Documents | [REF-D2-CMP-001](b.d2.comparision.md), [BPD-DGM-001](../diagrams/best-practices.md) |
 
 This document isolates the **prior-art comparison** between [Kroki](https://kroki.io/) and kymo. The factual reference (architecture, API encoding, supported types, output formats, deployment) lives in [REF-KROKI-001](b.kroki.md); read that first if you need ground truth on how Kroki actually behaves.
 
@@ -225,6 +224,6 @@ These follow from the comparison, especially §2.3:
 
 - Comparison subject: yuzutech/kroki 0.30.1 as documented at <https://kroki.io/> and <https://docs.kroki.io/> on 2026-05-28.
 - Factual basis for the Kroki column: [REF-KROKI-001](b.kroki.md).
-- Factual basis for the kymo column: this repository's [KYMO-DSL-001](../formats/kymo-dsl/README.md), [BPD-DGM-001](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores are held identical to the kymo column in [REF-D2-CMP-001](b.d2.comparision.md) so the same-rubric comparisons stay consistent.
+- Factual basis for the kymo column: this repository's [BPD-DGM-001](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores are held identical to the kymo column in [REF-D2-CMP-001](b.d2.comparision.md) so the same-rubric comparisons stay consistent.
 - **Scoring caveat (do not strip):** Kroki has no native notation, layout, or icon set; its A/C cells (and part of B) score the *aggregate of the bundled engines as reached through Kroki*, with a penalty for single-engine-per-diagram commitment. The honest signal of this document is in §2 and §4, not the §3 numbers.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

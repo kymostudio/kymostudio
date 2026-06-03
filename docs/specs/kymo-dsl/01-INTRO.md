@@ -15,7 +15,6 @@ related_documents:
   - DESIGN-KYMO-DSL-001      # Design
   - TEST-KYMO-DSL-001        # Test documentation
   - PLAN-KYMO-DSL-001        # Plan
-  - KYMO-DSL-001             # kymo DSL language specification (normative grammar)
   - DESIGN-BPMN-DSL-001      # bpmn { } block design (delegated subset)
   - KYMOJSON-MAP-001         # .kymo.json — serialization of the resolved model
 authors:
@@ -43,7 +42,7 @@ iso_compliance:
 | Status       | Released                                                    |
 | Issue Date   | 2026-05-25                                                  |
 | Owner        | `diagrams/` project                                         |
-| Related      | PROD-KYMO-DSL-001, FEAT-KYMO-DSL-001, DESIGN-KYMO-DSL-001, TEST-KYMO-DSL-001, PLAN-KYMO-DSL-001 |
+| Related      | PROD-FEAT-DESIGN-TEST-PLAN-KYMO-DSL-001 |
 
 ## 1. Purpose and scope
 
@@ -63,7 +62,7 @@ comments) and the **resolution pipeline** — parse → `layout()` → `resolve_
 (`packages/js`) implementations.
 
 **Out of scope (delegated):** the normative EBNF grammar and per-statement
-semantics (KYMO-DSL-001); the `bpmn { … }` block and its auto-layout
+semantics; the `bpmn { … }` block and its auto-layout
 (INTRO/FEAT/DESIGN/TEST-BPMN-DSL-001); the BPMN 2.0 XML importer/exporter
 (BPMN-MAP-001 and the `bpmn-parser`/`bpmn-export` sets); the `.kymo.json`
 interchange format (KYMOJSON-MAP-001); and the canvas editor (`canvas-*` sets).

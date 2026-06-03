@@ -1,75 +1,8 @@
----
-title: BPMN Lint & Validation Tooling (Research)
-document_id: RES-BPMN-LINT-001
-version: "1.0"
-issue_date: 2026-05-28
-status: Released
-classification: Internal
-owner: diagrams/ project
-audience: Engineers evolving the `kymo` BPMN importer/exporter, or considering a diagram-quality linter
-review_cycle: On a bpmnlint major release, or annually (whichever first)
-supersedes: null
-related_documents:
-  - REF-BPMNIO-001
-  - BPMN-NREF-001
-  - BPMN-MAP-001
-  - RES-MERMAID-D2-001
-  - RES-LANG-EVAL-001
-authors:
-  - Vũ Anh
-language: en
-keywords:
-  - bpmn
-  - bpmnlint
-  - linting
-  - validation
-  - diagram-quality
-  - modeling-conventions
-  - prior-art
-  - research
-upstream:
-  - project: bpmn-io/bpmnlint
-    homepage: https://bpmn.io/
-    repository: https://github.com/bpmn-io/bpmnlint
-    license: MIT
-    version_reviewed: "10.x"
-    access_date: 2026-05-28
-  - project: bpmn-io/bpmn-js-bpmnlint
-    homepage: https://bpmn.io/
-    repository: https://github.com/bpmn-io/bpmn-js-bpmnlint
-    license: MIT
-    access_date: 2026-05-28
-  - project: bpmn-io/dmnlint
-    homepage: https://bpmn.io/
-    repository: https://github.com/bpmn-io/dmnlint
-    license: MIT
-    access_date: 2026-05-28
-  - project: bpmn-io/bpmn-moddle
-    homepage: https://bpmn.io/
-    repository: https://github.com/bpmn-io/bpmn-moddle
-    license: MIT
-    access_date: 2026-05-28
----
-
 # BPMN Lint & Validation Tooling (Research)
-
-| Field             | Value                                                                                                  |
-|-------------------|--------------------------------------------------------------------------------------------------------|
-| Document ID       | RES-BPMN-LINT-001                                                                                      |
-| Version           | 1.0                                                                                                    |
-| Issue Date        | 2026-05-28                                                                                             |
-| Status            | Released                                                                                               |
-| Classification    | Internal                                                                                               |
-| Owner             | `diagrams/` project                                                                                    |
-| Audience          | Engineers evolving the `kymo` BPMN importer/exporter, or weighing a diagram-quality linter             |
-| Subjects          | [`bpmn-io/bpmnlint`](https://github.com/bpmn-io/bpmnlint) · Camunda Modeler · SAP Signavio · XSD/semantic validators |
-| Licenses          | MIT (bpmnlint, bpmn-js-bpmnlint, dmnlint, bpmn-moddle)                                                  |
-| Versions Reviewed | bpmnlint 10.x (2026-05-28)                                                                              |
-| Related Documents | `REF-BPMNIO-001`, `BPMN-NREF-001`, `BPMN-MAP-001`, `RES-MERMAID-D2-001`, `RES-LANG-EVAL-001`           |
 
 This is a **research note on prior art** for *linting* and *validating* BPMN models — not a specification of kymo. kymo already imports and exports BPMN (`BPMN-MAP-001`); this note surveys the tools that judge whether a BPMN diagram is *well-formed* and *well-modelled*, so the team can borrow the right rule set if it ever adds a "kymo lint" layer. No code or behaviour in this repository depends on any tool below.
 
-A key framing used throughout: **lint ≠ schema validation**. *Schema/semantic validation* answers "is this legal BPMN 2.0 XML per the OMG spec?" (`BPMN-NREF-001`). *Linting* answers "is this a *good* diagram?" — a configurable layer of best-practice and house-style rules on top of legal XML, exactly as ESLint sits on top of a JavaScript parser.
+A key framing used throughout: **lint ≠ schema validation**. *Schema/semantic validation* answers "is this legal BPMN 2.0 XML per the OMG spec?". *Linting* answers "is this a *good* diagram?" — a configurable layer of best-practice and house-style rules on top of legal XML, exactly as ESLint sits on top of a JavaScript parser.
 
 ## 1. Landscape at a glance
 
@@ -154,7 +87,7 @@ These are lint *intentions* expressed as enterprise policy; bpmnlint is the clos
 
 ## 6. Schema & semantic validation (the lower bar)
 
-Distinct from linting — these check legality against the OMG spec (`BPMN-NREF-001`), not quality:
+Distinct from linting — these check legality against the OMG spec, not quality:
 
 - **bpmn-moddle** — ships the OMG `BPMN20.xsd` and `Semantic.xsd`; it is the moddle parser that BPMN importers (kymo's included, conceptually) read XML through. It enforces the metamodel rather than offering opinions.
 - **OAGIS BPMN 2.0 Validator** — an online validator focused on Messages, Data Objects, Data Stores.
@@ -163,7 +96,7 @@ Distinct from linting — these check legality against the OMG spec (`BPMN-NREF-
 
 ## 7. Relevance to kymo
 
-kymo already round-trips BPMN — importer/exporter and a ~120-file MIWG corpus regression baseline (`BPMN-MAP-001`, `BPMN-NREF-001`). What this survey adds is the option of a **diagram-quality layer**, distinct from "does it parse / does it match the golden":
+kymo already round-trips BPMN — importer/exporter and a ~120-file MIWG corpus regression baseline (`BPMN-MAP-001`). What this survey adds is the option of a **diagram-quality layer**, distinct from "does it parse / does it match the golden":
 
 - **A "kymo lint" feature** could reuse bpmnlint's rule *catalogue* (§3) as a ready-made checklist — the highest-value, lowest-controversy rules to start with are `no-disconnected`, `label-required`, `start-event-required`, `end-event-required`, and the gateway-hygiene set. These apply equally to a hand-written `.kymo` diagram and to an imported `.bpmn`.
 - **Architecture fit**: such a linter belongs *after* `resolve_alignments()` (it needs resolved positions for `no-overlapping-elements`) but is otherwise a pure read-only pass over the model — consistent with kymo's "dumb renderer, smart resolver" split. It would have a natural Python ⇄ JS parity obligation, like every other front-/back-end feature.

@@ -10,10 +10,8 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-EXEC-001     # Clause 13 — Execution Semantics (the behaviour preserved)
   - BPMN-NREF-PROCESS-001  # Clause 10 — Process (the source constructs)
-  - REF-BPMN-001           # BPMN 2.0 research reference (ecosystem §17)
 authors:
   - Vũ Anh
 language: en
@@ -45,7 +43,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§14 Mapping BPMN Models to WS-BPEL** (pp.445–474) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-EXEC-001`, `BPMN-NREF-PROCESS-001`, `REF-BPMN-001` |
+| Related Documents | `BPMN-NREF-EXEC-001`, `BPMN-NREF-PROCESS-001` |
 
 Mirrors **Clause 14 (Mapping BPMN Models to WS-BPEL)** of the OMG BPMN 2.0.2 specification
 (§14.1–§14.3, pp.445–474). Part of the normative-reference set `BPMN-NREF-001`. Where this

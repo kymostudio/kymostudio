@@ -10,11 +10,9 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-ADDINFO-001  # Clause 6 — Additional Information
   - BPMN-NREF-CHOREO-001   # Clause 11 — Choreography (new in 2.0)
   - BPMN-NREF-COLLAB-001   # Clause 9 — Collaboration / Conversation (new in 2.0)
-  - REF-BPMN-001           # BPMN 2.0 research reference (history §5)
 authors:
   - Vũ Anh
 language: en
@@ -45,7 +43,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **Annex A — Changes from v1.2** *(informative)* (pp.479–480) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-ADDINFO-001`, `BPMN-NREF-CHOREO-001`, `BPMN-NREF-COLLAB-001`, `REF-BPMN-001` |
+| Related Documents | `BPMN-NREF-ADDINFO-001`, `BPMN-NREF-CHOREO-001`, `BPMN-NREF-COLLAB-001` |
 
 Mirrors **Annex A (Changes from v1.2)** — an **informative** annex — of the OMG BPMN 2.0.2
 specification (pp.479–480). Part of the normative-reference set `BPMN-NREF-001`. Where this

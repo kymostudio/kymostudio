@@ -13,7 +13,6 @@ related_documents:
   - INTRO-BPMN-EXPORT-001
   - FEAT-BPMN-EXPORT-001
   - BPMN-MAP-001
-  - KYMO-DSL-001
   - DESIGN-BPMN-DSL-001
   - REF-BPMNIO-CMP-001
 authors:

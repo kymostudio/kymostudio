@@ -10,10 +10,9 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - z.flowable.comparision.md
-  - ../diagrams/bpmn/README.md
-  - ./z.activiti.md
-  - ./b.camunda.md
+  - REF-FLOWABLE-CMP-001
+  - REF-ACTIVITI-001
+  - REF-CAMUNDA-001
 authors:
   - Vũ Anh
 language: en
@@ -49,7 +48,7 @@ upstream:
 | License           | Apache-2.0 (+ commercial Enterprise)                          |
 | Version Reviewed  | Flowable 7.x line (2026)                                      |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`flowable.comparision.md`](./z.flowable.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`activiti.md`](./z.activiti.md), [`camunda.md`](./b.camunda.md) |
+| Related Documents | [`flowable.comparision.md`](./z.flowable.comparision.md), `bpmn/README.md`, [`activiti.md`](./z.activiti.md), [`camunda.md`](./b.camunda.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Flowable's design choices so the team can consult them when reasoning about BPMN execution and model interchange. No code or behaviour in this repository depends on Flowable. Flowable is a **process-execution engine**, a different category from kymo (a static diagram DSL).
 

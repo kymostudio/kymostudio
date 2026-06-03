@@ -14,7 +14,6 @@ related_documents:
   - FEAT-CANVAS-001
   - PLAN-CANVAS-001
   - TEST-CANVAS-001
-  - KYMO-DSL-001
 authors:
   - Vũ Anh
 language: en
@@ -40,7 +39,7 @@ keywords:
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers implementing the editor (`website/app/`) and `packages/js` |
-| Related Documents | `PLAN-CANVAS-001` (why / phases), `KYMO-DSL-001` (serializer target grammar), `RES-MERMAID-D2-001` |
+| Related Documents | `PLAN-CANVAS-001` (why / phases), `KYMO-DSL-001` (serializer target grammar) |
 
 > **Status note.** Draft engineering design, not a committed spec. This is the *how* that
 > complements `PLAN-CANVAS-001` (the *why* and the phase ordering). Re-validate symbol names against

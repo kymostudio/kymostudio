@@ -10,12 +10,11 @@ audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - a.mermaid.comparision.md
-  - b.d2.md
-  - a.plantuml.md
-  - b.kroki.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-MERMAID-CMP-001
+  - REF-D2-001
+  - REF-PLANTUML-001
+  - REF-KROKI-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -51,7 +50,7 @@ upstream:
 | License           | MIT                                                           |
 | Version Reviewed  | 11.13.0                                                       |
 | Access Date       | 2026-06-03                                                    |
-| Related Documents | [`mermaid.comparision.md`](./a.mermaid.comparision.md), [`d2.md`](./b.d2.md), [`plantuml.md`](./a.plantuml.md), [`kroki.md`](./b.kroki.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`mermaid.comparision.md`](./a.mermaid.comparision.md), [`d2.md`](./b.d2.md), [`plantuml.md`](./a.plantuml.md), [`kroki.md`](./b.kroki.md), `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Mermaid's design choices so the team can consult them when evolving kymo's DSL, layout, and render pipeline. No code or behavior in this repository depends on Mermaid.
 

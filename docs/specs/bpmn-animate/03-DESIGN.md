@@ -17,7 +17,6 @@ related_documents:
   - KYMOANIM-MAP-001         # the self-contained kymo.anim format (normative)
   - KYMOJSON-MAP-001         # kymo.json model (Diagram built from a kymo.anim)
   - BPMN-MAP-001             # node type ↔ bpmn-* shapes; flow kinds
-  - KYMO-DSL-001             # kymo DSL language specification
 authors:
   - Vũ Anh
 language: en

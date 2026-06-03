@@ -10,9 +10,8 @@ audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - b.d2.comparision.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-D2-CMP-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +47,7 @@ upstream:
 | License           | MPL-2.0                                                        |
 | Version Reviewed  | 0.7.1                                                          |
 | Access Date       | 2026-05-18                                                     |
-| Related Documents | [`d2.comparision.md`](./b.d2.comparision.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`d2.comparision.md`](./b.d2.comparision.md), `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures D2's design choices so the team can consult them when evolving kymo's DSL, layout, and render pipeline. No code or behavior in this repository depends on D2.
 

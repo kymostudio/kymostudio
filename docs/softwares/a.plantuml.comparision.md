@@ -10,12 +10,11 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream PlantUML major release, on kymo DSL/layout change, or annually
 supersedes: null
 related_documents:
-  - a.plantuml.md
-  - b.d2.comparision.md
-  - a.mermaid.comparision.md
-  - b.kroki.comparision.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-PLANTUML-001
+  - REF-D2-CMP-001
+  - REF-MERMAID-CMP-001
+  - REF-KROKI-CMP-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +47,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline  |
 | Access Date       | 2026-06-03                                                   |
 | Parent Reference  | [`plantuml.md`](./a.plantuml.md)                            |
-| Related Documents | [`d2.comparision.md`](./b.d2.comparision.md), [`mermaid.comparision.md`](./a.mermaid.comparision.md), [`kroki.comparision.md`](./b.kroki.comparision.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`d2.comparision.md`](./b.d2.comparision.md), [`mermaid.comparision.md`](./a.mermaid.comparision.md), [`kroki.comparision.md`](./b.kroki.comparision.md), `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This document isolates the **prior-art comparison** between [PlantUML](https://plantuml.com/) and kymo. The factual reference (syntax, diagram catalog, preprocessor, rendering model, output formats) lives in [`plantuml.md`](./a.plantuml.md); read that first if you need ground truth on how PlantUML actually behaves.
 
@@ -224,5 +223,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`plantu
 
 - Comparison subject: plantuml/plantuml 1.2026.5 as documented at <https://plantuml.com/> on 2026-06-03.
 - Factual basis for the PlantUML column: [`plantuml.md`](./a.plantuml.md).
-- Factual basis for the kymo column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores are held identical to [`d2.comparision.md`](./b.d2.comparision.md) §3 and [`diagrams.mingrammer.comparision.md`](./b.diagrams.mingrammer.comparision.md) §3 so the same-category comparisons stay consistent.
+- Factual basis for the kymo column: this repository's `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores are held identical to [`d2.comparision.md`](./b.d2.comparision.md) §3 and [`diagrams.mingrammer.comparision.md`](./b.diagrams.mingrammer.comparision.md) §3 so the same-category comparisons stay consistent.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

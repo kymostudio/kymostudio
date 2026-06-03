@@ -14,7 +14,6 @@ related_documents:
   - FEAT-BPMN-DSL-001    # Requirements (traced below)
   - DESIGN-BPMN-DSL-001    # Design
   - PLAN-BPMN-DSL-001   # Plan
-  - KYMO-DSL-001             # kymo DSL language specification (normative)
 authors:
   - Vũ Anh
 language: en

@@ -10,10 +10,9 @@ audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
 review_cycle: On upstream Plugin API or REST API breaking change, or annually (whichever first)
 supersedes: null
 related_documents:
-  - a.figma.comparision.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
-  - b.d2.md
+  - REF-FIGMA-CMP-001
+  - BPD-DGM-001
+  - REF-D2-001
 authors:
   - Vũ Anh
 language: en
@@ -51,7 +50,7 @@ upstream:
 | License           | Proprietary (SaaS) — Plugin typings package `@figma/plugin-typings` is MIT |
 | Version Reviewed  | REST v1 · Plugin API as of access date                         |
 | Access Date       | 2026-05-18                                                     |
-| Related Documents | [`figma.comparision.md`](./a.figma.comparision.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md), [`d2.md`](./b.d2.md) |
+| Related Documents | [`figma.comparision.md`](./a.figma.comparision.md), `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), [`d2.md`](./b.d2.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Figma's programmatic surfaces so the team can consult them when evolving kymo's DSL, layout, and render pipeline. kymo already targets Figma as an output format via `packages/python/src/kymo/to_figma.py` (emitted by `kymo <src> --figma`, see `packages/python/src/kymo/cli.py:79`); this doc describes the surface that file writes against. No behavior in this repository depends on Figma — the generated JS is consumed externally.
 

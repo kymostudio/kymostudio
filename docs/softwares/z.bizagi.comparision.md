@@ -10,9 +10,8 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream Bizagi Modeler major release, on kymo DSL/layout change, or annually
 supersedes: null
 related_documents:
-  - z.bizagi.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-BIZAGI-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -45,7 +44,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-20                                                     |
 | Parent Reference  | [`bizagi.md`](z.bizagi.md)                                       |
-| Related Documents | [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This document isolates the **prior-art comparison** between [Bizagi Modeler](https://www.bizagi.com/en/platform/modeler) and kymo. The factual reference (editions, capabilities, BPMN support, documentation export) lives in [`bizagi.md`](z.bizagi.md); read that first if you need ground truth on how Bizagi Modeler actually behaves.
 
@@ -206,5 +205,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`bizagi
 
 - Comparison subject: Bizagi Modeler (desktop, 2026) as documented at <https://www.bizagi.com/en/platform/modeler> on 2026-05-20.
 - Factual basis for the Bizagi column: [`bizagi.md`](z.bizagi.md).
-- Factual basis for the kymo column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

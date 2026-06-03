@@ -1,29 +1,3 @@
----
-title: Software Prior-Art Notes — Index
-document_id: REF-SOFTWARES-IDX-001
-version: "1.0"
-issue_date: 2026-06-03
-status: Released
-classification: Internal
-owner: diagrams/ project
-audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
-review_cycle: When a tool is added/removed, or annually
-supersedes: null
-related_documents:
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
-authors:
-  - Vũ Anh
-language: en
-keywords:
-  - prior-art
-  - diagramming-tools
-  - diagram-as-code
-  - bpmn
-  - comparison
-  - index
----
-
 # Software Prior-Art Notes — Index
 
 This folder collects **prior-art reference notes** on the diagramming and

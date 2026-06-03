@@ -10,11 +10,10 @@ audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - b.kroki.comparision.md
-  - b.d2.md
-  - b.bpmn-io.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-KROKI-CMP-001
+  - REF-D2-001
+  - REF-BPMNIO-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -51,7 +50,7 @@ upstream:
 | License           | MIT                                                            |
 | Version Reviewed  | 0.30.1                                                         |
 | Access Date       | 2026-05-28                                                     |
-| Related Documents | [REF-KROKI-CMP-001](./b.kroki.comparision.md), [REF-D2-001](b.d2.md), [REF-BPMNIO-001](b.bpmn-io.md), [KYMO-DSL-001](../formats/kymo-dsl/README.md), [BPD-DGM-001](../diagrams/best-practices.md) |
+| Related Documents | [REF-KROKI-CMP-001](./b.kroki.comparision.md), [REF-D2-001](b.d2.md), [REF-BPMNIO-001](b.bpmn-io.md), [BPD-DGM-001](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Kroki's design choices so the team can consult them when evolving kymo's render and distribution story. No code or behavior in this repository depends on Kroki.
 

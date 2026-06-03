@@ -12,7 +12,6 @@ supersedes: null
 related_documents:
   - INTRO-CANVAS-001
   - FEAT-CANVAS-001
-  - KYMO-DSL-001
 authors:
   - Vũ Anh
 language: en

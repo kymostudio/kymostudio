@@ -10,12 +10,10 @@ audience: Engineers authoring or parsing `.kymo` files
 review_cycle: On grammar change, or annually (whichever first)
 supersedes: null
 related_documents:
-  - KYMO-DSL-001             # Language specification (index)
   - KYMO-DSL-LEX-001         # Clause 5 — Lexical Conventions
   - KYMO-DSL-SEMANTICS-001   # Clause 7 — Semantics
   - KYMO-DSL-CONF-001        # Clause 9 — Conformance
   - DESIGN-BPMN-DSL-001      # bpmn { } block design + Sugiyama layout (§6.9)
-  - dsl.py
 authors:
   - Vũ Anh
 language: en
@@ -41,7 +39,7 @@ iso_compliance:
 | Issue Date        | 2026-05-25                                         |
 | Status            | Released                                           |
 | Owner             | `diagrams/` project                                |
-| Related Documents | `KYMO-DSL-001`, `KYMO-DSL-LEX-001`, `KYMO-DSL-SEMANTICS-001`, `KYMO-DSL-CONF-001`, `DESIGN-BPMN-DSL-001` |
+| Related Documents | `KYMO-DSL-LEX-001`, `KYMO-DSL-SEMANTICS-001`, `KYMO-DSL-CONF-001`, `DESIGN-BPMN-DSL-001` |
 
 ## 6. Grammar
 

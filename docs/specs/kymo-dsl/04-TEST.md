@@ -14,7 +14,6 @@ related_documents:
   - FEAT-KYMO-DSL-001        # Requirements (traced below)
   - DESIGN-KYMO-DSL-001      # Design
   - PLAN-KYMO-DSL-001        # Plan
-  - KYMO-DSL-001             # kymo DSL language specification (normative grammar)
   - TEST-BPMN-DSL-001        # bpmn { } block tests (delegated subset)
 authors:
   - Vũ Anh
@@ -40,7 +39,7 @@ iso_compliance:
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | INTRO-KYMO-DSL-001, FEAT-KYMO-DSL-001, DESIGN-KYMO-DSL-001, PLAN-KYMO-DSL-001 |
+| Related      | INTRO-FEAT-DESIGN-PLAN-KYMO-DSL-001 |
 
 Verifies the requirements in FEAT-KYMO-DSL-001 (FR/NFR IDs). Covers
 ISO/IEC/IEEE 12207 Verification & Validation.

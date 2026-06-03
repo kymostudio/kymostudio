@@ -15,7 +15,6 @@ related_documents:
   - DESIGN-KYMO-DSL-001      # Design
   - TEST-KYMO-DSL-001        # Test documentation
   - PLAN-KYMO-DSL-001        # Plan
-  - KYMO-DSL-001             # kymo DSL language specification (normative grammar)
   - FEAT-BPMN-DSL-001        # bpmn { } block requirements (delegated subset)
   - KYMOJSON-MAP-001         # .kymo.json — serialization of the resolved model
 authors:
@@ -43,7 +42,7 @@ iso_compliance:
 | Status       | Released                                           |
 | Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | PROD-KYMO-DSL-001 (stakeholder needs), INTRO-KYMO-DSL-001, DESIGN-KYMO-DSL-001, TEST-KYMO-DSL-001, PLAN-KYMO-DSL-001 |
+| Related      | PROD-KYMO-DSL-001 (stakeholder needs), INTRO-DESIGN-TEST-PLAN-KYMO-DSL-001 |
 
 The key words **SHALL**, **SHOULD**, and **MAY** are used per ISO/IEC/IEEE
 29148:2018 drafting conventions. Each requirement carries a stable ID for

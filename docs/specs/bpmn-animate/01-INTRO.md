@@ -20,7 +20,6 @@ related_documents:
   - PLAN-BPMN-EXPORT-001     # bpmn-export plan (records the animation deferral this picks up)
   - FEAT-BPMN-EXPORT-001     # bpmn-export SRS (§4 deferral note)
   - BPMN-MAP-001             # BPMN element mapping (node type ↔ bpmn-* shapes; flow kinds)
-  - KYMO-DSL-001             # kymo DSL language specification (bpmn { } block)
   - DESIGN-BPMN-DSL-001      # BPMN-in-DSL design
   - REF-BPMNIO-CMP-001       # bpmn.io comparison ("no animation" gap)
 authors:

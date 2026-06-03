@@ -14,8 +14,6 @@ related_documents:
   - FEAT-CANVAS-001
   - DESIGN-CANVAS-001
   - TEST-CANVAS-001
-  - KYMO-DSL-001
-  - RES-MERMAID-D2-001
 authors:
   - Vũ Anh
 language: en
@@ -45,7 +43,7 @@ keywords:
 | Classification    | Internal                                                        |
 | Owner             | `diagrams/` project                                             |
 | Audience          | Engineers evolving the web playground (`website/app/`) and `packages/js` |
-| Related Documents | `FEAT-CANVAS-001` (requirements), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V), `KYMO-DSL-001`, `RES-MERMAID-D2-001` |
+| Related Documents | `FEAT-CANVAS-001` (requirements), `DESIGN-CANVAS-001` (design), `TEST-CANVAS-001` (V&V) |
 
 > **Implementation plan (ISO/IEC/IEEE 12207 §6.3 Technical Management).** This is the *delivery*
 > layer for the canvas-editor: mission rationale, the phased plan (**milestones = phases**), the risk

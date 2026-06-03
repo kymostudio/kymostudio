@@ -10,11 +10,10 @@ audience: Engineers evolving the `kymo` DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
-  - b.d2.md
-  - a.figma.md
-  - b.diagrams.mingrammer.comparision.md
+  - BPD-DGM-001
+  - REF-D2-001
+  - REF-FIGMA-001
+  - REF-DIAGRAMS-MINGRAMMER-CMP-001
 authors:
   - Vũ Anh
 language: en
@@ -55,7 +54,7 @@ upstream:
 | Hard Dependency   | Graphviz (`dot` binary on `$PATH`)                             |
 | Access Date       | 2026-05-18                                                     |
 | Primary Source    | [Examples page](https://diagrams.mingrammer.com/docs/getting-started/examples) |
-| Related Documents | [`diagrams.mingrammer.comparision.md`](b.diagrams.mingrammer.comparision.md) (kymo comparison), [`d2.md`](b.d2.md), [`figma.md`](a.figma.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`diagrams.mingrammer.comparision.md`](b.diagrams.mingrammer.comparision.md) (kymo comparison), [`d2.md`](b.d2.md), [`figma.md`](a.figma.md), `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures the design choices in `mingrammer/diagrams` so the team can consult them when evolving kymo's DSL, layout, and render pipeline. No code or behavior in this repository depends on `diagrams`.
 

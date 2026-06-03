@@ -13,7 +13,6 @@ related_documents:
   - INTRO-KYMOJSON-001          # Introduction
   - FEAT-KYMOJSON-001           # Requirements (SRS derived from the needs below)
   - KYMOJSON-MAP-001            # The normative schema (envelope + model body)
-  - KYMO-DSL-001                # kymo DSL front-end (produces this model)
 authors:
   - Vũ Anh
 language: en
@@ -46,7 +45,7 @@ iso_compliance:
 
 ## 1. Problem & motivation
 
-kymo's architecture has a clean seam: front-ends (the `.kymo` DSL parser `KYMO-DSL-001`, the BPMN
+kymo's architecture has a clean seam: front-ends (the `.kymo` DSL parser the BPMN
 importer `DESIGN-BPMN-PARSER-001`, a `.py` `DIAGRAM`) build a resolved `Diagram`; back-ends (SVG,
 Figma, Excalidraw, WebP, BPMN export `BPMN-MAP-001`) turn it into output. But that resolved model could
 never be **persisted** — every render re-parsed from source, and the model was observable only through

@@ -66,7 +66,7 @@ schema in **KYMOJSON-MAP-001**. This plan covers scope, phases, and risks.
 | **P2** | JS end-to-end | `to-kymojson.ts` / `from-kymojson.ts`; `index.ts` exports; round-trip tests | `npm test` green; JS load-fixpoint holds | FR-8, NFR-3 | ✅ Done (2026-05-24) |
 | **P3** | Cross-language parity gate | Standalone check: Python `export` and JS `toKymoJson` byte-identical (incl. `layout_trees`) across the corpus | Identical bytes both ways; layout-tree divergences (if any) reconciled in isolation | NFR-1 | ✅ Done (2026-05-24) |
 | **P4** | Unify conformance serializer | Point `tests/_conformance.{py,mjs}` at `model_dict`/`modelDict`; regenerate `.model.json` + `bpmn_import.json` goldens (now incl. `layout_trees`) | Both conformance suites green; layout-tree parity now gated | NFR-1 | ✅ Done (2026-05-24) |
-| **P5** | Docs | `KYMOJSON-MAP-001` format doc + this spec set + back-references (KYMO-DSL-001, BPMN-MAP-001) | Doc set Released; citations resolve | all | ✅ Done (2026-05-24) |
+| **P5** | Docs | `KYMOJSON-MAP-001` format doc + this spec set + back-references (BPMN-MAP-001) | Doc set Released; citations resolve | all | ✅ Done (2026-05-24) |
 
 ## 4. Risks and mitigations
 

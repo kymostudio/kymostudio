@@ -3,7 +3,7 @@
 A guided tour of the building blocks you'll use to draw diagrams. Every section has a
 small snippet you can paste into a file and render with `kymo file.kymo`.
 
-This is the *teaching* companion to the [DSL Language Specification](../formats/kymo-dsl/README.md) (`KYMO-DSL-001`).
+This is the *teaching* companion to the DSL Language Specification.
 Each section links to the spec clause that defines it formally; reach for the spec when you
 need the exact grammar or an edge case.
 
@@ -255,4 +255,4 @@ directly — `kymo process.bpmn` — and kymo uses the geometry stored in the fi
 
 - **[Cookbook](./cookbook.md)** — complete diagrams you can adapt.
 - **[FAQ & Troubleshooting](./faq.md)** — fixes for common surprises.
-- **[DSL Language Specification](../formats/kymo-dsl/README.md)** — the full normative grammar.
+- **DSL Language Specification** — the full normative grammar.

@@ -55,7 +55,7 @@ Notes:
 If you change DSL parsing, the diagram model, layout, alignment, or BPMN
 import/export behavior in one language, mirror the change in the other so
 `pip install kymostudio` and `npm install kymostudio` stay consistent.
-[`docs/formats/kymo-dsl/`](docs/formats/kymo-dsl/README.md) (`KYMO-DSL-001`) is the normative
+`docs/formats/kymo-dsl/` is the normative
 specification — update it when the language surface changes.
 
 ## Commit & pull-request conventions

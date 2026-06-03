@@ -15,7 +15,6 @@ related_documents:
   - DESIGN-BPMN-EDITOR-CR-003
   - TEST-BPMN-EDITOR-CR-003
   - PLAN-BPMN-EDITOR-001
-  - RES-BPMN-LINT-001
 authors:
   - Vũ Anh
 language: en
@@ -39,7 +38,7 @@ keywords:
 | Status            | **Proposed** — awaiting v1 baseline + approval |
 | Owner             | `diagrams/` project |
 | Entry gate        | **CR-003 approved** and the v1 spec baselined. |
-| Related Documents | `FEAT-BPMN-EDITOR-CR-003`, `DESIGN-BPMN-EDITOR-CR-003`, `TEST-BPMN-EDITOR-CR-003`, `PLAN-BPMN-EDITOR-001`, `RES-BPMN-LINT-001` |
+| Related Documents | `FEAT-BPMN-EDITOR-CR-003`, `DESIGN-BPMN-EDITOR-CR-003`, `TEST-BPMN-EDITOR-CR-003`, `PLAN-BPMN-EDITOR-001` |
 
 ---
 

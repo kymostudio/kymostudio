@@ -14,8 +14,6 @@ related_documents:
   - DESIGN-KYMO-NREF-001     # Design
   - TEST-KYMO-NREF-001       # Test documentation
   - PLAN-KYMO-NREF-001       # Plan
-  - KYMO-DSL-001             # the spec this set reorganises (now the index)
-  - BPMN-NREF-001            # BPMN normative-reference set (the structural model mirrored)
 authors:
   - Vũ Anh
 language: en
@@ -51,7 +49,7 @@ Concept and rationale: INTRO-KYMO-NREF-001; realisation: DESIGN-KYMO-NREF-001.
 
 ## 1. Scope and stakeholder needs
 
-Reorganise the kymo DSL specification (`KYMO-DSL-001`) from one monolithic file into
+Reorganise the kymo DSL specification from one monolithic file into
 a clause-per-file normative-reference set — so each clause can be cited, revised,
 and versioned independently (as the BPMN set already is) — **without** changing the
 normative language definition and **without** breaking any existing cross-reference.
@@ -60,7 +58,7 @@ normative language definition and **without** breaking any existing cross-refere
 
 | ID | Need |
 |----|------|
-| **SN-1** | Each clause of the DSL spec should be **independently citable, revisable, and versioned** — as the `.bpmn` normative set (`BPMN-NREF-001`) already is. |
+| **SN-1** | Each clause of the DSL spec should be **independently citable, revisable, and versioned** — as the `.bpmn` normative set already is. |
 | **SN-2** | Existing references to the spec — the ≈50 `KYMO-DSL-001` `document_id` citations, the path links, and the teaching guide's **deep section anchors** — must keep working: no broken links, no churn for documents that cite it. |
 | **SN-3** | The **normative language definition must not change**: readers and tooling that depend on the grammar/semantics must see byte-identical content after the move. |
 | **SN-4** | The set should match the repository's existing normative-reference **convention** (the BPMN set), so a contributor navigates kymo and BPMN the same way. |
@@ -72,7 +70,7 @@ normative language definition and **without** breaking any existing cross-refere
 
 | ID | Requirement | Source need | Phase |
 |----|-------------|-------------|-------|
-| **FR-1** | The DSL specification SHALL be organised as a **clause-per-file normative-reference set** under `docs/formats/kymo-dsl/`, mirroring `docs/formats/bpmn/` (`BPMN-NREF-001`): a `README.md` index plus one file per clause for clauses 1–10 (`01-scope.md` … `10-examples.md`). | SN-1, SN-4 | P1 |
+| **FR-1** | The DSL specification SHALL be organised as a **clause-per-file normative-reference set** under `docs/formats/kymo-dsl/`, mirroring `docs/formats/bpmn/`: a `README.md` index plus one file per clause for clauses 1–10 (`01-scope.md` … `10-examples.md`). | SN-1, SN-4 | P1 |
 | **FR-2** | The index `README.md` SHALL retain `document_id: KYMO-DSL-001`; each clause file SHALL carry a unique `KYMO-DSL-<X>-001` sub-id (`SCOPE`, `NORMREF`, `TERMS`, `ABBR`, `LEX`, `GRAMMAR`, `SEMANTICS`, `AUTHORING`, `CONF`, `EXAMPLES`). Each file (index and clauses) SHALL carry its own Annex A (revision history) and Annex B (document control). | SN-2, SN-1 | P1 |
 | **FR-3** | Clause content SHALL be lifted **verbatim** from the v2.5 monolith — no grammar or semantic change. Original section-heading **texts** SHALL be preserved so existing in-document anchors (e.g. `#64-leaf-components`, `#7-semantics`, `#74-auto-canvas`) continue to resolve; only relative paths inside the lifted content are adjusted for the new folder depth. | SN-3, SN-2 | P1 |
 | **FR-4** | The monolith (`docs/KYMO_DSL.md`) SHALL be deleted, and **every** `../KYMO_DSL.md` path/anchor link in the repository (docs, `CONTRIBUTING.md`, `CHANGELOG.md`, the PR template, the issue-template contact link) SHALL be repointed into the new folder — deep anchors to their specific clause file, plain links to the index. | SN-2 | P2 |

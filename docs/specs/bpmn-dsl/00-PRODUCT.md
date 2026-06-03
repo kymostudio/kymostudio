@@ -12,9 +12,7 @@ supersedes: null
 related_documents:
   - INTRO-BPMN-DSL-001
   - FEAT-BPMN-DSL-001
-  - KYMO-DSL-001
   - BPMN-MAP-001
-  - RES-MERMAID-D2-001
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +46,7 @@ and error-prone. Tools such as Mermaid let an author describe a process textuall
 automatically (cf. `RES-MERMAID-D2-001`). kymo can already *import* BPMN 2.0 XML (`BPMN-MAP-001`) but
 cannot *author* it concisely.
 
-A new file-scope `bpmn { … }` block in the kymo DSL (`KYMO-DSL-001`) lets an author describe a process
+A new file-scope `bpmn { … }` block in the kymo DSL lets an author describe a process
 as typed nodes and flows — *declare-then-connect* — and have the engine lay it out: declarative
 node kinds (`start`/`task`/`xor`/`and`/`end` …) then `->` connections; a left-to-right layered
 (Sugiyama/DAG) auto-layout that positions nodes and routes orthogonal flows; hybrid coordinates (a
@@ -60,7 +58,7 @@ like the BPMN importer, so the existing `bpmn-*` glyphs and flow renderer draw i
 
 - **Who:** authors of `.kymo` diagrams who want to express a BPMN process concisely, plus engineers
   and maintainers of the kymo DSL parser, layout engine, and Python/JS renderers.
-- **Substrate it builds on (unchanged):** the kymo DSL (`KYMO-DSL-001`); the BPMN importer's element
+- **Substrate it builds on (unchanged):** the kymo DSL; the BPMN importer's element
   mapping (`BPMN-MAP-001`) — the block reuses the same `(shape, marker)` / flow classification; and
   the existing `bpmn-*` glyphs + flow renderer, which draw the emitted sub-diagram without change.
 - **Scenario:** an author writes a `bpmn { … }` block of typed nodes + flows, optionally pinning a

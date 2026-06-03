@@ -10,10 +10,8 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-COLLAB-001   # Clause 9 — Collaboration
   - BPMN-NREF-PROCESS-001  # Clause 10 — Process (Events/Gateways reused)
-  - REF-BPMN-001           # BPMN 2.0 research reference (diagram types §14)
 authors:
   - Vũ Anh
 language: en
@@ -45,7 +43,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§11 Choreography** (pp.315–366) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-COLLAB-001`, `BPMN-NREF-PROCESS-001`, `REF-BPMN-001` |
+| Related Documents | `BPMN-NREF-COLLAB-001`, `BPMN-NREF-PROCESS-001` |
 
 Mirrors **Clause 11 (Choreography)** of the OMG BPMN 2.0.2 specification (§11.1–§11.9,
 pp.315–366). Part of the normative-reference set `BPMN-NREF-001`. Where this note and the OMG

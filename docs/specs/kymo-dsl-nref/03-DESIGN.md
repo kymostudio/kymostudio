@@ -14,8 +14,6 @@ related_documents:
   - FEAT-KYMO-NREF-001       # Requirements (traced below)
   - TEST-KYMO-NREF-001       # Test documentation
   - PLAN-KYMO-NREF-001       # Plan
-  - KYMO-DSL-001             # the spec this set reorganises (now the index)
-  - BPMN-NREF-001            # BPMN normative-reference set (the structural model mirrored)
 authors:
   - Vũ Anh
 language: en
@@ -61,8 +59,8 @@ The before/after:
 
 ```
 before                                    after
-docs/KYMO_DSL.md  (KYMO-DSL-001, v2.5)     docs/formats/kymo-dsl/
-  §1 … §10 + Annex A/B                       README.md            (KYMO-DSL-001, v2.6 — index)
+docs/KYMO_DSL.md  (v2.5)     docs/formats/kymo-dsl/
+  §1 … §10 + Annex A/B                       README.md            (v2.6 — index)
                                              01-scope.md          (KYMO-DSL-SCOPE-001)
                                              …                    …
                                              10-examples.md       (KYMO-DSL-EXAMPLES-001)
@@ -70,7 +68,7 @@ docs/KYMO_DSL.md  (KYMO-DSL-001, v2.5)     docs/formats/kymo-dsl/
 
 ## 2. Target structure — clause → file → id map (FR-1, FR-2)
 
-Mirrors `docs/formats/bpmn/` (`BPMN-NREF-001`): a README index plus one file per
+Mirrors `docs/formats/bpmn/`: a README index plus one file per
 clause; the kymo DSL is the repo's own spec, so there is **no `upstream:`**
 frontmatter block and **no content annexes** — only the doc-control Annex A/B each
 file carries.

@@ -10,10 +10,8 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - a.drawio.comparision.md
-  - ../diagrams/bpmn/README.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-DRAWIO-CMP-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -49,7 +47,7 @@ upstream:
 | License           | Apache-2.0 (with stencil/template caveats)                    |
 | Version Reviewed  | drawio 30.0.2 (2026-05-16)                                    |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`drawio.comparision.md`](./a.drawio.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`drawio.comparision.md`](./a.drawio.comparision.md), `bpmn/README.md`, `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures draw.io's design choices so the team can consult them when evolving kymo's render and export pipeline. No code or behaviour in this repository depends on draw.io. draw.io is a **general-purpose** diagram editor (BPMN is one of many shape libraries), included here because it is a common way teams draw BPMN and because, like bpmn.io, it is a client-side SVG engine.
 

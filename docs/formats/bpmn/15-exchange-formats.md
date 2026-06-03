@@ -10,10 +10,8 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-NOTATION-001 # Clause 12 — BPMN DI (the DI namespaces)
   - BPMN-NREF-CORE-001     # Clause 8 — Core (Definitions, Import)
-  - REF-BPMN-001           # BPMN 2.0 research reference (interchange §16)
 authors:
   - Vũ Anh
 language: en
@@ -46,7 +44,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§15 Exchange Formats** (pp.475–478) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-NOTATION-001`, `BPMN-NREF-CORE-001`, `REF-BPMN-001` |
+| Related Documents | `BPMN-NREF-NOTATION-001`, `BPMN-NREF-CORE-001` |
 
 Mirrors **Clause 15 (Exchange Formats)** of the OMG BPMN 2.0.2 specification (§15.1–§15.5,
 pp.475–478) — the XML serialisation of a `.bpmn` file. Part of the normative-reference set

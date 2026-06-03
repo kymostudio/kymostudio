@@ -10,11 +10,9 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-CORE-001     # Clause 8 — Common Elements
   - BPMN-NREF-EXEC-001     # Clause 13 — Execution Semantics
   - BPMN-NREF-OVERVIEW-001 # Clause 7 — Overview (marker catalogue, Table 7.2)
-  - REF-BPMN-001           # BPMN 2.0 research reference (events/activities/gateways §8–§10)
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +46,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§10 Process** (pp.143–314) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-CORE-001`, `BPMN-NREF-EXEC-001`, `BPMN-NREF-OVERVIEW-001`, `REF-BPMN-001` |
+| Related Documents | `BPMN-NREF-CORE-001`, `BPMN-NREF-EXEC-001`, `BPMN-NREF-OVERVIEW-001` |
 
 Mirrors **Clause 10 (Process)** of the OMG BPMN 2.0.2 specification (§10.1–§10.12,
 pp.143–314) — the largest clause, defining Activities, Items & Data, Events, Gateways,

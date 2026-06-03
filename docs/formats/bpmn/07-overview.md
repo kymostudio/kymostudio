@@ -10,10 +10,8 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-CORE-001     # Clause 8 — BPMN Core Structure
   - BPMN-NREF-PROCESS-001  # Clause 10 — Process (Flow Objects, Data)
-  - REF-BPMN-001           # BPMN 2.0 research reference (taxonomy §7)
 authors:
   - Vũ Anh
 language: en
@@ -46,7 +44,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **§7 Overview** (pp.19–46) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-CORE-001`, `BPMN-NREF-PROCESS-001`, `REF-BPMN-001` |
+| Related Documents | `BPMN-NREF-CORE-001`, `BPMN-NREF-PROCESS-001` |
 
 Mirrors **Clause 7 (Overview)** of the OMG BPMN 2.0.2 specification (§7.1–§7.8, pp.19–46).
 Part of the normative-reference set `BPMN-NREF-001`. Where this note and the OMG

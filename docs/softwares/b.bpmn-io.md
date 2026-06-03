@@ -10,10 +10,8 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - b.bpmn-io.comparision.md
-  - ../diagrams/bpmn/README.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-BPMNIO-CMP-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -49,7 +47,7 @@ upstream:
 | License           | bpmn.io license (core libs MIT + attribution)                 |
 | Version Reviewed  | bpmn-js 18.16.1 (2026-05-05)                                  |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`bpmn-io.comparision.md`](./b.bpmn-io.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`bpmn-io.comparision.md`](./b.bpmn-io.comparision.md), `bpmn/README.md`, `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures bpmn.io's design choices so the team can consult them when evolving kymo's render pipeline and any future web-embeddable output. No code or behaviour in this repository depends on bpmn.io. Of all the BPMN tools surveyed, bpmn-js is the **closest analogue to kymo's renderer**: a client-side, SVG-based engine that turns a notation model into an interactive diagram in the browser.
 
@@ -85,7 +83,7 @@ bpmn.io is not one library but a family that shares a common rendering core:
 
 ## 4. BPMN support and interchange
 
-- Round-trips **BPMN 2.0 XML** (`.bpmn`) losslessly, including **BPMN DI** — the model (elements, flows) and the diagram (shape bounds, edge waypoints) are kept distinct, exactly as the OMG specification prescribes (see [`bpmn/README.md` §16](../diagrams/bpmn/README.md)).
+- Round-trips **BPMN 2.0 XML** (`.bpmn`) losslessly, including **BPMN DI** — the model (elements, flows) and the diagram (shape bounds, edge waypoints) are kept distinct, exactly as the OMG specification prescribes (see `bpmn/README.md` §16).
 - Renders the full descriptive/analytical element set: events, activities, gateways, pools/lanes, data objects, artifacts.
 - Validation and modelling rules are layered on as diagram-js modules rather than baked in.
 

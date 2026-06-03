@@ -10,8 +10,6 @@ audience: Engineers producing architecture diagrams for docs and slides
 review_cycle: On major rendering-stack change, or annually (whichever first)
 supersedes: null
 related_documents:
-  - KYMO-DSL-001
-  - README.md
 authors:
   - Vũ Anh
 language: en
@@ -43,7 +41,7 @@ iso_compliance:
 | Audience          | Engineers producing architecture diagrams for docs and slides  |
 | Review Cycle      | On major rendering-stack change, or annually (whichever first) |
 | Supersedes        | —                                                              |
-| Related Documents | `KYMO-DSL-001`, [`README.md`](../../README.md) (run/build instructions) |
+| Related Documents | [`README.md`](../../README.md) (run/build instructions) |
 
 Structured per ISO/IEC/IEEE 15289:2019 (information item content) and
 ISO/IEC/IEEE 26515:2018 (agile documentation): metadata header, numbered
@@ -109,7 +107,7 @@ kymostudio/                          (monorepo root)
 ├── packages/python/src/kymo/
 │   ├── model.py       Component, Region, Edge, Diagram dataclasses
 │   ├── icons.py       SVG icon library
-│   ├── dsl.py         .kymo DSL parser (KYMO-DSL-001)
+│   ├── dsl.py         .kymo DSL parser
 │   ├── layout.py      Auto-layout + edge routing
 │   ├── alignment.py   Post-parse resolver (positions, region bounds)
 │   ├── to_svg.py      Diagram → SVG renderer
@@ -1217,7 +1215,7 @@ The five revisions that produced the greatest visual quality gain were:
 | 1.5     | 2026-05-18 | Vũ Anh      | §5.5.1.1 Region border overrides — `dash (X, Y)` + `stroke #hex` per-region.       |
 | 1.6     | 2026-05-18 | Vũ Anh      | §5.5.1.2 Asymmetric padding — `padding-bottom N` balances label's top visual weight.|
 | 1.7     | 2026-05-18 | Vũ Anh      | §7.6 Orthogonality rule — every routed edge segment must be H or V (no diagonals).  |
-| 1.8     | 2026-05-24 | Vũ Anh      | Corrected source paths to the `packages/python/src/kymo/` monorepo layout (§1.3 tree, §5.4 table, §5.5.3 commands, §11/§12, Annex B); `uv run kymo` replaces `uv run src/cli.py`. Cross-doc citations now by document_id (`KYMO-DSL-001`); added it to `related_documents`. |
+| 1.8     | 2026-05-24 | Vũ Anh      | Corrected source paths to the `packages/python/src/kymo/` monorepo layout (§1.3 tree, §5.4 table, §5.5.3 commands, §11/§12, Annex B); `uv run kymo` replaces `uv run src/cli.py`. Cross-doc citations now by document_id; added it to `related_documents`. |
 | 1.9     | 2026-05-25 | Vũ Anh      | Relocated `docs/BEST_PRACTICE_DIAGRAMS.md` → `docs/diagrams/best-practices.md` (topical home under `diagrams/`); updated B.1 storage path and the root-`README.md` link depth. `document_id` `BPD-DGM-001` unchanged. |
 
 ---

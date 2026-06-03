@@ -10,10 +10,9 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream major release, or annually (whichever first)
 supersedes: null
 related_documents:
-  - z.activiti.comparision.md
-  - ../diagrams/bpmn/README.md
-  - ./z.flowable.md
-  - ./b.camunda.md
+  - REF-ACTIVITI-CMP-001
+  - REF-FLOWABLE-001
+  - REF-CAMUNDA-001
 authors:
   - Vũ Anh
 language: en
@@ -48,7 +47,7 @@ upstream:
 | License           | Apache-2.0                                                    |
 | Version Reviewed  | Activiti 7.x / Activiti Cloud (2026)                         |
 | Access Date       | 2026-05-20                                                     |
-| Related Documents | [`activiti.comparision.md`](./z.activiti.comparision.md), [`bpmn/README.md`](../diagrams/bpmn/README.md), [`flowable.md`](./z.flowable.md), [`camunda.md`](./b.camunda.md) |
+| Related Documents | [`activiti.comparision.md`](./z.activiti.comparision.md), `bpmn/README.md`, [`flowable.md`](./z.flowable.md), [`camunda.md`](./b.camunda.md) |
 
 This is a **reference note on prior art**, not a specification of kymo. It captures Activiti's design choices and its role as the common ancestor of today's open BPMN engines. No code or behaviour in this repository depends on Activiti. Activiti is a **process-execution engine**, a different category from kymo (a static diagram DSL).
 

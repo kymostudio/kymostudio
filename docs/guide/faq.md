@@ -1,7 +1,7 @@
 # FAQ & Troubleshooting
 
 Fixes for the things you're most likely to hit early on. If something here doesn't match what
-you see, the [DSL Language Specification](../formats/kymo-dsl/README.md) is the authoritative source.
+you see, the DSL Language Specification is the authoritative source.
 
 ## Getting set up
 
@@ -109,4 +109,4 @@ Or use the [browser playground](https://kymostudio.github.io/kymostudio/app/) â€
 
 - Compare against a working file in [`samples/`](../../samples).
 - Re-read the relevant section of [The `.kymo` Language](./dsl-guide.md).
-- Consult the normative [DSL Language Specification](../formats/kymo-dsl/README.md) for exact grammar and edge cases.
+- Consult the normative DSL Language Specification for exact grammar and edge cases.

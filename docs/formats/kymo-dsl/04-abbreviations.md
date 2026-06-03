@@ -10,7 +10,6 @@ audience: Engineers authoring or parsing `.kymo` files
 review_cycle: On grammar change, or annually (whichever first)
 supersedes: null
 related_documents:
-  - KYMO-DSL-001             # Language specification (index)
   - KYMO-DSL-TERMS-001       # Clause 3 — Terms and Definitions
 authors:
   - Vũ Anh
@@ -33,7 +32,7 @@ iso_compliance:
 | Issue Date        | 2026-05-25                                         |
 | Status            | Released                                           |
 | Owner             | `diagrams/` project                                |
-| Related Documents | `KYMO-DSL-001`, `KYMO-DSL-TERMS-001`              |
+| Related Documents | `KYMO-DSL-TERMS-001`              |
 
 ## 4. Abbreviations
 

@@ -10,9 +10,7 @@ audience: Engineers reading, writing, or implementing BPMN 2.0 (`.bpmn`) interch
 review_cycle: On OMG BPMN release
 supersedes: null
 related_documents:
-  - BPMN-NREF-001          # Normative-reference set (index)
   - BPMN-NREF-TERMS-001    # Clause 4 — Terms and Definitions
-  - REF-BPMN-001           # BPMN 2.0 research reference (glossary §3)
 authors:
   - Vũ Anh
 language: en
@@ -42,7 +40,7 @@ upstream:
 | Status            | Released                                                      |
 | Owner             | `diagrams/` project                                          |
 | Mirrors           | [OMG BPMN 2.0.2](https://www.omg.org/spec/BPMN/2.0.2/PDF) **Annex C — Glossary** *(informative)* (pp.499–502) |
-| Related Documents | `BPMN-NREF-001`, `BPMN-NREF-TERMS-001`, `REF-BPMN-001`        |
+| Related Documents | `BPMN-NREF-TERMS-001`        |
 
 Mirrors **Annex C (Glossary)** — an **informative** annex — of the OMG BPMN 2.0.2
 specification (pp.499–502). Part of the normative-reference set `BPMN-NREF-001`. Where this

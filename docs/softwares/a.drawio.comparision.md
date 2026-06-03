@@ -10,10 +10,9 @@ audience: Engineers evolving the kymo DSL, layout engine, or render pipeline
 review_cycle: On upstream draw.io major release, on kymo DSL/layout change, or annually
 supersedes: null
 related_documents:
-  - a.drawio.md
-  - a.lucidchart.comparision.md
-  - ../formats/kymo-dsl/README.md
-  - ../diagrams/best-practices.md
+  - REF-DRAWIO-001
+  - REF-LUCIDCHART-CMP-001
+  - BPD-DGM-001
 authors:
   - Vũ Anh
 language: en
@@ -46,7 +45,7 @@ upstream:
 | Audience          | Engineers evolving the kymo DSL, layout, or render pipeline    |
 | Access Date       | 2026-05-20                                                     |
 | Parent Reference  | [`drawio.md`](a.drawio.md)                                       |
-| Related Documents | [`lucidchart.comparision.md`](a.lucidchart.comparision.md), [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md) |
+| Related Documents | [`lucidchart.comparision.md`](a.lucidchart.comparision.md), `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
 This document isolates the **prior-art comparison** between [draw.io / diagrams.net](https://www.drawio.com/) and kymo. The factual reference (architecture, file format, BPMN support, capabilities) lives in [`drawio.md`](a.drawio.md); read that first if you need ground truth on how draw.io actually behaves.
 
@@ -216,5 +215,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`drawio
 
 - Comparison subject: draw.io / diagrams.net 30.0.2 as documented at <https://www.drawio.com/> on 2026-05-20.
 - Factual basis for the draw.io column: [`drawio.md`](a.drawio.md).
-- Factual basis for the kymo column: this repository's [`kymo-dsl/`](../formats/kymo-dsl/README.md), [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]]). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.
