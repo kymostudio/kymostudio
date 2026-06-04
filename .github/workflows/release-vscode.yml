@@ -81,3 +81,49 @@ jobs:
         if: ${{ env.OVSX_PAT != '' }}
         working-directory: packages/vscode-extension
         run: npx --yes ovsx publish --no-dependencies -p "$OVSX_PAT"
+
+      # A successful `vsce`/`ovsx publish` only means the upload was accepted —
+      # both registries then index asynchronously before the new version is
+      # actually served. Poll each registry that we published to until it serves
+      # the package.json version, so the job isn't "done" until the release is
+      # live. Caps at 5 min (indexing is usually well under a minute); on
+      # timeout it red-fails to surface the lag (the publish itself succeeded).
+      - name: Wait for registries to serve the new version
+        if: ${{ env.VSCE_PAT != '' || env.OVSX_PAT != '' }}
+        working-directory: packages/vscode-extension
+        run: |
+          set -u
+          PUBLISHER=$(node -p "require('./package.json').publisher")
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          ID="$PUBLISHER.$NAME"
+          echo "Waiting up to 5 min for $ID@$VERSION to be served by registries…"
+
+          ovsx_version() {
+            curl -sf "https://open-vsx.org/api/$PUBLISHER/$NAME/latest" 2>/dev/null \
+              | python3 -c "import sys,json;print(json.load(sys.stdin).get('version',''))" 2>/dev/null || true
+          }
+          mp_version() {
+            curl -sf "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery" \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json;api-version=7.2-preview.1" \
+              -d "{\"filters\":[{\"criteria\":[{\"filterType\":7,\"value\":\"$ID\"}]}],\"flags\":914}" 2>/dev/null \
+              | python3 -c "import sys,json;e=json.load(sys.stdin)['results'][0]['extensions'];print(e[0]['versions'][0]['version'] if e else '')" 2>/dev/null || true
+          }
+
+          need_mp=false; need_ovsx=false
+          [ -n "${VSCE_PAT:-}" ] && need_mp=true
+          [ -n "${OVSX_PAT:-}" ] && need_ovsx=true
+
+          deadline=$(( $(date +%s) + 300 ))
+          while :; do
+            mp_ok=true; ovsx_ok=true
+            if $need_mp;   then v=$(mp_version);   echo "  Marketplace: ${v:-<none>}"; [ "$v" = "$VERSION" ] || mp_ok=false; fi
+            if $need_ovsx; then v=$(ovsx_version); echo "  Open VSX:    ${v:-<none>}"; [ "$v" = "$VERSION" ] || ovsx_ok=false; fi
+            if $mp_ok && $ovsx_ok; then echo "✓ All target registries now serve $VERSION"; exit 0; fi
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo "::error::Timed out after 5 min waiting for registries to serve $VERSION (publish succeeded; indexing lag)."
+              exit 1
+            fi
+            sleep 15
+          done
