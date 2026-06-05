@@ -1,7 +1,7 @@
 ---
 title: kymo Icons v2 — Plan
 document_id: PLAN-ICONS-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-04
 status: Draft
 classification: Internal
@@ -61,13 +61,20 @@ scope, phases, and risks.
 
 ## 3. Phases (work breakdown)
 
-| ID | Phase | Deliverables | Exit criteria | Reqs | Status |
-|----|-------|--------------|---------------|------|--------|
-| **P1** | Namespace `prefix:name` + aliases | Replace flat `<provider>-<name>` key with collision-proof `prefix:name`; add aliases for synonyms/variants; legacy-key compatibility map | No source icon unreachable (TC-1); legacy diagrams render unchanged (TC-10); suites green | FR-1, FR-4, FR-11 | ⬜ Planned |
-| **P2** | One generator / single source of truth | Promote `build-manifest.mjs` to a generator emitting per-set artifacts; both Python & JS consume it; retire the second scanner | Both impls read one artifact (TC-7); conformance record-parity gated (NFR-1); no new runtime dep (TC-12) | FR-8, FR-10, NFR-1, NFR-3 | ⬜ Planned |
-| **P3** | IconifyJSON manifest + on-demand loading | Per-set IconifyJSON with dims/aliases/`info`/tags; batched fetch + cache + `missing` set | Metadata queryable (TC-4); page fetches only referenced icons, caches (TC-8); whole catalogue not pulled up front | FR-2, FR-3, FR-5, FR-9, NFR-4 | ⬜ Planned |
-| **P4** | PNG → SVG body (vectorization) | Source vector originals; run normalize pipeline (`cleanupSVG → parseColors(currentColor) → SVGO → validate → dedup → minify`); `id`/`defs`-safe inlining; retire `<image>`/`_svg_as_inline()` | Records render + recolour + scale crisply (TC-5); no `id` collisions (TC-6); goldens stable for unaffected diagrams (TC-11) | FR-3, FR-6, FR-7, NFR-2 | ⬜ Planned (big lift) |
-| **P5** | Docs & gates | Normative catalogue-format doc; reconcile this spec set; conformance/golden gates wired | Doc set Released; citations resolve; gates green | all | ⬜ Planned |
+Each phase is tracked as an **implementation change-request** under [`CR/`](CR/) — a work-order that
+schedules, designs-in-detail, and verifies the baseline requirements it realises (it mints no new
+requirement; on completion its row here flips to Done and Annex C records the work). The CLI phase
+(P6) is the one **requirements-adding** CR (it introduces FR-12..15). Phase number ≠ CR number;
+execution order is the **Depends on** column.
+
+| ID | Phase | CR | Deliverables | Exit criteria | Reqs | Depends on | Status |
+|----|-------|----|--------------|---------------|------|------------|--------|
+| **P1** | Namespace `prefix:name` + aliases | [`CR-ICONS-002`](CR/CR-ICONS-002/01-REQUIREMENTS.md) | Replace flat `<provider>-<name>` key with collision-proof `prefix:name`; add aliases for synonyms/variants; legacy-key compatibility map | No source icon unreachable (TC-1); legacy diagrams render unchanged (TC-10); suites green | FR-1, FR-4, FR-11 | — | ⬜ Planned |
+| **P2** | One generator / single source of truth | [`CR-ICONS-003`](CR/CR-ICONS-003/01-REQUIREMENTS.md) | Promote `build-manifest.mjs` to a generator emitting per-set artifacts; both Python & JS consume it; retire the second scanner | Both impls read one artifact (TC-7); conformance record-parity gated (NFR-1); no new runtime dep (TC-12) | FR-8, FR-10, NFR-1, NFR-3 | P1 | ⬜ Planned |
+| **P3** | IconifyJSON manifest + on-demand loading | [`CR-ICONS-004`](CR/CR-ICONS-004/01-REQUIREMENTS.md) | Per-set IconifyJSON with dims/aliases/`info`/tags; batched fetch + cache + `missing` set | Metadata queryable (TC-4); page fetches only referenced icons, caches (TC-8); whole catalogue not pulled up front | FR-2, FR-3, FR-5, FR-9, NFR-4 | P2 | ⬜ Planned |
+| **P4** | PNG → SVG body (vectorization) | [`CR-ICONS-005`](CR/CR-ICONS-005/01-REQUIREMENTS.md) | Source vector originals; run normalize pipeline (`cleanupSVG → parseColors(currentColor) → SVGO → validate → dedup → minify`); `id`/`defs`-safe inlining; retire `<image>`/`_svg_as_inline()` | Records render + recolour + scale crisply (TC-5); no `id` collisions (TC-6); goldens stable for unaffected diagrams (TC-11) | FR-3, FR-6, FR-7, NFR-2 | P3 + sourced vectors | ⬜ Planned (big lift) |
+| **P5** | Docs & gates | [`CR-ICONS-006`](CR/CR-ICONS-006/01-REQUIREMENTS.md) | Normative catalogue-format doc; reconcile this spec set; conformance/golden gates wired | Doc set Released; citations resolve; gates green | all | P1–P4, P6 | ⬜ Planned |
+| **P6** | Icon CLI (`kymo icons`) | [`CR-ICONS-001`](CR/CR-ICONS-001/01-REQUIREMENTS.md) | `list`/`search`/`describe`/`download` in both packages; hand-rolled JS arg parser + new `bin` | TC-13..16 passing; converter unaffected; parity | FR-12..15 (**added**) | P3 (+P2/P4 for `download`) | ⬜ Planned |
 
 ## 4. Risks and mitigations
 
@@ -93,22 +100,34 @@ unaffected diagrams.
 
 ## 6. Estimate (complexity)
 
-| Phase | Points |
-|-------|--------|
-| P1 — Namespace `prefix:name` + aliases | 5 |
-| P2 — One generator / single source of truth | 5 |
-| P3 — IconifyJSON manifest + on-demand loading | 8 |
-| P4 — PNG → SVG body (vectorization) | 13 |
-| P5 — Docs & gates | 3 |
-| **Total** | **34** |
+| Phase | CR | Points |
+|-------|----|--------|
+| P1 — Namespace `prefix:name` + aliases | CR-ICONS-002 | 5 |
+| P2 — One generator / single source of truth | CR-ICONS-003 | 5 |
+| P3 — IconifyJSON manifest + on-demand loading | CR-ICONS-004 | 8 |
+| P4 — PNG → SVG body (vectorization) | CR-ICONS-005 | 13 |
+| P5 — Docs & gates | CR-ICONS-006 | 3 |
+| P6 — Icon CLI (`kymo icons`) | CR-ICONS-001 | 8 |
+| **Total** | | **42** |
 
-**Progress:** 0 / 34 pts — proposed; not started.
+**Progress:** 0 / 42 pts — proposed; not started. (P1–P5 baseline = 34 pts; P6 CLI = +8, added by
+CR-ICONS-001.)
 
 ## 7. Change requests
 
-Changes to the baselined spec (`docs/specs/icons/`) are raised, assessed, and logged as a
-folder per CR under [`CR/`](CR/) (raise → assess → approve → implement → re-baseline). Raised:
-[`CR-ICONS-001`](CR/CR-ICONS-001/01-REQUIREMENTS.md) — the `kymo icons` command group (Open).
+Work against this plan is tracked as a folder per CR under [`CR/`](CR/) (raise → assess → implement →
+close / re-baseline). Two kinds: **implementation CRs** realise existing baseline requirements (P1–P5)
+and close by flipping their phase row to Done; the **requirements-adding CR** (P6) introduces new
+FR/NFR re-based into the baseline on close.
+
+| CR | Phase | Kind | Realises / adds | Depends on | Status |
+|----|-------|------|-----------------|------------|--------|
+| [`CR-ICONS-002`](CR/CR-ICONS-002/01-REQUIREMENTS.md) | P1 | implementation | FR-1, FR-4, FR-11 | — | Open |
+| [`CR-ICONS-003`](CR/CR-ICONS-003/01-REQUIREMENTS.md) | P2 | implementation | FR-8, FR-10, NFR-1, NFR-3 | P1 | Open |
+| [`CR-ICONS-004`](CR/CR-ICONS-004/01-REQUIREMENTS.md) | P3 | implementation | FR-2, FR-3, FR-5, FR-9, NFR-4 | P2 | Open |
+| [`CR-ICONS-005`](CR/CR-ICONS-005/01-REQUIREMENTS.md) | P4 | implementation | FR-3, FR-6, FR-7, NFR-2 | P3 + sourced vectors | Open |
+| [`CR-ICONS-006`](CR/CR-ICONS-006/01-REQUIREMENTS.md) | P5 | implementation | all (docs & gates) | P1–P4, P6 | Open |
+| [`CR-ICONS-001`](CR/CR-ICONS-001/01-REQUIREMENTS.md) | P6 | requirements-adding | **adds** FR-12..15 (`kymo icons` CLI) | P3 (+P2/P4) | Open |
 
 ## Annex A — Revision History
 
@@ -117,6 +136,7 @@ folder per CR under [`CR/`](CR/) (raise → assess → approve → implement →
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-06-04 | Vũ Anh | Initial issue — proposes kymo Icons v2 (P1–P5) sequenced per RES-ICONS-001 §7; no phase started. |
+| 0.2     | 2026-06-05 | Vũ Anh | Mapped every phase onto a CR folder: P1→CR-ICONS-002, P2→CR-ICONS-003, P3→CR-ICONS-004, P4→CR-ICONS-005, P5→CR-ICONS-006 (implementation CRs realising existing FR/NFR), P6→CR-ICONS-001 (requirements-adding, the CLI). §3 phase table gains CR + Depends-on columns and a P6 row; §6 estimate adds P6 (total 34→42); §7 lists all six CRs. No requirement changed. |
 
 ## Annex B — Document Control
 
