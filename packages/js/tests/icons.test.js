@@ -13,6 +13,7 @@ import {
   registerAlias,
   isAddress,
   iconAddresses,
+  resetIconCaches,
 } from "../dist/index.js";
 
 // A v2 fixture manifest + a stubbed fetch returning a tiny SVG body.
@@ -89,4 +90,46 @@ test("generated manifest is the v2 shape consumed by the loader (TC-7)", () => {
 test("packages/js declares zero runtime dependencies (NFR-3 / TC-12)", () => {
   const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url)));
   assert.equal(Object.keys(pkg.dependencies ?? {}).length, 0);
+});
+
+// ── P3 — on-demand / batched loading (CR-ICONS-004 / TC-8) ────────────────
+// A fetch stub that counts requests per URL and serves one per-set file.
+function installSetStub() {
+  resetIconCaches();
+  const calls = [];
+  const setBody = {
+    prefix: "aws", width: 64, height: 64, aliases: {},
+    info: { name: "aws", total: 2, categories: { security: ["security-waf"] } },
+    icons: {
+      "security-waf": { path: "icons/aws/security/waf.png", category: "security" },
+      "compute-lambda": { path: "icons/aws/compute/lambda.png", category: "compute" },
+    },
+  };
+  globalThis.fetch = async (url) => {
+    calls.push(url);
+    if (url.endsWith("sets/aws.json")) {
+      return { ok: true, status: 200, json: async () => setBody };
+    }
+    return { ok: true, status: 200, arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer };
+  };
+  return calls;
+}
+
+test("addresses load on demand: one request per set, then cached (TC-8)", async () => {
+  const calls = installSetStub();
+  await getIcon("aws:security-waf");
+  await getIcon("aws:compute-lambda");           // same set → no second set fetch
+  await getIcon("aws:security-waf");             // cached fragment → no fetch at all
+  const setFetches = calls.filter((u) => u.endsWith("sets/aws.json")).length;
+  assert.equal(setFetches, 1, "set fetched exactly once (batched + cached)");
+  // whole catalogue (flat manifest) was NOT pulled up front
+  assert.equal(calls.filter((u) => u.endsWith("icons-manifest.json")).length, 0);
+});
+
+test("a missing name is recorded and not re-requested (TC-8 / NFR-4)", async () => {
+  const calls = installSetStub();
+  await assert.rejects(() => getIcon("aws:does-not-exist"), /unknown icon/);
+  await assert.rejects(() => getIcon("aws:does-not-exist"), /unknown icon/);
+  // set fetched once; the miss is cached so the 2nd lookup issues no new fetch
+  assert.equal(calls.filter((u) => u.endsWith("sets/aws.json")).length, 1);
 });

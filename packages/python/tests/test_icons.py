@@ -123,3 +123,41 @@ def test_no_second_scanner() -> None:
     """The hand-maintained Python scanner is retired (FR-8)."""
     assert not hasattr(icons, "_scan_icons_dir")
     assert hasattr(icons, "_load_catalogue")
+
+
+# ── TC-2 — IconifyJSON shape + sparse records (FR-2, FR-3) ────────────────
+def test_per_set_iconifyjson_shape() -> None:
+    cols = icons.collections()
+    if not cols:
+        pytest.skip("per-set artifacts absent")
+    prefix = sorted(cols)[0]
+    s = icons.load_set(prefix)
+    assert s["prefix"] == prefix
+    assert s["width"] == 64 and s["height"] == 64          # root defaults
+    assert isinstance(s["icons"], dict) and s["icons"]
+    assert "aliases" in s and "info" in s
+    # Sparse: records inherit root dims (no per-icon width/height yet, pre-P4).
+    rec = next(iter(s["icons"].values()))
+    assert "width" not in rec and "height" not in rec
+
+
+# ── TC-4 — Searchable metadata (FR-5) ─────────────────────────────────────
+def test_set_carries_searchable_metadata() -> None:
+    cols = icons.collections()
+    if not cols:
+        pytest.skip("per-set artifacts absent")
+    prefix = "aws" if "aws" in cols else sorted(cols)[0]
+    s = icons.load_set(prefix)
+    assert s["info"]["total"] == len(s["icons"])
+    assert s["info"]["total"] == cols[prefix]["total"]      # index agrees with set
+    # categories are queryable (info.categories + per-icon category)
+    assert isinstance(s["info"]["categories"], dict)
+    assert isinstance(cols[prefix]["categories"], list)
+
+
+def test_load_set_is_cached() -> None:
+    cols = icons.collections()
+    if not cols:
+        pytest.skip("per-set artifacts absent")
+    prefix = sorted(cols)[0]
+    assert icons.load_set(prefix) is icons.load_set(prefix)   # same cached object

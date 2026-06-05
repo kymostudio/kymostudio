@@ -13,13 +13,17 @@
  * addressable; the legacy `<provider>-<name>` key (last-write-wins) maps to
  * the winning address so authored diagrams resolve unchanged.
  */
-import { readdir, writeFile } from "node:fs/promises";
+import { readdir, writeFile, mkdir } from "node:fs/promises";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));    // packages/js/scripts
 const ICONS_DIR = join(HERE, "..", "..", "..", "icons"); // repo-root icons/
-const OUT = join(HERE, "..", "icons-manifest.json");     // packages/js/icons-manifest.json
+const PKG = join(HERE, "..");                            // packages/js
+const OUT = join(PKG, "icons-manifest.json");            // flat v2 manifest (resolution + parity)
+const SETS_DIR = join(PKG, "sets");                      // per-set IconifyJSON (P3)
+const COLLECTIONS = join(PKG, "icons-collections.json"); // set index (P3)
+const ROOT_DIM = 64;                                     // default icon box (raster, pre-vectorization)
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "x";
 
@@ -34,9 +38,9 @@ async function walk(dir) {
 }
 
 const files = (await walk(ICONS_DIR)).sort();
-const icons = {};        // prefix:name → path
+const icons = {};        // prefix:name → path (flat manifest)
 const legacy = {};       // <provider>-<name> → prefix:name
-const byPath = new Map();
+const sets = {};         // prefix → per-set IconifyJSON (P3)
 
 for (const f of files) {
   const rel = relative(ICONS_DIR, f).replace(/\\/g, "/");
@@ -45,6 +49,8 @@ for (const f of files) {
   const parts = rel.replace(/\.[^.]+$/, "").split("/");          // [aws, compute, ec2]
   const prefix = slug(parts[0]);
   const name = parts.length > 1 ? parts.slice(1).map(slug).join("-") : prefix;
+  // category = first path segment after the provider (filesystem grouping)
+  const category = parts.length > 2 ? slug(parts[1]) : "";
   let addr = `${prefix}:${name}`;
   // Guarantee a unique address per source file (TC-1) on the rare clash.
   if (icons[addr] && icons[addr] !== `icons/${rel}`) {
@@ -52,14 +58,42 @@ for (const f of files) {
     while (icons[`${addr}-${n}`]) n += 1;
     addr = `${addr}-${n}`;
   }
+  const localName = addr.slice(prefix.length + 1);                // name within the set
   icons[addr] = `icons/${rel}`;
-  byPath.set(`icons/${rel}`, addr);
   const legacyKey = parts.length > 1 ? `${parts[0]}-${parts[parts.length - 1]}` : parts[0];
   legacy[legacyKey] = addr;                                       // last-write-wins, matches Python
+
+  // Per-set IconifyJSON record (P3 / FR-2, FR-3, FR-5). Dimensions inherit the
+  // root default (sparse — no per-icon width/height until they differ at P4);
+  // `path` lets the on-demand loader fetch the file; `category` is searchable.
+  const set = sets[prefix] ?? (sets[prefix] = {
+    prefix, width: ROOT_DIM, height: ROOT_DIM,
+    icons: {}, aliases: {},
+    info: { name: prefix, total: 0, categories: {} },
+  });
+  set.icons[localName] = category ? { path: `icons/${rel}`, category } : { path: `icons/${rel}` };
+  set.info.total += 1;
+  if (category) (set.info.categories[category] ??= []).push(localName);
 }
 
 const manifest = { icons, legacy, aliases: {} };
 await writeFile(OUT, JSON.stringify(manifest, null, 0));
+
+// Per-set IconifyJSON files + a collections index (P3). Deterministic: sorted
+// prefixes, sorted icon names, so the committed output is diffable.
+await mkdir(SETS_DIR, { recursive: true });
+const collections = {};
+for (const prefix of Object.keys(sets).sort()) {
+  const set = sets[prefix];
+  const ordered = {};
+  for (const n of Object.keys(set.icons).sort()) ordered[n] = set.icons[n];
+  set.icons = ordered;
+  await writeFile(join(SETS_DIR, `${prefix}.json`), JSON.stringify(set, null, 0));
+  collections[prefix] = { total: set.info.total, categories: Object.keys(set.info.categories).sort() };
+}
+await writeFile(COLLECTIONS, JSON.stringify(collections, null, 0));
+
 console.log(
-  `✓ wrote ${OUT} (${Object.keys(icons).length} addresses, ${Object.keys(legacy).length} legacy keys)`,
+  `✓ wrote ${OUT} (${Object.keys(icons).length} addresses, ${Object.keys(legacy).length} legacy keys)\n` +
+  `✓ wrote ${Object.keys(sets).length} per-set files under sets/ + icons-collections.json`,
 );

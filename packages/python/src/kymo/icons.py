@@ -651,4 +651,34 @@ def icon_addresses() -> list[str]:
     return sorted(_NS_ICONS)
 
 
+# ── Per-set IconifyJSON metadata (P3 / CR-ICONS-004, FR-2/FR-5) ────────────
+# The generator also emits one `sets/<prefix>.json` per set (dims/aliases/
+# `info`/categories) + a `collections` index. The renderer doesn't need them,
+# but discovery tooling (the `kymo icons` CLI) reads them on demand.
+_SETS_DIR = _REPO_ROOT / "packages" / "js" / "sets"
+_COLLECTIONS_PATH = _REPO_ROOT / "packages" / "js" / "icons-collections.json"
+_SET_CACHE: dict[str, dict] = {}
+
+
+def collections() -> dict:
+    """`{ prefix: { total, categories } }` — the set index (for `icons list`)."""
+    import json
+
+    if not _COLLECTIONS_PATH.is_file():
+        return {}
+    return json.loads(_COLLECTIONS_PATH.read_text(encoding="utf-8"))
+
+
+def load_set(prefix: str) -> dict:
+    """Load one per-set IconifyJSON file (cached). Returns `{}` if absent."""
+    import json
+
+    if prefix in _SET_CACHE:
+        return _SET_CACHE[prefix]
+    path = _SETS_DIR / f"{prefix}.json"
+    data = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    _SET_CACHE[prefix] = data
+    return data
+
+
 _load_catalogue()

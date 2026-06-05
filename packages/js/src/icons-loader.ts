@@ -23,13 +23,23 @@ type ManifestV2 = {
 };
 type Manifest = Record<string, string> | ManifestV2;
 
+type IconRecord = { path: string; category?: string; width?: number; height?: number };
+type SetFile = { prefix: string; width?: number; height?: number; icons: Record<string, IconRecord>;
+                 aliases?: Record<string, AliasEntry>; info?: unknown };
+type SetCache = { icons: Record<string, IconRecord>; missing: Set<string> };
+
 const IMAGE_SIZE = 64;
 const _cache = new Map<string, string>(Object.entries(ICONS));   // builtin keys start cached
-let _addrPaths: Record<string, string> | null = null;            // prefix:name → path
+let _addrPaths: Record<string, string> | null = null;            // prefix:name → path (injected/flat)
 let _legacy: Record<string, string> = {};                        // legacy key → address
 const _aliases: Record<string, AliasEntry> = {};                 // alias → entry
 let _manifestPromise: Promise<void> | null = null;
 let _baseURL = "";
+
+// On-demand per-set loading (FR-9, NFR-4): one request per prefix, cached,
+// with a `missing` set so a name is never re-requested.
+const _sets = new Map<string, SetCache>();
+const _setPromises = new Map<string, Promise<SetCache>>();
 
 /** `prefix:name` grammar (DESIGN-ICONS-CR002 §2). */
 const ADDR_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*:[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -68,6 +78,17 @@ export function registerIcon(key: string, svg: string): void {
 /** Register `addr` as an alias of `parent` (synonym or transformed variant, FR-4). */
 export function registerAlias(addr: string, entry: AliasEntry): void {
   _aliases[addr] = entry;
+}
+
+/** Reset all on-demand caches (manifest, per-set, resolved fragments) back to
+ *  built-ins only. Primarily for tests / re-hosting under a new base URL. */
+export function resetIconCaches(): void {
+  _addrPaths = null;
+  _legacy = {};
+  _manifestPromise = null;
+  _sets.clear();
+  _setPromises.clear();
+  for (const k of [..._cache.keys()]) if (!(k in ICONS)) _cache.delete(k);
 }
 
 async function loadManifest(): Promise<void> {
@@ -113,6 +134,27 @@ function resolvePath(key: string): string | undefined {
   return undefined;
 }
 
+/** Fetch one per-set IconifyJSON file (`sets/<prefix>.json`) on demand and
+ *  cache it. One request per prefix; subsequent icons of that set are hits. */
+async function loadSet(prefix: string): Promise<SetCache> {
+  const hit = _sets.get(prefix);
+  if (hit) return hit;
+  const inflight = _setPromises.get(prefix);
+  if (inflight) return inflight;
+  const url = `${_baseURL}/sets/${prefix}.json`.replace(/^\//, "");
+  const p = fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`set fetch failed: ${prefix} (${r.status})`);
+    return r.json() as Promise<SetFile>;
+  }).then((set) => {
+    const rec: SetCache = { icons: set.icons ?? {}, missing: new Set() };
+    if (set.aliases) Object.assign(_aliases, set.aliases);
+    _sets.set(prefix, rec);
+    return rec;
+  });
+  _setPromises.set(prefix, p);
+  return p;
+}
+
 /**
  * Resolve `key` to an SVG fragment. Built-in icons resolve immediately;
  * aliases walk their parent chain (cycle-guarded); file-backed icons resolve
@@ -130,8 +172,20 @@ export async function getIcon(key: string, seen: ReadonlySet<string> = new Set()
     return svg;
   }
 
-  await loadManifest();
-  const path = resolvePath(key);
+  let path: string | undefined;
+  if (isAddress(key) && !(_addrPaths && key in _addrPaths)) {
+    // On-demand: fetch only this icon's set (FR-9, NFR-4) — not the catalogue.
+    const prefix = key.slice(0, key.indexOf(":"));
+    const local = key.slice(prefix.length + 1);
+    const set = await loadSet(prefix);
+    if (set.missing.has(local)) throw new Error(`unknown icon: ${JSON.stringify(key)}`);
+    const rec = set.icons[local];
+    if (!rec) { set.missing.add(local); throw new Error(`unknown icon: ${JSON.stringify(key)}`); }
+    path = rec.path;
+  } else {
+    await loadManifest();
+    path = resolvePath(key);
+  }
   if (!path) throw new Error(`unknown icon: ${JSON.stringify(key)}`);
 
   const url = _baseURL ? `${_baseURL}/${path}` : path;
