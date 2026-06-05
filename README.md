@@ -29,4 +29,5 @@ kymo sample.kymo --animate    # → sample-animated.svg
 kymo sample.kymo --figma      # → sample.figma.js
 kymo sample.kymo --excalidraw # → sample.excalidraw
 kymo process.bpmn             # → process.svg (BPMN 2.0 import)
+kymo lint process.bpmn        # report BPMN structural + import-fidelity issues
 ```
