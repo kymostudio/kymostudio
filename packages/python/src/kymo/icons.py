@@ -501,7 +501,14 @@ _FILE_ICONS: dict[str, Path] = {}
 _NS_ICONS: dict[str, Path] = {}
 _LEGACY_MAP: dict[str, str] = {}
 _ALIASES: dict[str, dict] = {}
+_RECORD_ICONS: dict[str, dict] = {}     # address → vector record (P4, FR-3/FR-6)
 _RENDER_CACHE: dict[str, str] = {}
+
+
+def register_record(addr: str, record: dict) -> None:
+    """Register a vectorized `{body, width, height}` record for `addr` so it
+    renders as crisp, recolourable SVG (P4) instead of a raster `<image>`."""
+    _RECORD_ICONS[addr] = record
 
 # `prefix:name` grammar (DESIGN-ICONS-CR002 §2): both halves are
 # `^[a-z0-9]+(-[a-z0-9]+)*$`, joined by a single colon.
@@ -556,6 +563,28 @@ def _svg_as_inline(path: Path, size: int = _IMAGE_SIZE) -> str:
     return (
         f'<svg x="-{half}" y="-{half}" width="{size}" height="{size}" '
         f'overflow="visible">{raw}</svg>'
+    )
+
+
+# ── Vector record rendering (P4 / CR-ICONS-005, FR-6/FR-7) ────────────────
+_RECORD_USES = [0]   # monotonic counter → unique id suffix per inline (FR-7)
+
+
+def render_record(rec: dict, size: int = _IMAGE_SIZE) -> str:
+    """Assemble `<svg viewBox=…>{body}</svg>` from a normalized record,
+    centered at (0,0). The body keeps `currentColor` (themeable, FR-6) and its
+    element ids are made unique per use so repeated icons never collide (FR-7).
+    This is the vector path that retires the fixed-size PNG `<image>`."""
+    from .icons_pipeline import make_ids_safe
+
+    w = rec.get("width", 24)
+    h = rec.get("height", 24)
+    _RECORD_USES[0] += 1
+    body = make_ids_safe(rec["body"], f"i{_RECORD_USES[0]}")
+    half = size // 2
+    return (
+        f'<svg x="-{half}" y="-{half}" width="{size}" height="{size}" '
+        f'viewBox="0 0 {w} {h}" overflow="visible">{body}</svg>'
     )
 
 
@@ -637,6 +666,9 @@ def get_icon(key: str, _seen: frozenset[str] = frozenset()) -> str:
         svg = _apply_transforms(base, entry)
         _RENDER_CACHE[key] = svg
         return svg
+    if key in _RECORD_ICONS:
+        # Vector record: render fresh each time (ids made unique per use, FR-7).
+        return render_record(_RECORD_ICONS[key])
     path = _resolve_path(key)
     if path is not None:
         svg = _png_as_image_tag(path) if path.suffix.lower() == ".png" else _svg_as_inline(path)
