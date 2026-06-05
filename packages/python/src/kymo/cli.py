@@ -94,6 +94,13 @@ def _lint(paths: list[str]) -> None:
 
 
 def main() -> None:
+    # `kymo icons <verb>` — the icon command group (CR-ICONS-001 / FR-12).
+    # `icons` is the ONLY reserved first token; every other first token is a
+    # converter source path, so the verb-less converter grammar is unchanged.
+    if sys.argv[1:2] == ["icons"]:
+        from .icons_cli import run as run_icons
+        sys.exit(run_icons(sys.argv[2:]))
+
     args  = [a for a in sys.argv[1:] if not a.startswith("--")]
     flags = {a for a in sys.argv[1:] if a.startswith("--")}
 

@@ -1,7 +1,7 @@
 ---
 title: kymo Icons v2 — Requirements (ConOps, Stakeholder Needs & SRS)
 document_id: FEAT-ICONS-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-05
 status: Draft
 classification: Internal
@@ -39,7 +39,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-ICONS-001                                     |
-| Version      | 0.2                                                |
+| Version      | 0.3                                                |
 | Status       | Draft                                              |
 | Issue Date   | 2026-06-05                                         |
 | Owner        | `diagrams/` project                                |
@@ -50,8 +50,8 @@ is the **single requirements doc** for kymo Icons v2: it states the problem and 
 ISO 29148 §6.4.2), owns the `SN-ICONS` stakeholder needs, and derives the `FR`/`NFR` software
 requirements (SRS) from them. Each requirement carries a stable ID for traceability from
 TEST-ICONS-001; design realisation in DESIGN-ICONS-001; evidence base RES-ICONS-001; sequencing in
-PLAN-ICONS-001. The `kymo icons` CLI surface is a **proposed extension** (FR-12..FR-15) tracked in
-the change-request CR-ICONS-001, not yet part of this baseline.
+PLAN-ICONS-001. The `kymo icons` CLI surface (FR-12..FR-15), introduced by CR-ICONS-001, has been
+**re-based into this baseline** (2026-06-05) and is now part of §5.
 
 ## 1. Problem & motivation
 
@@ -152,9 +152,20 @@ decision. **kymo Icons v2** adopts that model and its build/distribution mechani
   continue to work (via a compatibility mapping / aliases) so authored `.kymo`/BPMN diagrams do not
   break on upgrade.
 
-> **Proposed (CR-ICONS-001):** FR-12..FR-15 add a `kymo icons` CLI command group (list · search ·
-> describe · download) over this catalogue. They are specified in the change-request and are
-> **not** part of this baseline until approved and re-based here.
+**CLI surface (CR-ICONS-001 — `kymo icons` command group; re-based into this baseline 2026-06-05)**
+- **FR-12** The CLI SHALL expose an icon command **namespace `kymo icons <verb>`** with verbs
+  `list`, `search`, `describe`, `download`. `icons` SHALL be the **only** reserved first token; any
+  other first token SHALL be treated as a converter source path, so the verb-less converter grammar
+  is unchanged. The namespace SHALL exist with equivalent verbs/output in both packages (parity, FR-10).
+- **FR-13** `kymo icons list [provider]` SHALL enumerate icon sets with their `info` (count/
+  categories); with `provider` it SHALL list that set's icons; `--json` SHALL emit a stable list.
+- **FR-14** `kymo icons search <query>` SHALL match name/alias/category and return `prefix:name`,
+  resolving **offline** by default; `--remote` MAY additionally query the Iconify API; `--provider`/
+  `--limit`/`--json` filter/format. An empty result is success (exit 0, empty list).
+- **FR-15** `kymo icons describe <prefix:name>` SHALL print the resolved record metadata (dims,
+  alias chain, set `info`, category, source path), `--json` for machine use; `kymo icons download
+  <prefix:name>...` SHALL vendor icons, running the FR-8 normalize pipeline when `--from iconify`
+  and re-syncing the manifest; `-o`/`-y` set the directory / skip the prompt.
 
 ## 6. Non-functional requirements
 
@@ -221,6 +232,7 @@ baselined spec is raised as a change-request folder under `docs/specs/icons/CR/`
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-04 | Vũ Anh | Initial issue (as `02-FEATURE.md`) — requirements FR-1..FR-11/NFR-1..NFR-4 for kymo Icons v2, derived from the `SN-ICONS` needs and RES-ICONS-001 §7. |
 | 0.2     | 2026-06-05 | Vũ Anh | Consolidated the spec set: merged the product description (`PROD-ICONS-001` — problem, ConOps, goals, `SN-ICONS-01..05`) and the introduction (`INTRO-ICONS-001` — concept, terms, document map) into this single requirements document; renamed to `01-REQUIREMENTS.md`. Both former document_ids are retired; FR/NFR/SN IDs unchanged. |
+| 0.3     | 2026-06-05 | Vũ Anh | Re-based CR-ICONS-001 into the baseline: FR-12..FR-15 (`kymo icons` CLI) added to §5; the §5 "proposed" note removed. Implemented + verified across P1–P6. |
 
 ## Annex B — Document Control
 

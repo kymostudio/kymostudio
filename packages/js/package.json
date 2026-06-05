@@ -23,6 +23,9 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "kymo-icons": "bin/kymo-icons.mjs"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -40,7 +43,10 @@
   },
   "files": [
     "dist/",
-    "icons-manifest.json"
+    "bin/",
+    "sets/",
+    "icons-manifest.json",
+    "icons-collections.json"
   ],
   "devDependencies": {
     "@eslint/js": "^9.0.0",

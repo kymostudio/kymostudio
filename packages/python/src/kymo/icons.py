@@ -12,6 +12,7 @@ so the glyphs sit ON the face with the right perspective. Use
 from __future__ import annotations
 
 import base64
+import re
 from pathlib import Path
 
 
@@ -480,12 +481,69 @@ ICONS: dict[str, str] = {
 # Repo-root `icons/` is shared by both packages and lives outside this
 # package. In the dev tree it sits 4 levels up from this file
 # (packages/python/src/kymo/icons.py → repo root). When kymo is pip-installed
-# the folder is absent, so `_scan_icons_dir()` finds nothing and only the
-# hand-coded ICONS above are available — file-backed icons are a dev-tree
-# (and static-host) convenience.
+# the generated manifest is absent, so `_load_catalogue()` finds nothing and
+# only the hand-coded ICONS above are available — file-backed icons are a
+# dev-tree (and static-host) convenience.
 _ICONS_DIR = Path(__file__).resolve().parents[4] / "icons"
 _IMAGE_SIZE = 64
+
+# ── kymo Icons v2 — P1 addressing (CR-ICONS-002 / FR-1, FR-4, FR-11) ───
+# Three registries, populated by `_load_catalogue()` from the generated manifest:
+#   _FILE_ICONS  legacy `<provider>-<name>` → Path (last-write-wins).
+#                Kept byte-identical so authored diagrams resolve unchanged
+#                (FR-11) and golden output never churns (NFR-2).
+#   _NS_ICONS    collision-proof `prefix:name` → Path, where `name` retains
+#                the category (the source path), so EVERY vendored icon is
+#                addressable (FR-1) — closing the ~157 legacy collisions.
+#   _LEGACY_MAP  legacy key → the `prefix:name` it resolves to (the winner).
+# _ALIASES holds synonym / transformed-variant entries (FR-4).
 _FILE_ICONS: dict[str, Path] = {}
+_NS_ICONS: dict[str, Path] = {}
+_LEGACY_MAP: dict[str, str] = {}
+_ALIASES: dict[str, dict] = {}
+_RECORD_ICONS: dict[str, dict] = {}     # address → vector record (P4, FR-3/FR-6)
+_RENDER_CACHE: dict[str, str] = {}
+
+
+def register_record(addr: str, record: dict) -> None:
+    """Register a vectorized `{body, width, height}` record for `addr` so it
+    renders as crisp, recolourable SVG (P4) instead of a raster `<image>`."""
+    _RECORD_ICONS[addr] = record
+
+# `prefix:name` grammar (DESIGN-ICONS-CR002 §2): both halves are
+# `^[a-z0-9]+(-[a-z0-9]+)*$`, joined by a single colon.
+_ADDR_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*:[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+def is_address(key: str) -> bool:
+    """True if `key` is a well-formed `prefix:name` address."""
+    return bool(_ADDR_RE.match(key))
+
+
+def _slug(text: str) -> str:
+    """Normalize a path segment to the `[a-z0-9-]` name grammar."""
+    text = text.lower()
+    text = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
+    return text or "x"
+
+
+def _path_to_address(parts: tuple[str, ...]) -> str:
+    """`(provider, category…, name)` → `provider:category-…-name`.
+
+    The category is RETAINED in the name (unlike the legacy key), so two
+    icons that collapsed to the same `<provider>-<name>` get distinct
+    addresses. Paths are unique, so addresses are unique."""
+    prefix = _slug(parts[0])
+    name = "-".join(_slug(p) for p in parts[1:]) if len(parts) > 1 else prefix
+    return f"{prefix}:{name}"
+
+
+def register_alias(addr: str, parent: str, **transforms: object) -> None:
+    """Register `addr` as an alias of `parent` (a synonym, or a transformed
+    variant via `rotate`/`hflip`/`vflip`). Resolved by `get_icon` (FR-4)."""
+    entry: dict = {"parent": parent}
+    entry.update({k: v for k, v in transforms.items() if v})
+    _ALIASES[addr] = entry
 
 
 def _png_as_image_tag(path: Path, size: int = _IMAGE_SIZE) -> str:
@@ -508,30 +566,151 @@ def _svg_as_inline(path: Path, size: int = _IMAGE_SIZE) -> str:
     )
 
 
-def _scan_icons_dir() -> None:
-    """Catalogue file paths only — no I/O on file contents until first use."""
-    if not _ICONS_DIR.exists():
+# ── Vector record rendering (P4 / CR-ICONS-005, FR-6/FR-7) ────────────────
+_RECORD_USES = [0]   # monotonic counter → unique id suffix per inline (FR-7)
+
+
+def render_record(rec: dict, size: int = _IMAGE_SIZE) -> str:
+    """Assemble `<svg viewBox=…>{body}</svg>` from a normalized record,
+    centered at (0,0). The body keeps `currentColor` (themeable, FR-6) and its
+    element ids are made unique per use so repeated icons never collide (FR-7).
+    This is the vector path that retires the fixed-size PNG `<image>`."""
+    from .icons_pipeline import make_ids_safe
+
+    w = rec.get("width", 24)
+    h = rec.get("height", 24)
+    _RECORD_USES[0] += 1
+    body = make_ids_safe(rec["body"], f"i{_RECORD_USES[0]}")
+    half = size // 2
+    return (
+        f'<svg x="-{half}" y="-{half}" width="{size}" height="{size}" '
+        f'viewBox="0 0 {w} {h}" overflow="visible">{body}</svg>'
+    )
+
+
+# The catalogue is built by the single generator (`packages/js/scripts/
+# build-manifest.mjs`) and consumed by BOTH implementations — there is no
+# longer a second, hand-maintained Python scanner (FR-8, NFR-1). The Python
+# side reads the generated artifact; resolution is therefore identical to JS
+# by construction. `_path_to_address` is retained for tooling/tests.
+_REPO_ROOT = _ICONS_DIR.parent
+_MANIFEST_PATH = _REPO_ROOT / "packages" / "js" / "icons-manifest.json"
+
+
+def _load_catalogue() -> None:
+    """Populate the registries from the generated manifest (FR-8).
+
+    The manifest is the v2 shape `{ icons, legacy, aliases }`. Icon paths are
+    repo-root-relative (`icons/<provider>/…`); bytes are read on first use.
+    When the artifact is absent (e.g. a pip-installed tree with no repo
+    checkout) only the hand-coded ICONS are available — same graceful
+    degradation as before."""
+    import json
+
+    if not _MANIFEST_PATH.is_file():
         return
-    for path in sorted(_ICONS_DIR.rglob("*")):
-        if not path.is_file() or path.suffix.lower() not in (".png", ".svg"):
-            continue
-        parts = path.relative_to(_ICONS_DIR).with_suffix("").parts
-        key = f"{parts[0]}-{parts[-1]}" if len(parts) > 1 else parts[0]
-        _FILE_ICONS[key] = path
+    data = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
+    icons = data.get("icons", data if "legacy" not in data else {})
+    for addr, rel in icons.items():
+        _NS_ICONS[addr] = _REPO_ROOT / rel
+    for legacy, addr in data.get("legacy", {}).items():
+        _LEGACY_MAP[legacy] = addr
+        if addr in _NS_ICONS:
+            _FILE_ICONS[legacy] = _NS_ICONS[addr]   # same winner as JS, byte-stable
+    for addr, entry in data.get("aliases", {}).items():
+        _ALIASES[addr] = entry
 
 
-def get_icon(key: str) -> str:
-    """Return the SVG fragment for `key`. Resolves the hand-coded ICONS
-    dict first, then file-backed icons (which are loaded + cached on
-    first hit). Raises KeyError if neither registry knows the key."""
+def _apply_transforms(fragment: str, entry: dict) -> str:
+    """Wrap a centered (0,0) fragment in the alias' transform (FR-4)."""
+    ops: list[str] = []
+    rot = entry.get("rotate")
+    if rot:
+        ops.append(f"rotate({int(rot) * 90})")
+    sx = -1 if entry.get("hflip") else 1
+    sy = -1 if entry.get("vflip") else 1
+    if (sx, sy) != (1, 1):
+        ops.append(f"scale({sx},{sy})")
+    if not ops:
+        return fragment
+    return f'<g transform="{" ".join(ops)}">{fragment}</g>'
+
+
+def _resolve_path(key: str) -> Path | None:
+    """`key` (address or legacy) → source Path, or None if unknown."""
+    if key in _NS_ICONS:
+        return _NS_ICONS[key]
+    if key in _FILE_ICONS:
+        return _FILE_ICONS[key]
+    if key in _LEGACY_MAP:
+        return _NS_ICONS.get(_LEGACY_MAP[key])
+    return None
+
+
+def get_icon(key: str, _seen: frozenset[str] = frozenset()) -> str:
+    """Return the SVG fragment for `key`.
+
+    Resolution order: hand-coded ICONS → aliases (parent chain, transforms,
+    cycle-guarded) → `prefix:name` address → legacy `<provider>-<name>` key.
+    File-backed fragments are loaded + cached on first hit. Raises KeyError
+    when no registry knows the key."""
     if key in ICONS:
         return ICONS[key]
-    if key in _FILE_ICONS:
-        path = _FILE_ICONS[key]
+    if key in _RENDER_CACHE:
+        return _RENDER_CACHE[key]
+    if key in _ALIASES:
+        if key in _seen:
+            raise ValueError(f"alias cycle: {key!r}")
+        entry = _ALIASES[key]
+        base = get_icon(entry["parent"], _seen | {key})
+        svg = _apply_transforms(base, entry)
+        _RENDER_CACHE[key] = svg
+        return svg
+    if key in _RECORD_ICONS:
+        # Vector record: render fresh each time (ids made unique per use, FR-7).
+        return render_record(_RECORD_ICONS[key])
+    path = _resolve_path(key)
+    if path is not None:
         svg = _png_as_image_tag(path) if path.suffix.lower() == ".png" else _svg_as_inline(path)
-        ICONS[key] = svg                      # cache for subsequent calls
+        _RENDER_CACHE[key] = svg
         return svg
     raise KeyError(f"unknown icon: {key!r}")
 
 
-_scan_icons_dir()
+def icon_addresses() -> list[str]:
+    """All collision-proof `prefix:name` addresses (sorted) — every vendored
+    icon is reachable through exactly one (FR-1). Used by tooling/tests."""
+    return sorted(_NS_ICONS)
+
+
+# ── Per-set IconifyJSON metadata (P3 / CR-ICONS-004, FR-2/FR-5) ────────────
+# The generator also emits one `sets/<prefix>.json` per set (dims/aliases/
+# `info`/categories) + a `collections` index. The renderer doesn't need them,
+# but discovery tooling (the `kymo icons` CLI) reads them on demand.
+_SETS_DIR = _REPO_ROOT / "packages" / "js" / "sets"
+_COLLECTIONS_PATH = _REPO_ROOT / "packages" / "js" / "icons-collections.json"
+_SET_CACHE: dict[str, dict] = {}
+
+
+def collections() -> dict:
+    """`{ prefix: { total, categories } }` — the set index (for `icons list`)."""
+    import json
+
+    if not _COLLECTIONS_PATH.is_file():
+        return {}
+    return json.loads(_COLLECTIONS_PATH.read_text(encoding="utf-8"))
+
+
+def load_set(prefix: str) -> dict:
+    """Load one per-set IconifyJSON file (cached). Returns `{}` if absent."""
+    import json
+
+    if prefix in _SET_CACHE:
+        return _SET_CACHE[prefix]
+    path = _SETS_DIR / f"{prefix}.json"
+    data = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    _SET_CACHE[prefix] = data
+    return data
+
+
+_load_catalogue()

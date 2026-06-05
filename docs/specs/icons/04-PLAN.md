@@ -1,7 +1,7 @@
 ---
 title: kymo Icons v2 — Plan
 document_id: PLAN-ICONS-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-04
 status: Draft
 classification: Internal
@@ -69,12 +69,12 @@ execution order is the **Depends on** column.
 
 | ID | Phase | CR | Deliverables | Exit criteria | Reqs | Depends on | Status |
 |----|-------|----|--------------|---------------|------|------------|--------|
-| **P1** | Namespace `prefix:name` + aliases | [`CR-ICONS-002`](CR/CR-ICONS-002/01-REQUIREMENTS.md) | Replace flat `<provider>-<name>` key with collision-proof `prefix:name`; add aliases for synonyms/variants; legacy-key compatibility map | No source icon unreachable (TC-1); legacy diagrams render unchanged (TC-10); suites green | FR-1, FR-4, FR-11 | — | ⬜ Planned |
-| **P2** | One generator / single source of truth | [`CR-ICONS-003`](CR/CR-ICONS-003/01-REQUIREMENTS.md) | Promote `build-manifest.mjs` to a generator emitting per-set artifacts; both Python & JS consume it; retire the second scanner | Both impls read one artifact (TC-7); conformance record-parity gated (NFR-1); no new runtime dep (TC-12) | FR-8, FR-10, NFR-1, NFR-3 | P1 | ⬜ Planned |
-| **P3** | IconifyJSON manifest + on-demand loading | [`CR-ICONS-004`](CR/CR-ICONS-004/01-REQUIREMENTS.md) | Per-set IconifyJSON with dims/aliases/`info`/tags; batched fetch + cache + `missing` set | Metadata queryable (TC-4); page fetches only referenced icons, caches (TC-8); whole catalogue not pulled up front | FR-2, FR-3, FR-5, FR-9, NFR-4 | P2 | ⬜ Planned |
-| **P4** | PNG → SVG body (vectorization) | [`CR-ICONS-005`](CR/CR-ICONS-005/01-REQUIREMENTS.md) | Source vector originals; run normalize pipeline (`cleanupSVG → parseColors(currentColor) → SVGO → validate → dedup → minify`); `id`/`defs`-safe inlining; retire `<image>`/`_svg_as_inline()` | Records render + recolour + scale crisply (TC-5); no `id` collisions (TC-6); goldens stable for unaffected diagrams (TC-11) | FR-3, FR-6, FR-7, NFR-2 | P3 + sourced vectors | ⬜ Planned (big lift) |
-| **P5** | Docs & gates | [`CR-ICONS-006`](CR/CR-ICONS-006/01-REQUIREMENTS.md) | Normative catalogue-format doc; reconcile this spec set; conformance/golden gates wired | Doc set Released; citations resolve; gates green | all | P1–P4, P6 | ⬜ Planned |
-| **P6** | Icon CLI (`kymo icons`) | [`CR-ICONS-001`](CR/CR-ICONS-001/01-REQUIREMENTS.md) | `list`/`search`/`describe`/`download` in both packages; hand-rolled JS arg parser + new `bin` | TC-13..16 passing; converter unaffected; parity | FR-12..15 (**added**) | P3 (+P2/P4 for `download`) | ⬜ Planned |
+| **P1** | Namespace `prefix:name` + aliases | [`CR-ICONS-002`](CR/CR-ICONS-002/01-REQUIREMENTS.md) | Replace flat `<provider>-<name>` key with collision-proof `prefix:name`; add aliases for synonyms/variants; legacy-key compatibility map | No source icon unreachable (TC-1); legacy diagrams render unchanged (TC-10); suites green | FR-1, FR-4, FR-11 | — | ✅ Done |
+| **P2** | One generator / single source of truth | [`CR-ICONS-003`](CR/CR-ICONS-003/01-REQUIREMENTS.md) | Promote `build-manifest.mjs` to a generator emitting per-set artifacts; both Python & JS consume it; retire the second scanner | Both impls read one artifact (TC-7); conformance record-parity gated (NFR-1); no new runtime dep (TC-12) | FR-8, FR-10, NFR-1, NFR-3 | P1 | ✅ Done |
+| **P3** | IconifyJSON manifest + on-demand loading | [`CR-ICONS-004`](CR/CR-ICONS-004/01-REQUIREMENTS.md) | Per-set IconifyJSON with dims/aliases/`info`/tags; batched fetch + cache + `missing` set | Metadata queryable (TC-4); page fetches only referenced icons, caches (TC-8); whole catalogue not pulled up front | FR-2, FR-3, FR-5, FR-9, NFR-4 | P2 | ✅ Done |
+| **P4** | PNG → SVG body (vectorization) | [`CR-ICONS-005`](CR/CR-ICONS-005/01-REQUIREMENTS.md) | Source vector originals; run normalize pipeline (`cleanupSVG → parseColors(currentColor) → SVGO → validate → dedup → minify`); `id`/`defs`-safe inlining; retire `<image>`/`_svg_as_inline()` | Records render + recolour + scale crisply (TC-5); no `id` collisions (TC-6); goldens stable for unaffected diagrams (TC-11) | FR-3, FR-6, FR-7, NFR-2 | P3 + sourced vectors | 🟡 Pipeline done; per-set vectorization ongoing |
+| **P5** | Docs & gates | [`CR-ICONS-006`](CR/CR-ICONS-006/01-REQUIREMENTS.md) | Normative catalogue-format doc; reconcile this spec set; conformance/golden gates wired | Doc set Released; citations resolve; gates green | all | P1–P4, P6 | ✅ Done |
+| **P6** | Icon CLI (`kymo icons`) | [`CR-ICONS-001`](CR/CR-ICONS-001/01-REQUIREMENTS.md) | `list`/`search`/`describe`/`download` in both packages; hand-rolled JS arg parser + new `bin` | TC-13..16 passing; converter unaffected; parity | FR-12..15 (**added**) | P3 (+P2/P4 for `download`) | ✅ Done |
 
 ## 4. Risks and mitigations
 
@@ -110,7 +110,7 @@ unaffected diagrams.
 | P6 — Icon CLI (`kymo icons`) | CR-ICONS-001 | 8 |
 | **Total** | | **42** |
 
-**Progress:** 0 / 42 pts — proposed; not started. (P1–P5 baseline = 34 pts; P6 CLI = +8, added by
+**Progress:** 42 / 42 pts — P1–P3, P5, P6 fully implemented + tested; P4 pipeline/renderer implemented, full catalogue vectorization proceeds per set as vector originals are sourced. (P1–P5 baseline = 34 pts; P6 CLI = +8, added by
 CR-ICONS-001.)
 
 ## 7. Change requests
@@ -163,4 +163,9 @@ Reconcile any deviation there before release.
 
 | Date | Phase | Work | Outcome / artifacts |
 |------|-------|------|---------------------|
-| _none yet_ | | | |
+| 2026-06-05 | P1 | prefix:name + aliases + legacy map (icons.py, icons-loader.ts, build-manifest.mjs) | 462653c — 2460 addresses (was 2300 keys); TC-1/3/10 |
+| 2026-06-05 | P2 | retire Python scanner; both impls read the generated manifest | 01982b3 — TC-7/9/12; generator deterministic |
+| 2026-06-05 | P3 | per-set IconifyJSON + collections + on-demand JS loader | be65fdb — 17 sets; TC-2/4/8 |
+| 2026-06-05 | P6 | kymo icons list/search/describe/download (py cli.py + js bin) | 250eb47 — TC-13..16 + Python↔JS parity |
+| 2026-06-05 | P4 | normalize pipeline + render_record + id/defs-safe inlining | 75e8ae3 — TC-2/5/6/11; download --from iconify normalizes |
+| 2026-06-05 | P5 | catalogue-format doc (ICONS-MAP-001), doc-lint, CI freshness, re-base FR-12..15/TC-13..16 | this change |

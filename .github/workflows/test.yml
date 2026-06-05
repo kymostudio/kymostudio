@@ -47,6 +47,10 @@ jobs:
         run: npm run typecheck
       - name: Lint
         run: npm run lint
+      - name: Icon generator freshness (committed artifact == regenerated)
+        run: |
+          npm run build-manifest
+          git diff --exit-code -- icons-manifest.json icons-collections.json sets/
       - name: Run tests
         run: npm test   # builds TS to dist/, then `node --test`
 
