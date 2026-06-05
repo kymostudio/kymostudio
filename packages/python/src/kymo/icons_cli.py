@@ -208,7 +208,7 @@ def _download(args: list[str]) -> int:
             except Exception as exc:
                 return _err(f"iconify fetch failed for {addr}: {exc}")
             try:
-                from .icons_pipeline import normalize          # P4 normalize (FR-8)
+                from .icons_pipeline import normalize  # P4 normalize (FR-8)
                 body = normalize(body)
             except Exception:
                 pass                                           # pipeline optional pre-P4

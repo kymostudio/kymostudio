@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from kymo import icons
-from kymo.icons_pipeline import make_ids_safe, normalize, parse_colors, to_record
+from kymo.icons_pipeline import make_ids_safe, parse_colors, to_record
 
 _SAMPLE = (
     '<?xml version="1.0"?><!-- editor cruft -->'

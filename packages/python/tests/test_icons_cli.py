@@ -170,6 +170,7 @@ def test_only_icons_first_token_is_reserved(monkeypatch) -> None:
     """`kymo <path>` must NOT route into the icon CLI — only the exact first
     token `icons` does (FR-12)."""
     import sys
+
     from kymo import cli
 
     monkeypatch.setattr(sys, "argv", ["kymo", "icons.kymo"])   # a source named like the verb

@@ -1,7 +1,7 @@
 ---
 title: kymo Icons v2 — Test Documentation
 document_id: TEST-ICONS-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-04
 status: Draft
 classification: Internal
@@ -34,7 +34,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | TEST-ICONS-001                                     |
-| Version      | 0.1                                                |
+| Version      | 0.2                                                |
 | Status       | Draft                                              |
 | Issue Date   | 2026-06-04                                         |
 | Owner        | `diagrams/` project                                |
@@ -80,6 +80,12 @@ the generator (`packages/js/scripts/`). No new **runtime** dependency (NFR-3).
 | **TC-10** | Legacy keys still resolve | FR-11 | Existing `.kymo`/BPMN diagrams using `<provider>-<name>` keys render unchanged |
 | **TC-11** | Byte-stable goldens | NFR-2 | Golden SVG + BPMN-corpus baselines unchanged for diagrams whose icons are unaffected |
 | **TC-12** | Dependency posture | NFR-3 | `packages/js` carries zero new **runtime** deps; normalization tooling is build-time only |
+| **TC-13** | `icons list` enumeration | FR-12, FR-13 | `kymo icons list` lists every set with counts/categories; `list <provider>` filters; `--json` stable; exit 0 |
+| **TC-14** | `icons search` offline + remote | FR-14 | `search lambda` finds `aws:…lambda` offline; `--remote` merges Iconify matches; `--provider`/`--limit` constrain; empty result exits 0 with empty list |
+| **TC-15** | `icons describe` + errors | FR-15 | `describe <addr>` reports dims/alias chain/set `info`/category/source; `--json` stable; unknown/malformed key exits non-zero |
+| **TC-16** | `icons download` pipeline + parity | FR-12, FR-15 | `download --from iconify` writes a **normalized** record (currentColor, not raw) and re-syncs; Python and JS yield equivalent `--json`/exit codes; the converter stays byte-identical (only `icons` is reserved) |
+
+> TC-13..16 were introduced by CR-ICONS-001 and **re-based into this baseline** (2026-06-05).
 
 ## 4. Pass/fail criteria
 
@@ -108,6 +114,10 @@ intentional, reviewed regeneration (`KYMO_UPDATE_GOLDEN` / `KYMO_UPDATE_BPMN_BAS
 | NFR-2 | TC-11 |
 | NFR-3 | TC-12 |
 | NFR-4 | TC-8 |
+| FR-12 | TC-13, TC-16 |
+| FR-13 | TC-13 |
+| FR-14 | TC-14 |
+| FR-15 | TC-15, TC-16 |
 
 ## Annex A — Revision History
 
@@ -116,6 +126,7 @@ intentional, reviewed regeneration (`KYMO_UPDATE_GOLDEN` / `KYMO_UPDATE_BPMN_BAS
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-06-04 | Vũ Anh | Initial issue — test documentation for kymo Icons v2 (catalogue, generator, render/recolour, on-demand load, parity, byte-stable goldens). |
+| 0.2     | 2026-06-05 | Vũ Anh | Re-based CR-ICONS-001: added TC-13..16 (`kymo icons` CLI) + their traceability rows (FR-12..15). |
 
 ## Annex B — Document Control
 
