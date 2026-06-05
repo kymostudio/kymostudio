@@ -5,6 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   getIcon,
@@ -74,4 +75,18 @@ test("legacy <provider>-<name> key still resolves", async () => {
   installFixture();
   const svg = await getIcon("aws-waf");           // legacy key → aws:security-waf
   assert.match(svg, /aws\/security\/waf\.svg/);
+});
+
+// ── P2 — single source of truth (CR-ICONS-003 / TC-7, TC-12) ──────────────
+test("generated manifest is the v2 shape consumed by the loader (TC-7)", () => {
+  const m = JSON.parse(readFileSync(new URL("../icons-manifest.json", import.meta.url)));
+  assert.ok(m.icons && m.legacy, "manifest carries icons + legacy");
+  assert.ok(Object.keys(m.icons).length > 2000, "addresses generated");
+  // every legacy key maps to a real address — the artifact both packages read
+  for (const addr of Object.values(m.legacy)) assert.ok(addr in m.icons);
+});
+
+test("packages/js declares zero runtime dependencies (NFR-3 / TC-12)", () => {
+  const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url)));
+  assert.equal(Object.keys(pkg.dependencies ?? {}).length, 0);
 });

@@ -104,3 +104,22 @@ def test_legacy_map_points_at_a_real_address() -> None:
         pytest.skip("icons/ dir absent")
     for legacy, addr in icons._LEGACY_MAP.items():
         assert addr in icons._NS_ICONS
+
+
+# ── TC-7 — One source of truth (FR-8, NFR-1) ──────────────────────────────
+def test_python_consumes_the_generated_manifest() -> None:
+    """Python no longer scans icons/ — it reads the single generated artifact,
+    so its registries equal the manifest exactly (parity by construction)."""
+    import json
+
+    if not icons._MANIFEST_PATH.is_file():
+        pytest.skip("generated manifest absent")
+    data = json.loads(icons._MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert set(icons.icon_addresses()) == set(data["icons"])
+    assert icons._LEGACY_MAP == data["legacy"]
+
+
+def test_no_second_scanner() -> None:
+    """The hand-maintained Python scanner is retired (FR-8)."""
+    assert not hasattr(icons, "_scan_icons_dir")
+    assert hasattr(icons, "_load_catalogue")

@@ -481,14 +481,14 @@ ICONS: dict[str, str] = {
 # Repo-root `icons/` is shared by both packages and lives outside this
 # package. In the dev tree it sits 4 levels up from this file
 # (packages/python/src/kymo/icons.py → repo root). When kymo is pip-installed
-# the folder is absent, so `_scan_icons_dir()` finds nothing and only the
-# hand-coded ICONS above are available — file-backed icons are a dev-tree
-# (and static-host) convenience.
+# the generated manifest is absent, so `_load_catalogue()` finds nothing and
+# only the hand-coded ICONS above are available — file-backed icons are a
+# dev-tree (and static-host) convenience.
 _ICONS_DIR = Path(__file__).resolve().parents[4] / "icons"
 _IMAGE_SIZE = 64
 
 # ── kymo Icons v2 — P1 addressing (CR-ICONS-002 / FR-1, FR-4, FR-11) ───
-# Three registries, populated by `_scan_icons_dir()`:
+# Three registries, populated by `_load_catalogue()` from the generated manifest:
 #   _FILE_ICONS  legacy `<provider>-<name>` → Path (last-write-wins).
 #                Kept byte-identical so authored diagrams resolve unchanged
 #                (FR-11) and golden output never churns (NFR-2).
@@ -559,30 +559,37 @@ def _svg_as_inline(path: Path, size: int = _IMAGE_SIZE) -> str:
     )
 
 
-def _scan_icons_dir() -> None:
-    """Catalogue file paths only — no I/O on file contents until first use.
+# The catalogue is built by the single generator (`packages/js/scripts/
+# build-manifest.mjs`) and consumed by BOTH implementations — there is no
+# longer a second, hand-maintained Python scanner (FR-8, NFR-1). The Python
+# side reads the generated artifact; resolution is therefore identical to JS
+# by construction. `_path_to_address` is retained for tooling/tests.
+_REPO_ROOT = _ICONS_DIR.parent
+_MANIFEST_PATH = _REPO_ROOT / "packages" / "js" / "icons-manifest.json"
 
-    Builds all three registries (FR-1, FR-11): the legacy `<provider>-<name>`
-    map (last-write-wins, byte-stable), the collision-proof `prefix:name`
-    map (every icon addressable), and the legacy→address compatibility map."""
-    if not _ICONS_DIR.exists():
+
+def _load_catalogue() -> None:
+    """Populate the registries from the generated manifest (FR-8).
+
+    The manifest is the v2 shape `{ icons, legacy, aliases }`. Icon paths are
+    repo-root-relative (`icons/<provider>/…`); bytes are read on first use.
+    When the artifact is absent (e.g. a pip-installed tree with no repo
+    checkout) only the hand-coded ICONS are available — same graceful
+    degradation as before."""
+    import json
+
+    if not _MANIFEST_PATH.is_file():
         return
-    for path in sorted(_ICONS_DIR.rglob("*")):
-        if not path.is_file() or path.suffix.lower() not in (".png", ".svg"):
-            continue
-        parts = path.relative_to(_ICONS_DIR).with_suffix("").parts
-        legacy = f"{parts[0]}-{parts[-1]}" if len(parts) > 1 else parts[0]
-        addr = _path_to_address(parts)
-        # Guarantee a UNIQUE address per source file (so addressable-key count
-        # == source-icon count, TC-1) even on the rare normalized clash.
-        if addr in _NS_ICONS and _NS_ICONS[addr] != path:
-            n = 2
-            while f"{addr}-{n}" in _NS_ICONS:
-                n += 1
-            addr = f"{addr}-{n}"
-        _NS_ICONS[addr] = path
-        _FILE_ICONS[legacy] = path            # last-write-wins, unchanged
-        _LEGACY_MAP[legacy] = addr            # legacy key → the winning address
+    data = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
+    icons = data.get("icons", data if "legacy" not in data else {})
+    for addr, rel in icons.items():
+        _NS_ICONS[addr] = _REPO_ROOT / rel
+    for legacy, addr in data.get("legacy", {}).items():
+        _LEGACY_MAP[legacy] = addr
+        if addr in _NS_ICONS:
+            _FILE_ICONS[legacy] = _NS_ICONS[addr]   # same winner as JS, byte-stable
+    for addr, entry in data.get("aliases", {}).items():
+        _ALIASES[addr] = entry
 
 
 def _apply_transforms(fragment: str, entry: dict) -> str:
@@ -644,4 +651,4 @@ def icon_addresses() -> list[str]:
     return sorted(_NS_ICONS)
 
 
-_scan_icons_dir()
+_load_catalogue()
