@@ -10,9 +10,7 @@ audience: Engineers verifying the kymo icon catalogue, generator, renderer, and 
 review_cycle: On phase completion, or on scope change
 supersedes: null
 related_documents:
-  - PROD-ICONS-001              # Product description
-  - INTRO-ICONS-001             # Introduction
-  - FEAT-ICONS-001              # Requirements (traced below)
+  - FEAT-ICONS-001              # Requirements (ConOps + SN + SRS; traced below)
   - DESIGN-ICONS-001            # Design
   - PLAN-ICONS-001              # Plan
   - RES-ICONS-001               # Prior-art research (Iconify)
@@ -40,7 +38,7 @@ iso_compliance:
 | Status       | Draft                                              |
 | Issue Date   | 2026-06-04                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | PROD-ICONS-001, INTRO-ICONS-001, FEAT-ICONS-001, DESIGN-ICONS-001, PLAN-ICONS-001 |
+| Related      | FEAT-ICONS-001, DESIGN-ICONS-001, PLAN-ICONS-001 |
 
 Verifies FEAT-ICONS-001 (FR/NFR IDs). Covers 12207 Verification & Validation. The headline
 checks are **no unreachable icons**, **cross-language record parity**, and **byte-stable
@@ -122,7 +120,7 @@ intentional, reviewed regeneration (`KYMO_UPDATE_GOLDEN` / `KYMO_UPDATE_BPMN_BAS
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/icons/04-TEST.md`; authoritative source is the
+Version-controlled at `docs/specs/icons/03-TEST.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

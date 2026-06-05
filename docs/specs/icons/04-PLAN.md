@@ -10,9 +10,7 @@ audience: Engineers implementing the kymo icon catalogue, generator, renderer, a
 review_cycle: On phase completion
 supersedes: null
 related_documents:
-  - PROD-ICONS-001              # Product description
-  - INTRO-ICONS-001             # Introduction
-  - FEAT-ICONS-001              # Requirements
+  - FEAT-ICONS-001              # Requirements (ConOps + SN + SRS)
   - DESIGN-ICONS-001            # Design
   - TEST-ICONS-001              # Test documentation
   - RES-ICONS-001               # Prior-art research (Iconify) — the evidence base
@@ -40,9 +38,9 @@ iso_compliance:
 | Status       | Draft                                              |
 | Issue Date   | 2026-06-04                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | PROD-ICONS-001, INTRO-ICONS-001, FEAT-ICONS-001, DESIGN-ICONS-001, TEST-ICONS-001, RES-ICONS-001 |
+| Related      | FEAT-ICONS-001, DESIGN-ICONS-001, TEST-ICONS-001, RES-ICONS-001 |
 
-Concept: INTRO-ICONS-001. Requirements: FEAT-ICONS-001. Design: DESIGN-ICONS-001.
+Concept, needs & requirements: FEAT-ICONS-001. Design: DESIGN-ICONS-001.
 Verification: TEST-ICONS-001. Evidence base: RES-ICONS-001.
 
 ## 1. Scope and approach
@@ -108,9 +106,9 @@ unaffected diagrams.
 
 ## 7. Change requests
 
-Changes to the baselined spec (`docs/specs/icons/`) are raised, assessed, and logged in
-[`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised yet — see
-[`CR/README.md`](CR/README.md).
+Changes to the baselined spec (`docs/specs/icons/`) are raised, assessed, and logged as a
+folder per CR under [`CR/`](CR/) (raise → assess → approve → implement → re-baseline). Raised:
+[`CR-ICONS-001`](CR/CR-ICONS-001/01-REQUIREMENTS.md) — the `kymo icons` command group (Open).
 
 ## Annex A — Revision History
 
@@ -123,7 +121,7 @@ Changes to the baselined spec (`docs/specs/icons/`) are raised, assessed, and lo
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/icons/PLAN.md`; authoritative source is the main-branch
+Version-controlled at `docs/specs/icons/04-PLAN.md`; authoritative source is the main-branch
 working tree (history via `git log`).
 
 ### B.2 Distribution

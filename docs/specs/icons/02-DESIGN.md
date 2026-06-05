@@ -10,9 +10,7 @@ audience: Engineers implementing the kymo icon catalogue, generator, renderer, a
 review_cycle: On phase completion, or on scope change
 supersedes: null
 related_documents:
-  - PROD-ICONS-001              # Product description
-  - INTRO-ICONS-001             # Introduction
-  - FEAT-ICONS-001              # Requirements (traced below)
+  - FEAT-ICONS-001              # Requirements (ConOps + SN + SRS; traced below)
   - TEST-ICONS-001              # Test documentation
   - PLAN-ICONS-001              # Plan
   - RES-ICONS-001               # Prior-art research (Iconify) — the evidence base
@@ -41,7 +39,7 @@ iso_compliance:
 | Status       | Draft                                              |
 | Issue Date   | 2026-06-04                                         |
 | Owner        | `diagrams/` project                                |
-| Related      | PROD-ICONS-001, INTRO-ICONS-001, FEAT-ICONS-001, TEST-ICONS-001, PLAN-ICONS-001, RES-ICONS-001 |
+| Related      | FEAT-ICONS-001, TEST-ICONS-001, PLAN-ICONS-001, RES-ICONS-001 |
 
 Realises FEAT-ICONS-001 (FR/NFR cited per clause). The icon-record / IconifyJSON mechanics
 are evidenced by RES-ICONS-001 §2–§5. Covers ISO/IEC/IEEE 12207 Architecture & Design.
@@ -163,7 +161,7 @@ discipline `CLAUDE.md` mandates for the existing `.kymo`/BPMN conformance.
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/icons/03-DESIGN.md`; authoritative source is the
+Version-controlled at `docs/specs/icons/02-DESIGN.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
