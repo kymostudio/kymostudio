@@ -18,6 +18,7 @@ kymo path/to/diagram.kymo --animate    # → path/to/diagram-animated.svg
 kymo path/to/diagram.kymo --figma      # → path/to/diagram.figma.js
 kymo path/to/diagram.kymo --excalidraw # → path/to/diagram.excalidraw
 kymo path/to/process.bpmn                 # → path/to/process.svg (BPMN 2.0)
+kymo lint path/to/process.bpmn            # report BPMN structural + import issues
 ```
 
 See [`samples/`](https://github.com/kymostudio/kymostudio/tree/main/samples) for complete example `.kymo` and

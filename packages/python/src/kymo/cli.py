@@ -31,6 +31,13 @@ dev console (Plugins menu → Development → Open console).
 
 `--excalidraw` emits an Excalidraw scene v2 JSON; open it directly in
 excalidraw.com (Menu → Open) or the Excalidraw desktop app.
+
+`kymo lint <file.bpmn> [...]` runs the BPMN linter instead of rendering:
+it reports import-fidelity problems (shapes with no DI bounds, edges with
+too few waypoints, dangling source/target refs, nodes/flows with no DI)
+and BPMN structural issues (start with an incoming flow, end with an
+outgoing flow, activities/gateways missing a flow, disconnected nodes,
+processes with no start/end). It is informational and always exits 0.
 """
 import sys
 from importlib import import_module
@@ -65,9 +72,34 @@ def load(source: Path) -> tuple[object, object | None, object | None]:
     return mod.DIAGRAM, getattr(mod, "LAYOUT", None), getattr(mod, "EXTERNAL_LAYOUT", None)
 
 
+def _lint(paths: list[str]) -> None:
+    """`kymo lint <file.bpmn> ...` — report BPMN issues; always exit 0."""
+    from .lint_bpmn import format_report, lint_file
+
+    if not paths:
+        print("usage: kymo lint <file.bpmn> [...]")
+        sys.exit(1)
+    reports: list[str] = []
+    for p in paths:
+        src = Path(p)
+        if not src.exists():
+            print(f"not found: {src}")
+            sys.exit(1)
+        if src.suffix != ".bpmn":
+            print(f"lint only supports .bpmn sources (got {src})")
+            sys.exit(1)
+        reports.append(format_report(str(src), lint_file(src)))
+    print("\n\n".join(reports))
+    sys.exit(0)
+
+
 def main() -> None:
     args  = [a for a in sys.argv[1:] if not a.startswith("--")]
     flags = {a for a in sys.argv[1:] if a.startswith("--")}
+
+    if args and args[0] == "lint":
+        _lint(args[1:])
+        return
 
     if not args or "--help" in flags or "-h" in flags:
         print(__doc__)
