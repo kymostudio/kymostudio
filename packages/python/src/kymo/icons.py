@@ -12,6 +12,7 @@ so the glyphs sit ON the face with the right perspective. Use
 from __future__ import annotations
 
 import base64
+import re
 from pathlib import Path
 
 
@@ -485,7 +486,57 @@ ICONS: dict[str, str] = {
 # (and static-host) convenience.
 _ICONS_DIR = Path(__file__).resolve().parents[4] / "icons"
 _IMAGE_SIZE = 64
+
+# ── kymo Icons v2 — P1 addressing (CR-ICONS-002 / FR-1, FR-4, FR-11) ───
+# Three registries, populated by `_scan_icons_dir()`:
+#   _FILE_ICONS  legacy `<provider>-<name>` → Path (last-write-wins).
+#                Kept byte-identical so authored diagrams resolve unchanged
+#                (FR-11) and golden output never churns (NFR-2).
+#   _NS_ICONS    collision-proof `prefix:name` → Path, where `name` retains
+#                the category (the source path), so EVERY vendored icon is
+#                addressable (FR-1) — closing the ~157 legacy collisions.
+#   _LEGACY_MAP  legacy key → the `prefix:name` it resolves to (the winner).
+# _ALIASES holds synonym / transformed-variant entries (FR-4).
 _FILE_ICONS: dict[str, Path] = {}
+_NS_ICONS: dict[str, Path] = {}
+_LEGACY_MAP: dict[str, str] = {}
+_ALIASES: dict[str, dict] = {}
+_RENDER_CACHE: dict[str, str] = {}
+
+# `prefix:name` grammar (DESIGN-ICONS-CR002 §2): both halves are
+# `^[a-z0-9]+(-[a-z0-9]+)*$`, joined by a single colon.
+_ADDR_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*:[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+def is_address(key: str) -> bool:
+    """True if `key` is a well-formed `prefix:name` address."""
+    return bool(_ADDR_RE.match(key))
+
+
+def _slug(text: str) -> str:
+    """Normalize a path segment to the `[a-z0-9-]` name grammar."""
+    text = text.lower()
+    text = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
+    return text or "x"
+
+
+def _path_to_address(parts: tuple[str, ...]) -> str:
+    """`(provider, category…, name)` → `provider:category-…-name`.
+
+    The category is RETAINED in the name (unlike the legacy key), so two
+    icons that collapsed to the same `<provider>-<name>` get distinct
+    addresses. Paths are unique, so addresses are unique."""
+    prefix = _slug(parts[0])
+    name = "-".join(_slug(p) for p in parts[1:]) if len(parts) > 1 else prefix
+    return f"{prefix}:{name}"
+
+
+def register_alias(addr: str, parent: str, **transforms: object) -> None:
+    """Register `addr` as an alias of `parent` (a synonym, or a transformed
+    variant via `rotate`/`hflip`/`vflip`). Resolved by `get_icon` (FR-4)."""
+    entry: dict = {"parent": parent}
+    entry.update({k: v for k, v in transforms.items() if v})
+    _ALIASES[addr] = entry
 
 
 def _png_as_image_tag(path: Path, size: int = _IMAGE_SIZE) -> str:
@@ -509,29 +560,88 @@ def _svg_as_inline(path: Path, size: int = _IMAGE_SIZE) -> str:
 
 
 def _scan_icons_dir() -> None:
-    """Catalogue file paths only — no I/O on file contents until first use."""
+    """Catalogue file paths only — no I/O on file contents until first use.
+
+    Builds all three registries (FR-1, FR-11): the legacy `<provider>-<name>`
+    map (last-write-wins, byte-stable), the collision-proof `prefix:name`
+    map (every icon addressable), and the legacy→address compatibility map."""
     if not _ICONS_DIR.exists():
         return
     for path in sorted(_ICONS_DIR.rglob("*")):
         if not path.is_file() or path.suffix.lower() not in (".png", ".svg"):
             continue
         parts = path.relative_to(_ICONS_DIR).with_suffix("").parts
-        key = f"{parts[0]}-{parts[-1]}" if len(parts) > 1 else parts[0]
-        _FILE_ICONS[key] = path
+        legacy = f"{parts[0]}-{parts[-1]}" if len(parts) > 1 else parts[0]
+        addr = _path_to_address(parts)
+        # Guarantee a UNIQUE address per source file (so addressable-key count
+        # == source-icon count, TC-1) even on the rare normalized clash.
+        if addr in _NS_ICONS and _NS_ICONS[addr] != path:
+            n = 2
+            while f"{addr}-{n}" in _NS_ICONS:
+                n += 1
+            addr = f"{addr}-{n}"
+        _NS_ICONS[addr] = path
+        _FILE_ICONS[legacy] = path            # last-write-wins, unchanged
+        _LEGACY_MAP[legacy] = addr            # legacy key → the winning address
 
 
-def get_icon(key: str) -> str:
-    """Return the SVG fragment for `key`. Resolves the hand-coded ICONS
-    dict first, then file-backed icons (which are loaded + cached on
-    first hit). Raises KeyError if neither registry knows the key."""
+def _apply_transforms(fragment: str, entry: dict) -> str:
+    """Wrap a centered (0,0) fragment in the alias' transform (FR-4)."""
+    ops: list[str] = []
+    rot = entry.get("rotate")
+    if rot:
+        ops.append(f"rotate({int(rot) * 90})")
+    sx = -1 if entry.get("hflip") else 1
+    sy = -1 if entry.get("vflip") else 1
+    if (sx, sy) != (1, 1):
+        ops.append(f"scale({sx},{sy})")
+    if not ops:
+        return fragment
+    return f'<g transform="{" ".join(ops)}">{fragment}</g>'
+
+
+def _resolve_path(key: str) -> Path | None:
+    """`key` (address or legacy) → source Path, or None if unknown."""
+    if key in _NS_ICONS:
+        return _NS_ICONS[key]
+    if key in _FILE_ICONS:
+        return _FILE_ICONS[key]
+    if key in _LEGACY_MAP:
+        return _NS_ICONS.get(_LEGACY_MAP[key])
+    return None
+
+
+def get_icon(key: str, _seen: frozenset[str] = frozenset()) -> str:
+    """Return the SVG fragment for `key`.
+
+    Resolution order: hand-coded ICONS → aliases (parent chain, transforms,
+    cycle-guarded) → `prefix:name` address → legacy `<provider>-<name>` key.
+    File-backed fragments are loaded + cached on first hit. Raises KeyError
+    when no registry knows the key."""
     if key in ICONS:
         return ICONS[key]
-    if key in _FILE_ICONS:
-        path = _FILE_ICONS[key]
+    if key in _RENDER_CACHE:
+        return _RENDER_CACHE[key]
+    if key in _ALIASES:
+        if key in _seen:
+            raise ValueError(f"alias cycle: {key!r}")
+        entry = _ALIASES[key]
+        base = get_icon(entry["parent"], _seen | {key})
+        svg = _apply_transforms(base, entry)
+        _RENDER_CACHE[key] = svg
+        return svg
+    path = _resolve_path(key)
+    if path is not None:
         svg = _png_as_image_tag(path) if path.suffix.lower() == ".png" else _svg_as_inline(path)
-        ICONS[key] = svg                      # cache for subsequent calls
+        _RENDER_CACHE[key] = svg
         return svg
     raise KeyError(f"unknown icon: {key!r}")
+
+
+def icon_addresses() -> list[str]:
+    """All collision-proof `prefix:name` addresses (sorted) — every vendored
+    icon is reachable through exactly one (FR-1). Used by tooling/tests."""
+    return sorted(_NS_ICONS)
 
 
 _scan_icons_dir()
