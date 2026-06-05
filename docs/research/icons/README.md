@@ -12,7 +12,7 @@
 | Subjects          | [`iconify/iconify`](https://github.com/iconify/iconify) · `@iconify/tools` · `@iconify/api` · `@iconify/json` (IconifyJSON format) |
 | Licenses          | MIT (Iconify libraries) · Apache-2.0 + per-set (icon data)                                             |
 | Versions Reviewed | @iconify/utils 3.x, @iconify/core 4.x (2026-06-03)                                                     |
-| Related Documents | `PROD-ICONS-001`, `INTRO-ICONS-001`, `FEAT-ICONS-001`, `DESIGN-ICONS-001`, `TEST-ICONS-001`, `PLAN-ICONS-001` (the kymo Icons v2 spec set derived from this note) · `REF-DRAWIO-001`, `REF-PLANTUML-001`, `RES-MERMAID-D2-001` |
+| Related Documents | `FEAT-ICONS-001`, `DESIGN-ICONS-001`, `TEST-ICONS-001`, `PLAN-ICONS-001` (the kymo Icons v2 spec set derived from this note), `CR-ICONS-001` (`kymo icons` CLI CR) · `REF-DRAWIO-001`, `REF-PLANTUML-001`, `RES-MERMAID-D2-001` |
 
 This is a **research note on prior art** for managing an icon catalogue *at scale* — not a specification of kymo. Iconify serves **~250,000 icons across 150+ sets** from one data model; kymo today ships ~2,460 vendored icons through a much simpler mechanism. The note dissects *how* Iconify gets to that scale (format, namespacing, build pipeline, distribution, on-demand loading), then maps each lesson onto kymo's current icon subsystem. No code or behaviour in this repository depends on Iconify; nothing here is committed work — it is the evidence base for a possible future "kymo icons v2".
 
@@ -152,7 +152,7 @@ Evolve `icons-manifest.json` from `key → path` toward a **per-set IconifyJSON*
 
 Generate the normalized icon data **once** (the build pipeline emits IconifyJSON), and have both `icons.py` and the JS loader **consume that artefact** rather than each re-scanning `icons/`. Removes the standing requirement to keep two scanners byte-compatible and guarantees the two implementations see identical icons — directly serving the "two implementations at parity" rule in `CLAUDE.md`.
 
-**Suggested sequencing:** 7.2 (cheap, stops data loss) → 7.4 (single generator) → 7.3 (richer manifest) → 7.1 (vectorization, the big lift). This adoption is now written up as the **kymo Icons v2** feature spec under `docs/specs/icons/` (`INTRO-ICONS-001` → `FEAT-ICONS-001` → `DESIGN-ICONS-001` → `TEST-ICONS-001` → `PLAN-ICONS-001`, anchored by `PROD-ICONS-001`), which traces these lessons to requirements and phases (P1=7.2, P2=7.4, P3=7.3, P4=7.1) and cross-references this note by `RES-ICONS-001`.
+**Suggested sequencing:** 7.2 (cheap, stops data loss) → 7.4 (single generator) → 7.3 (richer manifest) → 7.1 (vectorization, the big lift). This adoption is now written up as the **kymo Icons v2** feature spec under `docs/specs/icons/` (`FEAT-ICONS-001` requirements — ConOps, `SN-ICONS` needs & SRS — → `DESIGN-ICONS-001` → `TEST-ICONS-001` → `PLAN-ICONS-001`), which traces these lessons to requirements and phases (P1=7.2, P2=7.4, P3=7.3, P4=7.1) and cross-references this note by `RES-ICONS-001`.
 
 ## 8. Sources
 
