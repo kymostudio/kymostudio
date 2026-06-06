@@ -19,12 +19,12 @@
 
 #### Features
 
-- **dsl** parses the line-oriented `.kymo` grammar into a plain `Diagram` data model.
-- **from_bpmn** imports BPMN 2.0 XML using the geometry stored in the file.
-- **layout** positions the members of auto-layout frames.
-- **alignment** resolves final positions: auto-layouts, anchoring, region bounds, edge staggering and auto-canvas sizing.
-- **to_svg** renders the resolved model to SVG; sibling emitters target Figma, Excalidraw, WebP and PNG.
-- **icons** resolves icon keys against the bundled catalogue.
+- **Diagrams as code** — describe your diagram in a clean, line-oriented `.kymo` syntax; no dragging boxes around.
+- **Animated by default** — edges come alive with built-in flowing animation, straight to a self-contained SVG.
+- **Smart auto-layout** — frames, anchoring, edge routing and canvas sizing are figured out for you.
+- **Many output formats** — export to SVG, PNG, WebP, Figma or Excalidraw from a single source.
+- **BPMN 2.0 ready** — drop in standard BPMN files and render them faithfully.
+- **Batteries-included icons** — a large bundled catalogue covering cloud, infra and more.
 
 ## Install
 
