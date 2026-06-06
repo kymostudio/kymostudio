@@ -75,10 +75,35 @@ def _accuracy_table(a: dict) -> str:
     return "\n".join([head, sep] + rows)
 
 
+def _frontmatter(q: dict, a: dict, p: dict) -> str:
+    """YAML front matter stamping the run — so two REPORT.md are trivially
+    diffable / distinguishable (host, versions, timestamp, corpus sizes)."""
+    env = p["environment"]
+    lines = [
+        "---",
+        "bench: svg2png",
+        f"generated: {env['timestamp'].split('T', 1)[0]}",
+        f"timestamp: {env['timestamp']}",
+        f"host: {env['platform']}",
+        f"python: \"{env['python']}\"",
+        f"kymo_version: \"{env['kymo_version']}\"",
+        f"reps: {env['reps']}",
+        f"fidelity_corpus: {q['corpus']['items']}",
+        f"accuracy_dataset: {a['dataset']['samples']}",
+        f"ground_truth: {a['ground_truth']}",
+        "engines:",
+    ]
+    for r in p["engines"]:
+        lines.append(f"  {r['key']}: \"{r['backend']}\"")
+    lines.append("---")
+    return "\n".join(lines) + "\n\n"
+
+
 def _render_report(q: dict, a: dict, p: dict) -> str:
     env = p["environment"]
     stamp = env["timestamp"]
     date = stamp.split("T", 1)[0]  # YYYY-MM-DD from the ISO run timestamp
+    front = _frontmatter(q, a, p)
     n = q["corpus"]["items"]
     ds = a["dataset"]
     nd = ds["samples"]
@@ -99,7 +124,7 @@ def _render_report(q: dict, a: dict, p: dict) -> str:
     )
     cat_counts = ", ".join(f"{c} {v}" for c, v in ds["categories"].items())
 
-    return f"""# SVG → PNG — rasterizer scorecard
+    return f"""{front}# SVG → PNG — rasterizer scorecard
 
 > **Generated {date}** by `benches/svg2png/run.py` (run stamp `{stamp}`).
 > **Offline bench** — re-run with

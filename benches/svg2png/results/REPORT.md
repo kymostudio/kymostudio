@@ -1,6 +1,25 @@
+---
+bench: svg2png
+generated: 2026-06-06
+timestamp: 2026-06-06T12:53:51+00:00
+host: Linux-6.8.0-117-generic-x86_64-with-glibc2.39
+python: "3.13.13"
+kymo_version: "0.3.6"
+reps: 7
+fidelity_corpus: 30
+accuracy_dataset: 72
+ground_truth: headless Google Chrome
+engines:
+  kymo: "resvg (kymostudio-core 0.3.6)"
+  resvg-py: "resvg (0.3.2)"
+  pyvips: "librsvg (via libvips 8.15.1)"
+  cairosvg: "Cairo (2.9.0)"
+  svglib: "reportlab renderPM (4.5.1, svglib 1.6.0)"
+---
+
 # SVG → PNG — rasterizer scorecard
 
-> **Generated 2026-06-06** by `benches/svg2png/run.py` (run stamp `2026-06-06T12:51:11+00:00`).
+> **Generated 2026-06-06** by `benches/svg2png/run.py` (run stamp `2026-06-06T12:53:51+00:00`).
 > **Offline bench** — re-run with
 > `cd benches && uv run python svg2png/run.py`. Two complementary questions:
 > **(1) Fidelity** — does an engine reproduce the SVGs *kymo itself emits*?
@@ -18,10 +37,10 @@ on the image composited over white; *diff* is mean per-channel |Δ| (0…255),
 
 | Engine | Backend | Renders | Dims | Diff | Differ | Median ms | Files/s | Speed | Verdict |
 |---|---|---|---|---|---|---|---|---|---|
-| kymo | `resvg (kymostudio-core 0.3.6)` | 30/30 | 30/30 | — | — | 11.156 | 60.6 | ×1.0 | **reference** |
-| resvg-py | `resvg (0.3.2)` | 30/30 | 30/30 | 0.0 | 0.0% | 18.729 | 33.1 | ×0.55 | **pixel-identical** |
-| pyvips | `librsvg (via libvips 8.15.1)` | 30/30 | 30/30 | 0.24 | 4.07% | 13.797 | 18.7 | ×0.31 | **high fidelity** |
-| cairosvg | `Cairo (2.9.0)` | 30/30 | 30/30 | 11.24 | 99.73% | 6.974 | 106.8 | ×1.76 | **low fidelity** |
+| kymo | `resvg (kymostudio-core 0.3.6)` | 30/30 | 30/30 | — | — | 11.258 | 60.3 | ×1.0 | **reference** |
+| resvg-py | `resvg (0.3.2)` | 30/30 | 30/30 | 0.0 | 0.0% | 19.172 | 32.7 | ×0.54 | **pixel-identical** |
+| pyvips | `librsvg (via libvips 8.15.1)` | 30/30 | 30/30 | 0.24 | 4.07% | 17.612 | 18.3 | ×0.3 | **high fidelity** |
+| cairosvg | `Cairo (2.9.0)` | 30/30 | 30/30 | 11.24 | 99.73% | 7.078 | 108.6 | ×1.8 | **low fidelity** |
 | svglib | `reportlab renderPM (4.5.1, svglib 1.6.0)` | 0/30 | 0/0 | — | — | — | — | — | **fails to render** |
 
 *Diff/Differ blank for the reference (compared to itself). Speed is vs kymo,
@@ -94,6 +113,6 @@ the most Chrome-accurate engine in the field.**
 - Accuracy scope excludes `text`/`image` SVGs (font/external-resource dependent,
   and unresolvable through the string-based engine API).
 - Timing is host-specific (`Linux-6.8.0-117-generic-x86_64-with-glibc2.39`, Python 3.13.13,
-  4 CPU, reps=7, 2026-06-06T12:51:11+00:00).
+  4 CPU, reps=7, 2026-06-06T12:53:51+00:00).
 - Browser engines are the ground truth here but out of scope as *engines* —
   heavy, and not what the `kymo` CLI ships.
