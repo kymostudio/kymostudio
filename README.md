@@ -24,7 +24,7 @@
 - **Smart auto-layout** — frames, anchoring, edge routing and canvas sizing are figured out for you.
 - **Many output formats** — export to SVG, PNG, WebP, Figma or Excalidraw from a single source.
 - **BPMN 2.0 ready** — drop in standard BPMN files and render them faithfully.
-- **Batteries-included icons** — a large bundled catalogue covering cloud, infra and more.
+- **Batteries-included icons** — 2,460 bundled icons spanning AWS, Azure, GCP, Kubernetes, on-prem and more.
 
 ## Install
 
