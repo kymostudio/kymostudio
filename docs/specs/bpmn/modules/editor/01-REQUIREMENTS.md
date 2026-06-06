@@ -9,8 +9,8 @@ owner: diagrams/ project
 audience: Engineers implementing & verifying the BPMN editor (`website/app/`)
 review_cycle: On scope change, or when a phase completes
 supersedes:
-  - PROD-BPMN-EDITOR-001
-  - INTRO-BPMN-EDITOR-001
+  - FEAT-BPMN-EDITOR-001
+  - FEAT-BPMN-EDITOR-001
 related_documents:
   - DESIGN-BPMN-EDITOR-001
   - TEST-BPMN-EDITOR-001
@@ -63,7 +63,7 @@ keywords:
 | Status            | Draft |
 | Classification    | Internal |
 | Owner             | `diagrams/` project |
-| Supersedes        | `PROD-BPMN-EDITOR-001` (stakeholder needs), `INTRO-BPMN-EDITOR-001` (introduction/map) |
+| Supersedes        | `FEAT-BPMN-EDITOR-001` (stakeholder needs), `FEAT-BPMN-EDITOR-001` (introduction/map) |
 | Related Documents | `DESIGN-BPMN-EDITOR-001` (design), `TEST-BPMN-EDITOR-001` (V&V), `PLAN-BPMN-EDITOR-001` (plan/risk), `BPMN-MAP-001` (element mapping) |
 
 > This is the **requirements specification** (ISO/IEC/IEEE 12207 §6.4.2/§6.4.3). It owns both the
@@ -281,10 +281,10 @@ realizes it.
 
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
-| 0.1     | 2026-05-31 | Vũ Anh | Initial product description (`PROD-BPMN-EDITOR-001`). Derived from a live inspection of `demo.bpmn.io` (three pillars) and the kymostudio editor-stack survey; minted feature-scoped needs `SN-BE-01..04`. v1 scope = three pillars over core elements; pools/lanes, color, validation, copy-paste, auto-layout deferred to `CR-BPMN-EDITOR-001..005`. |
-| 0.1     | 2026-05-31 | Vũ Anh | Initial introduction + document map (`INTRO-BPMN-EDITOR-001`); positions bpmn-editor as a composition over `FEAT-ENGINE-001` / `FEAT-STUDIO-001` / `FEAT-JAM-001` / `FEAT-BPMN-PARSER-001` / `FEAT-BPMN-EXPORT-001` / `BPMN-MAP-001`, distinct from the generic `canvas-create-tools` palette. |
+| 0.1     | 2026-05-31 | Vũ Anh | Initial product description (`FEAT-BPMN-EDITOR-001`). Derived from a live inspection of `demo.bpmn.io` (three pillars) and the kymostudio editor-stack survey; minted feature-scoped needs `SN-BE-01..04`. v1 scope = three pillars over core elements; pools/lanes, color, validation, copy-paste, auto-layout deferred to `CR-BPMN-EDITOR-001..005`. |
+| 0.1     | 2026-05-31 | Vũ Anh | Initial introduction + document map (`FEAT-BPMN-EDITOR-001`); positions bpmn-editor as a composition over `FEAT-ENGINE-001` / `FEAT-STUDIO-001` / `FEAT-JAM-001` / `FEAT-BPMN-PARSER-001` / `FEAT-BPMN-EXPORT-001` / `BPMN-MAP-001`, distinct from the generic `canvas-create-tools` palette. |
 | 0.1     | 2026-05-31 | Vũ Anh | Initial requirements draft (`FEAT-BPMN-EDITOR-001`). Minted `FR-BE-01..12` (grouped by the three `demo.bpmn.io` pillars) + `NFR-BE-01..05`; traces to `SN-BE-01..04`. v1 = core elements; pools/lanes, color, validation, copy-paste, auto-layout listed out-of-scope (`CR-BPMN-EDITOR-001..005`). |
-| 0.2     | 2026-06-06 | Vũ Anh | Consolidated PROD-BPMN-EDITOR-001 (stakeholder needs) and INTRO-BPMN-EDITOR-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
+| 0.2     | 2026-06-06 | Vũ Anh | Consolidated FEAT-BPMN-EDITOR-001 (stakeholder needs) and FEAT-BPMN-EDITOR-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
 
 ## Annex B — Document Control
 

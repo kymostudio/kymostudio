@@ -9,8 +9,8 @@ owner: diagrams/ project
 audience: Engineers implementing and verifying the BPMN animation feature
 review_cycle: On phase/CR completion, or on format-schema change
 supersedes:
-  - PROD-BPMN-ANIMATE-001
-  - INTRO-BPMN-ANIMATE-001
+  - FEAT-BPMN-ANIMATE-001
+  - FEAT-BPMN-ANIMATE-001
 related_documents:
   - DESIGN-BPMN-ANIMATE-001  # Design
   - TEST-BPMN-ANIMATE-001    # Test documentation
@@ -65,8 +65,8 @@ DESIGN-BPMN-ANIMATE-001; the format: KYMOANIM-MAP-001.
 This document is the **requirements** entry point for the **BPMN animation** feature (ANIMATE = BPMN
 token-flow animation over the rendered SVG). It states the problem and concept, the stakeholder needs
 (`SN-BPMN-ANIMATE-NN`), and the functional/non-functional requirements (`FR`/`NFR`) derived from them.
-It consolidates the former product description (PROD-BPMN-ANIMATE-001) and introduction
-(INTRO-BPMN-ANIMATE-001). The set conforms to ISO/IEC/IEEE 12207:2017 and ISO/IEC/IEEE 15289:2019.
+It consolidates the former product description (FEAT-BPMN-ANIMATE-001) and introduction
+(FEAT-BPMN-ANIMATE-001). The set conforms to ISO/IEC/IEEE 12207:2017 and ISO/IEC/IEEE 15289:2019.
 
 **Background.** kymo already ships a **generic, no-JavaScript edge animation**:
 `to_svg.render(animate=…)` appends pure-CSS `@keyframes` presets (`flow`/`slow`/`pulse`/`ants`,
@@ -230,7 +230,7 @@ Each increment is a self-contained mini-spec under `CR/` with CR-local IDs (`FR-
 | 0.1     | 2026-05-31 | Vũ Anh | Initial umbrella SRS (`FR-1..FR-7`, `NFR-1..4`); CR roadmap. Initial product description (`SN-BPMN-ANIMATE-01..04`; four-CR delivery) and introduction (concept, glossary, document map). |
 | 0.2     | 2026-05-31 | Vũ Anh | Re-centered on an explicit `kymo.anim` descriptor (sidecar + `target` + id refs + validation + default-gen); added `SN-05`. |
 | 0.3     | 2026-05-31 | Vũ Anh | **Re-architected to a self-contained format** ("Lottie for process diagrams"). `kymo.anim` now carries the whole diagram (nodes with `type`+explicit position, flows) **and** the animation in one file — no external diagram, no layout engine. `FR-1..FR-7` revised; `NFR-1` recast as additive; `SN-02`/`SN-04`/`SN-05` reworded; glossary and document map updated; non-goals now exclude referencing/embedding an external diagram. |
-| 0.4     | 2026-06-06 | Vũ Anh | Consolidated PROD-BPMN-ANIMATE-001 (stakeholder needs) and INTRO-BPMN-ANIMATE-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
+| 0.4     | 2026-06-06 | Vũ Anh | Consolidated FEAT-BPMN-ANIMATE-001 (stakeholder needs) and FEAT-BPMN-ANIMATE-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
 
 ## Annex B — Document Control
 

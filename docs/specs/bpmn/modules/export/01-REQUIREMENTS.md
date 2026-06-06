@@ -9,8 +9,8 @@ owner: diagrams/ project
 audience: Engineers implementing and verifying the BPMN export feature
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes:
-  - PROD-BPMN-EXPORT-001
-  - INTRO-BPMN-EXPORT-001
+  - FEAT-BPMN-EXPORT-001
+  - FEAT-BPMN-EXPORT-001
 related_documents:
   - FEAT-BPMN-001                # Umbrella feature
   - DESIGN-BPMN-EXPORT-001       # Design
@@ -256,7 +256,7 @@ geometry (`<bpmndi:BPMNDiagram>` with shape bounds + edge waypoints).
 | 0.1     | 2026-05-23 | Vũ Anh | Initial issue. |
 | 1.0 | 2026-05-24 | Vũ Anh | Released — P4 complete: BPMN-MAP-001 Export section added; doc set marked Released; importer-mapping citations repointed. |
 | 1.1 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to the product description; minted `SN-BPMN-EXPORT-01..04` and annotated each FR group with its Source need; §1 pointed to the product description and kept only scope. No requirement content changed. |
-| 1.2 | 2026-06-06 | Vũ Anh | Consolidated PROD-BPMN-EXPORT-001 (stakeholder needs) and INTRO-BPMN-EXPORT-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
+| 1.2 | 2026-06-06 | Vũ Anh | Consolidated FEAT-BPMN-EXPORT-001 (stakeholder needs) and FEAT-BPMN-EXPORT-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
 
 ## Annex B — Document Control
 

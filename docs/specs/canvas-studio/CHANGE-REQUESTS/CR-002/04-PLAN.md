@@ -1,0 +1,131 @@
+---
+title: "Canvas Studio CR-002 — Implementation Plan (close-out)"
+document_id: PLAN-STUDIO-002
+version: "0.3"
+issue_date: 2026-05-27
+status: Closed
+classification: Internal
+owner: diagrams/ project
+audience: Engineer closing CR-002 (canvas-studio editor-chrome simplification)
+review_cycle: Until CR-002 is closed (implemented + re-baselined, or rejected)
+supersedes: null
+related_documents:
+  - FEAT-STUDIO-002
+  - DESIGN-STUDIO-002
+  - TEST-STUDIO-002
+  - PLAN-STUDIO-001
+authors:
+  - Vũ Anh
+language: en
+keywords:
+  - plan
+  - close-out
+  - change-request
+  - risk-register
+  - story-points
+  - worklog
+  - canvas-studio
+---
+
+# Canvas Studio CR-002 — Implementation Plan (close-out)
+
+| Field             | Value |
+|-------------------|-------|
+| Document ID       | `PLAN-STUDIO-002` |
+| Version           | 0.3 |
+| Status            | **Closed** — P1–P3 done; implemented + re-baselined |
+| Owner             | `diagrams/` project |
+| Entry gate        | **CR-002 approved** (`FEAT-STUDIO-002 §5`). No code begins before approval. |
+| Related Documents | `FEAT-STUDIO-002` (requirements), `DESIGN-STUDIO-002` (design), `TEST-STUDIO-002` (V&V), `PLAN-STUDIO-001` (the baselined plan re-baselined at close-out) |
+
+---
+
+## 1. Context
+
+The delivery layer for CR-002: implement the two editor-chrome changes (single `Code` toggle; default
+code-hidden), prove them (E2E + goldens), then re-baseline the parent `STUDIO-001` clauses so the spec
+matches the shipped chrome. **Client-only**, golden-safe, zero new deps — same constraints as
+`PLAN-STUDIO-001`. Honour the "run Playwright before shipping web-app changes" lesson: `npm run
+test:e2e` green locally before ship. (The code-pane *side* — left → right — is `CR-STUDIO-003`,
+tracked separately.)
+
+## 2. Decision
+
+Build the change in `website/app/` exactly per `DESIGN-STUDIO-002 §2–§4`, then re-baseline. Small,
+contained, golden-safe — no architectural choice to make; the only judgement calls are the open
+questions in `DESIGN-STUDIO-002 §7` (`RK-CR2-Q1`: keep the `Code` label/icon).
+
+## 3. Phased plan
+
+Sequencing `1 → 2 → 3`. Story points (~3 SP total).
+
+| Phase | Goal | SP |
+|-------|------|----|
+| **P1 — Implement** (`DESIGN §2–§3`) | Single `Code` toggle; default code-hidden. | 1 |
+| **P2 — V&V** (`TEST-STUDIO-002`) | `TC-CR2-01..02` green; goldens byte-identical; render-guard green. | 1 |
+| **P3 — Re-baseline + close** | Reconcile parent clauses; close CR-002. | 1 |
+
+- **P1:** `ui/TopBar.tsx` remove `tab-preview` + drop `Play` import; `App.tsx:36` `useState(false)`.
+  Rebuild & commit `website/app/kymo.bundle.js`.
+- **P2:** add/revise `TC-CR2-01..02` in `e2e/chrome.spec.ts`; `npm run test:e2e` all green; JS + Python
+  goldens byte-identical; chrome-anhv spot-check (light + dark): canvas-first on load, single `Code`
+  control, 0 console errors.
+- **P3:** edit the parent baseline — `FEAT-STUDIO-001` (`FR-CS-02`/`FR-CS-07`/§5 #6),
+  `DESIGN-STUDIO-001` (§3/§8/§11), `TEST-STUDIO-001` (`TC-CS-02`/`TC-CS-07`), `PLAN-STUDIO-001`
+  (§4 P2/P7 note), bumping each version + Annex A; flip `FEAT-STUDIO-002` status **Open → Closed** and
+  fill its §5 decision log; update the `CHANGE-REQUESTS/README.md` register row to **Closed**. (The
+  `DESIGN-STUDIO-001 §1` layout re-baseline belongs to `CR-STUDIO-003`.)
+
+## 4. Risk register
+
+| ID | Risk | L | I | Mitigation |
+|----|------|---|---|------------|
+| `RK-CR2-01` | Rebuilt bundle / CSS churns committed `kymo.bundle.js` beyond intent | Med | Low | Diff the bundle; change confined to chrome React + CSS; `renderSVG` untouched. |
+| `RK-CR2-02` | Removing `tab-preview` breaks existing E2E selectors | Med | Med | Update `chrome.spec.ts` in lockstep; run `test:e2e` before ship. |
+| `RK-CR2-03` | A layout/styling tweak leaks into `renderSVG` → golden churn | Low | High | All change in `website/app/*`; goldens run in P2 (`NFR-CR2-01`). |
+| `RK-CR2-04` | Scope creep — "while we're here" adds inspector/timeline/persistence | Low | Med | Hard non-goals stand (`FEAT-STUDIO-002 §4`); CR-002 is chrome-simplification only. |
+
+## 5. Files to create / modify
+
+| File | Change |
+|------|--------|
+| `website/app/src/ui/TopBar.tsx` | Remove `tab-preview`; keep `tab-code` as sole toggle; drop `Play` import. |
+| `website/app/src/App.tsx` | `showCode` default `false` (`:36`). |
+| `website/app/e2e/chrome.spec.ts` | Revise case (4) → `TC-CR2-01`; add `TC-CR2-02`. |
+| `website/app/kymo.bundle.js` | Rebuild (committed-bundle deploy). |
+| parent `STUDIO-001` docs + `CHANGE-REQUESTS/README.md` | P3 re-baseline + register close. |
+
+## 6. Verification (close-out gate)
+
+Closes when `TEST-STUDIO-002 §2/§3` pass: no `tab-preview` in DOM; single `Code` toggle works both
+ways; first load canvas-first (code hidden); `chrome.spec.ts` green; goldens byte-identical;
+render-guard green; parent `STUDIO-001` re-baselined; `FEAT-STUDIO-002` status = Closed; register row
+= Closed.
+
+## 7. Change-control / close-out
+
+CR-002 is a change against the baselined `STUDIO-001` (`FEAT-STUDIO-001 §5`). At close-out the parent
+clauses named in `FEAT-STUDIO-002 §3` are reconciled, each parent doc's version + Annex A updated, and
+the `CHANGE-REQUESTS/README.md` register row flipped to **Closed** with the close date.
+
+---
+
+## Annex A — Revision History
+
+| Version | Date       | Author | Changes |
+|---------|------------|--------|---------|
+| 0.1     | 2026-05-27 | Vũ Anh | Initial close-out plan for CR-002: P1 implement (TopBar/App/index.html + bundle) → P2 V&V (`chrome.spec.ts` + goldens + render-guard) → P3 re-baseline `STUDIO-001` + close, ≈4 SP; risk register `RK-CR2-01..04`; files-to-modify; close-out gate. Contingent on CR-002 approval. |
+| 0.2     | 2026-05-29 | Vũ Anh | Scope narrowed (code-pane-on-the-right → `CR-STUDIO-003`): P1 now `DESIGN §2–§3` (TopBar + `App.tsx:36`, no pane reorder / `index.html`); P2 `TC-CR2-01..02`; P3 re-baselines `DESIGN-STUDIO-001 §3/§8/§11` (not §1); `RK-CR2-02` drops pane-reorder; files table drops `index.html` + App.tsx reorder; ≈3 SP. |
+| 0.3     | 2026-05-31 | Vũ Anh | **Closed.** P1–P3 executed (status Open → Closed); Annex B worklog rows added for implement / V&V / re-baseline. |
+
+## Annex B — Worklog
+
+Append-only (newest at the bottom). `Status`: ✅ done · 🚧 in progress · ⏳ pending.
+
+| Date | Phase | Work | Status |
+|------|-------|------|--------|
+| 2026-05-27 | — | CR-002 mini-spec authored (`01-INTRO`/`02-REQUIREMENT`/`03-DESIGN`/`04-TEST`/`05-PLAN`, `STUDIO-002` series); Open, awaiting approval. | ✅ |
+| 2026-05-29 | — | Scope narrowed — code-pane-on-the-right carved into `CR-STUDIO-003`; all 5 CR-002 docs updated to v0.2. Still Open, awaiting approval. | ✅ |
+| 2026-05-31 | P1 | `ui/TopBar.tsx` removed the `tab-preview` button + `Play` import (sole `Code` toggle); `App.tsx:36` `useState(true)`→`useState(false)` (canvas-first); header/comment + `index.html` chrome comment refreshed; bundle rebuilt (413.3 kb, down from 413.5 — `Preview` button gone). | ✅ |
+| 2026-05-31 | P2 | `TC-CR2-01` (single `Code` toggle, no `tab-preview`) + `TC-CR2-02` (canvas-first boot) added to `e2e/chrome.spec.ts`; old `TC-CS-07` Code/Preview case rewritten; `TC-CR3-01` + three canvas-jam specs (`draw`/`sticky`/`text`) reveal the now-hidden pane before reading `textarea#editor`. `npm run test:e2e` **23/23**; `js` goldens 368/0; `python` render goldens (`test_diagrams`/`layout`/`edges`) 26/26 byte-identical (`renderSVG` untouched). | ✅ |
+| 2026-05-31 | P3 | Re-baselined parent `STUDIO-001`: `FEAT-STUDIO-001` v0.7 (`FR-CS-02`/`FR-CS-07`/§5 #6), `DESIGN-STUDIO-001` v0.7 (§1 ASCII/§3/§8 default/§11), `TEST-STUDIO-001` v0.6 (`TC-CS-02`/`TC-CS-07`), `PLAN-STUDIO-001` v0.7 (§4 P7 + §8 note). `FEAT-STUDIO-002` Open → Closed (§5 decision log); `CHANGE-REQUESTS/README.md` register row Closed (2026-05-31). | ✅ |
