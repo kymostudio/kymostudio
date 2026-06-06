@@ -9,6 +9,23 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-06-06
+
+### Added
+
+- **New `packages/rust/kymostudio-core`** — a pure-Rust SVG → PNG rasterizer
+  built on `resvg` (no browser, no C deps). One core crate compiled to three
+  targets via feature flags: the native `kymo` CLI, a Python extension (abi3
+  wheel, `_kymostudio_core`), and a wasm package for browser + Node. Published
+  to crates.io, PyPI, and npm as `kymostudio-core`. CI build matrix in
+  `.github/workflows/rust.yml`; release via `release-crate.yml`.
+
+### Changed
+
+- `packages/python` `to_webp.py` now prefers the in-repo `_kymostudio_core`
+  rasterizer when installed, falling back to `resvg-py` — same engine, no
+  behavior change.
+
 ## [0.3.3] - 2026-06-03
 
 ### Fixed

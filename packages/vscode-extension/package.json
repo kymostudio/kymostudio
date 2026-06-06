@@ -2,7 +2,7 @@
   "name": "kymostudio-vscode",
   "displayName": "kymostudio — Diagram Preview",
   "description": "Type it. See it appear. Watch it animate.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "license": "Apache-2.0",
   "icon": "media/icon.png",
   "publisher": "kymostudio",
