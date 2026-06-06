@@ -17,7 +17,7 @@
 
 **Kymostudio** is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
 
-#### Features
+#### Key Features
 
 - **Diagrams as code** — describe your diagram in a clean, line-oriented `.kymo` syntax; no dragging boxes around.
 - **Animated by default** — edges come alive with built-in flowing animation, straight to a self-contained SVG.
