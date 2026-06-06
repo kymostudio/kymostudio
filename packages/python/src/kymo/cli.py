@@ -1,8 +1,8 @@
-"""Entry point: `kymo <path> [--animate] [--figma] [--excalidraw]`
+"""Entry point: `kymo <path> [out.png] [--animate] [--figma] [--excalidraw]`
 
-Argument is a path to a `.kymo` (DSL), `.bpmn` (BPMN 2.0 XML), or
-`.py` (Python form) source. Output is a SVG (or Figma Plugin JS /
-Excalidraw scene) written next to the input file:
+Argument is a path to a `.kymo` (DSL), `.bpmn` (BPMN 2.0 XML), `.py`
+(Python form), or `.svg` source. Output is a SVG (or Figma Plugin JS /
+Excalidraw scene / PNG) written next to the input file:
 
     kymo samples/aws_1.kymo                → samples/aws_1.svg
     kymo samples/aws_1.kymo --animate      → samples/aws_1-animated.svg
@@ -11,6 +11,14 @@ Excalidraw scene) written next to the input file:
     kymo samples/aws_1.kymo --json         → samples/aws_1.kymo.json
     kymo samples/aws_1.kymo.json               → samples/aws_1.svg
     kymo samples/order.bpmn                    → samples/order.svg
+
+A second positional `*.png` path (or a `.svg` source) rasterizes to PNG
+via resvg (kymostudio-core); optional `--scale N` / `-s N` (1.0 = intrinsic):
+
+    kymo in.svg out.png                        → rasterize an existing SVG
+    kymo in.svg                                → in.png (default name)
+    kymo samples/aws_1.kymo out.png            → render then rasterize
+    kymo samples/aws_1.kymo out.png -s 2       → 2× resolution
 
 `.bpmn` files are imported via their Diagram-Interchange geometry
 (`from_bpmn.py`), so positions come straight from the file — no layout
@@ -123,6 +131,60 @@ def _lint_config(flags: set[str]):
         sys.exit(1)
 
 
+def _load_resolved(src: Path):
+    """Load a source and run the layout/alignment passes → a positioned Diagram.
+
+    Mirrors the back-end of the render flow: `.bpmn`/`.kymo.json` (and a
+    resolved `bpmn { }` block) arrive already positioned, so the
+    alignment/auto-size passes are skipped for them.
+    """
+    diagram, layout_spec, external_layout = load(src)
+    had_bpmn = bool(getattr(diagram, "bpmn_blocks", None))
+    if had_bpmn:
+        from .bpmn_layout import layout as layout_bpmn
+        layout_bpmn(diagram)
+    if layout_spec:
+        layout(diagram, layout_spec, external_layout)
+    if src.suffix not in (".bpmn", ".json") and not had_bpmn:
+        resolve_alignments(diagram)
+    return diagram
+
+
+def _extract_scale(argv: list[str]) -> tuple[float, list[str]]:
+    """Pull a `--scale`/`-s` value out of argv (supports `--scale N`, `-s N`,
+    `--scale=N`, `-s=N`); returns (scale, remaining-args). Default scale is 1.0."""
+    def _parse(v: str) -> float:
+        try:
+            s = float(v)
+        except ValueError:
+            print(f"invalid scale: {v}")
+            sys.exit(1)
+        if s <= 0 or s != s or s == float("inf"):
+            print(f"scale must be a positive number, got {v}")
+            sys.exit(1)
+        return s
+
+    scale = 1.0
+    out: list[str] = []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a in ("--scale", "-s"):
+            if i + 1 >= len(argv):
+                print("missing value for --scale")
+                sys.exit(1)
+            scale = _parse(argv[i + 1])
+            i += 2
+            continue
+        if a.startswith("--scale=") or a.startswith("-s="):
+            scale = _parse(a.split("=", 1)[1])
+            i += 1
+            continue
+        out.append(a)
+        i += 1
+    return scale, out
+
+
 def _lint(paths: list[str], flags: set[str]) -> None:
     """`kymo lint <file.bpmn> ...` — report BPMN issues; always exit 0."""
     from .lint_bpmn import format_report, lint_file
@@ -153,8 +215,9 @@ def main() -> None:
         from .icons_cli import run as run_icons
         sys.exit(run_icons(sys.argv[2:]))
 
-    args  = [a for a in sys.argv[1:] if not a.startswith("--")]
-    flags = {a for a in sys.argv[1:] if a.startswith("--")}
+    scale, rest = _extract_scale(sys.argv[1:])
+    args  = [a for a in rest if not a.startswith("--")]
+    flags = {a for a in rest if a.startswith("--")}
 
     if args and args[0] == "lint":
         _lint(args[1:], flags)
@@ -168,8 +231,48 @@ def main() -> None:
     if not src.exists():
         print(f"not found: {src}")
         sys.exit(1)
-    if src.suffix not in (".kymo", ".py", ".bpmn", ".json"):
-        print(f"unsupported source: {src} (expected .kymo, .kymo.json, .bpmn or .py)")
+    if src.suffix not in (".kymo", ".py", ".bpmn", ".json", ".svg"):
+        print(f"unsupported source: {src} (expected .kymo, .kymo.json, .bpmn, .py or .svg)")
+        sys.exit(1)
+
+    # PNG rasterization path: `kymo in.svg out.png` or `kymo in.kymo out.png`.
+    # Triggered by a `.svg` input (only rasterization makes sense for it) or by a
+    # second positional output path ending in `.png`. A `.svg` source renders
+    # directly; any other source is loaded + resolved + rendered to SVG first.
+    out_arg = args[1] if len(args) > 1 else None
+    png_mode = src.suffix == ".svg" or (out_arg is not None and out_arg.lower().endswith(".png"))
+    if png_mode:
+        if out_arg is not None and not out_arg.lower().endswith(".png"):
+            print(f"PNG output expects a .png output path (got {out_arg})")
+            sys.exit(1)
+        try:
+            from .to_png import render_png
+        except ModuleNotFoundError:
+            print("PNG output requires the kymostudio-core rasterizer. "
+                  "Try: pip install --force-reinstall kymostudio-core")
+            sys.exit(1)
+        if src.suffix == ".svg":
+            svg = src.read_text(encoding="utf-8")
+            dims = ""
+        else:
+            diagram = _load_resolved(src)
+            svg = render(diagram, animate=False)
+            dims = f"{diagram.width}×{diagram.height}, "
+        try:
+            png = render_png(svg, scale)
+        except ValueError as e:
+            print(f"kymo: {e}")
+            sys.exit(1)
+        out = Path(out_arg) if out_arg else src.with_suffix(".png")
+        out.write_bytes(png)
+        rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
+        sfx = f" scale {scale:g}" if scale != 1.0 else ""
+        print(f"✓ wrote {rel} (png{sfx})  ({dims}{len(png):,} bytes)")
+        return
+
+    if src.suffix == ".svg":
+        # Unreachable (a .svg source always sets png_mode) — guard for clarity.
+        print("a .svg source can only be rendered to .png")
         sys.exit(1)
 
     animate    = "--animate"    in flags
@@ -178,20 +281,7 @@ def main() -> None:
     bpmn       = "--bpmn"       in flags
     json_out   = "--json"       in flags
 
-    diagram, layout_spec, external_layout = load(src)
-    had_bpmn = bool(getattr(diagram, "bpmn_blocks", None))
-    if had_bpmn:
-        from .bpmn_layout import layout as layout_bpmn
-        layout_bpmn(diagram)
-    if layout_spec:
-        layout(diagram, layout_spec, external_layout)
-    # `.bpmn` (DI geometry) and `.kymo.json` (serialized resolved model) arrive
-    # fully positioned, as does a `bpmn { }` block after its own layout. The
-    # alignment/auto-size passes assume DSL-authored nodes and would perturb the
-    # already-absolute geometry (and `_auto_size_canvas` ignores `Edge.points`),
-    # so skip them for resolved sources.
-    if src.suffix not in (".bpmn", ".json") and not had_bpmn:
-        resolve_alignments(diagram)
+    diagram = _load_resolved(src)
 
     if excalidraw:
         payload = render_excalidraw(diagram)

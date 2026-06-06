@@ -87,9 +87,12 @@ test("generated manifest is the v2 shape consumed by the loader (TC-7)", () => {
   for (const addr of Object.values(m.legacy)) assert.ok(addr in m.icons);
 });
 
-test("packages/js declares zero runtime dependencies (NFR-3 / TC-12)", () => {
+test("packages/js's only runtime dependency is the kymostudio-core rasterizer (NFR-3 / TC-12)", () => {
   const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url)));
-  assert.equal(Object.keys(pkg.dependencies ?? {}).length, 0);
+  // The library itself is dependency-free; the `kymo` CLI's PNG output
+  // rasterizes via kymostudio-core (the wasm build of the shared resvg engine).
+  // Guard against any *other* runtime dependency creeping in.
+  assert.deepEqual(Object.keys(pkg.dependencies ?? {}), ["kymostudio-core"]);
 });
 
 // ── P3 — on-demand / batched loading (CR-ICONS-004 / TC-8) ────────────────

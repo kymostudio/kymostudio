@@ -22,7 +22,10 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "cairosvg>=2.9.0",
+    # The shared resvg engine (the `_kymostudio_core` extension module). It is
+    # the sole runtime dependency: SVG→PNG rasterization for the `kymo … out.png`
+    # CLI and the Excalidraw icon embedding, matching the Rust CLI / JS wasm build.
+    "kymostudio-core>=0.3.3",
 ]
 
 [project.urls]
