@@ -1,6 +1,6 @@
 # Which SVG→PNG rasterizer should a diagram tool ship? A two-reference benchmark
 
-*An offline study behind `benches/svg2png/`. Generated 2026-06-06.*
+*An offline study behind `benches/svg2png/`. Written 2026-06-06 — analysing the run in [`../results/REPORT.md`](../results/REPORT.md).*
 
 ## Abstract
 
