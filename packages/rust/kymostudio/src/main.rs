@@ -3,7 +3,7 @@
 //!     kymo -i in.svg out.png
 //!     kymo -i in.svg -o out.png --scale 2
 //!
-//! Pure Rust (resvg) — no browser, no system image libraries.
+//! Pure Rust (resvg via kymostudio-core) — no browser, no system image libraries.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -14,23 +14,24 @@ const HELP: &str = "\
 kymo — rasterize an SVG to PNG (pure Rust, no browser)
 
 USAGE:
-    kymo -i <input.svg> [output.png] [options]
+    kymo <input.svg> [output.png] [options]
 
 ARGS:
+    <input.svg>             Input SVG file (positional, or use -i).
     <output.png>            Output path (positional). Defaults to the input
                             path with its extension swapped to .png.
 
 OPTIONS:
-    -i, --input  <FILE>    Input SVG file (required)
+    -i, --input  <FILE>    Input SVG file
     -o, --output <FILE>    Output PNG file (alternative to the positional arg)
     -s, --scale  <N>       Scale factor, 1.0 = intrinsic size (default: 1)
     -h, --help             Print this help
     -V, --version          Print version
 
 EXAMPLES:
-    kymo -i in.svg out.png
-    kymo -i diagram.svg                 # -> diagram.png
-    kymo -i diagram.svg -s 2 hi.png     # 2x resolution
+    kymo in.svg out.png
+    kymo diagram.svg                    # -> diagram.png
+    kymo diagram.svg -s 2 hi.png        # 2x resolution
 ";
 
 struct Args {

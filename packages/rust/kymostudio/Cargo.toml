@@ -1,0 +1,28 @@
+[package]
+name = "kymostudio"
+version = "0.3.5"
+edition = "2021"
+rust-version = "1.74"
+description = "Type it. See it appear. Watch it animate."
+license = "Apache-2.0"
+repository = "https://github.com/kymostudio/kymostudio"
+homepage = "https://github.com/kymostudio/kymostudio"
+readme = "README.md"
+keywords = ["svg", "png", "rasterizer", "diagram", "cli"]
+categories = ["command-line-utilities", "multimedia::images"]
+
+# The `kymo` CLI. The rasterization engine lives in kymostudio-core; this crate
+# is a thin command-line front-end over `kymostudio_core::svg_to_png`.
+[[bin]]
+name = "kymo"
+path = "src/main.rs"
+
+[dependencies]
+# `path` for local dev; `version` so crates.io resolves the published core
+# (kymostudio-core must be published first — see release-crate.yml `publish-cli`).
+kymostudio-core = { path = "../kymostudio-core", version = "0.3.5" }
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

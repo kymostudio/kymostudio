@@ -47,6 +47,11 @@ jobs:
         run: cargo check --no-default-features
       - name: clippy (wasm feature)
         run: cargo clippy --lib --no-default-features --features wasm --target wasm32-unknown-unknown -- -D warnings
+      - name: rustfmt + clippy (kymo CLI crate)
+        working-directory: packages/rust/kymostudio
+        run: |
+          cargo fmt --all --check
+          cargo clippy --all-targets -- -D warnings
 
   # ── Native: build the kymo CLI + run tests on every OS ──
   test:
@@ -62,15 +67,20 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: packages/rust/kymostudio-core
-      - name: Test (default = native + system-fonts)
+      - name: Test core (default = native + system-fonts)
+        run: cargo test
+      - name: Test the kymo CLI crate
+        working-directory: packages/rust/kymostudio
         run: cargo test
       - name: Build release CLI
+        working-directory: packages/rust/kymostudio
         run: cargo build --release --bin kymo
       - name: Smoke-test the CLI
+        working-directory: packages/rust/kymostudio
         shell: bash
         run: |
           printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="#0a0"/></svg>' > sq.svg
-          ./target/release/kymo -i sq.svg out.png
+          ./target/release/kymo sq.svg out.png
           test -s out.png && echo "PNG produced"
 
   # ── wasm: compile to wasm32 and produce the wasm-pack JS package ──

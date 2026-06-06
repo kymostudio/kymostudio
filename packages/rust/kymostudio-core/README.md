@@ -4,14 +4,14 @@ Pure-Rust SVG → PNG rasterizer core for **kymostudio**, built on
 [`resvg`](https://github.com/linebender/resvg). No browser, no headless Chrome,
 no C/Cairo/Skia system dependencies.
 
-One core crate, compiled to **four targets** from a single source via feature
+One core crate, compiled to **three targets** from a single source via feature
 flags — so the Rust CLI, the Python package, and the JS/browser playground all
 share the exact same resvg engine (`resvg` is **CSS-class-aware**, the reason the
 project avoids cairosvg):
 
 | Target | Feature | Build tool | Consumer |
 |--------|---------|-----------|----------|
-| Native lib + `kymo` CLI | `system-fonts` (default) | `cargo` | standalone CLI |
+| Native lib | `system-fonts` (default) | `cargo` | `kymostudio` CLI crate |
 | Python extension (abi3) | `python` | `maturin` → wheel | `packages/python` |
 | wasm (browser + Node) | `wasm` | `wasm-pack` → pkg | `packages/js`, website playground |
 
@@ -20,25 +20,17 @@ core function; each binding (`src/python.rs`, `src/wasm.rs`) is a thin façade.
 
 ## CLI — `kymo`
 
-```bash
-kymo -i in.svg out.png          # rasterize at intrinsic size
-kymo -i diagram.svg             # output defaults to diagram.png
-kymo -i diagram.svg -s 2 hi.png # 2× resolution
-```
-
-| Flag | Meaning |
-|------|---------|
-| `-i, --input <FILE>`  | Input SVG (required) |
-| `-o, --output <FILE>` | Output PNG (or pass it positionally) |
-| `-s, --scale <N>`     | Scale factor, `1.0` = intrinsic size (default `1`) |
-| `-h, --help` / `-V, --version` | Help / version |
+The `kymo` command-line tool lives in the sibling **[`kymostudio`](../kymostudio)**
+crate (a thin front-end over this core). Install it with `cargo install kymostudio`.
 
 ## Build each target
 
 ```bash
-# Native (CLI + lib + tests)
+# Native lib + tests
 cargo test
-cargo build --release --bin kymo          # -> target/release/kymo
+
+# The `kymo` CLI (sibling crate)
+cargo build --release --manifest-path ../kymostudio/Cargo.toml   # -> ../kymostudio/target/release/kymo
 
 # Python wheel (abi3, one wheel for CPython ≥ 3.10)
 maturin build --release --out dist        # -> dist/kymostudio_core-*-abi3-*.whl

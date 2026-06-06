@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "kymostudio-core"
 version = "0.3.3"
-description = "Type it. See it appear. Watch it animate."
+description = "Type it. See it appear. Watch it animate. (Core)"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"

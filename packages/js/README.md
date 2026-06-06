@@ -8,6 +8,23 @@
 npm install kymostudio
 ```
 
+## CLI — `kymo`
+
+Render a source to SVG, or rasterize to PNG:
+
+```bash
+kymo arch.kymo                 # → arch.svg
+kymo process.bpmn out.svg      # render BPMN to SVG
+kymo arch.kymo out.png         # render, then rasterize to PNG
+kymo image.svg out.png         # rasterize an existing SVG
+kymo image.svg                 # → image.png
+kymo arch.kymo out.png -s 2    # 2× resolution
+```
+
+PNG output rasterizes via [`kymostudio-core`](https://www.npmjs.com/package/kymostudio-core)
+(the shared resvg engine, same output as the Python and Rust CLIs), installed as
+a dependency.
+
 ## Render a `.kymo` DSL file
 
 `parseDiagram(src)` runs the full front-end pipeline — parse the declarative

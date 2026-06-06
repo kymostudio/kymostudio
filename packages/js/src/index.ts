@@ -2,7 +2,8 @@
  * kymostudio — an independent TypeScript implementation of the diagram-as-code
  * toolkit (data model + icon library + SVG renderer + BPMN importer). It is
  * developed in parallel with the Python package at `packages/python/src/kymo/`
- * and kept at feature parity — not a port of it. Dependency-free.
+ * and kept at feature parity — not a port of it. The library is dependency-free;
+ * the `kymo` CLI's PNG output rasterizes via the `kymostudio-core` wasm package.
  *
  * Public surface:
  *   - data model: `makeComponent`, `makeEdge`, `makeRegion`, `makeDiagram`,

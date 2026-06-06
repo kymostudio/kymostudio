@@ -31,10 +31,9 @@ import base64
 import hashlib
 import json
 
-import cairosvg
-
 from .icons import ICONS
 from .model import SHAPE_HALF, Component, Diagram, Edge, Region
+from .to_png import render_png
 from .to_svg import route_edge
 
 # ── Palette (Excalidraw uses CSS hex strings) ─────────────────────────
@@ -183,7 +182,7 @@ _ICON_PNG_SCALE = 2
 
 
 def _register_icon(icon_key: str, shape: str | None = None) -> tuple[str, float, float]:
-    """Rasterise the icon to PNG (via cairosvg) and register it as an
+    """Rasterise the icon to PNG (via resvg) and register it as an
     entry in the scene `files` map. Returns (fileId, display_w, display_h)
     — the display size includes shadow padding so positioning code can
     shift the image's top-left."""
@@ -194,11 +193,9 @@ def _register_icon(icon_key: str, shape: str | None = None) -> tuple[str, float,
     # SHA-1 of (key+svg) — non-cryptographic, just a stable content hash.
     file_id = hashlib.sha1(f"{icon_key}::{svg}".encode()).hexdigest()
     if file_id not in _files:
-        png_bytes = cairosvg.svg2png(
-            bytestring=svg.encode("utf-8"),
-            output_width=int(display_w * _ICON_PNG_SCALE),
-            output_height=int(display_h * _ICON_PNG_SCALE),
-        )
+        # The icon SVG's intrinsic size is display_w×display_h, so a uniform
+        # _ICON_PNG_SCALE renders it at exactly that × the HiDPI factor.
+        png_bytes = render_png(svg, _ICON_PNG_SCALE)
         b64 = base64.b64encode(png_bytes).decode("ascii")
         _files[file_id] = {
             "mimeType": "image/png",

@@ -1,4 +1,4 @@
-name: Release kymostudio-core
+name: Release kymostudio crates
 
 on:
   push:
@@ -6,9 +6,13 @@ on:
       - 'v*'  # Trigger on tags like v0.1.0 (shared lockstep tag)
   workflow_dispatch:
 
-# The kymostudio-core crate + its Python/wasm bindings all build from
-# packages/rust/kymostudio-core/. Publishes to crates.io, PyPI, and npm — each
-# via that registry's Trusted Publishing (OIDC); only npm uses a stored token.
+# Two crates ship from packages/rust/:
+#   • kymostudio-core — the resvg engine + Python (pyo3) / wasm bindings.
+#     Publishes to crates.io, PyPI, and npm (each via Trusted Publishing OIDC;
+#     only npm uses a stored token). Builds from packages/rust/kymostudio-core/.
+#   • kymostudio — the `kymo` CLI (thin front-end over the core). Publishes to
+#     crates.io only, AFTER the core (it depends on the just-published version).
+# Most jobs default to the core dir; the CLI job overrides working-directory.
 defaults:
   run:
     working-directory: packages/rust/kymostudio-core
@@ -20,14 +24,20 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v5
-      - name: Verify tag matches Cargo.toml version
+      - name: Verify tag matches both Cargo.toml versions
         run: |
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
-          CARGO_VERSION=$(grep '^version = ' Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
-          echo "Tag version:        $TAG_VERSION"
-          echo "Cargo.toml version: $CARGO_VERSION"
-          if [ "$TAG_VERSION" != "$CARGO_VERSION" ]; then
-            echo "ERROR: Tag version ($TAG_VERSION) does not match Cargo.toml version ($CARGO_VERSION)"
+          CORE_VERSION=$(grep '^version = ' Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+          CLI_VERSION=$(grep '^version = ' ../kymostudio/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+          echo "Tag version:                  $TAG_VERSION"
+          echo "kymostudio-core Cargo.toml:   $CORE_VERSION"
+          echo "kymostudio (CLI) Cargo.toml:  $CLI_VERSION"
+          if [ "$TAG_VERSION" != "$CORE_VERSION" ]; then
+            echo "ERROR: Tag ($TAG_VERSION) != kymostudio-core version ($CORE_VERSION)"
+            exit 1
+          fi
+          if [ "$TAG_VERSION" != "$CLI_VERSION" ]; then
+            echo "ERROR: Tag ($TAG_VERSION) != kymostudio (CLI) version ($CLI_VERSION)"
             exit 1
           fi
           echo "✓ Versions match"
@@ -38,8 +48,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
-      - name: Run test suite
+      - name: Run core test suite
         run: cargo test
+      - name: Run CLI crate test suite
+        run: cargo test --manifest-path ../kymostudio/Cargo.toml
 
   # ── Build Python wheels across platforms (abi3 → one wheel per platform) ──
   wheels:
@@ -111,6 +123,42 @@ jobs:
         run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+
+  # ── Publish the `kymo` CLI crate to crates.io (after the core) ──
+  # `cargo install kymostudio` then provides the `kymo` binary. This crate
+  # depends on the version of kymostudio-core that publish-crate just pushed, so
+  # it must run after it AND retry — crates.io's sparse index lags a bit behind a
+  # publish, and the dependency won't resolve until the new core version appears.
+  # NOTE: the very first publish of a brand-new crate name may need a manual
+  # token-based `cargo publish` by an owner to claim the name + configure
+  # Trusted Publishing; subsequent runs use OIDC like below.
+  publish-cli:
+    name: Publish kymo CLI to crates.io
+    needs: [publish-crate]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: packages/rust/kymostudio
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Authenticate to crates.io (OIDC)
+        uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - name: cargo publish (retry until the new core is indexed)
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          for i in $(seq 1 20); do
+            if cargo publish; then echo "✓ published kymostudio"; exit 0; fi
+            echo "attempt $i: publish failed (core may not be indexed yet); sleeping 30s…"
+            sleep 30
+          done
+          echo "::error::cargo publish (kymostudio) failed after retries"
+          exit 1
 
   # ── Publish to PyPI (OIDC Trusted Publishing — no token) ──
   publish-pypi:

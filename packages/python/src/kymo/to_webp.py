@@ -41,19 +41,9 @@ from pathlib import Path
 
 from PIL import Image
 
-# Rasterizer backend. Prefer the in-repo Rust core (packages/rust/kymostudio-core,
-# importable as `_kymostudio_core` once its wheel is installed); fall back to the
-# external `resvg-py`. Both wrap the same resvg engine, so output is equivalent.
-try:
-    import _kymostudio_core as _kcore
-
-    def _svg_to_png(svg_str: str) -> bytes:
-        return _kcore.svg_to_png(svg_str.encode("utf-8"), 1.0)
-except ModuleNotFoundError:
-    import resvg_py
-
-    def _svg_to_png(svg_str: str) -> bytes:
-        return bytes(resvg_py.svg_to_bytes(svg_string=svg_str))
+# Rasterizer backend lives in to_png.py (no Pillow dependency) so plain PNG
+# output works without it; the WebP encoder below reuses the same resvg binding.
+from .to_png import _svg_to_png  # noqa: E402
 
 # Match the constants in to_svg.py ANIM_PRESETS["flow"].
 DASH_LEN           = 16          # @keyframes edge-flow { from: 16 → to: 0 }

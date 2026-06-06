@@ -18,8 +18,15 @@ kymo path/to/diagram.kymo --animate    # → path/to/diagram-animated.svg
 kymo path/to/diagram.kymo --figma      # → path/to/diagram.figma.js
 kymo path/to/diagram.kymo --excalidraw # → path/to/diagram.excalidraw
 kymo path/to/process.bpmn                 # → path/to/process.svg (BPMN 2.0)
+kymo path/to/diagram.kymo out.png         # render, then rasterize to PNG (resvg)
+kymo path/to/diagram.kymo out.png -s 2    # 2× resolution
+kymo path/to/image.svg out.png            # rasterize an existing SVG
+kymo path/to/image.svg                    # → path/to/image.png
 kymo lint path/to/process.bpmn            # report BPMN structural + import issues
 ```
+
+PNG output rasterizes via [`kymostudio-core`](https://pypi.org/project/kymostudio-core/)
+(the shared resvg engine), installed automatically as a dependency.
 
 See [`samples/`](https://github.com/kymostudio/kymostudio/tree/main/samples) for complete example `.kymo` and
 `.bpmn` files.
