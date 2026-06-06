@@ -25,13 +25,20 @@ Kymostudio is a collection of libraries and tools to turn diagram-as-code source
 
 ## ✨ Features
 
-- **Draws what you actually need** — software architecture, process flows and standard BPMN, all rendered faithfully.
-- **Starts from any source** — author in the `.kymo` DSL, or feed it BPMN, JSON or Python.
-- **Write once, export anywhere** — one source compiles to SVG, PNG, WebP, Figma and Excalidraw.
-- **Diagrams as code** — describe your diagram in a clean, line-oriented `.kymo` syntax; no dragging boxes around.
-- **Animated by default** — edges come alive with built-in flowing animation, straight to a self-contained SVG.
-- **Smart auto-layout** — frames, anchoring, edge routing and canvas sizing are figured out for you.
-- **A rich icon library** — 2,460 icons spanning AWS, Azure, GCP, Kubernetes, on-prem and more.
+- **Draws what you actually need**  
+  Software architecture, process flows and standard BPMN, all rendered faithfully.
+- **Starts from any source**  
+  Author in the `.kymo` DSL, or feed it BPMN, JSON or Python.
+- **Write once, export anywhere**  
+  One source compiles to SVG, PNG, WebP, Figma and Excalidraw.
+- **Diagrams as code**  
+  Describe your diagram in a clean, line-oriented `.kymo` syntax — no dragging boxes around.
+- **Animated by default**  
+  Edges come alive with built-in flowing animation, straight to a self-contained SVG.
+- **Smart auto-layout**  
+  Frames, anchoring, edge routing and canvas sizing are figured out for you.
+- **A rich icon library**  
+  2,460 icons spanning AWS, Azure, GCP, Kubernetes, on-prem and more.
 
 ## Install
 
