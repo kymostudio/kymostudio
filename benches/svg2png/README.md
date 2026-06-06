@@ -28,6 +28,11 @@ the field (lowest mean Δ overall and in nearly every category), *and* on kymo's
 own SVGs it is the faithful, fastest option. librsvg is a close second; cairosvg
 and svglib trail and partly fail. See [`results/REPORT.md`](results/REPORT.md).
 
+For the full write-up — motivation, method, the two-reference design, per-category
+analysis, and the investigation into why the best engines all "fail" one shapes
+case (an SVG 2 `ic`-unit feature only Chrome implements) — read
+**[`RESEARCH.md`](RESEARCH.md)**.
+
 ## Run
 
 ```bash
