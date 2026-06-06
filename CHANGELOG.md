@@ -9,6 +9,17 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-06-06
+
+### Changed
+
+- **Python & JS now require `kymostudio-core` `^0.4`** (`>=0.4,<0.5` / `^0.4`),
+  up from `^0.3`. This activates the `kymo … out.pdf` SVG → vector PDF path in
+  the Python and JS CLIs (it calls the core's `svg_to_pdf`, new in 0.4.0). The
+  floor raise lands one release after 0.4.0 so the floor always points at an
+  already-published core (`docs/RELEASING.md`); 0.4.0 published the core, so CI
+  and installs now resolve it cleanly. No API changes.
+
 ## [0.4.0] - 2026-06-06
 
 ### Added

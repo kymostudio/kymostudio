@@ -21,7 +21,7 @@ from .model import Component, Diagram, Edge, Region
 from .to_bpmn import export as to_bpmn
 from .to_svg import render
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 __all__ = [
     "parse",
