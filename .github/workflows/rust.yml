@@ -1,0 +1,141 @@
+name: Rust core
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/rust/**'
+      - '.github/workflows/rust.yml'
+  pull_request:
+    paths:
+      - 'packages/rust/**'
+      - '.github/workflows/rust.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  # All cargo/maturin/wasm work happens inside the crate.
+  CRATE_DIR: packages/rust/kymostudio-core
+
+defaults:
+  run:
+    working-directory: packages/rust/kymostudio-core
+
+jobs:
+  # ── Lint: formatting, clippy, and every feature permutation type-checks ──
+  lint:
+    name: Format & clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/rust/kymostudio-core
+      - name: rustfmt
+        run: cargo fmt --all --check
+      - name: clippy (native, default features)
+        run: cargo clippy --all-targets -- -D warnings
+      - name: check (bare core, no features)
+        run: cargo check --no-default-features
+      - name: clippy (wasm feature)
+        run: cargo clippy --lib --no-default-features --features wasm --target wasm32-unknown-unknown -- -D warnings
+
+  # ── Native: build the kymo CLI + run tests on every OS ──
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/rust/kymostudio-core
+      - name: Test (default = native + system-fonts)
+        run: cargo test
+      - name: Build release CLI
+        run: cargo build --release --bin kymo
+      - name: Smoke-test the CLI
+        shell: bash
+        run: |
+          printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="#0a0"/></svg>' > sq.svg
+          ./target/release/kymo -i sq.svg out.png
+          test -s out.png && echo "PNG produced"
+
+  # ── wasm: compile to wasm32 and produce the wasm-pack JS package ──
+  wasm:
+    name: wasm build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/rust/kymostudio-core
+      - name: Cargo build (wasm32)
+        run: cargo build --lib --release --no-default-features --features wasm --target wasm32-unknown-unknown
+      - uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: 'latest'
+      - name: wasm-pack build (browser + Node)
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
+      - name: Check generated JS/TS glue exists
+        run: |
+          test -f pkg/kymostudio_core.js
+          test -f pkg/kymostudio_core_bg.wasm
+          test -f pkg/kymostudio_core.d.ts
+          echo "wasm pkg OK"; ls -la pkg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wasm-pkg
+          path: packages/rust/kymostudio-core/pkg
+
+  # ── Python: build the abi3 wheel on every OS, then import + render ──
+  wheels:
+    name: Python wheel (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Build abi3 wheel (maturin)
+        uses: PyO3/maturin-action@v1
+        with:
+          working-directory: packages/rust/kymostudio-core
+          command: build
+          args: --release --out dist
+          manylinux: auto
+      - name: Install & smoke-test the wheel
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --no-index --find-links dist kymostudio-core
+          python - <<'PY'
+          import _kymostudio_core as k
+          svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="#09f"/></svg>'
+          png = k.svg_to_png(svg, 2.0)
+          assert png[:8] == b'\x89PNG\r\n\x1a\n', "not a PNG"
+          print("kymostudio-core", k.__version__, "->", len(png), "bytes OK")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}
+          path: packages/rust/kymostudio-core/dist/*.whl

@@ -39,8 +39,21 @@ import sys
 from io import BytesIO
 from pathlib import Path
 
-import resvg_py
 from PIL import Image
+
+# Rasterizer backend. Prefer the in-repo Rust core (packages/rust/kymostudio-core,
+# importable as `_kymostudio_core` once its wheel is installed); fall back to the
+# external `resvg-py`. Both wrap the same resvg engine, so output is equivalent.
+try:
+    import _kymostudio_core as _kcore
+
+    def _svg_to_png(svg_str: str) -> bytes:
+        return _kcore.svg_to_png(svg_str.encode("utf-8"), 1.0)
+except ModuleNotFoundError:
+    import resvg_py
+
+    def _svg_to_png(svg_str: str) -> bytes:
+        return bytes(resvg_py.svg_to_bytes(svg_string=svg_str))
 
 # Match the constants in to_svg.py ANIM_PRESETS["flow"].
 DASH_LEN           = 16          # @keyframes edge-flow { from: 16 → to: 0 }
@@ -106,10 +119,8 @@ def make_frame_svg(animated_svg: str, t_ms: float) -> str:
 
 
 def render_frame(svg_str: str, width: int | None) -> Image.Image:
-    # resvg-py accepts a string and returns a list of bytes (RGBA-encoded
-    # PNG). Width override via `resolution_scale` (1.0 = native viewBox).
-    kwargs: dict = {"svg_string": svg_str}
-    png_bytes = bytes(resvg_py.svg_to_bytes(**kwargs))
+    # Rasterize at the SVG's native viewBox; width override is applied below.
+    png_bytes = _svg_to_png(svg_str)
     img = Image.open(BytesIO(png_bytes)).convert("RGBA")
     if width and img.width != width:
         h = round(img.height * width / img.width)

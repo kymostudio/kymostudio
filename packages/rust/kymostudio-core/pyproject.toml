@@ -1,0 +1,27 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "kymostudio-core"
+version = "0.3.3"
+description = "Type it. See it appear. Watch it animate."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [{ name = "rain1024", email = "anhv.ict91@gmail.com" }]
+keywords = ["svg", "png", "rasterizer", "diagram", "resvg"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Graphics",
+]
+
+[project.urls]
+Homepage = "https://github.com/kymostudio/kymostudio"
+Repository = "https://github.com/kymostudio/kymostudio"
+
+[tool.maturin]
+# Build the `python` feature; ship a single abi3 wheel (cp310-abi3).
+features = ["python"]
+module-name = "_kymostudio_core"
