@@ -120,18 +120,25 @@ jobs:
         uses: rust-lang/crates-io-auth-action@v1
         id: auth
       - name: cargo publish
-        run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          if out=$(cargo publish 2>&1); then echo "$out"; exit 0; fi
+          echo "$out"
+          echo "$out" | grep -qi "already exists" && { echo "::warning::kymostudio-core already on crates.io — treating as published."; exit 0; }
+          exit 1
 
   # ── Publish the `kymo` CLI crate to crates.io (after the core) ──
-  # `cargo install kymostudio` then provides the `kymo` binary. This crate
-  # depends on the version of kymostudio-core that publish-crate just pushed, so
-  # it must run after it AND retry — crates.io's sparse index lags a bit behind a
-  # publish, and the dependency won't resolve until the new core version appears.
-  # NOTE: the very first publish of a brand-new crate name may need a manual
-  # token-based `cargo publish` by an owner to claim the name + configure
-  # Trusted Publishing; subsequent runs use OIDC like below.
+  # `cargo install kymostudio` then provides the `kymo` binary. The CLI depends
+  # on kymostudio-core via a caret-to-MINOR range (`version = "0.3"`, see the
+  # dependency convention in CLAUDE.md), so on a PATCH release the dep already
+  # resolves against a previously-published core and `cargo publish` succeeds at
+  # once. The retry only matters on a MINOR bump, when the floor points at the
+  # core version this same run just published — then it covers crates.io's
+  # sparse-index lag. `already exists` is treated as success so re-runs are
+  # idempotent. (First publish of a brand-new crate name must be done once
+  # manually with a token to claim it + configure Trusted Publishing — already
+  # done for `kymostudio`; subsequent runs use OIDC below.)
   publish-cli:
     name: Publish kymo CLI to crates.io
     needs: [publish-crate]
@@ -148,12 +155,14 @@ jobs:
       - name: Authenticate to crates.io (OIDC)
         uses: rust-lang/crates-io-auth-action@v1
         id: auth
-      - name: cargo publish (retry until the new core is indexed)
+      - name: cargo publish (retry for minor-bump index lag; idempotent)
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
         run: |
           for i in $(seq 1 20); do
-            if cargo publish; then echo "✓ published kymostudio"; exit 0; fi
+            if out=$(cargo publish 2>&1); then echo "$out"; echo "✓ published kymostudio"; exit 0; fi
+            echo "$out"
+            echo "$out" | grep -qi "already exists" && { echo "::warning::kymostudio already on crates.io — treating as published."; exit 0; }
             echo "attempt $i: publish failed (core may not be indexed yet); sleeping 30s…"
             sleep 30
           done

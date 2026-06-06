@@ -18,9 +18,13 @@ name = "kymo"
 path = "src/main.rs"
 
 [dependencies]
-# `path` for local dev; `version` so crates.io resolves the published core
-# (kymostudio-core must be published first — see release-crate.yml `publish-cli`).
-kymostudio-core = { path = "../kymostudio-core", version = "0.3.6" }
+# Dependency convention (see CLAUDE.md): caret-pinned to the current MINOR
+# series of kymostudio-core, NOT lockstep-bumped per patch. `^0.3` = >=0.3.0,
+# <0.4.0 — identical semantics to the Python (`>=0.3,<0.4`) and npm (`^0.3`)
+# packages. The floor is always an already-published version, so publishing this
+# crate never has to wait for the same release's core to be indexed. `path` is
+# for local dev; `version` is what crates.io resolves against.
+kymostudio-core = { path = "../kymostudio-core", version = "0.3" }
 
 [profile.release]
 opt-level = 3

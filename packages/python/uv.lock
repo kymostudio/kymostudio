@@ -53,7 +53,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "kymostudio-core", specifier = ">=0.3.3" },
+    { name = "kymostudio-core", specifier = ">=0.3,<0.4" },
     { name = "pillow", marker = "extra == 'webp'", specifier = ">=10.0" },
 ]
 provides-extras = ["webp"]
