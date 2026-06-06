@@ -9,6 +9,34 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-06-06
+
+### Added
+
+- **`kymo <input> [output.png] [--scale N]` SVG → PNG CLI in all three impls.**
+  An existing `.svg` rasterizes directly; a `.kymo`/`.bpmn`/`.kymo.json` source
+  is rendered then rasterized (Python + JS). All three route through the one
+  `resvg` engine in `kymostudio-core`, producing byte-identical PNG output.
+- **New `packages/rust/kymostudio` crate** — the `kymo` CLI binary now lives in
+  its own crate (published as `kymostudio` on crates.io → `cargo install
+  kymostudio`); `kymostudio-core` is now a pure library. `release-crate.yml`
+  gained a `publish-cli` job (publishes the CLI after the core, with retry for
+  crates.io index lag).
+
+### Changed
+
+- **Python now depends only on `kymostudio-core`** — dropped `cairosvg`; SVG→PNG
+  (CLI + Excalidraw icon embedding) goes through the shared `resvg` engine.
+- **JS adds `kymostudio-core` (wasm) as its sole runtime dependency** for the
+  `kymo` CLI's PNG output; the library itself remains dependency-free.
+
+### Fixed
+
+- **PyPI `kymostudio-core` was stuck at 0.3.3.** `pyproject.toml` pinned the
+  version statically, so maturin rebuilt 0.3.3 every release. The version is now
+  sourced dynamically from `Cargo.toml` (one source of truth), so each release
+  publishes the correct wheel.
+
 ## [0.3.5] - 2026-06-06
 
 ### Fixed
