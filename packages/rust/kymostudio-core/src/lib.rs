@@ -1,9 +1,11 @@
-//! kymostudio core — pure-Rust SVG rasterization built on [`resvg`].
+//! kymostudio core — pure-Rust SVG rasterization (PNG) and vector PDF, built on
+//! [`resvg`] / [`svg2pdf`].
 //!
 //! No browser, no headless Chrome, no C dependencies. This mirrors what the
 //! Python package does via `resvg-py` (`to_webp.py`) so SVG→PNG output stays
 //! consistent across implementations — `resvg` is CSS-class-aware, which is why
-//! the project avoids cairosvg.
+//! the project avoids cairosvg. PDF goes through `svg2pdf` (same usvg lineage),
+//! keeping vector output CSS-class-aware too.
 
 use resvg::{tiny_skia, usvg};
 
@@ -13,7 +15,7 @@ mod python;
 #[cfg(feature = "wasm")]
 mod wasm;
 
-/// Something went wrong turning SVG bytes into PNG bytes.
+/// Something went wrong turning SVG bytes into PNG or PDF bytes.
 #[derive(Debug)]
 pub enum RenderError {
     /// The SVG could not be parsed.
@@ -22,6 +24,8 @@ pub enum RenderError {
     Size { width: u32, height: u32 },
     /// PNG encoding failed.
     Encode(String),
+    /// SVG→PDF conversion failed (svg2pdf parse or encode).
+    Pdf(String),
 }
 
 impl std::fmt::Display for RenderError {
@@ -32,6 +36,7 @@ impl std::fmt::Display for RenderError {
                 write!(f, "invalid raster size {width}x{height}")
             }
             RenderError::Encode(e) => write!(f, "PNG encoding failed: {e}"),
+            RenderError::Pdf(e) => write!(f, "SVG→PDF conversion failed: {e}"),
         }
     }
 }
@@ -70,4 +75,50 @@ pub fn svg_to_png(svg: &[u8], scale: f32) -> Result<Vec<u8>, RenderError> {
     pixmap
         .encode_png()
         .map_err(|e| RenderError::Encode(e.to_string()))
+}
+
+/// Convert SVG bytes to a vector PDF (one page, intrinsic SVG size, 72 dpi).
+///
+/// Vector — strokes and text stay crisp at any zoom. Parsing uses `svg2pdf`'s
+/// own bundled usvg (0.45), independent of the `resvg` used by [`svg_to_png`],
+/// so there is no `scale`: PDF is resolution-independent. On native builds
+/// (`system-fonts`) system fonts are loaded so `<text>` renders; the wasm build
+/// omits this path entirely (the `pdf` feature is off there).
+#[cfg(feature = "pdf")]
+pub fn svg_to_pdf(svg: &[u8]) -> Result<Vec<u8>, RenderError> {
+    use svg2pdf::usvg as pdf_usvg;
+
+    #[allow(unused_mut)]
+    let mut opt = pdf_usvg::Options::default();
+    #[cfg(feature = "system-fonts")]
+    opt.fontdb_mut().load_system_fonts();
+
+    let tree =
+        pdf_usvg::Tree::from_data(svg, &opt).map_err(|e| RenderError::Pdf(e.to_string()))?;
+
+    svg2pdf::to_pdf(
+        &tree,
+        svg2pdf::ConversionOptions::default(),
+        svg2pdf::PageOptions::default(),
+    )
+    .map_err(|e| RenderError::Pdf(e.to_string()))
+}
+
+#[cfg(test)]
+mod tests {
+    const SVG: &[u8] =
+        br##"<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20"><rect width="40" height="20" fill="#09f"/></svg>"##;
+
+    #[test]
+    fn png_has_magic() {
+        let png = super::svg_to_png(SVG, 1.0).expect("render png");
+        assert_eq!(&png[..8], b"\x89PNG\r\n\x1a\n");
+    }
+
+    #[cfg(feature = "pdf")]
+    #[test]
+    fn pdf_has_magic() {
+        let pdf = super::svg_to_pdf(SVG).expect("render pdf");
+        assert_eq!(&pdf[..5], b"%PDF-");
+    }
 }

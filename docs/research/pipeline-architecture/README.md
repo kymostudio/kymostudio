@@ -372,8 +372,9 @@ packages/python/src/kymo/
 
 - Adding a `.drawio` Python importer = one file in `pipeline/importers/` + one registry entry.
   Today: edit `cli.py:58-72`.
-- Adding a `.pdf` output = one file in `pipeline/encoders/`. Today: add a `--pdf` flag plus a new
-  branch in `cli.py:144-189`.
+- Adding a `.pdf` output = one file in `pipeline/encoders/`. **Now shipped**: vector PDF via
+  `kymostudio-core`'s `svg_to_pdf` (svg2pdf), dispatched by the `.pdf` output extension in all three
+  CLIs (`cli.py`, the Rust `kymo`, and the JS CLI) — no dedicated flag.
 - `kymo -i a.bpmn -i b.kymo -filter_complex concat -o out.svg` works without touching the core.
 - Per-stage unit tests (importer with fixed JSON, filter with fixed `Diagram`, encoder with fixed
   `Diagram`) replace today's end-to-end-only coverage.
