@@ -1,0 +1,9 @@
+{
+  "name": "tool-icon",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Web app to browse Iconify and pick vendor-neutral agentic-AI concept icons for the kymo `ai` set. Zero-dependency Node static server.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

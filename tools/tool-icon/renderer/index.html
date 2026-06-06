@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://code.iconify.design; connect-src 'self' https://api.iconify.design; img-src data: https://api.iconify.design; style-src 'self' 'unsafe-inline';" />
+  <title>tool-icon</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Iconify web component: renders any prefix:name from api.iconify.design -->
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">tool-icon <span class="muted">· Iconify → ai: concepts</span></div>
+    <div class="topbar-actions">
+      <span id="progress" class="muted"></span>
+      <button id="themeBtn" class="ghost" title="Đổi giao diện sáng/tối">☀ Sáng</button>
+      <button id="saveBtn" class="primary">Lưu lựa chọn</button>
+      <span id="saveStatus" class="muted"></span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Left: the 10 concepts -->
+    <nav id="conceptList" class="concepts"></nav>
+
+    <!-- Center: search + candidate grid -->
+    <section class="picker">
+      <div class="picker-head">
+        <h2 id="conceptLabel">—</h2>
+        <p id="conceptDesc" class="muted"></p>
+        <div class="searchrow">
+          <input id="searchInput" type="search" placeholder="Tìm trên Iconify… (Enter)" />
+          <button id="searchBtn">Tìm</button>
+          <label class="bgtoggle">
+            <input type="checkbox" id="darkToggle" /> Nền tối
+          </label>
+        </div>
+        <div id="seedRow" class="seedrow"></div>
+      </div>
+      <div id="results" class="grid"></div>
+      <div id="resultsStatus" class="muted status"></div>
+    </section>
+
+    <!-- Right: current selection detail -->
+    <aside class="detail">
+      <h3>Lựa chọn hiện tại</h3>
+      <div class="swatches">
+        <div class="swatch light"><iconify-icon id="prevLight"></iconify-icon></div>
+        <div class="swatch dark"><iconify-icon id="prevDark"></iconify-icon></div>
+      </div>
+      <div class="addr" id="selAddr">chưa chọn</div>
+      <label class="okrow">
+        <input type="checkbox" id="okCheck" /> Hợp lý
+      </label>
+      <textarea id="noteInput" placeholder="Ghi chú (tuỳ chọn)…"></textarea>
+      <button id="clearBtn" class="ghost">Bỏ chọn icon này</button>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

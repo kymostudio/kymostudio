@@ -1,0 +1,17 @@
+{
+  "set": "ai",
+  "category": "concept",
+  "note": "10 vendor-neutral agentic-AI concept icons to vendor into packages/icons/sets/ai.json. `key` becomes ai:<key>. `keywords` seed the Iconify search.",
+  "concepts": [
+    { "key": "agent",             "label": "Agent",            "desc": "Generic autonomous agent (replaces the overloaded hex-agent)", "keywords": ["robot", "agent", "bot"] },
+    { "key": "orchestrator",      "label": "Orchestrator",     "desc": "Supervisor / multi-agent coordinator",                        "keywords": ["sitemap", "hub", "orchestration", "network"] },
+    { "key": "llm",               "label": "LLM",              "desc": "Language model (generic, non-brand)",                         "keywords": ["brain", "sparkles", "cpu", "language"] },
+    { "key": "tool",              "label": "Tool",             "desc": "Tool / function-calling",                                     "keywords": ["tool", "wrench", "function"] },
+    { "key": "memory",            "label": "Memory",           "desc": "Agent memory (short / long-term)",                            "keywords": ["memory", "brain", "database", "ram"] },
+    { "key": "retriever",         "label": "Retriever",        "desc": "RAG retriever",                                               "keywords": ["search", "document", "retrieve"] },
+    { "key": "vector-db",         "label": "Vector DB",        "desc": "Vector store",                                                "keywords": ["database", "vector", "cylinder"] },
+    { "key": "guardrail",         "label": "Guardrail",        "desc": "Safety guardrail / policy filter",                            "keywords": ["shield", "guard", "safety"] },
+    { "key": "human-in-the-loop", "label": "Human-in-the-loop","desc": "HITL clarification / approval",                              "keywords": ["user-check", "human", "approval"] },
+    { "key": "mcp",               "label": "MCP",              "desc": "Model Context Protocol / tool server",                        "keywords": ["plug", "connection", "protocol", "api"] }
+  ]
+}
