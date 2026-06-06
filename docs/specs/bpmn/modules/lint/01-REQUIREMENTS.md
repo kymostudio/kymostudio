@@ -1,7 +1,7 @@
 ---
 title: BPMN Lint — Requirements
 document_id: FEAT-BPMN-LINT-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-06-06
 status: Baselined
 classification: Internal
@@ -47,7 +47,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-BPMN-LINT-001                                 |
-| Version      | 1.1                                                |
+| Version      | 1.2                                                |
 | Status       | Baselined                                          |
 | Issue Date   | 2026-06-06                                         |
 | Owner        | `packages/python` (kymo CLI)                       |
@@ -232,6 +232,18 @@ output.
   `ParseError.position` for the line.
   *Source need:* SN-LINT-04.
 
+- **FR-LINT-9** The rule set SHALL be **configurable** (delivered by CR-BPMN-LINT-002): every finding
+  carries its `LR-*` rule code, and a configuration MAY select a **preset** (`all` — every rule, the
+  default; `recommended` — drops purely-stylistic rules) and then **override** individual rules
+  (disable, or change severity to `warn`/`error`). Configuration is read from a JSON `.kymolintrc`
+  (`extends` + `rules`, each value `off|warn|error`) discovered from the cwd upward, or selected via
+  `--preset=`/`--config=`; an invalid configuration is a usage error (exit 1). The default
+  configuration (no rc-file, no flag) SHALL be behaviourally identical to preset `all`.
+  *Clarification:* configuration is applied as a post-pass over the generated findings — disabled rules
+  are dropped and severity overrides are substituted — so rule logic (FR-LINT-2..4, FR-LINT-8) is
+  unchanged. Extends FR-LINT-2..4 and NFR-LINT-3.
+  *Source need:* SN-LINT-04, SN-LINT-05.
+
 ## 4. The rule set
 
 This is the **normative catalogue** of rules. Each rule emits a `Finding` with the listed severity and
@@ -318,12 +330,13 @@ because it is renderer-agnostic.
 ### 6.1 CLI surface
 
 ```
-kymo lint <file.bpmn> [<file.bpmn> ...]
+kymo lint [--preset=all|recommended] [--config=<.kymolintrc>] <file.bpmn> [<file.bpmn> ...]
 ```
 
 `lint` is the first positional subcommand of the kymo CLI; **Python package only** (the JS package is
 library-only with no CLI). Each argument is linted independently; per-file reports are joined by a
-blank line.
+blank line. `--preset=` selects a preset; `--config=` points at an explicit rc-file; with neither, the
+nearest `.kymolintrc` from the cwd upward is used, else preset `all` (see §6.5).
 
 ### 6.2 Exit-code contract
 
@@ -331,6 +344,7 @@ blank line.
 |---------|------|
 | Linting completed (with or without findings) | **0** |
 | Usage error: empty argument list, file not found, or non-`.bpmn` suffix | **1** |
+| Configuration error: bad preset/rule/severity, missing `--config` file, or invalid rc-file JSON | **1** |
 
 ### 6.3 Output line format
 
@@ -350,17 +364,45 @@ Module `kymo.lint_bpmn` (re-exported from `kymo` as `lint_bpmn`):
 
 | Symbol | Signature | Purpose |
 |--------|-----------|---------|
-| `Finding` | `Finding(severity, eid, name, message, line=0)` | frozen dataclass for one finding |
-| `lint` | `lint(xml_text: str) -> list[Finding]` | lint raw XML; returns ordered findings |
-| `lint_file` | `lint_file(path: Path) -> list[Finding]` | read a file, then `lint` it |
+| `Finding` | `Finding(severity, eid, name, message, line=0, rule="")` | frozen dataclass for one finding; `rule` is its `LR-*` code |
+| `lint` | `lint(xml_text: str, config: Config \| None = None) -> list[Finding]` | lint raw XML; `config=None` ⇒ preset `all` |
+| `lint_file` | `lint_file(path: Path, config: Config \| None = None) -> list[Finding]` | read a file, then `lint` it |
 | `counts` | `counts(findings) -> tuple[int, int]` | `(error_count, warning_count)` |
 | `format_report` | `format_report(label, findings) -> str` | render the §6.3 report for one file |
+| `RULES` / `PRESETS` | `dict[str, str]` / `dict[str, frozenset[str]]` | the rule registry and named presets |
+| `Config` | `Config(enabled, severity)` | a resolved configuration (active codes + overrides) |
+| `default_config` / `preset_config` | `() -> Config` / `(name) -> Config` | preset-`all` default; a named preset |
+| `parse_config` / `load_config` / `find_config` | `(dict) -> Config` / `(Path) -> Config` / `(Path) -> Path \| None` | build/read/discover an rc-file config |
+| `ConfigError` | exception | raised on an invalid configuration |
+
+### 6.5 Configuration (rc-file & presets) — FR-LINT-9
+
+A JSON `.kymolintrc` (or `.kymolintrc.json`) mirrors bpmnlint's shape:
+
+```json
+{
+  "extends": "recommended",
+  "rules": { "LR-GR-11": "off", "LR-DI-01": "error" }
+}
+```
+
+- **`extends`** — a preset name: `all` (every rule; the default when omitted) or `recommended` (every
+  rule except purely-stylistic ones — currently `LR-GR-11`).
+- **`rules`** — per-rule overrides keyed by `LR-*` code: `"off"` disables a rule; `"warn"`/`"error"`
+  re-enables it (over the preset) and sets its severity. An unknown preset, unknown rule code, or bad
+  severity value is a configuration error (exit 1).
+
+Resolution precedence: `--config=<path>` › `--preset=<name>` › nearest `.kymolintrc` (cwd upward) ›
+preset `all`. The default path (no rc-file, no flag) is behaviourally identical to the pre-CR-002
+linter, so existing output is unchanged.
 
 ## 7. Future requirements (change-requests)
 
-Forward-looking deltas are proposed (not built) and specified in PLAN-BPMN-LINT-001:
+Forward-looking deltas are specified in PLAN-BPMN-LINT-001:
 
 - **CR-BPMN-LINT-002** — configurable rules (rc-file on/off + per-rule severity, presets).
+  **Delivered** (realises FR-LINT-9): `.kymolintrc` + `--preset=`/`--config=`, presets `all`/
+  `recommended`, per-rule `off|warn|error`.
 - **CR-BPMN-LINT-003** — more bpmnlint-parity rules (`no-implicit-split`,
   `no-duplicate-sequence-flows`, `label-required`).
 - **CR-BPMN-LINT-004** — JS port (`lintBpmn()`) + VS Code diagnostics via the `bpmn-editor` engine
@@ -381,6 +423,7 @@ withdrawn requirement SHALL be marked withdrawn rather than re-used.
 | 1.0 (INTRO-BPMN-LINT-001) | 2026-06-05 | Vũ Anh | Initial as-built baseline of the introduction. Introduced the `kymo lint <file.bpmn>` raw-XML / DI-fidelity linter; concept, terminology, and document map for the set. |
 | 1.0 (FEAT-BPMN-LINT-001) | 2026-06-05 | Vũ Anh | Initial as-built SRS (`FR-LINT-1..8`, `NFR-LINT-1..5`); normative rule registry `LR-*`; interfaces & output contract; CR roadmap (`CR-BPMN-LINT-002..005`, Proposed). |
 | 1.1 | 2026-06-06 | Vũ Anh | Consolidated PROD-BPMN-LINT-001 (stakeholder needs) and INTRO-BPMN-LINT-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
+| 1.2 | 2026-06-06 | Vũ Anh | **CR-BPMN-LINT-002 delivered.** Added `FR-LINT-9` (configurable rules): `LR-*` codes now carried on every `Finding`; presets `all`/`recommended`; per-rule `off\|warn\|error` overrides via JSON `.kymolintrc` (`extends` + `rules`) and `--preset=`/`--config=` CLI flags. Updated §6.1 (CLI), §6.2 (config-error exit 1), §6.4 (API: `Config`/`RULES`/`PRESETS`/`parse_config`/`load_config`/`find_config`/`ConfigError`; `lint`/`lint_file` gain `config`), added §6.5 (rc-file contract). Default path behaviourally identical to pre-CR-002. |
 
 ## Annex B — Document Control
 

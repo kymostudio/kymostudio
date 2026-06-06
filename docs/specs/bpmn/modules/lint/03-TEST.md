@@ -1,7 +1,7 @@
 ---
 title: BPMN Lint — Test Documentation
 document_id: TEST-BPMN-LINT-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-06-05
 status: Baselined
 classification: Internal
@@ -36,14 +36,14 @@ iso_compliance:
 | Field       | Value                                                              |
 |-------------|-------------------------------------------------------------------|
 | Document ID | TEST-BPMN-LINT-001                                                |
-| Version     | 1.0                                                               |
+| Version     | 1.1                                                               |
 | Status      | Baselined                                                         |
 | Issue Date  | 2026-06-05                                                        |
 | Owner       | `packages/python` (kymo CLI)                                      |
 | Related     | FEAT-BPMN-LINT-001, DESIGN-BPMN-LINT-001, PLAN-BPMN-LINT-001 |
 
 Verifies FEAT-BPMN-LINT-001 (FR-LINT-1..8, NFR-LINT-1..5). Covers the ISO/IEC/IEEE 12207:2017
-Verification & Validation processes. This document **owns** test cases TC-LINT-01..10. The headline
+Verification & Validation processes. This document **owns** test cases TC-LINT-01..15. The headline
 properties under test are: **import-fidelity detection** (the DI rules the importer
 DESIGN-BPMN-PARSER-001 silently drops), **exact source-line mapping**, **always-exit-0 behaviour**,
 and **deterministic, golden-friendly output**.
@@ -72,7 +72,7 @@ and **deterministic, golden-friendly output**.
 | API surface       | `lint`, `lint_file`, `counts`, `format_report`, `Finding`, `ERROR`, `WARN` |
 | Dependencies      | Python standard library only (`xml.etree.ElementTree`, `xml.parsers.expat`) — NFR-LINT-1 |
 | Runtime           | Python ≥ 3.13, managed with `uv`                                        |
-| Test file         | `packages/python/tests/test_lint_bpmn.py` (12 tests)                    |
+| Test file         | `packages/python/tests/test_lint_bpmn.py` (21 tests)                    |
 | Fixture           | `packages/python/tests/fixtures/bpmn/no_di.bpmn` (semantic graph, no DI plane) |
 | Inline fixtures   | `CLEAN` (start → task → end, full DI) and `BROKEN` (well-formed XML, multiple graph + DI faults) defined in the test module |
 | Command           | `uv run --group dev python -m pytest tests/test_lint_bpmn.py -q`        |
@@ -80,9 +80,10 @@ and **deterministic, golden-friendly output**.
 
 ## 3. Test cases
 
-The suite has **12 tests** in total; this section enumerates the ten owned cases TC-LINT-01..10.
-(The two further tests are inspection-grade reinforcements: an additional single-finding malformed-XML
-assertion and the clean-report `✓ no issues` string check, both folded into the criteria below.)
+The suite has **21 tests** in total; this section enumerates the owned cases TC-LINT-01..15
+(TC-LINT-11..15 cover configurable rules, FR-LINT-9 / CR-BPMN-LINT-002). The remaining tests are
+inspection-grade reinforcements (e.g. an additional single-finding malformed-XML assertion and the
+clean-report `✓ no issues` string check) folded into the criteria below.
 
 | ID | Intent | Input | Expected finding(s) / rule | Exit | Covers |
 |----|--------|-------|----------------------------|------|--------|
@@ -96,6 +97,11 @@ assertion and the clean-report `✓ no issues` string check, both folded into th
 | **TC-LINT-08** | No-DI fixture flags every node and every flow | `tests/fixtures/bpmn/no_di.bpmn` | `warn` **LR-DI-03** per node (e.g. `S "has no DI shape (will not render)"`) + `warn` **LR-DI-04** per flow (e.g. `F0`); **all** findings `warn` | 0 | FR-LINT-2 |
 | **TC-LINT-09** | Malformed XML → single error carrying a line | `"<a>\n  <b>\n"` (unclosed) | exactly one finding, `severity == ERROR`, `line ≥ 1` (**LR-XML-01**) | 0 | FR-LINT-8 |
 | **TC-LINT-10** | Counts + report summary | `BROKEN` | `counts() == (2, ≥1)`; report contains `broken.bpmn:` locations and **ends with** `N errors, M warnings`; e.g. `broken.bpmn:11  error  F9 targetRef 'Node_X' not found` | 0 | FR-LINT-7 |
+| **TC-LINT-11** | Findings carry `LR-*` codes; default config == preset `all` (back-compat) | `BROKEN` | every `Finding.rule` is a registered `LR-*` code (incl. LR-REF-01/LR-DI-01/LR-GR-09); `lint(x) == lint(x, default_config()) == lint(x, preset_config("all"))` | 0 | FR-LINT-9 |
+| **TC-LINT-12** | `recommended` preset drops stylistic `LR-GR-11`; `all` keeps it | `REDUNDANT` (gateway 1-in/1-out, full DI) | `LR-GR-11` present under `all`; `lint(REDUNDANT, preset_config("recommended")) == []` | 0 | FR-LINT-9 |
+| **TC-LINT-13** | rc-file overrides: disable, change severity, extend+re-enable | `BROKEN` / `REDUNDANT` + `parse_config({...})` | `{"rules":{"LR-REF-01":"off"}}` drops LR-REF-01 (others remain); `{"rules":{"LR-DI-01":"error"}}` makes LR-DI-01 findings `error`; `{"extends":"recommended","rules":{"LR-GR-11":"warn"}}` re-enables LR-GR-11 | 0 | FR-LINT-9; NFR-LINT-3 |
+| **TC-LINT-14** | Invalid configuration raises `ConfigError` | bad preset / unknown rule / bad severity / invalid JSON | `parse_config` raises on `extends:"nope"`, rule `LR-NOPE-99`, severity `"loud"`; `load_config` raises on non-JSON `.kymolintrc` | n/a | FR-LINT-9 |
+| **TC-LINT-15** | rc-file discovery + load round-trip | a `.kymolintrc` written in a tmp dir | `find_config(dir)` returns the file; `load_config` yields a `Config` honouring `extends:"recommended"` + `LR-DI-01:"off"` (both LR-DI-01 and LR-GR-11 disabled) | 0 | FR-LINT-9 |
 
 All findings are reported informationally; lint itself never exits non-zero (FR-LINT-6). Exit-code
 behaviour is a property of the CLI wiring (`cli.py`) verified by inspection against
@@ -136,9 +142,10 @@ reading the CLI wiring are flagged **(inspection)**.
 | FR-LINT-6 (lint always exits 0; only usage errors non-zero) | TC-LINT-01..10 are informational by construction; exit-code path **(inspection)** of `cli.py` |
 | FR-LINT-7 (clean → `✓ no issues`; else `N errors, M warnings`) | TC-LINT-01, TC-LINT-10 |
 | FR-LINT-8 (malformed XML → single LR-XML-01 error, no raise) | TC-LINT-09 |
+| FR-LINT-9 (configurable rules: codes, presets, rc-file overrides) | TC-LINT-11 (codes + default==`all`), TC-LINT-12 (presets), TC-LINT-13 (overrides), TC-LINT-14 (invalid config), TC-LINT-15 (discovery/load); CLI `--preset=`/`--config=` resolution **(inspection)** of `cli.py` |
 | NFR-LINT-1 (stdlib only) | Whole suite imports no third-party package; environment per §2 **(inspection)** of imports |
 | NFR-LINT-2 (deterministic, document-order findings) | TC-LINT-10 asserts ordered line locations; all exact-tuple assertions rely on stable order |
-| NFR-LINT-3 (severity model {error, warn}; informational) | TC-LINT-02/04 (error), TC-LINT-03/05/06/07/08 (warn); no auto-fix exercised |
+| NFR-LINT-3 (severity model {error, warn}; informational) | TC-LINT-02/04 (error), TC-LINT-03/05/06/07/08 (warn), TC-LINT-13 (per-rule severity override); no auto-fix exercised |
 | NFR-LINT-4 (DI findings point at the DI element's line) | TC-LINT-05 (line 17, the `<BPMNShape>`, not semantic line 9) |
 | NFR-LINT-5 (JS parity / future `lintBpmn()`) | Not testable in this Python suite — **(inspection)**; tracked as CR-BPMN-LINT-004 in PLAN-BPMN-LINT-001 |
 
@@ -149,6 +156,7 @@ reading the CLI wiring are flagged **(inspection)**.
 | Version | Date       | Author | Changes                                                       |
 |---------|------------|--------|---------------------------------------------------------------|
 | 1.0     | 2026-06-05 | Vũ Anh | Initial as-built test documentation: cases `TC-LINT-01..10`, pass/fail criteria, and full FR/NFR traceability for FEAT-BPMN-LINT-001. |
+| 1.1     | 2026-06-06 | Vũ Anh | Added `TC-LINT-11..15` for configurable rules (FR-LINT-9 / CR-BPMN-LINT-002): rule codes + default-equals-`all`, presets, rc-file overrides, invalid-config `ConfigError`, discovery/load. Test count 12 → 21; FR-LINT-9 + NFR-LINT-3 traceability updated. |
 
 ## Annex B — Document Control
 

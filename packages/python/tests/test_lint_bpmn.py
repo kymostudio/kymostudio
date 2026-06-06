@@ -3,7 +3,24 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from kymo.lint_bpmn import ERROR, WARN, counts, format_report, lint
+import pytest
+
+from kymo.lint_bpmn import (
+    ERROR,
+    PRESETS,
+    RULES,
+    WARN,
+    Config,
+    ConfigError,
+    counts,
+    default_config,
+    find_config,
+    format_report,
+    lint,
+    load_config,
+    parse_config,
+    preset_config,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures" / "bpmn"
 
@@ -127,3 +144,101 @@ def test_malformed_xml_reports_one_error():
 
 def test_clean_report_says_no_issues():
     assert format_report("ok.bpmn", lint(CLEAN)) == "ok.bpmn: ✓ no issues"
+
+
+# ── Configurable rules (CR-BPMN-LINT-002) ────────────────────────────────
+
+# start → gateway → task → end, all with DI; the only defect is that the
+# gateway G has exactly one incoming and one outgoing flow (LR-GR-11).
+REDUNDANT = """<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="d">
+  <bpmn:process id="P">
+    <bpmn:startEvent id="S"/>
+    <bpmn:exclusiveGateway id="G"/>
+    <bpmn:task id="T" name="Work"/>
+    <bpmn:endEvent id="E"/>
+    <bpmn:sequenceFlow id="F0" sourceRef="S" targetRef="G"/>
+    <bpmn:sequenceFlow id="F1" sourceRef="G" targetRef="T"/>
+    <bpmn:sequenceFlow id="F2" sourceRef="T" targetRef="E"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram><bpmndi:BPMNPlane bpmnElement="P">
+    <bpmndi:BPMNShape bpmnElement="S"><dc:Bounds x="0" y="0" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="G"><dc:Bounds x="60" y="0" width="50" height="50"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="T"><dc:Bounds x="140" y="0" width="100" height="60"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="E"><dc:Bounds x="280" y="0" width="36" height="36"/></bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge bpmnElement="F0"><di:waypoint x="36" y="18"/><di:waypoint x="60" y="18"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge bpmnElement="F1"><di:waypoint x="110" y="18"/><di:waypoint x="140" y="18"/></bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge bpmnElement="F2"><di:waypoint x="240" y="18"/><di:waypoint x="280" y="18"/></bpmndi:BPMNEdge>
+  </bpmndi:BPMNPlane></bpmndi:BPMNDiagram>
+</bpmn:definitions>"""
+
+
+def _rules(findings):
+    return {f.rule for f in findings}
+
+
+def test_findings_carry_rule_codes():
+    rules = _rules(lint(BROKEN))
+    assert "LR-REF-01" in rules and "LR-DI-01" in rules and "LR-GR-09" in rules
+    assert rules <= set(RULES)               # every emitted code is registered
+
+
+def test_default_config_equals_all_preset():
+    # No config and preset "all" both run every rule — back-compat guarantee.
+    assert lint(BROKEN) == lint(BROKEN, default_config())
+    assert lint(BROKEN) == lint(BROKEN, preset_config("all"))
+
+
+def test_redundant_gateway_only_under_all():
+    assert "LR-GR-11" in _rules(lint(REDUNDANT))                  # preset all
+    assert lint(REDUNDANT, preset_config("recommended")) == []    # stylistic dropped
+    assert "LR-GR-11" not in PRESETS["recommended"]
+
+
+def test_rc_file_can_disable_a_rule():
+    cfg = parse_config({"rules": {"LR-REF-01": "off"}})
+    rules = _rules(lint(BROKEN, cfg))
+    assert "LR-REF-01" not in rules
+    assert "LR-DI-01" in rules               # other rules still fire
+
+
+def test_rc_file_can_override_severity():
+    # LR-DI-01 is a warning by default; promote it to an error.
+    cfg = parse_config({"rules": {"LR-DI-01": "error"}})
+    di = [f for f in lint(BROKEN, cfg) if f.rule == "LR-DI-01"]
+    assert di and all(f.severity == ERROR for f in di)
+
+
+def test_recommended_can_be_extended_with_overrides():
+    # Re-enable the stylistic rule on top of the recommended preset.
+    cfg = parse_config({"extends": "recommended", "rules": {"LR-GR-11": "warn"}})
+    assert "LR-GR-11" in _rules(lint(REDUNDANT, cfg))
+
+
+def test_unknown_preset_rule_and_severity_raise():
+    with pytest.raises(ConfigError):
+        parse_config({"extends": "nope"})
+    with pytest.raises(ConfigError):
+        parse_config({"rules": {"LR-NOPE-99": "off"}})
+    with pytest.raises(ConfigError):
+        parse_config({"rules": {"LR-DI-01": "loud"}})
+
+
+def test_load_and_find_config_roundtrip(tmp_path):
+    (tmp_path / ".kymolintrc").write_text(
+        '{"extends": "recommended", "rules": {"LR-DI-01": "off"}}', encoding="utf-8")
+    found = find_config(tmp_path)
+    assert found is not None and found.name == ".kymolintrc"
+    cfg = load_config(found)
+    assert isinstance(cfg, Config)
+    assert "LR-DI-01" not in cfg.enabled and "LR-GR-11" not in cfg.enabled
+
+
+def test_invalid_json_rc_file_raises(tmp_path):
+    bad = tmp_path / ".kymolintrc"
+    bad.write_text("{not json", encoding="utf-8")
+    with pytest.raises(ConfigError):
+        load_config(bad)
