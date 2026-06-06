@@ -106,3 +106,32 @@ KYMO_UPDATE_CONFORMANCE=1 uv run --group dev python -m pytest \
 Then run the JS suite (`cd packages/js && npm test`). If it fails, the two
 implementations have diverged — reconcile them (default to Python) rather than
 loosening the comparison.
+
+## Rust BPMN — the single source of truth
+
+The Rust core (`packages/rust/kymostudio-core`, `bpmn` feature) carries the BPMN
+stack — import, export, layout, **and SVG render** — as the eventual single source
+of truth. It is validated against Python (the reference) the same golden way, via
+`packages/rust/kymostudio-core/tests/bpmn_conformance.rs` (`cargo test --features bpmn`):
+
+- **import / export** reuse the shared `golden/bpmn_import.json` + `golden/bpmn_export.json`
+  (the very files the Python/JS suites assert against) — locked over the full corpus.
+- **layout** uses `golden/bpmn_layout.json` — the positionless `bpmn { }` block AST +
+  its resolved model, written by `gen_bpmn_layout.py` (Rust has no DSL front-end yet,
+  so the AST is fed directly rather than parsed from `.kymo`).
+- **render** is **byte-identical** to `to_svg.render`: `golden/bpmn_svg/<stem>.svg`
+  (curated, byte-compared) + `golden/bpmn_svg.json` (`{stem: sha256}` over the full
+  corpus), written by `gen_bpmn_svg.py`.
+
+Regenerate the two Rust-only goldens after an intentional change (Python stays the
+sole writer):
+
+```bash
+cd packages/python
+uv run python ../../conformance/gen_bpmn_layout.py
+uv run python ../../conformance/gen_bpmn_svg.py
+```
+
+The Python wheel (`python` feature ⇒ `bpmn`) exposes `bpmn_import`, `bpmn_layout`,
+and `bpmn_to_svg` so Python/JS can eventually delegate to this core; the delegation
+(deleting the per-language ports) is a later step, intentionally not done yet.

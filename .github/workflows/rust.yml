@@ -5,10 +5,14 @@ on:
     branches: [main]
     paths:
       - 'packages/rust/**'
+      - 'conformance/**'          # Rust bpmn conformance tests read these goldens
+      - '.gitattributes'          # EOL pinning the byte-for-byte SVG goldens rely on
       - '.github/workflows/rust.yml'
   pull_request:
     paths:
       - 'packages/rust/**'
+      - 'conformance/**'
+      - '.gitattributes'
       - '.github/workflows/rust.yml'
   workflow_dispatch:
 
@@ -43,6 +47,8 @@ jobs:
         run: cargo fmt --all --check
       - name: clippy (native, default features)
         run: cargo clippy --all-targets -- -D warnings
+      - name: clippy (bpmn feature)
+        run: cargo clippy --all-targets --features bpmn -- -D warnings
       - name: check (bare core, no features)
         run: cargo check --no-default-features
       - name: clippy (wasm feature)
@@ -69,6 +75,8 @@ jobs:
           workspaces: packages/rust/kymostudio-core
       - name: Test core (default = native + system-fonts)
         run: cargo test
+      - name: Test core (bpmn — conformance vs conformance/golden)
+        run: cargo test --features bpmn
       - name: Test the kymo CLI crate
         working-directory: packages/rust/kymostudio
         run: cargo test
@@ -143,7 +151,15 @@ jobs:
           svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="#09f"/></svg>'
           png = k.svg_to_png(svg, 2.0)
           assert png[:8] == b'\x89PNG\r\n\x1a\n', "not a PNG"
-          print("kymostudio-core", k.__version__, "->", len(png), "bytes OK")
+          # The wheel ships the BPMN single-source-of-truth (python feature ⇒ bpmn).
+          for fn in ("bpmn_import", "bpmn_layout", "bpmn_to_svg"):
+              assert hasattr(k, fn), f"wheel missing BPMN fn {fn}"
+          import json
+          xml = '<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"/>'
+          m = json.loads(k.bpmn_import(xml))
+          assert "components" in m, "bpmn_import did not return a model"
+          assert k.bpmn_to_svg(xml).startswith("<?xml"), "bpmn_to_svg did not return SVG"
+          print("kymostudio-core", k.__version__, "->", len(png), "bytes OK; BPMN fns OK")
           PY
       - uses: actions/upload-artifact@v4
         with:

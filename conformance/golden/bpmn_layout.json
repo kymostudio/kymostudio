@@ -1,0 +1,3556 @@
+{
+  "cycle": {
+    "blocks": [
+      {
+        "flows": [
+          {
+            "dst": "A",
+            "flow": "sequence",
+            "label": "",
+            "src": "S"
+          },
+          {
+            "dst": "B",
+            "flow": "sequence",
+            "label": "",
+            "src": "A"
+          },
+          {
+            "dst": "C",
+            "flow": "sequence",
+            "label": "",
+            "src": "B"
+          },
+          {
+            "dst": "E",
+            "flow": "sequence",
+            "label": "",
+            "src": "C"
+          },
+          {
+            "dst": "A",
+            "flow": "sequence",
+            "label": "",
+            "src": "C"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S",
+            "label": "Start",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "A",
+            "label": "A",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "B",
+            "label": "B",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "C",
+            "label": "C",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "E",
+            "label": "End",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      }
+    ],
+    "model": {
+      "components": [
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S",
+          "label_box": null,
+          "name": "Start",
+          "parent": null,
+          "pos": [
+            138,
+            80
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "A",
+          "label_box": null,
+          "name": "A",
+          "parent": null,
+          "pos": [
+            286,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "B",
+          "label_box": null,
+          "name": "B",
+          "parent": null,
+          "pos": [
+            466,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "C",
+          "label_box": null,
+          "name": "C",
+          "parent": null,
+          "pos": [
+            646,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "E",
+          "label_box": null,
+          "name": "End",
+          "parent": null,
+          "pos": [
+            794,
+            80
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        }
+      ],
+      "edges": [
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              80
+            ],
+            [
+              236,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "B",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              336,
+              80
+            ],
+            [
+              416,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "C",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              516,
+              80
+            ],
+            [
+              596,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "B",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              696,
+              80
+            ],
+            [
+              776,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "C",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              236,
+              80
+            ],
+            [
+              351,
+              80
+            ],
+            [
+              351,
+              -10
+            ],
+            [
+              581,
+              -10
+            ],
+            [
+              581,
+              80
+            ],
+            [
+              696,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "C",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        }
+      ],
+      "height": 160,
+      "layout_trees": [],
+      "regions": [],
+      "subtitle": "",
+      "title": "",
+      "width": 852
+    }
+  },
+  "flows": {
+    "blocks": [
+      {
+        "flows": [
+          {
+            "dst": "A",
+            "flow": "sequence",
+            "label": "",
+            "src": "S"
+          },
+          {
+            "dst": "E",
+            "flow": "sequence",
+            "label": "",
+            "src": "A"
+          },
+          {
+            "dst": "N",
+            "flow": "message",
+            "label": "",
+            "src": "A"
+          },
+          {
+            "dst": "N",
+            "flow": "association",
+            "label": "",
+            "src": "A"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S",
+            "label": "Start",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "A",
+            "label": "A",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "N",
+            "label": "Annotation",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-annotation"
+          },
+          {
+            "id": "E",
+            "label": "End",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      }
+    ],
+    "model": {
+      "components": [
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S",
+          "label_box": null,
+          "name": "Start",
+          "parent": null,
+          "pos": [
+            138,
+            146
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "A",
+          "label_box": null,
+          "name": "A",
+          "parent": null,
+          "pos": [
+            286,
+            146
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "N",
+          "label_box": null,
+          "name": "Annotation",
+          "parent": null,
+          "pos": [
+            466,
+            146
+          ],
+          "shape": "bpmn-annotation",
+          "size": [
+            100,
+            40
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "E",
+          "label_box": null,
+          "name": "End",
+          "parent": null,
+          "pos": [
+            466,
+            58
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        }
+      ],
+      "edges": [
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              146
+            ],
+            [
+              236,
+              146
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              286,
+              106
+            ],
+            [
+              286,
+              58
+            ],
+            [
+              448,
+              58
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "message",
+          "dashed": false,
+          "dst": "N",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              336,
+              146
+            ],
+            [
+              416,
+              146
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "association",
+          "dashed": false,
+          "dst": "N",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              336,
+              146
+            ],
+            [
+              416,
+              146
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        }
+      ],
+      "height": 226,
+      "layout_trees": [],
+      "regions": [],
+      "subtitle": "",
+      "title": "",
+      "width": 556
+    }
+  },
+  "linear": {
+    "blocks": [
+      {
+        "flows": [
+          {
+            "dst": "A",
+            "flow": "sequence",
+            "label": "",
+            "src": "S"
+          },
+          {
+            "dst": "B",
+            "flow": "sequence",
+            "label": "",
+            "src": "A"
+          },
+          {
+            "dst": "E",
+            "flow": "sequence",
+            "label": "",
+            "src": "B"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S",
+            "label": "Start",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "A",
+            "label": "A",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "B",
+            "label": "B",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "E",
+            "label": "End",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      }
+    ],
+    "model": {
+      "components": [
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S",
+          "label_box": null,
+          "name": "Start",
+          "parent": null,
+          "pos": [
+            138,
+            80
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "A",
+          "label_box": null,
+          "name": "A",
+          "parent": null,
+          "pos": [
+            286,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "B",
+          "label_box": null,
+          "name": "B",
+          "parent": null,
+          "pos": [
+            466,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "E",
+          "label_box": null,
+          "name": "End",
+          "parent": null,
+          "pos": [
+            614,
+            80
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        }
+      ],
+      "edges": [
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              80
+            ],
+            [
+              236,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "B",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              336,
+              80
+            ],
+            [
+              416,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              516,
+              80
+            ],
+            [
+              596,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "B",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        }
+      ],
+      "height": 160,
+      "layout_trees": [],
+      "regions": [],
+      "subtitle": "",
+      "title": "",
+      "width": 672
+    }
+  },
+  "long_edge": {
+    "blocks": [
+      {
+        "flows": [
+          {
+            "dst": "A",
+            "flow": "sequence",
+            "label": "",
+            "src": "S"
+          },
+          {
+            "dst": "B",
+            "flow": "sequence",
+            "label": "",
+            "src": "A"
+          },
+          {
+            "dst": "C",
+            "flow": "sequence",
+            "label": "",
+            "src": "B"
+          },
+          {
+            "dst": "E",
+            "flow": "sequence",
+            "label": "",
+            "src": "C"
+          },
+          {
+            "dst": "E",
+            "flow": "sequence",
+            "label": "",
+            "src": "S"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S",
+            "label": "Start",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "A",
+            "label": "A",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "B",
+            "label": "B",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "C",
+            "label": "C",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "E",
+            "label": "End",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      }
+    ],
+    "model": {
+      "components": [
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S",
+          "label_box": null,
+          "name": "Start",
+          "parent": null,
+          "pos": [
+            138,
+            80
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "A",
+          "label_box": null,
+          "name": "A",
+          "parent": null,
+          "pos": [
+            286,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "B",
+          "label_box": null,
+          "name": "B",
+          "parent": null,
+          "pos": [
+            466,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "C",
+          "label_box": null,
+          "name": "C",
+          "parent": null,
+          "pos": [
+            646,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "E",
+          "label_box": null,
+          "name": "End",
+          "parent": null,
+          "pos": [
+            794,
+            80
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        }
+      ],
+      "edges": [
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              80
+            ],
+            [
+              236,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "B",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              336,
+              80
+            ],
+            [
+              416,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "C",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              516,
+              80
+            ],
+            [
+              596,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "B",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              696,
+              80
+            ],
+            [
+              776,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "C",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              138,
+              62
+            ],
+            [
+              138,
+              -10
+            ],
+            [
+              711,
+              -10
+            ],
+            [
+              711,
+              80
+            ],
+            [
+              776,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        }
+      ],
+      "height": 160,
+      "layout_trees": [],
+      "regions": [],
+      "subtitle": "",
+      "title": "",
+      "width": 852
+    }
+  },
+  "multi_block": {
+    "blocks": [
+      {
+        "flows": [
+          {
+            "dst": "A1",
+            "flow": "sequence",
+            "label": "",
+            "src": "S1"
+          },
+          {
+            "dst": "E1",
+            "flow": "sequence",
+            "label": "",
+            "src": "A1"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S1",
+            "label": "Start 1",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "A1",
+            "label": "A1",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "E1",
+            "label": "End 1",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      },
+      {
+        "flows": [
+          {
+            "dst": "A2",
+            "flow": "sequence",
+            "label": "",
+            "src": "S2"
+          },
+          {
+            "dst": "E2",
+            "flow": "sequence",
+            "label": "",
+            "src": "A2"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S2",
+            "label": "Start 2",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "A2",
+            "label": "A2",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "E2",
+            "label": "End 2",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      }
+    ],
+    "model": {
+      "components": [
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S1",
+          "label_box": null,
+          "name": "Start 1",
+          "parent": null,
+          "pos": [
+            138,
+            80
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "A1",
+          "label_box": null,
+          "name": "A1",
+          "parent": null,
+          "pos": [
+            286,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "E1",
+          "label_box": null,
+          "name": "End 1",
+          "parent": null,
+          "pos": [
+            434,
+            80
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S2",
+          "label_box": null,
+          "name": "Start 2",
+          "parent": null,
+          "pos": [
+            138,
+            240
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "A2",
+          "label_box": null,
+          "name": "A2",
+          "parent": null,
+          "pos": [
+            286,
+            240
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "E2",
+          "label_box": null,
+          "name": "End 2",
+          "parent": null,
+          "pos": [
+            434,
+            240
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        }
+      ],
+      "edges": [
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A1",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              80
+            ],
+            [
+              236,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S1",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E1",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              336,
+              80
+            ],
+            [
+              416,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A1",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A2",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              240
+            ],
+            [
+              236,
+              240
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S2",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E2",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              336,
+              240
+            ],
+            [
+              416,
+              240
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A2",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        }
+      ],
+      "height": 320,
+      "layout_trees": [],
+      "regions": [],
+      "subtitle": "",
+      "title": "",
+      "width": 492
+    }
+  },
+  "order-flow": {
+    "blocks": [
+      {
+        "flows": [
+          {
+            "dst": "V",
+            "flow": "sequence",
+            "label": "",
+            "src": "S"
+          },
+          {
+            "dst": "GW",
+            "flow": "sequence",
+            "label": "",
+            "src": "V"
+          },
+          {
+            "dst": "P",
+            "flow": "sequence",
+            "label": "Yes",
+            "src": "GW"
+          },
+          {
+            "dst": "N",
+            "flow": "sequence",
+            "label": "No",
+            "src": "GW"
+          },
+          {
+            "dst": "C",
+            "flow": "sequence",
+            "label": "",
+            "src": "N"
+          },
+          {
+            "dst": "SP",
+            "flow": "sequence",
+            "label": "",
+            "src": "P"
+          },
+          {
+            "dst": "Pk",
+            "flow": "sequence",
+            "label": "",
+            "src": "SP"
+          },
+          {
+            "dst": "Iv",
+            "flow": "sequence",
+            "label": "",
+            "src": "SP"
+          },
+          {
+            "dst": "Sy",
+            "flow": "sequence",
+            "label": "",
+            "src": "Pk"
+          },
+          {
+            "dst": "Sy",
+            "flow": "sequence",
+            "label": "",
+            "src": "Iv"
+          },
+          {
+            "dst": "Sh",
+            "flow": "sequence",
+            "label": "",
+            "src": "Sy"
+          },
+          {
+            "dst": "D",
+            "flow": "sequence",
+            "label": "",
+            "src": "Sh"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S",
+            "label": "Order received",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "V",
+            "label": "Validate order",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "GW",
+            "label": "In stock?",
+            "marker": "exclusive",
+            "pin": null,
+            "shape": "bpmn-gateway"
+          },
+          {
+            "id": "P",
+            "label": "Process payment",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "N",
+            "label": "Notify customer",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "C",
+            "label": "Order cancelled",
+            "marker": "terminate",
+            "pin": null,
+            "shape": "bpmn-end"
+          },
+          {
+            "id": "SP",
+            "label": "Split",
+            "marker": "parallel",
+            "pin": null,
+            "shape": "bpmn-gateway"
+          },
+          {
+            "id": "Pk",
+            "label": "Pack items",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "Iv",
+            "label": "Generate invoice",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "Sy",
+            "label": "Sync",
+            "marker": "parallel",
+            "pin": null,
+            "shape": "bpmn-gateway"
+          },
+          {
+            "id": "Sh",
+            "label": "Ship order",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "D",
+            "label": "Order delivered",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      }
+    ],
+    "model": {
+      "components": [
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S",
+          "label_box": null,
+          "name": "Order received",
+          "parent": null,
+          "pos": [
+            138,
+            210
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "V",
+          "label_box": null,
+          "name": "Validate order",
+          "parent": null,
+          "pos": [
+            286,
+            210
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "exclusive",
+          "id": "GW",
+          "label_box": null,
+          "name": "In stock?",
+          "parent": null,
+          "pos": [
+            441,
+            210
+          ],
+          "shape": "bpmn-gateway",
+          "size": [
+            50,
+            50
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "P",
+          "label_box": null,
+          "name": "Process payment",
+          "parent": null,
+          "pos": [
+            596,
+            210
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "N",
+          "label_box": null,
+          "name": "Notify customer",
+          "parent": null,
+          "pos": [
+            596,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "terminate",
+          "id": "C",
+          "label_box": null,
+          "name": "Order cancelled",
+          "parent": null,
+          "pos": [
+            751,
+            80
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "parallel",
+          "id": "SP",
+          "label_box": null,
+          "name": "Split",
+          "parent": null,
+          "pos": [
+            751,
+            210
+          ],
+          "shape": "bpmn-gateway",
+          "size": [
+            50,
+            50
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "Pk",
+          "label_box": null,
+          "name": "Pack items",
+          "parent": null,
+          "pos": [
+            906,
+            210
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "Iv",
+          "label_box": null,
+          "name": "Generate invoice",
+          "parent": null,
+          "pos": [
+            906,
+            340
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "parallel",
+          "id": "Sy",
+          "label_box": null,
+          "name": "Sync",
+          "parent": null,
+          "pos": [
+            1061,
+            210
+          ],
+          "shape": "bpmn-gateway",
+          "size": [
+            50,
+            50
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "Sh",
+          "label_box": null,
+          "name": "Ship order",
+          "parent": null,
+          "pos": [
+            1216,
+            210
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "D",
+          "label_box": null,
+          "name": "Order delivered",
+          "parent": null,
+          "pos": [
+            1364,
+            210
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        }
+      ],
+      "edges": [
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "V",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              210
+            ],
+            [
+              236,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "GW",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              336,
+              210
+            ],
+            [
+              416,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "V",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "P",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "Yes",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": [
+            506,
+            202
+          ],
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              466,
+              210
+            ],
+            [
+              546,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "GW",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "N",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "No",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": [
+            441,
+            124
+          ],
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              441,
+              185
+            ],
+            [
+              441,
+              80
+            ],
+            [
+              546,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "GW",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "C",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              646,
+              80
+            ],
+            [
+              733,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "N",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "SP",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              646,
+              210
+            ],
+            [
+              726,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "P",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "Pk",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              776,
+              210
+            ],
+            [
+              856,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "SP",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "Iv",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              751,
+              235
+            ],
+            [
+              751,
+              340
+            ],
+            [
+              856,
+              340
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "SP",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "Sy",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              956,
+              210
+            ],
+            [
+              1036,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "Pk",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "Sy",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              956,
+              340
+            ],
+            [
+              996,
+              340
+            ],
+            [
+              996,
+              210
+            ],
+            [
+              1036,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "Iv",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "Sh",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              1086,
+              210
+            ],
+            [
+              1166,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "Sy",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "D",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              1266,
+              210
+            ],
+            [
+              1346,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "Sh",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        }
+      ],
+      "height": 420,
+      "layout_trees": [],
+      "regions": [],
+      "subtitle": "",
+      "title": "",
+      "width": 1422
+    }
+  },
+  "pins": {
+    "blocks": [
+      {
+        "flows": [
+          {
+            "dst": "A",
+            "flow": "sequence",
+            "label": "",
+            "src": "S"
+          },
+          {
+            "dst": "E",
+            "flow": "sequence",
+            "label": "",
+            "src": "A"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S",
+            "label": "Start",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "A",
+            "label": "Pinned",
+            "marker": "",
+            "pin": [
+              500,
+              300
+            ],
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "E",
+            "label": "End",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      }
+    ],
+    "model": {
+      "components": [
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S",
+          "label_box": null,
+          "name": "Start",
+          "parent": null,
+          "pos": [
+            138,
+            80
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "A",
+          "label_box": null,
+          "name": "Pinned",
+          "parent": null,
+          "pos": [
+            500,
+            300
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "E",
+          "label_box": null,
+          "name": "End",
+          "parent": null,
+          "pos": [
+            434,
+            80
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        }
+      ],
+      "edges": [
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              80
+            ],
+            [
+              303,
+              80
+            ],
+            [
+              303,
+              300
+            ],
+            [
+              450,
+              300
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              550,
+              300
+            ],
+            [
+              483,
+              300
+            ],
+            [
+              483,
+              80
+            ],
+            [
+              416,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        }
+      ],
+      "height": 380,
+      "layout_trees": [],
+      "regions": [],
+      "subtitle": "",
+      "title": "",
+      "width": 590
+    }
+  },
+  "split_join": {
+    "blocks": [
+      {
+        "flows": [
+          {
+            "dst": "G",
+            "flow": "sequence",
+            "label": "",
+            "src": "S"
+          },
+          {
+            "dst": "A",
+            "flow": "sequence",
+            "label": "yes",
+            "src": "G"
+          },
+          {
+            "dst": "B",
+            "flow": "sequence",
+            "label": "no",
+            "src": "G"
+          },
+          {
+            "dst": "J",
+            "flow": "sequence",
+            "label": "",
+            "src": "A"
+          },
+          {
+            "dst": "J",
+            "flow": "sequence",
+            "label": "",
+            "src": "B"
+          },
+          {
+            "dst": "E",
+            "flow": "sequence",
+            "label": "",
+            "src": "J"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "S",
+            "label": "Start",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-start"
+          },
+          {
+            "id": "G",
+            "label": "Branch?",
+            "marker": "exclusive",
+            "pin": null,
+            "shape": "bpmn-gateway"
+          },
+          {
+            "id": "A",
+            "label": "Yes path",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "B",
+            "label": "No path",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-task"
+          },
+          {
+            "id": "J",
+            "label": "Join",
+            "marker": "parallel",
+            "pin": null,
+            "shape": "bpmn-gateway"
+          },
+          {
+            "id": "E",
+            "label": "End",
+            "marker": "",
+            "pin": null,
+            "shape": "bpmn-end"
+          }
+        ]
+      }
+    ],
+    "model": {
+      "components": [
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "S",
+          "label_box": null,
+          "name": "Start",
+          "parent": null,
+          "pos": [
+            138,
+            210
+          ],
+          "shape": "bpmn-start",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "exclusive",
+          "id": "G",
+          "label_box": null,
+          "name": "Branch?",
+          "parent": null,
+          "pos": [
+            261,
+            210
+          ],
+          "shape": "bpmn-gateway",
+          "size": [
+            50,
+            50
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "A",
+          "label_box": null,
+          "name": "Yes path",
+          "parent": null,
+          "pos": [
+            416,
+            210
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "B",
+          "label_box": null,
+          "name": "No path",
+          "parent": null,
+          "pos": [
+            416,
+            80
+          ],
+          "shape": "bpmn-task",
+          "size": [
+            100,
+            80
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "parallel",
+          "id": "J",
+          "label_box": null,
+          "name": "Join",
+          "parent": null,
+          "pos": [
+            571,
+            210
+          ],
+          "shape": "bpmn-gateway",
+          "size": [
+            50,
+            50
+          ],
+          "subtitle": ""
+        },
+        {
+          "accent": "blue",
+          "align": null,
+          "align_gap": 24,
+          "align_offset": [
+            0,
+            0
+          ],
+          "icon": "",
+          "id": "E",
+          "label_box": null,
+          "name": "End",
+          "parent": null,
+          "pos": [
+            694,
+            210
+          ],
+          "shape": "bpmn-end",
+          "size": [
+            36,
+            36
+          ],
+          "subtitle": ""
+        }
+      ],
+      "edges": [
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "G",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              156,
+              210
+            ],
+            [
+              236,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "S",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "A",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "yes",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": [
+            326,
+            202
+          ],
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              286,
+              210
+            ],
+            [
+              366,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "G",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "B",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "no",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": [
+            261,
+            124
+          ],
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              261,
+              185
+            ],
+            [
+              261,
+              80
+            ],
+            [
+              366,
+              80
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "G",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "J",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              466,
+              210
+            ],
+            [
+              546,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "A",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "J",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              466,
+              80
+            ],
+            [
+              506,
+              80
+            ],
+            [
+              506,
+              210
+            ],
+            [
+              546,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "B",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        },
+        {
+          "bpmn_flow": "sequence",
+          "dashed": false,
+          "dst": "E",
+          "dst_anchor": null,
+          "dst_offset": [
+            0,
+            0
+          ],
+          "label": "",
+          "label_anchor": "mid",
+          "label_offset": [
+            0,
+            0
+          ],
+          "label_pos": null,
+          "label_small": false,
+          "no_arrow": false,
+          "points": [
+            [
+              596,
+              210
+            ],
+            [
+              676,
+              210
+            ]
+          ],
+          "route": "auto",
+          "shared_port": false,
+          "src": "J",
+          "src_anchor": null,
+          "src_offset": [
+            0,
+            0
+          ],
+          "style": "gray",
+          "trunk_offset": 0,
+          "via": []
+        }
+      ],
+      "height": 290,
+      "layout_trees": [],
+      "regions": [],
+      "subtitle": "",
+      "title": "",
+      "width": 752
+    }
+  }
+}

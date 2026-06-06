@@ -33,6 +33,19 @@ svg2pdf = { version = "0.13", optional = true }
 pyo3 = { version = "0.28", features = ["extension-module", "abi3-py310"], optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
 
+# BPMN stack deps — pure logic (no resvg), pulled in only by the `bpmn` feature.
+# roxmltree: read-only DOM whose tag_name().name() yields the *local* name, so the
+# importer is namespace-agnostic exactly like Python's `_local()`. serde_json: the
+# canonical model JSON the cross-language conformance suite compares against.
+roxmltree = { version = "0.20", optional = true }
+serde_json = { version = "1", optional = true }
+
+[dev-dependencies]
+# Used by tests/bpmn_conformance.rs to load + compare the shared golden JSON.
+serde_json = "1"
+# sha256 for the full-corpus SVG-render hash comparison (vs conformance/golden/bpmn_svg.json).
+sha2 = "0.10"
+
 [features]
 # Native builds (CLI, tests, Python wheel) load system fonts so <text> renders,
 # and ship vector PDF output.
@@ -42,14 +55,23 @@ system-fonts = ["resvg/system-fonts", "resvg/memmap-fonts"]
 # Vector SVG→PDF via svg2pdf (native only — see the dep note above).
 pdf = ["dep:svg2pdf"]
 
-# Python extension module (maturin builds the cdylib with this on).
-python = ["dep:pyo3", "system-fonts", "pdf"]
+# Python extension module (maturin builds the cdylib with this on). Includes vector
+# PDF and the BPMN stack, so the `_kymostudio_core` wheel exposes svg_to_pdf plus
+# bpmn_import/bpmn_layout/bpmn_to_svg.
+python = ["dep:pyo3", "system-fonts", "pdf", "bpmn"]
 
 # wasm (browser + Node) — NO system-fonts (no fs/mmap on wasm). Includes pdf so
 # the JS CLI has SVG→PDF parity with Python/Rust; this pulls a second SVG engine
 # (svg2pdf's usvg 0.45) into the bundle — text still needs fonts embedded in the
-# SVG since system fonts aren't available on wasm.
+# SVG since system fonts aren't available on wasm. BPMN is NOT in the wasm build
+# yet (the JS library still has its own port); it joins when the JS delegation
+# lands, to keep the wasm bundle lean until then.
 wasm = ["dep:wasm-bindgen", "pdf"]
+
+# BPMN import/export/layout/shapes — the single-source-of-truth stack. On for
+# native builds + the Python wheel; validated by tests/bpmn_conformance.rs against
+# the shared conformance/golden/ JSON. Pure Rust (no resvg dependency).
+bpmn = ["dep:roxmltree", "dep:serde_json"]
 
 [profile.release]
 opt-level = 3

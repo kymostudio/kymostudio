@@ -15,6 +15,12 @@ mod python;
 #[cfg(feature = "wasm")]
 mod wasm;
 
+// BPMN stack (import / export / layout / shapes) — the cross-language single
+// source of truth. Pure Rust; compiled under the `bpmn` feature. Mirrors the
+// Python pipeline module-for-module (see each submodule's header).
+#[cfg(feature = "bpmn")]
+pub mod bpmn;
+
 /// Something went wrong turning SVG bytes into PNG or PDF bytes.
 #[derive(Debug)]
 pub enum RenderError {
