@@ -1,0 +1,160 @@
+{
+  "generated_by": "benches/svg2png/accuracy.py",
+  "ground_truth": "headless Google Chrome",
+  "diff_threshold": 1,
+  "match_tolerance": 10.0,
+  "dataset": {
+    "source": "resvg-test-suite (MIT)",
+    "samples": 72,
+    "categories": {
+      "filters": 12,
+      "masking": 12,
+      "paint-servers": 12,
+      "painting": 12,
+      "shapes": 12,
+      "structure": 12
+    }
+  },
+  "missing_engines": [],
+  "engines": [
+    {
+      "key": "kymo",
+      "label": "kymo",
+      "backend": "resvg (kymostudio-core 0.3.6)",
+      "renders": "72/72",
+      "matches_chrome": "68/72",
+      "match_rate": 0.9444,
+      "mean_abs_diff_avg": 4.0,
+      "mean_abs_diff_median": 0.04,
+      "pct_pixels_diff_avg": 4.01,
+      "per_category_mean_diff": {
+        "filters": 0.42,
+        "masking": 6.93,
+        "paint-servers": 0.45,
+        "painting": 0.08,
+        "shapes": 10.52,
+        "structure": 5.57
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "resvg-py",
+      "label": "resvg-py",
+      "backend": "resvg (0.3.2)",
+      "renders": "72/72",
+      "matches_chrome": "66/72",
+      "match_rate": 0.9167,
+      "mean_abs_diff_avg": 5.51,
+      "mean_abs_diff_median": 0.05,
+      "pct_pixels_diff_avg": 4.94,
+      "per_category_mean_diff": {
+        "filters": 1.46,
+        "masking": 6.93,
+        "paint-servers": 0.45,
+        "painting": 0.08,
+        "shapes": 10.52,
+        "structure": 13.62
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "pyvips",
+      "label": "pyvips",
+      "backend": "librsvg (via libvips 8.15.1)",
+      "renders": "72/72",
+      "matches_chrome": "59/72",
+      "match_rate": 0.8194,
+      "mean_abs_diff_avg": 9.82,
+      "mean_abs_diff_median": 0.08,
+      "pct_pixels_diff_avg": 8.84,
+      "per_category_mean_diff": {
+        "filters": 7.34,
+        "masking": 8.69,
+        "paint-servers": 17.91,
+        "painting": 0.07,
+        "shapes": 10.58,
+        "structure": 14.36
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "cairosvg",
+      "label": "cairosvg",
+      "backend": "Cairo (2.9.0)",
+      "renders": "67/72",
+      "matches_chrome": "46/72",
+      "match_rate": 0.6389,
+      "mean_abs_diff_avg": 15.11,
+      "mean_abs_diff_median": 0.17,
+      "pct_pixels_diff_avg": 15.29,
+      "per_category_mean_diff": {
+        "filters": 28.66,
+        "masking": 23.55,
+        "paint-servers": 11.21,
+        "painting": 7.81,
+        "shapes": 16.81,
+        "structure": 0.38
+      },
+      "failures": [
+        {
+          "item": "masking/clipPath__recursive-on-child",
+          "error": "RecursionError: maximum recursion depth exceeded"
+        },
+        {
+          "item": "painting/marker__empty",
+          "error": "TypeError: 'NoneType' object is not subscriptable"
+        },
+        {
+          "item": "shapes/path__negative-sweep-flag-value",
+          "error": "ValueError: invalid literal for int() with base 10: '-'"
+        },
+        {
+          "item": "structure/svg__elements-via-ENTITY-reference-2",
+          "error": "EntitiesForbidden: EntitiesForbidden(name='Rect', system_id=None, public_id=None)"
+        },
+        {
+          "item": "structure/use__indirect-recursive-3",
+          "error": "RecursionError: maximum recursion depth exceeded"
+        }
+      ],
+      "failure_count": 5
+    },
+    {
+      "key": "svglib",
+      "label": "svglib",
+      "backend": "reportlab renderPM (4.5.1, svglib 1.6.0)",
+      "renders": "69/72",
+      "matches_chrome": "38/72",
+      "match_rate": 0.5278,
+      "mean_abs_diff_avg": 36.02,
+      "mean_abs_diff_median": 7.45,
+      "pct_pixels_diff_avg": 25.95,
+      "per_category_mean_diff": {
+        "filters": 16.8,
+        "masking": 60.57,
+        "paint-servers": 66.47,
+        "painting": 39.47,
+        "shapes": 11.51,
+        "structure": 15.48
+      },
+      "failures": [
+        {
+          "item": "shapes/path__negative-sweep-flag-value",
+          "error": "ValueError: could not convert string to float: ''"
+        },
+        {
+          "item": "shapes/rect__ic-values",
+          "error": "ValueError: Can't convert '1ic' to length"
+        },
+        {
+          "item": "structure/use__indirect-recursive-3",
+          "error": "RecursionError: Group.contents _isListOfShapes([])"
+        }
+      ],
+      "failure_count": 3
+    }
+  ]
+}

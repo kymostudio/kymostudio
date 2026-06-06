@@ -1,0 +1,32 @@
+{
+  "generated_by": "benches/bpmn/quality.py",
+  "render": {
+    "corpus_full": 840,
+    "ok": 829,
+    "empty_output": 11,
+    "error": 0,
+    "pass_rate": 0.9869,
+    "error_rate": 0.0,
+    "corpus_gate": 120,
+    "gate_ok": 109,
+    "gate_empty_output": 11
+  },
+  "parity": {
+    "import_stems": 126,
+    "export_stems": 109,
+    "divergences": 0,
+    "parity_rate": 1.0
+  },
+  "coverage": {
+    "elements_mapped": 30,
+    "event_definitions": 9
+  },
+  "sources": {
+    "baseline_full": "packages/python/tests/corpus_bpmn/baseline_full.json",
+    "baseline_gate": "packages/python/tests/corpus_bpmn/baseline.json",
+    "import_golden": "conformance/golden/bpmn_import.json",
+    "export_golden": "conformance/golden/bpmn_export.json",
+    "divergences": "conformance/known_divergences.json",
+    "mapping": "docs/formats/bpmn/kymo-mapping.md"
+  }
+}
