@@ -83,7 +83,8 @@ pub fn svg_to_png(svg: &[u8], scale: f32) -> Result<Vec<u8>, RenderError> {
 /// own bundled usvg (0.45), independent of the `resvg` used by [`svg_to_png`],
 /// so there is no `scale`: PDF is resolution-independent. On native builds
 /// (`system-fonts`) system fonts are loaded so `<text>` renders; the wasm build
-/// omits this path entirely (the `pdf` feature is off there).
+/// keeps this path (for the JS CLI) but, with no system fonts, needs fonts
+/// embedded in the SVG for text to appear.
 #[cfg(feature = "pdf")]
 pub fn svg_to_pdf(svg: &[u8]) -> Result<Vec<u8>, RenderError> {
     use svg2pdf::usvg as pdf_usvg;
@@ -93,8 +94,7 @@ pub fn svg_to_pdf(svg: &[u8]) -> Result<Vec<u8>, RenderError> {
     #[cfg(feature = "system-fonts")]
     opt.fontdb_mut().load_system_fonts();
 
-    let tree =
-        pdf_usvg::Tree::from_data(svg, &opt).map_err(|e| RenderError::Pdf(e.to_string()))?;
+    let tree = pdf_usvg::Tree::from_data(svg, &opt).map_err(|e| RenderError::Pdf(e.to_string()))?;
 
     svg2pdf::to_pdf(
         &tree,
