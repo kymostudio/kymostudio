@@ -129,6 +129,7 @@ FR/NFR re-based into the baseline on close.
 | [`CR-ICONS-006`](CR/CR-ICONS-006/01-REQUIREMENTS.md) | P5 | implementation | all (docs & gates) | P1–P4, P6 | Open |
 | [`CR-ICONS-001`](CR/CR-ICONS-001/01-REQUIREMENTS.md) | P6 | requirements-adding | **adds** FR-12..15 (`kymo icons` CLI) | P3 (+P2/P4) | Open |
 | [`CR-ICONS-007`](CR/CR-ICONS-007/01-REQUIREMENTS.md) | post-baseline | extension | vendored **inline** sets + the `ai` brand-logo group (no new FR; exercises FR-2/3/6/7/13/15) | P3, P4 | Implemented |
+| [`CR-ICONS-008`](CR/CR-ICONS-008/01-REQUIREMENTS.md) | post-baseline | refactor | catalogue (art + generator + index) extracted into the shared `packages/icons` package — single source of truth; relocates the FR-8/NFR-1 artifact, byte-stable (NFR-2), zero-dep (NFR-3) | P2 | Implemented |
 
 ## Annex A — Revision History
 
@@ -170,3 +171,5 @@ Reconcile any deviation there before release.
 | 2026-06-05 | P6 | kymo icons list/search/describe/download (py cli.py + js bin) | 250eb47 — TC-13..16 + Python↔JS parity |
 | 2026-06-05 | P4 | normalize pipeline + render_record + id/defs-safe inlining | 75e8ae3 — TC-2/5/6/11; download --from iconify normalizes |
 | 2026-06-05 | P5 | catalogue-format doc (ICONS-MAP-001), doc-lint, CI freshness, re-base FR-12..15/TC-13..16 | this change |
+| 2026-06-06 | post | vendored inline sets + `ai` group (CR-ICONS-007) | #129 — `ai:openai/anthropic/gemini`; CR007-1..7 |
+| 2026-06-06 | post | extract catalogue → `packages/icons` SSOT (CR-ICONS-008) | #129 — pure move (renames); both impls repointed; CI/website/CLI |

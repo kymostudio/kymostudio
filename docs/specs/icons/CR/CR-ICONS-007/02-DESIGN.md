@@ -44,7 +44,7 @@ iso_compliance:
 Realises **CR-ICONS-007**. Three small, additive changes — loader resolution, generator index, and
 the vendored artifact.
 
-## 1. The artifact — `sets/ai.json`
+## 1. The artifact — `packages/icons/sets/ai.json`
 
 A standard per-set IconifyJSON (P3 shape), but **inline**: each record carries `body` (the inner
 SVG, no `<svg>` wrapper) plus its own `width`/`height` (the source viewBox), and a `category`.
