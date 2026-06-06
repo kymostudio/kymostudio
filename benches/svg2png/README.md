@@ -30,8 +30,8 @@ and svglib trail and partly fail. See [`results/REPORT.md`](results/REPORT.md).
 
 For the full write-up — motivation, method, the two-reference design, per-category
 analysis, and the investigation into why the best engines all "fail" one shapes
-case (an SVG 2 `ic`-unit feature only Chrome implements) — read
-**[`RESEARCH.md`](RESEARCH.md)**.
+case (an SVG 2 `ic`-unit feature only Chrome implements) — read the
+**[`research/`](research/)** folder — a written article per benchmarking round.
 
 ## Run
 
