@@ -52,6 +52,4 @@ Render any `.svg` to a PNG image — no headless browser required.
 ```bash
 kymo diagram.svg out.png      # rasterize an existing SVG
 kymo diagram.svg              # → diagram.png (default name)
-kymo sample.kymo out.png      # render .kymo, then rasterize
-kymo sample.kymo out.png -s 2 # 2× resolution (--scale / -s, default 1.0 = intrinsic)
 ```
