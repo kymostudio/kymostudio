@@ -25,7 +25,7 @@ dependencies = [
     # The shared resvg engine (the `_kymostudio_core` extension module). It is
     # the sole runtime dependency: SVG→PNG rasterization for the `kymo … out.png`
     # CLI and the Excalidraw icon embedding, matching the Rust CLI / JS wasm build.
-    # Dependency convention (see CLAUDE.md): caret-pinned to the current MINOR
+    # Dependency convention (see docs/RELEASING.md): caret-pinned to current MINOR
     # series — `>=0.3,<0.4` ≡ Rust `^0.3` ≡ npm `^0.3`; bump only on a minor/major.
     "kymostudio-core>=0.3,<0.4",
 ]
