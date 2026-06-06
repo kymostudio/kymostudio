@@ -1,6 +1,6 @@
 [package]
 name = "kymostudio"
-version = "0.3.5"
+version = "0.3.6"
 edition = "2021"
 rust-version = "1.74"
 description = "Type it. See it appear. Watch it animate."
@@ -20,7 +20,7 @@ path = "src/main.rs"
 [dependencies]
 # `path` for local dev; `version` so crates.io resolves the published core
 # (kymostudio-core must be published first — see release-crate.yml `publish-cli`).
-kymostudio-core = { path = "../kymostudio-core", version = "0.3.5" }
+kymostudio-core = { path = "../kymostudio-core", version = "0.3.6" }
 
 [profile.release]
 opt-level = 3
