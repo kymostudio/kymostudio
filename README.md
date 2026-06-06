@@ -1,7 +1,11 @@
 <h1 align="center">kymo</h1>
 
 <p align="center">
-  <b>Type it. See it appear. Watch it animate.</b>
+  <a href="https://kymostudio.github.io/kymostudio/app/">Live Editor</a>
+  <span>|</span>
+  <a href="https://kymostudio.github.io/kymostudio/">Website</a>
+  <span>|</span>
+  <a href="./docs/guide/getting-started.md">Documentation</a>
 </p>
 
 <p align="center">
@@ -13,11 +17,13 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
 </p>
 
+> **Type it. See it appear. Watch it animate.**
+
+Kymostudio is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
+
 ![NVIDIA AIQ replica — animated](samples/nvidia-aiq-animated.webp)
 
-**Kymostudio** is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
-
-#### Key Features
+## ✨ Features
 
 - **Draws what you actually need** — software architecture, process flows and standard BPMN, all rendered faithfully.
 - **Starts from any source** — author in the `.kymo` DSL, or feed it BPMN, JSON or Python.
