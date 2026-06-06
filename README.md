@@ -14,6 +14,19 @@
 
 ![NVIDIA AIQ replica — animated](samples/nvidia-aiq-animated.webp)
 
+## About
+
+kymostudio is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
+
+#### Pipeline
+
+- **dsl** parses the line-oriented `.kymo` grammar into a plain `Diagram` data model.
+- **from_bpmn** imports BPMN 2.0 XML using the geometry stored in the file.
+- **layout** positions the members of auto-layout frames.
+- **alignment** resolves final positions: auto-layouts, anchoring, region bounds, edge staggering and auto-canvas sizing.
+- **to_svg** renders the resolved model to SVG; sibling emitters target Figma, Excalidraw, WebP and PNG.
+- **icons** resolves icon keys against the bundled catalogue.
+
 ## Install
 
 ```bash
