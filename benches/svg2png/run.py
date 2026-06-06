@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""SVG→PNG bench — run quality + perf and render the human-readable report.
+"""SVG→PNG bench — run quality + accuracy + perf and render the report.
 
-Runs the fidelity aggregator (`quality.py`) and the timing pass (`perf.py`),
-writes `results/quality.json` + `results/perf.json`, and renders
-`results/REPORT.md` — the side-by-side scorecard of every SVG→PNG engine against
-the kymo (resvg) reference.
+Three passes, one report:
+
+  • quality  (`quality.py`)  — fidelity vs *kymo's own* output, on real kymo SVGs
+                               (does an engine reproduce what kymo ships?)
+  • accuracy (`accuracy.py`) — correctness vs *headless Chrome*, on the vendored
+                               resvg test suite (is the engine right? kymo graded too)
+  • perf     (`perf.py`)     — rasterize timing over the kymo SVGs
+
+Writes `results/quality.json`, `results/accuracy.json`, `results/perf.json`, and
+the human-readable `results/REPORT.md`.
 
 Run:  cd benches && uv run python svg2png/run.py [--reps N]
 """
@@ -14,6 +20,7 @@ import argparse
 import json
 from pathlib import Path
 
+import accuracy
 import perf
 import quality
 
@@ -21,16 +28,18 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 RESULTS = HERE / "results"
 
+# Short headers for the per-category accuracy table.
+CAT_SHORT = {
+    "filters": "filt", "masking": "mask", "paint-servers": "paint-srv",
+    "painting": "paint", "shapes": "shape", "structure": "struct",
+}
+
 
 def _perf_row(p: dict, key: str) -> dict | None:
     return next((r for r in p["engines"] if r["key"] == key), None)
 
 
-def _render_report(q: dict, p: dict) -> str:
-    env = p["environment"]
-    n = q["corpus"]["items"]
-
-    # One merged row per engine: fidelity (quality) + speed (perf).
+def _scorecard(q: dict, p: dict) -> str:
     lines = []
     for qr in q["engines"]:
         pr = _perf_row(p, qr["key"]) or {}
@@ -40,79 +49,108 @@ def _render_report(q: dict, p: dict) -> str:
         diff = qr["mean_abs_diff_avg"]
         pct = qr["pct_pixels_diff_avg"]
         lines.append(
-            f"| {qr['label']} | `{qr['backend']}` | {qr['renders']} | "
-            f"{qr['dims_match']} | "
+            f"| {qr['label']} | `{qr['backend']}` | {qr['renders']} | {qr['dims_match']} | "
             f"{'—' if qr['is_reference'] else (diff if diff is not None else '—')} | "
             f"{'—' if qr['is_reference'] else (str(pct) + '%' if pct is not None else '—')} | "
-            f"{med if med is not None else '—'} | "
-            f"{thr if thr else '—'} | "
-            f"{('×' + str(spd)) if spd else '—'} | "
-            f"**{qr['verdict']}** |"
+            f"{med if med is not None else '—'} | {thr if thr else '—'} | "
+            f"{('×' + str(spd)) if spd else '—'} | **{qr['verdict']}** |"
         )
-    table = "\n".join(lines)
+    return "\n".join(lines)
 
-    # Honesty section: every engine that failed on ≥1 file, with a sample error.
+
+def _accuracy_table(a: dict) -> str:
+    cats = list(a["dataset"]["categories"].keys())
+    head = "| Engine | Backend | Renders | Matches Chrome | Mean Δ | " + \
+        " | ".join(CAT_SHORT.get(c, c) for c in cats) + " |"
+    sep = "|---|---|---|---|---|" + "|".join("---" for _ in cats) + "|"
+    rows = []
+    for r in a["engines"]:
+        pc = r["per_category_mean_diff"]
+        cells = " | ".join(str(pc[c]) if pc[c] is not None else "—" for c in cats)
+        rows.append(
+            f"| {r['label']} | `{r['backend']}` | {r['renders']} | "
+            f"{r['matches_chrome']} ({r['match_rate']:.0%}) | "
+            f"**{r['mean_abs_diff_avg'] if r['mean_abs_diff_avg'] is not None else '—'}** | {cells} |"
+        )
+    return "\n".join([head, sep] + rows)
+
+
+def _render_report(q: dict, a: dict, p: dict) -> str:
+    env = p["environment"]
+    n = q["corpus"]["items"]
+    ds = a["dataset"]
+    nd = ds["samples"]
+
+    # Honesty: every engine that failed on ≥1 file, in either pass.
     fail_notes = []
-    for qr in q["engines"]:
-        if qr["failure_count"]:
-            sample = qr["failures"][0]["error"] if qr["failures"] else ""
-            fail_notes.append(
-                f"- **{qr['label']}** failed on {qr['failure_count']}/{n} files — "
-                f"e.g. `{sample}`"
-            )
-    fail_block = "\n".join(fail_notes) if fail_notes else "- None — every engine rendered every file."
+    for src, rows in (("kymo SVGs", q["engines"]), (f"{ds['source']} dataset", a["engines"])):
+        for r in rows:
+            if r.get("failure_count"):
+                sample = r["failures"][0]["error"] if r["failures"] else ""
+                fail_notes.append(f"- **{r['label']}** — {r['failure_count']} failures on the {src}: e.g. `{sample}`")
+    fail_block = "\n".join(fail_notes) if fail_notes else "- None."
 
     missing = q["missing_engines"]
     missing_block = (
-        f"\n> Skipped (package not importable on this host): "
-        f"{', '.join('`' + m + '`' for m in missing)}.\n"
+        f"\n> Skipped (package not importable): {', '.join('`' + m + '`' for m in missing)}.\n"
         if missing else ""
     )
+    cat_counts = ", ".join(f"{c} {v}" for c, v in ds["categories"].items())
 
     return f"""# SVG → PNG — rasterizer scorecard
 
 > Generated by `benches/svg2png/run.py`. **Offline bench** — re-run with
-> `cd benches && uv run python svg2png/run.py` to refresh. It rasterizes a corpus
-> of **real kymo SVGs** (rendered from `.kymo` sources) with every available
-> Python SVG→PNG engine and scores each against the **kymo (resvg)** reference —
-> the engine that authored the SVGs. *Fidelity* is deterministic; *timing* is
-> machine-dependent (host below) and informational, not a gate.
+> `cd benches && uv run python svg2png/run.py`. Two complementary questions:
+> **(1) Fidelity** — does an engine reproduce the SVGs *kymo itself emits*?
+> **(2) Accuracy** — is an engine *correct*, judged against an independent ground
+> truth (**headless Google Chrome**) on the resvg test suite? Fidelity/accuracy
+> are deterministic; *timing* is machine-dependent (host below), not a gate.
 {missing_block}
-## Scorecard
+## 1. Fidelity + speed — vs kymo, on real kymo SVGs
 
-Corpus: **{n} kymo SVGs** ({', '.join(['samples', 'conformance corpus'])}). Every
-engine rasterizes the identical SVG string per item. Fidelity is measured on the
-image composited over white; *diff* is mean per-channel |Δ| (0…255), *differ* is
-the share of pixels off by > {q['diff_threshold']} luminance. `resvg-py` is the
-control — same engine as kymo, so it should read ~0.
+Corpus: **{n} kymo SVGs** (samples + conformance corpus), rendered from `.kymo`
+sources; every engine rasterizes the identical SVG string. Fidelity is measured
+on the image composited over white; *diff* is mean per-channel |Δ| (0…255),
+*differ* is the share of pixels off by > {q['diff_threshold']} luminance.
+`resvg-py` is the control — same engine as kymo, so ~0.
 
 | Engine | Backend | Renders | Dims | Diff | Differ | Median ms | Files/s | Speed | Verdict |
 |---|---|---|---|---|---|---|---|---|---|
-{table}
+{_scorecard(q, p)}
 
-*Diff/Differ are blank for the reference (it is compared to itself). Speed is
-relative to kymo and only shown when an engine rendered the same file set, so
-the ratio isn't flattered by skipping hard files.*
+*Diff/Differ blank for the reference (compared to itself). Speed is vs kymo,
+shown only when an engine rendered the same file set.*
+
+## 2. Accuracy — vs headless Chrome, on the resvg test suite
+
+Dataset: **{nd} SVGs** vendored from `{ds['source']}` ({cat_counts}) — self-contained,
+text-free, normalized to their viewBox size. Ground truth = **{a['ground_truth']}**
+(committed `refs/`); every engine, *kymo included*, is graded against it. **Mean Δ**
+is mean per-channel |Δ| vs Chrome (lower = more accurate); a sample "matches" if
+Mean Δ < {a['match_tolerance']}. Per-category columns are mean Δ.
+
+{_accuracy_table(a)}
+
+*Closer to 0 = closer to Chrome. Rows sorted by overall accuracy.*
 
 ## What this shows
 
-kymo emits **modern SVG**: a `<style>` block with CSS class selectors, a root
-`style="max-width:100%;height:auto"`, gradient/pattern fills (`url(#…)`) and a
-filter. A rasterizer has to support that CSS to reproduce the image.
+- **Against an independent ground truth, kymo's resvg core is the most accurate**
+  engine here — lowest mean Δ vs Chrome overall and in nearly every category
+  (filters, paint-servers, painting, structure). It even edges out the standalone
+  `resvg-py` (newer resvg ⇒ better filters & structure).
+- **librsvg (pyvips)** is the next most accurate, but diverges from Chrome on
+  paint-servers (gradients/patterns) and structure.
+- **cairosvg** is middling: good on basic structure, poor on filters and masking,
+  and recurses to death on a few nested cases.
+- **svglib** is the least accurate — no real gradient/mask support — and on kymo's
+  *own* SVGs it can't render at all (`height:auto` defeats its parser).
+- On kymo SVGs, the fidelity table tells the shipping story: resvg (shipped) is
+  exact and fastest among the faithful engines; librsvg is faithful but slow;
+  cairosvg is fast but drops kymo's CSS/gradients; svglib fails.
 
-- **resvg** (kymo, resvg-py) and **librsvg** (pyvips) handle it — resvg-py is
-  pixel-identical to kymo (same engine), pyvips is a near-identical independent
-  renderer.
-- **cairosvg** rasterizes without error but drops the gradient/pattern fills
-  (`url(#…)`) and the `<style>`-block class selectors, so output diverges on
-  nearly every pixel — the icon-rich samples come out largely blank. Fast, but
-  not faithful to this input.
-- **svglib** can't parse the SVG at all (`height:auto` is not a valid ReportLab
-  length), so it produces nothing.
-
-The takeaway for kymo's own `kymo … out.png` path: resvg (shipped) and librsvg
-are the faithful options; the popular pure-Python rasterizers are not, for the
-SVG kymo produces.
+The two passes agree: **resvg is both the faithful choice for kymo's output and
+the most Chrome-accurate engine in the field.**
 
 ## Per-engine failures
 
@@ -120,29 +158,31 @@ SVG kymo produces.
 
 ## How it is measured
 
-- **Corpus** — `benches/svg2png/corpus.py` renders every `samples/*.kymo` and
-  `conformance/corpus/*.kymo` through the public kymo pipeline (parse → layout →
-  resolve_alignments → render). Same SVG string fed to every engine.
-- **Quality** — `benches/svg2png/quality.py` decodes each PNG (Pillow), composites
-  over white, and compares to the kymo reference: render success, dimension
-  match, mean |Δ|, and % pixels differing.
-- **Performance** — `benches/svg2png/perf.py` times each engine (median of
-  {env['reps']} reps per file after one warm-up); reports per-file median/p95,
-  throughput, and speed vs kymo.
+- **Fidelity** (`quality.py`) — render every `samples/*.kymo` + `conformance/corpus/*.kymo`
+  through the kymo pipeline; decode each engine's PNG (Pillow), composite over
+  white, compare to the kymo reference.
+- **Accuracy** (`accuracy.py` + `datasets.py`) — a vendored MIT subset of the
+  resvg test suite (`datasets/resvg-suite/`, see `PROVENANCE.md`), each SVG paired
+  with a headless-Chrome reference (`gen_refs.py`, committed). Score every engine
+  vs Chrome, rolled up per category. Chrome is only needed to *regenerate* refs.
+- **Performance** (`perf.py`) — time each engine (median of {env['reps']} reps per
+  file after one warm-up) over the kymo SVGs.
 
 ## Honest limitations
 
-- **Fidelity is agreement with kymo, not absolute truth.** kymo is the system
-  under test; resvg-py (same engine) reading ~0 is the method's control.
+- **Two references, two questions.** Fidelity is *agreement with kymo* (with
+  `resvg-py` as the same-engine control); accuracy is *agreement with Chrome*.
+  Chrome is the de-facto SVG renderer but still one renderer — a category where
+  all engines diverge from it (e.g. a shapes antialiasing case) is a Chrome
+  quirk as much as an engine one.
 - Engines that default to a transparent background are composited over white
-  before comparison, so they are not penalised for the alpha convention — only
-  real drawing differences count.
+  before comparison, so they aren't penalised for the alpha convention.
+- Accuracy scope excludes `text`/`image` SVGs (font/external-resource dependent,
+  and unresolvable through the string-based engine API).
 - Timing is host-specific (`{env['platform']}`, Python {env['python']},
-  {env['cpu_count']} CPU, reps={env['reps']}, {env['timestamp']}). Compare runs
-  on the same machine.
-- Scope is **Python** SVG→PNG packages. Browser engines (Chromium via Playwright,
-  etc.) are the highest-fidelity reference but are out of scope here — heavy,
-  and not what the `kymo` CLI ships.
+  {env['cpu_count']} CPU, reps={env['reps']}, {env['timestamp']}).
+- Browser engines are the ground truth here but out of scope as *engines* —
+  heavy, and not what the `kymo` CLI ships.
 """
 
 
@@ -154,25 +194,21 @@ def main() -> None:
 
     RESULTS.mkdir(parents=True, exist_ok=True)
     q = quality.collect()
+    a = accuracy.collect()
     p = perf.measure(reps=args.reps, stamp=args.stamp)
 
-    (RESULTS / "quality.json").write_text(
-        json.dumps(q, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
-    (RESULTS / "perf.json").write_text(
-        json.dumps(p, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
-    (RESULTS / "REPORT.md").write_text(_render_report(q, p), encoding="utf-8")
+    (RESULTS / "quality.json").write_text(json.dumps(q, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (RESULTS / "accuracy.json").write_text(json.dumps(a, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (RESULTS / "perf.json").write_text(json.dumps(p, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (RESULTS / "REPORT.md").write_text(_render_report(q, a, p), encoding="utf-8")
 
-    print(f"corpus  : {q['corpus']['items']} kymo SVGs, reference '{q['reference_engine']}'")
+    print(f"fidelity: {q['corpus']['items']} kymo SVGs (ref '{q['reference_engine']}')")
     for qr in q["engines"]:
-        pr = _perf_row(p, qr["key"]) or {}
-        print(f"  {qr['label']:10} {qr['renders']:>6} render  "
-              f"diff {str(qr['mean_abs_diff_avg']):>6}  "
-              f"median {str(pr.get('per_file_median_ms')):>7} ms  → {qr['verdict']}")
-    if q["missing_engines"]:
-        print(f"missing : {', '.join(q['missing_engines'])}")
-    for name in ("quality.json", "perf.json", "REPORT.md"):
+        print(f"  {qr['label']:10} {qr['renders']:>6} render  diff {str(qr['mean_abs_diff_avg']):>6}  → {qr['verdict']}")
+    print(f"accuracy: {a['dataset']['samples']} suite SVGs vs Chrome")
+    for r in a["engines"]:
+        print(f"  {r['label']:10} {r['renders']:>6} render  meanΔ {str(r['mean_abs_diff_avg']):>6}  matches {r['match_rate']:.0%}")
+    for name in ("quality.json", "accuracy.json", "perf.json", "REPORT.md"):
         print(f"wrote   : {(RESULTS / name).relative_to(ROOT)}")
 
 

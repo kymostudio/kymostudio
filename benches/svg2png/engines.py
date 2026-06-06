@@ -114,9 +114,10 @@ def _svglib() -> Engine | None:
         from svglib.svglib import svg2rlg
     except ModuleNotFoundError:
         return None
-    # svglib warns per unsupported `url(#…)` fill before it ultimately fails on
-    # kymo's `height:auto` — silence the flood; the failure is recorded as data.
-    logging.getLogger("svglib.svglib").setLevel(logging.ERROR)
+    # svglib logs per unsupported `url(#…)` fill (warning) and per ambiguous
+    # length (error) on its way to a result — non-fatal noise. Silence below
+    # CRITICAL; real failures still raise and are recorded as data.
+    logging.getLogger("svglib.svglib").setLevel(logging.CRITICAL)
     backend = f"reportlab renderPM ({_pkg_version('reportlab')}, svglib {_pkg_version('svglib')})"
 
     def render(svg_str: str, svg_bytes: bytes) -> bytes:

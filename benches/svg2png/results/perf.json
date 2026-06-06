@@ -6,7 +6,7 @@
     "kymo_version": "0.3.6",
     "cpu_count": 4,
     "reps": 7,
-    "timestamp": "2026-06-06T12:13:23+00:00"
+    "timestamp": "2026-06-06T12:34:33+00:00"
   },
   "corpus": {
     "items": 30
@@ -18,11 +18,11 @@
       "backend": "resvg (kymostudio-core 0.3.6)",
       "rendered": 30,
       "failed": 0,
-      "total_ms": 499.36,
-      "per_file_median_ms": 11.458,
-      "per_file_p95_ms": 64.815,
-      "throughput_files_per_s": 60.1,
-      "throughput_mpix_per_s": 12.3,
+      "total_ms": 509.23,
+      "per_file_median_ms": 11.274,
+      "per_file_p95_ms": 68.883,
+      "throughput_files_per_s": 58.9,
+      "throughput_mpix_per_s": 12.0,
       "speed_vs_kymo": 1.0
     },
     {
@@ -31,12 +31,12 @@
       "backend": "resvg (0.3.2)",
       "rendered": 30,
       "failed": 0,
-      "total_ms": 925.42,
-      "per_file_median_ms": 19.145,
-      "per_file_p95_ms": 132.723,
-      "throughput_files_per_s": 32.4,
-      "throughput_mpix_per_s": 6.6,
-      "speed_vs_kymo": 0.54
+      "total_ms": 919.39,
+      "per_file_median_ms": 19.079,
+      "per_file_p95_ms": 130.369,
+      "throughput_files_per_s": 32.6,
+      "throughput_mpix_per_s": 6.7,
+      "speed_vs_kymo": 0.55
     },
     {
       "key": "pyvips",
@@ -44,12 +44,12 @@
       "backend": "librsvg (via libvips 8.15.1)",
       "rendered": 30,
       "failed": 0,
-      "total_ms": 1670.08,
-      "per_file_median_ms": 14.789,
-      "per_file_p95_ms": 344.06,
-      "throughput_files_per_s": 18.0,
-      "throughput_mpix_per_s": 3.7,
-      "speed_vs_kymo": 0.3
+      "total_ms": 1603.67,
+      "per_file_median_ms": 15.465,
+      "per_file_p95_ms": 328.203,
+      "throughput_files_per_s": 18.7,
+      "throughput_mpix_per_s": 3.8,
+      "speed_vs_kymo": 0.32
     },
     {
       "key": "cairosvg",
@@ -57,12 +57,12 @@
       "backend": "Cairo (2.9.0)",
       "rendered": 30,
       "failed": 0,
-      "total_ms": 280.91,
-      "per_file_median_ms": 7.121,
-      "per_file_p95_ms": 33.823,
-      "throughput_files_per_s": 106.8,
-      "throughput_mpix_per_s": 21.8,
-      "speed_vs_kymo": 1.78
+      "total_ms": 281.6,
+      "per_file_median_ms": 7.347,
+      "per_file_p95_ms": 33.029,
+      "throughput_files_per_s": 106.5,
+      "throughput_mpix_per_s": 21.7,
+      "speed_vs_kymo": 1.81
     },
     {
       "key": "svglib",
