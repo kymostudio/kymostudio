@@ -1,0 +1,102 @@
+{
+  "generated_by": "bench/svg2png/quality.py",
+  "reference_engine": "kymo",
+  "diff_threshold": 1,
+  "corpus": {
+    "items": 30
+  },
+  "missing_engines": [],
+  "engines": [
+    {
+      "key": "kymo",
+      "label": "kymo",
+      "backend": "resvg (kymostudio-core 0.3.6)",
+      "is_reference": true,
+      "renders": "30/30",
+      "render_rate": 1.0,
+      "dims_match": "30/30",
+      "mean_abs_diff_avg": 0.0,
+      "pct_pixels_diff_avg": 0.0,
+      "verdict": "reference",
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "resvg-py",
+      "label": "resvg-py",
+      "backend": "resvg (0.3.2)",
+      "is_reference": false,
+      "renders": "30/30",
+      "render_rate": 1.0,
+      "dims_match": "30/30",
+      "mean_abs_diff_avg": 0.0,
+      "pct_pixels_diff_avg": 0.0,
+      "verdict": "pixel-identical",
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "pyvips",
+      "label": "pyvips",
+      "backend": "librsvg (via libvips 8.15.1)",
+      "is_reference": false,
+      "renders": "30/30",
+      "render_rate": 1.0,
+      "dims_match": "30/30",
+      "mean_abs_diff_avg": 0.24,
+      "pct_pixels_diff_avg": 4.07,
+      "verdict": "high fidelity",
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "cairosvg",
+      "label": "cairosvg",
+      "backend": "Cairo (2.9.0)",
+      "is_reference": false,
+      "renders": "30/30",
+      "render_rate": 1.0,
+      "dims_match": "30/30",
+      "mean_abs_diff_avg": 11.24,
+      "pct_pixels_diff_avg": 99.73,
+      "verdict": "low fidelity",
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "svglib",
+      "label": "svglib",
+      "backend": "reportlab renderPM (4.5.1, svglib 1.6.0)",
+      "is_reference": false,
+      "renders": "0/30",
+      "render_rate": 0.0,
+      "dims_match": "0/0",
+      "mean_abs_diff_avg": null,
+      "pct_pixels_diff_avg": null,
+      "verdict": "fails to render",
+      "failures": [
+        {
+          "item": "samples/aiq",
+          "error": "ValueError: Can't convert 'auto' to length"
+        },
+        {
+          "item": "samples/aws_1",
+          "error": "ValueError: Can't convert 'auto' to length"
+        },
+        {
+          "item": "samples/data",
+          "error": "ValueError: Can't convert 'auto' to length"
+        },
+        {
+          "item": "samples/order-fulfillment",
+          "error": "ValueError: Can't convert 'auto' to length"
+        },
+        {
+          "item": "conformance/basic_agent",
+          "error": "ValueError: Can't convert 'auto' to length"
+        }
+      ],
+      "failure_count": 30
+    }
+  ]
+}

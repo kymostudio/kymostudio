@@ -8,6 +8,20 @@ description = "Offline quality + performance benchmarks for kymostudio."
 requires-python = ">=3.10"
 dependencies = ["kymostudio"]
 
+[project.optional-dependencies]
+# Comparison rasterizers for the svg2png bench — each is benchmarked against
+# kymo's own resvg core (`kymo … out.png`). They pull system libraries (Cairo,
+# libvips, a C toolchain for the Cairo/ReportLab bindings); see
+# `bench/svg2png/README.md`. Install with: `uv sync --extra svg2png`.
+svg2png = [
+    "pillow>=10.0",   # decode PNGs for the fidelity comparison
+    "resvg-py>=0.3",  # standalone resvg — control (same engine as kymo)
+    "pyvips>=2.2",    # librsvg via libvips
+    "cairosvg>=2.7",  # Cairo
+    "svglib>=1.5",    # ReportLab renderPM
+    "reportlab>=4.0",
+]
+
 [tool.uv.sources]
 kymostudio = { path = "../packages/python", editable = true }
 

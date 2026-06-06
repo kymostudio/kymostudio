@@ -24,6 +24,7 @@ real pipeline) to roll them up — it never re-baselines them.
 | Folder | Measures | Output |
 |--------|----------|--------|
 | [`bpmn/`](bpmn/) | BPMN module quality — render pass-rate, Python↔JS parity, element coverage (correctness) **and** parse+render timing (performance) | [`bpmn/results/REPORT.md`](bpmn/results/REPORT.md) |
+| [`svg2png/`](svg2png/) | SVG→PNG rasterizer comparison — kymo's resvg core vs cairosvg, svglib, pyvips/librsvg, resvg-py: render fidelity vs the kymo reference (correctness) **and** rasterize timing (performance) | [`svg2png/results/REPORT.md`](svg2png/results/REPORT.md) |
 
 Each bench folder follows the same shape: read-only `quality.py` (correctness,
 pure stdlib), `perf.py` (timing, imports `kymo`), `run.py` (both → `results/`),
