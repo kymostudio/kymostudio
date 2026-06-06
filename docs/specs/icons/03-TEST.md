@@ -62,7 +62,8 @@ goldens for unaffected diagrams**.
 `packages/python` (`uv run --group dev python -m pytest` — icon unit tests +
 `tests/test_conformance.py`, golden `tests/test_diagrams.py` / `test_bpmn_corpus.py`),
 `packages/js` (`npm test` → `node --test` — icon loader tests + `conformance.test.js`), and
-the generator (`packages/js/scripts/`). No new **runtime** dependency (NFR-3).
+the generator (`packages/icons/scripts/`, the shared source-of-truth package — CR-ICONS-008).
+No new **runtime** dependency (NFR-3).
 
 ## 3. Test cases
 

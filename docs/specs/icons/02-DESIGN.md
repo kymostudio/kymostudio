@@ -1,7 +1,7 @@
 ---
 title: kymo Icons v2 — Design
 document_id: DESIGN-ICONS-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-04
 status: Draft
 classification: Internal
@@ -48,8 +48,10 @@ are evidenced by RES-ICONS-001 §2–§5. Covers ISO/IEC/IEEE 12207 Architecture
 
 The icon **catalogue format** (per-set IconifyJSON artifacts), the **generator** that emits
 it, the **renderer/loader** changes in both packages, and the **on-demand client loading**
-path — mirrored in `packages/python` (`src/kymo/icons.py`) and `packages/js`
-(`src/icons-loader.ts`, `src/icons-builtin.ts`, `scripts/build-manifest.mjs`). It replaces
+path. The renderers/loaders live in `packages/python` (`src/kymo/icons.py`) and `packages/js`
+(`src/icons-loader.ts`, `src/icons-builtin.ts`); the catalogue + generator
+(`scripts/build-manifest.mjs`) are the shared **`packages/icons`** package — the single source of
+truth both implementations resolve through (see ICONS-MAP-001 §2 and CR-ICONS-008). It replaces
 the current state diagnosed in RES-ICONS-001 §6.
 
 ## 2. Current state (the thing being replaced)
@@ -157,6 +159,7 @@ discipline `CLAUDE.md` mandates for the existing `.kymo`/BPMN conformance.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-06-04 | Vũ Anh | Initial issue — design of the IconifyJSON-style catalogue, generator, renderer/inliner, on-demand loader, and parity gate, derived from RES-ICONS-001. |
+| 0.2     | 2026-06-06 | Vũ Anh | §1 reconciled: the catalogue + generator are now the shared `packages/icons` package (single source of truth) per CR-ICONS-008; renderers/loaders stay in the language packages. §2 (state being replaced) left historical. |
 
 ## Annex B — Document Control
 

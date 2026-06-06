@@ -76,9 +76,10 @@ hand-authored set survives `npm run build-manifest`. This CR closes that gap and
 - **Generator** — `build-manifest.mjs` folds vendored inline `sets/*.json` (those it did not
   generate from `icons/`) into `icons-collections.json`, with deterministic sorted keys, so they are
   not dropped on rebuild.
-- **The `ai` set** — `sets/ai.json`, three icons under category `provider`: `ai:openai`,
-  `ai:anthropic`, `ai:gemini`, sourced from Iconify's `logos` collection (CC0-1.0), brand colours
-  preserved. Discoverable through `kymo icons list ai` / `describe`.
+- **The `ai` set** — `packages/icons/sets/ai.json` (the catalogue's source-of-truth package — see
+  CR-ICONS-008), three icons under category `provider`: `ai:openai`, `ai:anthropic`, `ai:gemini`,
+  sourced from Iconify's `logos` collection (CC0-1.0), brand colours preserved. Discoverable through
+  `kymo icons list ai` / `describe`.
 - **Catalogue-format doc** — `ICONS-MAP-001` gains §2.1 documenting vendored inline sets.
 
 The mechanism, loader changes, and provenance are detailed in **DESIGN-ICONS-CR007**.

@@ -85,8 +85,9 @@ decision. **kymo Icons v2** adopts that model and its build/distribution mechani
   per-set `info`/tags make the catalogue searchable; a single generator emits the data both
   implementations read; the client fetches per-set/batched records and caches them.
 - **Substrate it builds on:** the existing icon resolution in `packages/python/src/kymo/icons.py`
-  and `packages/js/src/icons-loader.ts` (+ `icons-builtin.ts`, `scripts/build-manifest.mjs`), and
-  the "two implementations at parity" rule in `CLAUDE.md`.
+  and `packages/js/src/icons-loader.ts` (+ `icons-builtin.ts`), the generator + catalogue in the
+  shared `packages/icons` package (`scripts/build-manifest.mjs` — see CR-ICONS-008), and the
+  "two implementations at parity" rule in `CLAUDE.md`.
 
 ## 3. Goals & non-goals
 
