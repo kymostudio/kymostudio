@@ -57,11 +57,16 @@ kymo sample.kymo              # → sample.svg
 kymo sample.kymo --animate    # → sample-animated.svg
 kymo sample.kymo --figma      # → sample.figma.js
 kymo sample.kymo --excalidraw # → sample.excalidraw
+```
+
+### 2. Import BPMN
+
+```bash
 kymo process.bpmn             # → process.svg (BPMN 2.0 import)
 kymo lint process.bpmn        # report BPMN structural + import-fidelity issues
 ```
 
-### 2. Convert SVG to PNG
+### 3. Convert SVG to PNG
 
 Render any `.svg` to a PNG image — no headless browser required.
 
@@ -69,7 +74,7 @@ Render any `.svg` to a PNG image — no headless browser required.
 kymo diagram.svg out.png      # rasterize an existing SVG
 ```
 
-### 3. Browse the icon catalogue
+### 4. Browse the icon catalogue
 
 Explore the bundled icons right from the CLI.
 
