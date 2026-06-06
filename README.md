@@ -14,9 +14,7 @@
 
 ![NVIDIA AIQ replica — animated](samples/nvidia-aiq-animated.webp)
 
-## About
-
-kymostudio is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
+**Kymostudio** is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
 
 #### Pipeline
 
