@@ -1,6 +1,6 @@
 [project]
 name = "kymostudio"
-version = "0.3.6"
+version = "0.4.0"
 description = "Type it. See it appear. Watch it animate."
 readme = "README.md"
 license = "Apache-2.0"
@@ -22,11 +22,14 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    # The shared resvg engine (the `_kymostudio_core` extension module). It is
-    # the sole runtime dependency: SVG→PNG rasterization for the `kymo … out.png`
-    # CLI and the Excalidraw icon embedding, matching the Rust CLI / JS wasm build.
+    # The shared resvg/svg2pdf engine (the `_kymostudio_core` extension module).
+    # It is the sole runtime dependency: SVG→PNG rasterization for `kymo … out.png`
+    # and the Excalidraw icon embedding, plus SVG→PDF (`svg_to_pdf`) for
+    # `kymo … out.pdf` — matching the Rust CLI / JS wasm build.
     # Dependency convention (see docs/RELEASING.md): caret-pinned to current MINOR
-    # series — `>=0.3,<0.4` ≡ Rust `^0.3` ≡ npm `^0.3`; bump only on a minor/major.
+    # series — `>=0.3,<0.4` ≡ Rust `^0.3` ≡ npm `^0.3`; the floor stays at an
+    # already-published core and is raised to 0.4 by `/kymo-bump minor` at the
+    # release that ships `svg_to_pdf` (PDF output requires that 0.4 core).
     "kymostudio-core>=0.3,<0.4",
 ]
 

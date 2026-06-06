@@ -66,12 +66,14 @@ kymo process.bpmn             # → process.svg
 kymo lint process.bpmn        # check for issues
 ```
 
-### 3. Convert SVG to PNG
+### 3. Convert SVG to PNG or PDF
 
-Render any `.svg` to a PNG image — no headless browser required.
+Turn any `.svg` into a PNG image or a vector PDF — no headless browser required.
+The output format follows the output file's extension.
 
 ```bash
-kymo diagram.svg out.png      # turn an SVG into a PNG
+kymo diagram.svg out.png      # raster PNG (add -s 2 for 2× resolution)
+kymo diagram.svg out.pdf      # vector PDF — crisp at any zoom
 ```
 
 ### 4. Browse the icon catalogue

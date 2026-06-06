@@ -1,6 +1,6 @@
 [package]
 name = "kymostudio"
-version = "0.3.6"
+version = "0.4.0"
 edition = "2021"
 rust-version = "1.74"
 description = "Type it. See it appear. Watch it animate."
@@ -19,12 +19,12 @@ path = "src/main.rs"
 
 [dependencies]
 # Dependency convention (see docs/RELEASING.md): caret-pinned to the current MINOR
-# series of kymostudio-core, NOT lockstep-bumped per patch. `^0.3` = >=0.3.0,
-# <0.4.0 — identical semantics to the Python (`>=0.3,<0.4`) and npm (`^0.3`)
-# packages. The floor is always an already-published version, so publishing this
-# crate never has to wait for the same release's core to be indexed. `path` is
-# for local dev; `version` is what crates.io resolves against.
-kymostudio-core = { path = "../kymostudio-core", version = "0.3" }
+# series of kymostudio-core, NOT lockstep-bumped per patch. `^0.4` = >=0.4.0,
+# <0.5.0 — the CLI uses the 0.4 core (it calls `svg_to_pdf`). `path` is for local
+# dev (so CI builds against this repo's core); `version` is what crates.io
+# resolves against — `release-crate.yml` publishes the core first, then this CLI
+# with retry while the new core indexes.
+kymostudio-core = { path = "../kymostudio-core", version = "0.4" }
 
 [profile.release]
 opt-level = 3

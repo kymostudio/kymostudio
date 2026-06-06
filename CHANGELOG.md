@@ -9,6 +9,25 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-06
+
+### Added
+
+- **SVG → vector PDF.** New `svg_to_pdf` in `kymostudio-core` (built on
+  `svg2pdf`) converts an SVG to a one-page vector PDF — crisp at any zoom,
+  selectable text, no `--scale`. CSS-class-aware like the PNG path. `svg2pdf`
+  brings its own `usvg` 0.45, kept behind a `pdf` cargo feature alongside the
+  resvg 0.47 PNG path (native only; the wasm build also enables it for the JS
+  CLI). Exposed to Python (PyO3 `svg_to_pdf`) and JS (wasm `svgToPdf`).
+- **`kymo <input> out.pdf` in all three CLIs.** The output format follows the
+  output extension (`.pdf` → vector PDF, otherwise PNG). An existing `.svg`
+  converts directly; a `.kymo`/`.bpmn`/`.kymo.json` source is rendered then
+  converted. **Live now in the Rust `kymo` CLI** (it depends on the 0.4 core).
+  The Python and JS CLIs ship the `.pdf` path here too, but it activates once
+  they run on a 0.4 core — their `kymostudio-core` floor is raised to `^0.4` in
+  0.4.1 (until then `kymo … out.pdf` prints a "needs kymostudio-core ≥ 0.4"
+  hint). See `docs/RELEASING.md` for why the floor lags one release.
+
 ## [0.3.6] - 2026-06-06
 
 ### Added

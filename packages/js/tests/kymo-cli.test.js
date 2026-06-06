@@ -17,6 +17,20 @@ const SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">' +
   '<rect width="10" height="10" fill="#0a0"/></svg>';
 const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const PDF_MAGIC = Buffer.from([0x25, 0x50, 0x44, 0x46, 0x2d]); // %PDF-
+
+// `svgToPdf` landed in kymostudio-core 0.4; the PDF test skips on older cores
+// (the named wasm-bindgen export is absent in the JS glue) so CI on the
+// published floor stays green.
+async function pdfAvailable() {
+  try {
+    const mod = await import("kymostudio-core");
+    return typeof mod.svgToPdf === "function";
+  } catch {
+    return false;
+  }
+}
+const PDF_OK = await pdfAvailable();
 
 test("renders a .kymo source to SVG", async () => {
   const src = join(TMP, "d.kymo");
@@ -50,6 +64,31 @@ test("rasterizes a .svg input to PNG", async () => {
   assert.equal(await run([src, out]), 0);
   assert.deepEqual(readFileSync(out).subarray(0, 8), PNG_MAGIC);
 });
+
+test(
+  "converts a .svg input to PDF",
+  { skip: PDF_OK ? false : "kymostudio-core >= 0.4 (svgToPdf) not installed" },
+  async () => {
+    const src = join(TMP, "p.svg");
+    writeFileSync(src, SVG);
+    const out = join(TMP, "p.pdf");
+    assert.equal(await run([src, out]), 0);
+    assert.deepEqual(readFileSync(out).subarray(0, 5), PDF_MAGIC);
+  },
+);
+
+test(
+  "a .pdf output overrides the .svg-input PNG default",
+  { skip: PDF_OK ? false : "kymostudio-core >= 0.4 (svgToPdf) not installed" },
+  async () => {
+    const src = join(TMP, "pref.svg");
+    writeFileSync(src, SVG);
+    const out = join(TMP, "pref.pdf");
+    assert.equal(await run([src, out]), 0);
+    assert.deepEqual(readFileSync(out).subarray(0, 5), PDF_MAGIC);
+    assert.ok(!existsSync(join(TMP, "pref.png")));
+  },
+);
 
 test("--scale doubles the rasterized dimensions", async () => {
   const src = join(TMP, "s.svg");
