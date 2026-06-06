@@ -68,3 +68,15 @@ Render any `.svg` to a PNG image — no headless browser required.
 ```bash
 kymo diagram.svg out.png      # rasterize an existing SVG
 ```
+
+### 3. Browse the icon catalogue
+
+Explore the bundled icons right from the CLI.
+
+```bash
+kymo icons list                         # list every icon set
+kymo icons list aws                     # list icons in one provider
+kymo icons search database              # find icons by keyword
+kymo icons describe aws:compute-ec2     # show details for one icon
+kymo icons download aws:compute-ec2 -o . # save the icon to a folder
+```
