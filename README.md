@@ -72,8 +72,8 @@ Turn any `.svg` into a PNG image or a vector PDF — no headless browser require
 The output format follows the output file's extension.
 
 ```bash
-kymo diagram.svg out.png      # raster PNG (add -s 2 for 2× resolution)
-kymo diagram.svg out.pdf      # vector PDF — crisp at any zoom
+kymo diagram.svg out.png      # to PNG
+kymo diagram.svg out.pdf      # to PDF
 ```
 
 ### 4. Browse the icon catalogue
