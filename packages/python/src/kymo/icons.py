@@ -674,7 +674,33 @@ def get_icon(key: str, _seen: frozenset[str] = frozenset()) -> str:
         svg = _png_as_image_tag(path) if path.suffix.lower() == ".png" else _svg_as_inline(path)
         _RENDER_CACHE[key] = svg
         return svg
+    # Vendored inline IconifyJSON sets (e.g. `ai:`): not in the flat manifest
+    # (no `icons/<prefix>/` source file), so resolve the address by loading its
+    # set on demand and registering its `{body,…}` record (mirrors the JS
+    # loader's on-demand `loadSet`). Brand art keeps its own fills/gradients.
+    rec = _inline_record(key)
+    if rec is not None:
+        register_record(key, rec)
+        return render_record(rec)
     raise KeyError(f"unknown icon: {key!r}")
+
+
+def _inline_record(key: str) -> dict | None:
+    """If `key` is an address whose per-set IconifyJSON carries an inline
+    `body`, return a self-contained `{body, width, height}` record (set-level
+    dims filled in). Returns None for path-backed or unknown addresses."""
+    if not is_address(key):
+        return None
+    prefix, _, name = key.partition(":")
+    s = load_set(prefix)
+    rec = s.get("icons", {}).get(name)
+    if not isinstance(rec, dict) or "body" not in rec:
+        return None
+    return {
+        "body": rec["body"],
+        "width": rec.get("width", s.get("width", 24)),
+        "height": rec.get("height", s.get("height", 24)),
+    }
 
 
 def icon_addresses() -> list[str]:

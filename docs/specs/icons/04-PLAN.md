@@ -128,6 +128,7 @@ FR/NFR re-based into the baseline on close.
 | [`CR-ICONS-005`](CR/CR-ICONS-005/01-REQUIREMENTS.md) | P4 | implementation | FR-3, FR-6, FR-7, NFR-2 | P3 + sourced vectors | Open |
 | [`CR-ICONS-006`](CR/CR-ICONS-006/01-REQUIREMENTS.md) | P5 | implementation | all (docs & gates) | P1–P4, P6 | Open |
 | [`CR-ICONS-001`](CR/CR-ICONS-001/01-REQUIREMENTS.md) | P6 | requirements-adding | **adds** FR-12..15 (`kymo icons` CLI) | P3 (+P2/P4) | Open |
+| [`CR-ICONS-007`](CR/CR-ICONS-007/01-REQUIREMENTS.md) | post-baseline | extension | vendored **inline** sets + the `ai` brand-logo group (no new FR; exercises FR-2/3/6/7/13/15) | P3, P4 | Implemented |
 
 ## Annex A — Revision History
 

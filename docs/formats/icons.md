@@ -1,7 +1,7 @@
 ---
 title: kymo Icons — Catalogue Format (prefix:name + IconifyJSON)
 document_id: ICONS-MAP-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-06-05
 status: Released
 classification: Internal
@@ -33,7 +33,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | ICONS-MAP-001                                      |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Owner        | `diagrams/` project                                |
 | Related      | FEAT-ICONS-001, DESIGN-ICONS-001, RES-ICONS-001    |
@@ -72,6 +72,20 @@ Both implementations consume these artifacts; there is no second scanner
 (FR-8). `packages/js` carries **zero runtime dependencies** — the generator and
 SVG-normalization tooling are build-time only (NFR-3).
 
+### 2.1 Vendored inline sets (CR-ICONS-007)
+
+A set need not be backed by source files under `icons/`. A **vendored inline
+set** is a hand-authored `sets/<prefix>.json` whose records ship the SVG `body`
+inline (§3) — exactly how an `@iconify-json/<prefix>` package distributes its
+`icons.json`. The generator does not scan or rewrite such a file (it has no
+`icons/<prefix>/` source), but **folds it into `icons-collections.json`** so
+`kymo icons list` still indexes it across rebuilds. The loaders resolve an
+inline address on demand (`load_set(prefix)` → render the `body`), never
+fetching a file. The first such set is **`ai`** — three foundation-model brand
+logos (`ai:openai`, `ai:anthropic`, `ai:gemini`), sourced from the canonical
+Iconify `logos` collection (CC0-1.0). Brand art keeps its own fills/gradients;
+the `currentColor` recolour (§6) is **not** applied to it.
+
 ## 3. Per-set IconifyJSON
 
 ```jsonc
@@ -91,6 +105,8 @@ SVG-normalization tooling are build-time only (NFR-3).
   an icon carries its own only when it differs (none do pre-vectorization).
 - **Records** are `{ body, width?, height? }` once vectorized — `body` is the
   inner SVG (no `<svg>` wrapper); until then `path` points at the source file.
+  Vendored inline sets (§2.1) ship `body` records from the outset, with their
+  own per-icon `width`/`height` (the source viewBox).
 - **Metadata** (FR-5): `info` carries totals + categories; each record carries
   its `category` — enough for the CLI / a picker UI to search and filter.
 
@@ -139,3 +155,4 @@ See FEAT-ICONS-001 (FR-12..15) and CR-ICONS-001.
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 1.0     | 2026-06-05 | Vũ Anh | Initial release — authoritative catalogue format (addressing, artifacts, IconifyJSON, aliases, rendering, pipeline, legacy compat, CLI), consolidating the implemented P1–P6. |
+| 1.1     | 2026-06-06 | Vũ Anh | Add §2.1 vendored inline sets (CR-ICONS-007): hand-authored `sets/<prefix>.json` with inline `body` art, folded into collections by the generator, resolved on demand — first set `ai` (openai/anthropic/gemini brand logos, CC0). |

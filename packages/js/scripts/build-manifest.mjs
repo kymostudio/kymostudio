@@ -13,7 +13,7 @@
  * addressable; the legacy `<provider>-<name>` key (last-write-wins) maps to
  * the winning address so authored diagrams resolve unchanged.
  */
-import { readdir, writeFile, mkdir } from "node:fs/promises";
+import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -91,9 +91,32 @@ for (const prefix of Object.keys(sets).sort()) {
   await writeFile(join(SETS_DIR, `${prefix}.json`), JSON.stringify(set, null, 0));
   collections[prefix] = { total: set.info.total, categories: Object.keys(set.info.categories).sort() };
 }
-await writeFile(COLLECTIONS, JSON.stringify(collections, null, 0));
+
+// Vendored inline IconifyJSON sets (e.g. `ai`): hand-authored `sets/*.json`
+// with inline `body` art, NOT scanned from `icons/`. They have no source files
+// so the loop above never (re)writes them — but the collections index must
+// still list them, or `kymo icons list` would drop them on every rebuild.
+let vendored = 0;
+for (const f of (await readdir(SETS_DIR)).sort()) {
+  if (!f.endsWith(".json")) continue;
+  const prefix = f.slice(0, -5);
+  if (prefix in sets) continue;                       // already generated above
+  const set = JSON.parse(await readFile(join(SETS_DIR, f), "utf8"));
+  const cats = set.info?.categories ?? {};
+  collections[prefix] = {
+    total: set.info?.total ?? Object.keys(set.icons ?? {}).length,
+    categories: Object.keys(cats).sort(),
+  };
+  vendored += 1;
+}
+
+// Deterministic, diffable: sort collection prefixes (vendored sets included).
+const orderedCollections = {};
+for (const k of Object.keys(collections).sort()) orderedCollections[k] = collections[k];
+await writeFile(COLLECTIONS, JSON.stringify(orderedCollections, null, 0));
 
 console.log(
   `✓ wrote ${OUT} (${Object.keys(icons).length} addresses, ${Object.keys(legacy).length} legacy keys)\n` +
-  `✓ wrote ${Object.keys(sets).length} per-set files under sets/ + icons-collections.json`,
+  `✓ wrote ${Object.keys(sets).length} per-set files under sets/ + icons-collections.json` +
+  (vendored ? ` (+${vendored} vendored inline set${vendored > 1 ? "s" : ""})` : ""),
 );

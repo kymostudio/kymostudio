@@ -141,8 +141,9 @@ function cmdDescribe(argv, log, err) {
   log(`address  : ${out.address}`);
   log(`size     : ${out.width}×${out.height}`);
   log(`category : ${out.category}`);
-  log(`source   : ${out.path}`);
+  log(`source   : ${out.path ?? "inline (IconifyJSON body)"}`);
   log(`set      : ${out.set.name} (${out.set.total} icons)`);
+  if (out.set.license) log(`license  : ${out.set.license.title ?? out.set.license.spdx ?? out.set.license}`);
   if (out.aliasChain.length) log(`alias of : ${out.aliasChain.join(" → ")}`);
   return 0;
 }

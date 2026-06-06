@@ -130,7 +130,11 @@ def test_per_set_iconifyjson_shape() -> None:
     cols = icons.collections()
     if not cols:
         pytest.skip("per-set artifacts absent")
-    prefix = sorted(cols)[0]
+    # Path-backed sets are generated from `icons/` at the root 64×64 box and are
+    # sparse (no per-icon dims). Vendored inline sets (e.g. `ai`) carry their own
+    # viewBox dims, so target a generated set here (aws is always present).
+    prefix = "aws" if "aws" in cols else next(
+        p for p in sorted(cols) if icons.load_set(p).get("width") == 64)
     s = icons.load_set(prefix)
     assert s["prefix"] == prefix
     assert s["width"] == 64 and s["height"] == 64          # root defaults
