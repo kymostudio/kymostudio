@@ -62,8 +62,8 @@ kymo sample.kymo --excalidraw # → sample.excalidraw
 ### 2. Import BPMN
 
 ```bash
-kymo process.bpmn             # → process.svg (BPMN 2.0 import)
-kymo lint process.bpmn        # report BPMN structural + import-fidelity issues
+kymo process.bpmn             # → process.svg
+kymo lint process.bpmn        # check for issues
 ```
 
 ### 3. Convert SVG to PNG
