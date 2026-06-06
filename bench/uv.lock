@@ -1,0 +1,48 @@
+version = 1
+revision = 2
+requires-python = ">=3.10"
+
+[[package]]
+name = "kymo-bench"
+version = "0.0.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "kymostudio" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "kymostudio", editable = "../packages/python" }]
+
+[[package]]
+name = "kymostudio"
+version = "0.3.6"
+source = { editable = "../packages/python" }
+dependencies = [
+    { name = "kymostudio-core" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "kymostudio-core", specifier = ">=0.3.3" },
+    { name = "pillow", marker = "extra == 'webp'", specifier = ">=10.0" },
+]
+provides-extras = ["webp"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "ruff", specifier = ">=0.6" },
+]
+
+[[package]]
+name = "kymostudio-core"
+version = "0.3.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a4/da/ef6a7c9e69fe04ebb2316f71de04998614b5e94981bba0558b1d74fa6e6b/kymostudio_core-0.3.6.tar.gz", hash = "sha256:6b34f35d461f9b89e5d94058799b138bf96c94b222250d49a709094e3c1d95e3", size = 10248, upload-time = "2026-06-06T10:56:39.255Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/8e/255170e6a1294b53314144ec083c11c54ea67b39d0b8874315abb13ab971/kymostudio_core-0.3.6-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:e57ccd15a14d18d657d65e597f7874d78eaa920ec1de28cd57948bc885508154", size = 1434903, upload-time = "2026-06-06T10:56:30.81Z" },
+    { url = "https://files.pythonhosted.org/packages/97/53/e5ed420cf4bf6e9886e72e5073fc867039b8e08bd9b354309b14ad99d975/kymostudio_core-0.3.6-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:70058dc1243fc320b3a12fbdefeaf0da27c43759343aed6f5c7d28619473494c", size = 1368972, upload-time = "2026-06-06T10:56:32.68Z" },
+    { url = "https://files.pythonhosted.org/packages/26/3c/098fcd6984ab1295dc3ac97e5b53389e39d27413ec9900b18bbeeb2a4d7c/kymostudio_core-0.3.6-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:26fa55a8be5aa037595c060d69f32316ad8d274f4d1c2b095aa28e0b984a4708", size = 1486441, upload-time = "2026-06-06T10:56:34.171Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/35/b2bf762b25f97dabe8a789ca9992453ee1622db5dcb6d06d9dd8b841664a/kymostudio_core-0.3.6-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1afdbd4a98b2202a4a37d4ec592c3db4a60ec2698ff2a2c15cd8c4e37d75a97a", size = 1546032, upload-time = "2026-06-06T10:56:35.801Z" },
+    { url = "https://files.pythonhosted.org/packages/cc/cd/d3d1bfa2c76e3f4efab05b615f4c08bebc27a65e0503d385ffbdd12278e8/kymostudio_core-0.3.6-cp310-abi3-win_amd64.whl", hash = "sha256:292da9602064bcbafc875af2e5837c4ea385b33819866a5c11ba2e8bfa81c475", size = 1408259, upload-time = "2026-06-06T10:56:37.953Z" },
+]
