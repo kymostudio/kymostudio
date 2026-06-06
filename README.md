@@ -19,7 +19,8 @@
 
 #### Key Features
 
-- **Built for real diagrams** — architecture, flows and standard BPMN, all rendered faithfully.
+- **Draws what you actually need** — software architecture, process flows and standard BPMN, all rendered faithfully.
+- **Starts from any source** — author in the `.kymo` DSL, or feed it BPMN, JSON or Python.
 - **Write once, export anywhere** — one source compiles to SVG, PNG, WebP, Figma and Excalidraw.
 - **Diagrams as code** — describe your diagram in a clean, line-oriented `.kymo` syntax; no dragging boxes around.
 - **Animated by default** — edges come alive with built-in flowing animation, straight to a self-contained SVG.
