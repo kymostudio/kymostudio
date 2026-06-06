@@ -1,0 +1,54 @@
+[package]
+name = "kymostudio-core"
+version = "0.3.3"
+edition = "2021"
+rust-version = "1.74"
+description = "Type it. See it appear. Watch it animate."
+license = "Apache-2.0"
+repository = "https://github.com/kymostudio/kymostudio"
+homepage = "https://github.com/kymostudio/kymostudio"
+readme = "README.md"
+keywords = ["svg", "png", "rasterizer", "diagram", "resvg"]
+categories = ["multimedia::images", "command-line-utilities", "wasm"]
+
+# rlib  -> native CLI + tests; cdylib -> Python (pyo3) and wasm (wasm-bindgen).
+[lib]
+name = "kymostudio_core"
+path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]
+
+# The `kymo` CLI (native only — built under default features).
+[[bin]]
+name = "kymo"
+path = "src/main.rs"
+
+[dependencies]
+# Core SVG engine. system-fonts + memmap-fonts pull in fs/mmap (no good on
+# wasm) so they live behind the `system-fonts` feature, OFF for the wasm build.
+resvg = { version = "0.47", default-features = false, features = ["text", "raster-images"] }
+
+# Binding deps — each pulled in only by its feature.
+pyo3 = { version = "0.28", features = ["extension-module", "abi3-py310"], optional = true }
+wasm-bindgen = { version = "0.2", optional = true }
+
+[features]
+# Native builds (CLI, tests, Python wheel) load system fonts so <text> renders.
+default = ["system-fonts"]
+system-fonts = ["resvg/system-fonts", "resvg/memmap-fonts"]
+
+# Python extension module (maturin builds the cdylib with this on).
+python = ["dep:pyo3", "system-fonts"]
+
+# wasm (browser + Node) — deliberately NO system-fonts (no fs/mmap on wasm).
+wasm = ["dep:wasm-bindgen"]
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true
+
+# wasm-pack post-processing. wasm-opt is disabled for deterministic builds
+# across environments (the prebuilt binary is flaky on some hosts); re-enable
+# once a pinned wasm-opt is wired into CI to shrink the ~2.4 MB module.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
