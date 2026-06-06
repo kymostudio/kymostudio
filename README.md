@@ -34,7 +34,7 @@ kymo lint process.bpmn        # report BPMN structural + import-fidelity issues
 
 ## Convert SVG to PNG
 
-Render any `.kymo`/`.svg` to a PNG image — no headless browser required.
+Render any `.svg` to a PNG image — no headless browser required.
 
 ```bash
 kymo diagram.svg out.png      # rasterize an existing SVG
