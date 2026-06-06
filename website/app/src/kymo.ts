@@ -4,10 +4,13 @@
  *
  * Built-in vector icons render with zero network; the ~2300 file-backed icons
  * (cloud-provider logos) are fetched lazily from jsDelivr (the repo is public).
+ * The catalogue + art live in the `packages/icons` package, so both the
+ * inlined manifest and the runtime base URL point there (the base URL also
+ * serves on-demand per-set files like `sets/ai.json`).
  * esbuild's `text` loader inlines the sample files as strings at build time.
  */
 import { setManifest, setIconBaseURL } from "../../../packages/js/dist/index.js";
-import manifest from "../../../packages/js/icons-manifest.json";
+import manifest from "../../../packages/icons/icons-manifest.json";
 
 import aiqSrc from "../../../samples/aiq.kymo";
 import dataSrc from "../../../samples/data.kymo";
@@ -15,7 +18,7 @@ import awsSrc from "../../../samples/aws_1.kymo";
 import orderBpmn from "../../../samples/order.bpmn";
 
 setManifest(manifest as Parameters<typeof setManifest>[0]);
-setIconBaseURL("https://cdn.jsdelivr.net/gh/kymostudio/kymostudio@main");
+setIconBaseURL("https://cdn.jsdelivr.net/gh/kymostudio/kymostudio@main/packages/icons");
 
 export interface Sample {
   label: string;

@@ -1,7 +1,7 @@
 ---
 title: kymo Icons — Catalogue Format (prefix:name + IconifyJSON)
 document_id: ICONS-MAP-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-06-05
 status: Released
 classification: Internal
@@ -33,7 +33,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | ICONS-MAP-001                                      |
-| Version      | 1.1                                                |
+| Version      | 1.2                                                |
 | Status       | Released                                           |
 | Owner        | `diagrams/` project                                |
 | Related      | FEAT-ICONS-001, DESIGN-ICONS-001, RES-ICONS-001    |
@@ -57,20 +57,42 @@ Because the category is kept, two icons that the legacy flat `<provider>-<name>`
 key collapsed onto one slot now hold distinct addresses — the catalogue exposes
 **one address per source file** (no silent shadowing; FR-1).
 
-## 2. Generated artifacts
+## 2. Source of truth — the `packages/icons` package
 
-A single generator — `packages/js/scripts/build-manifest.mjs` — scans the
-repo-root `icons/` and emits (deterministically; re-running produces no diff):
+The icon catalogue — **raw art and the generated index** — is a single shared
+package, `packages/icons`, consumed by both implementations:
+
+```
+packages/icons/
+  icons/<provider>/<cat…>/<file>   # raw art (PNG/SVG)
+  scripts/build-manifest.mjs       # the single generator
+  icons-manifest.json              # generated index ┐
+  icons-collections.json           # generated index ├ committed source of truth
+  sets/<prefix>.json               # generated index ┘
+```
+
+A single generator — `packages/icons/scripts/build-manifest.mjs` — scans
+`packages/icons/icons/` and emits (deterministically; re-running produces no diff):
 
 | Artifact | Shape | Consumed by |
 |----------|-------|-------------|
-| `packages/js/icons-manifest.json` | `{ icons: {addr→path}, legacy: {legacyKey→addr}, aliases: {} }` | Python `icons.py` (bulk) + JS loader (legacy resolution) |
-| `packages/js/sets/<prefix>.json` | per-set IconifyJSON (below) | on-demand loader + `kymo icons` |
-| `packages/js/icons-collections.json` | `{ prefix: { total, categories[] } }` | `kymo icons list` |
+| `icons-manifest.json` | `{ icons: {addr→path}, legacy: {legacyKey→addr}, aliases: {} }` | Python `icons.py` (bulk) + JS loader (legacy resolution) |
+| `sets/<prefix>.json` | per-set IconifyJSON (below) | on-demand loader + `kymo icons` |
+| `icons-collections.json` | `{ prefix: { total, categories[] } }` | `kymo icons list` |
 
-Both implementations consume these artifacts; there is no second scanner
-(FR-8). `packages/js` carries **zero runtime dependencies** — the generator and
-SVG-normalization tooling are build-time only (NFR-3).
+Paths inside the manifest stay **relative to `packages/icons`** (`icons/<provider>/…`),
+so a consumer resolves them against wherever it hosts/mirrors the package.
+
+**How each side consumes it:**
+- **Python** reads `packages/icons/{icons-manifest.json,sets/,icons/}` directly in the dev tree
+  (degrading to built-in glyphs when absent, e.g. a pip-installed tree).
+- **JS** build-copies the **index** (`sets/`, `icons-manifest.json`, `icons-collections.json` — not the
+  art) into `packages/js` at `prebuild`/`prepack` (`scripts/sync-icons.mjs`); those copies are
+  git-ignored, so the only committed copy lives in `packages/icons`. The published npm tarball is
+  thus self-contained while staying **zero runtime dependencies** (NFR-3). Raw art is fetched at
+  runtime from a host/CDN via `setIconBaseURL` (the playground points at jsDelivr `…@main/packages/icons`).
+
+There is no second scanner (FR-8); both sides resolve identically by construction.
 
 ### 2.1 Vendored inline sets (CR-ICONS-007)
 
@@ -156,3 +178,4 @@ See FEAT-ICONS-001 (FR-12..15) and CR-ICONS-001.
 |---------|------------|--------|---------|
 | 1.0     | 2026-06-05 | Vũ Anh | Initial release — authoritative catalogue format (addressing, artifacts, IconifyJSON, aliases, rendering, pipeline, legacy compat, CLI), consolidating the implemented P1–P6. |
 | 1.1     | 2026-06-06 | Vũ Anh | Add §2.1 vendored inline sets (CR-ICONS-007): hand-authored `sets/<prefix>.json` with inline `body` art, folded into collections by the generator, resolved on demand — first set `ai` (openai/anthropic/gemini brand logos, CC0). |
+| 1.2     | 2026-06-06 | Vũ Anh | §2 rewritten: catalogue (raw art + generated index + generator) consolidated into the shared `packages/icons` package as the single source of truth; Python reads it directly, JS build-copies the index (git-ignored) at prebuild/prepack; playground base URL → `…@main/packages/icons`. |

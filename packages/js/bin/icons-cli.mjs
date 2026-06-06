@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 
 const PKG = join(dirname(fileURLToPath(import.meta.url)), "..");   // packages/js
 const REPO = join(PKG, "..", "..");
+const ICONS_PKG = join(REPO, "packages", "icons");                // raw art source of truth
 const ICONIFY_API = "https://api.iconify.design";
 const ADDR_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*:[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -181,7 +182,7 @@ async function cmdDownload(argv, log, err) {
       const target = join(outDir, basename(path));
       if (existsSync(target) && !yes) { err(`refusing to overwrite ${target} (pass -y)`); return 1; }
       mkdirSync(dirname(target), { recursive: true });
-      copyFileSync(join(REPO, path), target);
+      copyFileSync(join(ICONS_PKG, path), target);              // path is icons/<provider>/… under packages/icons
       log(`✓ wrote ${target}`);
     }
   }

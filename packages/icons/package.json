@@ -1,0 +1,17 @@
+{
+  "name": "@kymostudio/icons",
+  "version": "0.3.3",
+  "description": "kymo icon catalogue — single source of truth (raw art + generated IconifyJSON manifest/sets) shared by the Python and JS implementations.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build-manifest": "node scripts/build-manifest.mjs"
+  },
+  "files": [
+    "icons/",
+    "sets/",
+    "icons-manifest.json",
+    "icons-collections.json"
+  ]
+}

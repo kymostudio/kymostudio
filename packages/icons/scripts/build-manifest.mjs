@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 /**
- * Build script: scan the repo-root `icons/` and emit
- * `../icons-manifest.json` (i.e. packages/js/icons-manifest.json, bundled
- * into the published npm package).
- * Mirrors `_scan_icons_dir()` in `packages/python/src/kymo/icons.py`.
+ * Build script: scan this package's `icons/` art and emit the catalogue
+ * (`icons-manifest.json`, `icons-collections.json`, `sets/`) alongside it.
+ * `packages/icons` is the single source of truth consumed by both packages;
+ * `packages/js` build-copies these artifacts in at build/pack time.
+ * Mirrors resolution in `packages/python/src/kymo/icons.py`.
  *
  * kymo Icons v2 — P1 (CR-ICONS-002). Emits the v2 manifest shape:
  *   { icons:   { "<prefix>:<name>": "icons/<provider>/<cat…>/<file>" },  // FR-1
  *     legacy:  { "<provider>-<name>": "<prefix>:<name>" },                // FR-11
  *     aliases: { } }                                                      // FR-4
+ * Paths stay relative to this package root (`icons/<provider>/…`), so a
+ * consumer resolves them against wherever it hosts/mirrors this package.
  * `name` RETAINS the category (the source path) so every icon is
  * addressable; the legacy `<provider>-<name>` key (last-write-wins) maps to
  * the winning address so authored diagrams resolve unchanged.
@@ -17,9 +20,9 @@ import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const HERE = dirname(fileURLToPath(import.meta.url));    // packages/js/scripts
-const ICONS_DIR = join(HERE, "..", "..", "..", "icons"); // repo-root icons/
-const PKG = join(HERE, "..");                            // packages/js
+const HERE = dirname(fileURLToPath(import.meta.url));    // packages/icons/scripts
+const PKG = join(HERE, "..");                            // packages/icons (source of truth)
+const ICONS_DIR = join(PKG, "icons");                    // packages/icons/icons (raw art)
 const OUT = join(PKG, "icons-manifest.json");            // flat v2 manifest (resolution + parity)
 const SETS_DIR = join(PKG, "sets");                      // per-set IconifyJSON (P3)
 const COLLECTIONS = join(PKG, "icons-collections.json"); // set index (P3)

@@ -48,11 +48,12 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Icon generator freshness (committed artifact == regenerated)
+        working-directory: packages/icons
         run: |
-          npm run build-manifest
+          node scripts/build-manifest.mjs
           git diff --exit-code -- icons-manifest.json icons-collections.json sets/
       - name: Run tests
-        run: npm test   # builds TS to dist/, then `node --test`
+        run: npm test   # syncs catalogue from packages/icons, builds TS, then `node --test`
 
   js-canvas:
     name: JS canvas engine tests
