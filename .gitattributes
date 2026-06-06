@@ -1,0 +1,5 @@
+# The Rust BPMN conformance suite byte-compares these SVG goldens against the
+# renderer's output (which always emits LF). Pin them to LF so Windows CI — where
+# git checks out text as CRLF by default (core.autocrlf=true) — doesn't corrupt the
+# byte-for-byte comparison. See packages/rust/kymostudio-core/tests/bpmn_conformance.rs.
+conformance/golden/bpmn_svg/*.svg text eol=lf
