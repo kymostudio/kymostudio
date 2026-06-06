@@ -1,5 +1,5 @@
 {
-  "generated_by": "bench/bpmn/quality.py",
+  "generated_by": "benches/bpmn/quality.py",
   "render": {
     "corpus_full": 840,
     "ok": 829,

@@ -1,7 +1,7 @@
 [project]
-# Offline benchmark harness for kymostudio — a first-class `bench/` folder
+# Offline benchmark harness for kymostudio — a first-class `benches/` folder
 # (Rust-idiom: benches get their own directory, separate from `tests/`).
-# Its own uv project so it runs standalone: `cd bench && uv run python bpmn/run.py`.
+# Its own uv project so it runs standalone: `cd benches && uv run python bpmn/run.py`.
 name = "kymo-bench"
 version = "0.0.0"
 description = "Offline quality + performance benchmarks for kymostudio."
@@ -12,7 +12,7 @@ dependencies = ["kymostudio"]
 # Comparison rasterizers for the svg2png bench — each is benchmarked against
 # kymo's own resvg core (`kymo … out.png`). They pull system libraries (Cairo,
 # libvips, a C toolchain for the Cairo/ReportLab bindings); see
-# `bench/svg2png/README.md`. Install with: `uv sync --extra svg2png`.
+# `benches/svg2png/README.md`. Install with: `uv sync --extra svg2png`.
 svg2png = [
     "pillow>=10.0",   # decode PNGs for the fidelity comparison
     "resvg-py>=0.3",  # standalone resvg — control (same engine as kymo)

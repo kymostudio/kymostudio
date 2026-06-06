@@ -98,7 +98,7 @@ def measure(reps: int = DEFAULT_REPS, stamp: str | None = None) -> dict:
 
     total_pass = parse_total + render_total
     return {
-        "generated_by": "bench/bpmn/perf.py",
+        "generated_by": "benches/bpmn/perf.py",
         "environment": {
             "platform": platform.platform(),
             "python": platform.python_version(),

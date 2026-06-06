@@ -30,7 +30,7 @@ import re
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]  # bench/bpmn -> bench -> repo root
+ROOT = HERE.parents[1]  # benches/bpmn -> bench -> repo root
 RESULTS = HERE / "results"
 
 BASELINE_FULL = ROOT / "packages/python/tests/corpus_bpmn/baseline_full.json"
@@ -91,7 +91,7 @@ def collect() -> dict:
 
     n_import, n_div = len(imp), len(div)
     return {
-        "generated_by": "bench/bpmn/quality.py",
+        "generated_by": "benches/bpmn/quality.py",
         "render": {
             "corpus_full": full["total"],
             "ok": full["ok"],

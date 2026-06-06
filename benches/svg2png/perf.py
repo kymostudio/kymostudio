@@ -111,7 +111,7 @@ def measure(reps: int = DEFAULT_REPS, stamp: str | None = None) -> dict:
         r.pop("_total_ms", None)
 
     return {
-        "generated_by": "bench/svg2png/perf.py",
+        "generated_by": "benches/svg2png/perf.py",
         "environment": {
             "platform": platform.platform(),
             "python": platform.python_version(),

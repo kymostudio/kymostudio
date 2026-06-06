@@ -1,5 +1,5 @@
 {
-  "generated_by": "bench/bpmn/perf.py",
+  "generated_by": "benches/bpmn/perf.py",
   "environment": {
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
     "python": "3.14.3",

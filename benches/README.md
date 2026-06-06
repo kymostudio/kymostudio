@@ -9,7 +9,7 @@ This is its own **uv project** (path-depends on `../packages/python`, editable),
 so it runs standalone without touching the package's own dev environment:
 
 ```bash
-cd bench
+cd benches
 uv sync                       # one-time: create the env (kymo editable)
 uv run python bpmn/run.py     # run a bench, refresh its results/
 ```

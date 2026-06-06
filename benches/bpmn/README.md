@@ -1,4 +1,4 @@
-# bench/bpmn — BPMN module quality bench
+# benches/bpmn — BPMN module quality bench
 
 How good is the BPMN importer/exporter? This bench answers it on two axes and
 renders a single scorecard: [`results/REPORT.md`](results/REPORT.md).
@@ -10,7 +10,7 @@ renders a single scorecard: [`results/REPORT.md`](results/REPORT.md).
 ## Run
 
 ```bash
-cd bench && uv sync                  # one-time
+cd benches && uv sync                  # one-time
 uv run python bpmn/run.py            # writes results/{quality,perf}.json + REPORT.md
 uv run python bpmn/run.py --reps 11  # more reps → steadier timing
 uv run python bpmn/quality.py        # correctness only (pure stdlib, no kymo)

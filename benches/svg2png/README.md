@@ -24,7 +24,7 @@ An engine whose package isn't importable is reported as skipped, not an error.
 ## Run
 
 ```bash
-cd bench
+cd benches
 uv sync --extra svg2png        # one-time: pull the comparison rasterizers
 uv run python svg2png/run.py   # quality + perf → results/
 ```

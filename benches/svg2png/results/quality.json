@@ -1,5 +1,5 @@
 {
-  "generated_by": "bench/svg2png/quality.py",
+  "generated_by": "benches/svg2png/quality.py",
   "reference_engine": "kymo",
   "diff_threshold": 1,
   "corpus": {

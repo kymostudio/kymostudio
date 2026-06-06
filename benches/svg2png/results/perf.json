@@ -1,12 +1,12 @@
 {
-  "generated_by": "bench/svg2png/perf.py",
+  "generated_by": "benches/svg2png/perf.py",
   "environment": {
     "platform": "Linux-6.8.0-117-generic-x86_64-with-glibc2.39",
     "python": "3.13.13",
     "kymo_version": "0.3.6",
     "cpu_count": 4,
     "reps": 7,
-    "timestamp": "2026-06-06T11:50:47+00:00"
+    "timestamp": "2026-06-06T12:13:23+00:00"
   },
   "corpus": {
     "items": 30
@@ -18,11 +18,11 @@
       "backend": "resvg (kymostudio-core 0.3.6)",
       "rendered": 30,
       "failed": 0,
-      "total_ms": 512.3,
-      "per_file_median_ms": 11.748,
-      "per_file_p95_ms": 66.681,
-      "throughput_files_per_s": 58.6,
-      "throughput_mpix_per_s": 11.9,
+      "total_ms": 499.36,
+      "per_file_median_ms": 11.458,
+      "per_file_p95_ms": 64.815,
+      "throughput_files_per_s": 60.1,
+      "throughput_mpix_per_s": 12.3,
       "speed_vs_kymo": 1.0
     },
     {
@@ -31,12 +31,12 @@
       "backend": "resvg (0.3.2)",
       "rendered": 30,
       "failed": 0,
-      "total_ms": 919.48,
-      "per_file_median_ms": 19.247,
-      "per_file_p95_ms": 131.093,
-      "throughput_files_per_s": 32.6,
-      "throughput_mpix_per_s": 6.7,
-      "speed_vs_kymo": 0.56
+      "total_ms": 925.42,
+      "per_file_median_ms": 19.145,
+      "per_file_p95_ms": 132.723,
+      "throughput_files_per_s": 32.4,
+      "throughput_mpix_per_s": 6.6,
+      "speed_vs_kymo": 0.54
     },
     {
       "key": "pyvips",
@@ -44,12 +44,12 @@
       "backend": "librsvg (via libvips 8.15.1)",
       "rendered": 30,
       "failed": 0,
-      "total_ms": 1661.0,
-      "per_file_median_ms": 15.67,
-      "per_file_p95_ms": 327.065,
-      "throughput_files_per_s": 18.1,
+      "total_ms": 1670.08,
+      "per_file_median_ms": 14.789,
+      "per_file_p95_ms": 344.06,
+      "throughput_files_per_s": 18.0,
       "throughput_mpix_per_s": 3.7,
-      "speed_vs_kymo": 0.31
+      "speed_vs_kymo": 0.3
     },
     {
       "key": "cairosvg",
@@ -57,12 +57,12 @@
       "backend": "Cairo (2.9.0)",
       "rendered": 30,
       "failed": 0,
-      "total_ms": 275.12,
-      "per_file_median_ms": 7.252,
-      "per_file_p95_ms": 32.271,
-      "throughput_files_per_s": 109.0,
-      "throughput_mpix_per_s": 22.2,
-      "speed_vs_kymo": 1.86
+      "total_ms": 280.91,
+      "per_file_median_ms": 7.121,
+      "per_file_p95_ms": 33.823,
+      "throughput_files_per_s": 106.8,
+      "throughput_mpix_per_s": 21.8,
+      "speed_vs_kymo": 1.78
     },
     {
       "key": "svglib",

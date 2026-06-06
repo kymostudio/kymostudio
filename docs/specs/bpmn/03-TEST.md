@@ -110,7 +110,7 @@ change must regenerate the affected goldens/baseline in the same change.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-06-06 | Vũ Anh | Initial umbrella V&V: three test levels, family `TC-BPMN-01..08`, pass/fail criteria, and the requirements traceability matrix. Created with the `bpmn/` consolidation. |
-| 0.2     | 2026-06-06 | Vũ Anh | Added **Annex C — Benchmark**: the offline `bench/bpmn/` quality scorecard (correctness roll-up + parse/render timing) folded in as a benchmark annex. |
+| 0.2     | 2026-06-06 | Vũ Anh | Added **Annex C — Benchmark**: the offline `benches/bpmn/` quality scorecard (correctness roll-up + parse/render timing) folded in as a benchmark annex. |
 
 ## Annex B — Document Control
 
@@ -133,8 +133,8 @@ traceability links remain valid.
 
 Per the repository convention (a benchmark folds into the TEST spec as an annex, not a separate
 document type), the BPMN module's quality benchmark lives as an offline, first-class bench at
-`bench/bpmn/` (its own uv project; analogous to a Rust crate's `benches/`). It measures quality on
-two axes and renders a single scorecard, `bench/bpmn/results/REPORT.md`:
+`benches/bpmn/` (its own uv project; analogous to a Rust crate's `benches/`). It measures quality on
+two axes and renders a single scorecard, `benches/bpmn/results/REPORT.md`:
 
 - **Correctness** (`quality.py`) — a read-only roll-up of committed snapshots: render pass-rate over
   the MIWG corpus (`corpus_bpmn/baseline_full.json` 840-file, `baseline.json` 120-file gate),
@@ -145,6 +145,6 @@ two axes and renders a single scorecard, `bench/bpmn/results/REPORT.md`:
   file, throughput). Machine-dependent and **informational** (env-stamped in `results/perf.json`),
   not a pass/fail gate.
 
-Reproduce: `cd bench && uv sync && uv run python bpmn/run.py`. The committed `results/` is the
+Reproduce: `cd benches && uv sync && uv run python bpmn/run.py`. The committed `results/` is the
 reference snapshot; regenerate the underlying baselines (with `KYMO_UPDATE_BPMN_BASELINE=1` /
 `KYMO_UPDATE_CONFORMANCE=1`) before re-running the bench to reflect an intentional renderer change.

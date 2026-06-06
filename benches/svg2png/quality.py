@@ -121,7 +121,7 @@ def collect() -> dict:
         })
 
     return {
-        "generated_by": "bench/svg2png/quality.py",
+        "generated_by": "benches/svg2png/quality.py",
         "reference_engine": ref_engine.key,
         "diff_threshold": DIFF_THRESHOLD,
         "corpus": {"items": len(items)},
