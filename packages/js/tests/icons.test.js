@@ -133,3 +133,60 @@ test("a missing name is recorded and not re-requested (TC-8 / NFR-4)", async () 
   // set fetched once; the miss is cached so the 2nd lookup issues no new fetch
   assert.equal(calls.filter((u) => u.endsWith("sets/aws.json")).length, 1);
 });
+
+// ── CR-ICONS-007 — vendored inline IconifyJSON sets (the `ai` set) ─────────
+// `sets/ai.json` ships inline SVG `body` art (no `icons/ai/` files), exactly
+// like `@iconify-json/<prefix>`. The loader renders the body crisp + id-safe
+// per use, keeping brand colours — no file fetch.
+function installInlineStub() {
+  resetIconCaches();
+  const calls = [];
+  const aiSet = {
+    prefix: "ai", width: 256, height: 256, aliases: {},
+    info: { name: "AI", total: 2, categories: { provider: ["openai", "gemini"] },
+            license: { title: "CC0 1.0", spdx: "CC0-1.0" } },
+    icons: {
+      openai: { body: '<path d="M1 2z"/>', width: 256, height: 260, category: "provider" },
+      gemini: { body: '<defs><radialGradient id="g"/></defs><path fill="url(#g)" d="M0 0z"/>',
+                width: 512, height: 188, category: "provider" },
+    },
+  };
+  globalThis.fetch = async (url) => {
+    calls.push(url);
+    if (url.endsWith("sets/ai.json")) return { ok: true, status: 200, json: async () => aiSet };
+    return { ok: false, status: 404 };               // no file should be fetched
+  };
+  return calls;
+}
+
+test("inline-body address renders as crisp SVG with its own viewBox (no file fetch)", async () => {
+  const calls = installInlineStub();
+  const svg = await getIcon("ai:openai");
+  assert.match(svg, /^<svg /);
+  assert.match(svg, /viewBox="0 0 256 260"/);
+  assert.match(svg, /<path d="M1 2z"\/>/);
+  // resolved from the set body — the loader never hit an icon file
+  assert.equal(calls.filter((u) => u.endsWith("sets/ai.json")).length, 1);
+  assert.equal(calls.filter((u) => /\.(svg|png)$/.test(u)).length, 0);
+});
+
+test("repeated inline use gets distinct ids so gradients never collide (FR-7)", async () => {
+  installInlineStub();
+  const a = await getIcon("ai:gemini");
+  const b = await getIcon("ai:gemini");
+  const ids = (s) => [...s.matchAll(/id="([^"]+)"/g)].map((m) => m[1]);
+  assert.ok(ids(a).length > 0);
+  assert.ok(ids(a).every((x) => !ids(b).includes(x)), "ids are namespaced per use");
+  assert.match(a, /url\(#g-i\d+\)/);                 // ref rewritten to match
+});
+
+test("the real sets/ai.json is a valid inline set with three brand logos", () => {
+  const ai = JSON.parse(readFileSync(new URL("../sets/ai.json", import.meta.url)));
+  assert.equal(ai.prefix, "ai");
+  assert.deepEqual(Object.keys(ai.icons).sort(), ["anthropic", "gemini", "openai"]);
+  for (const rec of Object.values(ai.icons)) {
+    assert.ok(typeof rec.body === "string" && rec.body.length > 0);
+    assert.equal(rec.path, undefined);               // inline, not path-backed
+  }
+  assert.equal(ai.info.license.spdx, "CC0-1.0");
+});

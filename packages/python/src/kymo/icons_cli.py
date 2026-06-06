@@ -170,8 +170,11 @@ def _describe(args: list[str]) -> int:
     print(f"address  : {out['address']}")
     print(f"size     : {out['width']}×{out['height']}")
     print(f"category : {out['category']}")
-    print(f"source   : {out['path']}")
+    print(f"source   : {out['path'] or 'inline (IconifyJSON body)'}")
     print(f"set      : {out['set']['name']} ({out['set']['total']} icons)")
+    lic = out["set"].get("license")
+    if lic:
+        print(f"license  : {lic.get('title') or lic.get('spdx') if isinstance(lic, dict) else lic}")
     if out["aliasChain"]:
         print(f"alias of : {' → '.join(out['aliasChain'])}")
     return 0

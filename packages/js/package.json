@@ -34,11 +34,14 @@
     "./icons-manifest.json": "./icons-manifest.json"
   },
   "scripts": {
+    "sync-icons": "node scripts/sync-icons.mjs",
+    "build-manifest": "npm --prefix ../icons run build-manifest",
+    "prebuild": "npm run sync-icons",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
-    "build-manifest": "node scripts/build-manifest.mjs",
-    "prepack": "npm run build",
+    "pretest": "npm run sync-icons",
+    "prepack": "npm run sync-icons && npm run build",
     "test": "npm run build && node --test"
   },
   "files": [

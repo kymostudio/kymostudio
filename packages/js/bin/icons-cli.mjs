@@ -17,6 +17,11 @@ import { fileURLToPath } from "node:url";
 
 const PKG = join(dirname(fileURLToPath(import.meta.url)), "..");   // packages/js
 const REPO = join(PKG, "..", "..");
+const ICONS_PKG = join(REPO, "packages", "icons");                // raw art + catalogue source of truth
+// Read the catalogue from the source-of-truth package when present (the
+// monorepo dev tree / CI, where packages/js copies are git-ignored), else from
+// this package's own bundled copies (a published npm install, no sibling pkg).
+const CATALOG = existsSync(join(ICONS_PKG, "icons-manifest.json")) ? ICONS_PKG : PKG;
 const ICONIFY_API = "https://api.iconify.design";
 const ADDR_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*:[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -32,9 +37,9 @@ function readJSON(path, fallback) {
   try { return JSON.parse(readFileSync(path, "utf-8")); }
   catch { return fallback; }
 }
-const collections = () => readJSON(join(PKG, "icons-collections.json"), {});
-const loadSet = (prefix) => readJSON(join(PKG, "sets", `${prefix}.json`), null);
-const manifest = () => readJSON(join(PKG, "icons-manifest.json"), { icons: {}, legacy: {}, aliases: {} });
+const collections = () => readJSON(join(CATALOG, "icons-collections.json"), {});
+const loadSet = (prefix) => readJSON(join(CATALOG, "sets", `${prefix}.json`), null);
+const manifest = () => readJSON(join(CATALOG, "icons-manifest.json"), { icons: {}, legacy: {}, aliases: {} });
 
 /** Pop `--name value` (or `-o value`) from argv, returning the value. */
 function opt(argv, name) {
@@ -141,8 +146,9 @@ function cmdDescribe(argv, log, err) {
   log(`address  : ${out.address}`);
   log(`size     : ${out.width}×${out.height}`);
   log(`category : ${out.category}`);
-  log(`source   : ${out.path}`);
+  log(`source   : ${out.path ?? "inline (IconifyJSON body)"}`);
   log(`set      : ${out.set.name} (${out.set.total} icons)`);
+  if (out.set.license) log(`license  : ${out.set.license.title ?? out.set.license.spdx ?? out.set.license}`);
   if (out.aliasChain.length) log(`alias of : ${out.aliasChain.join(" → ")}`);
   return 0;
 }
@@ -180,7 +186,7 @@ async function cmdDownload(argv, log, err) {
       const target = join(outDir, basename(path));
       if (existsSync(target) && !yes) { err(`refusing to overwrite ${target} (pass -y)`); return 1; }
       mkdirSync(dirname(target), { recursive: true });
-      copyFileSync(join(REPO, path), target);
+      copyFileSync(join(ICONS_PKG, path), target);              // path is icons/<provider>/… under packages/icons
       log(`✓ wrote ${target}`);
     }
   }

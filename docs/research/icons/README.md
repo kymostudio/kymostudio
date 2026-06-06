@@ -130,7 +130,7 @@ kymo's icon subsystem (two parallel implementations at feature parity, per `CLAU
 - **Two hand-maintained scanners** — `_scan_icons_dir` (Python) and `build-manifest.mjs` (JS) must be kept byte-compatible by convention; drift risk.
 - **No metadata** — manifest is `key → path` only: no dimensions, aliases, category, or tags, so a picker UI can't search or filter without re-deriving from paths.
 
-Reference files: `packages/python/src/kymo/icons.py`, `packages/js/src/icons-loader.ts`, `packages/js/src/icons-builtin.ts`, `packages/js/scripts/build-manifest.mjs`, `packages/js/icons-manifest.json`, root `icons/`. The only existing icon documentation is a prose section in `docs/guide/dsl-guide.md`.
+Reference files: `packages/python/src/kymo/icons.py`, `packages/js/src/icons-loader.ts`, `packages/js/src/icons-builtin.ts`, and the shared catalogue package `packages/icons/` (`scripts/build-manifest.mjs`, `icons-manifest.json`, raw art under `icons/`). The only existing icon documentation is a prose section in `docs/guide/dsl-guide.md`.
 
 ## 7. Lessons for kymo
 

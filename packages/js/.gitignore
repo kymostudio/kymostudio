@@ -1,0 +1,6 @@
+# Icon catalogue index — build-copied from the source of truth in
+# packages/icons by scripts/sync-icons.mjs (prebuild/prepack). Not committed
+# here; the only committed copy lives in packages/icons.
+/sets/
+/icons-manifest.json
+/icons-collections.json

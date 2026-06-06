@@ -478,13 +478,15 @@ ICONS: dict[str, str] = {
 # this matters.
 
 
-# Repo-root `icons/` is shared by both packages and lives outside this
-# package. In the dev tree it sits 4 levels up from this file
-# (packages/python/src/kymo/icons.py → repo root). When kymo is pip-installed
-# the generated manifest is absent, so `_load_catalogue()` finds nothing and
+# The icon catalogue (raw art + generated manifest/sets) is the single source
+# of truth in the sibling `packages/icons` package, shared by both
+# implementations. In the dev tree it sits 4 levels up from this file
+# (packages/python/src/kymo/icons.py → repo root → packages/icons). When kymo is
+# pip-installed that package is absent, so `_load_catalogue()` finds nothing and
 # only the hand-coded ICONS above are available — file-backed icons are a
 # dev-tree (and static-host) convenience.
-_ICONS_DIR = Path(__file__).resolve().parents[4] / "icons"
+_ICONS_PKG = Path(__file__).resolve().parents[4] / "packages" / "icons"
+_ICONS_DIR = _ICONS_PKG / "icons"
 _IMAGE_SIZE = 64
 
 # ── kymo Icons v2 — P1 addressing (CR-ICONS-002 / FR-1, FR-4, FR-11) ───
@@ -588,13 +590,15 @@ def render_record(rec: dict, size: int = _IMAGE_SIZE) -> str:
     )
 
 
-# The catalogue is built by the single generator (`packages/js/scripts/
+# The catalogue is built by the single generator (`packages/icons/scripts/
 # build-manifest.mjs`) and consumed by BOTH implementations — there is no
 # longer a second, hand-maintained Python scanner (FR-8, NFR-1). The Python
 # side reads the generated artifact; resolution is therefore identical to JS
 # by construction. `_path_to_address` is retained for tooling/tests.
-_REPO_ROOT = _ICONS_DIR.parent
-_MANIFEST_PATH = _REPO_ROOT / "packages" / "js" / "icons-manifest.json"
+# `_REPO_ROOT` is the real repo root (for docs/samples/bin lookups); manifest
+# paths resolve against `_ICONS_PKG` (`packages/icons`), the source of truth.
+_REPO_ROOT = Path(__file__).resolve().parents[4]
+_MANIFEST_PATH = _ICONS_PKG / "icons-manifest.json"
 
 
 def _load_catalogue() -> None:
@@ -612,7 +616,7 @@ def _load_catalogue() -> None:
     data = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
     icons = data.get("icons", data if "legacy" not in data else {})
     for addr, rel in icons.items():
-        _NS_ICONS[addr] = _REPO_ROOT / rel
+        _NS_ICONS[addr] = _ICONS_PKG / rel
     for legacy, addr in data.get("legacy", {}).items():
         _LEGACY_MAP[legacy] = addr
         if addr in _NS_ICONS:
@@ -674,7 +678,33 @@ def get_icon(key: str, _seen: frozenset[str] = frozenset()) -> str:
         svg = _png_as_image_tag(path) if path.suffix.lower() == ".png" else _svg_as_inline(path)
         _RENDER_CACHE[key] = svg
         return svg
+    # Vendored inline IconifyJSON sets (e.g. `ai:`): not in the flat manifest
+    # (no `icons/<prefix>/` source file), so resolve the address by loading its
+    # set on demand and registering its `{body,…}` record (mirrors the JS
+    # loader's on-demand `loadSet`). Brand art keeps its own fills/gradients.
+    rec = _inline_record(key)
+    if rec is not None:
+        register_record(key, rec)
+        return render_record(rec)
     raise KeyError(f"unknown icon: {key!r}")
+
+
+def _inline_record(key: str) -> dict | None:
+    """If `key` is an address whose per-set IconifyJSON carries an inline
+    `body`, return a self-contained `{body, width, height}` record (set-level
+    dims filled in). Returns None for path-backed or unknown addresses."""
+    if not is_address(key):
+        return None
+    prefix, _, name = key.partition(":")
+    s = load_set(prefix)
+    rec = s.get("icons", {}).get(name)
+    if not isinstance(rec, dict) or "body" not in rec:
+        return None
+    return {
+        "body": rec["body"],
+        "width": rec.get("width", s.get("width", 24)),
+        "height": rec.get("height", s.get("height", 24)),
+    }
 
 
 def icon_addresses() -> list[str]:
@@ -687,8 +717,8 @@ def icon_addresses() -> list[str]:
 # The generator also emits one `sets/<prefix>.json` per set (dims/aliases/
 # `info`/categories) + a `collections` index. The renderer doesn't need them,
 # but discovery tooling (the `kymo icons` CLI) reads them on demand.
-_SETS_DIR = _REPO_ROOT / "packages" / "js" / "sets"
-_COLLECTIONS_PATH = _REPO_ROOT / "packages" / "js" / "icons-collections.json"
+_SETS_DIR = _ICONS_PKG / "sets"
+_COLLECTIONS_PATH = _ICONS_PKG / "icons-collections.json"
 _SET_CACHE: dict[str, dict] = {}
 
 

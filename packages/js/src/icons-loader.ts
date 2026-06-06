@@ -23,10 +23,10 @@ type ManifestV2 = {
 };
 type Manifest = Record<string, string> | ManifestV2;
 
-type IconRecord = { path: string; category?: string; width?: number; height?: number };
+type IconRecord = { path?: string; body?: string; category?: string; width?: number; height?: number };
 type SetFile = { prefix: string; width?: number; height?: number; icons: Record<string, IconRecord>;
                  aliases?: Record<string, AliasEntry>; info?: unknown };
-type SetCache = { icons: Record<string, IconRecord>; missing: Set<string> };
+type SetCache = { icons: Record<string, IconRecord>; missing: Set<string>; width: number; height: number };
 
 const IMAGE_SIZE = 64;
 const _cache = new Map<string, string>(Object.entries(ICONS));   // builtin keys start cached
@@ -118,6 +118,35 @@ function svgTextToInline(text: string, size = IMAGE_SIZE): string {
          `overflow="visible">${text}</svg>`;
 }
 
+// ── Inline IconifyJSON body rendering (mirror of icons.py:render_record +
+// icons_pipeline.makeIdsSafe). Vendored sets (e.g. `ai:`) ship the SVG body
+// inline; we render it crisp and recolourable, suffixing every element id per
+// use so the same icon inlined N times never collides (FR-7). Brand art with
+// its own fills/gradients renders verbatim. ────────────────────────────────
+let _recordUses = 0;
+
+function makeIdsSafe(body: string, suffix: string): string {
+  const ids = new Set([...body.matchAll(/\bid\s*=\s*"([^"]+)"/g)].map((m) => m[1] as string));
+  let out = body;
+  for (const old of ids) {
+    const safe = old.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const next = `${old}-${suffix}`;
+    out = out.replace(new RegExp(`(\\bid\\s*=\\s*")(${safe})(")`, "g"), `$1${next}$3`);
+    out = out.split(`url(#${old})`).join(`url(#${next})`);
+    out = out.replace(new RegExp(`((?:xlink:)?href\\s*=\\s*")#${safe}(")`, "g"), `$1#${next}$2`);
+  }
+  return out;
+}
+
+function renderRecord(rec: IconRecord, size = IMAGE_SIZE): string {
+  const w = rec.width ?? 24;
+  const h = rec.height ?? 24;
+  const body = makeIdsSafe(rec.body ?? "", `i${++_recordUses}`);
+  const half = (size / 2) | 0;
+  return `<svg x="-${half}" y="-${half}" width="${size}" height="${size}" ` +
+         `viewBox="0 0 ${w} ${h}" overflow="visible">${body}</svg>`;
+}
+
 function applyTransforms(fragment: string, e: AliasEntry): string {
   const ops: string[] = [];
   if (e.rotate) ops.push(`rotate(${(e.rotate | 0) * 90})`);
@@ -146,7 +175,10 @@ async function loadSet(prefix: string): Promise<SetCache> {
     if (!r.ok) throw new Error(`set fetch failed: ${prefix} (${r.status})`);
     return r.json() as Promise<SetFile>;
   }).then((set) => {
-    const rec: SetCache = { icons: set.icons ?? {}, missing: new Set() };
+    const rec: SetCache = {
+      icons: set.icons ?? {}, missing: new Set(),
+      width: set.width ?? 24, height: set.height ?? 24,
+    };
     if (set.aliases) Object.assign(_aliases, set.aliases);
     _sets.set(prefix, rec);
     return rec;
@@ -181,6 +213,11 @@ export async function getIcon(key: string, seen: ReadonlySet<string> = new Set()
     if (set.missing.has(local)) throw new Error(`unknown icon: ${JSON.stringify(key)}`);
     const rec = set.icons[local];
     if (!rec) { set.missing.add(local); throw new Error(`unknown icon: ${JSON.stringify(key)}`); }
+    if (rec.body !== undefined) {
+      // Vendored inline IconifyJSON set (e.g. `ai:`): render fresh per call so
+      // ids stay unique across repeated inlines (FR-7) — hence NOT cached.
+      return renderRecord({ body: rec.body, width: rec.width ?? set.width, height: rec.height ?? set.height });
+    }
     path = rec.path;
   } else {
     await loadManifest();
