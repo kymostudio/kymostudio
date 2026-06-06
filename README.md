@@ -16,7 +16,7 @@
 
 **Kymostudio** is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
 
-#### Pipeline
+#### Features
 
 - **dsl** parses the line-oriented `.kymo` grammar into a plain `Diagram` data model.
 - **from_bpmn** imports BPMN 2.0 XML using the geometry stored in the file.
