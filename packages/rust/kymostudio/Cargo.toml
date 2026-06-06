@@ -18,7 +18,7 @@ name = "kymo"
 path = "src/main.rs"
 
 [dependencies]
-# Dependency convention (see CLAUDE.md): caret-pinned to the current MINOR
+# Dependency convention (see docs/RELEASING.md): caret-pinned to the current MINOR
 # series of kymostudio-core, NOT lockstep-bumped per patch. `^0.3` = >=0.3.0,
 # <0.4.0 — identical semantics to the Python (`>=0.3,<0.4`) and npm (`^0.3`)
 # packages. The floor is always an already-published version, so publishing this

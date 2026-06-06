@@ -29,5 +29,13 @@ kymo sample.kymo --animate    # → sample-animated.svg
 kymo sample.kymo --figma      # → sample.figma.js
 kymo sample.kymo --excalidraw # → sample.excalidraw
 kymo process.bpmn             # → process.svg (BPMN 2.0 import)
+kymo sample.kymo out.png      # → render, then rasterize to PNG (resvg)
+kymo image.svg out.png        # → rasterize an existing SVG
 kymo lint process.bpmn        # report BPMN structural + import-fidelity issues
 ```
+
+## Development
+
+Versioning, the `kymostudio-core` dependency convention, and the publish flow
+(PyPI · npm · crates.io) are documented in [`docs/RELEASING.md`](docs/RELEASING.md).
+Releases are cut with the `/kymo-bump` workflow.

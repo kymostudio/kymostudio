@@ -131,7 +131,7 @@ jobs:
   # ── Publish the `kymo` CLI crate to crates.io (after the core) ──
   # `cargo install kymostudio` then provides the `kymo` binary. The CLI depends
   # on kymostudio-core via a caret-to-MINOR range (`version = "0.3"`, see the
-  # dependency convention in CLAUDE.md), so on a PATCH release the dep already
+  # dependency convention in docs/RELEASING.md), so on a PATCH release the dep already
   # resolves against a previously-published core and `cargo publish` succeeds at
   # once. The retry only matters on a MINOR bump, when the floor points at the
   # core version this same run just published — then it covers crates.io's
