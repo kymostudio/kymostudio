@@ -13,12 +13,16 @@ Excalidraw scene / PNG) written next to the input file:
     kymo samples/order.bpmn                    → samples/order.svg
 
 A second positional `*.png` path (or a `.svg` source) rasterizes to PNG
-via resvg (kymostudio-core); optional `--scale N` / `-s N` (1.0 = intrinsic):
+via resvg (kymostudio-core); optional `--scale N` / `-s N` (1.0 = intrinsic).
+A `*.pdf` output path emits a vector PDF instead (via svg2pdf; crisp at any
+zoom, no scale). Both back-ends live in the shared kymostudio-core engine:
 
     kymo in.svg out.png                        → rasterize an existing SVG
     kymo in.svg                                → in.png (default name)
     kymo samples/aws_1.kymo out.png            → render then rasterize
     kymo samples/aws_1.kymo out.png -s 2       → 2× resolution
+    kymo in.svg out.pdf                        → convert an SVG to vector PDF
+    kymo samples/aws_1.kymo out.pdf            → render then convert to PDF
 
 `.bpmn` files are imported via their Diagram-Interchange geometry
 (`from_bpmn.py`), so positions come straight from the file — no layout
@@ -235,22 +239,38 @@ def main() -> None:
         print(f"unsupported source: {src} (expected .kymo, .kymo.json, .bpmn, .py or .svg)")
         sys.exit(1)
 
-    # PNG rasterization path: `kymo in.svg out.png` or `kymo in.kymo out.png`.
-    # Triggered by a `.svg` input (only rasterization makes sense for it) or by a
-    # second positional output path ending in `.png`. A `.svg` source renders
-    # directly; any other source is loaded + resolved + rendered to SVG first.
+    # Raster/convert path: `kymo in.svg out.png`, `kymo in.kymo out.pdf`, etc.
+    # The output format follows the second positional path's extension — `.pdf`
+    # → vector PDF, otherwise PNG. A `.svg` source (which can only be converted)
+    # defaults to PNG. A `.svg` source renders directly; any other source is
+    # loaded + resolved + rendered to SVG first. Both back-ends live in the
+    # kymostudio-core engine (PNG via resvg, PDF via svg2pdf).
     out_arg = args[1] if len(args) > 1 else None
-    png_mode = src.suffix == ".svg" or (out_arg is not None and out_arg.lower().endswith(".png"))
-    if png_mode:
-        if out_arg is not None and not out_arg.lower().endswith(".png"):
+    out_lower = out_arg.lower() if out_arg is not None else None
+    pdf_mode = out_lower is not None and out_lower.endswith(".pdf")
+    png_mode = not pdf_mode and (
+        src.suffix == ".svg" or (out_lower is not None and out_lower.endswith(".png"))
+    )
+    if pdf_mode or png_mode:
+        if png_mode and out_arg is not None and not out_lower.endswith(".png"):
             print(f"PNG output expects a .png output path (got {out_arg})")
             sys.exit(1)
-        try:
-            from .to_png import render_png
-        except ModuleNotFoundError:
-            print("PNG output requires the kymostudio-core rasterizer. "
-                  "Try: pip install --force-reinstall kymostudio-core")
-            sys.exit(1)
+        # Import the conversion back-end first so a missing engine fails fast.
+        if pdf_mode:
+            try:
+                from .to_pdf import render_pdf
+            except ModuleNotFoundError:
+                print("PDF output requires the kymostudio-core engine (>=0.4). "
+                      "Try: pip install --upgrade kymostudio-core")
+                sys.exit(1)
+        else:
+            try:
+                from .to_png import render_png
+            except ModuleNotFoundError:
+                print("PNG output requires the kymostudio-core rasterizer. "
+                      "Try: pip install --force-reinstall kymostudio-core")
+                sys.exit(1)
+        # Obtain the SVG: read a `.svg` source directly, else render it.
         if src.suffix == ".svg":
             svg = src.read_text(encoding="utf-8")
             dims = ""
@@ -258,6 +278,13 @@ def main() -> None:
             diagram = _load_resolved(src)
             svg = render(diagram, animate=False)
             dims = f"{diagram.width}×{diagram.height}, "
+        if pdf_mode:
+            pdf = render_pdf(svg)
+            out = Path(out_arg)
+            out.write_bytes(pdf)
+            rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
+            print(f"✓ wrote {rel} (pdf)  ({dims}{len(pdf):,} bytes)")
+            return
         try:
             png = render_png(svg, scale)
         except ValueError as e:
@@ -271,8 +298,9 @@ def main() -> None:
         return
 
     if src.suffix == ".svg":
-        # Unreachable (a .svg source always sets png_mode) — guard for clarity.
-        print("a .svg source can only be rendered to .png")
+        # A bare `.svg` source defaults to png_mode; only a non-.png/.pdf output
+        # path reaches here (e.g. `kymo x.svg y.figma`).
+        print("a .svg source can only be converted to .png or .pdf")
         sys.exit(1)
 
     animate    = "--animate"    in flags

@@ -1,8 +1,8 @@
 /**
- * `kymo` executable — render a diagram source to SVG, or rasterize to PNG.
- * JS mirror of packages/python/src/kymo/cli.py's converter grammar (the PNG
- * subset). Hand-rolled parser, ZERO *required* runtime dependencies (NFR-3):
- * SVG output uses only this package + node built-ins.
+ * `kymo` executable — render a diagram source to SVG, or convert to PNG / PDF.
+ * JS mirror of packages/python/src/kymo/cli.py's converter grammar. Hand-rolled
+ * parser, ZERO *required* runtime dependencies (NFR-3): SVG output uses only
+ * this package + node built-ins.
  *
  *   kymo in.kymo                  → in.svg
  *   kymo in.bpmn out.svg          → render BPMN to SVG
@@ -10,16 +10,19 @@
  *   kymo in.svg  out.png          → rasterize an existing SVG
  *   kymo in.svg                   → in.png
  *   kymo in.kymo out.png -s 2     → 2× resolution
+ *   kymo in.kymo out.pdf          → render then convert to vector PDF
+ *   kymo in.svg  out.pdf          → convert an existing SVG to PDF
  *
- * PNG output rasterizes via the `kymostudio-core` package (the wasm build of
- * the shared resvg engine — same output as the Python/Rust CLIs).
+ * The output format follows the output path's extension (`.pdf` → vector PDF,
+ * otherwise PNG). Both go through the `kymostudio-core` package (the wasm build
+ * of the shared resvg/svg2pdf engine — same output as the Python/Rust CLIs).
  */
 import { readFileSync, writeFileSync } from "node:fs";
 
 const USAGE = [
   "usage: kymo <input> [output] [--scale N]",
   "  <input>   .svg | .kymo | .bpmn | .kymo.json",
-  "  <output>  .svg or .png; omitted → input name with .svg",
+  "  <output>  .svg, .png or .pdf; omitted → input name with .svg",
   "            (or .png when the input is a .svg)",
   "  -s, --scale N   PNG scale factor, 1.0 = intrinsic size (PNG output only)",
   "  -h, --help",
@@ -64,16 +67,17 @@ async function renderToSvg(input) {
 }
 
 /**
- * Load the wasm rasterizer (`kymostudio-core`, a runtime dependency).
- * Returns `(svg, scale) => Uint8Array`; throws if the package can't be loaded.
+ * Load and initialize the wasm core (`kymostudio-core`, a runtime dependency).
+ * Returns the initialized module (with `svgToPng`, and `svgToPdf` on core
+ * >= 0.4); throws if the package can't be loaded.
  */
-async function loadRaster() {
+async function loadCore() {
   const { createRequire } = await import("node:module");
   const require = createRequire(import.meta.url);
   const wasmPath = require.resolve("kymostudio-core/kymostudio_core_bg.wasm");
   const mod = await import("kymostudio-core");
   await mod.default({ module_or_path: readFileSync(wasmPath) }); // __wbg_init
-  return (svg, scale) => mod.svgToPng(new TextEncoder().encode(svg), scale);
+  return mod;
 }
 
 export async function run(argv) {
@@ -97,7 +101,10 @@ export async function run(argv) {
 
   const low = input.toLowerCase();
   const isSvgInput = low.endsWith(".svg");
-  const pngMode = isSvgInput || (output !== undefined && output.toLowerCase().endsWith(".png"));
+  const outLow = output?.toLowerCase();
+  const pdfMode = outLow !== undefined && outLow.endsWith(".pdf");
+  // A bare `.svg` source defaults to PNG; a `.pdf` output path overrides that.
+  const pngMode = !pdfMode && (isSvgInput || (outLow !== undefined && outLow.endsWith(".png")));
 
   // Produce the SVG string (read .svg directly, else render the source).
   let svg;
@@ -108,19 +115,37 @@ export async function run(argv) {
     return 1;
   }
 
+  if (pdfMode) {
+    let mod;
+    try {
+      mod = await loadCore();
+    } catch (e) {
+      console.error(`kymo: could not load the SVG engine (kymostudio-core): ${e.message}`);
+      return 1;
+    }
+    if (typeof mod.svgToPdf !== "function") {
+      console.error("kymo: PDF output requires kymostudio-core >= 0.4 (svgToPdf missing)");
+      return 1;
+    }
+    const pdf = mod.svgToPdf(new TextEncoder().encode(svg));
+    writeFileSync(output, pdf);
+    console.error(`${input} -> ${output} (${pdf.length} bytes)`);
+    return 0;
+  }
+
   if (pngMode) {
-    if (output !== undefined && !output.toLowerCase().endsWith(".png")) {
+    if (output !== undefined && !outLow.endsWith(".png")) {
       console.error(`kymo: PNG output expects a .png output path (got ${output})`);
       return 1;
     }
-    let raster;
+    let mod;
     try {
-      raster = await loadRaster();
+      mod = await loadCore();
     } catch (e) {
       console.error(`kymo: could not load the PNG rasterizer (kymostudio-core): ${e.message}`);
       return 1;
     }
-    const png = raster(svg, scale);
+    const png = mod.svgToPng(new TextEncoder().encode(svg), scale);
     const out = output ?? input.replace(/\.svg$/i, ".png");
     writeFileSync(out, png);
     console.error(`${input} -> ${out} (${png.length} bytes${scale !== 1 ? `, scale ${scale}` : ""})`);

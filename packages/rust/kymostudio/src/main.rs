@@ -1,9 +1,12 @@
-//! `kymo` CLI — rasterize an SVG to PNG.
+//! `kymo` CLI — convert an SVG to PNG (raster) or PDF (vector).
 //!
 //!     kymo -i in.svg out.png
 //!     kymo -i in.svg -o out.png --scale 2
+//!     kymo in.svg out.pdf
 //!
-//! Pure Rust (resvg via kymostudio-core) — no browser, no system image libraries.
+//! Pure Rust (resvg/svg2pdf via kymostudio-core) — no browser, no system image
+//! libraries. The output format is chosen by the output path's extension
+//! (`.pdf` → vector PDF, otherwise PNG).
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -11,20 +14,22 @@ use std::process::ExitCode;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 const HELP: &str = "\
-kymo — rasterize an SVG to PNG (pure Rust, no browser)
+kymo — convert an SVG to PNG (raster) or PDF (vector) (pure Rust, no browser)
 
 USAGE:
-    kymo <input.svg> [output.png] [options]
+    kymo <input.svg> [output.png|output.pdf] [options]
 
 ARGS:
     <input.svg>             Input SVG file (positional, or use -i).
-    <output.png>            Output path (positional). Defaults to the input
-                            path with its extension swapped to .png.
+    <output>                Output path (positional). A `.pdf` extension emits a
+                            vector PDF; anything else emits PNG. Defaults to the
+                            input path with its extension swapped to .png.
 
 OPTIONS:
     -i, --input  <FILE>    Input SVG file
-    -o, --output <FILE>    Output PNG file (alternative to the positional arg)
-    -s, --scale  <N>       Scale factor, 1.0 = intrinsic size (default: 1)
+    -o, --output <FILE>    Output file (alternative to the positional arg)
+    -s, --scale  <N>       Scale factor for PNG, 1.0 = intrinsic size (default:
+                           1). Ignored for PDF (vector, resolution-independent).
     -h, --help             Print this help
     -V, --version          Print version
 
@@ -32,6 +37,7 @@ EXAMPLES:
     kymo in.svg out.png
     kymo diagram.svg                    # -> diagram.png
     kymo diagram.svg -s 2 hi.png        # 2x resolution
+    kymo diagram.svg out.pdf            # vector PDF
 ";
 
 struct Args {
@@ -102,14 +108,28 @@ fn parse(argv: &[String]) -> Result<Parsed, String> {
 fn run(args: Args) -> Result<(), String> {
     let svg = std::fs::read(&args.input)
         .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
-    let png = kymostudio_core::svg_to_png(&svg, args.scale).map_err(|e| e.to_string())?;
-    std::fs::write(&args.output, &png)
+    let is_pdf = args
+        .output
+        .extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("pdf"));
+    let (bytes, kind) = if is_pdf {
+        (
+            kymostudio_core::svg_to_pdf(&svg).map_err(|e| e.to_string())?,
+            "pdf",
+        )
+    } else {
+        (
+            kymostudio_core::svg_to_png(&svg, args.scale).map_err(|e| e.to_string())?,
+            "png",
+        )
+    };
+    std::fs::write(&args.output, &bytes)
         .map_err(|e| format!("cannot write {}: {e}", args.output.display()))?;
     eprintln!(
-        "{} -> {} ({} bytes)",
+        "{} -> {} ({kind}, {} bytes)",
         args.input.display(),
         args.output.display(),
-        png.len()
+        bytes.len()
     );
     Ok(())
 }

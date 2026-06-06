@@ -1,0 +1,81 @@
+{
+  "generated_by": "benches/svg2png/perf.py",
+  "environment": {
+    "platform": "Linux-6.8.0-117-generic-x86_64-with-glibc2.39",
+    "python": "3.13.13",
+    "kymo_version": "0.3.6",
+    "cpu_count": 4,
+    "reps": 7,
+    "timestamp": "2026-06-06T12:53:51+00:00"
+  },
+  "corpus": {
+    "items": 30
+  },
+  "engines": [
+    {
+      "key": "kymo",
+      "label": "kymo",
+      "backend": "resvg (kymostudio-core 0.3.6)",
+      "rendered": 30,
+      "failed": 0,
+      "total_ms": 497.73,
+      "per_file_median_ms": 11.258,
+      "per_file_p95_ms": 65.501,
+      "throughput_files_per_s": 60.3,
+      "throughput_mpix_per_s": 12.3,
+      "speed_vs_kymo": 1.0
+    },
+    {
+      "key": "resvg-py",
+      "label": "resvg-py",
+      "backend": "resvg (0.3.2)",
+      "rendered": 30,
+      "failed": 0,
+      "total_ms": 918.14,
+      "per_file_median_ms": 19.172,
+      "per_file_p95_ms": 132.484,
+      "throughput_files_per_s": 32.7,
+      "throughput_mpix_per_s": 6.7,
+      "speed_vs_kymo": 0.54
+    },
+    {
+      "key": "pyvips",
+      "label": "pyvips",
+      "backend": "librsvg (via libvips 8.15.1)",
+      "rendered": 30,
+      "failed": 0,
+      "total_ms": 1636.6,
+      "per_file_median_ms": 17.612,
+      "per_file_p95_ms": 332.797,
+      "throughput_files_per_s": 18.3,
+      "throughput_mpix_per_s": 3.7,
+      "speed_vs_kymo": 0.3
+    },
+    {
+      "key": "cairosvg",
+      "label": "cairosvg",
+      "backend": "Cairo (2.9.0)",
+      "rendered": 30,
+      "failed": 0,
+      "total_ms": 276.16,
+      "per_file_median_ms": 7.078,
+      "per_file_p95_ms": 32.391,
+      "throughput_files_per_s": 108.6,
+      "throughput_mpix_per_s": 22.2,
+      "speed_vs_kymo": 1.8
+    },
+    {
+      "key": "svglib",
+      "label": "svglib",
+      "backend": "reportlab renderPM (4.5.1, svglib 1.6.0)",
+      "rendered": 0,
+      "failed": 30,
+      "total_ms": 0,
+      "per_file_median_ms": null,
+      "per_file_p95_ms": null,
+      "throughput_files_per_s": 0.0,
+      "throughput_mpix_per_s": 0.0,
+      "speed_vs_kymo": null
+    }
+  ]
+}

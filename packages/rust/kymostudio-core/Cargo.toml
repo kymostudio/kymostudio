@@ -1,6 +1,6 @@
 [package]
 name = "kymostudio-core"
-version = "0.3.6"
+version = "0.4.1"
 edition = "2021"
 rust-version = "1.74"
 description = "Type it. See it appear. Watch it animate. (Core)"
@@ -23,6 +23,12 @@ crate-type = ["rlib", "cdylib"]
 # wasm) so they live behind the `system-fonts` feature, OFF for the wasm build.
 resvg = { version = "0.47", default-features = false, features = ["text", "raster-images"] }
 
+# Vector SVG→PDF. Brings its OWN usvg/resvg (0.45) — it can't share our resvg
+# 0.47's usvg, so the PDF path parses with `svg2pdf::usvg` and the two engines
+# coexist. A second SVG engine would ~double the wasm bundle, so this lives
+# behind the `pdf` feature (ON for native/python, OFF for wasm).
+svg2pdf = { version = "0.13", optional = true }
+
 # Binding deps — each pulled in only by its feature.
 pyo3 = { version = "0.28", features = ["extension-module", "abi3-py310"], optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
@@ -41,18 +47,26 @@ serde_json = "1"
 sha2 = "0.10"
 
 [features]
-# Native builds (CLI, tests, Python wheel) load system fonts so <text> renders.
-default = ["system-fonts"]
+# Native builds (CLI, tests, Python wheel) load system fonts so <text> renders,
+# and ship vector PDF output.
+default = ["system-fonts", "pdf"]
 system-fonts = ["resvg/system-fonts", "resvg/memmap-fonts"]
 
-# Python extension module (maturin builds the cdylib with this on). Includes the
-# BPMN stack so the `_kymostudio_core` wheel exposes bpmn_import/export/etc.
-python = ["dep:pyo3", "system-fonts", "bpmn"]
+# Vector SVG→PDF via svg2pdf (native only — see the dep note above).
+pdf = ["dep:svg2pdf"]
 
-# wasm (browser + Node) — deliberately NO system-fonts (no fs/mmap on wasm).
-# BPMN is NOT in the wasm build yet (the JS library still has its own port); it
-# joins when the JS delegation lands, to keep the wasm bundle lean until then.
-wasm = ["dep:wasm-bindgen"]
+# Python extension module (maturin builds the cdylib with this on). Includes vector
+# PDF and the BPMN stack, so the `_kymostudio_core` wheel exposes svg_to_pdf plus
+# bpmn_import/bpmn_layout/bpmn_to_svg.
+python = ["dep:pyo3", "system-fonts", "pdf", "bpmn"]
+
+# wasm (browser + Node) — NO system-fonts (no fs/mmap on wasm). Includes pdf so
+# the JS CLI has SVG→PDF parity with Python/Rust; this pulls a second SVG engine
+# (svg2pdf's usvg 0.45) into the bundle — text still needs fonts embedded in the
+# SVG since system fonts aren't available on wasm. BPMN is NOT in the wasm build
+# yet (the JS library still has its own port); it joins when the JS delegation
+# lands, to keep the wasm bundle lean until then.
+wasm = ["dep:wasm-bindgen", "pdf"]
 
 # BPMN import/export/layout/shapes — the single-source-of-truth stack. On for
 # native builds + the Python wheel; validated by tests/bpmn_conformance.rs against

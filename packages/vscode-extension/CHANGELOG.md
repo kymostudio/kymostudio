@@ -2,6 +2,10 @@
 
 All notable changes to the kymostudio VS Code extension.
 
+## 0.4.1
+
+- Version bump to realign the extension with the monorepo release (catching up from 0.3.5 through 0.4.0). No change to the extension's behaviour.
+
 ## 0.3.5
 
 - Version bump to stay in lockstep with the monorepo release. No change to the
