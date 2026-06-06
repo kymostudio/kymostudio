@@ -53,9 +53,3 @@ Render any `.svg` to a PNG image — no headless browser required.
 ```bash
 kymo diagram.svg out.png      # rasterize an existing SVG
 ```
-
-## Development
-
-Versioning, the `kymostudio-core` dependency convention, and the publish flow
-(PyPI · npm · crates.io) are documented in [`docs/RELEASING.md`](docs/RELEASING.md).
-Releases are cut with the `/kymo-bump` workflow.
