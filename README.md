@@ -1,4 +1,4 @@
-<h1 align="center">kymo</h1>
+<h1 align="center">kymostudio</h1>
 
 <p align="center">
   <a href="https://kymostudio.github.io/kymostudio/app/">Live Editor</a>
