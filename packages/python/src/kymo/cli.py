@@ -38,6 +38,11 @@ too few waypoints, dangling source/target refs, nodes/flows with no DI)
 and BPMN structural issues (start with an incoming flow, end with an
 outgoing flow, activities/gateways missing a flow, disconnected nodes,
 processes with no start/end). It is informational and always exits 0.
+
+The lint rule set is configurable: `--preset=all|recommended` picks a
+preset, `--config=<.kymolintrc>` points at a JSON rc-file (bpmnlint-style
+`extends` + `rules`, each rule `off|warn|error`); with neither flag, the
+nearest `.kymolintrc` from the cwd upward is used, else every rule runs.
 """
 import sys
 from importlib import import_module
@@ -72,13 +77,60 @@ def load(source: Path) -> tuple[object, object | None, object | None]:
     return mod.DIAGRAM, getattr(mod, "LAYOUT", None), getattr(mod, "EXTERNAL_LAYOUT", None)
 
 
-def _lint(paths: list[str]) -> None:
+def _flag_value(flags: set[str], name: str) -> str | None:
+    """Return the value of a ``--name=value`` flag, or None if absent.
+
+    A bare ``--name`` (no ``=value``) is a usage error and exits 1.
+    """
+    for f in flags:
+        if f == name:
+            print(f"usage: {name}=<value>")
+            sys.exit(1)
+        if f.startswith(name + "="):
+            return f.split("=", 1)[1]
+    return None
+
+
+def _lint_config(flags: set[str]):
+    """Resolve the lint `Config` from --config=/--preset= flags or a .kymolintrc.
+
+    Precedence: explicit ``--config=PATH`` > ``--preset=NAME`` > nearest
+    ``.kymolintrc`` discovered from the cwd upward > default (every rule on).
+    """
+    from .lint_bpmn import (
+        ConfigError,
+        default_config,
+        find_config,
+        load_config,
+        preset_config,
+    )
+
+    try:
+        cfg_path = _flag_value(flags, "--config")
+        preset = _flag_value(flags, "--preset")
+        if cfg_path is not None:
+            src = Path(cfg_path)
+            if not src.is_file():
+                print(f"config not found: {src}")
+                sys.exit(1)
+            return load_config(src)
+        if preset is not None:
+            return preset_config(preset)
+        found = find_config(Path.cwd())
+        return load_config(found) if found else default_config()
+    except ConfigError as exc:
+        print(f"lint config error: {exc}")
+        sys.exit(1)
+
+
+def _lint(paths: list[str], flags: set[str]) -> None:
     """`kymo lint <file.bpmn> ...` — report BPMN issues; always exit 0."""
     from .lint_bpmn import format_report, lint_file
 
     if not paths:
-        print("usage: kymo lint <file.bpmn> [...]")
+        print("usage: kymo lint [--config=<rc>] [--preset=all|recommended] <file.bpmn> [...]")
         sys.exit(1)
+    config = _lint_config(flags)
     reports: list[str] = []
     for p in paths:
         src = Path(p)
@@ -88,7 +140,7 @@ def _lint(paths: list[str]) -> None:
         if src.suffix != ".bpmn":
             print(f"lint only supports .bpmn sources (got {src})")
             sys.exit(1)
-        reports.append(format_report(str(src), lint_file(src)))
+        reports.append(format_report(str(src), lint_file(src, config)))
     print("\n\n".join(reports))
     sys.exit(0)
 
@@ -105,7 +157,7 @@ def main() -> None:
     flags = {a for a in sys.argv[1:] if a.startswith("--")}
 
     if args and args[0] == "lint":
-        _lint(args[1:])
+        _lint(args[1:], flags)
         return
 
     if not args or "--help" in flags or "-h" in flags:

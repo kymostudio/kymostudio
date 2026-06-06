@@ -1,7 +1,7 @@
 ---
 title: BPMN Lint — Design
 document_id: DESIGN-BPMN-LINT-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-06-05
 status: Baselined
 classification: Internal
@@ -38,7 +38,7 @@ iso_compliance:
 | Field        | Value                                                               |
 |--------------|---------------------------------------------------------------------|
 | Document ID  | DESIGN-BPMN-LINT-001                                                 |
-| Version      | 1.0                                                                 |
+| Version      | 1.1                                                                 |
 | Status       | Baselined                                                          |
 | Issue Date   | 2026-06-05                                                          |
 | Owner        | `packages/python` (kymo CLI)                                        |
@@ -184,19 +184,21 @@ A clean file prints `‹path›: ✓ no issues`. Otherwise the body is followed 
 joined with a blank line between reports.
 
 **Exit model (FR-LINT-6).** Lint *results* are informational and **always exit 0** — safe in
-scripts and CI (SN-LINT-04). Only **usage errors** in `cli.py:_lint()` exit 1: empty argument list
-(`usage: kymo lint <file.bpmn> [...]`), a path that does not exist (`not found: …`), or a non-`.bpmn`
-suffix (`lint only supports .bpmn sources …`). `main()` routes to `_lint()` when `argv[1]` is
-`lint`, before the normal render dispatch.
+scripts and CI (SN-LINT-04). Only **usage errors** in `cli.py:_lint()` exit 1: empty argument list,
+a path that does not exist (`not found: …`), a non-`.bpmn` suffix (`lint only supports .bpmn sources
+…`), or a **configuration error** (`lint config error: …`, see §8). `main()` routes to `_lint()`
+when `argv[1]` is `lint`, before the normal render dispatch.
 
 ## 6. Dependencies & determinism (NFR-LINT-1..2)
 
 **Stdlib only.** `xml.etree.ElementTree` (parse + tree walk) and `xml.parsers.expat` (line
 recovery) ship with CPython; the linter adds **no runtime or dev dependency** (NFR-LINT-1,
 SN-LINT-03). The module API surface is small and frozen: `Finding(severity, eid, name, message,
-line)` (frozen dataclass), `lint(xml_text) -> list[Finding]`, `lint_file(path)`,
-`counts(findings) -> (errors, warnings)`, `format_report(label, findings) -> str`; exported from the
-`kymo` package as `lint_bpmn`.
+line, rule)` (frozen dataclass; `rule` is the `LR-*` code), `lint(xml_text, config=None) ->
+list[Finding]`, `lint_file(path, config=None)`, `counts(findings) -> (errors, warnings)`,
+`format_report(label, findings) -> str`, plus the configuration surface (`Config`, `RULES`,
+`PRESETS`, `default_config`, `preset_config`, `parse_config`, `load_config`, `find_config`,
+`ConfigError`; see §8); exported from the `kymo` package as `lint_bpmn`.
 
 **Determinism.** Findings accumulate in a fixed family order — REF, then per-node GR, then PR, then
 DI shapes, DI edges, no-DI nodes, no-DI flows — and within each family in `root.iter()` document
@@ -222,6 +224,30 @@ complementary to bpmnlint rather than a replacement. The full comparison (and th
 landscape: `bpmn-moddle` XSD validation, Signavio conventions, engine load-time checks) is in the
 **BPMN Lint & Validation Tooling research note** (`docs/research/bpmn-lint/`).
 
+## 8. Configurable rules (FR-LINT-9 / CR-BPMN-LINT-002)
+
+Configuration is a **post-pass over the generated findings**, not a change to rule logic — every
+`add(...)` now tags its `Finding` with the rule's `LR-*` code, and `lint()` runs `_apply(cfg,
+findings)` just before returning (the malformed-XML early return goes through `_apply` too, so
+`LR-XML-01` is configurable as well). `_apply` drops findings whose code is not in `cfg.enabled` and
+substitutes `cfg.severity[code]` where an override exists. Because the default `Config` enables every
+rule with no overrides (preset `all`), `lint(xml)` with no config is byte-identical to the pre-CR-002
+linter — the determinism/golden guarantees (§6) are preserved.
+
+**Config model.** `Config(enabled: frozenset[str], severity: dict[str,str])`. A `Config` is built by:
+`default_config()` (preset `all`); `preset_config(name)` (a named preset, no overrides); or
+`parse_config(data)` from a parsed rc-file mapping — start from the `extends` preset, then for each
+`rules` entry apply `off` (discard) / `warn`|`error` (add + record severity override). `PRESETS` maps
+a name to its enabled-set; `recommended = all − _STYLISTIC` (currently `{LR-GR-11}`). Unknown preset,
+unknown rule code, or non-`off|warn|error` value raises `ConfigError`.
+
+**rc-file discovery.** `find_config(start)` walks from `start` (cwd in the CLI) up to the filesystem
+root, returning the first `.kymolintrc` / `.kymolintrc.json`; `load_config(path)` reads it as JSON
+(`json.JSONDecodeError` → `ConfigError`). In `cli.py`, `_lint_config(flags)` resolves precedence
+`--config=` › `--preset=` › discovered rc-file › default, catching `ConfigError` to print
+`lint config error: …` and exit 1 (§5). Flags use the `--name=value` form so the value is not
+mistaken for a positional file argument.
+
 ## Annex A — Revision History
 
 **Table A.1 — Document revisions**
@@ -229,6 +255,7 @@ landscape: `bpmn-moddle` XSD validation, Signavio conventions, engine load-time 
 | Version | Date       | Author | Changes                                                                 |
 |---------|------------|--------|-------------------------------------------------------------------------|
 | 1.0     | 2026-06-05 | Vũ Anh | Initial as-built design: pipeline (raw-XML, not imported `Diagram`), expat line-resolution gotcha, the three rule families (DI / REF / GR+PR), output & always-exit-0 model, stdlib-only determinism, parity & bpmnlint prior art. |
+| 1.1     | 2026-06-06 | Vũ Anh | Added §8 (configurable rules, FR-LINT-9 / CR-BPMN-LINT-002): `LR-*` codes on every `Finding`, the `_apply(cfg, …)` post-pass, `Config`/preset model, and `.kymolintrc` discovery + CLI resolution. Updated §5 (config-error exit 1) and §6 (API surface). |
 
 ## Annex B — Document Control
 

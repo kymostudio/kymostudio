@@ -1,7 +1,7 @@
 ---
 title: BPMN Lint — Plan
 document_id: PLAN-BPMN-LINT-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-06-05
 status: Baselined
 classification: Internal
@@ -37,7 +37,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-BPMN-LINT-001                                 |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Baselined                                          |
 | Issue Date   | 2026-06-05                                         |
 | Owner        | `packages/python` (kymo CLI)                       |
@@ -79,7 +79,7 @@ The baseline (`-001`) is the as-built linter. Later changes are raised as change
 | CR | Increment | Realises | Status | Date |
 |----|-----------|----------|--------|------|
 | — (`-001`) | **As-built** — raw-XML stdlib linter, `kymo lint` subcommand, rule families LR-DI/REF/GR/PR/XML, expat line mapping, informational exit-0 | FR-LINT-1..8; NFR-LINT-1..5 | **Baselined** | 2026-06-05 |
-| `CR-BPMN-LINT-002` (`CR-002/`) | **Configurable rules** — rc-file enable/disable + per-rule severity overrides + presets (e.g. `recommended`/`all`) | extends FR-LINT-2..4; NFR-LINT-3 | **Proposed** | 2026-06-05 |
+| `CR-BPMN-LINT-002` (`CR-002/`) | **Configurable rules** — rc-file enable/disable + per-rule severity overrides + presets (`recommended`/`all`) | realises FR-LINT-9 (extends FR-LINT-2..4; NFR-LINT-3) | **Delivered** | 2026-06-06 |
 | `CR-BPMN-LINT-003` (`CR-003/`) | **bpmnlint-parity rules** — `no-implicit-split`, `no-duplicate-sequence-flows`, `label-required` | extends FR-LINT-3, FR-LINT-4 | **Proposed** | 2026-06-05 |
 | `CR-BPMN-LINT-004` (`CR-004/`) | **JS port** — `lintBpmn()` rule logic in the JS package + VS Code diagnostics via the `bpmn-editor` engine | realises NFR-LINT-5 | **Proposed** | 2026-06-05 |
 | `CR-BPMN-LINT-005` (`CR-005/`) | **CI gating** — `--json` machine-readable output + opt-in `--max-severity` / exit-code mode | extends FR-LINT-6, FR-LINT-7 | **Proposed** | 2026-06-05 |
@@ -133,6 +133,7 @@ CR-BPMN-LINT-005 (CI gating) are registered as **Proposed**.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-06-05 | Vũ Anh | Initial as-built plan: scope/approach (stdlib-only, informational, raw-XML renderer-fidelity linter), baseline `-001` + CR-002..005 register, risks, verification, change-request register. |
+| 1.1     | 2026-06-06 | Vũ Anh | **CR-BPMN-LINT-002 delivered** (configurable rules — `.kymolintrc`, presets `all`/`recommended`, per-rule `off\|warn\|error`, `--preset=`/`--config=`); register row flipped to Delivered and re-pointed to `FR-LINT-9`. |
 
 ## Annex B — Document Control
 
