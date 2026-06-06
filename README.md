@@ -50,6 +50,8 @@ cargo install kymostudio      # Rust
 
 ## Usage
 
+### 1. Render a diagram
+
 ```bash
 kymo sample.kymo              # → sample.svg
 kymo sample.kymo --animate    # → sample-animated.svg
@@ -59,7 +61,7 @@ kymo process.bpmn             # → process.svg (BPMN 2.0 import)
 kymo lint process.bpmn        # report BPMN structural + import-fidelity issues
 ```
 
-## Convert SVG to PNG
+### 2. Convert SVG to PNG
 
 Render any `.svg` to a PNG image — no headless browser required.
 
