@@ -232,7 +232,7 @@ baselined spec is raised as a change-request folder under `docs/specs/icons/CR/`
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-04 | Vũ Anh | Initial issue (as `02-FEATURE.md`) — requirements FR-1..FR-11/NFR-1..NFR-4 for kymo Icons v2, derived from the `SN-ICONS` needs and RES-ICONS-001 §7. |
-| 0.2     | 2026-06-05 | Vũ Anh | Consolidated the spec set: merged the product description (`PROD-ICONS-001` — problem, ConOps, goals, `SN-ICONS-01..05`) and the introduction (`INTRO-ICONS-001` — concept, terms, document map) into this single requirements document; renamed to `01-REQUIREMENTS.md`. Both former document_ids are retired; FR/NFR/SN IDs unchanged. |
+| 0.2     | 2026-06-05 | Vũ Anh | Consolidated the spec set: merged the product description (`FEAT-ICONS-001` — problem, ConOps, goals, `SN-ICONS-01..05`) and the introduction (`FEAT-ICONS-001` — concept, terms, document map) into this single requirements document; renamed to `01-REQUIREMENTS.md`. Both former document_ids are retired; FR/NFR/SN IDs unchanged. |
 | 0.3     | 2026-06-05 | Vũ Anh | Re-based CR-ICONS-001 into the baseline: FR-12..FR-15 (`kymo icons` CLI) added to §5; the §5 "proposed" note removed. Implemented + verified across P1–P6. |
 
 ## Annex B — Document Control
@@ -252,4 +252,4 @@ baseline or an approved change-request under `CR/`.
 
 ### B.4 Backwards Compatibility
 SN/FR/NFR IDs are stable; a removed item SHALL be marked withdrawn (not re-used) so traceability
-links remain valid. The retired `PROD-ICONS-001` / `INTRO-ICONS-001` document_ids are not re-used.
+links remain valid. The retired `FEAT-ICONS-001` / `FEAT-ICONS-001` document_ids are not re-used.

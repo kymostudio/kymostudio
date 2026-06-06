@@ -14,7 +14,6 @@ related_documents:
   - DESIGN-STUDIO-001
   - TEST-STUDIO-001
   - PLAN-STUDIO-001
-  - INTRO-STUDIO-001
 authors:
   - Vũ Anh
 language: en

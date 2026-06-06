@@ -112,7 +112,7 @@ the **mapping contract** (`BPMN-MAP-001`) and the corpus baseline, which is what
 ## 6. Prior art
 
 The BPMN importer is kymo's reference precedent for ingesting a foreign XML diagram format with
-embedded geometry; the `drawio` family (`INTRO-DRAWIO-001`) follows the same "decode geometry → emit"
+embedded geometry; the `drawio` family (`FEAT-DRAWIO-001`) follows the same "decode geometry → emit"
 shape for mxGraph XML and cites this design as precedent.
 
 ## Annex A — Revision History

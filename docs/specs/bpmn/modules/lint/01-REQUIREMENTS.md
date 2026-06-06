@@ -9,8 +9,8 @@ owner: packages/python (kymo CLI)
 audience: Engineers implementing and verifying the kymo BPMN linter; integrators consuming the lint API
 review_cycle: On CR completion, or on importer/renderer change affecting render fidelity
 supersedes:
-  - PROD-BPMN-LINT-001
-  - INTRO-BPMN-LINT-001
+  - FEAT-BPMN-LINT-001
+  - FEAT-BPMN-LINT-001
 related_documents:
   - FEAT-BPMN-001           # BPMN feature umbrella
   - DESIGN-BPMN-LINT-001    # Design
@@ -62,7 +62,7 @@ the normative catalogue those requirements detect. Design realisation: DESIGN-BP
 This document is the **requirements** entry point for the **BPMN lint** feature and the single
 source of its stakeholder needs (`SN-LINT-NN`), functional requirements (`FR-LINT-N`) and
 non-functional requirements (`NFR-LINT-N`). It consolidates the former product description
-(PROD-BPMN-LINT-001) and introduction (INTRO-BPMN-LINT-001).
+(FEAT-BPMN-LINT-001) and introduction (FEAT-BPMN-LINT-001).
 
 `kymo lint <file.bpmn> [<file.bpmn> ...]` is a **raw-XML linter for the BPMN→SVG (DI-driven)
 pipeline**. It reads the raw BPMN 2.0 XML — not the imported `Diagram` — so it can flag exactly what
@@ -419,10 +419,10 @@ withdrawn requirement SHALL be marked withdrawn rather than re-used.
 
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
-| 1.0 (PROD-BPMN-LINT-001) | 2026-06-05 | Vũ Anh | Initial baseline of the product description. Documented the **as-built** `kymo lint <file.bpmn>` linter (`packages/python/src/kymo/lint_bpmn.py` + CLI subcommand). Owned `SN-LINT-01..05`. Established the renderer-fidelity-linter positioning vs `bpmnlint`. |
-| 1.0 (INTRO-BPMN-LINT-001) | 2026-06-05 | Vũ Anh | Initial as-built baseline of the introduction. Introduced the `kymo lint <file.bpmn>` raw-XML / DI-fidelity linter; concept, terminology, and document map for the set. |
+| 1.0 (FEAT-BPMN-LINT-001) | 2026-06-05 | Vũ Anh | Initial baseline of the product description. Documented the **as-built** `kymo lint <file.bpmn>` linter (`packages/python/src/kymo/lint_bpmn.py` + CLI subcommand). Owned `SN-LINT-01..05`. Established the renderer-fidelity-linter positioning vs `bpmnlint`. |
+| 1.0 (FEAT-BPMN-LINT-001) | 2026-06-05 | Vũ Anh | Initial as-built baseline of the introduction. Introduced the `kymo lint <file.bpmn>` raw-XML / DI-fidelity linter; concept, terminology, and document map for the set. |
 | 1.0 (FEAT-BPMN-LINT-001) | 2026-06-05 | Vũ Anh | Initial as-built SRS (`FR-LINT-1..8`, `NFR-LINT-1..5`); normative rule registry `LR-*`; interfaces & output contract; CR roadmap (`CR-BPMN-LINT-002..005`, Proposed). |
-| 1.1 | 2026-06-06 | Vũ Anh | Consolidated PROD-BPMN-LINT-001 (stakeholder needs) and INTRO-BPMN-LINT-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
+| 1.1 | 2026-06-06 | Vũ Anh | Consolidated FEAT-BPMN-LINT-001 (stakeholder needs) and FEAT-BPMN-LINT-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
 | 1.2 | 2026-06-06 | Vũ Anh | **CR-BPMN-LINT-002 delivered.** Added `FR-LINT-9` (configurable rules): `LR-*` codes now carried on every `Finding`; presets `all`/`recommended`; per-rule `off\|warn\|error` overrides via JSON `.kymolintrc` (`extends` + `rules`) and `--preset=`/`--config=` CLI flags. Updated §6.1 (CLI), §6.2 (config-error exit 1), §6.4 (API: `Config`/`RULES`/`PRESETS`/`parse_config`/`load_config`/`find_config`/`ConfigError`; `lint`/`lint_file` gain `config`), added §6.5 (rc-file contract). Default path behaviourally identical to pre-CR-002. |
 
 ## Annex B — Document Control

@@ -9,8 +9,8 @@ owner: diagrams/ project
 audience: Engineers implementing and verifying the BPMN-in-kymo feature
 review_cycle: On phase completion, or on grammar change
 supersedes:
-  - PROD-BPMN-DSL-001
-  - INTRO-BPMN-DSL-001
+  - FEAT-BPMN-DSL-001
+  - FEAT-BPMN-DSL-001
 related_documents:
   - FEAT-BPMN-001             # Umbrella feature
   - DESIGN-BPMN-DSL-001       # Design
@@ -253,8 +253,8 @@ bpmn {
 | 0.2     | 2026-05-23 | Vũ Anh | Doc-set version sync after P0 (spike) complete; requirements unchanged. |
 | 1.0     | 2026-05-23 | Vũ Anh | Released — feature shipped (P0–P3 merged; normative grammar in KYMO-DSL-001 §6.9). |
 | 1.1 | 2026-05-24 | Vũ Anh | Corrected the importer-mapping cross-reference to BPMN-MAP-001 (the importer doc gained an ID; moved to docs/formats/bpmn.md). |
-| 1.2 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-BPMN-DSL-001`; minted `SN-BPMN-DSL-01..04` and annotated each FR group with its Source need; §1 now points to the product description and keeps only scope. No requirement content changed. |
-| 1.3 | 2026-06-06 | Vũ Anh | Consolidated PROD-BPMN-DSL-001 (stakeholder needs) and INTRO-BPMN-DSL-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
+| 1.2 | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `FEAT-BPMN-DSL-001`; minted `SN-BPMN-DSL-01..04` and annotated each FR group with its Source need; §1 now points to the product description and keeps only scope. No requirement content changed. |
+| 1.3 | 2026-06-06 | Vũ Anh | Consolidated FEAT-BPMN-DSL-001 (stakeholder needs) and FEAT-BPMN-DSL-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
 
 ## Annex B — Document Control
 

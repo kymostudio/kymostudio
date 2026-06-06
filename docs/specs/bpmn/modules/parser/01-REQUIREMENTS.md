@@ -9,8 +9,8 @@ owner: diagrams/ project
 audience: Engineers implementing and verifying the BPMN importer; stakeholders, reviewers
 review_cycle: On phase completion, or on BPMN-mapping change
 supersedes:
-  - PROD-BPMN-PARSER-001
-  - INTRO-BPMN-PARSER-001
+  - FEAT-BPMN-PARSER-001
+  - FEAT-BPMN-PARSER-001
 related_documents:
   - DESIGN-BPMN-PARSER-001       # Design
   - TEST-BPMN-PARSER-001         # Test documentation
@@ -233,9 +233,9 @@ annotation on its requirement group.
 
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
-| 1.0     | 2026-05-24 | Vũ Anh | Initial issue — requirements for the shipped BPMN importer, traced in TEST-BPMN-PARSER-001. (Companion docs: INTRO-BPMN-PARSER-001 v1.0 introduction; PROD-BPMN-PARSER-001 product description.) |
-| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `PROD-BPMN-PARSER-001`; minted `SN-BPMN-PARSER-01..04` and annotated each FR group with its Source need; §1 now points to the product description and keeps only scope. No requirement content changed. (INTRO-BPMN-PARSER-001 → v1.1: §6 trimmed to a document map adding `00-PRODUCT`; PROD-BPMN-PARSER-001 v0.1 issued.) |
-| 1.2     | 2026-06-06 | Vũ Anh | Consolidated PROD-BPMN-PARSER-001 (stakeholder needs) and INTRO-BPMN-PARSER-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
+| 1.0     | 2026-05-24 | Vũ Anh | Initial issue — requirements for the shipped BPMN importer, traced in TEST-BPMN-PARSER-001. (Companion docs: FEAT-BPMN-PARSER-001 v1.0 introduction; FEAT-BPMN-PARSER-001 product description.) |
+| 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Moved §1 stakeholder needs to `FEAT-BPMN-PARSER-001`; minted `SN-BPMN-PARSER-01..04` and annotated each FR group with its Source need; §1 now points to the product description and keeps only scope. No requirement content changed. (FEAT-BPMN-PARSER-001 → v1.1: §6 trimmed to a document map adding `00-PRODUCT`; FEAT-BPMN-PARSER-001 v0.1 issued.) |
+| 1.2     | 2026-06-06 | Vũ Anh | Consolidated FEAT-BPMN-PARSER-001 (stakeholder needs) and FEAT-BPMN-PARSER-001 (introduction/map) into this requirements doc under the new 4-document module layout (01-REQUIREMENTS/02-DESIGN/03-TEST/04-PLAN). |
 
 ## Annex B — Document Control
 
@@ -254,4 +254,4 @@ BPMN-MAP-001; increment `version`; append a row to Annex A.
 ### B.4 Backwards Compatibility
 Requirement IDs are stable across revisions; a removed requirement SHALL be marked
 withdrawn (not re-used) so traceability links remain valid. This doc supersedes and
-absorbs PROD-BPMN-PARSER-001 and INTRO-BPMN-PARSER-001.
+absorbs FEAT-BPMN-PARSER-001 and FEAT-BPMN-PARSER-001.
