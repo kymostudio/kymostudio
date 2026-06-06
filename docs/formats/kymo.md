@@ -10,8 +10,7 @@ audience: Engineers and authors using or maintaining the .kymo source format and
 review_cycle: On grammar change, or on format-identification change
 supersedes: null
 related_documents:
-  - INTRO-KYMO-DSL-001          # Front-end engineering doc set — introduction
-  - FEAT-KYMO-DSL-001           # Front-end requirements
+  - FEAT-KYMO-DSL-001          # Front-end engineering doc set — introduction
   - DESIGN-KYMO-DSL-001         # Front-end design
   - TEST-KYMO-DSL-001           # Front-end test documentation
   - KYMOJSON-MAP-001            # .kymo.json — serialization of the resolved model this format produces

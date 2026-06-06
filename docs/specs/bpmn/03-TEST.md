@@ -1,7 +1,7 @@
 ---
 title: BPMN Support — Test Documentation (umbrella)
 document_id: TEST-BPMN-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -40,7 +40,7 @@ iso_compliance:
 | Field        | Value                                                       |
 |--------------|-------------------------------------------------------------|
 | Document ID  | TEST-BPMN-001                                              |
-| Version      | 0.1                                                       |
+| Version      | 0.2                                                       |
 | Status       | Draft                                                     |
 | Issue Date   | 2026-06-06                                                |
 | Owner        | `packages/python` (kymo CLI) · `packages/js`              |
@@ -110,6 +110,7 @@ change must regenerate the affected goldens/baseline in the same change.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 0.1     | 2026-06-06 | Vũ Anh | Initial umbrella V&V: three test levels, family `TC-BPMN-01..08`, pass/fail criteria, and the requirements traceability matrix. Created with the `bpmn/` consolidation. |
+| 0.2     | 2026-06-06 | Vũ Anh | Added **Annex C — Benchmark**: the offline `bench/bpmn/` quality scorecard (correctness roll-up + parse/render timing) folded in as a benchmark annex. |
 
 ## Annex B — Document Control
 
@@ -127,3 +128,23 @@ matrix and the affected module test doc; increment `version`; append a row to An
 ### B.4 Backwards Compatibility
 Test-case IDs are stable across revisions; a withdrawn case SHALL be marked (not re-used) so
 traceability links remain valid.
+
+## Annex C — Benchmark
+
+Per the repository convention (a benchmark folds into the TEST spec as an annex, not a separate
+document type), the BPMN module's quality benchmark lives as an offline, first-class bench at
+`bench/bpmn/` (its own uv project; analogous to a Rust crate's `benches/`). It measures quality on
+two axes and renders a single scorecard, `bench/bpmn/results/REPORT.md`:
+
+- **Correctness** (`quality.py`) — a read-only roll-up of committed snapshots: render pass-rate over
+  the MIWG corpus (`corpus_bpmn/baseline_full.json` 840-file, `baseline.json` 120-file gate),
+  Python↔JS parity (`conformance/golden/`, `known_divergences.json`), and element coverage
+  (`BPMN-MAP-001`). It never re-renders, so the numbers reflect the snapshots exactly — traces to
+  `NFR-BPMN-1` (parity), `NFR-BPMN-3` (conformance), `NFR-BPMN-5` (corpus).
+- **Performance** (`perf.py`) — parse + render timing over the vendored corpus (median / p95 ms per
+  file, throughput). Machine-dependent and **informational** (env-stamped in `results/perf.json`),
+  not a pass/fail gate.
+
+Reproduce: `cd bench && uv sync && uv run python bpmn/run.py`. The committed `results/` is the
+reference snapshot; regenerate the underlying baselines (with `KYMO_UPDATE_BPMN_BASELINE=1` /
+`KYMO_UPDATE_CONFORMANCE=1`) before re-running the bench to reflect an intentional renderer change.
