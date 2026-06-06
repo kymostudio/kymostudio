@@ -1,7 +1,7 @@
 ---
 title: Pipeline & CLI Architecture — Requirements
 document_id: FEAT-PIPECLI-001
-version: "0.1"
+version: "0.3"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -42,7 +42,7 @@ iso_compliance:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-PIPECLI-001` |
-| Version           | 0.1 |
+| Version           | 0.3 |
 | Status            | Draft |
 | Owner             | `packages/python` (kymo CLI) · `packages/js` · `packages/rust` |
 | Related Documents | `DESIGN-PIPECLI-001`, `TEST-PIPECLI-001`, `PLAN-PIPECLI-001`; evidence base `RES-PIPELINE-001`, `RES-CLI-001` |
@@ -109,23 +109,23 @@ live in the research notes; this baseline takes only what §2/§3 require.
 | `FR-PC-3` | **Filters** SHALL be `Diagram → Diagram` functions registered by name, **format-agnostic** (they know nothing about `.svg`/`.figma`). `layout`, `align`, `autosize`, `animate`, `theme` SHALL each be a filter. | `SN-PC-02` |
 | `FR-PC-4` | **Encoders** SHALL be registered one-per-target. Raster targets (`png`, `webp`) SHALL encode as `Diagram → SVG → raster`, never directly. | `SN-PC-01` |
 | `FR-PC-5` | A **post / bitstream** stage SHALL exist for transforms on the *encoded* payload (animation snapshot, SVG minify, font inlining, sanitize), distinct from the encoder. | `SN-PC-02` |
-| `FR-PC-6` | The "already-resolved" property of BPMN / `.kymo.json` sources SHALL become an **explicit `diagram.resolved` flag on the model**, so the filter stage can skip layout deterministically — replacing the suffix check at `cli.py:193`. | `SN-PC-02` |
-| `FR-PC-7` | Stage dispatch SHALL be by **registry lookup, not `if/elif`** — replacing the suffix switch (`cli.py:61–77`) and the boolean-flag chain (`cli.py:196–232`). | `SN-PC-01` |
+| `FR-PC-6` | The "already-resolved" property of pre-positioned sources SHALL become an **explicit `diagram.resolved` flag on the model** that an importer/filter sets — so the filter stage can skip layout deterministically, replacing the `src.suffix not in (".bpmn", ".json") and not had_bpmn` skip in `_load_resolved()`. Note this currently also covers a `.kymo` DSL source carrying a `bpmn { }` block (laid out by `bpmn_layout`, then alignment-skipped), so `resolved` is a per-`Diagram` property, **not** a property of the source format alone. | `SN-PC-02` |
+| `FR-PC-7` | Stage dispatch SHALL be by **registry lookup, not `if/elif`** — replacing the suffix switch in `load()` and the boolean-flag target chain in `main()`. | `SN-PC-01` |
 
 ### 2.2 CLI grammar (external) — realises `SN-PC-03`, `SN-PC-04`, `SN-PC-05`
 
 | ID | Requirement | Trace |
 |----|-------------|-------|
-| `FR-PC-8` | The binary SHALL be **verb-less** (`kymo [-i] <src> -t <target>`): the binary *is* the converter, `-i` only **marks** the input and is optional when the source is the first bare argument. The only reserved first tokens remain `icons` and `lint` (`cli.py:152,159`). | `SN-PC-03` |
+| `FR-PC-8` | The **converter** SHALL be **verb-less** (`kymo [-i] <src> -t <target>`): the binary *is* the converter, `-i` only **marks** the input and is optional when the source is the first bare argument. Beside the converter, `icons` and `lint` are **reserved tooling subcommands** (a `git`/`cargo`-style first-token verb); they are the only reserved first tokens — every other first token is a converter source (the first-token checks in `main()`). | `SN-PC-03` |
 | `FR-PC-9` | The output target SHALL be **a value** (`-t svg`, repeatable: `-t svg -t figma -t webp`) producing **many outputs from one parse/resolve**, not the first-truthy-flag chain of today. | `SN-PC-04` |
 | `FR-PC-10` | An input-format override (`-f/--from`) SHALL decouple format from extension, enabling **stdin** (`-i -`); `-` as an output target SHALL write **stdout** (`-o -`). | `SN-PC-03` |
-| `FR-PC-11` | **Container vs variant** SHALL be separated: animation is a *property* of the `svg`/`webp` target (`--anim <preset>`), not its own target. `--anim` against a target that cannot animate SHALL **warn**, not silently drop (today `--figma --animate` drops silently, `cli.py:175,204`). | `SN-PC-03` |
+| `FR-PC-11` | **Container vs variant** SHALL be separated: animation is a *property* of the `svg`/`webp` target (`--anim <preset>`), not its own target. `--anim` against a target that cannot animate SHALL **warn**, not silently drop (today the `figma` branch in `main()` renders without the `animate` flag, so `--figma --animate` drops silently). | `SN-PC-03` |
 | `FR-PC-12` | Output destination SHALL be controllable via `-o <path\|->`; absent `-o`, the legacy "next to input" default is retained. | `SN-PC-03` |
 | `FR-PC-13` | A **filter-chain** option (`-vf "layout=algo=bpmn,theme=dark,animate=flow"`) SHALL drive the filter stage from the command line; a `-filter_complex` form SHALL support multi-input compose (`concat`, `overlay`). | `SN-PC-02,04` |
-| `FR-PC-14` | **Auxiliary modes** SHALL be flags on the one binary, not sub-commands: `--probe` (inspect: format, size, node/edge counts, validity — no render), `--lint` (rule-check — already exists as `kymo lint`), `--watch` (re-render on change). | `SN-PC-05` |
-| `FR-PC-15` | **Capability & help** SHALL be queryable: `-formats` (input formats), `-targets` (output targets), `-h [topic]` (layered help) — replacing `print(__doc__)` (`cli.py:164`). | `SN-PC-05` |
+| `FR-PC-14` | Auxiliary modes SHALL split by kind: **converter-run modifiers** — `--probe` (inspect: format, size, node/edge counts, validity — no render) and `--watch` (re-render on change) — are **flags** on the converter; **standalone tooling verbs** — `icons` and `lint` (rule-check) — are **reserved subcommands** (`kymo lint <src>`), **not** flags. There is no `--lint` flag. (Deliberate divergence from `RES-CLI-001` §4, which modelled lint as a flag: tooling verbs read better as `git`/`cargo`-style subcommands.) | `SN-PC-05` |
+| `FR-PC-15` | **Capability & help** SHALL be queryable: `-formats` (input formats), `-targets` (output targets), `-h [topic]` (layered help) — replacing the bare `print(__doc__)` in `main()`. | `SN-PC-05` |
 | `FR-PC-16` | Options SHALL be **order-insensitive** — a flag means the same thing wherever it appears (kymo rejects FFmpeg's positional-option trap). Conventional plumbing `-y/-n` (overwrite) and `-q/-v` (verbosity) SHALL be honoured. | `SN-PC-03` |
-| `FR-PC-17` | `packages/js` SHALL ship a `bin` exposing the **same CLI surface** (today it has none — breaks the parity rule). | `SN-PC-06` |
+| `FR-PC-17` | The `packages/js` `bin` (today `kymo`/`kymo-icons` via `render-cli.mjs`, which renders `.svg`/`.kymo`/`.bpmn`/`.kymo.json` → svg/png but with an ad-hoc flag surface) SHALL expose the **same verb-less grammar** as the Python CLI — the gap is grammar parity, not the absence of a binary. | `SN-PC-06` |
 
 ## 3. Non-functional requirements (`NFR-PC`)
 
@@ -134,7 +134,7 @@ live in the research notes; this baseline takes only what §2/§3 require.
 | `NFR-PC-1` | **Behaviour-preserving migration.** Each migration step SHALL leave all golden SVGs (`tests/test_diagrams.py`, `test_layout.py`, `test_edges.py`) and the BPMN corpus baselines byte-identical until a new surface is explicitly opted in. | `SN-PC-07` |
 | `NFR-PC-2` | **Per-stage testability.** Each stage SHALL be pure (explicit inputs/outputs) so an importer (fixed bytes → `Diagram`), a filter (fixed `Diagram` → `Diagram`), and an encoder (fixed `Diagram` → bytes) are unit-testable in isolation, replacing today's end-to-end-only coverage. | `SN-PC-07` |
 | `NFR-PC-3` | **Cross-language parity.** Python, JS, and Rust SHALL present the same pipeline shape and CLI surface; `.kymo.json` (`KYMOJSON-MAP-001`) SHALL be the byte-stable interchange between them. | `SN-PC-06` |
-| `NFR-PC-4` | **No new runtime dependencies.** `packages/js` stays zero-runtime-dep; the registry uses only the standard library. External layout engines, if added, SHALL be optional (not a hard import). | — |
+| `NFR-PC-4` | **No new runtime dependencies.** The `packages/js` **library** stays dependency-free (ESM + `.d.ts`); the only runtime dep of its CLI remains `kymostudio-core` (the wasm resvg build, for PNG/WebP) — no dep is added. The Python/JS registry uses only the standard library. External layout engines, if added, SHALL be optional (not a hard import). | — |
 | `NFR-PC-5` | **Backwards compatibility during migration.** Legacy flags (`--animate`, `--figma`, `--excalidraw`, `--bpmn`, `--json`) SHALL keep working alongside the new grammar until the clean-break phase (see `PLAN-PIPECLI-001` §3), with a deprecation window. | `SN-PC-07` |
 
 ## 4. Constraints, assumptions, out-of-scope (v1)
@@ -158,6 +158,8 @@ live in the research notes; this baseline takes only what §2/§3 require.
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-06 | Vũ Anh | Initial requirements. Promotes `RES-PIPELINE-001` (six-stage architecture) and `RES-CLI-001` (verb-less grammar) into one baselined feature; minted needs `SN-PC-01..07`, requirements `FR-PC-1..17`, `NFR-PC-1..5`. |
+| 0.2     | 2026-06-06 | Vũ Anh | Review corrections. Restated `FR-PC-17` (JS already ships a `bin`; the gap is verb-less grammar parity, not an absent binary) and `NFR-PC-4` (JS *library* is dependency-free; its CLI's lone dep stays `kymostudio-core`). Clarified `FR-PC-6` `resolved` as a per-`Diagram` flag covering the DSL-with-`bpmn{}` case. Replaced fragile `cli.py:NN` citations with function names (`load()`, `main()`, `_load_resolved()`). |
+| 0.3     | 2026-06-06 | Vũ Anh | Grammar-consistency fix (review finding #5). `FR-PC-8`: converter is verb-less; `icons`/`lint` are reserved tooling subcommands beside it. `FR-PC-14`: split aux modes — `--probe`/`--watch` are converter-run flags, `icons`/`lint` are subcommands, **no `--lint` flag** (deliberate divergence from `RES-CLI-001` §4). See `DESIGN-PIPECLI-001` §3 for the grammar layers + parser-tokenisation rules that resolve the `-f`/`-formats`, `-t`/`-targets` ambiguity. |
 
 ## Annex B — Document Control
 

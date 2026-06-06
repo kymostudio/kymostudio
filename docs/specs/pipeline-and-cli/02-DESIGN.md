@@ -1,7 +1,7 @@
 ---
 title: Pipeline & CLI Architecture — Design
 document_id: DESIGN-PIPECLI-001
-version: "0.1"
+version: "0.3"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -37,7 +37,7 @@ iso_compliance:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `DESIGN-PIPECLI-001` |
-| Version           | 0.1 |
+| Version           | 0.3 |
 | Status            | Draft |
 | Owner             | `packages/python` · `packages/js` · `packages/rust` |
 | Related Documents | `FEAT-PIPECLI-001` (requirements, traced below), `TEST-PIPECLI-001`, `PLAN-PIPECLI-001` |
@@ -71,12 +71,12 @@ central registry (`FR-PC-7`).
 
 | Stage | Role | Today | Target |
 |-------|------|-------|--------|
-| **DEMUX** | sniff extension + magic bytes → importer name; accept `stdin`, `-f` override | suffix switch `cli.py:61–77` | `pipeline/demux.py` registry (`FR-PC-7`, `FR-PC-10`) |
+| **DEMUX** | sniff extension + magic bytes → importer name; accept `stdin`, `-f` override | suffix switch in `load()` | `pipeline/demux.py` registry (`FR-PC-7`, `FR-PC-10`) |
 | **DECODE** | importer → `Diagram` (no layout/align) | `dsl.py`, `from_bpmn.py`, `from_kymojson.py`, dynamic `.py` | `pipeline/importers/*` (`FR-PC-2`) |
 | **FILTER** | `Diagram → Diagram` passes, format-agnostic | `bpmn_layout.py`, `layout.py`, `alignment.py`, `--animate` flag | `pipeline/filters/*` (`FR-PC-3`) |
 | **ENCODE** | `Diagram` → container bytes/string | `to_svg/figma/excalidraw/bpmn/kymojson` | `pipeline/encoders/*` (`FR-PC-4`) |
 | **POST** | tweak encoded payload, no re-decode | `to_webp.make_frame_svg` (animation snapshot) | `pipeline/post/*` (`FR-PC-5`) |
-| **MUX** | write file / stdout; infer container from `-o`, `-f` overrides | `out.write_text(...)` per branch | `pipeline/mux.py` (`FR-PC-12`) |
+| **MUX** | write file / stdout; infer container from `-o`, `-f` overrides | per-branch `out.write_text(...)` in `main()` | `pipeline/mux.py` (`FR-PC-12`) |
 
 ### 2.1 Stage 1 — DEMUX (`FR-PC-7`, `FR-PC-10`)
 
@@ -93,32 +93,38 @@ IMPORTERS = {
 def sniff(path_or_stream) -> str: ...   # → importer name (extension + magic bytes; -f overrides)
 ```
 
-Replaces the suffix switch at `cli.py:61–77` and the `unsupported source` check at
-`cli.py:171–173`.
+Replaces the suffix switch in `load()` and the `unsupported source` check in `main()`.
 
 ### 2.2 Stage 2 — DECODE (`FR-PC-2`, `FR-PC-6`)
 
 Each importer is an independent module returning a `Diagram`. Importers **must not** run
-layout or alignment. The implicit "pre-resolved" property of `from_bpmn`/`from_kymojson`
-becomes an **explicit `diagram.resolved = True` flag** (`FR-PC-6`), so the filter stage skips
-layout deterministically instead of `cli.py:193` checking `src.suffix not in (".bpmn",
-".json")`.
+layout or alignment. The implicit "pre-resolved" property becomes an **explicit
+`diagram.resolved = True` flag** (`FR-PC-6`), so the filter stage skips layout
+deterministically instead of `_load_resolved()` checking
+`src.suffix not in (".bpmn", ".json") and not had_bpmn`.
+
+**`resolved` is a per-`Diagram` property, not a property of the source format.** The current
+skip condition fires for `.bpmn`/`.kymo.json` *and* for a `.kymo` DSL source that carries a
+`bpmn { }` block (`had_bpmn`): the BPMN-layout pass positions it, then alignment is skipped.
+So the importer alone cannot always set `resolved` — for the DSL case it is the `bpmn_layout`
+filter that marks the diagram resolved once it has positioned the block. The default chain
+(below) must consult the flag after that filter runs, not before.
 
 | Importer | Existing module | `resolved`? |
 |----------|-----------------|-------------|
-| `kymo_dsl` | `dsl.py` | No |
+| `kymo_dsl` | `dsl.py` | No — **unless** it carries a `bpmn { }` block, then set `resolved` *after* the `bpmn_layout` filter |
 | `bpmn_2_0` | `from_bpmn.py` | Yes (DI geometry) |
 | `kymo_json` | `from_kymojson.py` | Yes |
-| `python_module` | dynamic `import_module` (`cli.py:75–77`) | Depends (`mod.LAYOUT`) |
+| `python_module` | dynamic `import_module` in `load()` | Depends (`mod.LAYOUT`) |
 | `drawio` | port from `packages/js/src/drawio2svg/` | Yes |
 | `svg` | new | Yes |
 
 ### 2.3 Stage 3 — FILTER GRAPH (`FR-PC-3`, `FR-PC-13`) — the stage kymo is missing most
 
-Today the passes are scattered: `bpmn_layout.py::layout` (`bpmn { }` blocks, `cli.py:183–185`),
-`layout.py::layout` (DSL DAG, `cli.py:186–187`), `alignment.py::resolve_alignments`
-(`cli.py:193–194`), and `--animate` forwarded to the renderer (`cli.py:232`). Each becomes a
-registered `Diagram → Diagram` filter:
+Today the passes are scattered through `_load_resolved()`: `bpmn_layout.py::layout`
+(`bpmn { }` blocks), `layout.py::layout` (DSL DAG), `alignment.py::resolve_alignments`, with
+`--animate` forwarded to the renderer in `main()`. Each becomes a registered
+`Diagram → Diagram` filter:
 
 ```python
 # pipeline/filters.py
@@ -144,8 +150,12 @@ kymo -i a.bpmn -i b.kymo -filter_complex "[0][1]concat=axis=v[out]" -map "[out]"
 ```
 
 **Load-bearing invariant:** filters touch only the model; they know nothing about output
-formats. The default chain for a *non-resolved* source is `layout → align → autosize` (the
-order `cli.py:186–194` runs today); a `resolved` diagram skips straight to encode.
+formats. The default chain mirrors the order `_load_resolved()` runs today:
+`bpmn_layout` (only if the diagram has `bpmn { }` blocks) → `layout` (only if a DSL
+`layout { }` spec is present) → `align`. Today **`autosize` is not a separate pass** at this
+point — auto-canvas sizing is one of the passes *inside* `resolve_alignments`; splitting it
+into its own `autosize` filter is part of this work, and must preserve the current ordering.
+A `resolved` diagram skips `layout`/`align` and goes straight to encode.
 
 ### 2.4 Stage 4 — ENCODE (`FR-PC-4`)
 
@@ -167,28 +177,31 @@ wrapper-over-codec containers. No encoder reads from disk; the mux owns I/O.
 ### 2.5 Stage 5 — POST / BITSTREAM (`FR-PC-5`)
 
 Tweaks the encoded payload without re-decoding: **animation snapshot**
-(`to_webp.py:102 make_frame_svg` rewrites CSS into the encoded SVG to freeze a time-step —
+(`to_webp.make_frame_svg` rewrites CSS into the encoded SVG to freeze a time-step —
 it belongs here, not in the encoder), **SVG minify**, **inline fonts / base64 images**,
 **sanitize** (strip `<script>`/comments).
 
 ### 2.6 Stage 6 — MUX (`FR-PC-12`)
 
 Infers the container from the `-o` extension; `-f` overrides; `-o -` writes stdout. Replaces
-the per-branch `out.write_text(...)` and `src.with_suffix(...)` destination logic
-(`cli.py:196–241`).
+the per-branch `out.write_text(...)` and `src.with_suffix(...)` destination logic in `main()`.
 
 ## 3. CLI grammar (`FR-PC-8..16`)
 
 A clean break to FFmpeg's verb-less model — the binary *is* the converter:
 
 ```
+# converter (verb-less) — every first token that is not a reserved subcommand is a source:
 kymo [-i] <src|->  [-f <informat>] [-t <target>]... [-o <path|->]
                    [-vf <chain>] [--anim <preset>] [--width N] [--frames N] [--quality Q]
-                   [-y|-n] [-q|-v]
+                   [--probe] [--watch] [-y|-n] [-q|-v]
 
-# auxiliary modes — flags, not sub-commands:
+# reserved tooling subcommands (git/cargo-style first-token verb — NOT flags):
+kymo lint  <src|-> [--json] [--max-level warn|error]   # rule-check the source
+kymo icons <verb>                                      # the icon command group
+
+# converter-run modifiers are flags on the converter (no separate binary, no subcommand):
 kymo --probe <src|->        # inspect: format, size, node/edge counts, valid? (no render)
-kymo --lint  <src|->        # rule-check (today: `kymo lint`, cli.py:159)
 kymo --watch <src> -t ...   # re-render on change
 
 # capability & help:
@@ -211,9 +224,46 @@ the dual input/output meaning of `-i` (`-i` marks input only). The throughline: 
 shape, drop the positional-option trap.
 
 **Behaviour fixes the grammar buys** (`FR-PC-9,11`): `-t svg -t figma` renders both from one
-parse (today the first-truthy-flag wins and extras are silently ignored, `cli.py:196–232`);
-`--anim` against a non-animatable target warns instead of silently dropping
-(`cli.py:175,204`).
+parse (today the target branches in `main()` each return early, so the first matched flag wins
+and extras never run); `--anim` against a non-animatable target warns instead of silently
+dropping (today the `figma` branch renders without the `animate` flag).
+
+### 3.1 Grammar layers & parser rules (`FR-PC-8`, `FR-PC-14`, `FR-PC-16`)
+
+kymo deliberately mixes three lexical token styles (FFmpeg homage, GNU long, POSIX short). That
+is legal because the parser is **hand-rolled and zero-dependency** (`RES-CLI-001` §5) — but the
+mix is only consistent if the tokenisation is specified. This subsection is that specification;
+it resolves the `-f`/`-formats` and `-t`/`-targets` ambiguity and the prefix-style mismatch.
+
+**Layer 0 — reserved subcommand token.** If `argv[0]` is `icons` or `lint`, dispatch to that
+tooling verb (`git`/`cargo`-style). Otherwise the invocation is the **verb-less converter** and
+`argv[0]` is the source. These are the *only* reserved first tokens. The converter may also take
+**one trailing positional output path** (`kymo in.svg out.png`, today's behaviour) — a
+positional *path* is FFmpeg-style and is distinct from the positional *options* `FR-PC-16`
+rejects.
+
+**Three option classes** (converter + flags):
+
+| Class | Shape | Members |
+|-------|-------|---------|
+| **Short** | `-` + one char; value is the next token or `=value` | `-i -o -t -f -y -n -q -v -h` (each with a GNU long alias: `--input --out --to --from …`) |
+| **Long** | `--` + word | `--anim --probe --watch --json --width --frames --quality --max-level` — **no `--lint`** (lint is a subcommand) |
+| **Capability keyword** | `-` + word, matched as one atomic token (FFmpeg homage, deliberate) | `-formats` · `-targets` · `-vf` (≡ `--filter`) · `-filter_complex` |
+
+**Parser rules** (make the grammar order-insensitive and unambiguous):
+
+1. **Whole-token match.** A `-…` token is looked up *entire* against the option table; longest
+   exact match wins. `-formats` matches the `-formats` keyword and **never** decomposes to
+   `-f` + `ormats`; `-f` matches only the literal token `-f`.
+2. **No bundling.** `-qv` is an error, not `-q -v`. (Removes the whole short-flag-run ambiguity.)
+3. **No glued short value.** `-tsvg` is invalid; write `-t svg` or `-t=svg` (the `=` form is
+   already accepted today — see `_extract_scale`'s `-s N`/`-s=N`/`--scale=N`).
+4. A short option that takes a value (`-i -o -t -f`) consumes the **next** token (or its `=value`);
+   capability keywords take **no** value.
+
+Because tokens are matched whole and never bundled, `-f` (format override) and `-formats`
+(capability) coexist with zero ambiguity, and every option means the same thing wherever it sits
+(`FR-PC-16`) — without FFmpeg's positional-option trap.
 
 ## 4. Module layout (`FR-PC-1..7`)
 
@@ -237,8 +287,10 @@ Existing modules move into the registry **unchanged in behaviour** — `to_svg.p
 
 ## 5. Dual/triple-implementation parity (`NFR-PC-3`)
 
-`packages/rust/kymostudio-core` (`main.rs`) is today a separate `kymo` binary that accepts
-**only `.svg` via `-i`** and writes PNG — it shares no architecture with the Python CLI.
+The Rust CLI lives in its own crate `packages/rust/kymostudio` (`src/main.rs`); the
+`kymostudio-core` crate is **library-only** (the resvg engine, no `main.rs`). That `kymo`
+binary today accepts **only `.svg`** (positional or `-i`) and writes PNG — it shares no
+architecture with the Python CLI.
 Target state: all three implementations present the **same pipeline diagram and CLI surface**;
 only the implementation differs. `.kymo.json` (`KYMOJSON-MAP-001`) becomes the wire format
 between them — analogous to FFmpeg's raw frame on a Unix pipe. The Rust CLI may be the "fast
@@ -268,6 +320,8 @@ Excalidraw/tldraw scene files — front-ends decoupled from back-ends by a stabl
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-06 | Vũ Anh | Initial design. Six-stage pipeline, registries, module layout, CLI grammar, parity, invariants — derived from `RES-PIPELINE-001` §3/§5 and `RES-CLI-001` §4; traced to `FR-PC`/`NFR-PC`. |
+| 0.2     | 2026-06-06 | Vũ Anh | Review corrections. §2.2: `resolved` is a per-`Diagram` flag (covers DSL-with-`bpmn{}`, set after `bpmn_layout`), not a source-format property. §2.3: default chain restated to match `_load_resolved()` (`bpmn_layout → layout → align`); noted `autosize` is currently a sub-pass of `resolve_alignments`, not a standalone pass. §5: Rust CLI is the `kymostudio` crate (`kymostudio-core` is lib-only). Replaced fragile `cli.py:NN` / `to_webp.py:NN` citations with function names. |
+| 0.3     | 2026-06-06 | Vũ Anh | Grammar-consistency fix (review finding #5). New §3.1 "Grammar layers & parser rules": Layer-0 reserved subcommands (`icons`/`lint`), three option classes (short / long / FFmpeg-homage capability keywords), and four parser rules (whole-token match, no bundling, no glued short value) that make `-f`/`-formats` and `-t`/`-targets` unambiguous. §3 code block regrouped into converter / tooling-subcommands / converter-run-flags; `--lint` removed (lint is `kymo lint`). |
 
 ## Annex B — Document Control
 

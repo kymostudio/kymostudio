@@ -1,7 +1,7 @@
 ---
 title: Pipeline & CLI Architecture — Plan
 document_id: PLAN-PIPECLI-001
-version: "0.1"
+version: "0.3"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -36,7 +36,7 @@ iso_compliance:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `PLAN-PIPECLI-001` |
-| Version           | 0.1 |
+| Version           | 0.3 |
 | Status            | Draft |
 | Owner             | `packages/python` · `packages/js` · `packages/rust` |
 | Related Documents | `FEAT-PIPECLI-001`, `DESIGN-PIPECLI-001`, `TEST-PIPECLI-001`; migration evidence `RES-PIPELINE-001` §8, `RES-CLI-001` §6 |
@@ -64,12 +64,12 @@ follows `RES-PIPELINE-001` §8.
 | Phase | Deliverable | Realises | Exit gate |
 |-------|-------------|----------|-----------|
 | **P1 — Scaffold `pipeline/`** | Move importer/encoder modules into `pipeline/importers/`, `encoders/`; `cli.py` dispatch switches from if/elif to registry lookup. Public interface unchanged. | `FR-PC-1,2,4,7` | Golden/corpus byte-identical (`TC-PC-1,2,3`) |
-| **P2 — Extract filters** | `layout`, `align`, `autosize`, `animate`, `theme` become real `Diagram → Diagram` filters; add the `diagram.resolved` flag (replaces `cli.py:193` suffix check). Legacy flag-path still calls them in the old order. | `FR-PC-3,6` | `TC-PC-4,5,6`; golden unchanged |
+| **P2 — Extract filters** | `layout`, `align`, `autosize`, `animate`, `theme` become real `Diagram → Diagram` filters; add the `diagram.resolved` flag (replaces the `_load_resolved()` suffix-skip). Legacy flag-path still calls them in the old order. | `FR-PC-3,6` | `TC-PC-4,5,6`; golden unchanged |
 | **P3 — Filter-chain grammar** | Introduce `-vf` and `-filter_complex` alongside legacy flags (`--animate` still works). | `FR-PC-13` | `TC-PC-14` |
 | **P4 — Mux & format control** | `-o <path\|->` (stdout), `-f` format override, `-t` target-as-value (one parse → many targets), `--anim` warn-not-drop, `-formats`/`-targets`/`-h`, `--probe`. | `FR-PC-9,10,11,12,14,15` | `TC-PC-7,10,12,13,15,16` |
 | **P5 — New sources** | `.drawio` (port from JS), `.svg`, `stdin` — one PR each, one file + registry entry. | `FR-PC-2` | `TC-PC-3` per source |
-| **P6 — JS & Rust parity** | JS `bin` exposing the same grammar; mirror the pipeline shape in the Rust CLI with `.kymo.json` as the shared wire format. | `FR-PC-17`, `NFR-PC-3` | `TC-PC-18` |
-| **P7 — Clean break (opt-in)** | Retire legacy boolean flags after the deprecation window; verb-less grammar becomes the only surface. | `FR-PC-8`, `NFR-PC-5` | `TC-PC-11,17,20` |
+| **P6 — JS & Rust parity** | Re-grammar the existing JS `bin` (`kymo`/`kymo-icons`) to the same verb-less surface — the binary exists, only its flag grammar differs; mirror the pipeline shape in the Rust CLI (`kymostudio` crate) with `.kymo.json` as the shared wire format. | `FR-PC-17`, `NFR-PC-3` | `TC-PC-18` |
+| **P7 — Clean break (opt-in)** | Retire the legacy **boolean converter flags** (`--figma`/`--excalidraw`/`--bpmn`/`--json`/`--animate`) after the deprecation window; the verb-less converter grammar becomes the only conversion surface. The `kymo lint`/`kymo icons` tooling **subcommands stay** (they are not legacy flags). | `FR-PC-8`, `NFR-PC-5` | `TC-PC-11,17,20` |
 
 P1–P2 are pure refactors (no user-visible change). P3–P5 are additive (new surface alongside
 old). P6 extends parity. P7 is the only breaking step and is opt-in / windowed.
@@ -79,7 +79,7 @@ old). P6 extends parity. P7 is the only breaking step and is opt-in / windowed.
 | Risk | Mitigation |
 |------|------------|
 | Golden/corpus churn during the move (P1) | Move modules byte-for-byte; rewire dispatch only; gate on `TC-PC-1` every commit. |
-| Filter extraction reorders passes and perturbs geometry | Preserve the exact today order `layout → bpmn_layout → align → autosize` (`cli.py:183–194`); the `resolved` flag mirrors the current suffix skip exactly. |
+| Filter extraction reorders passes and perturbs geometry | Preserve the exact order `_load_resolved()` runs today — `bpmn_layout` (if `bpmn { }` blocks) → `layout` (if a DSL `layout { }` spec) → `align` (with auto-canvas-size as one of its internal passes, *not* yet a standalone `autosize` filter); the `resolved` flag mirrors the current `src.suffix not in (".bpmn",".json") and not had_bpmn` skip exactly. |
 | Multi-input compose semantics under-specified (`concat`/`overlay` id-collisions) | Out of scope v1 (`FEAT` §4); land single-input first; resolve by `CR/` (open question `RES-PIPELINE-001` §9). |
 | Filter-chain DSL grammar bikeshedding | Ship `-vf` parsing behind the additive P3 with the FFmpeg `name=k=v:k=v` form; revisit syntax via `CR/` if it proves too cramped. |
 | JS/Rust drift from Python | `.kymo.json` parity oracle (`TC-PC-18`, `conformance/golden/`) gates P6. |
@@ -119,6 +119,8 @@ external layout engines, Rust filter-stage necessity, streaming) are tracked as 
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-06 | Vũ Anh | Initial plan. Seven-phase incremental migration (scaffold → filters → `-vf` → mux/format → new sources → parity → clean break), gated by the golden/corpus oracle; derived from `RES-PIPELINE-001` §8 and `RES-CLI-001` §6. |
+| 0.2     | 2026-06-06 | Vũ Anh | Review corrections. P2/risk: pass-order wording aligned to `_load_resolved()` (`bpmn_layout → layout → align`, autosize still an alignment sub-pass) and to the corrected `resolved` skip; P6: JS already has a `bin`, so the work is re-grammaring it, and Rust CLI named as the `kymostudio` crate. |
+| 0.3     | 2026-06-06 | Vũ Anh | Grammar-consistency fix (review finding #5). P7 retires only the legacy boolean **converter** flags; the `kymo lint`/`kymo icons` tooling subcommands are kept (not deprecated). |
 
 ## Annex B — Document Control
 
