@@ -5,10 +5,14 @@ on:
     branches: [main]
     paths:
       - 'packages/rust/**'
+      - 'conformance/**'          # Rust bpmn conformance tests read these goldens
+      - '.gitattributes'          # EOL pinning the byte-for-byte SVG goldens rely on
       - '.github/workflows/rust.yml'
   pull_request:
     paths:
       - 'packages/rust/**'
+      - 'conformance/**'
+      - '.gitattributes'
       - '.github/workflows/rust.yml'
   workflow_dispatch:
 
