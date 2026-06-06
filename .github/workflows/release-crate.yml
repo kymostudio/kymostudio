@@ -52,9 +52,12 @@ jobs:
         platform:
           - { runner: ubuntu-latest,  target: x86_64 }
           - { runner: ubuntu-latest,  target: aarch64 }
-          - { runner: windows-latest, target: x64 }
-          - { runner: macos-13,       target: x86_64 }
-          - { runner: macos-14,       target: aarch64 }
+          - { runner: windows-latest,  target: x64 }
+          # macos-13 (Intel) runners were retired by GitHub on 2025-12-08, so a
+          # macos-13 job queues forever. Match linebender/resvg's CI: arm64 on
+          # macos-latest, Intel on the replacement `macos-15-intel` label.
+          - { runner: macos-latest,    target: aarch64 }
+          - { runner: macos-15-intel,  target: x86_64 }
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5

@@ -9,6 +9,16 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-06-06
+
+### Fixed
+
+- **`release-crate.yml` macOS wheel build** — the `macos-13` (Intel) runner was
+  retired by GitHub on 2025-12-08, so that job queued forever and blocked the
+  PyPI publish for `kymostudio-core` 0.3.4. Switched to `macos-latest` (arm64) +
+  `macos-15-intel` (x86_64), matching linebender/resvg's CI. This release lands
+  `kymostudio-core` on PyPI for the first time.
+
 ## [0.3.4] - 2026-06-06
 
 ### Added
