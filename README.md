@@ -71,7 +71,7 @@ kymo lint process.bpmn        # check for issues
 Render any `.svg` to a PNG image — no headless browser required.
 
 ```bash
-kymo diagram.svg out.png      # rasterize an existing SVG
+kymo diagram.svg out.png      # SVG → PNG
 ```
 
 ### 4. Browse the icon catalogue
