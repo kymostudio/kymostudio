@@ -9,7 +9,7 @@
  * render immediately, matching the original.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packages/js/dist/index.js";
+import { init, parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packages/js/dist/index.js";
 import type { Editor } from "../../../packages/js-canvas/dist/index.js";
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
@@ -92,6 +92,8 @@ export function App() {
   async function render(src: string, th: Theme, tr: boolean): Promise<void> {
     const token = ++renderToken.current;
     try {
+      await init(); // BPMN import/layout delegate to the wasm core (idempotent, cached)
+      if (token !== renderToken.current) return;
       const bpmn = isBpmn(src);
       const parsed = bpmn ? parseBpmn(src) : parseDiagram(src);
       const out = await renderSVG(parsed, { background: svgBackground(th, tr) });

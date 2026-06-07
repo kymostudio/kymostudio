@@ -260,5 +260,5 @@ def test_bpmn_render_raises_until_layout():
     """A diagram still carrying an un-laid-out block must not render (P1)."""
     from kymo.to_svg import render
     d, _, _ = parse('bpmn {\n  start S "x"\n  S -> E\n  end E "y"\n}\n')
-    with pytest.raises(NotImplementedError, match="not implemented"):
+    with pytest.raises(ValueError, match="un-laid-out"):
         render(d)

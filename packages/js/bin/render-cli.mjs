@@ -53,11 +53,22 @@ function parseScale(v) {
   return n;
 }
 
+/** Initialize the wasm core synchronously (BPMN import/layout/render delegate to it). */
+async function initCore(lib) {
+  const { createRequire } = await import("node:module");
+  const require = createRequire(import.meta.url);
+  const wasmPath = require.resolve("kymostudio-core/kymostudio_core_bg.wasm");
+  lib.initSync(readFileSync(wasmPath));
+}
+
 /** Source → SVG string, dispatching by input extension. */
 async function renderToSvg(input) {
   const lib = await import("../dist/index.js");
   const text = readFileSync(input, "utf-8");
   const low = input.toLowerCase();
+  // BPMN import + `bpmn { }` layout (in .bpmn / .kymo) delegate to the wasm core,
+  // which must be initialized before the synchronous parse calls.
+  if (low.endsWith(".bpmn") || low.endsWith(".kymo")) await initCore(lib);
   let diagram;
   if (low.endsWith(".bpmn")) diagram = lib.parseBpmn(text);
   else if (low.endsWith(".json")) diagram = lib.parseKymoJson(text);

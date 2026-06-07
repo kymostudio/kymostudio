@@ -7,6 +7,8 @@
 //!     bpmn_import(xml: str) -> str         # .bpmn → canonical model JSON
 //!     bpmn_layout(blocks_json: str) -> str # `bpmn { }` block AST JSON → model JSON
 //!     bpmn_to_svg(xml: str) -> str         # .bpmn → rendered SVG
+//!     bpmn_export(model_json: str) -> str  # model JSON → .bpmn XML
+//!     bpmn_render(model_json, animate=False, background=None) -> str  # model JSON → SVG
 //!
 //! The BPMN functions exchange the canonical `.kymo.json` model on the JSON seam, so
 //! Python can deserialize the result into its dataclasses and delegate to this one
@@ -50,6 +52,27 @@ fn bpmn_to_svg(xml: &str) -> PyResult<String> {
     Ok(crate::bpmn::render(&diagram))
 }
 
+/// Export a canonical model JSON → BPMN 2.0 XML (inverse of `bpmn_import`).
+#[cfg(feature = "bpmn")]
+#[pyfunction]
+fn bpmn_export(model_json: &str) -> PyResult<String> {
+    let diagram = crate::bpmn::from_json(model_json).map_err(PyValueError::new_err)?;
+    Ok(crate::bpmn::export(&diagram))
+}
+
+/// Render a canonical model JSON → SVG (animate + background mirror to_svg options).
+#[cfg(feature = "bpmn")]
+#[pyfunction]
+#[pyo3(signature = (model_json, animate = false, background = None))]
+fn bpmn_render(model_json: &str, animate: bool, background: Option<String>) -> PyResult<String> {
+    let diagram = crate::bpmn::from_json(model_json).map_err(PyValueError::new_err)?;
+    let opts = crate::bpmn::RenderOpts {
+        animate,
+        background,
+    };
+    Ok(crate::bpmn::render_opts(&diagram, &opts))
+}
+
 /// Convert `svg` (bytes) to a vector PDF (one page, intrinsic size).
 #[cfg(feature = "pdf")]
 #[pyfunction]
@@ -69,6 +92,8 @@ fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_function(wrap_pyfunction!(bpmn_import, m)?)?;
         m.add_function(wrap_pyfunction!(bpmn_layout, m)?)?;
         m.add_function(wrap_pyfunction!(bpmn_to_svg, m)?)?;
+        m.add_function(wrap_pyfunction!(bpmn_export, m)?)?;
+        m.add_function(wrap_pyfunction!(bpmn_render, m)?)?;
     }
     Ok(())
 }

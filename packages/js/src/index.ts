@@ -26,8 +26,14 @@ export {
   type LayoutNode, type RegionLayout, type ExternalSpec, type LayoutOptions, type Cell,
 } from "./layout.js";
 export { resolveAlignments } from "./alignment.js";
-export { bpmnLayout } from "./bpmn-layout.js";
-export { parseBpmn } from "./from-bpmn.js";
-export { toBpmn } from "./to-bpmn.js";
+// BPMN import/export/layout delegate to the Rust core (the single source of truth).
+// Call `init()` (browser) or `initSync(bytes)` (Node) once before these synchronous
+// functions; `renderSVG` auto-initializes its own BPMN path.
+export {
+  init, initSync,
+  coreParseBpmn as parseBpmn,
+  coreToBpmn as toBpmn,
+  coreApplyLayout as bpmnLayout,
+} from "./core.js";
 export { toKymoJson, modelDict } from "./to-kymojson.js";  // Diagram → .kymo.json
 export { parseKymoJson } from "./from-kymojson.js";          // .kymo.json → Diagram

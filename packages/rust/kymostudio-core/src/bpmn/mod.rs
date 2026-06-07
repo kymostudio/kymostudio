@@ -19,6 +19,7 @@ pub mod round;
 
 pub mod bpmn_layout;
 pub mod from_bpmn;
+pub mod from_json;
 pub mod shapes;
 pub mod to_bpmn;
 pub mod to_json;
@@ -26,7 +27,8 @@ pub mod to_svg;
 
 pub use bpmn_layout::{layout, BpmnBlock, BpmnFlow, BpmnNode};
 pub use from_bpmn::parse as import;
+pub use from_json::from_json;
 pub use model::{Component, Diagram, Edge, Region};
 pub use to_bpmn::export;
 pub use to_json::model_json;
-pub use to_svg::render;
+pub use to_svg::{render, render_opts, RenderOpts};

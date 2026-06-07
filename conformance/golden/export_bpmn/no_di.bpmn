@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" id="defs_kymo">
-  <bpmn:process id="Process_kymo" isExecutable="false" />
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_kymo">
+  <bpmn:process id="Process_kymo" isExecutable="false">
+  </bpmn:process>
   <bpmndi:BPMNDiagram>
-    <bpmndi:BPMNPlane bpmnElement="Process_kymo" />
+    <bpmndi:BPMNPlane bpmnElement="Process_kymo">
+    </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

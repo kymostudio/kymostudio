@@ -1,3 +1,4 @@
+import "./_init.mjs";
 /**
  * bpmn-dsl P3 (JS parity): `bpmn { }` parser + layout, mirroring the Python
  * tests. Structural assertions + SVG-contains (no byte golden — NFR-4).

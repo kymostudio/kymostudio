@@ -1,3 +1,4 @@
+import "./_init.mjs";
 /**
  * `.kymo.json` round-trip + envelope tests (toKymoJson / parseKymoJson) — JS side.
  *

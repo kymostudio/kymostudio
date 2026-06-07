@@ -62,10 +62,22 @@ jobs:
       - uses: actions/checkout@v6
       - name: Install uv
         uses: astral-sh/setup-uv@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build the local kymostudio-core wheel (BPMN engine, required by BPMN)
+        uses: PyO3/maturin-action@v1
+        with:
+          working-directory: packages/rust/kymostudio-core
+          command: build
+          args: --release --out ${{ github.workspace }}/dist-core
+          manylinux: auto
       - name: Lint (ruff)
         run: uv run --python ${{ matrix.python-version }} --group dev ruff check src tests
+      - name: Sync env + install the locally-built core
+        run: |
+          uv sync --python ${{ matrix.python-version }} --group dev
+          uv pip install --reinstall "$(ls ${{ github.workspace }}/dist-core/*.whl)"
       - name: Run pytest
-        run: uv run --python ${{ matrix.python-version }} --group dev python -m pytest -q
+        run: uv run --no-sync --python ${{ matrix.python-version }} python -m pytest -q
 
   js:
     needs: changes
@@ -80,8 +92,17 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - name: Build the local kymostudio-core wasm pkg (BPMN engine)
+        working-directory: packages/rust/kymostudio-core
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
       - name: Install deps
         run: npm ci
+      - name: Link the locally-built core (BPMN wasm bindings)
+        run: npm install --no-save ../rust/kymostudio-core/pkg
       - name: Type check
         run: npm run typecheck
       - name: Lint
@@ -127,14 +148,26 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - name: Build the local kymostudio-core wasm pkg (BPMN engine)
+        working-directory: packages/rust/kymostudio-core
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
       - name: Build JS engine (bundled by the extension)
         working-directory: packages/js
-        run: npm ci && npm run build
+        run: |
+          npm ci
+          npm install --no-save ../rust/kymostudio-core/pkg
+          npm run build
       - name: Install deps
-        run: npm ci
+        run: |
+          npm ci
+          npm install --no-save ../rust/kymostudio-core/pkg
       - name: Type check
         run: npm run typecheck
       - name: Test
         run: npm test        # node --test (webview behaviour, via jsdom)
       - name: Bundle
-        run: npm run build   # esbuild -> dist/extension.js (inlines kymostudio)
+        run: npm run build   # esbuild -> dist/extension.js (inlines kymostudio + wasm)

@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from kymo.bpmn_layout import layout as layout_bpmn
+from kymo._core import apply_layout as layout_bpmn
 from kymo.dsl import parse as parse_dsl
 from kymo.to_kymojson import model_dict as canonical_model
 

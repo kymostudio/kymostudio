@@ -1,129 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_kymo">
   <bpmn:process id="Process_kymo" isExecutable="false">
-    <bpmn:startEvent id="Start" name="Order received" />
-    <bpmn:task id="Validate" name="Validate order" />
-    <bpmn:exclusiveGateway id="InStock" name="In stock?" default="flow3" />
-    <bpmn:task id="Notify" name="Notify customer" />
+    <bpmn:startEvent id="Start" name="Order received"/>
+    <bpmn:task id="Validate" name="Validate order"/>
+    <bpmn:exclusiveGateway id="InStock" name="In stock?" default="flow3"/>
+    <bpmn:task id="Notify" name="Notify customer"/>
     <bpmn:endEvent id="Cancelled" name="Order cancelled">
-      <bpmn:terminateEventDefinition />
+      <bpmn:terminateEventDefinition/>
     </bpmn:endEvent>
-    <bpmn:task id="Payment" name="Process payment" />
-    <bpmn:parallelGateway id="Split" name="Split" />
-    <bpmn:task id="Pack" name="Pack items" />
-    <bpmn:task id="Invoice" name="Generate invoice" />
-    <bpmn:parallelGateway id="Sync" name="Sync" />
-    <bpmn:task id="Ship" name="Ship order" />
-    <bpmn:endEvent id="Delivered" name="Order delivered" />
-    <bpmn:sequenceFlow id="flow0" sourceRef="Start" targetRef="Validate" />
-    <bpmn:sequenceFlow id="flow1" sourceRef="Validate" targetRef="InStock" />
-    <bpmn:sequenceFlow id="flow2" sourceRef="InStock" targetRef="Payment" name="Yes" />
-    <bpmn:sequenceFlow id="flow3" sourceRef="InStock" targetRef="Notify" name="No" />
-    <bpmn:sequenceFlow id="flow4" sourceRef="Notify" targetRef="Cancelled" />
-    <bpmn:sequenceFlow id="flow5" sourceRef="Payment" targetRef="Split" />
-    <bpmn:sequenceFlow id="flow6" sourceRef="Split" targetRef="Pack" />
-    <bpmn:sequenceFlow id="flow7" sourceRef="Split" targetRef="Invoice" />
-    <bpmn:sequenceFlow id="flow8" sourceRef="Pack" targetRef="Sync" />
-    <bpmn:sequenceFlow id="flow9" sourceRef="Invoice" targetRef="Sync" />
-    <bpmn:sequenceFlow id="flow10" sourceRef="Sync" targetRef="Ship" />
-    <bpmn:sequenceFlow id="flow11" sourceRef="Ship" targetRef="Delivered" />
+    <bpmn:task id="Payment" name="Process payment"/>
+    <bpmn:parallelGateway id="Split" name="Split"/>
+    <bpmn:task id="Pack" name="Pack items"/>
+    <bpmn:task id="Invoice" name="Generate invoice"/>
+    <bpmn:parallelGateway id="Sync" name="Sync"/>
+    <bpmn:task id="Ship" name="Ship order"/>
+    <bpmn:endEvent id="Delivered" name="Order delivered"/>
+    <bpmn:sequenceFlow id="flow0" sourceRef="Start" targetRef="Validate"/>
+    <bpmn:sequenceFlow id="flow1" sourceRef="Validate" targetRef="InStock"/>
+    <bpmn:sequenceFlow id="flow2" sourceRef="InStock" targetRef="Payment" name="Yes"/>
+    <bpmn:sequenceFlow id="flow3" sourceRef="InStock" targetRef="Notify" name="No"/>
+    <bpmn:sequenceFlow id="flow4" sourceRef="Notify" targetRef="Cancelled"/>
+    <bpmn:sequenceFlow id="flow5" sourceRef="Payment" targetRef="Split"/>
+    <bpmn:sequenceFlow id="flow6" sourceRef="Split" targetRef="Pack"/>
+    <bpmn:sequenceFlow id="flow7" sourceRef="Split" targetRef="Invoice"/>
+    <bpmn:sequenceFlow id="flow8" sourceRef="Pack" targetRef="Sync"/>
+    <bpmn:sequenceFlow id="flow9" sourceRef="Invoice" targetRef="Sync"/>
+    <bpmn:sequenceFlow id="flow10" sourceRef="Sync" targetRef="Ship"/>
+    <bpmn:sequenceFlow id="flow11" sourceRef="Ship" targetRef="Delivered"/>
   </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane bpmnElement="Process_kymo">
       <bpmndi:BPMNShape bpmnElement="Start">
-        <dc:Bounds x="30" y="292" width="36" height="36" />
+        <dc:Bounds x="30" y="292" width="36" height="36"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Validate">
-        <dc:Bounds x="128" y="270" width="100" height="80" />
+        <dc:Bounds x="128" y="270" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="InStock" isMarkerVisible="true">
-        <dc:Bounds x="313" y="285" width="50" height="50" />
+        <dc:Bounds x="313" y="285" width="50" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Notify">
-        <dc:Bounds x="448" y="30" width="100" height="80" />
+        <dc:Bounds x="448" y="30" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Cancelled">
-        <dc:Bounds x="640" y="52" width="36" height="36" />
+        <dc:Bounds x="640" y="52" width="36" height="36"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Payment">
-        <dc:Bounds x="428" y="270" width="100" height="80" />
+        <dc:Bounds x="428" y="270" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Split">
-        <dc:Bounds x="613" y="285" width="50" height="50" />
+        <dc:Bounds x="613" y="285" width="50" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Pack">
-        <dc:Bounds x="748" y="100" width="100" height="80" />
+        <dc:Bounds x="748" y="100" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Invoice">
-        <dc:Bounds x="748" y="440" width="100" height="80" />
+        <dc:Bounds x="748" y="440" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Sync">
-        <dc:Bounds x="933" y="285" width="50" height="50" />
+        <dc:Bounds x="933" y="285" width="50" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Ship">
-        <dc:Bounds x="1048" y="270" width="100" height="80" />
+        <dc:Bounds x="1048" y="270" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Delivered">
-        <dc:Bounds x="1220" y="292" width="36" height="36" />
+        <dc:Bounds x="1220" y="292" width="36" height="36"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow0">
-        <di:waypoint x="66" y="310" />
-        <di:waypoint x="128" y="310" />
+        <di:waypoint x="66" y="310"/>
+        <di:waypoint x="128" y="310"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1">
-        <di:waypoint x="228" y="310" />
-        <di:waypoint x="313" y="310" />
+        <di:waypoint x="228" y="310"/>
+        <di:waypoint x="313" y="310"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2">
-        <di:waypoint x="363" y="310" />
-        <di:waypoint x="428" y="310" />
+        <di:waypoint x="363" y="310"/>
+        <di:waypoint x="428" y="310"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="377" y="291" width="40" height="14" />
+          <dc:Bounds x="377" y="291" width="40" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow3">
-        <di:waypoint x="338" y="285" />
-        <di:waypoint x="338" y="70" />
-        <di:waypoint x="448" y="70" />
+        <di:waypoint x="338" y="285"/>
+        <di:waypoint x="338" y="70"/>
+        <di:waypoint x="448" y="70"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="330" y="173" width="40" height="14" />
+          <dc:Bounds x="330" y="173" width="40" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow4">
-        <di:waypoint x="548" y="70" />
-        <di:waypoint x="640" y="70" />
+        <di:waypoint x="548" y="70"/>
+        <di:waypoint x="640" y="70"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5">
-        <di:waypoint x="528" y="310" />
-        <di:waypoint x="613" y="310" />
+        <di:waypoint x="528" y="310"/>
+        <di:waypoint x="613" y="310"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6">
-        <di:waypoint x="638" y="285" />
-        <di:waypoint x="638" y="140" />
-        <di:waypoint x="748" y="140" />
+        <di:waypoint x="638" y="285"/>
+        <di:waypoint x="638" y="140"/>
+        <di:waypoint x="748" y="140"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7">
-        <di:waypoint x="638" y="335" />
-        <di:waypoint x="638" y="480" />
-        <di:waypoint x="748" y="480" />
+        <di:waypoint x="638" y="335"/>
+        <di:waypoint x="638" y="480"/>
+        <di:waypoint x="748" y="480"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow8">
-        <di:waypoint x="848" y="140" />
-        <di:waypoint x="958" y="140" />
-        <di:waypoint x="958" y="285" />
+        <di:waypoint x="848" y="140"/>
+        <di:waypoint x="958" y="140"/>
+        <di:waypoint x="958" y="285"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow9">
-        <di:waypoint x="848" y="480" />
-        <di:waypoint x="958" y="480" />
-        <di:waypoint x="958" y="335" />
+        <di:waypoint x="848" y="480"/>
+        <di:waypoint x="958" y="480"/>
+        <di:waypoint x="958" y="335"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow10">
-        <di:waypoint x="983" y="310" />
-        <di:waypoint x="1048" y="310" />
+        <di:waypoint x="983" y="310"/>
+        <di:waypoint x="1048" y="310"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow11">
-        <di:waypoint x="1148" y="310" />
-        <di:waypoint x="1220" y="310" />
+        <di:waypoint x="1148" y="310"/>
+        <di:waypoint x="1220" y="310"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_kymo">
   <bpmn:process id="Process_kymo" isExecutable="false">
-    <bpmn:startEvent id="S" />
-    <bpmn:exclusiveGateway id="X" name="X?" />
-    <bpmn:parallelGateway id="P1" />
-    <bpmn:inclusiveGateway id="O" />
-    <bpmn:endEvent id="E" />
-    <bpmn:sequenceFlow id="flow0" sourceRef="S" targetRef="X" />
-    <bpmn:sequenceFlow id="flow1" sourceRef="X" targetRef="P1" />
-    <bpmn:sequenceFlow id="flow2" sourceRef="P1" targetRef="O" />
-    <bpmn:sequenceFlow id="flow3" sourceRef="O" targetRef="E" />
+    <bpmn:startEvent id="S"/>
+    <bpmn:exclusiveGateway id="X" name="X?"/>
+    <bpmn:parallelGateway id="P1"/>
+    <bpmn:inclusiveGateway id="O"/>
+    <bpmn:endEvent id="E"/>
+    <bpmn:sequenceFlow id="flow0" sourceRef="S" targetRef="X"/>
+    <bpmn:sequenceFlow id="flow1" sourceRef="X" targetRef="P1"/>
+    <bpmn:sequenceFlow id="flow2" sourceRef="P1" targetRef="O"/>
+    <bpmn:sequenceFlow id="flow3" sourceRef="O" targetRef="E"/>
   </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane bpmnElement="Process_kymo">
       <bpmndi:BPMNShape bpmnElement="S">
-        <dc:Bounds x="30" y="37" width="36" height="36" />
+        <dc:Bounds x="30" y="37" width="36" height="36"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="X" isMarkerVisible="true">
-        <dc:Bounds x="110" y="30" width="50" height="50" />
+        <dc:Bounds x="110" y="30" width="50" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="P1">
-        <dc:Bounds x="210" y="30" width="50" height="50" />
+        <dc:Bounds x="210" y="30" width="50" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="O">
-        <dc:Bounds x="310" y="30" width="50" height="50" />
+        <dc:Bounds x="310" y="30" width="50" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="E">
-        <dc:Bounds x="410" y="37" width="36" height="36" />
+        <dc:Bounds x="410" y="37" width="36" height="36"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow0">
-        <di:waypoint x="66" y="55" />
-        <di:waypoint x="110" y="55" />
+        <di:waypoint x="66" y="55"/>
+        <di:waypoint x="110" y="55"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1">
-        <di:waypoint x="160" y="55" />
-        <di:waypoint x="210" y="55" />
+        <di:waypoint x="160" y="55"/>
+        <di:waypoint x="210" y="55"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2">
-        <di:waypoint x="260" y="55" />
-        <di:waypoint x="310" y="55" />
+        <di:waypoint x="260" y="55"/>
+        <di:waypoint x="310" y="55"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow3">
-        <di:waypoint x="360" y="55" />
-        <di:waypoint x="410" y="55" />
+        <di:waypoint x="360" y="55"/>
+        <di:waypoint x="410" y="55"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

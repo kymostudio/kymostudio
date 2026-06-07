@@ -21,13 +21,9 @@ function layoutNode(n: Obj): LayoutNode {
   return { t: "group", dir: n.dir, children: (n.children as Obj[]).map(layoutNode) };
 }
 
-/** Load a `.kymo.json` string into a fully-resolved `Diagram`. */
-export function parseKymoJson(text: string): Diagram {
-  const payload = JSON.parse(text);
-  if (payload.format !== FORMAT) {
-    throw new Error(`not a kymo.json document (format=${JSON.stringify(payload.format)}, expected ${JSON.stringify(FORMAT)})`);
-  }
-  const d = payload.diagram as Obj;
+/** Build a `Diagram` from a canonical model **body** object (the `diagram` payload —
+ *  what `modelDict` emits and the Rust core returns). */
+export function modelFromDict(d: Obj): Diagram {
   return makeDiagram({
     width: d.width, height: d.height, title: d.title, subtitle: d.subtitle,
     components: (d.components as Obj[]).map((c) => makeComponent({
@@ -54,4 +50,13 @@ export function parseKymoJson(text: string): Diagram {
     })),
     layoutTrees: ((d.layout_trees ?? []) as Obj[]).map(layoutNode),
   });
+}
+
+/** Load a `.kymo.json` string (versioned envelope) into a fully-resolved `Diagram`. */
+export function parseKymoJson(text: string): Diagram {
+  const payload = JSON.parse(text);
+  if (payload.format !== FORMAT) {
+    throw new Error(`not a kymo.json document (format=${JSON.stringify(payload.format)}, expected ${JSON.stringify(FORMAT)})`);
+  }
+  return modelFromDict(payload.diagram as Obj);
 }

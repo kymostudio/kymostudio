@@ -12,13 +12,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from kymo._core import apply_layout as layout_bpmn
+from kymo._core import export_bpmn
+from kymo._core import import_bpmn as parse_bpmn
 from kymo.alignment import resolve_alignments
-from kymo.bpmn_layout import layout as layout_bpmn
 from kymo.dsl import parse as parse_dsl
-from kymo.from_bpmn import parse as parse_bpmn
 from kymo.layout import layout as apply_grid_layout
 from kymo.model import Diagram
-from kymo.to_bpmn import export as export_bpmn
 
 # The canonical model serializer is the `.kymo.json` body (single source of truth);
 # `model_dict` includes `layout_trees`, so the cross-language model comparison now

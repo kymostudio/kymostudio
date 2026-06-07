@@ -1,3 +1,4 @@
+import "./_init.mjs";
 /**
  * Shared helpers for the Python↔JS conformance suite (`conformance.test.js`).
  *

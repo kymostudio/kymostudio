@@ -7,7 +7,17 @@
  *   - `.kymo` → `parseDiagram` (parse + layout + alignment) + `renderSVG`
  */
 import * as vscode from "vscode";
-import { parseBpmn, parseDiagram, renderSVG, type RenderOptions } from "kymostudio";
+import { initSync, parseBpmn, parseDiagram, renderSVG, type RenderOptions } from "kymostudio";
+// Inlined by esbuild's `binary` loader (see esbuild.mjs) → the BPMN engine's bytes.
+import wasmBytes from "kymostudio-core/kymostudio_core_bg.wasm";
+
+let coreReady = false;
+/** Initialize the BPMN wasm engine once (synchronous; bytes inlined in the bundle). */
+function ensureCore(): void {
+  if (coreReady) return;
+  initSync(wasmBytes);
+  coreReady = true;
+}
 
 export type BackgroundMode = "light" | "dark" | "transparent";
 
@@ -35,6 +45,9 @@ export async function renderSource(
 ): Promise<RenderResult> {
   const ext = extname(doc.uri);
   const opts: RenderOptions = { background: BACKGROUNDS[background] };
+  ensureCore(); // BPMN import/layout/render delegate to the wasm core
+
+
 
   if (ext === ".bpmn") {
     try {

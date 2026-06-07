@@ -65,13 +65,9 @@ def _layout_node(n: dict):
     return ("group", n["dir"], [_layout_node(c) for c in n["children"]])
 
 
-def parse(text: str) -> Diagram:
-    """Load a `.kymo.json` string into a fully-resolved `Diagram`."""
-    payload = json.loads(text)
-    fmt = payload.get("format")
-    if fmt != FORMAT:
-        raise ValueError(f"not a kymo.json document (format={fmt!r}, expected {FORMAT!r})")
-    d = payload["diagram"]
+def model_from_dict(d: dict) -> Diagram:
+    """Build a `Diagram` from a canonical model **body** dict (the `diagram` payload,
+    i.e. what `to_kymojson.model_dict` emits and the Rust core returns)."""
     return Diagram(
         width=d["width"], height=d["height"], title=d["title"], subtitle=d["subtitle"],
         components=[_component(c) for c in d["components"]],
@@ -79,3 +75,12 @@ def parse(text: str) -> Diagram:
         edges=[_edge(e) for e in d["edges"]],
         layout_trees=[_layout_node(t) for t in d.get("layout_trees", [])],
     )
+
+
+def parse(text: str) -> Diagram:
+    """Load a `.kymo.json` string (versioned envelope) into a fully-resolved `Diagram`."""
+    payload = json.loads(text)
+    fmt = payload.get("format")
+    if fmt != FORMAT:
+        raise ValueError(f"not a kymo.json document (format={fmt!r}, expected {FORMAT!r})")
+    return model_from_dict(payload["diagram"])

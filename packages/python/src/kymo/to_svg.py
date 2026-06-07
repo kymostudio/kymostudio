@@ -9,7 +9,6 @@ from __future__ import annotations
 import re
 from html import escape as _xml_escape
 
-from . import bpmn_shapes
 from .icons import get_icon
 from .model import Component, Diagram, Edge, Region, resolve_anchors
 
@@ -405,17 +404,6 @@ def render_region_rect(r: Region) -> str:
     x, y, w, h = r.bounds
     rstyle = getattr(r, "style", "outer")
 
-    # BPMN pool / lane: square rectangle with a label band down the left
-    # edge (separator drawn only when there is a label to sit in the band).
-    if rstyle in ("pool", "lane"):
-        band = 30
-        rect_cls = "region-rect region-rect--pool" if rstyle == "pool" else "region-rect region-rect--lane"
-        band_cls = "bpmn-pool-band" if rstyle == "pool" else "bpmn-lane-band"
-        sep = (f'<line class="{band_cls}" x1="{x + band}" y1="{y}" '
-               f'x2="{x + band}" y2="{y + h}"/>') if r.label else ""
-        return (f'<rect class="{rect_cls}" x="{x}" y="{y}" width="{w}" '
-                f'height="{h}"/>{sep}')
-
     rect_cls = "region-rect"
     if rstyle == "inner":
         rect_cls += " region-rect--inner"
@@ -451,13 +439,6 @@ def render_region_label(r: Region) -> str:
         return ""
     x, y, w, h = r.bounds
     rstyle = getattr(r, "style", "outer")
-
-    # BPMN pool / lane: name runs vertically up the left band.
-    if rstyle in ("pool", "lane"):
-        tx, ty = x + 15, y + h // 2
-        return (f'<text class="bpmn-pool-label" x="{tx}" y="{ty}" '
-                f'text-anchor="middle" transform="rotate(-90 {tx} {ty})">'
-                f'{_x(r.label)}</text>')
 
     label_cls = "region-label"
     if rstyle == "inner":
@@ -500,63 +481,7 @@ def render_region(r: Region) -> str:
     return render_region_rect(r) + "\n" + render_region_label(r)
 
 
-def _polyline_path(pts: list[tuple[int, int]]) -> str:
-    return "M " + " L ".join(f"{x},{y}" for x, y in pts)
-
-
-def _unit(a: tuple[int, int], b: tuple[int, int]) -> tuple[float, float]:
-    dx, dy = b[0] - a[0], b[1] - a[1]
-    n = (dx * dx + dy * dy) ** 0.5 or 1.0
-    return (dx / n, dy / n)
-
-
-def render_bpmn_edge(e: Edge) -> str:
-    """Render a flow drawn directly through its explicit `points` (the
-    file's DI waypoints). Markers and dashes follow `bpmn_flow`."""
-    pts = e.points or []
-    if len(pts) < 2:
-        return ""
-    path = _polyline_path(pts)
-    flow = e.bpmn_flow or "sequence"
-
-    if flow == "message":
-        cls = "bpmn-flow bpmn-flow--message"
-        markers = ' marker-start="url(#bpmn-msg-start)" marker-end="url(#bpmn-msg-end)"'
-    elif flow == "association":
-        cls = "bpmn-flow bpmn-flow--assoc"
-        markers = ""
-    else:  # sequence / default / conditional
-        cls = "bpmn-flow"
-        markers = ' marker-end="url(#bpmn-seq-end)"'
-
-    # Source decoration: default-flow slash tick, conditional-flow diamond.
-    deco = ""
-    p0, p1 = pts[0], pts[1]
-    ux, uy = _unit(p0, p1)
-    px, py = -uy, ux                                  # perpendicular
-    if flow == "default":
-        mx, my = p0[0] + ux * 14, p0[1] + uy * 14
-        deco = (f'<line class="bpmn-flow" x1="{mx - ux*5 - px*5:.1f}" '
-                f'y1="{my - uy*5 - py*5:.1f}" x2="{mx + ux*5 + px*5:.1f}" '
-                f'y2="{my + uy*5 + py*5:.1f}"/>')
-    elif flow == "conditional":
-        cxp, cyp = p0[0] + ux * 11, p0[1] + uy * 11
-        dpts = (f"{cxp + ux*8:.1f},{cyp + uy*8:.1f} {cxp + px*5:.1f},{cyp + py*5:.1f} "
-                f"{cxp - ux*8:.1f},{cyp - uy*8:.1f} {cxp - px*5:.1f},{cyp - py*5:.1f}")
-        deco = f'<polygon points="{dpts}" fill="#ffffff" stroke="#374151" stroke-width="1.4"/>'
-
-    label = ""
-    if e.label and e.label_pos is not None:
-        lx, ly = e.label_pos
-        label = f'<text class="bpmn-flow-label" x="{lx}" y="{ly}">{_x(e.label)}</text>'
-
-    return f'<path class="{cls}" d="{path}"{markers}/>\n{deco}{label}'
-
-
 def render_edge(e: Edge, d: Diagram) -> str:
-    if getattr(e, "points", None):          # BPMN flow with explicit waypoints
-        return render_bpmn_edge(e)
-
     src = d.get_node(e.src)         # accepts Component or Region
     dst = d.get_node(e.dst)
     src_anchor, dst_anchor = resolve_anchors(e, src, dst)
@@ -597,10 +522,6 @@ def render_edge(e: Edge, d: Diagram) -> str:
 
 def render_component(c: Component) -> str:
     cx, cy = c.pos
-
-    # BPMN glyphs draw their own geometry (no icon lookup) — see bpmn_shapes.
-    if c.shape.startswith("bpmn-"):
-        return bpmn_shapes.render_component(c)
 
     icon_svg = get_icon(c.icon)
 
@@ -707,26 +628,30 @@ def render(d: Diagram, animate: bool = False) -> str:
     the motion. All static SVG viewers (browsers, Figma, Inkscape)
     will render it correctly — non-animating viewers show a dashed
     line frozen at offset 0."""
+    # An un-laid-out `bpmn { }` block must be resolved (via the layout pass) before
+    # rendering — refuse rather than emit an empty canvas.
     if getattr(d, "bpmn_blocks", None):
-        raise NotImplementedError(
-            "bpmn { } block layout is not implemented yet (planned for P2)"
+        raise ValueError(
+            "diagram still carries un-laid-out bpmn { } blocks; run the layout pass first"
         )
+
+    # BPMN diagrams render via the Rust core (the single source of truth). The DSL
+    # `bpmn { }` blocks are resolved to bpmn-* components before render, so detect by
+    # shape / waypoint edges / pool|lane regions and delegate the whole SVG.
+    if (
+        any(c.shape.startswith("bpmn-") for c in d.components)
+        or any(getattr(e, "points", None) for e in d.edges)
+        or any(getattr(r, "style", "") in ("pool", "lane") for r in d.regions)
+    ):
+        from ._core import render_bpmn
+        return render_bpmn(d, animate=animate)
+
     region_rects  = "\n  ".join(render_region_rect(r)  for r in d.regions)
     region_labels = "\n  ".join(render_region_label(r) for r in d.regions)
     edges         = "\n  ".join(render_edge(e, d)      for e in d.edges)
     comps         = "\n  ".join(render_component(c)    for c in d.components)
 
-    # Inject BPMN styles/markers only when the diagram actually uses them,
-    # so non-BPMN output stays byte-identical (and lean).
-    has_bpmn = (
-        any(c.shape.startswith("bpmn-") for c in d.components)
-        or any(getattr(e, "points", None) for e in d.edges)
-        or any(getattr(r, "style", "") in ("pool", "lane") for r in d.regions)
-    )
-    bpmn_style = bpmn_shapes.BPMN_STYLE if has_bpmn else ""
-    bpmn_defs  = bpmn_shapes.BPMN_DEFS  if has_bpmn else ""
-
-    style = STYLE + bpmn_style + (ANIM_STYLE if animate else "")
+    style = STYLE + (ANIM_STYLE if animate else "")
 
     # Page auto-layout: title/subtitle stack at top, content below.
     # Content is translated DOWN by title_block_h so its DSL coordinates
@@ -750,7 +675,7 @@ def render(d: Diagram, animate: bool = False) -> str:
      style="max-width: 100%; height: auto"
      font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
   <style>{style}</style>
-  <defs>{DEFS}{bpmn_defs}</defs>
+  <defs>{DEFS}</defs>
 
   <rect width="{d.width}" height="{total_height}" fill="#fafafa"/>
   <rect width="{d.width}" height="{total_height}" class="bg-grid"/>
