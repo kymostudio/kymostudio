@@ -187,6 +187,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
+          skip-existing: true   # idempotent: a re-run after this version is published is a no-op
 
   # ── Publish wasm package to npm (token + OIDC provenance) ──
   publish-npm:
@@ -210,8 +211,13 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Build wasm package
         run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
-      - name: Publish to npm
+      - name: Publish to npm (idempotent — already-published is treated as success)
         working-directory: packages/rust/kymostudio-core/pkg
-        run: npm publish --provenance --access public
+        run: |
+          if npm publish --provenance --access public 2>publish.err; then exit 0; fi
+          if grep -qiE "cannot publish over|previously published|E409|403" publish.err; then
+            echo "::warning::kymostudio-core already on npm — treating as published."; exit 0
+          fi
+          cat publish.err >&2; exit 1
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

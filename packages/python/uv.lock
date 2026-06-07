@@ -66,15 +66,15 @@ dev = [
 
 [[package]]
 name = "kymostudio-core"
-version = "0.4.0"
+version = "0.4.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/84/ea/119a19e8a32e2296e5a9839c143fc0b93570402e28e3859a5a5e6a1c5341/kymostudio_core-0.4.0.tar.gz", hash = "sha256:dbd23169386f27f4c427a41a3e332ce8fa5df8e72fb930b365913a6c921fb8d1", size = 18120, upload-time = "2026-06-06T16:22:46.266Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/83/dc/ab5403ca4ad178b6d81c0e8225fc18032183011ebfd49f5dda423b8307df/kymostudio_core-0.4.2.tar.gz", hash = "sha256:ae2766880f4a9d3127280648a6771d80d6363d3d428a12f5e151413f19c157da", size = 55421, upload-time = "2026-06-07T02:11:49.223Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f6/4a/0478cbebebefe9d29cca13225e4d2c162d059b08070102e1b5dc8d8d7200/kymostudio_core-0.4.0-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:2df11687e50df7f4eb65b73270455bd57a67238283933afd736e98aad3473529", size = 2620752, upload-time = "2026-06-06T16:22:35.484Z" },
-    { url = "https://files.pythonhosted.org/packages/ca/08/2604dc48aebe1a460715e85ab689e821a7e487539c4448f3a70e1977a00d/kymostudio_core-0.4.0-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:c96e474d4e6d7cb107240760d4b7637e46ae4d6d8400cf8af5e5b87a7f6057f1", size = 2447754, upload-time = "2026-06-06T16:22:37.51Z" },
-    { url = "https://files.pythonhosted.org/packages/4b/91/ae99ae6374418d2821424684a464af0276d2359082dac4ce1050fcac7f21/kymostudio_core-0.4.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0bfe9a5cd31f251b97277454ad69a44d9b85b5a860ec2bb32dcb0153390dced6", size = 2566542, upload-time = "2026-06-06T16:22:39.532Z" },
-    { url = "https://files.pythonhosted.org/packages/1b/cc/21f1d41c9ded7cb495b58095cf55de433b0e1b6f08b4bc313f7c59f719d8/kymostudio_core-0.4.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:eaab90dc91422694a6846390e5ab631976f582b98964f5c206bc673f06d84b36", size = 2717833, upload-time = "2026-06-06T16:22:42.475Z" },
-    { url = "https://files.pythonhosted.org/packages/d0/4e/30b4e1d37660699d80fb57b01b2a54472c9e03c1d0fe1e268f3e8c4772b1/kymostudio_core-0.4.0-cp310-abi3-win_amd64.whl", hash = "sha256:fe16a2261f53fa3149c48e6c5410f7d5437879742b4311e1c38077396185ff2e", size = 2619975, upload-time = "2026-06-06T16:22:44.497Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/a0/7687c0e371ac5e0ecace043b0e4b1ee82919947845305973a6be2ceda804/kymostudio_core-0.4.2-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:e2e89c86a5979f86a85fcda868ece0fc0eb4e66eb83dfa2a76da3ca17a792e46", size = 2842898, upload-time = "2026-06-07T02:11:41.015Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/b0/2ec14ccbc0d29bb33922fb25553d537c4d0723232eef48d616fce203e0ba/kymostudio_core-0.4.2-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:243114f79d4ff10fc563a534f254f13c1860bdb3991e8765116b0fb1d7e43780", size = 2658820, upload-time = "2026-06-07T02:11:42.952Z" },
+    { url = "https://files.pythonhosted.org/packages/19/bd/b6a382a6a3387fe90d70bc7f171de432d24c3c83513ab1b33cf727acec46/kymostudio_core-0.4.2-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e7a35365b6b2a9a69cf14ccd93d888dacae30b74da49edd371f7bc8bb11c89f6", size = 2775463, upload-time = "2026-06-07T02:11:44.537Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/d4/548c4ff52f3740810c7e1eeb935b6f2a211ed13663be41216824eeb0c919/kymostudio_core-0.4.2-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:404a3a8f10a579cf9758cb860b168c2178f8256f57f32fcc12242ad86834d299", size = 2943198, upload-time = "2026-06-07T02:11:46.194Z" },
+    { url = "https://files.pythonhosted.org/packages/da/77/c9d1962955b4eca481fe4ef614fd339fb7107c882772c536a1348fb89595/kymostudio_core-0.4.2-cp310-abi3-win_amd64.whl", hash = "sha256:62722a6dd9288a11caaa4be7d0528e3aca9802fb506c7617e84d0652ba1ca65f", size = 2852069, upload-time = "2026-06-07T02:11:47.608Z" },
 ]
 
 [[package]]
