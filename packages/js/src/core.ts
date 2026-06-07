@@ -17,9 +17,10 @@ import initWasm, {
   bpmnExport,
   bpmnLayout as wasmBpmnLayout,
   bpmnRender,
+  mermaidToKymoJson,
 } from "kymostudio-core";
 
-import { modelFromDict } from "./from-kymojson.js";
+import { modelFromDict, parseKymoJson } from "./from-kymojson.js";
 import type { BpmnBlock, Diagram } from "./model.js";
 import { modelDict } from "./to-kymojson.js";
 
@@ -74,6 +75,14 @@ export function coreParseBpmn(xml: string): Diagram {
 export function coreToBpmn(d: Diagram): string {
   ensureReady();
   return bpmnExport(JSON.stringify(modelDict(d)));
+}
+
+/** Mermaid source (flowchart) → resolved `Diagram`. The core lays the graph
+ *  out and returns a `.kymo.json` envelope, so the result is already
+ *  positioned — render it directly (no layout/alignment pass), like BPMN. */
+export function coreMermaidImport(src: string): Diagram {
+  ensureReady();
+  return parseKymoJson(mermaidToKymoJson(src));
 }
 
 /** Resolve a diagram's `bpmn { }` blocks in place (mirrors the old `bpmnLayout`). */

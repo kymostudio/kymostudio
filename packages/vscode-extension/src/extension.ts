@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
       void vscode.window.showInformationMessage(
-        "kymostudio: open a .bpmn or .kymo file first.",
+        "kymostudio: open a .bpmn, .kymo or .mmd file first.",
       );
       return;
     }
@@ -56,9 +56,9 @@ async function exportActive(): Promise<void> {
     return;
   }
   const ext = extname(editor.document.uri);
-  if (ext !== ".bpmn" && ext !== ".kymo") {
+  if (ext !== ".bpmn" && ext !== ".kymo" && ext !== ".mmd" && ext !== ".mermaid") {
     void vscode.window.showWarningMessage(
-      "kymostudio: open a .bpmn or .kymo file to export.",
+      "kymostudio: open a .bpmn, .kymo or .mmd file to export.",
     );
     return;
   }

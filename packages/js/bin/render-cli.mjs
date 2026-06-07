@@ -66,14 +66,16 @@ async function renderToSvg(input) {
   const lib = await import("../dist/index.js");
   const text = readFileSync(input, "utf-8");
   const low = input.toLowerCase();
-  // BPMN import + `bpmn { }` layout (in .bpmn / .kymo) delegate to the wasm core,
-  // which must be initialized before the synchronous parse calls.
-  if (low.endsWith(".bpmn") || low.endsWith(".kymo")) await initCore(lib);
+  const isMermaid = low.endsWith(".mmd") || low.endsWith(".mermaid");
+  // BPMN import + `bpmn { }` layout (in .bpmn / .kymo) and Mermaid import all
+  // delegate to the wasm core, which must be initialized before the calls.
+  if (low.endsWith(".bpmn") || low.endsWith(".kymo") || isMermaid) await initCore(lib);
   let diagram;
   if (low.endsWith(".bpmn")) diagram = lib.parseBpmn(text);
   else if (low.endsWith(".json")) diagram = lib.parseKymoJson(text);
+  else if (isMermaid) diagram = lib.parseMermaid(text);
   else if (low.endsWith(".kymo")) diagram = lib.parseDiagram(text);
-  else throw new Error(`unsupported source: ${input} (expected .kymo, .kymo.json, .bpmn or .svg)`);
+  else throw new Error(`unsupported source: ${input} (expected .kymo, .kymo.json, .bpmn, .mmd or .svg)`);
   return lib.renderSVG(diagram);
 }
 

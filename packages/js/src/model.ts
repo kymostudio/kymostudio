@@ -11,6 +11,9 @@ export type Point = [number, number];
 
 export type Shape =
   | "circle" | "cube" | "cube-big" | "box" | "cylinder" | "hex"
+  // Mermaid flowchart decision node (`{...}`); icon-less, drawn as a
+  // rotated square by the icon-less render path.
+  | "diamond"
   | "annotation" | "aws-tile" | "aws-tile-hero" | "badge" | "image"
   // ── BPMN 2.0 glyphs (see bpmn-shapes.ts) ──────────────────────────
   // Imported from .bpmn files; size comes from the file's Diagram-
@@ -29,6 +32,7 @@ export const SHAPE_HALF: Record<Shape, Point> = {
   "box":           [35, 35],
   "cylinder":      [35, 35],
   "hex":           [35, 32],   // flat-top hexagon — wider than tall
+  "diamond":       [40, 28],   // fallback only — Mermaid always sets size
   "annotation":    [0, 0],
   "aws-tile":      [32, 32],
   "aws-tile-hero": [40, 40],
@@ -54,6 +58,7 @@ export const LABEL_HEIGHT: Record<Shape, number> = {
   "box":           38,
   "cylinder":      38,
   "hex":           40,
+  "diamond":       0,          // icon-less: label sits inside the glyph
   "annotation":    0,
   "aws-tile":      48,
   "aws-tile-hero": 48,
@@ -287,7 +292,10 @@ export function anchor(node: Component | Region, side: Side): Point {
 function componentAnchor(c: Component, side: Side): Point {
   const [cx, cy] = c.pos;
   const [hw, hh] = componentHalf(c);
-  const labelled = (c.name && c.name.length > 0) || (c.subtitle && c.subtitle.length > 0);
+  // Icon-less nodes (Mermaid flowchart) carry their label INSIDE the glyph,
+  // so there is no label band below — the bottom anchor stays flush. Only
+  // icon-bearing nodes push past the label.
+  const labelled = !!c.icon && ((c.name && c.name.length > 0) || (c.subtitle && c.subtitle.length > 0));
   const lh = labelled ? (LABEL_HEIGHT[c.shape] || 0) : 0;
   switch (side) {
     case "top":    return [cx, cy - hh];

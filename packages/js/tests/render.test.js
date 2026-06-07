@@ -39,3 +39,31 @@ test("renderSVG honours a transparent background", async () => {
   const svg = await renderSVG(makeDiagram({ components: [a] }), { background: null });
   assert.ok(!svg.includes('fill="#f8fafc"'));
 });
+
+// ── Icon-less flowchart nodes (Mermaid imports) ───────────────────────
+
+function flowchartSample() {
+  // Six icon-less shapes the Mermaid importer emits, each sized explicitly.
+  const shapes = ["box", "circle", "cylinder", "badge", "hex", "diamond"];
+  const comps = shapes.map((s, i) =>
+    makeComponent({ id: s, name: s, icon: "", shape: s, pos: [80 + i * 120, 100], size: [86, 50] }));
+  return makeDiagram({ components: comps });
+}
+
+test("renderSVG draws icon-less flowchart shapes with inner labels", async () => {
+  const svg = await renderSVG(flowchartSample());
+  assert.match(svg, /<rect class="fc-shape"/);          // box / badge
+  assert.match(svg, /<ellipse class="fc-shape"/);       // circle
+  assert.match(svg, /<polygon class="fc-shape"/);       // hex / diamond
+  assert.match(svg, /<path class="fc-shape"/);          // cylinder body
+  assert.match(svg, /<text class="fc-label"[^>]*>diamond<\/text>/);
+  // labels sit inside via .fc-label, not the below-the-icon .label class
+  assert.ok(!svg.includes('class="label"'), "no below-glyph labels");
+});
+
+test("renderSVG injects flowchart CSS only when nodes are icon-less", async () => {
+  const fc = await renderSVG(flowchartSample());
+  assert.match(fc, /\.fc-shape \{/, "flowchart CSS present for icon-less nodes");
+  const iconed = await renderSVG(sample());             // all icon-bearing
+  assert.ok(!iconed.includes(".fc-shape"), "no flowchart CSS for icon-bearing diagrams");
+});

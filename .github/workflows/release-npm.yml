@@ -48,8 +48,21 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+      # The TS build imports `mermaidToKymoJson` (+ BPMN bindings) from the core's
+      # type defs, so it must build against the local core — the published npm core
+      # may lag this release (core + JS publish in parallel, no ordering). Build &
+      # link the local wasm pkg before `npm run build`, mirroring test.yml.
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - name: Build the local kymostudio-core wasm pkg (engine bindings)
+        working-directory: packages/rust/kymostudio-core
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
       - name: Install deps
         run: npm ci
+      - name: Link the locally-built core
+        run: npm install --no-save ../rust/kymostudio-core/pkg
       - name: Build (TypeScript -> dist/)
         run: npm run build
       - name: Publish to npm

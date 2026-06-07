@@ -78,8 +78,17 @@ def test_component_anchor_bottom_includes_label_band():
     LABEL_HEIGHT so edges don't cross the label text."""
     c = _c(100, 100, shape="image")
     c.name = "labelled"                         # opt-in to label band
+    c.icon = "files"                            # icon-bearing → label below
     # 100 + 32 (half_h) + 26 (label_height for image) = 158
     assert c.anchor("bottom") == (100, 158)
+
+
+def test_component_anchor_bottom_iconless_flush():
+    """An icon-less node (Mermaid flowchart) carries its label INSIDE the
+    glyph, so even when named the bottom anchor stays flush — no band."""
+    c = _c(100, 100, shape="box")               # half=(35, 35), icon=""
+    c.name = "Decision"                         # label is drawn inside
+    assert c.anchor("bottom") == (100, 135)     # 100 + 35, no label band
 
 
 def test_component_anchor_bottom_no_label_flush_with_icon():
