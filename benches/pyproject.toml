@@ -21,6 +21,23 @@ svg2png = [
     "svglib>=1.5",    # ReportLab renderPM
     "reportlab>=4.0",
 ]
+# Comparison converters for the svg2pdf bench — each is benchmarked against kymo's
+# own svg2pdf core (`kymo … out.pdf`, needs kymostudio-core>=0.4). PDFs are
+# rasterized with PyMuPDF for the fidelity comparison; the librsvg engine shells
+# out to `rsvg-convert` (Debian/Ubuntu `librsvg2-bin`, not pip-installable). See
+# `benches/svg2pdf/README.md`. Install with: `uv sync --extra svg2pdf`.
+svg2pdf = [
+    "pymupdf>=1.24",           # rasterize + introspect produced PDFs (MuPDF, bundled)
+    "pillow>=10.0",            # decode the rasterized pages for the comparison
+    "vl-convert-python>=1.0",  # same svg2pdf as kymo → same-engine control
+    "cairosvg>=2.7",           # Cairo svg2pdf
+    "svglib>=1.5",             # ReportLab renderPDF
+    "reportlab>=4.0",
+    "fpdf2>=2.7",              # pure-Python SVG → PDF
+]
+# CLI engines for svg2pdf are system software, NOT pip deps — each skipped if its
+# binary is absent: rsvg-convert (librsvg2-bin), inkscape, libreoffice, and a
+# Chrome/Chromium binary. See benches/svg2pdf/README.md.
 
 [tool.uv.sources]
 kymostudio = { path = "../packages/python", editable = true }

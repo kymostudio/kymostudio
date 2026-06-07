@@ -1,0 +1,133 @@
+{
+  "generated_by": "benches/svg2pdf/perf.py",
+  "environment": {
+    "platform": "Linux-6.8.0-117-generic-x86_64-with-glibc2.39",
+    "python": "3.13.13",
+    "kymo_version": "0.4.1",
+    "cpu_count": 4,
+    "reps": 5,
+    "timestamp": "2026-06-07T02:58:41+00:00"
+  },
+  "corpus": {
+    "items": 30
+  },
+  "engines": [
+    {
+      "key": "kymo",
+      "label": "kymo",
+      "backend": "svg2pdf (kymostudio-core 0.4.1)",
+      "converted": 30,
+      "failed": 0,
+      "total_ms": 645.7,
+      "per_file_median_ms": 14.078,
+      "per_file_p95_ms": 94.156,
+      "throughput_files_per_s": 46.5,
+      "throughput_kb_per_s": 734.5,
+      "speed_vs_kymo": 1.0
+    },
+    {
+      "key": "chrome",
+      "label": "chrome",
+      "backend": "Google Chrome 149.0.7827.53",
+      "converted": 30,
+      "failed": 0,
+      "total_ms": 11695.05,
+      "per_file_median_ms": 368.286,
+      "per_file_p95_ms": 595.012,
+      "throughput_files_per_s": 2.6,
+      "throughput_kb_per_s": 185.4,
+      "speed_vs_kymo": 0.06
+    },
+    {
+      "key": "rsvg-convert",
+      "label": "rsvg-convert",
+      "backend": "rsvg-convert version 2.58.0",
+      "converted": 30,
+      "failed": 0,
+      "total_ms": 1674.78,
+      "per_file_median_ms": 26.977,
+      "per_file_p95_ms": 266.536,
+      "throughput_files_per_s": 17.9,
+      "throughput_kb_per_s": 339.1,
+      "speed_vs_kymo": 0.39
+    },
+    {
+      "key": "inkscape",
+      "label": "inkscape",
+      "backend": "Inkscape 1.2.2 (b0a8486541, 2022-12-01)",
+      "converted": 30,
+      "failed": 0,
+      "total_ms": 6479.28,
+      "per_file_median_ms": 216.298,
+      "per_file_p95_ms": 245.31,
+      "throughput_files_per_s": 4.6,
+      "throughput_kb_per_s": 46.7,
+      "speed_vs_kymo": 0.1
+    },
+    {
+      "key": "libreoffice",
+      "label": "libreoffice",
+      "backend": "LibreOffice 24.2.7.2 420(Build:2)",
+      "converted": 30,
+      "failed": 0,
+      "total_ms": 52316.81,
+      "per_file_median_ms": 1518.6,
+      "per_file_p95_ms": 4175.855,
+      "throughput_files_per_s": 0.6,
+      "throughput_kb_per_s": 10.5,
+      "speed_vs_kymo": 0.01
+    },
+    {
+      "key": "vl-convert",
+      "label": "vl-convert",
+      "backend": "svg2pdf (vl-convert 1.9.0.post1)",
+      "converted": 30,
+      "failed": 0,
+      "total_ms": 1149.89,
+      "per_file_median_ms": 23.086,
+      "per_file_p95_ms": 158.922,
+      "throughput_files_per_s": 26.1,
+      "throughput_kb_per_s": 419.5,
+      "speed_vs_kymo": 0.56
+    },
+    {
+      "key": "cairosvg",
+      "label": "cairosvg",
+      "backend": "Cairo (2.9.0)",
+      "converted": 30,
+      "failed": 0,
+      "total_ms": 73.36,
+      "per_file_median_ms": 2.244,
+      "per_file_p95_ms": 3.674,
+      "throughput_files_per_s": 409.0,
+      "throughput_kb_per_s": 380.3,
+      "speed_vs_kymo": 8.8
+    },
+    {
+      "key": "svglib",
+      "label": "svglib",
+      "backend": "reportlab renderPDF (4.5.1, svglib 1.6.0)",
+      "converted": 0,
+      "failed": 30,
+      "total_ms": 0,
+      "per_file_median_ms": null,
+      "per_file_p95_ms": null,
+      "throughput_files_per_s": 0.0,
+      "throughput_kb_per_s": 0.0,
+      "speed_vs_kymo": null
+    },
+    {
+      "key": "fpdf2",
+      "label": "fpdf2",
+      "backend": "fpdf2 (2.8.7)",
+      "converted": 27,
+      "failed": 3,
+      "total_ms": 158.11,
+      "per_file_median_ms": 5.495,
+      "per_file_p95_ms": 8.699,
+      "throughput_files_per_s": 170.8,
+      "throughput_kb_per_s": 278.8,
+      "speed_vs_kymo": null
+    }
+  ]
+}
