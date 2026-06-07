@@ -109,9 +109,9 @@ jobs:
           workspaces: packages/rust/kymostudio-core
       - name: Cargo build (wasm32)
         run: cargo build --lib --release --no-default-features --features wasm --target wasm32-unknown-unknown
-      - uses: jetli/wasm-pack-action@v0.4.0
+      - uses: taiki-e/install-action@v2
         with:
-          version: 'latest'
+          tool: wasm-pack
       - name: wasm-pack build (browser + Node)
         run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
       - name: Check generated JS/TS glue exists
