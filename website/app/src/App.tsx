@@ -92,9 +92,13 @@ export function App() {
   async function render(src: string, th: Theme, tr: boolean): Promise<void> {
     const token = ++renderToken.current;
     try {
-      await init(); // BPMN import/layout delegate to the wasm core (idempotent, cached)
-      if (token !== renderToken.current) return;
       const bpmn = isBpmn(src);
+      // BPMN (and `bpmn { }` blocks in a .kymo) delegate to the wasm core — load it
+      // only then, so plain .kymo diagrams stay pure-JS (no wasm fetch).
+      if (bpmn || /\bbpmn\s*\{/.test(src)) {
+        await init();
+        if (token !== renderToken.current) return;
+      }
       const parsed = bpmn ? parseBpmn(src) : parseDiagram(src);
       const out = await renderSVG(parsed, { background: svgBackground(th, tr) });
       if (token !== renderToken.current) return; // a newer keystroke superseded us

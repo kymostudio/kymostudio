@@ -39,6 +39,16 @@ jobs:
       - name: Install JS-package deps
         run: npm ci
         working-directory: packages/js
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - name: Build the local kymostudio-core wasm pkg (BPMN engine)
+        working-directory: packages/rust/kymostudio-core
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
+      - name: Link the locally-built core into packages/js
+        working-directory: packages/js
+        run: npm install --no-save ../rust/kymostudio-core/pkg
       - name: Build the playground bundle (js + js-canvas → esbuild)
         run: ./build.sh # builds packages/js + packages/js-canvas dist, npm ci (app), esbuild → kymo.bundle.js
         working-directory: website/app
