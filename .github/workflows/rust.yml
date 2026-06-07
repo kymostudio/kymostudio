@@ -36,7 +36,7 @@ jobs:
     name: Format & clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -69,7 +69,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
@@ -100,7 +100,7 @@ jobs:
     name: wasm build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
@@ -120,7 +120,7 @@ jobs:
           test -f pkg/kymostudio_core_bg.wasm
           test -f pkg/kymostudio_core.d.ts
           echo "wasm pkg OK"; ls -la pkg
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wasm-pkg
           path: packages/rust/kymostudio-core/pkg
@@ -134,8 +134,8 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.10'
       - name: Build abi3 wheel (maturin)
@@ -167,7 +167,7 @@ jobs:
           assert '"format": "kymo.json"' in j and '"shape": "diamond"' in j, "bad kymo.json"
           print("kymostudio-core", k.__version__, "->", len(png), "png bytes; BPMN fns OK;", len(j), "json bytes OK")
           PY
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheel-${{ matrix.os }}
           path: packages/rust/kymostudio-core/dist/*.whl
