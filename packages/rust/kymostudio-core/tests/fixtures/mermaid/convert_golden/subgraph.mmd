@@ -1,0 +1,15 @@
+flowchart TD
+  Start["Start"]
+  A["Fetch"]
+  B["Transform"]
+  C["Write"]
+  End["Done"]
+  subgraph G ["Worker Pool"]
+    A
+    B
+    C
+  end
+  Start --> A
+  A --> B
+  B --> C
+  C --> End

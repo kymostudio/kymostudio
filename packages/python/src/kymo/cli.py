@@ -1,8 +1,8 @@
 """Entry point: `kymo <path> [out.png] [--animate] [--figma] [--excalidraw]`
 
-Argument is a path to a `.kymo` (DSL), `.bpmn` (BPMN 2.0 XML), `.py`
-(Python form), or `.svg` source. Output is a SVG (or Figma Plugin JS /
-Excalidraw scene / PNG) written next to the input file:
+Argument is a path to a `.kymo` (DSL), `.bpmn` (BPMN 2.0 XML), `.mmd`
+(Mermaid flowchart), `.py` (Python form), or `.svg` source. Output is a SVG
+(or Figma Plugin JS / Excalidraw scene / PNG) written next to the input file:
 
     kymo samples/aws_1.kymo                → samples/aws_1.svg
     kymo samples/aws_1.kymo --animate      → samples/aws_1-animated.svg
@@ -11,6 +11,7 @@ Excalidraw scene / PNG) written next to the input file:
     kymo samples/aws_1.kymo --json         → samples/aws_1.kymo.json
     kymo samples/aws_1.kymo.json               → samples/aws_1.svg
     kymo samples/order.bpmn                    → samples/order.svg
+    kymo samples/approval.mmd                  → samples/approval.svg
 
 A second positional `*.png` path (or a `.svg` source) rasterizes to PNG
 via resvg (kymostudio-core); optional `--scale N` / `-s N` (1.0 = intrinsic).
@@ -79,6 +80,10 @@ def load(source: Path) -> tuple[object, object | None, object | None]:
         from .from_kymojson import parse as parse_kymojson
         # .kymo.json holds a fully-resolved model — already positioned, no layout.
         return parse_kymojson(source.read_text(encoding="utf-8")), None, None
+    if source.suffix in (".mmd", ".mermaid"):
+        from ._core import import_mermaid
+        # Mermaid flowcharts are laid out by the core — already positioned, no layout.
+        return import_mermaid(source.read_text(encoding="utf-8")), None, None
     if source.suffix == ".kymo":
         return parse_dsl(source.read_text(encoding="utf-8"))
     # For .py sources, the file's parent directory must be on sys.path so the
@@ -143,12 +148,19 @@ def _load_resolved(src: Path):
     """
     diagram, layout_spec, external_layout = load(src)
     had_bpmn = bool(getattr(diagram, "bpmn_blocks", None))
+    had_flowchart = bool(getattr(diagram, "flowchart_blocks", None))
     if had_bpmn:
         from ._core import apply_layout
         apply_layout(diagram)
+    if had_flowchart:
+        from ._core import resolve_flowchart_blocks
+        resolve_flowchart_blocks(diagram)
     if layout_spec:
         layout(diagram, layout_spec, external_layout)
-    if src.suffix not in (".bpmn", ".json") and not had_bpmn:
+    # `flowchart { }` blocks arrive pre-resolved from the core (like .mmd), so
+    # they skip the alignment pass too.
+    if (src.suffix not in (".bpmn", ".json", ".mmd", ".mermaid")
+            and not had_bpmn and not had_flowchart):
         resolve_alignments(diagram)
     return diagram
 
@@ -234,8 +246,8 @@ def main() -> None:
     if not src.exists():
         print(f"not found: {src}")
         sys.exit(1)
-    if src.suffix not in (".kymo", ".py", ".bpmn", ".json", ".svg"):
-        print(f"unsupported source: {src} (expected .kymo, .kymo.json, .bpmn, .py or .svg)")
+    if src.suffix not in (".kymo", ".py", ".bpmn", ".json", ".svg", ".mmd", ".mermaid"):
+        print(f"unsupported source: {src} (expected .kymo, .kymo.json, .bpmn, .mmd, .py or .svg)")
         sys.exit(1)
 
     # Raster/convert path: `kymo in.svg out.png`, `kymo in.kymo out.pdf`, etc.

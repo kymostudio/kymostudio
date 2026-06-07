@@ -40,18 +40,32 @@ Python `from_kymojson`/`to_kymojson`.
 
 ## Phase 2 — Python/JS rendering parity
 
-Make the kymojson actually render:
+Status: **implemented** (Python + JS). Make the kymojson actually render:
 
-- Add the **`diamond`** glyph to Python `to_svg` and JS `render`; add `diamond` to
-  the `Shape` literals and `SHAPE_HALF`/sizing tables.
-- Teach both renderers to draw **icon-less labelled shapes** (flowchart nodes carry
-  no icon; today `render_component` requires one).
-- Wire the binding: Python `from_mermaid`/CLI `.mmd` dispatch via
-  `_kymostudio_core.mermaid_to_kymojson` → `from_kymojson`; JS equivalent via wasm;
-  vscode-extension `.mmd` dispatch.
-- Two-release core rollout if a new core API floor is required (see the repo's
-  caret-floor convention).
-- Render the Phase-1 fixtures to golden SVGs.
+- ✅ Added the **`diamond`** glyph to the `Shape` literal/union and
+  `SHAPE_HALF`/`LABEL_HEIGHT` in both `model.py` and `model.ts`.
+- ✅ Both renderers (`to_svg.py`, `render.ts`) gained a **flowchart-node draw path**:
+  icon-less labelled shapes draw the outline (box / rounded / circle / diamond /
+  hex / cylinder / stadium) with the label **inside**, gated on `icon == ""` and
+  behind conditional CSS so existing goldens stay byte-identical. `anchor()` no
+  longer adds a label band for icon-less nodes. Excalidraw export draws native
+  rectangle/ellipse/diamond for these too.
+- ✅ Wired the binding: Python `_core.import_mermaid` + CLI `.mmd`/`.mermaid`
+  dispatch (`cli.py`); JS `core.coreParseMermaid` → `parseMermaid` export +
+  `bin/kymo.mjs` dispatch (via wasm `mermaidToKymoJson`).
+- ✅ Native **`flowchart [DIR] { … }` DSL block** (body = Mermaid syntax) in both
+  `dsl.py` and `dsl.ts`, resolved through the core (mirrors `bpmn { }`). Spec:
+  KYMO-DSL grammar §6.11.
+- ✅ Tests: `packages/python/tests/test_mermaid.py`, `packages/js/tests/mermaid.test.js`
+  (structural — the two impls render independently; the Rust `.kymo.json` goldens
+  remain the byte-exact import contract). Skip-guarded on the Python side when the
+  installed core predates the Mermaid binding.
+- **Two-release core rollout (in progress).** The Mermaid binding is a *new* core
+  API not yet in the published wheel/npm. Per the caret-floor convention, this
+  delivery degrades gracefully on an older core (Python tests skip; the render path
+  errors clearly), and a `flowchart` conformance sample + golden SVGs are deferred
+  until the core that ships the binding is released and the Python/JS floors raised.
+- vscode-extension `.mmd` dispatch: still pending.
 
 ## Phase 3+ — More diagram types (per module)
 

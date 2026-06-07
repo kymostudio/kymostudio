@@ -405,12 +405,41 @@ def region_label_to_excalidraw(r: Region) -> dict | None:
     )
 
 
+def _flowchart_node_excalidraw(c: Component, gid: str) -> list[dict]:
+    """Icon-less flowchart node (Mermaid import) → a native Excalidraw shape
+    (rectangle / ellipse / diamond) sized to `c.size` with a centered interior
+    label. Excalidraw has no hexagon/cylinder/stadium, so those fall back to a
+    (rounded) rectangle."""
+    cx, cy = c.pos
+    hw, hh = c.half
+    type_ = {"circle": "ellipse", "diamond": "diamond"}.get(c.shape, "rectangle")
+    glyph = _base(
+        type_, cx - hw, cy - hh, 2 * hw, 2 * hh,
+        stroke="#4b6b8a", fill="#eef4ff",
+        rounded=c.shape in ("box", "badge"), group_ids=[gid],
+    )
+    _anchor_eid[c.id] = glyph["id"]
+    out: list[dict] = [glyph]
+    if c.name:
+        out.append(_text(
+            cx - hw, cy - 9, 2 * hw, 18,
+            c.name, color=TEXT_PRIMARY, size=13, align="center", bold=True,
+            group_ids=[gid],
+        ))
+    return out
+
+
 def component_to_excalidraw(c: Component) -> list[dict]:
     """Returns 1–3 elements (icon image + optional name + optional subtitle).
     All share one group id so the user can move them together in Excalidraw."""
     cx, cy = c.pos
     hw, hh = c.half
     gid = f"g-{c.id}"
+
+    # Icon-less flowchart nodes draw a native shape outline with an interior
+    # label instead of an embedded icon image.
+    if not c.icon:
+        return _flowchart_node_excalidraw(c, gid)
 
     # Icon as an embedded SVG image — centred on (cx, cy).
     file_id, iw, ih = _register_icon(c.icon, c.shape)

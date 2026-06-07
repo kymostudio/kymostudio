@@ -12,6 +12,7 @@ use resvg::{tiny_skia, usvg};
 // The shared diagram engine — pure Rust, no SVG deps. Mermaid import parses
 // into [`model::Diagram`], lays it out, and serializes to the `.kymo.json`
 // interchange format the Python/JS front-ends consume.
+pub mod flowchart;
 pub mod kymojson;
 pub mod layout;
 pub mod mermaid;
@@ -127,6 +128,25 @@ pub fn mermaid_to_kymojson(src: &str) -> Result<String, mermaid::MermaidError> {
     let fc = mermaid::parse(src)?;
     let diagram = layout::layout_flowchart(&fc);
     Ok(kymojson::export(&diagram))
+}
+
+/// Convert Mermaid flowchart source to another text DSL via the flowchart IR.
+///
+/// `mmd → {mermaid, d2, dot}` is a parse-then-emit with no layout in between —
+/// the target lays the graph out itself. `to_mermaid` round-trips/normalizes the
+/// source. See [`flowchart::emit`].
+pub fn mermaid_to_d2(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(flowchart::emit::to_d2(&mermaid::parse(src)?))
+}
+
+/// Convert Mermaid flowchart source to Graphviz DOT (via the flowchart IR).
+pub fn mermaid_to_dot(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(flowchart::emit::to_dot(&mermaid::parse(src)?))
+}
+
+/// Round-trip / normalize Mermaid flowchart source through the IR.
+pub fn mermaid_to_mermaid(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(flowchart::emit::to_mermaid(&mermaid::parse(src)?))
 }
 
 #[cfg(test)]

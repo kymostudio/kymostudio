@@ -31,10 +31,17 @@ keywords:
 golden + unit + determinism tests; `samples/pipeline.mmd`, `samples/approval.mmd`
 (+ their `.kymo.json`); CLI/wheel smoke in `rust.yml`.
 
+**Phase 2 — rendering parity (implemented, Python + JS):** `diamond` glyph +
+icon-less flowchart-node draw path (outline + interior label) in `to_svg.py` /
+`render.ts`; `.mmd` CLI dispatch + `import_mermaid`/`parseMermaid` binding wiring;
+native `flowchart [DIR] { … }` DSL block (grammar §6.11). Tests:
+`test_mermaid.py`, `mermaid.test.js`. Golden SVGs + a `flowchart` conformance
+sample are deferred until the core that ships the Mermaid binding is released
+(two-release rollout).
+
 **Follow-ups (tracked in PLAN-MERMAID-001):**
 
-- Rendering parity: `diamond` glyph + icon-less labelled shapes in Python/JS
-  renderers; binding wiring; golden SVGs.
 - Grammar reach: inline `-- text --` edge labels; `&` multi-node statements;
-  `class`/`style` directives (ignored today); link/edge id syntax.
+  `class`/`style` directives (ignored today); link/edge id syntax;
+  parallelogram/trapezoid shapes; frontmatter.
 - Layout: optional subgraph-aware clustering if bounding-box regions look loose.

@@ -7,6 +7,7 @@
 //!     bpmnImport(xml): string   bpmnExport(json): string
 //!     bpmnLayout(blocksJson): string   bpmnRender(json, animate?, background?): string
 //!     mermaidToKymoJson(src: string): string
+//!     mermaidToD2(src): string   mermaidToDot(src): string   mermaidToMermaid(src): string
 
 use wasm_bindgen::prelude::*;
 
@@ -67,6 +68,24 @@ pub fn bpmn_render(
 #[wasm_bindgen(js_name = mermaidToKymoJson)]
 pub fn mermaid_to_kymojson(src: &str) -> Result<String, JsError> {
     crate::mermaid_to_kymojson(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Convert Mermaid flowchart source → D2 (via the flowchart IR).
+#[wasm_bindgen(js_name = mermaidToD2)]
+pub fn mermaid_to_d2(src: &str) -> Result<String, JsError> {
+    crate::mermaid_to_d2(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Convert Mermaid flowchart source → Graphviz DOT (via the flowchart IR).
+#[wasm_bindgen(js_name = mermaidToDot)]
+pub fn mermaid_to_dot(src: &str) -> Result<String, JsError> {
+    crate::mermaid_to_dot(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Round-trip / normalize Mermaid flowchart source through the IR.
+#[wasm_bindgen(js_name = mermaidToMermaid)]
+pub fn mermaid_to_mermaid(src: &str) -> Result<String, JsError> {
+    crate::mermaid_to_mermaid(src).map_err(|e| JsError::new(&e.to_string()))
 }
 
 /// The crate version, exposed to JS as `version()`.

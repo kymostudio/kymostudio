@@ -1,0 +1,12 @@
+digraph G {
+  rankdir=LR;
+  node [fontsize=12];
+  A [label="Init", shape=box];
+  B [label="Check", shape=box];
+  C [label="Work", shape=box];
+  D [label="Exit", shape=box];
+  A -> B;
+  B -> C;
+  C -> B;
+  C -> D;
+}

@@ -1,0 +1,12 @@
+direction: down
+G: "Worker Pool" {
+  A: "Fetch"
+  B: "Transform"
+  C: "Write"
+}
+Start: "Start"
+End: "Done"
+Start -> G.A
+G.A -> G.B
+G.B -> G.C
+G.C -> End

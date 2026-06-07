@@ -15,7 +15,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::mermaid::{Direction, FlowEdge, Flowchart};
+use crate::flowchart::{Direction, FlowEdge, Flowchart};
 use crate::model::{py_round, Component, Diagram, Edge, Region, Shape};
 
 const H_GAP: f64 = 80.0; // gap between layer columns (main axis)

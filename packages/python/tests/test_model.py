@@ -4,9 +4,11 @@ from __future__ import annotations
 from kymo.model import Component, Edge, resolve_anchors
 
 
-def _c(x: int, y: int, shape: str = "image") -> Component:
+def _c(x: int, y: int, shape: str = "image", icon: str = "cube") -> Component:
+    # A normal icon-bearing component (icon-less nodes are flowchart glyphs,
+    # which anchor flush with no label band — see the icon-less test below).
     return Component(
-        id="c", name="", subtitle="", icon="", shape=shape, accent="green",
+        id="c", name="", subtitle="", icon=icon, shape=shape, accent="green",
         pos=(x, y),
     )
 
@@ -87,4 +89,13 @@ def test_component_anchor_bottom_no_label_flush_with_icon():
     sits flush with the icon's bottom edge (no LABEL_HEIGHT padding)."""
     c = _c(100, 100, shape="image")             # empty name + subtitle
     # 100 + 32 (half_h) = 132 — no label band added.
+    assert c.anchor("bottom") == (100, 132)
+
+
+def test_component_anchor_bottom_iconless_flowchart_no_band():
+    """An icon-less flowchart node carries its label INSIDE the glyph, so even
+    when named the bottom anchor stays flush with the shape edge (no band)."""
+    c = _c(100, 100, shape="image", icon="")    # icon-less → flowchart node
+    c.name = "labelled"
+    # 100 + 32 (half_h) = 132 — label is inside, no band despite the name.
     assert c.anchor("bottom") == (100, 132)

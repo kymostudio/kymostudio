@@ -32,6 +32,10 @@ export { resolveAlignments } from "./alignment.js";
 export {
   init, initSync,
   coreParseBpmn as parseBpmn,
+  coreParseMermaid as parseMermaid,
+  coreMermaidToD2 as mermaidToD2,
+  coreMermaidToDot as mermaidToDot,
+  coreNormalizeMermaid as normalizeMermaid,
   coreToBpmn as toBpmn,
   coreApplyLayout as bpmnLayout,
 } from "./core.js";

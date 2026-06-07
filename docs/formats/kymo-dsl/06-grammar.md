@@ -168,12 +168,13 @@ A conforming parser MUST discriminate body lines in this order (first match wins
 1. `}` alone (possibly with whitespace) — closes the current container.
 2. `row` followed by zero or more ids — grid row (region body only; rejected in layout body or at file scope).
 3. Exactly `bpmn {` (first token `bpmn`) — opens a BPMN process block (file scope only; see §6.9).
-4. A line matching `layout { … }` (first token `layout`, opening and closing its braces on the one line) — anonymous layout tree (file scope only; see §6.10).
-5. Line ending with `{` — container opener; kind selects region vs layout.
-6. Match against the arrow forms `-->` or `==>` — edge (file scope only).
-7. Second token contains `/` — leaf component.
-8. All tokens match the `id` production — bare-id reference list (container body only).
-9. Otherwise — syntax error.
+4. `flowchart [DIR] {` (first token `flowchart`) — opens a flowchart block whose body is Mermaid syntax (file scope only; see §6.11).
+5. A line matching `layout { … }` (first token `layout`, opening and closing its braces on the one line) — anonymous layout tree (file scope only; see §6.10).
+6. Line ending with `{` — container opener; kind selects region vs layout.
+7. Match against the arrow forms `-->` or `==>` — edge (file scope only).
+8. Second token contains `/` — leaf component.
+9. All tokens match the `id` production — bare-id reference list (container body only).
+10. Otherwise — syntax error.
 
 ### 6.7 Edges
 
@@ -217,7 +218,7 @@ start     middle      end
 src       dst         via         route
 label_offset  label_pos  label_at  small  dashed  shared
 auto      over        under       curve       straight  elbow
-bpmn      layout
+bpmn      layout      flowchart
 ```
 
 These tokens SHALL NOT be used as user-defined leaf, container, or icon identifiers. Removed in v2.0: `component`, `region` (no longer keywords — the parser distinguishes by line shape). `layout` remains reserved **only** as the opener of an anonymous layout-tree block (`layout { … }`, clause 6.10), not as a container kind. Within a `bpmn { }` body, the node-kind keywords (`start`, `end`, `end!`, `task`, `xor`, `and`, `or`, `event`, `subprocess`, `note`, `data`, `store`) and the flow arrows (`->`, `~>`, `..>`) are reserved (see §6.9).
@@ -305,6 +306,42 @@ b      box/files/orange "B"      ""
 layout { header , { a | b } }   # Header on top; A and B side-by-side below it.
 ```
 
+### 6.11 Flowchart Blocks
+
+A `flowchart [DIR] { … }` block authors a flowchart in a *positionless*,
+auto-laid-out form. Its body is **Mermaid flowchart syntax** — the block reuses
+the shared engine's Mermaid importer (`mermaid_to_kymojson`) rather than a kymo-
+specific node grammar, so any `graph`/`flowchart` body pastes in directly. The
+block is **file scope only**.
+
+```
+flowchart_block = "flowchart" , [ direction ] , "{" , { mermaid_line } , "}" ;
+direction       = "TB" | "TD" | "BT" | "RL" | "LR" ;   (* default TD *)
+```
+
+- `mermaid_line` is verbatim Mermaid flowchart text (nodes `A[..]` `B{..}` …,
+  edges `-->` `-.->` `---` with `|labels|`, `subgraph … end`). Only a line that is
+  **solely** `}` closes the block; a decision node such as `B{ok?}` does not.
+- The optional `direction` after the `flowchart` keyword maps to the Mermaid
+  header — `flowchart LR { … }` is laid out left-to-right (default `TD`).
+- **Resolution.** The block reconstructs `flowchart <DIR>\n<body>`, hands it to the
+  core, and folds the resolved components/edges/regions + canvas size back in
+  (mirroring §6.9). Decision nodes (`{}`) use the `diamond` shape; flowchart nodes
+  carry no icon — the renderer draws the shape outline with the label inside.
+  Requires a `kymostudio-core` that ships the Mermaid binding. The same block
+  exists in the Python (`dsl.py`) and JS (`dsl.ts`) implementations.
+
+```text
+flowchart LR {
+  A[Collect] --> B{Valid?}
+  B -->|yes| C([Store])
+  B -->|no| D[(Archive)]
+}
+```
+
+See MERMAID-MAP-001 for the full Mermaid element mapping, and `samples/*.mmd` for
+standalone Mermaid sources (`kymo flow.mmd` renders them directly).
+
 ## Annex A — Revision History
 
 **Table A.1 — Document revisions**
@@ -312,6 +349,7 @@ layout { header , { a | b } }   # Header on top; A and B side-by-side below it.
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 2.6     | 2026-05-25 | Vũ Anh | Initial issue — extracted clause 6 (Grammar) from KYMO-DSL-001 v2.5 on the split into a clause-per-file normative-reference set. |
+| 2.7     | 2026-06-07 | Vũ Anh | Added §6.11 `flowchart [DIR] { … }` block (Mermaid-syntax body, core-laid-out); reserved `flowchart`; updated the §6.6 line discriminator. |
 
 ## Annex B — Document Control
 

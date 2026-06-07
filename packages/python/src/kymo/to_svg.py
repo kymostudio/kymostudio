@@ -101,6 +101,14 @@ text { fill: #1f2937; }
 .edge-label--small { font-size: 10.5px; }
 """
 
+# Flowchart-node CSS — appended to STYLE only when the diagram has icon-less
+# nodes (Mermaid flowchart imports). Kept out of STYLE so diagrams without
+# flowchart nodes stay byte-identical.
+FLOW_STYLE = """
+.flow-node  { fill: #eef4ff; stroke: #4b6b8a; stroke-width: 1.6; }
+.flow-label { font-size: 13px; font-weight: 600; fill: #0f172a; text-anchor: middle; }
+"""
+
 # Animation presets — appended to STYLE when render(animate=<name>).
 # Use render(animate=True) for the default ("flow"), or pass a name
 # explicitly for variants.
@@ -520,8 +528,51 @@ def render_edge(e: Edge, d: Diagram) -> str:
     )
 
 
+def _render_flowchart_node(c: Component) -> str:
+    """Draw an icon-less flowchart node: the shape OUTLINE sized to `c.size`,
+    with the label centered INSIDE it. Used for Mermaid flowchart imports
+    (box / rounded / circle / diamond / hex / cylinder / stadium), which carry
+    no icon — the outline IS the visual, unlike kymo's icon-card components."""
+    cx, cy = c.pos
+    hw, hh = c.half                       # respects explicit Component.size
+    w, h = 2 * hw, 2 * hh
+    x0, y0, x1, y1 = cx - hw, cy - hh, cx + hw, cy + hh
+
+    if c.shape == "circle":
+        glyph = f'<ellipse class="flow-node" cx="{cx}" cy="{cy}" rx="{hw}" ry="{hh}"/>'
+    elif c.shape == "diamond":
+        pts = f"{cx},{y0} {x1},{cy} {cx},{y1} {x0},{cy}"
+        glyph = f'<polygon class="flow-node" points="{pts}"/>'
+    elif c.shape == "hex":
+        inset = min(hh, hw // 2)
+        pts = (f"{x0},{cy} {x0 + inset},{y0} {x1 - inset},{y0} "
+               f"{x1},{cy} {x1 - inset},{y1} {x0 + inset},{y1}")
+        glyph = f'<polygon class="flow-node" points="{pts}"/>'
+    elif c.shape == "cylinder":
+        ry = max(4, hh // 4)
+        glyph = (
+            f'<path class="flow-node" d="M{x0},{y0 + ry} '
+            f'A{hw},{ry} 0 0 0 {x1},{y0 + ry} L{x1},{y1 - ry} '
+            f'A{hw},{ry} 0 0 1 {x0},{y1 - ry} Z"/>'
+            f'<ellipse class="flow-node" cx="{cx}" cy="{y0 + ry}" rx="{hw}" ry="{ry}"/>'
+        )
+    elif c.shape == "badge":              # stadium / pill
+        glyph = f'<rect class="flow-node" x="{x0}" y="{y0}" width="{w}" height="{h}" rx="{hh}"/>'
+    else:                                  # box & rounded rectangle
+        glyph = f'<rect class="flow-node" x="{x0}" y="{y0}" width="{w}" height="{h}" rx="6"/>'
+
+    label = (f'<text class="flow-label" x="{cx}" y="{cy + 5}">{_x(c.name)}</text>'
+             if c.name else "")
+    return f'<g>{glyph}{label}</g>'
+
+
 def render_component(c: Component) -> str:
     cx, cy = c.pos
+
+    # Icon-less flowchart nodes (Mermaid import) draw the shape outline with an
+    # interior label instead of an icon glyph + label below.
+    if not c.icon:
+        return _render_flowchart_node(c)
 
     icon_svg = get_icon(c.icon)
 
@@ -652,6 +703,8 @@ def render(d: Diagram, animate: bool = False) -> str:
     comps         = "\n  ".join(render_component(c)    for c in d.components)
 
     style = STYLE + (ANIM_STYLE if animate else "")
+    if any(not c.icon for c in d.components):
+        style += FLOW_STYLE
 
     # Page auto-layout: title/subtitle stack at top, content below.
     # Content is translated DOWN by title_block_h so its DSL coordinates

@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const USAGE = [
   "usage: kymo <input> [output] [--scale N]",
-  "  <input>   .svg | .kymo | .bpmn | .kymo.json",
+  "  <input>   .svg | .kymo | .bpmn | .kymo.json | .mmd",
   "  <output>  .svg, .png or .pdf; omitted → input name with .svg",
   "            (or .png when the input is a .svg)",
   "  -s, --scale N   PNG scale factor, 1.0 = intrinsic size (PNG output only)",
@@ -68,12 +68,14 @@ async function renderToSvg(input) {
   const low = input.toLowerCase();
   // BPMN import + `bpmn { }` layout (in .bpmn / .kymo) delegate to the wasm core,
   // which must be initialized before the synchronous parse calls.
-  if (low.endsWith(".bpmn") || low.endsWith(".kymo")) await initCore(lib);
+  const isMermaid = low.endsWith(".mmd") || low.endsWith(".mermaid");
+  if (low.endsWith(".bpmn") || low.endsWith(".kymo") || isMermaid) await initCore(lib);
   let diagram;
   if (low.endsWith(".bpmn")) diagram = lib.parseBpmn(text);
   else if (low.endsWith(".json")) diagram = lib.parseKymoJson(text);
+  else if (isMermaid) diagram = lib.parseMermaid(text);
   else if (low.endsWith(".kymo")) diagram = lib.parseDiagram(text);
-  else throw new Error(`unsupported source: ${input} (expected .kymo, .kymo.json, .bpmn or .svg)`);
+  else throw new Error(`unsupported source: ${input} (expected .kymo, .kymo.json, .bpmn, .mmd or .svg)`);
   return lib.renderSVG(diagram);
 }
 

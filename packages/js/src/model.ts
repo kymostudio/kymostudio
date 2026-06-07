@@ -12,6 +12,9 @@ export type Point = [number, number];
 export type Shape =
   | "circle" | "cube" | "cube-big" | "box" | "cylinder" | "hex"
   | "annotation" | "aws-tile" | "aws-tile-hero" | "badge" | "image"
+  // Flowchart decision rhombus (Mermaid `{...}`) — icon-less labelled shape
+  // (icon==""); outline IS the visual, label sits INSIDE. Size via Component.size.
+  | "diamond"
   // ── BPMN 2.0 glyphs (see bpmn-shapes.ts) ──────────────────────────
   // Imported from .bpmn files; size comes from the file's Diagram-
   // Interchange bounds (Component.size), not SHAPE_HALF. The sub-type
@@ -34,6 +37,7 @@ export const SHAPE_HALF: Record<Shape, Point> = {
   "aws-tile-hero": [40, 40],
   "badge":         [14, 14],
   "image":         [32, 32],
+  "diamond":       [40, 32],   // flowchart decision — fallback; real size via Component.size
   // BPMN — fallbacks only; real sizes arrive via Component.size from DI.
   "bpmn-start":        [18, 18],
   "bpmn-end":          [18, 18],
@@ -59,6 +63,7 @@ export const LABEL_HEIGHT: Record<Shape, number> = {
   "aws-tile-hero": 48,
   "badge":         0,
   "image":         26,
+  "diamond":       0,          // flowchart label is INSIDE the glyph — no band below
   // BPMN edges carry explicit waypoints, so no label clearance needed.
   "bpmn-start":        0,
   "bpmn-end":          0,
@@ -180,6 +185,10 @@ export interface Diagram {
   /** Positionless `bpmn { … }` blocks (from dsl.ts). Laid out into
    *  components/edges by bpmn-layout.ts; empty/absent once laid out. */
   bpmnBlocks?: BpmnBlock[];
+  /** Positionless `flowchart [DIR] { … }` blocks (from dsl.ts) as
+   *  `[direction, body]` pairs (body = Mermaid flowchart syntax). Resolved into
+   *  components/edges/regions by the core; empty/absent once laid out. */
+  flowchartBlocks?: Array<[string, string]>;
 }
 
 // ── Factories (mirror Python @dataclass with defaults) ────────────────
@@ -251,12 +260,14 @@ export function makeEdge({
 export function makeDiagram({
   width = 0, height = 0, title = "", subtitle = "",
   components = [], regions = [], edges = [], layoutTrees = [], bpmnBlocks = [],
+  flowchartBlocks = [],
 }: {
   width?: number; height?: number; title?: string; subtitle?: string;
   components?: Component[]; regions?: Region[]; edges?: Edge[]; layoutTrees?: unknown[];
   bpmnBlocks?: BpmnBlock[];
+  flowchartBlocks?: Array<[string, string]>;
 } = {}): Diagram {
-  return { width, height, title, subtitle, components, regions, edges, layoutTrees, bpmnBlocks };
+  return { width, height, title, subtitle, components, regions, edges, layoutTrees, bpmnBlocks, flowchartBlocks };
 }
 
 // ── Lookups & geometry helpers ────────────────────────────────────────
@@ -288,7 +299,9 @@ function componentAnchor(c: Component, side: Side): Point {
   const [cx, cy] = c.pos;
   const [hw, hh] = componentHalf(c);
   const labelled = (c.name && c.name.length > 0) || (c.subtitle && c.subtitle.length > 0);
-  const lh = labelled ? (LABEL_HEIGHT[c.shape] || 0) : 0;
+  // Icon-less flowchart nodes carry the label INSIDE the glyph, so there is no
+  // label band below — anchors sit flush with the shape edge.
+  const lh = (c.icon && labelled) ? (LABEL_HEIGHT[c.shape] || 0) : 0;
   switch (side) {
     case "top":    return [cx, cy - hh];
     case "right":  return [cx + hw, cy];
