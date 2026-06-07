@@ -344,7 +344,7 @@ dependencies = [
 
 [[package]]
 name = "kymostudio-core"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "pyo3",
  "resvg 0.47.0",
