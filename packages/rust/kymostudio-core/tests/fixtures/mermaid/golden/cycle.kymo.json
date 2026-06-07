@@ -1,0 +1,236 @@
+{
+  "format": "kymo.json",
+  "version": 1,
+  "diagram": {
+    "width": 566,
+    "height": 126,
+    "title": "",
+    "subtitle": "",
+    "components": [
+      {
+        "id": "A",
+        "name": "Init",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          70,
+          63
+        ],
+        "size": [
+          60,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "B",
+        "name": "Check",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          213,
+          63
+        ],
+        "size": [
+          66,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "C",
+        "name": "Work",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          356,
+          63
+        ],
+        "size": [
+          60,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "D",
+        "name": "Exit",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          496,
+          63
+        ],
+        "size": [
+          60,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      }
+    ],
+    "regions": [],
+    "edges": [
+      {
+        "src": "A",
+        "dst": "B",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "B",
+        "dst": "C",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "C",
+        "dst": "B",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "C",
+        "dst": "D",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      }
+    ],
+    "layout_trees": []
+  }
+}

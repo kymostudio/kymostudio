@@ -1,12 +1,16 @@
-//! `kymo` CLI — convert an SVG to PNG (raster) or PDF (vector).
+//! `kymo` CLI — render an SVG to PNG/PDF, or import a Mermaid flowchart.
 //!
 //!     kymo -i in.svg out.png
 //!     kymo -i in.svg -o out.png --scale 2
 //!     kymo in.svg out.pdf
+//!     kymo flow.mmd                 # -> flow.kymo.json (Mermaid import)
+//!     kymo flow.mmd diagram.kymo.json
 //!
 //! Pure Rust (resvg/svg2pdf via kymostudio-core) — no browser, no system image
-//! libraries. The output format is chosen by the output path's extension
-//! (`.pdf` → vector PDF, otherwise PNG).
+//! libraries. The operation is chosen by the INPUT extension: `.mmd`/`.mermaid`
+//! parse a Mermaid flowchart to the `.kymo.json` interchange format; any other
+//! input is treated as SVG and the OUTPUT extension picks PNG (default) or PDF.
+//! Rust does not render `.kymo.json` to SVG — feed it to the Python/JS renderer.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -14,22 +18,25 @@ use std::process::ExitCode;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 const HELP: &str = "\
-kymo — convert an SVG to PNG (raster) or PDF (vector) (pure Rust, no browser)
+kymo — render SVG to PNG/PDF, or import a Mermaid flowchart (pure Rust, no browser)
 
 USAGE:
-    kymo <input.svg> [output.png|output.pdf] [options]
+    kymo <input> [output] [options]
 
 ARGS:
-    <input.svg>             Input SVG file (positional, or use -i).
-    <output>                Output path (positional). A `.pdf` extension emits a
-                            vector PDF; anything else emits PNG. Defaults to the
-                            input path with its extension swapped to .png.
+    <input>                 Input file (positional, or use -i). A `.mmd`/`.mermaid`
+                            input is parsed as a Mermaid flowchart; anything else
+                            is treated as SVG.
+    <output>                Output path (positional). For SVG input: `.pdf` emits a
+                            vector PDF, otherwise PNG. For Mermaid input: a
+                            `.kymo.json` interchange file. Defaults to the input
+                            path with the matching extension.
 
 OPTIONS:
-    -i, --input  <FILE>    Input SVG file
+    -i, --input  <FILE>    Input file
     -o, --output <FILE>    Output file (alternative to the positional arg)
     -s, --scale  <N>       Scale factor for PNG, 1.0 = intrinsic size (default:
-                           1). Ignored for PDF (vector, resolution-independent).
+                           1). Ignored for PDF and Mermaid import.
     -h, --help             Print this help
     -V, --version          Print version
 
@@ -38,6 +45,8 @@ EXAMPLES:
     kymo diagram.svg                    # -> diagram.png
     kymo diagram.svg -s 2 hi.png        # 2x resolution
     kymo diagram.svg out.pdf            # vector PDF
+    kymo flow.mmd                       # -> flow.kymo.json (Mermaid import)
+    kymo flow.mmd out.kymo.json         # render the .kymo.json with the Python/JS CLI
 ";
 
 struct Args {
@@ -96,8 +105,13 @@ fn parse(argv: &[String]) -> Result<Parsed, String> {
         return Err(format!("unexpected argument: {extra}"));
     }
 
-    let input = input.ok_or("missing required input (use -i <file.svg>)")?;
-    let output = output.unwrap_or_else(|| input.with_extension("png"));
+    let input = input.ok_or("missing required input (use -i <file>)")?;
+    let default_ext = if is_mermaid(&input) {
+        "kymo.json"
+    } else {
+        "png"
+    };
+    let output = output.unwrap_or_else(|| input.with_extension(default_ext));
     Ok(Parsed::Run(Args {
         input,
         output,
@@ -105,13 +119,45 @@ fn parse(argv: &[String]) -> Result<Parsed, String> {
     }))
 }
 
+fn has_ext(path: &std::path::Path, ext: &str) -> bool {
+    path.extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case(ext))
+}
+
+fn is_mermaid(path: &std::path::Path) -> bool {
+    has_ext(path, "mmd") || has_ext(path, "mermaid")
+}
+
 fn run(args: Args) -> Result<(), String> {
+    // Mermaid import: `.mmd`/`.mermaid` input → `.kymo.json` interchange.
+    if is_mermaid(&args.input) {
+        if has_ext(&args.output, "svg")
+            || has_ext(&args.output, "png")
+            || has_ext(&args.output, "pdf")
+        {
+            return Err(format!(
+                "cannot render Mermaid to {} — Rust only imports it to .kymo.json; \
+                 render that with the Python or JS kymo CLI",
+                args.output.display()
+            ));
+        }
+        let src = std::fs::read_to_string(&args.input)
+            .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
+        let json = kymostudio_core::mermaid_to_kymojson(&src).map_err(|e| e.to_string())?;
+        std::fs::write(&args.output, &json)
+            .map_err(|e| format!("cannot write {}: {e}", args.output.display()))?;
+        eprintln!(
+            "{} -> {} (kymo.json, {} bytes)",
+            args.input.display(),
+            args.output.display(),
+            json.len()
+        );
+        return Ok(());
+    }
+
     let svg = std::fs::read(&args.input)
         .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
-    let is_pdf = args
-        .output
-        .extension()
-        .is_some_and(|e| e.eq_ignore_ascii_case("pdf"));
+    let is_pdf = has_ext(&args.output, "pdf");
     let (bytes, kind) = if is_pdf {
         (
             kymostudio_core::svg_to_pdf(&svg).map_err(|e| e.to_string())?,

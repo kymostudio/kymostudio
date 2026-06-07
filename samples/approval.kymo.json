@@ -1,0 +1,346 @@
+{
+  "format": "kymo.json",
+  "version": 1,
+  "diagram": {
+    "width": 320,
+    "height": 674,
+    "title": "",
+    "subtitle": "",
+    "components": [
+      {
+        "id": "Start",
+        "name": "Start",
+        "subtitle": "",
+        "icon": "",
+        "shape": "circle",
+        "accent": "blue",
+        "pos": [
+          212,
+          71
+        ],
+        "size": [
+          62,
+          62
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "Submit",
+        "name": "Submit request",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          212,
+          205
+        ],
+        "size": [
+          135,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "Review",
+        "name": "Approved?",
+        "subtitle": "",
+        "icon": "",
+        "shape": "diamond",
+        "accent": "blue",
+        "pos": [
+          212,
+          340
+        ],
+        "size": [
+          117,
+          64
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "Provision",
+        "name": "Provision",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          212,
+          475
+        ],
+        "size": [
+          97,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "Reject",
+        "name": "Reject",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          77,
+          475
+        ],
+        "size": [
+          74,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "Done",
+        "name": "Done",
+        "subtitle": "",
+        "icon": "",
+        "shape": "circle",
+        "accent": "blue",
+        "pos": [
+          212,
+          606
+        ],
+        "size": [
+          56,
+          56
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      }
+    ],
+    "regions": [],
+    "edges": [
+      {
+        "src": "Start",
+        "dst": "Submit",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "Submit",
+        "dst": "Review",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "Review",
+        "dst": "Provision",
+        "label": "yes",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "Review",
+        "dst": "Reject",
+        "label": "no",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "Provision",
+        "dst": "Done",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "Reject",
+        "dst": "Done",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      }
+    ],
+    "layout_trees": []
+  }
+}

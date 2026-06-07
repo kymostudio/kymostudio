@@ -9,6 +9,25 @@ packages share a version number.
 
 ## [Unreleased]
 
+### Added
+
+- **Mermaid flowchart import (Rust core).** `kymostudio-core` gains a Mermaid
+  importer — the first parser/model/layout subsystem to live in the Rust engine
+  (rather than being duplicated in Python and JS like BPMN). It parses Mermaid
+  `graph` / `flowchart` source (directions `TD`/`TB`/`BT`/`LR`/`RL`; node shapes
+  `[]` `()` `([])` `[[]]` `[()]` `(())` `{}` `{{}}`; edges `-->` `---` `-.->`
+  `==>` with `|labels|`; `subgraph … end`) and emits the resolved model as
+  `.kymo.json` (the interchange format Python/JS already load). A layered
+  (Sugiyama) layout — ported from `bpmn_layout.py` — positions the
+  coordinate-less graph deterministically. Decision nodes (`{}`) introduce a new
+  `diamond` shape. Exposed as a Rust API (`mermaid_to_kymojson`), the `kymo` CLI
+  (`kymo flow.mmd → flow.kymo.json`), PyO3 (`mermaid_to_kymojson`) and wasm
+  (`mermaidToKymoJson`). The output is byte-conformant with `to_kymojson`.
+  Rendering it to SVG (the `diamond` glyph + icon-less flowchart nodes in the
+  Python/JS renderers, and `.mmd` CLI dispatch) is a follow-up parity phase. See
+  `docs/specs/mermaid/` (FEAT-MERMAID-001) and `docs/formats/mermaid/mermaid-mapping.md`
+  (MERMAID-MAP-001); samples `samples/pipeline.mmd`, `samples/approval.mmd`.
+
 ## [0.4.2] - 2026-06-07
 
 ### Changed

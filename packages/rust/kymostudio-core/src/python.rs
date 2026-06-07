@@ -9,6 +9,7 @@
 //!     bpmn_to_svg(xml: str) -> str         # .bpmn → rendered SVG
 //!     bpmn_export(model_json: str) -> str  # model JSON → .bpmn XML
 //!     bpmn_render(model_json, animate=False, background=None) -> str  # model JSON → SVG
+//!     mermaid_to_kymojson(src: str) -> str # Mermaid flowchart → .kymo.json
 //!
 //! The BPMN functions exchange the canonical `.kymo.json` model on the JSON seam, so
 //! Python can deserialize the result into its dataclasses and delegate to this one
@@ -81,6 +82,12 @@ fn svg_to_pdf<'py>(py: Python<'py>, svg: &[u8]) -> PyResult<Bound<'py, PyBytes>>
     Ok(PyBytes::new(py, &pdf))
 }
 
+/// Parse Mermaid source (flowchart) into a `.kymo.json` interchange string.
+#[pyfunction]
+fn mermaid_to_kymojson(src: &str) -> PyResult<String> {
+    crate::mermaid_to_kymojson(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
 #[pymodule]
 fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
@@ -95,5 +102,6 @@ fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_function(wrap_pyfunction!(bpmn_export, m)?)?;
         m.add_function(wrap_pyfunction!(bpmn_render, m)?)?;
     }
+    m.add_function(wrap_pyfunction!(mermaid_to_kymojson, m)?)?;
     Ok(())
 }

@@ -1,0 +1,292 @@
+{
+  "format": "kymo.json",
+  "version": 1,
+  "diagram": {
+    "width": 201,
+    "height": 630,
+    "title": "",
+    "subtitle": "",
+    "components": [
+      {
+        "id": "Start",
+        "name": "Start",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          88,
+          63
+        ],
+        "size": [
+          66,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "A",
+        "name": "Fetch",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          88,
+          189
+        ],
+        "size": [
+          66,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "B",
+        "name": "Transform",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          88,
+          315
+        ],
+        "size": [
+          97,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "C",
+        "name": "Write",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          88,
+          441
+        ],
+        "size": [
+          66,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "End",
+        "name": "Done",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          88,
+          567
+        ],
+        "size": [
+          60,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      }
+    ],
+    "regions": [
+      {
+        "id": "G",
+        "label": "Worker Pool",
+        "bounds": [
+          16,
+          120,
+          145,
+          368
+        ],
+        "contains": [
+          "A",
+          "B",
+          "C"
+        ],
+        "padding": [
+          24,
+          24
+        ],
+        "padding_bottom": null,
+        "style": "cluster",
+        "icon": null,
+        "layout": null,
+        "pos": null,
+        "gap": 24,
+        "align": "center",
+        "visible": true,
+        "border_dash": null,
+        "border_stroke": null,
+        "label_anchor": "middle",
+        "label_position": null
+      }
+    ],
+    "edges": [
+      {
+        "src": "Start",
+        "dst": "A",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "A",
+        "dst": "B",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "B",
+        "dst": "C",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "C",
+        "dst": "End",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      }
+    ],
+    "layout_trees": []
+  }
+}

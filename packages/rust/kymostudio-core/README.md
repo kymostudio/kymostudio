@@ -1,8 +1,14 @@
 # kymostudio-core (Rust)
 
-Pure-Rust SVG → PNG rasterizer core for **kymostudio**, built on
-[`resvg`](https://github.com/linebender/resvg). No browser, no headless Chrome,
-no C/Cairo/Skia system dependencies.
+The pure-Rust core for **kymostudio**: an SVG → PNG/PDF rasterizer (built on
+[`resvg`](https://github.com/linebender/resvg) / `svg2pdf`) **and** the shared
+diagram engine. No browser, no headless Chrome, no C/Cairo/Skia system
+dependencies.
+
+The engine half parses diagram-as-code into kymo's model, lays it out, and
+serializes to the `.kymo.json` interchange format the Python/JS front-ends
+consume — written once in Rust instead of duplicated per language. First subsystem:
+**Mermaid flowchart import** (`mermaid_to_kymojson`). See `docs/specs/mermaid/`.
 
 One core crate, compiled to **three targets** from a single source via feature
 flags — so the Rust CLI, the Python package, and the JS/browser playground all
@@ -15,8 +21,9 @@ project avoids cairosvg):
 | Python extension (abi3) | `python` | `maturin` → wheel | `packages/python` |
 | wasm (browser + Node) | `wasm` | `wasm-pack` → pkg | `packages/js`, website playground |
 
-`svg_to_png(svg: &[u8], scale: f32) -> Result<Vec<u8>, RenderError>` is the one
-core function; each binding (`src/python.rs`, `src/wasm.rs`) is a thin façade.
+Core functions: `svg_to_png(svg: &[u8], scale: f32)` and `svg_to_pdf(svg: &[u8])`
+(rasterizer), plus `mermaid_to_kymojson(src: &str)` (engine). Each binding
+(`src/python.rs`, `src/wasm.rs`) is a thin façade.
 
 ## CLI — `kymo`
 

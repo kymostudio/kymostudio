@@ -1,0 +1,322 @@
+{
+  "format": "kymo.json",
+  "version": 1,
+  "diagram": {
+    "width": 485,
+    "height": 318,
+    "title": "",
+    "subtitle": "",
+    "components": [
+      {
+        "id": "A",
+        "name": "Gateway",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          81,
+          159
+        ],
+        "size": [
+          82,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "B",
+        "name": "Service A",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          250,
+          159
+        ],
+        "size": [
+          97,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "C",
+        "name": "Service B",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          250,
+          63
+        ],
+        "size": [
+          97,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "D",
+        "name": "Service C",
+        "subtitle": "",
+        "icon": "",
+        "shape": "box",
+        "accent": "blue",
+        "pos": [
+          250,
+          255
+        ],
+        "size": [
+          97,
+          46
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      },
+      {
+        "id": "E",
+        "name": "Store",
+        "subtitle": "",
+        "icon": "",
+        "shape": "cylinder",
+        "accent": "blue",
+        "pos": [
+          412,
+          159
+        ],
+        "size": [
+          66,
+          56
+        ],
+        "parent": null,
+        "align": null,
+        "align_gap": 24,
+        "align_offset": [
+          0,
+          0
+        ],
+        "label_box": null
+      }
+    ],
+    "regions": [],
+    "edges": [
+      {
+        "src": "A",
+        "dst": "B",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "A",
+        "dst": "C",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "A",
+        "dst": "D",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "B",
+        "dst": "E",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "C",
+        "dst": "E",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      },
+      {
+        "src": "D",
+        "dst": "E",
+        "label": "",
+        "style": "gray",
+        "src_anchor": null,
+        "dst_anchor": null,
+        "route": "auto",
+        "via": [],
+        "src_offset": [
+          0,
+          0
+        ],
+        "dst_offset": [
+          0,
+          0
+        ],
+        "label_offset": [
+          0,
+          0
+        ],
+        "label_anchor": "mid",
+        "label_small": false,
+        "label_pos": null,
+        "dashed": false,
+        "no_arrow": false,
+        "trunk_offset": 0,
+        "shared_port": false,
+        "points": null,
+        "bpmn_flow": null
+      }
+    ],
+    "layout_trees": []
+  }
+}
