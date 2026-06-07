@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""SVG→PDF bench — run quality + perf and render the report.
+"""SVG→PDF bench — run quality + accuracy + perf and render the report.
 
-Two passes, one report:
+Three passes, one report:
 
-  • quality (`quality.py`) — fidelity vs *kymo's own* PDF, on real kymo SVGs:
-                             does an engine reproduce what `kymo … out.pdf` ships,
-                             and is the page real vector content? (PDFs are
-                             rasterized with PyMuPDF for the visual comparison.)
-  • perf    (`perf.py`)    — SVG→PDF conversion timing over the kymo SVGs
+  • quality  (`quality.py`)  — fidelity vs *kymo's own* PDF, on real kymo SVGs:
+                               does an engine reproduce what `kymo … out.pdf`
+                               ships, and is the page real vector content?
+  • accuracy (`accuracy.py`) — correctness vs *headless Chrome*, on the vendored
+                               web-platform-tests SVG suite (is the engine right?
+                               kymo is graded too).
+  • perf     (`perf.py`)     — SVG→PDF conversion timing over the kymo SVGs
 
-Writes `results/quality.json`, `results/perf.json`, and the human-readable
-`results/REPORT.md`.
+(PDFs are rasterized with PyMuPDF for both pixel comparisons.) Writes
+`results/quality.json`, `results/accuracy.json`, `results/perf.json`, and the
+human-readable `results/REPORT.md`.
 
 Run:  cd benches && uv run python svg2pdf/run.py [--reps N]
 """
@@ -20,8 +23,17 @@ import argparse
 import json
 from pathlib import Path
 
+import accuracy
 import perf
 import quality
+
+# Short headers for the per-category accuracy table (WPT svg/ top-level dirs).
+CAT_SHORT = {
+    "coordinate-systems": "coord", "crashtests": "crash", "geometry": "geom",
+    "painting": "paint", "path": "path", "pservers": "paint-srv",
+    "render": "render", "shapes": "shape", "struct": "struct",
+    "styling": "style", "types": "types",
+}
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -68,7 +80,24 @@ def _structure_table(q: dict) -> str:
     return "\n".join([head, sep] + rows)
 
 
-def _frontmatter(q: dict, p: dict) -> str:
+def _accuracy_table(a: dict) -> str:
+    cats = list(a["dataset"]["categories"].keys())
+    head = "| Engine | Backend | Renders | Matches Chrome | Mean Δ | " + \
+        " | ".join(CAT_SHORT.get(c, c) for c in cats) + " |"
+    sep = "|---|---|---|---|---|" + "|".join("---" for _ in cats) + "|"
+    rows = []
+    for r in a["engines"]:
+        pc = r["per_category_mean_diff"]
+        cells = " | ".join(str(pc[c]) if pc.get(c) is not None else "—" for c in cats)
+        rows.append(
+            f"| {r['label']} | `{r['backend']}` | {r['renders']} | "
+            f"{r['matches_chrome']} ({r['match_rate']:.0%}) | "
+            f"**{r['mean_abs_diff_avg'] if r['mean_abs_diff_avg'] is not None else '—'}** | {cells} |"
+        )
+    return "\n".join([head, sep] + rows)
+
+
+def _frontmatter(q: dict, a: dict, p: dict) -> str:
     """YAML front matter stamping the run — so two REPORT.md are trivially
     diffable / distinguishable (host, versions, timestamp, corpus size)."""
     env = p["environment"]
@@ -84,6 +113,8 @@ def _frontmatter(q: dict, p: dict) -> str:
         f"corpus: {q['corpus']['items']}",
         f"reference: {q['reference_engine']}",
         f"rasterizer: \"{q['rasterizer']}\"",
+        f"accuracy_dataset: {a['dataset']['samples']}",
+        f"ground_truth: {a['ground_truth']}",
         "engines:",
     ]
     for r in p["engines"]:
@@ -92,12 +123,14 @@ def _frontmatter(q: dict, p: dict) -> str:
     return "\n".join(lines) + "\n\n"
 
 
-def _render_report(q: dict, p: dict) -> str:
+def _render_report(q: dict, a: dict, p: dict) -> str:
     env = p["environment"]
     stamp = env["timestamp"]
     date = stamp.split("T", 1)[0]
-    front = _frontmatter(q, p)
+    front = _frontmatter(q, a, p)
     n = q["corpus"]["items"]
+    ds = a["dataset"]
+    cat_counts = ", ".join(f"{c} {v}" for c, v in ds["categories"].items())
 
     fail_notes = []
     for r in q["engines"]:
@@ -116,14 +149,15 @@ def _render_report(q: dict, p: dict) -> str:
 
 > **Generated {date}** by `benches/svg2pdf/run.py` (run stamp `{stamp}`).
 > **Offline bench** — re-run with
-> `cd benches && uv run python svg2pdf/run.py`. One question, two passes:
-> **Fidelity** — does an engine reproduce the PDF *kymo itself emits* from the
-> SVGs *kymo itself emits*, as real vector content? PDFs are rasterized with
-> **{q['rasterizer']}** for the pixel comparison. Fidelity is deterministic;
-> *timing* is machine-dependent (host below), not a gate. The field spans famous
-> general-purpose renderers (headless **Chrome**, **Inkscape**, **LibreOffice**)
-> and dedicated converters; **vl-convert** is built on the same `svg2pdf` as kymo,
-> so it doubles as a same-engine control (expected ~0 diff).
+> `cd benches && uv run python svg2pdf/run.py`. Two complementary questions:
+> **(1) Fidelity** — does an engine reproduce the PDF *kymo itself emits* from the
+> SVGs *kymo itself emits*? **(2) Accuracy** — is an engine *correct*, judged
+> against an independent ground truth (**headless Google Chrome**) on the
+> web-platform-tests SVG suite? PDFs are rasterized with **{q['rasterizer']}** for
+> both pixel comparisons; fidelity/accuracy are deterministic, *timing* is
+> machine-dependent (host below), not a gate. The field spans famous general-purpose
+> renderers (Chrome, **Inkscape**, **LibreOffice**) and dedicated converters;
+> **vl-convert** wraps the same `svg2pdf` as kymo, so it is the same-engine control.
 {missing_block}
 ## 1. Fidelity + speed — vs kymo, on real kymo SVGs
 
@@ -139,7 +173,23 @@ measured on page 1 rasterized over white; *diff* is mean per-channel |Δ| (0…2
 *Diff/Differ blank for the reference (compared to itself). Speed is vs kymo,
 shown only when an engine converted the same file set.*
 
-## 2. PDF structure — page geometry & vector content
+## 2. Accuracy — vs headless Chrome, on the web-platform-tests SVG suite
+
+Dataset: **{ds['samples']} SVGs** vendored from `{ds['source']}` ({cat_counts}) —
+self-contained, normalized to their viewBox size. Ground truth = **{a['ground_truth']}**
+(committed `refs/`); every engine, *kymo included*, is graded against it — so this
+is *correctness*, not agreement-with-kymo. **Mean Δ** is mean per-channel |Δ| vs
+Chrome (lower = more accurate); a sample "matches" if Mean Δ < {a['match_tolerance']}.
+`chrome` (print-to-PDF) routes the same renderer as the ground truth, so it reads
+near-baseline (the method control). Per-category columns are mean Δ.
+
+{_accuracy_table(a)}
+
+*Closer to 0 = closer to Chrome. Rows sorted by overall accuracy. On this neutral,
+third-party corpus every vector engine clusters — kymo's own SVGs are a separate,
+harder test (§1).*
+
+## 3. PDF structure — page geometry & vector content
 
 What actually landed in the PDF: page count, the page size relative to the SVG's
 own px size (engines disagree on the px→pt convention — kymo/vl-convert/fpdf2 keep
@@ -159,6 +209,12 @@ text the PDF preserves (extracted with PyMuPDF).
 - **vl-convert validates the method.** It wraps the same `svg2pdf`, so it lands
   ~0 diff on kymo's output — the same-engine control the svg2png bench gets from
   `resvg-py`, which has no PDF equivalent.
+- **Against Chrome on a neutral suite, kymo is correct — and so is most of the
+  field (§2).** On the web-platform-tests SVGs every vector engine clusters close
+  to the de-facto renderer; kymo sits with vl-convert / librsvg / Inkscape, and
+  `chrome` (print-to-PDF) reads near-baseline as expected. Notably `cairosvg`,
+  which emits *blank pages* on kymo's own SVGs (§1), is accurate here — confirming
+  its §1 failure is specific to kymo's `<style>` class fills, not a general defect.
 - **The famous renderers largely agree with kymo:** headless **Chrome** (the
   de-facto SVG renderer), **librsvg** and **LibreOffice** each reproduce the full
   diagram at high fidelity — independent cross-checks that kymo's output is
@@ -192,15 +248,20 @@ text the PDF preserves (extracted with PyMuPDF).
   item; convert each with every engine; rasterize page 1 with PyMuPDF, composite
   over white, and compare to kymo's rasterized page. Structural facts (page size,
   vector ops, images) come from the same PyMuPDF parse.
+- **Accuracy** (`accuracy.py` + `datasets.py`) — a vendored, self-contained subset
+  of the web-platform-tests `svg/` suite (`datasets/wpt-svg/`, see `PROVENANCE.md`),
+  each paired with a headless-Chrome reference (`gen_refs.py`, committed). Convert
+  each SVG with every engine, rasterize page 1, compare vs Chrome, rolled up per
+  category. Chrome is only needed to *regenerate* refs.
 - **Performance** (`perf.py`) — time each engine (median of {env['reps']} reps per
   file after one warm-up) converting the kymo SVGs to PDF bytes.
 
 ## Honest limitations
 
-- **Fidelity is agreement with kymo**, not an absolute ground truth. But with the
-  de-facto renderer (Chrome) and three other independent engines in the field all
-  converging on kymo's output, "self-consistent" and "correct" coincide here.
-  `vl-convert` (same `svg2pdf`) is the same-engine control.
+- **Two references, two questions.** Fidelity (§1) is *agreement with kymo* (with
+  `vl-convert` as the same-engine control); accuracy (§2) is *agreement with
+  Chrome*. Chrome is the de-facto SVG renderer but still one renderer — a category
+  where all engines diverge from it is a Chrome quirk as much as an engine one.
 - **Page count / extra pages.** Chrome prints via paged media, so it can emit a
   trailing blank page (paged-media overflow) — the `single-page` column shows
   this; fidelity scores page 1, which holds the diagram.
@@ -230,18 +291,23 @@ def main() -> None:
 
     RESULTS.mkdir(parents=True, exist_ok=True)
     q = quality.collect()
+    a = accuracy.collect()
     p = perf.measure(reps=args.reps, stamp=args.stamp)
 
     (RESULTS / "quality.json").write_text(json.dumps(q, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (RESULTS / "accuracy.json").write_text(json.dumps(a, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (RESULTS / "perf.json").write_text(json.dumps(p, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    (RESULTS / "REPORT.md").write_text(_render_report(q, p), encoding="utf-8")
+    (RESULTS / "REPORT.md").write_text(_render_report(q, a, p), encoding="utf-8")
 
     print(f"fidelity: {q['corpus']['items']} kymo SVGs (ref '{q['reference_engine']}', {q['rasterizer']})")
     for qr in q["engines"]:
         print(f"  {qr['label']:13} {qr['renders']:>6} render  diff {str(qr['mean_abs_diff_avg']):>6}  → {qr['verdict']}")
+    print(f"accuracy: {a['dataset']['samples']} WPT SVGs vs {a['ground_truth']}")
+    for r in a["engines"]:
+        print(f"  {r['label']:13} {r['renders']:>6} render  meanΔ {str(r['mean_abs_diff_avg']):>6}  matches {r['match_rate']:.0%}")
     if q["missing_engines"]:
         print(f"missing : {', '.join(q['missing_engines'])}")
-    for name in ("quality.json", "perf.json", "REPORT.md"):
+    for name in ("quality.json", "accuracy.json", "perf.json", "REPORT.md"):
         print(f"wrote   : {(RESULTS / name).relative_to(ROOT)}")
 
 

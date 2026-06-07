@@ -1,7 +1,7 @@
 ---
 bench: svg2pdf
 generated: 2026-06-07
-timestamp: 2026-06-07T02:12:47+00:00
+timestamp: 2026-06-07T02:58:41+00:00
 host: Linux-6.8.0-117-generic-x86_64-with-glibc2.39
 python: "3.13.13"
 kymo_version: "0.4.1"
@@ -9,6 +9,8 @@ reps: 5
 corpus: 30
 reference: kymo
 rasterizer: "PyMuPDF 1.27.2.3"
+accuracy_dataset: 96
+ground_truth: headless Google Chrome
 engines:
   kymo: "svg2pdf (kymostudio-core 0.4.1)"
   chrome: "Google Chrome 149.0.7827.53"
@@ -23,16 +25,17 @@ engines:
 
 # SVG → PDF — converter scorecard
 
-> **Generated 2026-06-07** by `benches/svg2pdf/run.py` (run stamp `2026-06-07T02:12:47+00:00`).
+> **Generated 2026-06-07** by `benches/svg2pdf/run.py` (run stamp `2026-06-07T02:58:41+00:00`).
 > **Offline bench** — re-run with
-> `cd benches && uv run python svg2pdf/run.py`. One question, two passes:
-> **Fidelity** — does an engine reproduce the PDF *kymo itself emits* from the
-> SVGs *kymo itself emits*, as real vector content? PDFs are rasterized with
-> **PyMuPDF 1.27.2.3** for the pixel comparison. Fidelity is deterministic;
-> *timing* is machine-dependent (host below), not a gate. The field spans famous
-> general-purpose renderers (headless **Chrome**, **Inkscape**, **LibreOffice**)
-> and dedicated converters; **vl-convert** is built on the same `svg2pdf` as kymo,
-> so it doubles as a same-engine control (expected ~0 diff).
+> `cd benches && uv run python svg2pdf/run.py`. Two complementary questions:
+> **(1) Fidelity** — does an engine reproduce the PDF *kymo itself emits* from the
+> SVGs *kymo itself emits*? **(2) Accuracy** — is an engine *correct*, judged
+> against an independent ground truth (**headless Google Chrome**) on the
+> web-platform-tests SVG suite? PDFs are rasterized with **PyMuPDF 1.27.2.3** for
+> both pixel comparisons; fidelity/accuracy are deterministic, *timing* is
+> machine-dependent (host below), not a gate. The field spans famous general-purpose
+> renderers (Chrome, **Inkscape**, **LibreOffice**) and dedicated converters;
+> **vl-convert** wraps the same `svg2pdf` as kymo, so it is the same-engine control.
 
 ## 1. Fidelity + speed — vs kymo, on real kymo SVGs
 
@@ -43,20 +46,46 @@ measured on page 1 rasterized over white; *diff* is mean per-channel |Δ| (0…2
 
 | Engine | Backend | Renders | Non-empty | Diff | Differ | Median ms | Files/s | Speed | Verdict |
 |---|---|---|---|---|---|---|---|---|---|
-| kymo | `svg2pdf (kymostudio-core 0.4.1)` | 30/30 | 30/30 | — | — | 13.756 | 46.9 | ×1.0 | **reference** |
-| chrome | `Google Chrome 149.0.7827.53` | 30/30 | 30/30 | 0.81 | 5.21% | 358.547 | 2.6 | ×0.05 | **high fidelity** |
-| rsvg-convert | `rsvg-convert version 2.58.0` | 30/30 | 30/30 | 1.81 | 6.49% | 29.824 | 18.0 | ×0.38 | **high fidelity** |
-| inkscape | `Inkscape 1.2.2 (b0a8486541, 2022-12-01)` | 30/30 | 30/30 | 17.09 | 18.13% | 210.278 | 4.6 | ×0.1 | **low fidelity** |
-| libreoffice | `LibreOffice 24.2.7.2 420(Build:2)` | 30/30 | 30/30 | 2.01 | 10.19% | 1559.316 | 0.6 | ×0.01 | **high fidelity** |
-| vl-convert | `svg2pdf (vl-convert 1.9.0.post1)` | 30/30 | 30/30 | 0.0 | 0.0% | 22.482 | 26.3 | ×0.56 | **pixel-identical** |
-| cairosvg | `Cairo (2.9.0)` | 30/30 | 0/30 | 11.37 | 99.73% | 2.222 | 405.3 | ×8.64 | **empty pages** |
+| kymo | `svg2pdf (kymostudio-core 0.4.1)` | 30/30 | 30/30 | — | — | 14.078 | 46.5 | ×1.0 | **reference** |
+| chrome | `Google Chrome 149.0.7827.53` | 30/30 | 30/30 | 0.81 | 5.21% | 368.286 | 2.6 | ×0.06 | **high fidelity** |
+| rsvg-convert | `rsvg-convert version 2.58.0` | 30/30 | 30/30 | 1.81 | 6.49% | 26.977 | 17.9 | ×0.39 | **high fidelity** |
+| inkscape | `Inkscape 1.2.2 (b0a8486541, 2022-12-01)` | 30/30 | 30/30 | 17.09 | 18.13% | 216.298 | 4.6 | ×0.1 | **low fidelity** |
+| libreoffice | `LibreOffice 24.2.7.2 420(Build:2)` | 30/30 | 30/30 | 2.01 | 10.19% | 1518.6 | 0.6 | ×0.01 | **high fidelity** |
+| vl-convert | `svg2pdf (vl-convert 1.9.0.post1)` | 30/30 | 30/30 | 0.0 | 0.0% | 23.086 | 26.1 | ×0.56 | **pixel-identical** |
+| cairosvg | `Cairo (2.9.0)` | 30/30 | 0/30 | 11.37 | 99.73% | 2.244 | 409.0 | ×8.8 | **empty pages** |
 | svglib | `reportlab renderPDF (4.5.1, svglib 1.6.0)` | 0/30 | 0/0 | — | — | — | — | — | **fails to convert** |
-| fpdf2 | `fpdf2 (2.8.7)` | 27/30 | 27/27 | 0.96 | 5.04% | 5.79 | 170.2 | — | **high fidelity (only 27/30)** |
+| fpdf2 | `fpdf2 (2.8.7)` | 27/30 | 27/27 | 0.96 | 5.04% | 5.495 | 170.8 | — | **high fidelity (only 27/30)** |
 
 *Diff/Differ blank for the reference (compared to itself). Speed is vs kymo,
 shown only when an engine converted the same file set.*
 
-## 2. PDF structure — page geometry & vector content
+## 2. Accuracy — vs headless Chrome, on the web-platform-tests SVG suite
+
+Dataset: **96 SVGs** vendored from `web-platform-tests svg/ (BSD-3-Clause / W3C)` (coordinate-systems 1, crashtests 1, geometry 4, painting 24, path 19, pservers 5, render 2, shapes 11, struct 12, styling 16, types 1) —
+self-contained, normalized to their viewBox size. Ground truth = **headless Google Chrome**
+(committed `refs/`); every engine, *kymo included*, is graded against it — so this
+is *correctness*, not agreement-with-kymo. **Mean Δ** is mean per-channel |Δ| vs
+Chrome (lower = more accurate); a sample "matches" if Mean Δ < 10.0.
+`chrome` (print-to-PDF) routes the same renderer as the ground truth, so it reads
+near-baseline (the method control). Per-category columns are mean Δ.
+
+| Engine | Backend | Renders | Matches Chrome | Mean Δ | coord | crash | geom | paint | path | paint-srv | render | shape | struct | style | types |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| chrome | `Google Chrome 149.0.7827.53` | 96/96 | 93/96 (97%) | **2.91** | 154.63 | 0.0 | 0.41 | 1.49 | 0.89 | 10.16 | 0.14 | 0.39 | 0.07 | 0.88 | 0.01 |
+| cairosvg | `Cairo (2.9.0)` | 96/96 | 93/96 (97%) | **3.2** | 156.6 | 0.0 | 0.33 | 4.49 | 1.47 | 0.61 | 0.14 | 0.6 | 0.07 | 0.2 | 0.01 |
+| vl-convert | `svg2pdf (vl-convert 1.9.0.post1)` | 96/96 | 93/96 (97%) | **4.28** | 156.6 | 0.0 | 0.24 | 1.72 | 0.99 | 0.92 | 0.15 | 0.54 | 15.09 | 0.08 | 0.02 |
+| inkscape | `Inkscape 1.2.2 (b0a8486541, 2022-12-01)` | 96/96 | 93/96 (97%) | **4.45** | 156.6 | 0.0 | 0.33 | 2.09 | 1.47 | 0.66 | 0.14 | 0.55 | 15.07 | 0.08 | 0.01 |
+| rsvg-convert | `rsvg-convert version 2.58.0` | 96/96 | 91/96 (95%) | **4.62** | 156.6 | 0.0 | 0.33 | 2.0 | 2.42 | 0.61 | 0.14 | 0.55 | 15.07 | 0.08 | 0.01 |
+| kymo | `svg2pdf (kymostudio-core 0.4.1)` | 96/96 | 90/96 (94%) | **4.72** | 156.6 | 0.0 | 0.24 | 2.52 | 2.2 | 0.92 | 0.15 | 0.54 | 15.09 | 0.08 | 0.02 |
+| libreoffice | `LibreOffice 24.2.7.2 420(Build:2)` | 87/96 | 76/96 (79%) | **9.16** | 154.35 | — | 0.94 | 12.24 | 5.3 | 11.1 | 0.41 | 1.6 | 18.99 | 0.55 | 0.11 |
+| fpdf2 | `fpdf2 (2.8.7)` | 91/96 | 74/96 (77%) | **11.63** | 156.6 | 0.0 | 42.2 | 10.44 | 3.16 | 33.32 | 0.15 | 0.59 | 6.17 | 14.71 | 0.02 |
+| svglib | `reportlab renderPDF (4.5.1, svglib 1.6.0)` | 94/96 | 73/96 (76%) | **13.32** | 156.6 | 0.0 | 3.29 | 18.94 | 5.45 | 88.08 | 0.15 | 0.54 | 0.84 | 10.34 | 0.02 |
+
+*Closer to 0 = closer to Chrome. Rows sorted by overall accuracy. On this neutral,
+third-party corpus every vector engine clusters — kymo's own SVGs are a separate,
+harder test (§1).*
+
+## 3. PDF structure — page geometry & vector content
 
 What actually landed in the PDF: page count, the page size relative to the SVG's
 own px size (engines disagree on the px→pt convention — kymo/vl-convert/fpdf2 keep
@@ -86,6 +115,12 @@ text the PDF preserves (extracted with PyMuPDF).
 - **vl-convert validates the method.** It wraps the same `svg2pdf`, so it lands
   ~0 diff on kymo's output — the same-engine control the svg2png bench gets from
   `resvg-py`, which has no PDF equivalent.
+- **Against Chrome on a neutral suite, kymo is correct — and so is most of the
+  field (§2).** On the web-platform-tests SVGs every vector engine clusters close
+  to the de-facto renderer; kymo sits with vl-convert / librsvg / Inkscape, and
+  `chrome` (print-to-PDF) reads near-baseline as expected. Notably `cairosvg`,
+  which emits *blank pages* on kymo's own SVGs (§1), is accurate here — confirming
+  its §1 failure is specific to kymo's `<style>` class fills, not a general defect.
 - **The famous renderers largely agree with kymo:** headless **Chrome** (the
   de-facto SVG renderer), **librsvg** and **LibreOffice** each reproduce the full
   diagram at high fidelity — independent cross-checks that kymo's output is
@@ -120,15 +155,20 @@ text the PDF preserves (extracted with PyMuPDF).
   item; convert each with every engine; rasterize page 1 with PyMuPDF, composite
   over white, and compare to kymo's rasterized page. Structural facts (page size,
   vector ops, images) come from the same PyMuPDF parse.
+- **Accuracy** (`accuracy.py` + `datasets.py`) — a vendored, self-contained subset
+  of the web-platform-tests `svg/` suite (`datasets/wpt-svg/`, see `PROVENANCE.md`),
+  each paired with a headless-Chrome reference (`gen_refs.py`, committed). Convert
+  each SVG with every engine, rasterize page 1, compare vs Chrome, rolled up per
+  category. Chrome is only needed to *regenerate* refs.
 - **Performance** (`perf.py`) — time each engine (median of 5 reps per
   file after one warm-up) converting the kymo SVGs to PDF bytes.
 
 ## Honest limitations
 
-- **Fidelity is agreement with kymo**, not an absolute ground truth. But with the
-  de-facto renderer (Chrome) and three other independent engines in the field all
-  converging on kymo's output, "self-consistent" and "correct" coincide here.
-  `vl-convert` (same `svg2pdf`) is the same-engine control.
+- **Two references, two questions.** Fidelity (§1) is *agreement with kymo* (with
+  `vl-convert` as the same-engine control); accuracy (§2) is *agreement with
+  Chrome*. Chrome is the de-facto SVG renderer but still one renderer — a category
+  where all engines diverge from it is a Chrome quirk as much as an engine one.
 - **Page count / extra pages.** Chrome prints via paged media, so it can emit a
   trailing blank page (paged-media overflow) — the `single-page` column shows
   this; fidelity scores page 1, which holds the diagram.
@@ -143,7 +183,7 @@ text the PDF preserves (extracted with PyMuPDF).
   subprocesses (Chrome/Inkscape) vs LibreOffice (a full office suite that
   re-inits a profile per call, so it is slow by construction, not by inefficiency
   at the conversion itself). Host-specific: `Linux-6.8.0-117-generic-x86_64-with-glibc2.39`, Python
-  3.13.13, 4 CPU, reps=5, 2026-06-07T02:12:47+00:00.
+  3.13.13, 4 CPU, reps=5, 2026-06-07T02:58:41+00:00.
 
 For the full write-up — motivation, method, per-engine analysis — read the
 **[`research/`](research/)** folder: a written article per benchmarking round.

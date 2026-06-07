@@ -1,0 +1,312 @@
+{
+  "generated_by": "benches/svg2pdf/accuracy.py",
+  "ground_truth": "headless Google Chrome",
+  "diff_threshold": 1,
+  "match_tolerance": 10.0,
+  "raster_zoom": 2.0,
+  "dataset": {
+    "source": "web-platform-tests svg/ (BSD-3-Clause / W3C)",
+    "samples": 96,
+    "categories": {
+      "coordinate-systems": 1,
+      "crashtests": 1,
+      "geometry": 4,
+      "painting": 24,
+      "path": 19,
+      "pservers": 5,
+      "render": 2,
+      "shapes": 11,
+      "struct": 12,
+      "styling": 16,
+      "types": 1
+    }
+  },
+  "missing_engines": [],
+  "engines": [
+    {
+      "key": "chrome",
+      "label": "chrome",
+      "backend": "Google Chrome 149.0.7827.53",
+      "renders": "96/96",
+      "matches_chrome": "93/96",
+      "match_rate": 0.9688,
+      "mean_abs_diff_avg": 2.91,
+      "mean_abs_diff_median": 0.13,
+      "pct_pixels_diff_avg": 4.62,
+      "per_category_mean_diff": {
+        "coordinate-systems": 154.63,
+        "crashtests": 0.0,
+        "geometry": 0.41,
+        "painting": 1.49,
+        "path": 0.89,
+        "pservers": 10.16,
+        "render": 0.14,
+        "shapes": 0.39,
+        "struct": 0.07,
+        "styling": 0.88,
+        "types": 0.01
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "cairosvg",
+      "label": "cairosvg",
+      "backend": "Cairo (2.9.0)",
+      "renders": "96/96",
+      "matches_chrome": "93/96",
+      "match_rate": 0.9688,
+      "mean_abs_diff_avg": 3.2,
+      "mean_abs_diff_median": 0.16,
+      "pct_pixels_diff_avg": 4.98,
+      "per_category_mean_diff": {
+        "coordinate-systems": 156.6,
+        "crashtests": 0.0,
+        "geometry": 0.33,
+        "painting": 4.49,
+        "path": 1.47,
+        "pservers": 0.61,
+        "render": 0.14,
+        "shapes": 0.6,
+        "struct": 0.07,
+        "styling": 0.2,
+        "types": 0.01
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "vl-convert",
+      "label": "vl-convert",
+      "backend": "svg2pdf (vl-convert 1.9.0.post1)",
+      "renders": "96/96",
+      "matches_chrome": "93/96",
+      "match_rate": 0.9688,
+      "mean_abs_diff_avg": 4.28,
+      "mean_abs_diff_median": 0.16,
+      "pct_pixels_diff_avg": 5.44,
+      "per_category_mean_diff": {
+        "coordinate-systems": 156.6,
+        "crashtests": 0.0,
+        "geometry": 0.24,
+        "painting": 1.72,
+        "path": 0.99,
+        "pservers": 0.92,
+        "render": 0.15,
+        "shapes": 0.54,
+        "struct": 15.09,
+        "styling": 0.08,
+        "types": 0.02
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "inkscape",
+      "label": "inkscape",
+      "backend": "Inkscape 1.2.2 (b0a8486541, 2022-12-01)",
+      "renders": "96/96",
+      "matches_chrome": "93/96",
+      "match_rate": 0.9688,
+      "mean_abs_diff_avg": 4.45,
+      "mean_abs_diff_median": 0.17,
+      "pct_pixels_diff_avg": 5.62,
+      "per_category_mean_diff": {
+        "coordinate-systems": 156.6,
+        "crashtests": 0.0,
+        "geometry": 0.33,
+        "painting": 2.09,
+        "path": 1.47,
+        "pservers": 0.66,
+        "render": 0.14,
+        "shapes": 0.55,
+        "struct": 15.07,
+        "styling": 0.08,
+        "types": 0.01
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "rsvg-convert",
+      "label": "rsvg-convert",
+      "backend": "rsvg-convert version 2.58.0",
+      "renders": "96/96",
+      "matches_chrome": "91/96",
+      "match_rate": 0.9479,
+      "mean_abs_diff_avg": 4.62,
+      "mean_abs_diff_median": 0.17,
+      "pct_pixels_diff_avg": 5.69,
+      "per_category_mean_diff": {
+        "coordinate-systems": 156.6,
+        "crashtests": 0.0,
+        "geometry": 0.33,
+        "painting": 2.0,
+        "path": 2.42,
+        "pservers": 0.61,
+        "render": 0.14,
+        "shapes": 0.55,
+        "struct": 15.07,
+        "styling": 0.08,
+        "types": 0.01
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "kymo",
+      "label": "kymo",
+      "backend": "svg2pdf (kymostudio-core 0.4.1)",
+      "renders": "96/96",
+      "matches_chrome": "90/96",
+      "match_rate": 0.9375,
+      "mean_abs_diff_avg": 4.72,
+      "mean_abs_diff_median": 0.16,
+      "pct_pixels_diff_avg": 5.46,
+      "per_category_mean_diff": {
+        "coordinate-systems": 156.6,
+        "crashtests": 0.0,
+        "geometry": 0.24,
+        "painting": 2.52,
+        "path": 2.2,
+        "pservers": 0.92,
+        "render": 0.15,
+        "shapes": 0.54,
+        "struct": 15.09,
+        "styling": 0.08,
+        "types": 0.02
+      },
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "libreoffice",
+      "label": "libreoffice",
+      "backend": "LibreOffice 24.2.7.2 420(Build:2)",
+      "renders": "87/96",
+      "matches_chrome": "76/96",
+      "match_rate": 0.7917,
+      "mean_abs_diff_avg": 9.16,
+      "mean_abs_diff_median": 0.91,
+      "pct_pixels_diff_avg": 8.52,
+      "per_category_mean_diff": {
+        "coordinate-systems": 154.35,
+        "crashtests": null,
+        "geometry": 0.94,
+        "painting": 12.24,
+        "path": 5.3,
+        "pservers": 11.1,
+        "render": 0.41,
+        "shapes": 1.6,
+        "struct": 18.99,
+        "styling": 0.55,
+        "types": 0.11
+      },
+      "failures": [
+        {
+          "item": "crashtests/ext",
+          "error": "RuntimeError: Warning: failed to launch javaldx - java may not function correctly\nError: source file could not be loaded"
+        },
+        {
+          "item": "painting/resources",
+          "error": "RuntimeError: Warning: failed to launch javaldx - java may not function correctly\nError: source file could not be loaded"
+        },
+        {
+          "item": "pservers/gradient-color-interpolation-ref",
+          "error": "RuntimeError: Warning: failed to launch javaldx - java may not function correctly\nError: source file could not be loaded"
+        },
+        {
+          "item": "shapes/circle-01-ref",
+          "error": "RuntimeError: Warning: failed to launch javaldx - java may not function correctly\nError: source file could not be loaded"
+        },
+        {
+          "item": "shapes/ellipse-04-ref",
+          "error": "RuntimeError: Warning: failed to launch javaldx - java may not function correctly\nError: source file could not be loaded"
+        }
+      ],
+      "failure_count": 9
+    },
+    {
+      "key": "fpdf2",
+      "label": "fpdf2",
+      "backend": "fpdf2 (2.8.7)",
+      "renders": "91/96",
+      "matches_chrome": "74/96",
+      "match_rate": 0.7708,
+      "mean_abs_diff_avg": 11.63,
+      "mean_abs_diff_median": 0.48,
+      "pct_pixels_diff_avg": 8.67,
+      "per_category_mean_diff": {
+        "coordinate-systems": 156.6,
+        "crashtests": 0.0,
+        "geometry": 42.2,
+        "painting": 10.44,
+        "path": 3.16,
+        "pservers": 33.32,
+        "render": 0.15,
+        "shapes": 0.59,
+        "struct": 6.17,
+        "styling": 14.71,
+        "types": 0.02
+      },
+      "failures": [
+        {
+          "item": "painting/paint-order-002-ref",
+          "error": "ValueError: use <Element '{http://www.w3.org/2000/svg}use' at 0x75cd1dde5ee0> references nonexistent ref id #poly"
+        },
+        {
+          "item": "painting/paint-order-003-ref",
+          "error": "ValueError: use <Element '{http://www.w3.org/2000/svg}use' at 0x75cd1dde6b60> references nonexistent ref id #poly"
+        },
+        {
+          "item": "painting/paint-order-text-decorations-ref",
+          "error": "ValueError: use <Element '{http://www.w3.org/2000/svg}use' at 0x75cd1dde7c40> references nonexistent ref id #poly"
+        },
+        {
+          "item": "styling/circle-with-parameters",
+          "error": "ValueError: unsupported color specification param(--color, black)"
+        },
+        {
+          "item": "styling/css-var-on-length-attributes-05",
+          "error": "ValueError: Unable to parse 'var(--length)' as a length"
+        }
+      ],
+      "failure_count": 5
+    },
+    {
+      "key": "svglib",
+      "label": "svglib",
+      "backend": "reportlab renderPDF (4.5.1, svglib 1.6.0)",
+      "renders": "94/96",
+      "matches_chrome": "73/96",
+      "match_rate": 0.7604,
+      "mean_abs_diff_avg": 13.32,
+      "mean_abs_diff_median": 0.25,
+      "pct_pixels_diff_avg": 9.01,
+      "per_category_mean_diff": {
+        "coordinate-systems": 156.6,
+        "crashtests": 0.0,
+        "geometry": 3.29,
+        "painting": 18.94,
+        "path": 5.45,
+        "pservers": 88.08,
+        "render": 0.15,
+        "shapes": 0.54,
+        "struct": 0.84,
+        "styling": 10.34,
+        "types": 0.02
+      },
+      "failures": [
+        {
+          "item": "pservers/gradient-color-interpolation-ref",
+          "error": "AttributeError: 'ParseError' object has no attribute 'prelude'"
+        },
+        {
+          "item": "styling/css-var-on-length-attributes-05",
+          "error": "ValueError: Can't convert 'var(--length)' to length"
+        }
+      ],
+      "failure_count": 2
+    }
+  ]
+}

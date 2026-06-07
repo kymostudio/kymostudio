@@ -10,6 +10,9 @@ converters — and answers:
   SVGs **kymo itself emits** (`<style>` class selectors, `height:auto`,
   pattern/gradient fills, embedded icons, a filter)? Reference = kymo. PDFs are
   rasterized with **PyMuPDF** (MuPDF) for the pixel comparison.
+- **Accuracy** — is the engine **correct**, judged against an *independent* ground
+  truth (**headless Google Chrome**, the de-facto SVG renderer) on a vendored
+  subset of the **web-platform-tests** SVG suite? Here **kymo is graded too**.
 - **Structure** — is the output *real vector content*? Page count, page size vs
   the SVG's own px size (the px→pt convention), vector-ops / embedded-image counts,
   and **selectable-text** chars on page 1.
@@ -56,11 +59,14 @@ written analysis per round.
 ```bash
 cd benches
 uv sync --extra svg2pdf          # one-time: pull the comparison converters
-uv run python svg2pdf/run.py     # fidelity + structure + perf → results/
+uv run python svg2pdf/run.py     # fidelity + accuracy + structure + perf → results/
 ```
 
-`run.py` writes `results/{quality,perf}.json` and the human-readable
-`results/REPORT.md`. Each pass also runs standalone (`quality.py`, `perf.py`).
+`run.py` writes `results/{quality,accuracy,perf}.json` and the human-readable
+`results/REPORT.md`. Each pass also runs standalone (`quality.py`, `accuracy.py`,
+`perf.py`). The accuracy pass reads the committed Chrome reference PNGs, so it
+needs no browser; Chrome is only needed to *regenerate* them
+(`uv run python svg2pdf/gen_refs.py`).
 
 > Dependencies. The **kymo** engine needs `kymostudio-core >= 0.4` (the release
 > that added `svg_to_pdf`); on an older core it is reported as skipped. Python
@@ -76,9 +82,15 @@ uv run python svg2pdf/run.py     # fidelity + structure + perf → results/
 
 - `engines.py` — the converter registry (one guarded adapter per engine).
 - `corpus.py` — real kymo SVGs rendered from `.kymo` sources (fidelity corpus).
+- `datasets.py` — the web-platform-tests SVG loader + viewBox-size normalizer.
 - `quality.py` — fidelity + structure vs the kymo reference (PyMuPDF rasterize).
+- `accuracy.py` — accuracy vs the Chrome ground truth, per category.
 - `perf.py` — SVG→PDF timing per engine.
-- `run.py` — runs both passes, renders `results/REPORT.md`.
-- `results/` — committed snapshot (`quality.json`, `perf.json`, `REPORT.md`).
+- `gen_refs.py` — render the Chrome reference PNGs (regeneration tool).
+- `run.py` — runs all three passes, renders `results/REPORT.md`.
+- `datasets/wpt-svg/` — vendored WPT SVG subset + committed Chrome refs (see
+  `PROVENANCE.md`).
+- `results/` — committed snapshot (`quality.json`, `accuracy.json`, `perf.json`,
+  `REPORT.md`).
 - `research/` — a written article per benchmarking round (hand-written, not
   auto-generated).
