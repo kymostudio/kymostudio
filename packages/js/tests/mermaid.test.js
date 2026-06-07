@@ -35,7 +35,7 @@ test("parseMermaid imports a decision flowchart with a diamond + icon-less nodes
   assert.ok(d.components.every((c) => c.icon === "" && c.size != null));
 
   const svg = await renderSVG(d);
-  assert.ok(svg.includes("flow-node") && svg.includes("flow-label"));
+  assert.ok(svg.includes("fc-shape") && svg.includes("fc-label"));
   assert.ok(svg.includes("<polygon") && svg.includes("<ellipse"));
   for (const label of ["Start", "Work", "ok?", "Done", "Store"]) assert.ok(svg.includes(label));
 });
@@ -44,7 +44,7 @@ test("bundled .mmd samples import + render without crashing", async () => {
   for (const name of ["approval", "pipeline"]) {
     const d = parseMermaid(readFileSync(join(SAMPLES, `${name}.mmd`), "utf-8"));
     const svg = await renderSVG(d);
-    assert.ok(svg.startsWith("<?xml") && svg.includes("flow-node"));
+    assert.ok(svg.startsWith("<?xml") && svg.includes("fc-shape"));
   }
 });
 

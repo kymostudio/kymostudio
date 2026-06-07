@@ -46,7 +46,7 @@ def test_sample_mmd_renders(name: str) -> None:
     icon no longer crashes `get_icon`) and emits flowchart-node markup."""
     svg = _render_mmd((SAMPLES / f"{name}.mmd").read_text(encoding="utf-8"))
     assert svg.startswith("<?xml")
-    assert "flow-node" in svg and "flow-label" in svg
+    assert "fc-shape" in svg and "fc-label" in svg
 
 
 def test_decision_shapes_and_labels() -> None:
@@ -121,4 +121,4 @@ def test_iconless_component_renders_outline() -> None:
     c = Component(id="n", name="Hi", subtitle="", icon="", shape="diamond",
                   accent="blue", pos=(50, 50), size=(80, 60))
     out = render_component(c)
-    assert "<polygon" in out and "flow-node" in out and ">Hi<" in out
+    assert "<polygon" in out and "fc-shape" in out and ">Hi<" in out

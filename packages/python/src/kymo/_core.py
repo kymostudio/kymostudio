@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 
 from .from_kymojson import model_from_dict
+from .from_kymojson import parse as parse_kymojson
 from .model import Diagram
 from .to_kymojson import model_dict
 
@@ -31,11 +32,11 @@ def import_bpmn(xml: str) -> Diagram:
 
 
 def import_mermaid(src: str) -> Diagram:
-    """Parse a Mermaid flowchart → a fully-resolved `Diagram` (layered layout
-    done in the core, no alignment pass). `mermaid_to_kymojson` returns the full
-    `.kymo.json` envelope, so deserialize with `parse_kymojson` (not the bare
-    model_from_dict the BPMN model-JSON path uses)."""
-    from .from_kymojson import parse as parse_kymojson
+    """Parse Mermaid source (flowchart) → a fully-resolved `Diagram`.
+
+    The core lays the graph out and returns a `.kymo.json` envelope, so the
+    result is already positioned — no Python layout/alignment pass, exactly
+    like a `.bpmn` import."""
     return parse_kymojson(_kcore.mermaid_to_kymojson(src))
 
 
@@ -52,6 +53,7 @@ def mermaid_to_dot(src: str) -> str:
 def normalize_mermaid(src: str) -> str:
     """Round-trip / normalize Mermaid flowchart source through the IR."""
     return _kcore.mermaid_to_mermaid(src)
+
 
 
 def layout_bpmn(blocks: list) -> Diagram:

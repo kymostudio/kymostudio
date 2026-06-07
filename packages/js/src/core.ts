@@ -74,14 +74,6 @@ export function coreParseBpmn(xml: string): Diagram {
   return modelFromDict(JSON.parse(bpmnImport(xml)));
 }
 
-/** Mermaid flowchart source → resolved `Diagram` (layered layout done in the
- *  core). `mermaidToKymoJson` returns the full `.kymo.json` envelope, so parse
- *  it with `parseKymoJson` (not the bare model-dict the BPMN path uses). */
-export function coreParseMermaid(src: string): Diagram {
-  ensureReady();
-  return parseKymoJson(mermaidToKymoJson(src));
-}
-
 /** Convert Mermaid flowchart source → D2 (via the shared flowchart IR). */
 export function coreMermaidToD2(src: string): string {
   ensureReady();
@@ -121,6 +113,14 @@ export function coreResolveFlowchart(d: Diagram): void {
 export function coreToBpmn(d: Diagram): string {
   ensureReady();
   return bpmnExport(JSON.stringify(modelDict(d)));
+}
+
+/** Mermaid source (flowchart) → resolved `Diagram`. The core lays the graph
+ *  out and returns a `.kymo.json` envelope, so the result is already
+ *  positioned — render it directly (no layout/alignment pass), like BPMN. */
+export function coreMermaidImport(src: string): Diagram {
+  ensureReady();
+  return parseKymoJson(mermaidToKymoJson(src));
 }
 
 /** Resolve a diagram's `bpmn { }` blocks in place (mirrors the old `bpmnLayout`). */

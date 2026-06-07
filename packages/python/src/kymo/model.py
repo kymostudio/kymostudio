@@ -11,10 +11,8 @@ from typing import Literal
 
 Shape   = Literal["circle", "cube", "cube-big", "box", "cylinder", "hex", "annotation",
                   "aws-tile", "aws-tile-hero", "badge", "image",
-                  # ── Flowchart glyph (Mermaid `{...}` decision rhombus) ────
-                  # Icon-less labelled shapes (icon==""); the outline IS the
-                  # visual and the label sits INSIDE. Sizes arrive via
-                  # Component.size from the Mermaid layout, not SHAPE_HALF.
+                  # Mermaid flowchart decision node (`{...}`); icon-less,
+                  # drawn as a rotated square by the icon-less render path.
                   "diamond",
                   # ── BPMN 2.0 glyphs (see bpmn_shapes.py) ─────────────────
                   # Imported from .bpmn files; positions/sizes come from the
@@ -39,12 +37,12 @@ SHAPE_HALF: dict[Shape, tuple[int, int]] = {
     "box":        (35, 35),
     "cylinder":   (35, 35),
     "hex":        (35, 32),     # flat-top hexagon — wider than tall
+    "diamond":    (40, 28),     # fallback only — Mermaid always sets size
     "annotation": (0, 0),
     "aws-tile":      (32, 32),
     "aws-tile-hero": (40, 40),  # +25% over aws-tile — visual weight for orchestrator (§6.7.2)
     "badge":      (14, 14),     # numbered step circle (§6.7.3)
     "image":      (32, 32),     # file-backed PNG/SVG icon (mingrammer-style)
-    "diamond":    (40, 32),     # flowchart decision — fallback; real size via Component.size
     # BPMN — fallbacks only; real sizes arrive via Component.size from DI.
     "bpmn-start":        (18, 18),
     "bpmn-end":          (18, 18),
@@ -68,13 +66,12 @@ LABEL_HEIGHT: dict[Shape, int] = {
     "box":        38,
     "cylinder":   38,
     "hex":        40,
+    "diamond":    0,            # icon-less: label sits inside the glyph
     "annotation": 0,
     "aws-tile":      48,
     "aws-tile-hero": 48,
     "badge":      0,
     "image":      26,           # 1 label line + small clearance for bottom-anchored edges
-    "diamond":    0,            # flowchart label is INSIDE the glyph — no band below
-
     # BPMN edges always carry explicit waypoints (Edge.points), so no
     # label clearance is needed — anchors sit flush with the glyph box.
     "bpmn-start":        0,
@@ -142,9 +139,11 @@ class Component:
         bottom anchor sits flush with the icon's bottom edge."""
         cx, cy = self.pos
         hw, hh = self.half
-        # Icon-less flowchart nodes carry the label INSIDE the glyph, so there
-        # is no label band below — anchors sit flush with the shape edge.
-        lh = LABEL_HEIGHT.get(self.shape, 0) if (self.icon and (self.name or self.subtitle)) else 0
+        # Icon-less nodes (Mermaid flowchart) carry their label INSIDE the
+        # glyph, so there is no label band below — the bottom anchor stays
+        # flush with the box. Only icon-bearing nodes push past the label.
+        labelled = bool((self.name or self.subtitle) and self.icon)
+        lh = LABEL_HEIGHT.get(self.shape, 0) if labelled else 0
         match side:
             case "top":
                 return (cx, cy - hh)

@@ -82,49 +82,51 @@ const REGION_STYLE = `
     .region-rect--inner { fill: rgba(124,58,237,0.03); stroke: #7c3aed; stroke-width: 1.3; stroke-dasharray: 4 4; }
     .region-label--inner { font-size: 12px; font-weight: 600; fill: #6d28d9; }`;
 
-// Flowchart-node styling — injected only when the diagram has icon-less nodes
-// (Mermaid flowchart imports), so icon-card diagrams stay byte-identical.
-const FLOW_CSS = `
-    .flow-node  { fill: #eef4ff; stroke: #4b6b8a; stroke-width: 1.6; }
-    .flow-label { fill: #0f172a; font-size: 13px; font-weight: 600; text-anchor: middle; }`;
+// Flowchart-node styling — injected ONLY when a diagram has icon-less nodes
+// (Mermaid imports), so icon-bearing diagrams stay byte-identical. Nodes
+// carry their label centred INSIDE the glyph.
+const FLOWCHART_STYLE = `
+    .fc-shape { fill: #eff6ff; stroke: #3b82f6; stroke-width: 1.6; }
+    .fc-shape-line { fill: none; stroke: #3b82f6; stroke-width: 1.6; stroke-linecap: round; }
+    .fc-label { fill: #1e3a8a; font-size: 13px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }`;
 
 /**
- * Draw an icon-less flowchart node: the shape OUTLINE sized to `c.size`, with
- * the label centered INSIDE it (Mermaid flowchart imports — box / rounded /
- * circle / diamond / hex / cylinder / stadium carry no icon).
+ * Icon-less flowchart node (Mermaid import): a shape outline sized from
+ * `Component.size`, with the label centred INSIDE the glyph. Handles the
+ * six shapes the Mermaid importer emits (MERMAID-MAP-001 §3).
  */
-function flowNode(c: Component): string {
+function flowchartNode(c: Component): string {
   const [cx, cy] = c.pos;
   const [hw, hh] = half(c);
-  const w = 2 * hw, h = 2 * hh;
-  const x0 = cx - hw, y0 = cy - hh, x1 = cx + hw, y1 = cy + hh;
   let glyph: string;
   switch (c.shape) {
     case "circle":
-      glyph = `<ellipse class="flow-node" cx="${cx}" cy="${cy}" rx="${hw}" ry="${hh}"/>`;
+      glyph = `<ellipse class="fc-shape" cx="${cx}" cy="${cy}" rx="${hw}" ry="${hh}"/>`;
       break;
     case "diamond":
-      glyph = `<polygon class="flow-node" points="${cx},${y0} ${x1},${cy} ${cx},${y1} ${x0},${cy}"/>`;
+      glyph = `<polygon class="fc-shape" points="${cx},${cy - hh} ${cx + hw},${cy} ${cx},${cy + hh} ${cx - hw},${cy}"/>`;
       break;
     case "hex": {
-      const inset = Math.min(hh, Math.floor(hw / 2));
-      glyph = `<polygon class="flow-node" points="${x0},${cy} ${x0 + inset},${y0} ${x1 - inset},${y0} ${x1},${cy} ${x1 - inset},${y1} ${x0 + inset},${y1}"/>`;
+      const s = Math.min(hh, (hw / 2) | 0);
+      glyph = `<polygon class="fc-shape" points="${cx - hw},${cy} ${cx - hw + s},${cy - hh} ${cx + hw - s},${cy - hh} ${cx + hw},${cy} ${cx + hw - s},${cy + hh} ${cx - hw + s},${cy + hh}"/>`;
       break;
     }
     case "cylinder": {
-      const ry = Math.max(4, Math.floor(hh / 4));
-      glyph = `<path class="flow-node" d="M${x0},${y0 + ry} A${hw},${ry} 0 0 0 ${x1},${y0 + ry} L${x1},${y1 - ry} A${hw},${ry} 0 0 1 ${x0},${y1 - ry} Z"/>`
-            + `<ellipse class="flow-node" cx="${cx}" cy="${y0 + ry}" rx="${hw}" ry="${ry}"/>`;
+      const ry = Math.max(4, Math.round(hh * 0.22));
+      const top = cy - hh + ry, bot = cy + hh - ry;
+      glyph =
+        `<path class="fc-shape" d="M${cx - hw},${top} V${bot} A${hw},${ry} 0 0 0 ${cx + hw},${bot} V${top} A${hw},${ry} 0 0 1 ${cx - hw},${top} Z"/>` +
+        `<path class="fc-shape-line" d="M${cx - hw},${top} A${hw},${ry} 0 0 0 ${cx + hw},${top}"/>`;
       break;
     }
-    case "badge":   // stadium / pill
-      glyph = `<rect class="flow-node" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="${hh}"/>`;
+    case "badge":
+      glyph = `<rect class="fc-shape" x="${cx - hw}" y="${cy - hh}" width="${2 * hw}" height="${2 * hh}" rx="${hh}"/>`;
       break;
-    default:        // box & rounded rectangle
-      glyph = `<rect class="flow-node" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="6"/>`;
+    default: // "box" and any other icon-less shape — rounded rectangle.
+      glyph = `<rect class="fc-shape" x="${cx - hw}" y="${cy - hh}" width="${2 * hw}" height="${2 * hh}" rx="6"/>`;
   }
-  const label = c.name ? `<text class="flow-label" x="${cx}" y="${cy + 5}">${escapeXml(c.name)}</text>` : "";
-  return `<g>${glyph}${label}</g>`;
+  const label = c.name ? `<text class="fc-label" x="${cx}" y="${cy}">${escapeXml(c.name)}</text>` : "";
+  return glyph + label;
 }
 
 /** Horizontally-biased cubic Bézier between two resolved anchor points. */
@@ -164,7 +166,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
   const pad = opts.padding ?? 52;
   const background = opts.background === undefined ? "#f8fafc" : opts.background;
   const needsRegionStyle = d.regions.length > 0;
-  const hasFlow = d.components.some((c) => !c.icon);
+  const needsFlowchartStyle = d.components.some((c) => !c.icon);
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   const grow = (x: number, y: number): void => {
@@ -173,8 +175,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
   };
   for (const c of d.components) {
     const [hw, hh] = half(c);
-    // Icon-less flowchart nodes label INSIDE the glyph — no band below.
-    const lh = !c.icon ? 0 : (c.size ? (c.name ? 30 : 0) : (LABEL_HEIGHT[c.shape] ?? 0));
+    const lh = c.size ? (c.name ? 30 : 0) : (LABEL_HEIGHT[c.shape] ?? 0);
     grow(c.pos[0] - hw, c.pos[1] - hh);
     grow(c.pos[0] + hw, c.pos[1] + hh + lh);
   }
@@ -205,7 +206,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 
   const nodes: string[] = [];
   for (const c of d.components) {
-    if (!c.icon) { nodes.push(flowNode(c)); continue; }
+    if (!c.icon) { nodes.push(flowchartNode(c)); continue; }
     const glyph = await getIcon(c.icon);
     const [, hh] = half(c);
     const parts = [`<g transform="translate(${c.pos[0]},${c.pos[1]})" filter="url(#soft)">${glyph}</g>`];
@@ -228,7 +229,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${w} ${h}" width="${w}" height="${h}">
   <defs>${DEFS}
   </defs>
-  <style>${CSS}${needsRegionStyle ? REGION_STYLE : ""}${hasFlow ? FLOW_CSS : ""}
+  <style>${CSS}${needsRegionStyle ? REGION_STYLE : ""}${needsFlowchartStyle ? FLOWCHART_STYLE : ""}
   </style>
   ${bg}
   ${title}${regionRects}

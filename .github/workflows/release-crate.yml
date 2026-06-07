@@ -17,6 +17,12 @@ defaults:
   run:
     working-directory: packages/rust/kymostudio-core
 
+env:
+  # Opt JS actions into Node 24 ahead of GitHub's 2026-06-16 forced switch —
+  # silences the Node 20 deprecation warnings (some pinned actions have no
+  # Node24-native release yet).
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   verify-version:
     name: Verify Version
@@ -72,7 +78,7 @@ jobs:
           - { runner: macos-15-intel,  target: x86_64 }
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
       - name: Build wheel
@@ -83,7 +89,7 @@ jobs:
           args: --release --out dist
           sccache: 'true'
           manylinux: auto
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: dist-${{ matrix.platform.runner }}-${{ matrix.platform.target }}
           path: packages/rust/kymostudio-core/dist/*.whl
@@ -100,7 +106,7 @@ jobs:
           working-directory: packages/rust/kymostudio-core
           command: sdist
           args: --out dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: dist-sdist
           path: packages/rust/kymostudio-core/dist/*.tar.gz
@@ -178,7 +184,7 @@ jobs:
       id-token: write
     steps:
       - name: Download all built distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: dist-*
           path: dist
@@ -202,9 +208,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
-      - uses: jetli/wasm-pack-action@v0.4.0
+      - uses: taiki-e/install-action@v2
         with:
-          version: 'latest'
+          tool: wasm-pack
       - uses: actions/setup-node@v5
         with:
           node-version: '20'

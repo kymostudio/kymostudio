@@ -11,6 +11,35 @@ packages share a version number.
 
 ### Added
 
+- **Native `flowchart [DIR] { … }` DSL block.** Author a flowchart inline in a
+  `.kymo` file — the block body is Mermaid flowchart syntax, laid out by the core
+  (mirrors the `bpmn { }` block). Direction is optional (`flowchart LR { … }`,
+  default `TD`). Implemented in both Python (`dsl.py`) and JS (`dsl.ts`); see the
+  KYMO-DSL grammar §6.11.
+- **Flowchart transpilation: `mmd → {Mermaid, D2, DOT}`.** The core's flowchart
+  parse model was lifted into a format-neutral **flowchart IR** (`crate::flowchart`)
+  — a positionless node/edge/subgraph hub. New text emitters convert a Mermaid
+  flowchart to **D2**, **Graphviz DOT**, or **Mermaid** (round-trip / normalize);
+  each target lays the graph out itself, so no geometry is involved. Surfaced as
+  Rust APIs (`mermaid_to_d2` / `mermaid_to_dot` / `mermaid_to_mermaid`), the `kymo`
+  CLI (output extension picks the target: `kymo flow.mmd flow.d2` / `flow.dot` /
+  `norm.mmd`), and PyO3 + wasm bindings (Python `kymo._core.mermaid_to_d2` …; JS
+  `mermaidToD2` / `mermaidToDot` / `normalizeMermaid`). Golden + round-trip-fixpoint
+  + determinism tests; DOT output validated against Graphviz.
+
+## [0.4.3] - 2026-06-07
+
+### Added
+
+- **Mermaid rendering + CLI parity (Python/JS).** The Phase-1 Mermaid importer
+  is now usable end-to-end from both front-ends. The Python and JS renderers
+  gain a `diamond` glyph and an icon-less flowchart-node path
+  (`box`/`circle`/`cylinder`/`badge`/`hex`/`diamond` drawn with the label inside);
+  flowchart CSS is injected conditionally so existing output stays byte-identical.
+  `kymo foo.mmd` now renders in the Python CLI (`cli.py` → `_core.import_mermaid`)
+  and JS CLI (`render-cli.mjs` → `parseMermaid`), and the vscode-extension
+  previews/exports `.mmd`/`.mermaid`. The core's `mermaid_to_kymojson` binding
+  ships in this release.
 - **Mermaid flowchart import (Rust core).** `kymostudio-core` gains a Mermaid
   importer — the first parser/model/layout subsystem to live in the Rust engine
   (rather than being duplicated in Python and JS like BPMN). It parses Mermaid
@@ -26,30 +55,6 @@ packages share a version number.
   See `docs/specs/mermaid/` (FEAT-MERMAID-001) and
   `docs/formats/mermaid/mermaid-mapping.md` (MERMAID-MAP-001); samples
   `samples/pipeline.mmd`, `samples/approval.mmd`.
-- **Mermaid flowcharts now render in kymo (Python + JS).** A `.mmd` file is a
-  first-class source: `kymo flow.mmd` produces an SVG directly (the `kymo` CLI in
-  both packages dispatches `.mmd`/`.mermaid` → import via the core → render). Both
-  renderers gained a flowchart-node draw path — the shape **outline** (box /
-  rounded / circle / diamond / hexagon / cylinder / stadium) with the label
-  **inside** it, instead of kymo's icon-card style — plus the `diamond` glyph.
-  Excalidraw export draws native shapes for these nodes too. **Requires a
-  `kymostudio-core` that ships the Mermaid binding**; the import/render paths
-  degrade gracefully (skip / clear error) on an older core.
-- **Native `flowchart [DIR] { … }` DSL block.** Author a flowchart inline in a
-  `.kymo` file — the block body is Mermaid flowchart syntax, laid out by the core
-  (mirrors the `bpmn { }` block). Direction is optional (`flowchart LR { … }`,
-  default `TD`). Implemented in both Python (`dsl.py`) and JS (`dsl.ts`). See
-  `docs/DSL.md`.
-- **Flowchart transpilation: `mmd → {Mermaid, D2, DOT}`.** The core's flowchart
-  parse model was lifted into a format-neutral **flowchart IR** (`crate::flowchart`)
-  — a positionless node/edge/subgraph hub. New text emitters convert a Mermaid
-  flowchart to **D2**, **Graphviz DOT**, or **Mermaid** (round-trip / normalize);
-  each target lays the graph out itself, so no geometry is involved. Surfaced as
-  Rust APIs (`mermaid_to_d2` / `mermaid_to_dot` / `mermaid_to_mermaid`), the `kymo`
-  CLI (output extension picks the target: `kymo flow.mmd flow.d2` / `flow.dot` /
-  `norm.mmd`), and PyO3 + wasm bindings (Python `kymo._core.mermaid_to_d2` …; JS
-  `mermaidToD2` / `mermaidToDot` / `normalizeMermaid`). Golden + round-trip-fixpoint
-  + determinism tests; DOT output validated against Graphviz.
 
 ## [0.4.2] - 2026-06-07
 

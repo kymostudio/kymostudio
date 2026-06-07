@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 315 532"
+width="315" height="532"
+style="max-width: 100%; height: auto"
+font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"><style> text { fill: #1f2937; }
+.bg-grid { fill: url(#dot-grid); }
+.region-rect {
+fill: rgba(15, 23, 42, 0.02);
+stroke: #232f3e; /* AWS navy — admin boundary */
+stroke-width: 1.5;
+stroke-dasharray: 6 5;
+}
+.region-rect--inner {
+fill: rgba(124, 58, 237, 0.03);
+stroke: #7c3aed; /* purple — logical subgroup */
+stroke-width: 1.4;
+stroke-dasharray: 4 4;
+}
+.region-rect--cluster {
+fill: #eaf3ff; /* light-blue solid (mingrammer cluster look) */
+stroke: #b8d0ee;
+stroke-width: 1.2;
+stroke-dasharray: none;
+}
+.region-label {
+font-size: 13px; font-weight: 700; fill: #232f3e; letter-spacing: 0.06em;
+text-transform: uppercase;
+paint-order: stroke; stroke: #fafafa; stroke-width: 4; stroke-linejoin: round;
+}
+.region-label--inner { fill: #6d28d9; }
+.region-label--cluster {
+fill: #475569; font-size: 11px; letter-spacing: 0.02em;
+text-transform: none; font-weight: 500;
+paint-order: stroke; stroke: #eaf3ff; stroke-width: 3;
+}
+.component-name { font-size: 14px; font-weight: 700; text-anchor: middle; fill: #0f172a; }
+.component-sub { font-size: 11.5px; font-weight: 400; text-anchor: middle; fill: #64748b; }
+.diagram-title { font-size: 20px; font-weight: 800; text-anchor: middle; fill: #0f172a; letter-spacing: 0.01em; }
+.diagram-subtitle { font-size: 13px; font-weight: 400; text-anchor: middle; fill: #64748b; }
+.icon-shadow { filter: url(#shadow); }
+.edge-path {
+fill: none;
+stroke: #64748b;
+stroke-width: 1.8;
+stroke-linejoin: round;
+stroke-linecap: round;
+/* `filter: drop-shadow(...)` removed — rsvg-convert mis-renders the
+first path under a drop-shadow filter (drops it entirely). The
+shadow was barely visible anyway. */
+}
+.edge-path--orange { stroke: #ea580c; }
+.edge-shadow {
+fill: none;
+stroke: rgba(15, 23, 42, 0.06);
+stroke-width: 4.5;
+stroke-linejoin: round;
+stroke-linecap: round;
+}
+.edge-label {
+font-size: 11.5px; font-weight: 500; fill: #334155; text-anchor: middle;
+paint-order: stroke; stroke: #fafafa; stroke-width: 4; stroke-linejoin: round;
+}
+.edge-label--ext { fill: #c2410c; font-weight: 600; }
+.edge-label--small { font-size: 10.5px; }
+
+.fc-shape { fill: #eff6ff; stroke: #3b82f6; stroke-width: 1.6; }
+.fc-shape-line { fill: none; stroke: #3b82f6; stroke-width: 1.6; stroke-linecap: round; }
+.fc-label { font-size: 13px; font-weight: 600; fill: #1e3a8a; text-anchor: middle; dominant-baseline: central; } </style><defs><!-- Open-V arrowheads: stroke-only, thinner, more elegant than filled triangles.
+markerUnits=userSpaceOnUse keeps the stroke at the declared width
+regardless of the path's own stroke-width. --><marker id="arrow-gray" viewBox="0 0 12 10" refX="11" refY="5"
+markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse"><path d="M2,1 L11,5 L2,9" fill="none"
+stroke="#64748b" stroke-width="1.6"
+stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="arrow-orange" viewBox="0 0 12 10" refX="11" refY="5"
+markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse"><path d="M2,1 L11,5 L2,9" fill="none"
+stroke="#ea580c" stroke-width="1.6"
+stroke-linecap="round" stroke-linejoin="round"/></marker><!-- Soft drop shadow for icons --><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.18"/></filter><!-- Engineering-paper dot grid (very subtle) --><pattern id="dot-grid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" fill="#0f172a" fill-opacity="0.045"/></pattern><!-- Gradient highlight for cube faces (subtle, top→bottom darken) --><linearGradient id="g-face-front" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#82c70a"/><stop offset="100%" stop-color="#6ba600"/></linearGradient><linearGradient id="g-face-top" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b7e756"/><stop offset="100%" stop-color="#a0d440"/></linearGradient><linearGradient id="g-face-side" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#588a00"/><stop offset="100%" stop-color="#446a00"/></linearGradient><linearGradient id="g-box-orange" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient><linearGradient id="g-cyl-orange" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#ea7c1e"/></linearGradient><linearGradient id="g-user-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect width="315" height="532" fill="#fafafa"/><rect width="315" height="532" class="bg-grid"/><!-- title block (top, fixed) --><!-- content (auto-translated down by title_block_h) --><!-- region rects --><!-- edges --><path class="edge-path" d="M 205,86 L 205,166" marker-end="url(#arrow-gray)"/><path class="edge-path" d="M 205,230 L 205,310" marker-end="url(#arrow-gray)"/><text class="edge-label" x="205" y="270"> yes </text><path class="edge-path" d="M 135,198 L 124,198 L 124,333 L 114,333" marker-end="url(#arrow-gray)"/><text class="edge-label" x="124" y="265"> no </text><path class="edge-path" d="M 205,356 L 205,436" marker-end="url(#arrow-gray)"/><path class="edge-path" d="M 114,333 L 145,333 L 145,464 L 177,464" marker-end="url(#arrow-gray)"/><!-- components --><rect class="fc-shape" x="172" y="40" width="66" height="46" rx="6"/><text class="fc-label" x="205" y="63"> Start </text><polygon class="fc-shape" points="205,166 275,198 205,230 135,198"/><text class="fc-label" x="205" y="198"> Is it valid? </text><rect class="fc-shape" x="164" y="310" width="82" height="46" rx="6"/><text class="fc-label" x="205" y="333"> Process </text><rect class="fc-shape" x="40" y="310" width="74" height="46" rx="6"/><text class="fc-label" x="77" y="333"> Reject </text><ellipse class="fc-shape" cx="205" cy="464" rx="28" ry="28"/><text class="fc-label" x="205" y="464"> Done </text><!-- region labels (drawn last so they sit on top of crossing arrows) --></svg>

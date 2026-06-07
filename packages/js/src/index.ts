@@ -32,7 +32,7 @@ export { resolveAlignments } from "./alignment.js";
 export {
   init, initSync,
   coreParseBpmn as parseBpmn,
-  coreParseMermaid as parseMermaid,
+  coreMermaidImport as parseMermaid,   // Mermaid flowchart source → Diagram
   coreMermaidToD2 as mermaidToD2,
   coreMermaidToDot as mermaidToDot,
   coreNormalizeMermaid as normalizeMermaid,

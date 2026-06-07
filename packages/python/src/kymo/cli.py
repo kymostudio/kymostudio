@@ -82,7 +82,7 @@ def load(source: Path) -> tuple[object, object | None, object | None]:
         return parse_kymojson(source.read_text(encoding="utf-8")), None, None
     if source.suffix in (".mmd", ".mermaid"):
         from ._core import import_mermaid
-        # Mermaid flowcharts are laid out by the core — already positioned, no layout.
+        # Mermaid imports are laid out by the core — already resolved, no layout.
         return import_mermaid(source.read_text(encoding="utf-8")), None, None
     if source.suffix == ".kymo":
         return parse_dsl(source.read_text(encoding="utf-8"))

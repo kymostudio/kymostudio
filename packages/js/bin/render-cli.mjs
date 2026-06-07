@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const USAGE = [
   "usage: kymo <input> [output] [--scale N]",
-  "  <input>   .svg | .kymo | .bpmn | .kymo.json | .mmd",
+  "  <input>   .svg | .kymo | .bpmn | .kymo.json",
   "  <output>  .svg, .png or .pdf; omitted → input name with .svg",
   "            (or .png when the input is a .svg)",
   "  -s, --scale N   PNG scale factor, 1.0 = intrinsic size (PNG output only)",
@@ -66,9 +66,9 @@ async function renderToSvg(input) {
   const lib = await import("../dist/index.js");
   const text = readFileSync(input, "utf-8");
   const low = input.toLowerCase();
-  // BPMN import + `bpmn { }` layout (in .bpmn / .kymo) delegate to the wasm core,
-  // which must be initialized before the synchronous parse calls.
   const isMermaid = low.endsWith(".mmd") || low.endsWith(".mermaid");
+  // BPMN import + `bpmn { }` layout (in .bpmn / .kymo) and Mermaid import all
+  // delegate to the wasm core, which must be initialized before the calls.
   if (low.endsWith(".bpmn") || low.endsWith(".kymo") || isMermaid) await initCore(lib);
   let diagram;
   if (low.endsWith(".bpmn")) diagram = lib.parseBpmn(text);
