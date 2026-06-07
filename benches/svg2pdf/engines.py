@@ -9,46 +9,51 @@ how fast?**
 
 The reference is ``kymo`` — the `kymo … out.pdf` back-end, which is `svg2pdf`
 (the usvg-lineage vector converter by typst) running inside `kymostudio-core`.
-The field of comparison engines, widest reasonable set of well-known FOSS
-SVG→PDF tools reachable from Python:
+The field is the widest reasonable set of well-known FOSS SVG→PDF tools reachable
+from Python — converters *and* famous general-purpose software that can print SVG:
 
-  • ``rsvg-convert`` — librsvg (GNOME), via its CLI. A separate, high-fidelity
-                       vector engine — the closest thing to an independent
-                       reference (it, like kymo, embeds the diagram icons).
-  • ``cairosvg``     — Cairo's `svg2pdf`. Pure-Python + Cairo; widely used.
-  • ``svglib``       — svglib + reportlab's `renderPDF` (ReportLab graphics).
+  • ``chrome``       — headless Google Chrome `--print-to-pdf` (the de-facto SVG
+                       renderer). SVG inlined in a sized HTML page.
+  • ``rsvg-convert`` — librsvg (GNOME), via its CLI.
+  • ``inkscape``     — the Inkscape vector editor, headless export.
+  • ``libreoffice``  — LibreOffice headless `--convert-to pdf`.
+  • ``vl-convert``   — vl-convert (`vl_convert.svg_to_pdf`); built on the *same*
+                       `svg2pdf` as kymo, so it doubles as a same-engine control.
+  • ``cairosvg``     — Cairo's `svg2pdf`.
+  • ``svglib``       — svglib + reportlab's `renderPDF`.
   • ``fpdf2``        — fpdf2's `fpdf.svg` (pure-Python, zero native deps).
 
-Unlike the svg2png bench there is **no same-engine control**: `resvg-py` has no
-PDF path (resvg rasterizes; only `svg2pdf` in the core emits PDF), so the kymo
-row stands alone as the reference. That is an honest limitation, called out in
-the report.
-
 The kymo engine needs ``kymostudio-core >= 0.4`` (the release that added
-``svg_to_pdf``); on an older core `kymo.to_pdf` raises ``ModuleNotFoundError``
-and the engine reports as missing like any absent package. Likewise
-``rsvg-convert`` is skipped when the binary is not on ``PATH``.
-
-Engines whose package/binary is unavailable are skipped — the bench degrades
-gracefully rather than crashing.
+``svg_to_pdf``). The CLI engines (`chrome`, `rsvg-convert`, `inkscape`,
+`libreoffice`) are skipped when their binary is not on ``PATH``; the Python ones
+when their package is not importable. The bench degrades gracefully rather than
+crashing.
 """
 from __future__ import annotations
 
 import logging
 import os
+import re
 import shutil
 import subprocess
 import tempfile
 import warnings
 from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
 from typing import Callable
 
 # The engine that authored the SVGs — its PDF is the fidelity reference.
 REFERENCE_KEY = "kymo"
 
 # Every engine the bench knows about (for reporting which were skipped).
-ALL_KEYS = {"kymo", "rsvg-convert", "cairosvg", "svglib", "fpdf2"}
+ALL_KEYS = {
+    "kymo", "chrome", "rsvg-convert", "inkscape", "libreoffice",
+    "vl-convert", "cairosvg", "svglib", "fpdf2",
+}
+
+_CHROME_CANDIDATES = ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser")
+_WH = re.compile(r'width\s*=\s*["\']\s*([\d.]+).*?height\s*=\s*["\']\s*([\d.]+)', re.IGNORECASE | re.DOTALL)
 
 
 def _pkg_version(dist: str) -> str:
@@ -56,6 +61,17 @@ def _pkg_version(dist: str) -> str:
         return version(dist)
     except PackageNotFoundError:
         return "?"
+
+
+def _svg_size(svg: str, default: tuple[float, float] = (800.0, 600.0)) -> tuple[float, float]:
+    """Intrinsic px size from the root <svg> width/height, else `default`."""
+    m = _WH.search(svg[:600])
+    if not m:
+        return default
+    try:
+        return float(m.group(1)), float(m.group(2))
+    except ValueError:
+        return default
 
 
 @dataclass
@@ -67,15 +83,13 @@ class Engine:
 
 
 # --- adapters -------------------------------------------------------------
-# Each builder imports its package lazily and returns an Engine, or None if the
-# package/binary is missing. The render callable takes BOTH the str and the
+# Each builder imports its package / locates its binary lazily and returns an
+# Engine, or None if unavailable. The render callable takes BOTH the str and the
 # pre-encoded bytes so every engine gets the exact same SVG and no adapter
 # re-encodes per rep.
 
 
 def _kymo() -> Engine | None:
-    # `to_pdf` raises ModuleNotFoundError when the installed core predates 0.4
-    # (no `svg_to_pdf`) — treat that exactly like a missing package.
     try:
         from kymo.to_pdf import render_pdf
     except ModuleNotFoundError:
@@ -88,11 +102,50 @@ def _kymo() -> Engine | None:
     return Engine(REFERENCE_KEY, "kymo", backend, render)
 
 
+# Minimal white HTML page sized to the SVG. `svg{display:block}` + `line-height:0`
+# kill the inline-element descender gap that otherwise overflows onto a 2nd page.
+_CHROME_HTML = (
+    "<!DOCTYPE html><html><head><meta charset='utf-8'><style>"
+    "@page{{size:{w}px {h}px;margin:0}}*{{margin:0;padding:0;border:0}}"
+    "html,body{{background:#fff;line-height:0}}svg{{display:block}}"
+    "</style></head><body>{svg}</body></html>"
+)
+
+
+def _chrome() -> Engine | None:
+    exe = next((shutil.which(c) for c in _CHROME_CANDIDATES if shutil.which(c)), None)
+    if not exe:
+        return None
+    try:
+        out = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=10)
+        backend = out.stdout.strip() or "Chrome (headless print-to-pdf)"
+    except Exception:
+        backend = "Chrome (headless print-to-pdf)"
+
+    def render(svg_str: str, svg_bytes: bytes) -> bytes:
+        w, h = _svg_size(svg_str)
+        html = _CHROME_HTML.format(w=f"{w:g}", h=f"{h:g}", svg=svg_str)
+        with tempfile.TemporaryDirectory() as td:
+            hp = Path(td) / "page.html"
+            op = Path(td) / "out.pdf"
+            hp.write_text(html, encoding="utf-8")
+            r = subprocess.run(
+                [exe, "--headless=new", "--disable-gpu", "--no-sandbox",
+                 "--no-pdf-header-footer", f"--user-data-dir={Path(td) / 'ud'}",
+                 "--virtual-time-budget=3000", f"--print-to-pdf={op}", str(hp)],
+                capture_output=True, timeout=120,
+            )
+            if not op.exists() or op.stat().st_size == 0:
+                raise RuntimeError((r.stderr.decode("utf-8", "replace") or "chrome produced no PDF").strip()[:200])
+            return op.read_bytes()
+
+    return Engine("chrome", "chrome", backend, render)
+
+
 def _rsvg() -> Engine | None:
     exe = shutil.which("rsvg-convert")
     if not exe:
         return None
-    # Best-effort version string from `rsvg-convert --version`.
     try:
         out = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=10)
         backend = out.stdout.strip().splitlines()[0] if out.stdout else "librsvg (rsvg-convert)"
@@ -102,13 +155,78 @@ def _rsvg() -> Engine | None:
     def render(svg_str: str, svg_bytes: bytes) -> bytes:
         r = subprocess.run([exe, "-f", "pdf"], input=svg_bytes, capture_output=True)
         if r.returncode != 0:
-            msg = (r.stderr.decode("utf-8", "replace") or "rsvg-convert failed").strip()
-            raise RuntimeError(msg[:200])
+            raise RuntimeError((r.stderr.decode("utf-8", "replace") or "rsvg-convert failed").strip()[:200])
         if not r.stdout.startswith(b"%PDF"):
             raise RuntimeError("rsvg-convert produced no PDF")
         return r.stdout
 
     return Engine("rsvg-convert", "rsvg-convert", backend, render)
+
+
+def _inkscape() -> Engine | None:
+    exe = shutil.which("inkscape")
+    if not exe:
+        return None
+    try:
+        out = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=30)
+        backend = (out.stdout.strip().splitlines()[0] if out.stdout else "Inkscape")
+    except Exception:
+        backend = "Inkscape"
+
+    def render(svg_str: str, svg_bytes: bytes) -> bytes:
+        with tempfile.TemporaryDirectory() as td:
+            ip = Path(td) / "in.svg"
+            op = Path(td) / "out.pdf"
+            ip.write_bytes(svg_bytes)
+            r = subprocess.run(
+                [exe, str(ip), "--export-type=pdf", f"--export-filename={op}"],
+                capture_output=True, timeout=120, env={**os.environ, "HOME": td},
+            )
+            if not op.exists() or op.stat().st_size == 0:
+                raise RuntimeError((r.stderr.decode("utf-8", "replace") or "inkscape produced no PDF").strip()[:200])
+            return op.read_bytes()
+
+    return Engine("inkscape", "inkscape", backend, render)
+
+
+def _libreoffice() -> Engine | None:
+    exe = shutil.which("soffice") or shutil.which("libreoffice")
+    if not exe:
+        return None
+    try:
+        out = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=60)
+        backend = out.stdout.strip().splitlines()[0] if out.stdout else "LibreOffice"
+    except Exception:
+        backend = "LibreOffice"
+
+    def render(svg_str: str, svg_bytes: bytes) -> bytes:
+        with tempfile.TemporaryDirectory() as td:
+            ip = Path(td) / "doc.svg"
+            op = Path(td) / "doc.pdf"
+            ip.write_bytes(svg_bytes)
+            r = subprocess.run(
+                [exe, "--headless", "--convert-to", "pdf", "--outdir", td, str(ip),
+                 f"-env:UserInstallation=file://{Path(td) / 'profile'}"],
+                capture_output=True, timeout=180,
+            )
+            if not op.exists() or op.stat().st_size == 0:
+                raise RuntimeError((r.stderr.decode("utf-8", "replace") or "soffice produced no PDF").strip()[:200])
+            return op.read_bytes()
+
+    return Engine("libreoffice", "libreoffice", backend, render)
+
+
+def _vlconvert() -> Engine | None:
+    try:
+        import vl_convert as vlc
+    except ModuleNotFoundError:
+        return None
+    backend = f"svg2pdf (vl-convert {_pkg_version('vl-convert-python')})"
+
+    def render(svg_str: str, svg_bytes: bytes) -> bytes:
+        return vlc.svg_to_pdf(svg_str)
+
+    return Engine("vl-convert", "vl-convert", backend, render)
 
 
 def _cairosvg() -> Engine | None:
@@ -181,9 +299,12 @@ def _fpdf2() -> Engine | None:
     return Engine("fpdf2", "fpdf2", backend, render)
 
 
-# Display order: reference first, then the independent high-fidelity engine,
-# then the pure-Python field.
-_BUILDERS = (_kymo, _rsvg, _cairosvg, _svglib, _fpdf2)
+# Display order: reference first, then the famous renderers / independent vector
+# engines, then the same-engine control and the pure-Python field.
+_BUILDERS = (
+    _kymo, _chrome, _rsvg, _inkscape, _libreoffice,
+    _vlconvert, _cairosvg, _svglib, _fpdf2,
+)
 
 
 def available_engines() -> list[Engine]:

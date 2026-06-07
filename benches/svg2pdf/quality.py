@@ -59,7 +59,7 @@ RASTER_ZOOM = 2.0
 class PdfRender:
     """A rasterized + introspected PDF page-1: image plus structural facts."""
 
-    __slots__ = ("image", "page_w", "page_h", "pages", "drawings", "images")
+    __slots__ = ("image", "page_w", "page_h", "pages", "drawings", "images", "text_len")
 
     def __init__(self, pdf: bytes):
         doc = fitz.open(stream=pdf, filetype="pdf")
@@ -71,6 +71,10 @@ class PdfRender:
         self.page_h = float(page.rect.height)
         self.drawings = len(page.get_drawings())
         self.images = len(page.get_images())
+        # Selectable text: chars extractable from page 1. Converters that embed
+        # real text (svg2pdf/Cairo/Chrome) report > 0; those that rasterize or
+        # path-ify text report ~0. A reported axis, not part of the verdict.
+        self.text_len = len(page.get_text().strip())
         pix = page.get_pixmap(matrix=fitz.Matrix(RASTER_ZOOM, RASTER_ZOOM), alpha=True)
         self.image = _on_white(pix.tobytes("png"))
 
@@ -113,6 +117,7 @@ def collect() -> dict:
         scales: list[float] = []
         draws: list[int] = []
         imgs: list[int] = []
+        texts: list[int] = []
         mean_diffs: list[float] = []
         pct_diffs: list[float] = []
         failures: list[dict] = []
@@ -132,6 +137,7 @@ def collect() -> dict:
                 scales.append(r.page_w / item.width)
             draws.append(r.drawings)
             imgs.append(r.images)
+            texts.append(r.text_len)
             mean, pct = _fidelity(ref_imgs[item.name], r.image)
             mean_diffs.append(mean)
             pct_diffs.append(pct)
@@ -151,6 +157,10 @@ def collect() -> dict:
             "page_scale_avg": round(sum(scales) / len(scales), 3) if scales else None,
             "avg_drawings": round(sum(draws) / len(draws), 1) if draws else None,
             "avg_images": round(sum(imgs) / len(imgs), 1) if imgs else None,
+            # Selectable-text axis: avg extractable chars per page, and whether
+            # any rendered page carried text at all.
+            "avg_text_chars": round(sum(texts) / len(texts)) if texts else None,
+            "has_text": any(t > 0 for t in texts),
             # Fidelity averaged over the files this engine rendered. For the
             # reference these are 0 by construction (it's compared to itself).
             "mean_abs_diff_avg": round(sum(mean_diffs) / len(mean_diffs), 2) if mean_diffs else None,

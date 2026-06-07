@@ -52,16 +52,18 @@ def _scorecard(q: dict, p: dict) -> str:
 
 
 def _structure_table(q: dict) -> str:
-    head = "| Engine | Single-page | Page scale vs SVG | Avg vector ops | Avg images |"
-    sep = "|---|---|---|---|---|"
+    head = "| Engine | Single-page | Page scale vs SVG | Avg vector ops | Avg images | Text (chars) |"
+    sep = "|---|---|---|---|---|---|"
     rows = []
     for r in q["engines"]:
         scale = r["page_scale_avg"]
+        txt = r.get("avg_text_chars")
         rows.append(
             f"| {r['label']} | {r['single_page']} | "
             f"{('×' + str(scale)) if scale is not None else '—'} | "
             f"{r['avg_drawings'] if r['avg_drawings'] is not None else '—'} | "
-            f"{r['avg_images'] if r['avg_images'] is not None else '—'} |"
+            f"{r['avg_images'] if r['avg_images'] is not None else '—'} | "
+            f"{txt if txt is not None else '—'} |"
         )
     return "\n".join([head, sep] + rows)
 
@@ -118,9 +120,10 @@ def _render_report(q: dict, p: dict) -> str:
 > **Fidelity** — does an engine reproduce the PDF *kymo itself emits* from the
 > SVGs *kymo itself emits*, as real vector content? PDFs are rasterized with
 > **{q['rasterizer']}** for the pixel comparison. Fidelity is deterministic;
-> *timing* is machine-dependent (host below), not a gate. There is **no
-> same-engine control** (resvg has no PDF path); `rsvg-convert` (librsvg) is the
-> closest independent cross-check.
+> *timing* is machine-dependent (host below), not a gate. The field spans famous
+> general-purpose renderers (headless **Chrome**, **Inkscape**, **LibreOffice**)
+> and dedicated converters; **vl-convert** is built on the same `svg2pdf` as kymo,
+> so it doubles as a same-engine control (expected ~0 diff).
 {missing_block}
 ## 1. Fidelity + speed — vs kymo, on real kymo SVGs
 
@@ -139,30 +142,44 @@ shown only when an engine converted the same file set.*
 ## 2. PDF structure — page geometry & vector content
 
 What actually landed in the PDF: page count, the page size relative to the SVG's
-own px size (engines disagree on the px→pt convention — kymo and fpdf2 keep
-1 px → 1 pt (×1.0), while Cairo and librsvg apply the CSS 96-dpi conversion,
-1 px → 0.75 pt (×0.75); the drawing is identical, only the nominal page differs),
-and how much vector/image content page 1 carries (kymo and librsvg embed the
-diagram icons as images).
+own px size (engines disagree on the px→pt convention — kymo/vl-convert/fpdf2 keep
+1 px → 1 pt (×1.0), while Chrome/Inkscape/LibreOffice/Cairo/librsvg apply the CSS
+96-dpi conversion, 1 px → 0.75 pt (×0.75); the drawing is identical, only the
+nominal page differs), how much vector/image content page 1 carries (most engines
+embed the diagram icons as images), and **Text (chars)** — how much *selectable*
+text the PDF preserves (extracted with PyMuPDF).
 
 {_structure_table(q)}
 
 ## What this shows
 
 - **kymo's `svg2pdf` core produces a complete vector PDF** for the SVGs kymo
-  emits — paths as vectors, icons embedded as images — and is the reference here.
-- **librsvg (`rsvg-convert`)** is the one *independent* engine that reproduces
-  kymo's output faithfully: full vector content and the same embedded icons. It
-  is the closest thing to a cross-check in the absence of a same-engine control.
-- **The pure-Python field struggles on kymo's real SVGs:** `cairosvg` emits
-  blank pages (it doesn't apply kymo's `<style>` class fills → 0 vector ops),
+  emits — paths as vectors, icons embedded as images, selectable text — and is
+  the reference here.
+- **vl-convert validates the method.** It wraps the same `svg2pdf`, so it lands
+  ~0 diff on kymo's output — the same-engine control the svg2png bench gets from
+  `resvg-py`, which has no PDF equivalent.
+- **The famous renderers largely agree with kymo:** headless **Chrome** (the
+  de-facto SVG renderer), **librsvg** and **LibreOffice** each reproduce the full
+  diagram at high fidelity — independent cross-checks that kymo's output is
+  correct, not merely self-consistent. **Inkscape is the exception:** it matches
+  on the simple conformance graphs (Δ ≈ 6) but diverges hard on the icon-rich
+  architecture samples (Δ 80–140), where its PDF export of kymo's embedded raster
+  icons / dense content departs from the resvg/Chrome consensus — pulling its
+  corpus average to a low-fidelity 17.
+- **The dedicated pure-Python converters are the ones that fall down:** `cairosvg`
+  emits blank pages (it doesn't apply kymo's `<style>` class fills → 0 vector ops),
   `svglib` can't parse `height:auto`, and `fpdf2` renders the simpler conformance
-  graphs closely but rejects the icon-rich samples' `rgba()` fills and drops
+  graphs but rejects the icon-rich samples' `rgba()` fills and drops
   `<marker>`/`<filter>`/`<pattern>` — so its low diff is over that easy subset only.
-- Engines disagree on the **px→pt convention** (page-scale column): kymo and
-  fpdf2 keep 1 SVG px = 1 PDF pt (×1.0), while Cairo and librsvg apply the CSS
-  96-dpi conversion (1 px → 0.75 pt, ×0.75). The rendered drawing is the same;
-  only the nominal page size differs.
+- **Selectable text survives in most engines** (Text column): the `svg2pdf`-based
+  pair (kymo, vl-convert) and the renderers (Chrome, Inkscape, LibreOffice) keep
+  real text — so kymo's PDFs *are* searchable, contrary to the old "svg2pdf
+  paths-out-text" lore; cairosvg's blank pages carry none.
+- Engines disagree on the **px→pt convention** (page-scale column): kymo,
+  vl-convert and fpdf2 keep 1 SVG px = 1 PDF pt (×1.0); Chrome, Inkscape,
+  LibreOffice, Cairo and librsvg apply the CSS 96-dpi conversion (×0.75). The
+  rendered drawing is the same; only the nominal page size differs.
 
 ## Per-engine failures
 
@@ -180,18 +197,25 @@ diagram icons as images).
 
 ## Honest limitations
 
-- **One reference, one question.** Fidelity is *agreement with kymo*; there is no
-  same-engine control (resvg has no PDF path), so `rsvg-convert` (librsvg) is the
-  independent cross-check rather than a ground truth.
-- **Text rendering differs by design.** `svg2pdf` (kymo) converts text to vector
-  paths — crisp, but not selectable; Cairo/librsvg can embed real text. The
-  rasterized comparison scores *appearance*, not text-selectability.
+- **Fidelity is agreement with kymo**, not an absolute ground truth. But with the
+  de-facto renderer (Chrome) and three other independent engines in the field all
+  converging on kymo's output, "self-consistent" and "correct" coincide here.
+  `vl-convert` (same `svg2pdf`) is the same-engine control.
+- **Page count / extra pages.** Chrome prints via paged media, so it can emit a
+  trailing blank page (paged-media overflow) — the `single-page` column shows
+  this; fidelity scores page 1, which holds the diagram.
+- **Text axis measures presence, not placement.** The Text column counts
+  extractable characters, confirming a PDF keeps real text; it does not verify the
+  glyphs are positioned pixel-for-pixel (that is the fidelity pass's job).
 - Engines that default to a transparent background are composited over white
   before comparison, so they aren't penalised for the alpha convention.
 - Comparison is via rasterization (PyMuPDF/MuPDF), so it inherits MuPDF's own
   rendering — a second renderer in the loop, applied identically to every engine.
-- Timing is host-specific (`{env['platform']}`, Python {env['python']},
-  {env['cpu_count']} CPU, reps={env['reps']}, {env['timestamp']}).
+- **Timing spans very different cost models** — in-process libraries vs CLI
+  subprocesses (Chrome/Inkscape) vs LibreOffice (a full office suite that
+  re-inits a profile per call, so it is slow by construction, not by inefficiency
+  at the conversion itself). Host-specific: `{env['platform']}`, Python
+  {env['python']}, {env['cpu_count']} CPU, reps={env['reps']}, {env['timestamp']}.
 
 For the full write-up — motivation, method, per-engine analysis — read the
 **[`research/`](research/)** folder: a written article per benchmarking round.

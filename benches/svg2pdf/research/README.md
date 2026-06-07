@@ -8,7 +8,8 @@ auto-generated; the live machine output is the scorecard at
 
 | Date | Article | Gist |
 |---|---|---|
-| 2026-06-07 | [Benchmarking SVG→PDF against the FOSS field](2026-06-07-svg-to-pdf-field-benchmark.md) | kymo's `svg2pdf` core + librsvg are the only engines that faithfully convert kymo's real SVGs; the pure-Python field (cairosvg/svglib/fpdf2) renders empty or fails. The engines also split 96-dpi vs 72-dpi on page size. |
+| 2026-06-07 | [The full FOSS field: nine engines](2026-06-07-full-field-svg-to-pdf.md) | Field widened to 9 (adds Chrome, Inkscape, LibreOffice, vl-convert) + a text-extractability axis. vl-convert is pixel-identical (same svg2pdf → the same-engine control); Chrome/librsvg/LibreOffice agree; Inkscape diverges on the icon-rich samples. Two round-one assumptions overturned: there *is* a same-engine control, and svg2pdf embeds real selectable text. |
+| 2026-06-07 | [Benchmarking SVG→PDF against the FOSS field](2026-06-07-svg-to-pdf-field-benchmark.md) | First round, 5 engines: kymo's `svg2pdf` core + librsvg are the only engines that faithfully convert kymo's real SVGs; the pure-Python field (cairosvg/svglib/fpdf2) renders empty or fails. The engines also split 96-dpi vs 72-dpi on page size. |
 
 ## Adding a new round
 
