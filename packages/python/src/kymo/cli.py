@@ -63,7 +63,6 @@ from pathlib import Path
 from .alignment import resolve_alignments
 from .dsl import parse as parse_dsl
 from .layout import layout
-from .to_bpmn import export as render_bpmn
 from .to_excalidraw import render as render_excalidraw
 from .to_figma import render as render_figma
 from .to_kymojson import export as render_kymojson
@@ -73,9 +72,9 @@ from .to_svg import render
 def load(source: Path) -> tuple[object, object | None, object | None]:
     """Load a diagram source. Returns (DIAGRAM, LAYOUT, EXTERNAL_LAYOUT)."""
     if source.suffix == ".bpmn":
-        from .from_bpmn import parse as parse_bpmn
+        from ._core import import_bpmn
         # BPMN files carry their own geometry — already resolved, no layout.
-        return parse_bpmn(source.read_text(encoding="utf-8")), None, None
+        return import_bpmn(source.read_text(encoding="utf-8")), None, None
     if source.suffix == ".json":
         from .from_kymojson import parse as parse_kymojson
         # .kymo.json holds a fully-resolved model — already positioned, no layout.
@@ -145,8 +144,8 @@ def _load_resolved(src: Path):
     diagram, layout_spec, external_layout = load(src)
     had_bpmn = bool(getattr(diagram, "bpmn_blocks", None))
     if had_bpmn:
-        from .bpmn_layout import layout as layout_bpmn
-        layout_bpmn(diagram)
+        from ._core import apply_layout
+        apply_layout(diagram)
     if layout_spec:
         layout(diagram, layout_spec, external_layout)
     if src.suffix not in (".bpmn", ".json") and not had_bpmn:
@@ -328,7 +327,8 @@ def main() -> None:
         return
 
     if bpmn:
-        payload = render_bpmn(diagram)
+        from ._core import export_bpmn
+        payload = export_bpmn(diagram)
         out = src.with_suffix(".bpmn")
         if out.resolve() == src.resolve():            # don't clobber a .bpmn input
             out = src.with_name(src.stem + ".export.bpmn")

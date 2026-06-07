@@ -63,10 +63,10 @@ python = ["dep:pyo3", "system-fonts", "pdf", "bpmn"]
 # wasm (browser + Node) — NO system-fonts (no fs/mmap on wasm). Includes pdf so
 # the JS CLI has SVG→PDF parity with Python/Rust; this pulls a second SVG engine
 # (svg2pdf's usvg 0.45) into the bundle — text still needs fonts embedded in the
-# SVG since system fonts aren't available on wasm. BPMN is NOT in the wasm build
-# yet (the JS library still has its own port); it joins when the JS delegation
-# lands, to keep the wasm bundle lean until then.
-wasm = ["dep:wasm-bindgen", "pdf"]
+# SVG since system fonts aren't available on wasm. Includes bpmn so the JS library
+# delegates BPMN import/export/layout/render to this one source of truth (adds
+# roxmltree + serde_json, ~+100KB).
+wasm = ["dep:wasm-bindgen", "pdf", "bpmn"]
 
 # BPMN import/export/layout/shapes — the single-source-of-truth stack. On for
 # native builds + the Python wheel; validated by tests/bpmn_conformance.rs against

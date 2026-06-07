@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_kymo">
   <bpmn:collaboration id="Collab_kymo">
-    <bpmn:participant id="Pool_Customer" name="Customer" processRef="Process_kymo" />
-    <bpmn:participant id="Pool_Shop" name="Online Shop" />
-    <bpmn:messageFlow id="flow0" sourceRef="Pool_Customer" targetRef="Start_Order" />
-    <bpmn:messageFlow id="flow1" sourceRef="Task_Dispatch" targetRef="Pool_Customer" />
+    <bpmn:participant id="Pool_Customer" name="Customer" processRef="Process_kymo"/>
+    <bpmn:participant id="Pool_Shop" name="Online Shop"/>
+    <bpmn:messageFlow id="flow0" sourceRef="Pool_Customer" targetRef="Start_Order"/>
+    <bpmn:messageFlow id="flow1" sourceRef="Task_Dispatch" targetRef="Pool_Customer"/>
   </bpmn:collaboration>
   <bpmn:process id="Process_kymo" isExecutable="false">
     <bpmn:laneSet id="LaneSet_kymo">
@@ -26,132 +26,132 @@
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:startEvent id="Start_Order" name="Order received">
-      <bpmn:messageEventDefinition />
+      <bpmn:messageEventDefinition/>
     </bpmn:startEvent>
-    <bpmn:userTask id="Task_Review" name="Review order" />
-    <bpmn:exclusiveGateway id="GW_Approved" name="Approved?" default="flow5" />
-    <bpmn:userTask id="Task_Notify" name="Notify customer" />
-    <bpmn:endEvent id="End_Rejected" name="Order rejected" />
-    <bpmn:serviceTask id="Task_Reserve" name="Reserve stock" />
-    <bpmn:manualTask id="Task_Pack" name="Pack items" />
-    <bpmn:sendTask id="Task_Dispatch" name="Dispatch shipment" />
-    <bpmn:endEvent id="End_Shipped" name="Shipped" />
-    <bpmn:dataStoreReference id="DataStore_Inv" name="Inventory" />
-    <bpmn:dataObjectReference id="DataObj_Label" name="Shipping label" />
+    <bpmn:userTask id="Task_Review" name="Review order"/>
+    <bpmn:exclusiveGateway id="GW_Approved" name="Approved?" default="flow5"/>
+    <bpmn:userTask id="Task_Notify" name="Notify customer"/>
+    <bpmn:endEvent id="End_Rejected" name="Order rejected"/>
+    <bpmn:serviceTask id="Task_Reserve" name="Reserve stock"/>
+    <bpmn:manualTask id="Task_Pack" name="Pack items"/>
+    <bpmn:sendTask id="Task_Dispatch" name="Dispatch shipment"/>
+    <bpmn:endEvent id="End_Shipped" name="Shipped"/>
+    <bpmn:dataStoreReference id="DataStore_Inv" name="Inventory"/>
+    <bpmn:dataObjectReference id="DataObj_Label" name="Shipping label"/>
     <bpmn:textAnnotation id="Anno_QC">
       <bpmn:text>Fragile goods — manual quality check</bpmn:text>
     </bpmn:textAnnotation>
-    <bpmn:sequenceFlow id="flow2" sourceRef="Start_Order" targetRef="Task_Review" />
-    <bpmn:sequenceFlow id="flow3" sourceRef="Task_Review" targetRef="GW_Approved" />
-    <bpmn:sequenceFlow id="flow4" sourceRef="GW_Approved" targetRef="Task_Reserve" name="yes" />
-    <bpmn:sequenceFlow id="flow5" sourceRef="GW_Approved" targetRef="Task_Notify" name="no" />
-    <bpmn:sequenceFlow id="flow6" sourceRef="Task_Notify" targetRef="End_Rejected" />
-    <bpmn:sequenceFlow id="flow7" sourceRef="Task_Reserve" targetRef="Task_Pack" />
-    <bpmn:sequenceFlow id="flow8" sourceRef="Task_Pack" targetRef="Task_Dispatch" />
-    <bpmn:sequenceFlow id="flow9" sourceRef="Task_Dispatch" targetRef="End_Shipped" />
-    <bpmn:association id="flow10" sourceRef="Task_Pack" targetRef="Anno_QC" />
+    <bpmn:sequenceFlow id="flow2" sourceRef="Start_Order" targetRef="Task_Review"/>
+    <bpmn:sequenceFlow id="flow3" sourceRef="Task_Review" targetRef="GW_Approved"/>
+    <bpmn:sequenceFlow id="flow4" sourceRef="GW_Approved" targetRef="Task_Reserve" name="yes"/>
+    <bpmn:sequenceFlow id="flow5" sourceRef="GW_Approved" targetRef="Task_Notify" name="no"/>
+    <bpmn:sequenceFlow id="flow6" sourceRef="Task_Notify" targetRef="End_Rejected"/>
+    <bpmn:sequenceFlow id="flow7" sourceRef="Task_Reserve" targetRef="Task_Pack"/>
+    <bpmn:sequenceFlow id="flow8" sourceRef="Task_Pack" targetRef="Task_Dispatch"/>
+    <bpmn:sequenceFlow id="flow9" sourceRef="Task_Dispatch" targetRef="End_Shipped"/>
+    <bpmn:association id="flow10" sourceRef="Task_Pack" targetRef="Anno_QC"/>
   </bpmn:process>
   <bpmndi:BPMNDiagram>
     <bpmndi:BPMNPlane bpmnElement="Collab_kymo">
       <bpmndi:BPMNShape bpmnElement="Pool_Customer" isHorizontal="true">
-        <dc:Bounds x="30" y="30" width="970" height="60" />
+        <dc:Bounds x="30" y="30" width="970" height="60"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Pool_Shop" isHorizontal="true">
-        <dc:Bounds x="30" y="120" width="970" height="380" />
+        <dc:Bounds x="30" y="120" width="970" height="380"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Lane_Sales" isHorizontal="true">
-        <dc:Bounds x="60" y="120" width="940" height="180" />
+        <dc:Bounds x="60" y="120" width="940" height="180"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Lane_Ful" isHorizontal="true">
-        <dc:Bounds x="60" y="300" width="940" height="200" />
+        <dc:Bounds x="60" y="300" width="940" height="200"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Start_Order">
-        <dc:Bounds x="100" y="192" width="36" height="36" />
+        <dc:Bounds x="100" y="192" width="36" height="36"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Task_Review">
-        <dc:Bounds x="190" y="170" width="100" height="80" />
+        <dc:Bounds x="190" y="170" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="GW_Approved">
-        <dc:Bounds x="350" y="185" width="50" height="50" />
+        <dc:Bounds x="350" y="185" width="50" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Task_Notify">
-        <dc:Bounds x="470" y="170" width="100" height="80" />
+        <dc:Bounds x="470" y="170" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="End_Rejected">
-        <dc:Bounds x="640" y="192" width="36" height="36" />
+        <dc:Bounds x="640" y="192" width="36" height="36"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Task_Reserve">
-        <dc:Bounds x="190" y="350" width="100" height="80" />
+        <dc:Bounds x="190" y="350" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Task_Pack">
-        <dc:Bounds x="350" y="350" width="100" height="80" />
+        <dc:Bounds x="350" y="350" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Task_Dispatch">
-        <dc:Bounds x="510" y="350" width="100" height="80" />
+        <dc:Bounds x="510" y="350" width="100" height="80"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="End_Shipped">
-        <dc:Bounds x="680" y="372" width="36" height="36" />
+        <dc:Bounds x="680" y="372" width="36" height="36"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="DataStore_Inv">
-        <dc:Bounds x="215" y="446" width="50" height="50" />
+        <dc:Bounds x="215" y="446" width="50" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="DataObj_Label">
-        <dc:Bounds x="382" y="446" width="36" height="50" />
+        <dc:Bounds x="382" y="446" width="36" height="50"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="Anno_QC">
-        <dc:Bounds x="490" y="446" width="170" height="44" />
+        <dc:Bounds x="490" y="446" width="170" height="44"/>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow0">
-        <di:waypoint x="118" y="90" />
-        <di:waypoint x="118" y="192" />
+        <di:waypoint x="118" y="90"/>
+        <di:waypoint x="118" y="192"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1">
-        <di:waypoint x="592" y="350" />
-        <di:waypoint x="592" y="90" />
+        <di:waypoint x="592" y="350"/>
+        <di:waypoint x="592" y="90"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2">
-        <di:waypoint x="136" y="210" />
-        <di:waypoint x="190" y="210" />
+        <di:waypoint x="136" y="210"/>
+        <di:waypoint x="190" y="210"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow3">
-        <di:waypoint x="290" y="210" />
-        <di:waypoint x="350" y="210" />
+        <di:waypoint x="290" y="210"/>
+        <di:waypoint x="350" y="210"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow4">
-        <di:waypoint x="375" y="235" />
-        <di:waypoint x="375" y="305" />
-        <di:waypoint x="240" y="305" />
-        <di:waypoint x="240" y="350" />
+        <di:waypoint x="375" y="235"/>
+        <di:waypoint x="375" y="305"/>
+        <di:waypoint x="240" y="305"/>
+        <di:waypoint x="240" y="350"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="371" y="260" width="40" height="14" />
+          <dc:Bounds x="371" y="260" width="40" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5">
-        <di:waypoint x="400" y="210" />
-        <di:waypoint x="470" y="210" />
+        <di:waypoint x="400" y="210"/>
+        <di:waypoint x="470" y="210"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="414" y="188" width="40" height="14" />
+          <dc:Bounds x="414" y="188" width="40" height="14"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6">
-        <di:waypoint x="570" y="210" />
-        <di:waypoint x="640" y="210" />
+        <di:waypoint x="570" y="210"/>
+        <di:waypoint x="640" y="210"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7">
-        <di:waypoint x="290" y="390" />
-        <di:waypoint x="350" y="390" />
+        <di:waypoint x="290" y="390"/>
+        <di:waypoint x="350" y="390"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow8">
-        <di:waypoint x="450" y="390" />
-        <di:waypoint x="510" y="390" />
+        <di:waypoint x="450" y="390"/>
+        <di:waypoint x="510" y="390"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow9">
-        <di:waypoint x="610" y="390" />
-        <di:waypoint x="680" y="390" />
+        <di:waypoint x="610" y="390"/>
+        <di:waypoint x="680" y="390"/>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow10">
-        <di:waypoint x="420" y="430" />
-        <di:waypoint x="500" y="446" />
+        <di:waypoint x="420" y="430"/>
+        <di:waypoint x="500" y="446"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

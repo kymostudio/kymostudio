@@ -20,6 +20,9 @@ async function main() {
     target: "node18",
     outfile: "dist/extension.js",
     external: ["vscode"],
+    // Inline the kymostudio-core wasm (BPMN engine) as bytes so the single-file
+    // VSIX can `initSync` it with no node_modules at runtime.
+    loader: { ".wasm": "binary" },
     sourcemap: !production,
     minify: production,
     logLevel: "info",

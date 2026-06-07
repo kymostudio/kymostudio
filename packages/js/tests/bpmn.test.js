@@ -1,3 +1,4 @@
+import "./_init.mjs";
 /**
  * BPMN 2.0 import + render tests for the JS package (parity with the Python
  * `test_from_bpmn.py`). `npm test` builds dist/ first, so import the build.

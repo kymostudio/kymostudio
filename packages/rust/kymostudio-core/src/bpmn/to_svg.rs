@@ -133,6 +133,48 @@ const DEFS: &str = r##"
 </linearGradient>
 "##;
 
+// Animation preset appended to STYLE when `RenderOpts.animate` — mirrors Python
+// `to_svg.ANIM_STYLE` (= `ANIM_PRESETS["flow"]`). Targets `.edge-path`; BPMN flows use
+// `.bpmn-flow`, so this matches Python byte-for-byte without changing BPMN visuals.
+const ANIM_STYLE: &str = r##"
+@keyframes edge-flow {
+  from { stroke-dashoffset: 16; }
+  to   { stroke-dashoffset:  0; }
+}
+.edge-path {
+  stroke-dasharray: 8 4;
+  animation: edge-flow 1.2s linear infinite;
+}
+.edge-path--orange { animation-duration: 0.8s; }
+
+@keyframes component-breath {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.92; }   /* 8 % dip */
+}
+.icon-shadow {
+  animation: component-breath 2.4s ease-in-out infinite;
+}
+
+/* `accent="red"` components (HITL etc.) — pulse hue toward red so the
+   "needs human" semantic surfaces only in animated mode. */
+@keyframes alert-flash {
+  0%, 70%, 100% { filter: hue-rotate(0deg); }
+  35%           { filter: hue-rotate(-130deg); }
+}
+.alert-pulse { animation: alert-flash 2.4s ease-in-out infinite; }
+"##;
+
+/// Render options mirroring Python `to_svg.render(d, animate)` + the JS
+/// `renderSVG(d, {background})` surface. Defaults (animate off, `#fafafa` background)
+/// keep the committed SVG goldens byte-identical.
+#[derive(Debug, Clone, Default)]
+pub struct RenderOpts {
+    /// Append the `flow` animation preset to the stylesheet.
+    pub animate: bool,
+    /// Background-rect fill; `None` → `#fafafa` (the Python default).
+    pub background: Option<String>,
+}
+
 // ── Whitespace tidy (mirrors `_tidy`) ───────────────────────────────────────────
 fn tidy(svg: &str) -> String {
     // Pass A: replace each `>...<` text run — blank → "", else " " + trimmed + " ".
@@ -438,9 +480,15 @@ fn title_block(d: &Diagram) -> (String, i64) {
     (parts.join("\n  "), y + GAP_BLOCK)
 }
 
+/// Render a diagram to SVG with default options (animate off, `#fafafa` background).
+/// Convenience over [`render_opts`]; keeps the committed SVG goldens byte-identical.
+pub fn render(d: &Diagram) -> String {
+    render_opts(d, &RenderOpts::default())
+}
+
 /// Render a diagram to a single self-contained SVG string. BPMN-only (the
 /// architecture-icon component path is intentionally not ported here).
-pub fn render(d: &Diagram) -> String {
+pub fn render_opts(d: &Diagram, opts: &RenderOpts) -> String {
     let region_rects = join_nl2(d.regions.iter().map(render_region_rect));
     let region_labels = join_nl2(d.regions.iter().map(render_region_label));
     let edges = join_nl2(d.edges.iter().map(render_edge));
@@ -461,7 +509,9 @@ pub fn render(d: &Diagram) -> String {
     let bpmn_style = if has_bpmn { shapes::BPMN_STYLE } else { "" };
     let bpmn_defs = if has_bpmn { shapes::BPMN_DEFS } else { "" };
 
-    let style = format!("{STYLE}{bpmn_style}");
+    let anim = if opts.animate { ANIM_STYLE } else { "" };
+    let style = format!("{STYLE}{bpmn_style}{anim}");
+    let background = opts.background.as_deref().unwrap_or("#fafafa");
 
     let (title_block_str, title_block_h) = title_block(d);
     let total_height = d.height + title_block_h;
@@ -481,7 +531,7 @@ pub fn render(d: &Diagram) -> String {
   <style>{style}</style>
   <defs>{DEFS}{bpmn_defs}</defs>
 
-  <rect width="{width}" height="{total_height}" fill="#fafafa"/>
+  <rect width="{width}" height="{total_height}" fill="{background}"/>
   <rect width="{width}" height="{total_height}" class="bg-grid"/>
 
   <!-- title block (top, fixed) -->

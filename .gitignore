@@ -17,3 +17,4 @@ samples/_*.png
 test-results/
 playwright-report/
 .last-run.json
+dist-core/

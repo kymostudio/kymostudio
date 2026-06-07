@@ -9,7 +9,7 @@
  * render immediately, matching the original.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packages/js/dist/index.js";
+import { init, parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packages/js/dist/index.js";
 import type { Editor } from "../../../packages/js-canvas/dist/index.js";
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
@@ -93,6 +93,12 @@ export function App() {
     const token = ++renderToken.current;
     try {
       const bpmn = isBpmn(src);
+      // BPMN (and `bpmn { }` blocks in a .kymo) delegate to the wasm core — load it
+      // only then, so plain .kymo diagrams stay pure-JS (no wasm fetch).
+      if (bpmn || /\bbpmn\s*\{/.test(src)) {
+        await init();
+        if (token !== renderToken.current) return;
+      }
       const parsed = bpmn ? parseBpmn(src) : parseDiagram(src);
       const out = await renderSVG(parsed, { background: svgBackground(th, tr) });
       if (token !== renderToken.current) return; // a newer keystroke superseded us

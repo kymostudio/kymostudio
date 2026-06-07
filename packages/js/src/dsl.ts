@@ -29,7 +29,7 @@ import {
   type LayoutNode, type RegionLayout, type ExternalSpec,
 } from "./layout.js";
 import { resolveAlignments } from "./alignment.js";
-import { bpmnLayout } from "./bpmn-layout.js";
+import { coreApplyLayout } from "./core.js";
 
 // ── Top-level directives ───────────────────────────────────────────────
 const CANVAS_RE = /^canvas\s*:?\s+(\d+)\s*x\s*(\d+)\s*$/;
@@ -109,7 +109,7 @@ export function parse(dsl: string): ParseResult {
 export function parseDiagram(dsl: string): Diagram {
   const { diagram, layout: layoutSpec, external } = parse(dsl);
   const hadBpmn = (diagram.bpmnBlocks?.length ?? 0) > 0;
-  if (hadBpmn) bpmnLayout(diagram);
+  if (hadBpmn) coreApplyLayout(diagram);
   if (layoutSpec) layout(diagram, layoutSpec, external);
   // bpmn-block diagrams arrive fully positioned (like `.bpmn`) — skip alignment.
   if (!hadBpmn) resolveAlignments(diagram);

@@ -303,6 +303,29 @@ fn bpmn_export_matches_golden() {
 }
 
 #[test]
+fn from_json_round_trips_model() {
+    // from_json(model_json(d)) must reproduce the model exactly — the seam Python/JS
+    // use to hand a resolved model back to the core (export + render delegation).
+    let root = repo_root();
+    let corpus = bpmn_corpus(&root);
+    let mut checked = 0usize;
+    for path in corpus.values() {
+        let d = match bpmn::import(&read_lossy(path)) {
+            Ok(d) => d,
+            Err(_) => continue,
+        };
+        let json = model_json(&d);
+        let d2 = bpmn::from_json(&json.to_string()).expect("from_json must parse model_json");
+        assert_eq!(model_json(&d2), json, "round-trip mismatch for {path:?}");
+        checked += 1;
+    }
+    assert!(
+        checked > 0,
+        "no diagrams exercised the from_json round-trip"
+    );
+}
+
+#[test]
 fn bpmn_import_matches_golden() {
     let root = repo_root();
     let corpus = bpmn_corpus(&root);

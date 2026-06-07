@@ -24,8 +24,8 @@ from pathlib import Path
 sys.path.insert(0, "tests")
 import _conformance as C  # noqa: E402
 
-from kymo.from_bpmn import parse as parse_bpmn  # noqa: E402
-from kymo.to_svg import render  # noqa: E402
+from kymo import parse_bpmn  # noqa: E402  (delegates to the Rust core)
+from kymo.to_svg import render  # noqa: E402  (BPMN diagrams delegate to the core)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SVG_DIR = REPO_ROOT / "conformance" / "golden" / "bpmn_svg"

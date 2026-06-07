@@ -132,7 +132,8 @@
     "package": "npx --yes @vscode/vsce package --no-dependencies"
   },
   "dependencies": {
-    "kymostudio": "file:../js"
+    "kymostudio": "file:../js",
+    "kymostudio-core": "^0.4"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",

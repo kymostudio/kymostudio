@@ -1,3 +1,4 @@
+import "./_init.mjs";
 /**
  * DSL parser + front-end pipeline tests for the JS package (parity with the
  * Python `tests/test_dsl.py`). `npm test` builds dist/ first, so import the

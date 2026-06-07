@@ -132,6 +132,14 @@ uv run python ../../conformance/gen_bpmn_layout.py
 uv run python ../../conformance/gen_bpmn_svg.py
 ```
 
-The Python wheel (`python` feature ⇒ `bpmn`) exposes `bpmn_import`, `bpmn_layout`,
-and `bpmn_to_svg` so Python/JS can eventually delegate to this core; the delegation
-(deleting the per-language ports) is a later step, intentionally not done yet.
+**Both Python and JS now delegate BPMN to this core** (the cutover is done — their
+native BPMN ports were deleted). Python calls the `_kymostudio_core` wheel
+(`kymo/_core.py`); JS calls the wasm build (`packages/js/src/core.ts`, after
+`init()`/`initSync()`). They exchange the canonical model JSON over the seam
+(`from_kymojson`/`to_kymojson` ↔ `from-kymojson`/`to-kymojson`). So for BPMN the two
+are no longer independent implementations — the **Rust `bpmn_conformance.rs` is the
+sole regression guard**; the Python/JS BPMN suites now verify the *delegation* still
+reproduces these goldens. (Non-BPMN `.kymo` → model parity stays a genuine two-impl
+lock.) BPMN SVG output is byte-identical across all three languages for real BPMN
+diagrams; degenerate DI-less files that import to an empty model fall back to each
+language's own native (non-BPMN) renderer.
