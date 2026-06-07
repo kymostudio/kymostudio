@@ -7,6 +7,12 @@ on:
   workflow_dispatch:
 
 # JS package lives in packages/js/ — run all shell steps there.
+env:
+  # Opt JS actions into Node 24 ahead of GitHub's 2026-06-16 forced switch —
+  # silences the Node 20 deprecation warnings (some pinned actions have no
+  # Node24-native release yet).
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   verify-version:
     name: Verify Version
