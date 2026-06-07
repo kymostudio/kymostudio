@@ -82,6 +82,53 @@ const REGION_STYLE = `
     .region-rect--inner { fill: rgba(124,58,237,0.03); stroke: #7c3aed; stroke-width: 1.3; stroke-dasharray: 4 4; }
     .region-label--inner { font-size: 12px; font-weight: 600; fill: #6d28d9; }`;
 
+// Flowchart-node styling — injected ONLY when a diagram has icon-less nodes
+// (Mermaid imports), so icon-bearing diagrams stay byte-identical. Nodes
+// carry their label centred INSIDE the glyph.
+const FLOWCHART_STYLE = `
+    .fc-shape { fill: #eff6ff; stroke: #3b82f6; stroke-width: 1.6; }
+    .fc-shape-line { fill: none; stroke: #3b82f6; stroke-width: 1.6; stroke-linecap: round; }
+    .fc-label { fill: #1e3a8a; font-size: 13px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }`;
+
+/**
+ * Icon-less flowchart node (Mermaid import): a shape outline sized from
+ * `Component.size`, with the label centred INSIDE the glyph. Handles the
+ * six shapes the Mermaid importer emits (MERMAID-MAP-001 §3).
+ */
+function flowchartNode(c: Component): string {
+  const [cx, cy] = c.pos;
+  const [hw, hh] = half(c);
+  let glyph: string;
+  switch (c.shape) {
+    case "circle":
+      glyph = `<ellipse class="fc-shape" cx="${cx}" cy="${cy}" rx="${hw}" ry="${hh}"/>`;
+      break;
+    case "diamond":
+      glyph = `<polygon class="fc-shape" points="${cx},${cy - hh} ${cx + hw},${cy} ${cx},${cy + hh} ${cx - hw},${cy}"/>`;
+      break;
+    case "hex": {
+      const s = Math.min(hh, (hw / 2) | 0);
+      glyph = `<polygon class="fc-shape" points="${cx - hw},${cy} ${cx - hw + s},${cy - hh} ${cx + hw - s},${cy - hh} ${cx + hw},${cy} ${cx + hw - s},${cy + hh} ${cx - hw + s},${cy + hh}"/>`;
+      break;
+    }
+    case "cylinder": {
+      const ry = Math.max(4, Math.round(hh * 0.22));
+      const top = cy - hh + ry, bot = cy + hh - ry;
+      glyph =
+        `<path class="fc-shape" d="M${cx - hw},${top} V${bot} A${hw},${ry} 0 0 0 ${cx + hw},${bot} V${top} A${hw},${ry} 0 0 1 ${cx - hw},${top} Z"/>` +
+        `<path class="fc-shape-line" d="M${cx - hw},${top} A${hw},${ry} 0 0 0 ${cx + hw},${top}"/>`;
+      break;
+    }
+    case "badge":
+      glyph = `<rect class="fc-shape" x="${cx - hw}" y="${cy - hh}" width="${2 * hw}" height="${2 * hh}" rx="${hh}"/>`;
+      break;
+    default: // "box" and any other icon-less shape — rounded rectangle.
+      glyph = `<rect class="fc-shape" x="${cx - hw}" y="${cy - hh}" width="${2 * hw}" height="${2 * hh}" rx="6"/>`;
+  }
+  const label = c.name ? `<text class="fc-label" x="${cx}" y="${cy}">${escapeXml(c.name)}</text>` : "";
+  return glyph + label;
+}
+
 /** Horizontally-biased cubic Bézier between two resolved anchor points. */
 function edgePath(x1: number, y1: number, sa: Side, x2: number, y2: number, da: Side): string {
   const k = Math.max(40, Math.abs(x2 - x1) * 0.5);
@@ -119,6 +166,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
   const pad = opts.padding ?? 52;
   const background = opts.background === undefined ? "#f8fafc" : opts.background;
   const needsRegionStyle = d.regions.length > 0;
+  const needsFlowchartStyle = d.components.some((c) => !c.icon);
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   const grow = (x: number, y: number): void => {
@@ -158,6 +206,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 
   const nodes: string[] = [];
   for (const c of d.components) {
+    if (!c.icon) { nodes.push(flowchartNode(c)); continue; }
     const glyph = await getIcon(c.icon);
     const [, hh] = half(c);
     const parts = [`<g transform="translate(${c.pos[0]},${c.pos[1]})" filter="url(#soft)">${glyph}</g>`];
@@ -180,7 +229,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${w} ${h}" width="${w}" height="${h}">
   <defs>${DEFS}
   </defs>
-  <style>${CSS}${needsRegionStyle ? REGION_STYLE : ""}
+  <style>${CSS}${needsRegionStyle ? REGION_STYLE : ""}${needsFlowchartStyle ? FLOWCHART_STYLE : ""}
   </style>
   ${bg}
   ${title}${regionRects}

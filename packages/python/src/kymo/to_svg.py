@@ -101,6 +101,15 @@ text { fill: #1f2937; }
 .edge-label--small { font-size: 10.5px; }
 """
 
+# Flowchart-node CSS — injected ONLY when a diagram has icon-less nodes
+# (Mermaid imports). Keeping it conditional means icon-bearing diagrams
+# emit byte-identical SVG. Nodes carry their label centred INSIDE the glyph.
+FLOWCHART_CSS = """
+.fc-shape { fill: #eff6ff; stroke: #3b82f6; stroke-width: 1.6; }
+.fc-shape-line { fill: none; stroke: #3b82f6; stroke-width: 1.6; stroke-linecap: round; }
+.fc-label { font-size: 13px; font-weight: 600; fill: #1e3a8a; text-anchor: middle; dominant-baseline: central; }
+"""
+
 # Animation presets — appended to STYLE when render(animate=<name>).
 # Use render(animate=True) for the default ("flow"), or pass a name
 # explicitly for variants.
@@ -520,8 +529,58 @@ def render_edge(e: Edge, d: Diagram) -> str:
     )
 
 
+def render_flowchart_node(c: Component) -> str:
+    """Render an icon-less flowchart node (Mermaid import): a shape outline
+    sized from `Component.size`, with the label centred INSIDE the glyph.
+
+    Mermaid flowchart nodes carry no icon, so the visible glyph is the
+    geometric shape itself (drawn here) rather than an icon fragment. Only
+    the six shapes the Mermaid importer emits are handled — see
+    MERMAID-MAP-001 §3."""
+    cx, cy = c.pos
+    hw, hh = c.half
+    shape = c.shape
+
+    if shape == "circle":
+        glyph = f'<ellipse class="fc-shape" cx="{cx}" cy="{cy}" rx="{hw}" ry="{hh}"/>'
+    elif shape == "diamond":
+        pts = f"{cx},{cy - hh} {cx + hw},{cy} {cx},{cy + hh} {cx - hw},{cy}"
+        glyph = f'<polygon class="fc-shape" points="{pts}"/>'
+    elif shape == "hex":
+        # Pointy-left/right hexagon: two slanted ends, horizontal top/bottom.
+        s = min(hh, hw // 2)
+        pts = (f"{cx - hw},{cy} {cx - hw + s},{cy - hh} {cx + hw - s},{cy - hh} "
+               f"{cx + hw},{cy} {cx + hw - s},{cy + hh} {cx - hw + s},{cy + hh}")
+        glyph = f'<polygon class="fc-shape" points="{pts}"/>'
+    elif shape == "cylinder":
+        # Database glyph: a vertical body with elliptical top/bottom caps.
+        ry = max(4, round(hh * 0.22))
+        top, bot = cy - hh + ry, cy + hh - ry
+        body = (f'<path class="fc-shape" d="M{cx - hw},{top} V{bot} '
+                f'A{hw},{ry} 0 0 0 {cx + hw},{bot} V{top} '
+                f'A{hw},{ry} 0 0 1 {cx - hw},{top} Z"/>')
+        cap = (f'<path class="fc-shape-line" d="M{cx - hw},{top} '
+               f'A{hw},{ry} 0 0 0 {cx + hw},{top}"/>')
+        glyph = body + cap
+    elif shape == "badge":
+        # Stadium / pill (`([text])`): a rect rounded to a full semicircle.
+        glyph = (f'<rect class="fc-shape" x="{cx - hw}" y="{cy - hh}" '
+                 f'width="{2 * hw}" height="{2 * hh}" rx="{hh}"/>')
+    else:  # "box" and any other icon-less shape — rounded rectangle.
+        glyph = (f'<rect class="fc-shape" x="{cx - hw}" y="{cy - hh}" '
+                 f'width="{2 * hw}" height="{2 * hh}" rx="6"/>')
+
+    label = (f'<text class="fc-label" x="{cx}" y="{cy}">{_x(c.name)}</text>'
+             if c.name else "")
+    return f"{glyph}{label}"
+
+
 def render_component(c: Component) -> str:
     cx, cy = c.pos
+
+    # Icon-less node (Mermaid flowchart) — draw the shape itself + inner label.
+    if not c.icon:
+        return render_flowchart_node(c)
 
     icon_svg = get_icon(c.icon)
 
@@ -652,6 +711,10 @@ def render(d: Diagram, animate: bool = False) -> str:
     comps         = "\n  ".join(render_component(c)    for c in d.components)
 
     style = STYLE + (ANIM_STYLE if animate else "")
+    # Flowchart-node styling only when the diagram actually has icon-less
+    # nodes — keeps icon-bearing diagrams byte-identical.
+    if any(not c.icon for c in d.components):
+        style += FLOWCHART_CSS
 
     # Page auto-layout: title/subtitle stack at top, content below.
     # Content is translated DOWN by title_block_h so its DSL coordinates

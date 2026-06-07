@@ -76,29 +76,29 @@
       "editor/title": [
         {
           "command": "kymostudio.showPreviewToSide",
-          "when": "resourceExtname == .bpmn || resourceExtname == .kymo",
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo || resourceExtname == .mmd || resourceExtname == .mermaid",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
           "command": "kymostudio.showPreview",
-          "when": "resourceExtname == .bpmn || resourceExtname == .kymo",
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo || resourceExtname == .mmd || resourceExtname == .mermaid",
           "group": "navigation@10"
         }
       ],
       "commandPalette": [
         {
           "command": "kymostudio.showPreview",
-          "when": "resourceExtname == .bpmn || resourceExtname == .kymo"
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo || resourceExtname == .mmd || resourceExtname == .mermaid"
         },
         {
           "command": "kymostudio.showPreviewToSide",
-          "when": "resourceExtname == .bpmn || resourceExtname == .kymo"
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo || resourceExtname == .mmd || resourceExtname == .mermaid"
         },
         {
           "command": "kymostudio.exportSvg",
-          "when": "resourceExtname == .bpmn || resourceExtname == .kymo"
+          "when": "resourceExtname == .bpmn || resourceExtname == .kymo || resourceExtname == .mmd || resourceExtname == .mermaid"
         }
       ]
     },

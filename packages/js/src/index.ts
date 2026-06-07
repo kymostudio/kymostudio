@@ -34,6 +34,7 @@ export {
   coreParseBpmn as parseBpmn,
   coreToBpmn as toBpmn,
   coreApplyLayout as bpmnLayout,
+  coreMermaidImport as parseMermaid,   // Mermaid flowchart source → Diagram
 } from "./core.js";
 export { toKymoJson, modelDict } from "./to-kymojson.js";  // Diagram → .kymo.json
 export { parseKymoJson } from "./from-kymojson.js";          // .kymo.json → Diagram

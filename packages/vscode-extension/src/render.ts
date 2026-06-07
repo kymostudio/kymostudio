@@ -1,13 +1,14 @@
 /**
  * Source → SVG dispatch for the preview.
  *
- * Both formats render fully in-process via the bundled, dependency-free
+ * Each format renders fully in-process via the bundled, dependency-free
  * `kymostudio` package — no Python, no network:
  *   - `.bpmn`    → `parseBpmn` + `renderSVG`
  *   - `.kymo` → `parseDiagram` (parse + layout + alignment) + `renderSVG`
+ *   - `.mmd`/`.mermaid` → `parseMermaid` (core lays it out) + `renderSVG`
  */
 import * as vscode from "vscode";
-import { initSync, parseBpmn, parseDiagram, renderSVG, type RenderOptions } from "kymostudio";
+import { initSync, parseBpmn, parseDiagram, parseMermaid, renderSVG, type RenderOptions } from "kymostudio";
 // Inlined by esbuild's `binary` loader (see esbuild.mjs) → the BPMN engine's bytes.
 import wasmBytes from "kymostudio-core/kymostudio_core_bg.wasm";
 
@@ -77,10 +78,24 @@ export async function renderSource(
     }
   }
 
+  if (ext === ".mmd" || ext === ".mermaid") {
+    try {
+      const diagram = parseMermaid(doc.getText());
+      const svg = await renderSVG(diagram, opts);
+      return { ok: true, svg };
+    } catch (err) {
+      return {
+        ok: false,
+        title: "Could not render this Mermaid file",
+        detail: err instanceof Error ? err.message : String(err),
+      };
+    }
+  }
+
   return {
     ok: false,
     title: "Unsupported file type",
-    detail: `kymostudio previews .bpmn and .kymo files. Got "${ext || doc.languageId}".`,
+    detail: `kymostudio previews .bpmn, .kymo and .mmd files. Got "${ext || doc.languageId}".`,
   };
 }
 

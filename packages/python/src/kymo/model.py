@@ -11,6 +11,9 @@ from typing import Literal
 
 Shape   = Literal["circle", "cube", "cube-big", "box", "cylinder", "hex", "annotation",
                   "aws-tile", "aws-tile-hero", "badge", "image",
+                  # Mermaid flowchart decision node (`{...}`); icon-less,
+                  # drawn as a rotated square by the icon-less render path.
+                  "diamond",
                   # ── BPMN 2.0 glyphs (see bpmn_shapes.py) ─────────────────
                   # Imported from .bpmn files; positions/sizes come from the
                   # file's Diagram-Interchange bounds (Component.size), not
@@ -34,6 +37,7 @@ SHAPE_HALF: dict[Shape, tuple[int, int]] = {
     "box":        (35, 35),
     "cylinder":   (35, 35),
     "hex":        (35, 32),     # flat-top hexagon — wider than tall
+    "diamond":    (40, 28),     # fallback only — Mermaid always sets size
     "annotation": (0, 0),
     "aws-tile":      (32, 32),
     "aws-tile-hero": (40, 40),  # +25% over aws-tile — visual weight for orchestrator (§6.7.2)
@@ -62,6 +66,7 @@ LABEL_HEIGHT: dict[Shape, int] = {
     "box":        38,
     "cylinder":   38,
     "hex":        40,
+    "diamond":    0,            # icon-less: label sits inside the glyph
     "annotation": 0,
     "aws-tile":      48,
     "aws-tile-hero": 48,
@@ -134,7 +139,11 @@ class Component:
         bottom anchor sits flush with the icon's bottom edge."""
         cx, cy = self.pos
         hw, hh = self.half
-        lh = LABEL_HEIGHT.get(self.shape, 0) if (self.name or self.subtitle) else 0
+        # Icon-less nodes (Mermaid flowchart) carry their label INSIDE the
+        # glyph, so there is no label band below — the bottom anchor stays
+        # flush with the box. Only icon-bearing nodes push past the label.
+        labelled = bool((self.name or self.subtitle) and self.icon)
+        lh = LABEL_HEIGHT.get(self.shape, 0) if labelled else 0
         match side:
             case "top":
                 return (cx, cy - hh)

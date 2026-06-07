@@ -49,14 +49,26 @@ jobs:
         with:
           node-version: '20'
 
+      # The bundled JS engine imports the core's type defs (tsc) AND inlines the
+      # core wasm bytes (esbuild), so both packages must use the LOCAL core — the
+      # published npm core may lag this release. Build the wasm pkg once, then link
+      # it into both packages before their builds.
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: jetli/wasm-pack-action@v0.4.0
+      - name: Build the local kymostudio-core wasm pkg (engine bindings)
+        working-directory: packages/rust/kymostudio-core
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
+
       # The extension bundles packages/js, so build that first.
       - name: Build JS engine (bundled by the extension)
         working-directory: packages/js
-        run: npm ci && npm run build
+        run: npm ci && npm install --no-save ../rust/kymostudio-core/pkg && npm run build
 
       - name: Install extension deps
         working-directory: packages/vscode-extension
-        run: npm ci
+        run: npm ci && npm install --no-save ../rust/kymostudio-core/pkg
 
       - name: Bundle extension
         working-directory: packages/vscode-extension

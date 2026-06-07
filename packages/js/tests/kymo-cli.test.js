@@ -32,6 +32,19 @@ async function pdfAvailable() {
 }
 const PDF_OK = await pdfAvailable();
 
+// `mermaidToKymoJson` landed in kymostudio-core 0.4.3; the .mmd test skips on
+// older cores (the named wasm-bindgen export is absent) so CI on the published
+// floor stays green until the core patch ships.
+async function mermaidAvailable() {
+  try {
+    const mod = await import("kymostudio-core");
+    return typeof mod.mermaidToKymoJson === "function";
+  } catch {
+    return false;
+  }
+}
+const MERMAID_OK = await mermaidAvailable();
+
 test("renders a .kymo source to SVG", async () => {
   const src = join(TMP, "d.kymo");
   writeFileSync(src, "agent hex/hex-agent/green\n");
@@ -50,6 +63,21 @@ test("a .kymo source defaults to a .svg next to it", async () => {
 test("missing input returns a non-zero exit code", async () => {
   assert.notEqual(await run([]), 0);
 });
+
+test(
+  "renders a .mmd (Mermaid flowchart) source to SVG",
+  { skip: MERMAID_OK ? false : "kymostudio-core >= 0.4.3 (mermaidToKymoJson) not installed" },
+  async () => {
+    const src = join(TMP, "flow.mmd");
+    writeFileSync(src, "flowchart TD\n  A[Start] --> B{ok?}\n  B -->|yes| C[Done]\n");
+    const out = join(TMP, "flow.svg");
+    assert.equal(await run([src, out]), 0);
+    const svg = readFileSync(out, "utf-8");
+    assert.match(svg, /<svg/);
+    assert.match(svg, /class="fc-shape"/);     // icon-less flowchart nodes
+    assert.ok(svg.includes("Start"));
+  },
+);
 
 test("rejects a non-.png output for a .svg input", async () => {
   const src = join(TMP, "in.svg");

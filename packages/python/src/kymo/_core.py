@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 
 from .from_kymojson import model_from_dict
+from .from_kymojson import parse as parse_kymojson
 from .model import Diagram
 from .to_kymojson import model_dict
 
@@ -28,6 +29,15 @@ except ModuleNotFoundError as exc:  # pragma: no cover - exercised only without 
 def import_bpmn(xml: str) -> Diagram:
     """Parse BPMN 2.0 XML → a fully-resolved `Diagram` (DI geometry, no layout pass)."""
     return model_from_dict(json.loads(_kcore.bpmn_import(xml)))
+
+
+def import_mermaid(src: str) -> Diagram:
+    """Parse Mermaid source (flowchart) → a fully-resolved `Diagram`.
+
+    The core lays the graph out and returns a `.kymo.json` envelope, so the
+    result is already positioned — no Python layout/alignment pass, exactly
+    like a `.bpmn` import."""
+    return parse_kymojson(_kcore.mermaid_to_kymojson(src))
 
 
 def layout_bpmn(blocks: list) -> Diagram:
