@@ -1,0 +1,137 @@
+{
+  "generated_by": "benches/svg2pdf/quality.py",
+  "reference_engine": "kymo",
+  "diff_threshold": 1,
+  "raster_zoom": 2.0,
+  "rasterizer": "PyMuPDF 1.27.2.3",
+  "corpus": {
+    "items": 30
+  },
+  "missing_engines": [],
+  "engines": [
+    {
+      "key": "kymo",
+      "label": "kymo",
+      "backend": "svg2pdf (kymostudio-core 0.4.1)",
+      "is_reference": true,
+      "renders": "30/30",
+      "render_rate": 1.0,
+      "single_page": "30/30",
+      "nonempty": "30/30",
+      "page_scale_avg": 1.0,
+      "avg_drawings": 10.2,
+      "avg_images": 4.1,
+      "mean_abs_diff_avg": 0.0,
+      "pct_pixels_diff_avg": 0.0,
+      "verdict": "reference",
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "rsvg-convert",
+      "label": "rsvg-convert",
+      "backend": "rsvg-convert version 2.58.0",
+      "is_reference": false,
+      "renders": "30/30",
+      "render_rate": 1.0,
+      "single_page": "30/30",
+      "nonempty": "30/30",
+      "page_scale_avg": 0.75,
+      "avg_drawings": 11.7,
+      "avg_images": 4.1,
+      "mean_abs_diff_avg": 1.81,
+      "pct_pixels_diff_avg": 6.49,
+      "verdict": "high fidelity",
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "cairosvg",
+      "label": "cairosvg",
+      "backend": "Cairo (2.9.0)",
+      "is_reference": false,
+      "renders": "30/30",
+      "render_rate": 1.0,
+      "single_page": "30/30",
+      "nonempty": "0/30",
+      "page_scale_avg": 0.75,
+      "avg_drawings": 0.0,
+      "avg_images": 0.0,
+      "mean_abs_diff_avg": 11.37,
+      "pct_pixels_diff_avg": 99.73,
+      "verdict": "empty pages",
+      "failures": [],
+      "failure_count": 0
+    },
+    {
+      "key": "svglib",
+      "label": "svglib",
+      "backend": "reportlab renderPDF (4.5.1, svglib 1.6.0)",
+      "is_reference": false,
+      "renders": "0/30",
+      "render_rate": 0.0,
+      "single_page": "0/0",
+      "nonempty": "0/0",
+      "page_scale_avg": null,
+      "avg_drawings": null,
+      "avg_images": null,
+      "mean_abs_diff_avg": null,
+      "pct_pixels_diff_avg": null,
+      "verdict": "fails to convert",
+      "failures": [
+        {
+          "item": "samples/aiq",
+          "error": "ValueError: Can't convert 'auto' to length"
+        },
+        {
+          "item": "samples/aws_1",
+          "error": "ValueError: Can't convert 'auto' to length"
+        },
+        {
+          "item": "samples/data",
+          "error": "ValueError: Can't convert 'auto' to length"
+        },
+        {
+          "item": "samples/order-fulfillment",
+          "error": "ValueError: Can't convert 'auto' to length"
+        },
+        {
+          "item": "conformance/basic_agent",
+          "error": "ValueError: Can't convert 'auto' to length"
+        }
+      ],
+      "failure_count": 30
+    },
+    {
+      "key": "fpdf2",
+      "label": "fpdf2",
+      "backend": "fpdf2 (2.8.7)",
+      "is_reference": false,
+      "renders": "27/30",
+      "render_rate": 0.9,
+      "single_page": "27/27",
+      "nonempty": "27/27",
+      "page_scale_avg": 1.0,
+      "avg_drawings": 22.4,
+      "avg_images": 0.0,
+      "mean_abs_diff_avg": 0.96,
+      "pct_pixels_diff_avg": 5.04,
+      "verdict": "high fidelity (only 27/30)",
+      "failures": [
+        {
+          "item": "samples/aiq",
+          "error": "ValueError: rgba(15,23,42,0.02) does not follow the expected rgb(...) format"
+        },
+        {
+          "item": "samples/aws_1",
+          "error": "ValueError: rgba(15,23,42,0.02) does not follow the expected rgb(...) format"
+        },
+        {
+          "item": "samples/data",
+          "error": "ValueError: rgba(15,23,42,0.02) does not follow the expected rgb(...) format"
+        }
+      ],
+      "failure_count": 3
+    }
+  ]
+}
