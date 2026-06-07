@@ -9,6 +9,26 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-06-07
+
+### Changed
+
+- **BPMN is now a single source of truth in `kymostudio-core` (Rust).** Python and
+  JS no longer carry their own BPMN ports — import, export, layout and rendering
+  all delegate to the core (the wheel for Python, the wasm build for JS). The core
+  gains BPMN bindings (`bpmn_import` / `bpmn_export` / `bpmn_layout` / `bpmn_render`,
+  and the wasm `bpmnImport` / `bpmnExport` / `bpmnLayout` / `bpmnRender`) plus a
+  model-JSON → `Diagram` deserializer. BPMN output is byte-identical across Python,
+  JS and Rust.
+
+### Notes
+
+- The JS library's synchronous BPMN entry points (`parseBpmn` / `toBpmn` /
+  `bpmnLayout`, and `parseDiagram` on a `bpmn { }` source) now require the wasm core
+  to be initialized once: `await init()` (browser) or `initSync(bytes)` (Node).
+  `renderSVG` auto-initializes; the `kymo` CLI and the VS Code extension do it for
+  you. The `kymostudio-core` dependency requirement is unchanged (`^0.4`).
+
 ## [0.4.1] - 2026-06-06
 
 ### Changed
