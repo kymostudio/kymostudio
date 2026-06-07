@@ -1,0 +1,16 @@
+digraph G {
+  rankdir=TB;
+  node [fontsize=12];
+  subgraph cluster_G {
+    label="Worker Pool";
+    A [label="Fetch", shape=box];
+    B [label="Transform", shape=box];
+    C [label="Write", shape=box];
+  }
+  Start [label="Start", shape=box];
+  End [label="Done", shape=box];
+  Start -> A;
+  A -> B;
+  B -> C;
+  C -> End;
+}

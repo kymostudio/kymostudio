@@ -1,8 +1,8 @@
 """Entry point: `kymo <path> [out.png] [--animate] [--figma] [--excalidraw]`
 
-Argument is a path to a `.kymo` (DSL), `.bpmn` (BPMN 2.0 XML), `.py`
-(Python form), or `.svg` source. Output is a SVG (or Figma Plugin JS /
-Excalidraw scene / PNG) written next to the input file:
+Argument is a path to a `.kymo` (DSL), `.bpmn` (BPMN 2.0 XML), `.mmd`
+(Mermaid flowchart), `.py` (Python form), or `.svg` source. Output is a SVG
+(or Figma Plugin JS / Excalidraw scene / PNG) written next to the input file:
 
     kymo samples/aws_1.kymo                → samples/aws_1.svg
     kymo samples/aws_1.kymo --animate      → samples/aws_1-animated.svg
@@ -11,6 +11,7 @@ Excalidraw scene / PNG) written next to the input file:
     kymo samples/aws_1.kymo --json         → samples/aws_1.kymo.json
     kymo samples/aws_1.kymo.json               → samples/aws_1.svg
     kymo samples/order.bpmn                    → samples/order.svg
+    kymo samples/approval.mmd                  → samples/approval.svg
 
 A second positional `*.png` path (or a `.svg` source) rasterizes to PNG
 via resvg (kymostudio-core); optional `--scale N` / `-s N` (1.0 = intrinsic).
@@ -147,12 +148,19 @@ def _load_resolved(src: Path):
     """
     diagram, layout_spec, external_layout = load(src)
     had_bpmn = bool(getattr(diagram, "bpmn_blocks", None))
+    had_flowchart = bool(getattr(diagram, "flowchart_blocks", None))
     if had_bpmn:
         from ._core import apply_layout
         apply_layout(diagram)
+    if had_flowchart:
+        from ._core import resolve_flowchart_blocks
+        resolve_flowchart_blocks(diagram)
     if layout_spec:
         layout(diagram, layout_spec, external_layout)
-    if src.suffix not in (".bpmn", ".json", ".mmd", ".mermaid") and not had_bpmn:
+    # `flowchart { }` blocks arrive pre-resolved from the core (like .mmd), so
+    # they skip the alignment pass too.
+    if (src.suffix not in (".bpmn", ".json", ".mmd", ".mermaid")
+            and not had_bpmn and not had_flowchart):
         resolve_alignments(diagram)
     return diagram
 

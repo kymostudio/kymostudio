@@ -21,7 +21,7 @@ try:
     import _kymostudio_core as _kcore
 except ModuleNotFoundError as exc:  # pragma: no cover - exercised only without the wheel
     raise ModuleNotFoundError(
-        "BPMN support requires the kymostudio-core engine (>=0.4). "
+        "BPMN and Mermaid support require the kymostudio-core engine (>=0.4). "
         "Try: pip install --upgrade kymostudio-core"
     ) from exc
 
@@ -38,6 +38,22 @@ def import_mermaid(src: str) -> Diagram:
     result is already positioned — no Python layout/alignment pass, exactly
     like a `.bpmn` import."""
     return parse_kymojson(_kcore.mermaid_to_kymojson(src))
+
+
+def mermaid_to_d2(src: str) -> str:
+    """Convert Mermaid flowchart source → D2, via the shared flowchart IR."""
+    return _kcore.mermaid_to_d2(src)
+
+
+def mermaid_to_dot(src: str) -> str:
+    """Convert Mermaid flowchart source → Graphviz DOT, via the flowchart IR."""
+    return _kcore.mermaid_to_dot(src)
+
+
+def normalize_mermaid(src: str) -> str:
+    """Round-trip / normalize Mermaid flowchart source through the IR."""
+    return _kcore.mermaid_to_mermaid(src)
+
 
 
 def layout_bpmn(blocks: list) -> Diagram:
@@ -74,6 +90,22 @@ def apply_layout(diagram: Diagram) -> None:
     diagram.width = laid.width
     diagram.height = laid.height
     diagram.bpmn_blocks = []
+
+
+def resolve_flowchart_blocks(diagram: Diagram) -> None:
+    """Resolve a diagram's `flowchart { }` blocks in place — feed each block's
+    body (as `flowchart <DIR>\\n<body>`) to the Mermaid importer, fold the
+    positioned components/edges/regions + canvas size back in, and clear the
+    blocks. Mirrors `apply_layout` for `bpmn { }`. One block per file is the
+    supported case (the last block's canvas size wins)."""
+    for direction, body in diagram.flowchart_blocks:
+        laid = import_mermaid(f"flowchart {direction}\n{body}")
+        diagram.components.extend(laid.components)
+        diagram.edges.extend(laid.edges)
+        diagram.regions.extend(laid.regions)
+        diagram.width = laid.width
+        diagram.height = laid.height
+    diagram.flowchart_blocks = []
 
 
 def export_bpmn(diagram: Diagram) -> str:

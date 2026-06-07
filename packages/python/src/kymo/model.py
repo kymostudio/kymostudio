@@ -349,6 +349,11 @@ class Diagram:
     # Laid out into components/edges by `bpmn_layout` (not yet wired); while a
     # block is present the diagram is unresolved, so `to_svg.render` raises.
     bpmn_blocks: list = field(default_factory=list)
+    # Positionless `flowchart [DIR] { … }` blocks parsed by `dsl.py`. Each is a
+    # `(direction, body)` pair (body = Mermaid flowchart statements); resolved
+    # into components/edges/regions by the Rust core (`_core.resolve_flowchart_blocks`)
+    # before render, mirroring the bpmn block flow.
+    flowchart_blocks: list = field(default_factory=list)
 
     def get(self, id: str) -> Component:
         for c in self.components:

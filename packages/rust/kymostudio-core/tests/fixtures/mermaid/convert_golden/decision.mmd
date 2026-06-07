@@ -1,0 +1,11 @@
+flowchart TD
+  A["Start"]
+  B{"Is it valid?"}
+  C["Process"]
+  D["Reject"]
+  E(("Done"))
+  A --> B
+  B -->|yes| C
+  B -->|no| D
+  C --> E
+  D --> E

@@ -18,6 +18,9 @@ import initWasm, {
   bpmnLayout as wasmBpmnLayout,
   bpmnRender,
   mermaidToKymoJson,
+  mermaidToD2,
+  mermaidToDot,
+  mermaidToMermaid,
 } from "kymostudio-core";
 
 import { modelFromDict, parseKymoJson } from "./from-kymojson.js";
@@ -69,6 +72,41 @@ function serializeBlocks(blocks: BpmnBlock[]): string {
 export function coreParseBpmn(xml: string): Diagram {
   ensureReady();
   return modelFromDict(JSON.parse(bpmnImport(xml)));
+}
+
+/** Convert Mermaid flowchart source → D2 (via the shared flowchart IR). */
+export function coreMermaidToD2(src: string): string {
+  ensureReady();
+  return mermaidToD2(src);
+}
+
+/** Convert Mermaid flowchart source → Graphviz DOT (via the flowchart IR). */
+export function coreMermaidToDot(src: string): string {
+  ensureReady();
+  return mermaidToDot(src);
+}
+
+/** Round-trip / normalize Mermaid flowchart source through the IR. */
+export function coreNormalizeMermaid(src: string): string {
+  ensureReady();
+  return mermaidToMermaid(src);
+}
+
+/** Resolve a diagram's `flowchart { }` blocks in place — feed each block's body
+ *  (as `flowchart <DIR>\n<body>`) to the Mermaid importer, fold the positioned
+ *  components/edges/regions + canvas size back in, and clear the blocks. Mirrors
+ *  `coreApplyLayout` for `bpmn { }`. One block per file is the supported case. */
+export function coreResolveFlowchart(d: Diagram): void {
+  ensureReady();
+  for (const [direction, body] of d.flowchartBlocks ?? []) {
+    const laid = parseKymoJson(mermaidToKymoJson(`flowchart ${direction}\n${body}`));
+    d.components.push(...laid.components);
+    d.edges.push(...laid.edges);
+    d.regions.push(...laid.regions);
+    d.width = laid.width;
+    d.height = laid.height;
+  }
+  d.flowchartBlocks = [];
 }
 
 /** `Diagram` of `bpmn-*` glyphs → BPMN 2.0 XML. */

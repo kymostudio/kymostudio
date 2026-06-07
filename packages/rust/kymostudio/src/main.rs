@@ -4,13 +4,16 @@
 //!     kymo -i in.svg -o out.png --scale 2
 //!     kymo in.svg out.pdf
 //!     kymo flow.mmd                 # -> flow.kymo.json (Mermaid import)
-//!     kymo flow.mmd diagram.kymo.json
+//!     kymo flow.mmd flow.d2         # -> D2     (convert via the flowchart IR)
+//!     kymo flow.mmd flow.dot        # -> Graphviz DOT
+//!     kymo flow.mmd norm.mmd        # -> Mermaid (round-trip / normalize)
 //!
 //! Pure Rust (resvg/svg2pdf via kymostudio-core) — no browser, no system image
 //! libraries. The operation is chosen by the INPUT extension: `.mmd`/`.mermaid`
-//! parse a Mermaid flowchart to the `.kymo.json` interchange format; any other
-//! input is treated as SVG and the OUTPUT extension picks PNG (default) or PDF.
-//! Rust does not render `.kymo.json` to SVG — feed it to the Python/JS renderer.
+//! parse a Mermaid flowchart, then the OUTPUT extension picks the target —
+//! `.kymo.json` (default interchange), `.d2`, `.dot`/`.gv`, or `.mmd` (round-trip).
+//! Any other input is treated as SVG and the OUTPUT extension picks PNG (default)
+//! or PDF. Rust does not render `.kymo.json` to SVG — feed it to the Python/JS renderer.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -46,7 +49,9 @@ EXAMPLES:
     kymo diagram.svg -s 2 hi.png        # 2x resolution
     kymo diagram.svg out.pdf            # vector PDF
     kymo flow.mmd                       # -> flow.kymo.json (Mermaid import)
-    kymo flow.mmd out.kymo.json         # render the .kymo.json with the Python/JS CLI
+    kymo flow.mmd flow.d2               # -> D2 (convert via the flowchart IR)
+    kymo flow.mmd flow.dot              # -> Graphviz DOT
+    kymo flow.mmd norm.mmd              # -> Mermaid (round-trip / normalize)
 ";
 
 struct Args {
@@ -129,28 +134,40 @@ fn is_mermaid(path: &std::path::Path) -> bool {
 }
 
 fn run(args: Args) -> Result<(), String> {
-    // Mermaid import: `.mmd`/`.mermaid` input → `.kymo.json` interchange.
+    // Mermaid input: import to `.kymo.json`, or convert to another flowchart DSL.
+    // The OUTPUT extension picks the target: `.d2` / `.dot`|`.gv` / `.mmd`|`.mermaid`
+    // (round-trip) / else `.kymo.json`.
     if is_mermaid(&args.input) {
         if has_ext(&args.output, "svg")
             || has_ext(&args.output, "png")
             || has_ext(&args.output, "pdf")
         {
             return Err(format!(
-                "cannot render Mermaid to {} — Rust only imports it to .kymo.json; \
-                 render that with the Python or JS kymo CLI",
+                "cannot render Mermaid to {} — Rust imports/converts only \
+                 (.kymo.json | .d2 | .dot | .mmd); render to SVG/PNG/PDF with the \
+                 Python or JS kymo CLI",
                 args.output.display()
             ));
         }
         let src = std::fs::read_to_string(&args.input)
             .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
-        let json = kymostudio_core::mermaid_to_kymojson(&src).map_err(|e| e.to_string())?;
-        std::fs::write(&args.output, &json)
+        let (out, kind) = if has_ext(&args.output, "d2") {
+            (kymostudio_core::mermaid_to_d2(&src), "d2")
+        } else if has_ext(&args.output, "dot") || has_ext(&args.output, "gv") {
+            (kymostudio_core::mermaid_to_dot(&src), "dot")
+        } else if has_ext(&args.output, "mmd") || has_ext(&args.output, "mermaid") {
+            (kymostudio_core::mermaid_to_mermaid(&src), "mermaid")
+        } else {
+            (kymostudio_core::mermaid_to_kymojson(&src), "kymo.json")
+        };
+        let out = out.map_err(|e| e.to_string())?;
+        std::fs::write(&args.output, &out)
             .map_err(|e| format!("cannot write {}: {e}", args.output.display()))?;
         eprintln!(
-            "{} -> {} (kymo.json, {} bytes)",
+            "{} -> {} ({kind}, {} bytes)",
             args.input.display(),
             args.output.display(),
-            json.len()
+            out.len()
         );
         return Ok(());
     }

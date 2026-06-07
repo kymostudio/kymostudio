@@ -1,0 +1,17 @@
+digraph G {
+  rankdir=LR;
+  node [fontsize=12];
+  A [label="Rectangle", shape=box];
+  B [label="Rounded", shape=box];
+  C [label="Stadium", shape=box, style=rounded];
+  D [label="Database", shape=cylinder];
+  E [label="Circle", shape=circle];
+  F [label="Decision", shape=diamond];
+  G [label="Hexagon", shape=hexagon];
+  A -> B;
+  B -> C;
+  C -> D;
+  D -> E;
+  E -> F;
+  F -> G;
+}

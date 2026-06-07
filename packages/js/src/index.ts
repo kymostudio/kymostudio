@@ -32,9 +32,12 @@ export { resolveAlignments } from "./alignment.js";
 export {
   init, initSync,
   coreParseBpmn as parseBpmn,
+  coreMermaidImport as parseMermaid,   // Mermaid flowchart source → Diagram
+  coreMermaidToD2 as mermaidToD2,
+  coreMermaidToDot as mermaidToDot,
+  coreNormalizeMermaid as normalizeMermaid,
   coreToBpmn as toBpmn,
   coreApplyLayout as bpmnLayout,
-  coreMermaidImport as parseMermaid,   // Mermaid flowchart source → Diagram
 } from "./core.js";
 export { toKymoJson, modelDict } from "./to-kymojson.js";  // Diagram → .kymo.json
 export { parseKymoJson } from "./from-kymojson.js";          // .kymo.json → Diagram

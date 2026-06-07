@@ -1,0 +1,15 @@
+digraph G {
+  rankdir=LR;
+  node [fontsize=12];
+  A [label="Gateway", shape=box];
+  B [label="Service A", shape=box];
+  C [label="Service B", shape=box];
+  D [label="Service C", shape=box];
+  E [label="Store", shape=cylinder];
+  A -> B;
+  A -> C;
+  A -> D;
+  B -> E;
+  C -> E;
+  D -> E;
+}

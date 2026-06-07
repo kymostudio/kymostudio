@@ -1,0 +1,11 @@
+direction: down
+A: "Start"
+B: "Is it valid?" { shape: diamond }
+C: "Process"
+D: "Reject"
+E: "Done" { shape: circle }
+A -> B
+B -> C: "yes"
+B -> D: "no"
+C -> E
+D -> E

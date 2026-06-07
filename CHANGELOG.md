@@ -9,6 +9,24 @@ packages share a version number.
 
 ## [Unreleased]
 
+### Added
+
+- **Native `flowchart [DIR] { … }` DSL block.** Author a flowchart inline in a
+  `.kymo` file — the block body is Mermaid flowchart syntax, laid out by the core
+  (mirrors the `bpmn { }` block). Direction is optional (`flowchart LR { … }`,
+  default `TD`). Implemented in both Python (`dsl.py`) and JS (`dsl.ts`); see the
+  KYMO-DSL grammar §6.11.
+- **Flowchart transpilation: `mmd → {Mermaid, D2, DOT}`.** The core's flowchart
+  parse model was lifted into a format-neutral **flowchart IR** (`crate::flowchart`)
+  — a positionless node/edge/subgraph hub. New text emitters convert a Mermaid
+  flowchart to **D2**, **Graphviz DOT**, or **Mermaid** (round-trip / normalize);
+  each target lays the graph out itself, so no geometry is involved. Surfaced as
+  Rust APIs (`mermaid_to_d2` / `mermaid_to_dot` / `mermaid_to_mermaid`), the `kymo`
+  CLI (output extension picks the target: `kymo flow.mmd flow.d2` / `flow.dot` /
+  `norm.mmd`), and PyO3 + wasm bindings (Python `kymo._core.mermaid_to_d2` …; JS
+  `mermaidToD2` / `mermaidToDot` / `normalizeMermaid`). Golden + round-trip-fixpoint
+  + determinism tests; DOT output validated against Graphviz.
+
 ## [0.4.3] - 2026-06-07
 
 ### Added
@@ -34,10 +52,9 @@ packages share a version number.
   `diamond` shape. Exposed as a Rust API (`mermaid_to_kymojson`), the `kymo` CLI
   (`kymo flow.mmd → flow.kymo.json`), PyO3 (`mermaid_to_kymojson`) and wasm
   (`mermaidToKymoJson`). The output is byte-conformant with `to_kymojson`.
-  Rendering it to SVG (the `diamond` glyph + icon-less flowchart nodes in the
-  Python/JS renderers, and `.mmd` CLI dispatch) is a follow-up parity phase. See
-  `docs/specs/mermaid/` (FEAT-MERMAID-001) and `docs/formats/mermaid/mermaid-mapping.md`
-  (MERMAID-MAP-001); samples `samples/pipeline.mmd`, `samples/approval.mmd`.
+  See `docs/specs/mermaid/` (FEAT-MERMAID-001) and
+  `docs/formats/mermaid/mermaid-mapping.md` (MERMAID-MAP-001); samples
+  `samples/pipeline.mmd`, `samples/approval.mmd`.
 
 ## [0.4.2] - 2026-06-07
 

@@ -1,0 +1,14 @@
+digraph G {
+  rankdir=TB;
+  node [fontsize=12];
+  A [label="Start", shape=box];
+  B [label="Is it valid?", shape=diamond];
+  C [label="Process", shape=box];
+  D [label="Reject", shape=box];
+  E [label="Done", shape=circle];
+  A -> B;
+  B -> C [label="yes"];
+  B -> D [label="no"];
+  C -> E;
+  D -> E;
+}

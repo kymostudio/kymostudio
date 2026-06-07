@@ -1,0 +1,11 @@
+digraph G {
+  rankdir=TB;
+  node [fontsize=12];
+  A [label="Start", shape=box];
+  B [label="Load config", shape=box];
+  C [label="Run job", shape=box];
+  D [label="Report", shape=box];
+  A -> B;
+  B -> C;
+  C -> D;
+}

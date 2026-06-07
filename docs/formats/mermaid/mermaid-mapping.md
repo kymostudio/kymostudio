@@ -129,10 +129,41 @@ innermost open subgraph.
 
 ## 7. Output & rendering
 
-The importer produces `.kymo.json` (KYMOJSON-MAP-001) only. Rendering to SVG is
-done by the Python (`from_kymojson` → `to_svg`) and JS (`parseKymoJson` →
-`renderSVG`) back-ends. Those renderers require two additions before Mermaid
-output renders end-to-end — drawing **icon-less labelled shapes** (flowchart nodes
-carry no icon) and the new **`diamond`** glyph — tracked as the Python/JS parity
-phase (FEAT-MERMAID-001 §roadmap). The kymojson itself is already byte-conformant
+The importer produces `.kymo.json` (KYMOJSON-MAP-001). Rendering to SVG is done by
+the Python (`from_kymojson` → `to_svg`) and JS (`parseKymoJson` → `renderSVG`)
+back-ends, which **now render Mermaid output end-to-end** (Phase 2):
+
+- Both renderers draw **icon-less labelled shapes** — a flowchart node (`icon == ""`)
+  is drawn as the shape **outline** (box / rounded / circle / `diamond` / hex /
+  cylinder / stadium) with the label **inside**, not the icon-card style. The CSS is
+  injected only when such nodes are present, so non-flowchart goldens stay byte-identical.
+- The new **`diamond`** glyph is in the `Shape` literal/union + sizing tables of both
+  models.
+- A `.mmd` file is a first-class CLI source in both packages (`kymo flow.mmd` → SVG),
+  and a native **`flowchart [DIR] { … }`** DSL block embeds Mermaid syntax inside a
+  `.kymo` file (KYMO-DSL grammar §6.11). Both call the same core importer, so the
+  resolved model is identical across impls; the SVG bytes differ (independent renderers).
+
+These paths require a `kymostudio-core` that ships the Mermaid binding
+(`mermaid_to_kymojson` / `mermaidToKymoJson`); the kymojson itself is byte-conformant
 with the model both back-ends load.
+
+## 8. Transpilation (mmd → D2 / DOT / Mermaid)
+
+`mermaid::parse` returns a format-neutral **flowchart IR** (`crate::flowchart`:
+positionless `FlowNode` / `FlowEdge` / `Subgraph` / `Direction`). Besides the
+layout→`Diagram`→render path, the IR feeds text **emitters** (`flowchart::emit`),
+so converting between flowchart DSLs is a parse-then-emit with no geometry — the
+target lays the graph out itself.
+
+| Target | API / CLI | Shape mapping (from §3) |
+|---|---|---|
+| **Mermaid** | `mermaid_to_mermaid` · `kymo f.mmd norm.mmd` | inverse of §3 (round-trip / normalize) |
+| **D2** | `mermaid_to_d2` · `kymo f.mmd f.d2` | circle→`circle`, diamond→`diamond`, hex→`hexagon`, cylinder→`cylinder`, stadium→`oval`, box→default; subgraph→container (members ref'd as `g.id`) |
+| **Graphviz DOT** | `mermaid_to_dot` · `kymo f.mmd f.dot` | box/circle/diamond/hexagon/cylinder native; stadium→`box,style=rounded`; subgraph→`cluster_*` |
+
+Edge style carries over (dashed → D2 `style.stroke-dash` / DOT `style=dashed`;
+no-arrow → D2 `--` / DOT `dir=none`). Output is deterministic (declaration order
+preserved). Bindings: PyO3 (`mermaid_to_d2`/`_dot`/`_mermaid`) and wasm
+(`mermaidToD2`/`mermaidToDot`/`mermaidToMermaid`). `mmd → mmd` is a structural
+fixpoint (`tests/mermaid_convert.rs`).

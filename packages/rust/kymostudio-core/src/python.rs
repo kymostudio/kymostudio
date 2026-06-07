@@ -10,6 +10,9 @@
 //!     bpmn_export(model_json: str) -> str  # model JSON → .bpmn XML
 //!     bpmn_render(model_json, animate=False, background=None) -> str  # model JSON → SVG
 //!     mermaid_to_kymojson(src: str) -> str # Mermaid flowchart → .kymo.json
+//!     mermaid_to_d2(src: str) -> str       # Mermaid flowchart → D2
+//!     mermaid_to_dot(src: str) -> str      # Mermaid flowchart → Graphviz DOT
+//!     mermaid_to_mermaid(src: str) -> str  # Mermaid round-trip / normalize
 //!
 //! The BPMN functions exchange the canonical `.kymo.json` model on the JSON seam, so
 //! Python can deserialize the result into its dataclasses and delegate to this one
@@ -88,6 +91,24 @@ fn mermaid_to_kymojson(src: &str) -> PyResult<String> {
     crate::mermaid_to_kymojson(src).map_err(|e| PyValueError::new_err(e.to_string()))
 }
 
+/// Convert Mermaid flowchart source → D2 (via the flowchart IR).
+#[pyfunction]
+fn mermaid_to_d2(src: &str) -> PyResult<String> {
+    crate::mermaid_to_d2(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
+/// Convert Mermaid flowchart source → Graphviz DOT (via the flowchart IR).
+#[pyfunction]
+fn mermaid_to_dot(src: &str) -> PyResult<String> {
+    crate::mermaid_to_dot(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
+/// Round-trip / normalize Mermaid flowchart source through the IR.
+#[pyfunction]
+fn mermaid_to_mermaid(src: &str) -> PyResult<String> {
+    crate::mermaid_to_mermaid(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
 #[pymodule]
 fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
@@ -103,5 +124,8 @@ fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_function(wrap_pyfunction!(bpmn_render, m)?)?;
     }
     m.add_function(wrap_pyfunction!(mermaid_to_kymojson, m)?)?;
+    m.add_function(wrap_pyfunction!(mermaid_to_d2, m)?)?;
+    m.add_function(wrap_pyfunction!(mermaid_to_dot, m)?)?;
+    m.add_function(wrap_pyfunction!(mermaid_to_mermaid, m)?)?;
     Ok(())
 }

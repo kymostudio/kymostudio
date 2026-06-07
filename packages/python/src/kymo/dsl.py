@@ -155,6 +155,9 @@ _BPMN_KIND: dict[str, tuple[str, str]] = {
 _BPMN_ARROW: dict[str, str] = {"->": "sequence", "~>": "message", "..>": "association"}
 
 BPMN_OPEN_RE = re.compile(r'^bpmn\s*\{\s*$')
+# `flowchart [DIR] { … }` — body is Mermaid flowchart syntax, laid out by the
+# Rust core (mirrors `graph`/`flowchart` import). DIR ∈ TB/TD/BT/RL/LR (default TD).
+FLOWCHART_OPEN_RE = re.compile(r'^flowchart(?:\s+([A-Za-z]{2}))?\s*\{\s*$')
 # <kind> <id> ["Label"] [type=<subtype>] [@ (x,y)]   (`end!` before `end`)
 BPMN_NODE_RE = re.compile(
     r'^(start|end!|end|task|xor|and|or|event|subprocess|note|data|store)\s+'
@@ -244,6 +247,25 @@ def _consume_bpmn_block(state: _State, lines: list[str], i: int) -> int:
     raise SyntaxError(f"line {i + 1}: unclosed `bpmn {{` block (no matching `}}`)")
 
 
+def _consume_flowchart_block(state: _State, lines: list[str], i: int) -> int:
+    """Capture a `flowchart [DIR] { … }` block opening at `lines[i]` as a
+    `(direction, body)` pair on `state.flowchart_blocks`. The body is verbatim
+    Mermaid flowchart syntax (comments `%%` and shape braces `{…}` are the
+    importer's concern) — only a line that is solely `}` closes the block.
+    Returns the index AFTER the closing `}`. Layout happens later in the core."""
+    m = FLOWCHART_OPEN_RE.match(_strip_comment(lines[i]).strip())
+    direction = (m.group(1) or "TD").upper() if m else "TD"
+    body: list[str] = []
+    j = i + 1
+    while j < len(lines):
+        if CLOSE_RE.match(lines[j]):
+            state.flowchart_blocks.append((direction, "\n".join(body)))
+            return j + 1
+        body.append(lines[j])
+        j += 1
+    raise SyntaxError(f"line {i + 1}: unclosed `flowchart {{` block (no matching `}}`)")
+
+
 # ── Public API ────────────────────────────────────────────────────────
 def parse(dsl: str) -> tuple[Diagram, dict | None, dict | None]:
     """Parse a D2-style diagram DSL.
@@ -281,6 +303,7 @@ class _State:
         self.title: str = ""
         self.subtitle: str = ""
         self.bpmn_blocks: list = []          # positionless `bpmn { … }` ASTs
+        self.flowchart_blocks: list = []     # `(direction, body)` `flowchart { … }` blocks
 
     def finalize(self) -> tuple[Diagram, dict | None, dict | None]:
         diagram = Diagram(
@@ -289,6 +312,7 @@ class _State:
             components=self.components, regions=self.regions, edges=self.edges,
             layout_trees=self.layout_trees,
             bpmn_blocks=self.bpmn_blocks,
+            flowchart_blocks=self.flowchart_blocks,
         )
         if self.layout_trees:
             from .layout import apply_layout_tree, minimize_crossings
@@ -376,6 +400,9 @@ def _parse_block(
                 continue
             if BPMN_OPEN_RE.match(line):
                 i = _consume_bpmn_block(state, lines, i)
+                continue
+            if FLOWCHART_OPEN_RE.match(line):
+                i = _consume_flowchart_block(state, lines, i)
                 continue
 
         # Edges (file scope only — nesting an edge inside a container is

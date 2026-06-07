@@ -185,6 +185,10 @@ export interface Diagram {
   /** Positionless `bpmn { … }` blocks (from dsl.ts). Laid out into
    *  components/edges by bpmn-layout.ts; empty/absent once laid out. */
   bpmnBlocks?: BpmnBlock[];
+  /** Positionless `flowchart [DIR] { … }` blocks (from dsl.ts) as
+   *  `[direction, body]` pairs (body = Mermaid flowchart syntax). Resolved into
+   *  components/edges/regions by the core; empty/absent once laid out. */
+  flowchartBlocks?: Array<[string, string]>;
 }
 
 // ── Factories (mirror Python @dataclass with defaults) ────────────────
@@ -256,12 +260,14 @@ export function makeEdge({
 export function makeDiagram({
   width = 0, height = 0, title = "", subtitle = "",
   components = [], regions = [], edges = [], layoutTrees = [], bpmnBlocks = [],
+  flowchartBlocks = [],
 }: {
   width?: number; height?: number; title?: string; subtitle?: string;
   components?: Component[]; regions?: Region[]; edges?: Edge[]; layoutTrees?: unknown[];
   bpmnBlocks?: BpmnBlock[];
+  flowchartBlocks?: Array<[string, string]>;
 } = {}): Diagram {
-  return { width, height, title, subtitle, components, regions, edges, layoutTrees, bpmnBlocks };
+  return { width, height, title, subtitle, components, regions, edges, layoutTrees, bpmnBlocks, flowchartBlocks };
 }
 
 // ── Lookups & geometry helpers ────────────────────────────────────────

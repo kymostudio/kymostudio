@@ -29,7 +29,7 @@ import {
   type LayoutNode, type RegionLayout, type ExternalSpec,
 } from "./layout.js";
 import { resolveAlignments } from "./alignment.js";
-import { coreApplyLayout } from "./core.js";
+import { coreApplyLayout, coreResolveFlowchart } from "./core.js";
 
 // ── Top-level directives ───────────────────────────────────────────────
 const CANVAS_RE = /^canvas\s*:?\s+(\d+)\s*x\s*(\d+)\s*$/;
@@ -87,6 +87,10 @@ const BPMN_KIND: Record<string, [Shape, string]> = {
 };
 const BPMN_ARROW: Record<string, string> = { "->": "sequence", "~>": "message", "..>": "association" };
 
+// `flowchart [DIR] { … }` — body is Mermaid flowchart syntax, laid out by the
+// Rust core (mirrors `graph`/`flowchart` import). DIR ∈ TB/TD/BT/RL/LR (default TD).
+const FLOWCHART_OPEN_RE = /^flowchart(?:\s+([A-Za-z]{2}))?\s*\{\s*$/;
+
 export interface ParseResult {
   diagram: Diagram;
   layout: RegionLayout | null;
@@ -109,10 +113,12 @@ export function parse(dsl: string): ParseResult {
 export function parseDiagram(dsl: string): Diagram {
   const { diagram, layout: layoutSpec, external } = parse(dsl);
   const hadBpmn = (diagram.bpmnBlocks?.length ?? 0) > 0;
+  const hadFlowchart = (diagram.flowchartBlocks?.length ?? 0) > 0;
   if (hadBpmn) coreApplyLayout(diagram);
+  if (hadFlowchart) coreResolveFlowchart(diagram);
   if (layoutSpec) layout(diagram, layoutSpec, external);
-  // bpmn-block diagrams arrive fully positioned (like `.bpmn`) — skip alignment.
-  if (!hadBpmn) resolveAlignments(diagram);
+  // bpmn/flowchart-block diagrams arrive fully positioned (like `.bpmn`) — skip alignment.
+  if (!hadBpmn && !hadFlowchart) resolveAlignments(diagram);
   return diagram;
 }
 
@@ -128,6 +134,7 @@ class State {
   title = "";
   subtitle = "";
   bpmnBlocks: BpmnBlock[] = [];
+  flowchartBlocks: Array<[string, string]> = [];
 
   finalize(): ParseResult {
     const diagram = makeDiagram({
@@ -136,6 +143,7 @@ class State {
       components: this.components, regions: this.regions, edges: this.edges,
       layoutTrees: this.layoutTrees,
       bpmnBlocks: this.bpmnBlocks,
+      flowchartBlocks: this.flowchartBlocks,
     });
     if (this.layoutTrees.length) {
       const byId = new Map(this.components.map((c) => [c.id, c]));
@@ -191,6 +199,7 @@ function parseBlock(
         i++; continue;
       }
       if (BPMN_OPEN_RE.test(line)) { i = consumeBpmnBlock(state, lines, i); continue; }
+      if (FLOWCHART_OPEN_RE.test(line)) { i = consumeFlowchartBlock(state, lines, i); continue; }
     }
 
     if ((m = EDGE_RE.exec(line))) {
@@ -294,6 +303,26 @@ function consumeBpmnBlock(state: State, lines: string[], i: number): number {
     j++;
   }
   throw new SyntaxError(`line ${i + 1}: unclosed \`bpmn {\` block (no matching \`}\`)`);
+}
+
+/** Capture a `flowchart [DIR] { … }` block as a `[direction, body]` pair on
+ *  `state.flowchartBlocks`. The body is verbatim Mermaid flowchart syntax
+ *  (comments `%%` and shape braces `{…}` are the importer's concern) — only a
+ *  line that is solely `}` closes the block. Mirrors the Python parser. */
+function consumeFlowchartBlock(state: State, lines: string[], i: number): number {
+  const m = FLOWCHART_OPEN_RE.exec(stripComment(lines[i]).trim());
+  const direction = (m?.[1] ?? "TD").toUpperCase();
+  const body: string[] = [];
+  let j = i + 1;
+  while (j < lines.length) {
+    if (CLOSE_RE.test(lines[j])) {
+      state.flowchartBlocks.push([direction, body.join("\n")]);
+      return j + 1;
+    }
+    body.push(lines[j]);
+    j++;
+  }
+  throw new SyntaxError(`line ${i + 1}: unclosed \`flowchart {\` block (no matching \`}\`)`);
 }
 
 function makeBpmnNode(m: RegExpExecArray, lineNo: number): BpmnNode {
