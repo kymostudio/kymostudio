@@ -9,8 +9,19 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-06-07
+
 ### Added
 
+- **Mermaid rendering + CLI parity (Python/JS).** The Phase-1 Mermaid importer
+  is now usable end-to-end from both front-ends. The Python and JS renderers
+  gain a `diamond` glyph and an icon-less flowchart-node path
+  (`box`/`circle`/`cylinder`/`badge`/`hex`/`diamond` drawn with the label inside);
+  flowchart CSS is injected conditionally so existing output stays byte-identical.
+  `kymo foo.mmd` now renders in the Python CLI (`cli.py` → `_core.import_mermaid`)
+  and JS CLI (`render-cli.mjs` → `parseMermaid`), and the vscode-extension
+  previews/exports `.mmd`/`.mermaid`. The core's `mermaid_to_kymojson` binding
+  ships in this release.
 - **Mermaid flowchart import (Rust core).** `kymostudio-core` gains a Mermaid
   importer — the first parser/model/layout subsystem to live in the Rust engine
   (rather than being duplicated in Python and JS like BPMN). It parses Mermaid
