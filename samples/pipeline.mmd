@@ -1,0 +1,6 @@
+flowchart LR
+    A[Source] --> B[Build]
+    B --> C{Tests pass?}
+    C -->|yes| D[(Artifact store)]
+    C -->|no| E[Notify]
+    D --> F((Deploy))

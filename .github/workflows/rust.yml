@@ -90,6 +90,9 @@ jobs:
           printf '%s' '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="#0a0"/></svg>' > sq.svg
           ./target/release/kymo sq.svg out.png
           test -s out.png && echo "PNG produced"
+          printf 'flowchart TD\n  A[Start] --> B{ok?}\n  B -->|yes| C[Done]\n' > flow.mmd
+          ./target/release/kymo flow.mmd flow.kymo.json
+          test -s flow.kymo.json && grep -q '"format": "kymo.json"' flow.kymo.json && echo "kymo.json produced"
 
   # ── wasm: compile to wasm32 and produce the wasm-pack JS package ──
   wasm:
@@ -159,7 +162,9 @@ jobs:
           m = json.loads(k.bpmn_import(xml))
           assert "components" in m, "bpmn_import did not return a model"
           assert k.bpmn_to_svg(xml).startswith("<?xml"), "bpmn_to_svg did not return SVG"
-          print("kymostudio-core", k.__version__, "->", len(png), "bytes OK; BPMN fns OK")
+          j = k.mermaid_to_kymojson("flowchart TD\n A[Start] --> B{ok?}\n B -->|yes| C[Done]\n")
+          assert '"format": "kymo.json"' in j and '"shape": "diamond"' in j, "bad kymo.json"
+          print("kymostudio-core", k.__version__, "->", len(png), "png bytes; BPMN fns OK;", len(j), "json bytes OK")
           PY
       - uses: actions/upload-artifact@v4
         with:

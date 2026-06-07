@@ -6,6 +6,7 @@
 //!     svgToPdf(svg: Uint8Array): Uint8Array
 //!     bpmnImport(xml): string   bpmnExport(json): string
 //!     bpmnLayout(blocksJson): string   bpmnRender(json, animate?, background?): string
+//!     mermaidToKymoJson(src: string): string
 
 use wasm_bindgen::prelude::*;
 
@@ -60,6 +61,12 @@ pub fn bpmn_render(
         background,
     };
     Ok(crate::bpmn::render_opts(&d, &opts))
+}
+
+/// Parse Mermaid source (flowchart) into a `.kymo.json` interchange string.
+#[wasm_bindgen(js_name = mermaidToKymoJson)]
+pub fn mermaid_to_kymojson(src: &str) -> Result<String, JsError> {
+    crate::mermaid_to_kymojson(src).map_err(|e| JsError::new(&e.to_string()))
 }
 
 /// The crate version, exposed to JS as `version()`.

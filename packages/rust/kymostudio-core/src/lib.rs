@@ -9,6 +9,14 @@
 
 use resvg::{tiny_skia, usvg};
 
+// The shared diagram engine — pure Rust, no SVG deps. Mermaid import parses
+// into [`model::Diagram`], lays it out, and serializes to the `.kymo.json`
+// interchange format the Python/JS front-ends consume.
+pub mod kymojson;
+pub mod layout;
+pub mod mermaid;
+pub mod model;
+
 // Language-binding facades — each compiled only when its feature is on.
 #[cfg(feature = "python")]
 mod python;
@@ -108,6 +116,17 @@ pub fn svg_to_pdf(svg: &[u8]) -> Result<Vec<u8>, RenderError> {
         svg2pdf::PageOptions::default(),
     )
     .map_err(|e| RenderError::Pdf(e.to_string()))
+}
+
+/// Parse Mermaid source (flowchart) into the `.kymo.json` interchange string.
+///
+/// The shared engine entry point: parse → layered layout → serialize. Python
+/// (PyO3) and JS (wasm) call this and feed the result to their `from_kymojson`
+/// loaders. Errors describe the unsupported diagram type or the syntax problem.
+pub fn mermaid_to_kymojson(src: &str) -> Result<String, mermaid::MermaidError> {
+    let fc = mermaid::parse(src)?;
+    let diagram = layout::layout_flowchart(&fc);
+    Ok(kymojson::export(&diagram))
 }
 
 #[cfg(test)]

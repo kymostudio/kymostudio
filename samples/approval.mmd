@@ -1,0 +1,7 @@
+flowchart TD
+    Start((Start)) --> Submit[Submit request]
+    Submit --> Review{Approved?}
+    Review -->|yes| Provision[Provision]
+    Review -->|no| Reject[Reject]
+    Provision --> Done((Done))
+    Reject --> Done
