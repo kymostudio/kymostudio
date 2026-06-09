@@ -11,13 +11,19 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "mcp": "node mcp-server.js"
+    "mcp": "node mcp-server.js",
+    "build": "./build.sh"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "kymostudio": "file:../js",
+    "kymostudio-core": "file:../rust/kymostudio-core/pkg"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
   }
 }

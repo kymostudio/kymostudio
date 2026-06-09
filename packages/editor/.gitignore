@@ -1,6 +1,4 @@
-# Python virtualenv (holds the kymostudio-core layout engine) — recreate with:
-#   python3 -m venv .venv && .venv/bin/pip install "kymostudio-core>=0.4,<0.5"
-.venv/
-
-# Node (this app is dependency-free, but just in case)
 node_modules/
+.venv/
+dist/
+.wrangler/
