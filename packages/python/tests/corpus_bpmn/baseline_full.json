@@ -45,14 +45,14 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "d29d0ee981bc",
+  "sha": "4b3f66fed50a",
   "status": "ok"
  },
  "ADONIS_17.0_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "27e324f41aa0",
+  "sha": "16b1b0245689",
   "status": "ok"
  },
  "ADONIS_17.0_A.4.0-export": {
@@ -101,14 +101,14 @@
   "err": "",
   "n_edges": 90,
   "n_nodes": 92,
-  "sha": "2e4810f52fe1",
+  "sha": "5187c16b548f",
   "status": "ok"
  },
  "ADONIS_17.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 89,
-  "sha": "c676737f0475",
+  "sha": "561d719e217f",
   "status": "ok"
  },
  "ADONIS_17.0_C.1.0-export": {
@@ -143,70 +143,70 @@
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "8a9f98e38c51",
+  "sha": "d05aac7d4268",
   "status": "ok"
  },
  "ADONIS_17.0_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 27,
   "n_nodes": 28,
-  "sha": "d45725897478",
+  "sha": "392e7b05136e",
   "status": "ok"
  },
  "ADONIS_17.0_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 13,
-  "sha": "ebc7f2ff12a8",
+  "sha": "37b1ee5bd79a",
   "status": "ok"
  },
  "ADONIS_17.0_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 13,
-  "sha": "4f7d1aa27dad",
+  "sha": "4024a54e2879",
   "status": "ok"
  },
  "ADONIS_17.0_C.4.0-export": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 24,
-  "sha": "17ff99fb1291",
+  "sha": "30731355a1d9",
   "status": "ok"
  },
  "ADONIS_17.0_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 24,
-  "sha": "97393311533d",
+  "sha": "0ad6706e7e3d",
   "status": "ok"
  },
  "ADONIS_17.0_C.5.0-export": {
   "err": "",
   "n_edges": 64,
   "n_nodes": 46,
-  "sha": "1a5de5fc409f",
+  "sha": "48f0edc41c38",
   "status": "ok"
  },
  "ADONIS_17.0_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "ab79588224d2",
+  "sha": "8c028251f8a1",
   "status": "ok"
  },
  "ADONIS_17.0_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "2c7ffed1137d",
+  "sha": "5574b00c8316",
   "status": "ok"
  },
  "ADONIS_17.0_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "9e50ea90ac63",
+  "sha": "9da97bc9e5e9",
   "status": "ok"
  },
  "ADONIS_17.0_C.7.0-export": {
@@ -227,42 +227,42 @@
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "6ec19500f2a1",
+  "sha": "d452a1d0a7af",
   "status": "ok"
  },
  "ADONIS_17.0_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "30a00a60b7b3",
+  "sha": "d2a4f0e410f9",
   "status": "ok"
  },
  "ADONIS_17.0_C.8.1-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "4d6c97c6c6d0",
+  "sha": "0a757110a2c5",
   "status": "ok"
  },
  "ADONIS_17.0_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "8296b315a6de",
+  "sha": "027a8823dd7f",
   "status": "ok"
  },
  "ADONIS_17.0_C.9.0-export": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "e1120f753f84",
+  "sha": "30a07e6b9bac",
   "status": "ok"
  },
  "ADONIS_17.0_C.9.0-roundtrip": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "13c90e1d779a",
+  "sha": "5b119f089a06",
   "status": "ok"
  },
  "ADONIS_17.0_C.9.1-export": {
@@ -297,294 +297,294 @@
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "5b5d77aea347",
+  "sha": "db916de87751",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "aa8f82aad357",
+  "sha": "5ee4c32b20f6",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "0405c7fd4422",
+  "sha": "028a9d83fa45",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "8f98b654d361",
+  "sha": "bc94e52b0c0d",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "4d17af374758",
+  "sha": "cfa32c853087",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "99f2b29e0f41",
+  "sha": "e82a0e469fa9",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "e2b0e0c9f0ac",
+  "sha": "b8deb09fc5ea",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "93152c5a175b",
+  "sha": "e0d37d1d3dc8",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "c284937c0a45",
+  "sha": "532b1fc422fa",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "800756b8b293",
+  "sha": "761968c3d117",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "ea19b98886ef",
+  "sha": "a02a14411b18",
   "status": "ok"
  },
  "ARIS_10.2025.07_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "66e1e1a44b67",
+  "sha": "90ceb9b814df",
   "status": "ok"
  },
  "ARIS_10.2025.07_B.1.0-export": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "636196716219",
+  "sha": "aa2f1c047418",
   "status": "ok"
  },
  "ARIS_10.2025.07_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "d6b2a620b695",
+  "sha": "81ace0d20192",
   "status": "ok"
  },
  "ARIS_10.2025.07_B.2.0-export": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "356825638fd6",
+  "sha": "9b55304febc8",
   "status": "ok"
  },
  "ARIS_10.2025.07_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "bdfd251e940c",
+  "sha": "a99b54378f2a",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "9fb77e33b08d",
+  "sha": "3c8812477266",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "2b6a89f2ea9d",
+  "sha": "986455d191fa",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "0609ddf8530c",
+  "sha": "61b48333d41e",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "e2cde23df54c",
+  "sha": "ff61522c6b53",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "0f9d15f74c17",
+  "sha": "1f7b3293e3c7",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "04cd0b203e9a",
+  "sha": "25e6f49035ee",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "bb2a360de66b",
+  "sha": "47b9c29c7072",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "0d7228595ea5",
+  "sha": "3cbec8478d89",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.4.0-export": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "116bdf603842",
+  "sha": "f9c3fe9eabe1",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "7458a65eb4bd",
+  "sha": "6c52b7bf1762",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.5.0-export": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "13cf8f30bbb7",
+  "sha": "04aacd2670e0",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "52634fcb6516",
+  "sha": "87bbc639cd89",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "565795515cc3",
+  "sha": "f27f18080987",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "c88b074c97c7",
+  "sha": "dba4908c553e",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.7.0-export": {
   "err": "",
   "n_edges": 17,
   "n_nodes": 16,
-  "sha": "2808070bc03b",
+  "sha": "2a3a48fac51d",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.7.0-roundtrip": {
   "err": "",
   "n_edges": 17,
   "n_nodes": 16,
-  "sha": "4f251dc467ef",
+  "sha": "97a7bf5f96a2",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.8.0-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "17b279ebf92f",
+  "sha": "d5b55f1627ae",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "3551af388aed",
+  "sha": "655f069da120",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.8.1-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "0e5d886db774",
+  "sha": "0966be28a08f",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "cbb0a25f257a",
+  "sha": "4056d864fcfa",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.9.0-export": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "69f0caa97a44",
+  "sha": "6624d15a3332",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.9.0-roundtrip": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "519f5585b69c",
+  "sha": "407ed4300d86",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.9.1-export": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "f689b52e8b5a",
+  "sha": "ab2b747dff7e",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.9.1-roundtrip": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "a7aa1103d800",
+  "sha": "84b26e6e63e7",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.9.2-export": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "a42b496f156f",
+  "sha": "6fbc2e3c72d7",
   "status": "ok"
  },
  "ARIS_10.2025.07_C.9.2-roundtrip": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "cfa8c3634613",
+  "sha": "461f83a2e25f",
   "status": "ok"
  },
  "Activiti_Designer_5.14.1_A.1.0-export": {
@@ -598,7 +598,7 @@
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "9176614023d5",
+  "sha": "461713c257a5",
   "status": "ok"
  },
  "Activiti_Designer_5.14.1_A.2.0-export": {
@@ -612,168 +612,168 @@
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "54157c615540",
+  "sha": "a82ba3015650",
   "status": "ok"
  },
  "Activiti_Designer_5.14.1_A.3.0-export": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 9,
-  "sha": "50133fa4dd10",
+  "sha": "97fc7c61771f",
   "status": "ok"
  },
  "Activiti_Designer_5.14.1_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1da7bb05dd24",
+  "sha": "5102842be5a1",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "3113d4441b18",
+  "sha": "33c45e6cb916",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "c3c197675436",
+  "sha": "b4bbca569e43",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "a4f55600f25c",
+  "sha": "06edeec17bb1",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "c07a0c59e176",
+  "sha": "b14de42f26fb",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "e240505f5996",
+  "sha": "82b9d510b740",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "0f387fb5a851",
+  "sha": "74eae1a089da",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "0d9836745626",
+  "sha": "3b255514aa84",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "a231ed276e4e",
+  "sha": "4c55e9819a59",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "b069588ed695",
+  "sha": "b783da62558a",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "734367bbaf69",
+  "sha": "90b1220abcf4",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_B.1.0-export": {
   "err": "",
   "n_edges": 27,
   "n_nodes": 23,
-  "sha": "559f7567c611",
+  "sha": "9f1a2d973b39",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 23,
-  "sha": "81f5853777d6",
+  "sha": "0a9f8c981349",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_B.2.0-export": {
   "err": "",
   "n_edges": 88,
   "n_nodes": 88,
-  "sha": "6afc59dc23cc",
+  "sha": "2756d59095cb",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 79,
   "n_nodes": 80,
-  "sha": "c5694a73847e",
+  "sha": "3c1b775a75eb",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "84c595f42564",
+  "sha": "8952a230dd1e",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "ae078918bef0",
+  "sha": "31e599bf0109",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 10,
-  "sha": "19658ef845bc",
+  "sha": "4fdafe75dd9e",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 10,
   "n_nodes": 10,
-  "sha": "4e4b62d98b97",
+  "sha": "d388b5967871",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "b9d147db7bad",
+  "sha": "756960016225",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "6c116424ffd7",
+  "sha": "3807c19c4ad2",
   "status": "ok"
  },
  "Aeneis_5.7.89.2400_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "256c6308d92a",
+  "sha": "1192978ddd3c",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_A.1.0-export": {
@@ -794,42 +794,42 @@
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "1d9f09852ff6",
+  "sha": "30514e53343c",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "4089db65f3a5",
+  "sha": "cafdba17873a",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "0b274ee0ce09",
+  "sha": "ebbd90718219",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "3ffefd52ee31",
+  "sha": "229536a06e57",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "44040b95fee7",
+  "sha": "cf602a8edfeb",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "3f15f677c3ca",
+  "sha": "cab478fe6c33",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_A.4.0-export": {
@@ -864,602 +864,602 @@
   "err": "",
   "n_edges": 25,
   "n_nodes": 27,
-  "sha": "c3e57465f2c7",
+  "sha": "7be2a17dd384",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 25,
-  "sha": "966543a8921f",
+  "sha": "0c8ad61330c0",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 73,
   "n_nodes": 82,
-  "sha": "99c440aa8178",
+  "sha": "626589b46ad7",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "08051b4cd568",
+  "sha": "e4bd9490856e",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "fe479cdacd48",
+  "sha": "34911df89ca9",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "6d2f41bc47a6",
+  "sha": "f0a3b22b190c",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.2.0-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 26,
-  "sha": "96ebb0f5151a",
+  "sha": "90b21b6058be",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 26,
-  "sha": "d085f45f91a9",
+  "sha": "fd5b5e71ed93",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "bf9a665f71df",
+  "sha": "026c26f8618c",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "542b1abdbc8b",
+  "sha": "4439dc168624",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.4.0.1-export": {
   "err": "",
   "n_edges": 27,
   "n_nodes": 24,
-  "sha": "c3554e05fe7d",
+  "sha": "6c20059a98cf",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.4.0.2-export": {
   "err": "",
   "n_edges": 10,
   "n_nodes": 10,
-  "sha": "6c18909da5e7",
+  "sha": "bf455b94563e",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.4.0.3-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 8,
-  "sha": "a74111e06a1f",
+  "sha": "276862f84e4d",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.4.0.4-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "051b28208f0d",
+  "sha": "4324a797eb82",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 59,
   "n_nodes": 40,
-  "sha": "9ac2cdc5827e",
+  "sha": "7dd30b9bae87",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.5.0.1-export": {
   "err": "",
   "n_edges": 59,
   "n_nodes": 40,
-  "sha": "f4ad1a8bc94d",
+  "sha": "80f033065150",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.5.0.2-export": {
   "err": "",
   "n_edges": 6,
   "n_nodes": 6,
-  "sha": "777f0dc167ce",
+  "sha": "f13a5f7289a3",
   "status": "ok"
  },
  "BIC_Cloud_Design_6.2.0_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 27,
-  "sha": "231b09195f75",
+  "sha": "bca01d6d0b5f",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "6c98b83d68d6",
+  "sha": "ae36f3d0006a",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "8731275cc17c",
+  "sha": "d936042b62c2",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "6e7d2a4d2011",
+  "sha": "0ba15b82327d",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "cb04cb69472d",
+  "sha": "7840180b6dd8",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "49a0e20adcde",
+  "sha": "98f34e1ea24a",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "dcdb8854ed22",
+  "sha": "ccd8b2b53225",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1fefd21490f0",
+  "sha": "62898b281586",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "b99256059674",
+  "sha": "6addb5d2d9ef",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "610fe9cb2e21",
+  "sha": "b5bdff5176ba",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "07d4ca8a9ce0",
+  "sha": "7f6a44a2aa3b",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "28d5901cc92a",
+  "sha": "72c067515aa5",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "3a1a855641db",
+  "sha": "9d7056618b55",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_B.1.0-export": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 27,
-  "sha": "270739829802",
+  "sha": "75c7d92a91d4",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 27,
   "n_nodes": 25,
-  "sha": "24a0b8ca4ff4",
+  "sha": "91a70e8b39cd",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_B.2.0-export": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 90,
-  "sha": "489e1be50338",
+  "sha": "e004c1e7d548",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 81,
   "n_nodes": 83,
-  "sha": "86ed6c611551",
+  "sha": "01e75a4e92d3",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "cb56b88eb37d",
+  "sha": "b534eceb849b",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "46bf2fd8f588",
+  "sha": "57fb4445aa2e",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "bbcf968582e3",
+  "sha": "5b9e3f70eab6",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "52731c32b23e",
+  "sha": "a7b55647cfef",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "94b76a43d491",
+  "sha": "0d4918cecd2a",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "49a42e019260",
+  "sha": "bcce556e64b6",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "2e5a1f681802",
+  "sha": "a1a5e9f95e7e",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "bdfa0157f83f",
+  "sha": "a52a33c5e81f",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-export.1": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 24,
-  "sha": "43118fcf7f46",
+  "sha": "0894efd7ea3b",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-export.2": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 10,
-  "sha": "1d7f6eb5e860",
+  "sha": "e6d6232f7b08",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-export.3": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "b402f47d28a4",
+  "sha": "639ad51b0030",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-export.4": {
   "err": "",
   "n_edges": 5,
   "n_nodes": 5,
-  "sha": "4fc6c912ad27",
+  "sha": "e3e721ecada4",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "27cfc7ebfa19",
+  "sha": "46f5674ae2f1",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.5.0-export.1": {
   "err": "",
   "n_edges": 6,
   "n_nodes": 6,
-  "sha": "8bcaac57d1cf",
+  "sha": "24e833d5b84e",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.5.0-export.2": {
   "err": "",
   "n_edges": 6,
   "n_nodes": 6,
-  "sha": "c7d6f3b8eef2",
+  "sha": "a1fc7da4fa38",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "3ca85fa96474",
+  "sha": "87a13a09e99a",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "e7aece6d36c8",
+  "sha": "c3d8fe20282a",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "53904bbd5997",
+  "sha": "8112bc55aa29",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.7.0-export": {
   "err": "",
   "n_edges": 17,
   "n_nodes": 16,
-  "sha": "458c7199f69a",
+  "sha": "98dc72c4e3c5",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.7.0-roundtrip": {
   "err": "",
   "n_edges": 17,
   "n_nodes": 16,
-  "sha": "33bcf2fee6db",
+  "sha": "89a9fb1637c6",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.8.0-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "ecf41391bbca",
+  "sha": "fffb6f5658f0",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "80f2a4dca25a",
+  "sha": "417d8d7d4ed5",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.8.1-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "3783624f16fb",
+  "sha": "159a37bd470d",
   "status": "ok"
  },
  "BPMN-Modeler_for_Confluence_Enterprise_3.38.0_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "92aee202754e",
+  "sha": "0e027873b693",
   "status": "ok"
  },
  "Bizagi_Modeler_2.8.0.8_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "6e4e790c5c6f",
+  "sha": "8d21f71277fa",
   "status": "ok"
  },
  "Bizagi_Modeler_2.8.0.8_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "ba520c34db4c",
+  "sha": "cb5d7c2cdc43",
   "status": "ok"
  },
  "Bizagi_Modeler_2.8.0.8_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "85110a0b34c3",
+  "sha": "1b9da23bc73a",
   "status": "ok"
  },
  "Bizagi_Modeler_2.8.0.8_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "f21f42ad25a1",
+  "sha": "56c849e601e0",
   "status": "ok"
  },
  "Bizagi_Modeler_2.8.0.8_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "c6e86014f284",
+  "sha": "eb6eea5b41ba",
   "status": "ok"
  },
  "Bizagi_Modeler_2.8.0.8_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 31,
-  "sha": "8e036c0edaaa",
+  "sha": "50c47ee58182",
   "status": "ok"
  },
  "Bizagi_Modeler_2.8.0.8_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 88,
   "n_nodes": 94,
-  "sha": "b733b4ada997",
+  "sha": "3863b16b0183",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "1dc0949c1546",
+  "sha": "3fd294c8f304",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "026f07cff81d",
+  "sha": "c50be4780bd5",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "1a896f5d130b",
+  "sha": "8da0eb5fe997",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "dd03ce689fc7",
+  "sha": "30b503af12c1",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "e02239db37c2",
+  "sha": "0ff118f55550",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "ef53c8c286ca",
+  "sha": "a005cb3528a0",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.3.0-export": {
   "err": "",
   "n_edges": 6,
   "n_nodes": 7,
-  "sha": "2d520757d5ac",
+  "sha": "dec600bd0204",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 9,
-  "sha": "d0a7b6068f6a",
+  "sha": "562b0429df21",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.4.0-export": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 16,
-  "sha": "e8e1f395ee8e",
+  "sha": "38b55ab04165",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 17,
-  "sha": "ab7db0e46262",
+  "sha": "e21a3ac30f96",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 17,
-  "sha": "aeefe44c37fd",
+  "sha": "5118ece1c2b7",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 26,
   "n_nodes": 29,
-  "sha": "8fc00d4e895f",
+  "sha": "23d36de4633d",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_B.2.0-export": {
   "err": "",
   "n_edges": 20,
   "n_nodes": 20,
-  "sha": "d7c9589eb07f",
+  "sha": "f2a7b8821e91",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 81,
   "n_nodes": 90,
-  "sha": "933e589a57bc",
+  "sha": "80e956787925",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_C.1.0-export": {
   "err": "",
   "n_edges": 20,
   "n_nodes": 21,
-  "sha": "49477def5688",
+  "sha": "a3ae68d10e6c",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 20,
   "n_nodes": 21,
-  "sha": "14ca23259a11",
+  "sha": "0e2cfe0b37c6",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_C.1.1-export": {
   "err": "",
   "n_edges": 10,
   "n_nodes": 10,
-  "sha": "4ecb9daaa929",
+  "sha": "ab4608661676",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 10,
   "n_nodes": 10,
-  "sha": "a53388b29025",
+  "sha": "5f47f00454a2",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 29,
-  "sha": "bab194f3c224",
+  "sha": "8c92c5afe874",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "cbe94d7ec4bb",
+  "sha": "1864c582ee11",
   "status": "ok"
  },
  "Bonita_BPM_7.2.3_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "36d3895c909f",
+  "sha": "36c9b3ff7130",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_A.1.0-export": {
@@ -1473,35 +1473,35 @@
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "9176614023d5",
+  "sha": "461713c257a5",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "4e74078aa8df",
+  "sha": "bcf5e31f0aa6",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "54157c615540",
+  "sha": "a82ba3015650",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "142a0c58e0e9",
+  "sha": "eb4b97795e91",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1da7bb05dd24",
+  "sha": "5102842be5a1",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_A.4.0-export": {
@@ -1515,7 +1515,7 @@
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "e71b809ae8f0",
+  "sha": "a54b056d94dd",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_A.4.1-export": {
@@ -1529,329 +1529,329 @@
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "b18c85ae7bcb",
+  "sha": "4e9ec40ba79d",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_B.1.0-export": {
   "err": "",
   "n_edges": 27,
   "n_nodes": 25,
-  "sha": "78500990da78",
+  "sha": "933afa445d8a",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "3eba2fbb1580",
+  "sha": "c2c3454db814",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_B.2.0-export": {
   "err": "",
   "n_edges": 82,
   "n_nodes": 83,
-  "sha": "58dc22cd9172",
+  "sha": "179fdfc3e890",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 94,
-  "sha": "890fbc5a0b2d",
+  "sha": "e59ebc423fd3",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "ffa49ca24897",
+  "sha": "3ddaff6c9024",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "181e70aa880c",
+  "sha": "7116f751008a",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "935edb416aab",
+  "sha": "f58812777878",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "759ed9a0dd90",
+  "sha": "10b154498d9c",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "99ecfb2c843a",
+  "sha": "be056854b966",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "d31cae3e178b",
+  "sha": "45a2509e7361",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "f25b3cde97af",
+  "sha": "55cbf9b0451e",
   "status": "ok"
  },
  "Camunda_Eclipse_Plugin_3.0.0_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "540e55c5bdf7",
+  "sha": "39220da65780",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "1cd7c83826b4",
+  "sha": "6590783868c7",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "2b3668ebe6d4",
+  "sha": "8a5fa125ba8d",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "a79f31666691",
+  "sha": "e2a5e0cf8fe4",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "4f1da303caa5",
+  "sha": "bf4a0a07ec28",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "880e2f771d65",
+  "sha": "63a5b178ab03",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "dc80fa988aa4",
+  "sha": "18637b6717de",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "b320aaacd5e7",
+  "sha": "a71f22c7f0d7",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "76c46b58f152",
+  "sha": "e3f841131a46",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "c321019cf6ca",
+  "sha": "39662538ca29",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "23c77da087ca",
+  "sha": "2daecfb57d02",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "16207d864b55",
+  "sha": "846ed51fe911",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "567c1110e71a",
+  "sha": "36a11354b3bb",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "6da375e8bef5",
+  "sha": "caef29099b88",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "c655f39a9b4b",
+  "sha": "567263aee4f8",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "75ed16682225",
+  "sha": "12156b9d0cf2",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "719dd9836f98",
+  "sha": "50a50e6e8641",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.4.0-export": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "22dc6d8d59ae",
+  "sha": "c3abf7426312",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "ce5682f9909b",
+  "sha": "1cdacd91dc61",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.5.0-export": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 48,
-  "sha": "be240ec89c73",
+  "sha": "c7aa7f948a83",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "dc507702c7e8",
+  "sha": "b9f7bcd4225b",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "27885b0288e5",
+  "sha": "28e2ec750a7c",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 34,
   "n_nodes": 38,
-  "sha": "48875d041031",
+  "sha": "424fe95dd38f",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.7.0-export": {
   "err": "",
   "n_edges": 19,
   "n_nodes": 16,
-  "sha": "1fa276950952",
+  "sha": "b529f66dde62",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.7.0-roundtrip": {
   "err": "",
   "n_edges": 17,
   "n_nodes": 16,
-  "sha": "b0b6a5c5c421",
+  "sha": "d721c2b13fb3",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.8.0-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "a0df5631de49",
+  "sha": "ce0c716cfd51",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.8.1-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "a0df5631de49",
+  "sha": "ce0c716cfd51",
   "status": "ok"
  },
  "Cardanit_prev._BeePMN_4.9.1_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 16,
-  "sha": "9c6c5006a32e",
+  "sha": "f8310fc63589",
   "status": "ok"
  },
  "Enterprise_Architect_12.0.1207_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "3ae6d2b59a22",
+  "sha": "c289ce39890b",
   "status": "ok"
  },
  "Enterprise_Architect_12.0.1207_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "ad46fef58c37",
+  "sha": "9bdff95e2fc3",
   "status": "ok"
  },
  "Enterprise_Architect_12.0.1207_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "4214bd202b2b",
+  "sha": "cc89f2e05e77",
   "status": "ok"
  },
  "Enterprise_Architect_12.0.1207_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "4c04fba1bdf8",
+  "sha": "8a71b84cec35",
   "status": "ok"
  },
  "Enterprise_Architect_12.0.1207_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "9f1a0fca5f47",
+  "sha": "e7ec613721c4",
   "status": "ok"
  },
  "Enterprise_Architect_12.0.1207_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "4766608615f2",
+  "sha": "f68e552e4317",
   "status": "ok"
  },
  "Enterprise_Architect_12.0.1207_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 94,
-  "sha": "bf2329ff1292",
+  "sha": "08da898279df",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_A.1.0-export": {
@@ -1900,14 +1900,14 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "245a60d19460",
+  "sha": "c4858d05f2c5",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "f4127d410f99",
+  "sha": "b5add715886f",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_A.4.0-export": {
@@ -1942,119 +1942,119 @@
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "35e875b758ef",
+  "sha": "9a65baa0c0f6",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 31,
-  "sha": "a68c6134c548",
+  "sha": "b232613c7a4f",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 86,
   "n_nodes": 93,
-  "sha": "24d504a7173a",
+  "sha": "0e6a1f880bdb",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "a13e94c63c1f",
+  "sha": "b1699d3c30e2",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "3816cb71d2d2",
+  "sha": "1ec96e37a25b",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "14176001a73d",
+  "sha": "8a70fe6d6225",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "8eb9047cf826",
+  "sha": "4bb7d0ad9ffa",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "f4a4f1cd7961",
+  "sha": "7cd92f87bdb8",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "4e60d21dc1fb",
+  "sha": "6babbf12962e",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "6a89e395df4b",
+  "sha": "a1ce4e56e6b9",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "643f96814a1e",
+  "sha": "a416ad18f20f",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.4.0-export": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 41,
-  "sha": "5373f6ced4e3",
+  "sha": "f02b3c18046e",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 41,
-  "sha": "5373f6ced4e3",
+  "sha": "f02b3c18046e",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.5.0-export": {
   "err": "",
   "n_edges": 59,
   "n_nodes": 46,
-  "sha": "4e8e8763cf5a",
+  "sha": "3cd6b4018f7b",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.5.0-roundrip": {
   "err": "",
   "n_edges": 59,
   "n_nodes": 46,
-  "sha": "70f1d95a07d2",
+  "sha": "32e8663878c1",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "e8199f4986cd",
+  "sha": "b3de6a2e975c",
   "status": "ok"
  },
  "Enterprise_Explorer_1.0.0_C.6.0-roundrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "f180c11659fd",
+  "sha": "cc937d43b6c4",
   "status": "ok"
  },
  "GenMyModel_0.47_A.1.0-export": {
@@ -2068,7 +2068,7 @@
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "7433c0a58fcf",
+  "sha": "24b207c926f6",
   "status": "ok"
  },
  "GenMyModel_0.47_A.2.0-export": {
@@ -2082,7 +2082,7 @@
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "753fb7daa9b3",
+  "sha": "253995171152",
   "status": "ok"
  },
  "GenMyModel_0.47_A.3.0-export": {
@@ -2096,7 +2096,7 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "48b566b7d41c",
+  "sha": "f07d14318702",
   "status": "ok"
  },
  "GenMyModel_0.47_A.4.0-export": {
@@ -2110,7 +2110,7 @@
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "cc7afd1ee5a7",
+  "sha": "466aa8c4fba0",
   "status": "ok"
  },
  "GenMyModel_0.47_B.1.0-export": {
@@ -2124,7 +2124,7 @@
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "93fd51fd0ffd",
+  "sha": "8caa93ac4154",
   "status": "ok"
  },
  "GenMyModel_0.47_B.2.0-export": {
@@ -2138,7 +2138,7 @@
   "err": "",
   "n_edges": 90,
   "n_nodes": 94,
-  "sha": "68c0d0bea2d7",
+  "sha": "bfa062b2a50a",
   "status": "ok"
  },
  "GenMyModel_0.47_C.1.0-export": {
@@ -2152,7 +2152,7 @@
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "45091b31c4e7",
+  "sha": "97d3f09e203d",
   "status": "ok"
  },
  "GenMyModel_0.47_C.1.1-export": {
@@ -2180,7 +2180,7 @@
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "5fe5f3808fcf",
+  "sha": "5f5b0102dd8b",
   "status": "ok"
  },
  "GenMyModel_0.47_C.3.0-export": {
@@ -2194,7 +2194,7 @@
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "cfdba8e809e5",
+  "sha": "4fc8bf20f03c",
   "status": "ok"
  },
  "IBM_BlueWorks_Live_April_2014_A.1.0-export": {
@@ -2271,546 +2271,546 @@
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "5b0dbcd52eba",
+  "sha": "c52088fc2985",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "5b0dbcd52eba",
+  "sha": "c52088fc2985",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "a9e3747b6ef5",
+  "sha": "39310db8d067",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "a9e3747b6ef5",
+  "sha": "39310db8d067",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "2c16948f7653",
+  "sha": "3272e22d7be8",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "2c16948f7653",
+  "sha": "3272e22d7be8",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "365d626ce99b",
+  "sha": "7c8a68dc6c5a",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "365d626ce99b",
+  "sha": "7c8a68dc6c5a",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "2b7b31553936",
+  "sha": "40ba246e4917",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "2b7b31553936",
+  "sha": "40ba246e4917",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "38198b2f59d4",
+  "sha": "c00ca1c91ea7",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "38198b2f59d4",
+  "sha": "c00ca1c91ea7",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_B.1.0-export": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 30,
-  "sha": "493fe7a51687",
+  "sha": "85e755af1a80",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 30,
-  "sha": "493fe7a51687",
+  "sha": "85e755af1a80",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_B.2.0-export": {
   "err": "",
   "n_edges": 89,
   "n_nodes": 92,
-  "sha": "ed6b1839b0d4",
+  "sha": "c9dffce87edc",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 89,
   "n_nodes": 92,
-  "sha": "ed6b1839b0d4",
+  "sha": "c9dffce87edc",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "0e7ae021fc65",
+  "sha": "ab441b006164",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "0e7ae021fc65",
+  "sha": "ab441b006164",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "b72ef2b965b2",
+  "sha": "bc4428c0b865",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "b72ef2b965b2",
+  "sha": "bc4428c0b865",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "d33cff616afc",
+  "sha": "64eaa1298de3",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "d33cff616afc",
+  "sha": "64eaa1298de3",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 13,
-  "sha": "d17a98c1a331",
+  "sha": "63fb8bb84869",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 13,
-  "sha": "d17a98c1a331",
+  "sha": "63fb8bb84869",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.4.0-export": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "bb4087371913",
+  "sha": "b58b7aa80277",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 24,
-  "sha": "eceb23fbd515",
+  "sha": "22d2c0cbc373",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.5.0-export": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 48,
-  "sha": "bf3541070bae",
+  "sha": "eb2e62c0009a",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 48,
-  "sha": "bf3541070bae",
+  "sha": "eb2e62c0009a",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "d9a7bd6931a1",
+  "sha": "70bf223622b8",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "d9a7bd6931a1",
+  "sha": "70bf223622b8",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.7.0-export": {
   "err": "",
   "n_edges": 19,
   "n_nodes": 16,
-  "sha": "53b023a35a24",
+  "sha": "75b9b4dc6b87",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.7.0-roundtrip": {
   "err": "",
   "n_edges": 19,
   "n_nodes": 16,
-  "sha": "53b023a35a24",
+  "sha": "75b9b4dc6b87",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.8.0-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "23b6faebc813",
+  "sha": "58c2e32c974f",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "23b6faebc813",
+  "sha": "58c2e32c974f",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.8.1-export": {
   "err": "",
   "n_edges": 63,
   "n_nodes": 51,
-  "sha": "dc4f5cf5d399",
+  "sha": "e8222ba0d5d6",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 63,
   "n_nodes": 51,
-  "sha": "dc4f5cf5d399",
+  "sha": "e8222ba0d5d6",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.9.0-export": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "907fc7fbd923",
+  "sha": "aa11dd952111",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.9.0-roundtrip": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "907fc7fbd923",
+  "sha": "aa11dd952111",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.9.1-export": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "ec48012593e8",
+  "sha": "4854f5a32fca",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.9.1-roundtrip": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "ec48012593e8",
+  "sha": "4854f5a32fca",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.9.2-export": {
   "err": "",
   "n_edges": 19,
   "n_nodes": 27,
-  "sha": "197aa3cf59bc",
+  "sha": "845c211c7c32",
   "status": "ok"
  },
  "MID_Innovator_16.1.1.31016_C.9.2-roundtrip": {
   "err": "",
   "n_edges": 19,
   "n_nodes": 27,
-  "sha": "197aa3cf59bc",
+  "sha": "845c211c7c32",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "b9a1a56034df",
+  "sha": "c16fe9057308",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "9176614023d5",
+  "sha": "461713c257a5",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "c9be0363cd0a",
+  "sha": "302daf88b4ec",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "cfe464d2e2b6",
+  "sha": "849c9d9cb2b7",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "6df8078d4f96",
+  "sha": "446455d89455",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "dcdb8854ed22",
+  "sha": "ccd8b2b53225",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "f7a5f5205939",
+  "sha": "9c35017b284b",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1da7bb05dd24",
+  "sha": "dab4061c6c34",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "f7922ef1c53d",
+  "sha": "9f73eecdc2da",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "e71b809ae8f0",
+  "sha": "a54b056d94dd",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "68d372fc09e0",
+  "sha": "a515df4a1962",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "b18c85ae7bcb",
+  "sha": "4e9ec40ba79d",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_B.1.0-export": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 90,
-  "sha": "2fe6f49ae573",
+  "sha": "5f6c77224dcd",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "d94a2401a06b",
+  "sha": "11b1614ca4f9",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_B.2.0-export": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 90,
-  "sha": "4ee8523da114",
+  "sha": "5be7a74ab2fd",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "1df92da3c9ef",
+  "sha": "118f4c720906",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "57b2da293362",
+  "sha": "35fafbd0d6da",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "632257a3d84b",
+  "sha": "92b6b126d976",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "8da9653211fa",
+  "sha": "1cf65986988a",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "aae838fe48ab",
+  "sha": "33c7bbd0a745",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "477710dfc4b8",
+  "sha": "55b8fb865b32",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "d31cae3e178b",
+  "sha": "45a2509e7361",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "a4afa5f8114b",
+  "sha": "bbd100c95ac1",
   "status": "ok"
  },
  "MID_bpanda_2019.05.0.8393_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "8d6fec551d48",
+  "sha": "e77bbb4587d2",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "9176614023d5",
+  "sha": "461713c257a5",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "54157c615540",
+  "sha": "e8e73316cd7f",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "fd5204dbbadb",
+  "sha": "ec404b7397c0",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1da7bb05dd24",
+  "sha": "5102842be5a1",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "bc721e95043f",
+  "sha": "9f77dc055a9a",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "a5979dd3fe1d",
+  "sha": "8a6eea811dfa",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "09232058103b",
+  "sha": "3b84b4721867",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 89,
-  "sha": "77e6ef48e2b7",
+  "sha": "578a4403f9ba",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "a43f181ee798",
+  "sha": "ca56fc14b83c",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "dda996354282",
+  "sha": "47f858b54eed",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 27,
-  "sha": "790308ea01f4",
+  "sha": "4b8c0123a849",
   "status": "ok"
  },
  "ModelFoundry_1.1.1_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "024c7415f1e0",
+  "sha": "ff84f6a77f94",
   "status": "ok"
  },
  "Modelio_3.5_A.1.0-export": {
@@ -2845,14 +2845,14 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "546b19770ac2",
+  "sha": "83bf545ce602",
   "status": "ok"
  },
  "Modelio_3.5_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "5a1969f14482",
+  "sha": "87181e3ea5e7",
   "status": "ok"
  },
  "Modelio_3.5_A.4.0-export": {
@@ -2873,84 +2873,84 @@
   "err": "",
   "n_edges": 30,
   "n_nodes": 30,
-  "sha": "203f0b22362f",
+  "sha": "282edc6809db",
   "status": "ok"
  },
  "Modelio_3.5_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 30,
-  "sha": "55710933cdae",
+  "sha": "27c6bb1be388",
   "status": "ok"
  },
  "Modelio_3.5_B.2.0-export": {
   "err": "",
   "n_edges": 88,
   "n_nodes": 93,
-  "sha": "c8e2072211c4",
+  "sha": "8a798ff9c756",
   "status": "ok"
  },
  "Modelio_3.5_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 88,
   "n_nodes": 93,
-  "sha": "09964f2e781a",
+  "sha": "b5fefa6fd033",
   "status": "ok"
  },
  "Modelio_3.5_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "dc071dacce0a",
+  "sha": "9b6c36e14adb",
   "status": "ok"
  },
  "Modelio_3.5_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "20b09c2f6bbe",
+  "sha": "208d62959f09",
   "status": "ok"
  },
  "Modelio_3.5_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "7a9e29f4bcfb",
+  "sha": "b224d5c10f4b",
   "status": "ok"
  },
  "Modelio_3.5_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "1248be009589",
+  "sha": "7a2e403ca7c5",
   "status": "ok"
  },
  "Modelio_3.5_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "e7bf7aa064e6",
+  "sha": "aa870ed71048",
   "status": "ok"
  },
  "Modelio_3.5_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "874d0eeba61e",
+  "sha": "987824ca9641",
   "status": "ok"
  },
  "Modelio_3.5_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "517d638bce0f",
+  "sha": "306f267085f2",
   "status": "ok"
  },
  "Modelio_3.5_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "fcdf3c4b698c",
+  "sha": "7c48a3151529",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_A.1.0-export": {
@@ -2999,14 +2999,14 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "943a7ae27d9b",
+  "sha": "1f903cadd088",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "98ed6cf185d1",
+  "sha": "e85313e81935",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_A.4.0-export": {
@@ -3041,126 +3041,126 @@
   "err": "",
   "n_edges": 58,
   "n_nodes": 56,
-  "sha": "1e079d5ed05d",
+  "sha": "250fad509ead",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "1a0662145f74",
+  "sha": "f3aed3ddcc51",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_B.2.0-export": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "d0a9dd4deb2b",
+  "sha": "de3736c77040",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "9ac54e40f0b1",
+  "sha": "bee5af7ede4e",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "e72289d5b788",
+  "sha": "008370b85189",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "9e80dd282de2",
+  "sha": "b4fd3dab74e2",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "7d249520daa5",
+  "sha": "dd12f7778456",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "7696c0cc4c62",
+  "sha": "cdb39548cafa",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "6bbd3e81015c",
+  "sha": "6746678b5eba",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "3a8c8ee68246",
+  "sha": "c5b3bedfbb04",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "17643a14df12",
+  "sha": "b45f32241934",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "9162192cb022",
+  "sha": "60861aa420bc",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.4.0-export": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "51d6c575aa0a",
+  "sha": "83e7c4680887",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "98f30f5b851e",
+  "sha": "8f7574d9f0da",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.5.0-export": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "096a156085dc",
+  "sha": "281663a528df",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "01fc4458df85",
+  "sha": "62d4ffa40ca2",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "1fb396dfd05b",
+  "sha": "527b2104aed7",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "e4541d0923eb",
+  "sha": "8ea9a7d0712b",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.7.0-export": {
@@ -3181,42 +3181,42 @@
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "a62bad25808e",
+  "sha": "580f54522652",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "a3b54a4d8ca4",
+  "sha": "b2eabf5b6e40",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.8.1-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "d0976a56cee2",
+  "sha": "b0e1d2a07a4d",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "605106b382ed",
+  "sha": "0579ed070da6",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.9.0-export": {
   "err": "",
   "n_edges": 40,
   "n_nodes": 50,
-  "sha": "174b6409c7aa",
+  "sha": "3bf86408504f",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.9.0-roundtrip": {
   "err": "",
   "n_edges": 19,
   "n_nodes": 21,
-  "sha": "4345180ce087",
+  "sha": "5d0164b9fd82",
   "status": "ok"
  },
  "OMNITRACKER_BPMN_12.3_C.9.1-export": {
@@ -3251,798 +3251,798 @@
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "9176614023d5",
+  "sha": "461713c257a5",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "394523f18a0f",
+  "sha": "f7523281c2b9",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.2.0": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "54157c615540",
+  "sha": "a82ba3015650",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "a7013c095f57",
+  "sha": "c76bb6343996",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.2.1": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "2a9b20fad5ef",
+  "sha": "a7ebeff431ad",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "92684d2e9759",
+  "sha": "09674ecd3097",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.3.0": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1da7bb05dd24",
+  "sha": "237f0ec31121",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "444967ac248c",
+  "sha": "86f7b0684f8c",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.4.0": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "e71b809ae8f0",
+  "sha": "a54b056d94dd",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "f029e1be90f0",
+  "sha": "02867227741c",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.4.1": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "b18c85ae7bcb",
+  "sha": "4e9ec40ba79d",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "1f13523a4022",
+  "sha": "7192d5533c45",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_B.1.0": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "d00623511e8b",
+  "sha": "d68e6ad93ba4",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 31,
-  "sha": "a74a6879511f",
+  "sha": "1ad7a2544d13",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_B.2.0": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "1df92da3c9ef",
+  "sha": "118f4c720906",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 94,
-  "sha": "7f7cfe2e8fe6",
+  "sha": "aaa4543e3551",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.1.0": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "181e70aa880c",
+  "sha": "7116f751008a",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "0288ae4573c8",
+  "sha": "ef9509dda456",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.1.1": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "43f3cf610f59",
+  "sha": "257efbccc082",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "3860ef695c5b",
+  "sha": "790eec478c9f",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.2.0": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "d31cae3e178b",
+  "sha": "45a2509e7361",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "077d9a9499bd",
+  "sha": "5b1725ed9ff9",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.2.0_copy": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "d31cae3e178b",
+  "sha": "45a2509e7361",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.3.0": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "540e55c5bdf7",
+  "sha": "39220da65780",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "f85836a67092",
+  "sha": "23986ffcbfd5",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.4.0": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "fbb3ddbeebb7",
+  "sha": "b8233737e007",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 70,
-  "sha": "215ca308aff0",
+  "sha": "561be2c93293",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.5.0": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "d318a50ac06f",
+  "sha": "c65b2f3806ac",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 52,
-  "sha": "7981daba4ddd",
+  "sha": "ffb33100e1a4",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.6.0": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "885a0640dbf4",
+  "sha": "d53da15e47a2",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 42,
   "n_nodes": 46,
-  "sha": "16a1158af3a4",
+  "sha": "2c4468df20de",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.7.0": {
   "err": "",
   "n_edges": 18,
   "n_nodes": 16,
-  "sha": "07b6de6888ec",
+  "sha": "bc0024ada961",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.7.0-roundtrip": {
   "err": "",
   "n_edges": 18,
   "n_nodes": 16,
-  "sha": "1745121f3c04",
+  "sha": "6c5308b576b5",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.8.0": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "884721cbe7fc",
+  "sha": "1ead32ab1235",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "884721cbe7fc",
+  "sha": "1ead32ab1235",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.8.1": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "b5e0bb2d93d0",
+  "sha": "ff579a5a2c38",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "b471a0d88670",
+  "sha": "275e08e4aab9",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.9.0": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "7704715dae2e",
+  "sha": "60ccc51184bf",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.9.0-roundtrip": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "75cc8a7fc446",
+  "sha": "c4260fb3b9d9",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.9.1": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "a7aa1103d800",
+  "sha": "e062dce7a29b",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.9.1-roundtrip": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "92e1bc4c8684",
+  "sha": "bfde09893289",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.9.2": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "cfa8c3634613",
+  "sha": "462bdc4547a8",
   "status": "ok"
  },
  "Open-BPMN_1.2.8_2_C.9.2-roundtrip": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "4192eb54039a",
+  "sha": "1eb3763d2b8c",
   "status": "ok"
  },
  "Reference_A.1.0": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "9176614023d5",
+  "sha": "461713c257a5",
   "status": "ok"
  },
  "Reference_A.2.0": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "54157c615540",
+  "sha": "a82ba3015650",
   "status": "ok"
  },
  "Reference_A.2.1": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "2a9b20fad5ef",
+  "sha": "a7ebeff431ad",
   "status": "ok"
  },
  "Reference_A.3.0": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1da7bb05dd24",
+  "sha": "237f0ec31121",
   "status": "ok"
  },
  "Reference_A.4.0": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "e71b809ae8f0",
+  "sha": "a54b056d94dd",
   "status": "ok"
  },
  "Reference_A.4.1": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "b18c85ae7bcb",
+  "sha": "4e9ec40ba79d",
   "status": "ok"
  },
  "Reference_B.1.0": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "d00623511e8b",
+  "sha": "d68e6ad93ba4",
   "status": "ok"
  },
  "Reference_B.2.0": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "1df92da3c9ef",
+  "sha": "118f4c720906",
   "status": "ok"
  },
  "Reference_C.1.0": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "181e70aa880c",
+  "sha": "7116f751008a",
   "status": "ok"
  },
  "Reference_C.1.1": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "43f3cf610f59",
+  "sha": "257efbccc082",
   "status": "ok"
  },
  "Reference_C.2.0": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "d31cae3e178b",
+  "sha": "45a2509e7361",
   "status": "ok"
  },
  "Reference_C.3.0": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "540e55c5bdf7",
+  "sha": "39220da65780",
   "status": "ok"
  },
  "Reference_C.4.0": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "fbb3ddbeebb7",
+  "sha": "b8233737e007",
   "status": "ok"
  },
  "Reference_C.5.0": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "d318a50ac06f",
+  "sha": "c65b2f3806ac",
   "status": "ok"
  },
  "Reference_C.6.0": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "885a0640dbf4",
+  "sha": "d53da15e47a2",
   "status": "ok"
  },
  "Reference_C.7.0": {
   "err": "",
   "n_edges": 18,
   "n_nodes": 16,
-  "sha": "07b6de6888ec",
+  "sha": "bc0024ada961",
   "status": "ok"
  },
  "Reference_C.8.0": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "884721cbe7fc",
+  "sha": "1ead32ab1235",
   "status": "ok"
  },
  "Reference_C.8.1": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "b5e0bb2d93d0",
+  "sha": "ff579a5a2c38",
   "status": "ok"
  },
  "Reference_C.9.0": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "7704715dae2e",
+  "sha": "60ccc51184bf",
   "status": "ok"
  },
  "Reference_C.9.1": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "a7aa1103d800",
+  "sha": "e062dce7a29b",
   "status": "ok"
  },
  "Reference_C.9.2": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "cfa8c3634613",
+  "sha": "462bdc4547a8",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "b60d976ae254",
+  "sha": "1427ffb8f238",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "2ce61522c342",
+  "sha": "83112850b0f3",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "8b3ec43dec54",
+  "sha": "fdf59512b6ae",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "c339089e0f10",
+  "sha": "ed1c9da0084f",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "7ce7d42d7420",
+  "sha": "c35d65af8af2",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "5ed8a1a0fb5d",
+  "sha": "7f68f91a44f6",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "135f317a8522",
+  "sha": "95d50eaeb6bb",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "7c8ce696c1b5",
+  "sha": "0e05c38c22f0",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "9ba6430aa6da",
+  "sha": "aa481f5da24e",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "76d31370b772",
+  "sha": "07e171027e7b",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "e4351aa9df6b",
+  "sha": "b0d5e51049ae",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "be9bcb387813",
+  "sha": "5811478b7a35",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_B.1.0-export": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 25,
-  "sha": "14b62eb32405",
+  "sha": "56c56bdcf15c",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "562c26c22084",
+  "sha": "b3a1bb6b7dcb",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_B.2.0-export": {
   "err": "",
   "n_edges": 88,
   "n_nodes": 83,
-  "sha": "db2479a52ee3",
+  "sha": "3fe4fd98d2b2",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "84e3a4e2a54b",
+  "sha": "464f26995746",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "20e01fe409bf",
+  "sha": "816b82a3037b",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "8812303ac655",
+  "sha": "638210125fae",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "6dbed3f09fe4",
+  "sha": "d25d455bcca5",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "e75412db0466",
+  "sha": "5222d21e7a96",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "a64919b29c31",
+  "sha": "9db82e818946",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "9b2a894b2e54",
+  "sha": "c67d3e0631db",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "636e2aa37457",
+  "sha": "d9f665e7bb35",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "9751cdd8e305",
+  "sha": "537253480ffd",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.4.0-export.1": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 24,
-  "sha": "d79f64fd4b22",
+  "sha": "4e99cef48d19",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.4.0-export.2": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 10,
-  "sha": "432801f963b5",
+  "sha": "05e741dd6900",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.4.0-export.3": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "1e6225bf6966",
+  "sha": "141e7354ece2",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.4.0-export.4": {
   "err": "",
   "n_edges": 5,
   "n_nodes": 5,
-  "sha": "8a3a1cc735e8",
+  "sha": "4523a9276e0e",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.4.0-roundtrip.1": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 24,
-  "sha": "c6378abe9aee",
+  "sha": "74378a396905",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.4.0-roundtrip.2": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 10,
-  "sha": "244b73b5e5ba",
+  "sha": "528fb1e5021c",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.4.0-roundtrip.3": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "c0cb826c7d7a",
+  "sha": "9c1a11075afa",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.4.0-roundtrip.4": {
   "err": "",
   "n_edges": 5,
   "n_nodes": 5,
-  "sha": "8768ad3a7d7c",
+  "sha": "75cc1be34fdd",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.5.0-export.1": {
   "err": "",
   "n_edges": 59,
   "n_nodes": 40,
-  "sha": "467f96c3dc84",
+  "sha": "c37cdc636eed",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.5.0-export.2": {
   "err": "",
   "n_edges": 6,
   "n_nodes": 6,
-  "sha": "3a123312b814",
+  "sha": "19b93fe4682f",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.5.0-roundtrip.1": {
   "err": "",
   "n_edges": 59,
   "n_nodes": 40,
-  "sha": "3ed177dcdc66",
+  "sha": "14046b2ff798",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.5.0-roundtrip.2": {
   "err": "",
   "n_edges": 6,
   "n_nodes": 6,
-  "sha": "3e8b7df975da",
+  "sha": "053579d4a834",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "4a5a56bdb49f",
+  "sha": "dcbd875484bd",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "d38fdcab5d86",
+  "sha": "70daf17a28e6",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.7.0-export": {
   "err": "",
   "n_edges": 18,
   "n_nodes": 16,
-  "sha": "9268be84e232",
+  "sha": "0e880dd59dac",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.7.0-roundtrip": {
   "err": "",
   "n_edges": 17,
   "n_nodes": 16,
-  "sha": "4600e3d6fd1c",
+  "sha": "d78bfa0f9014",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.8.0-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "84fd39258bd5",
+  "sha": "d95991fa9140",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "f643faa69477",
+  "sha": "fef5f888d5e0",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.8.1-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "15f2c2191f6d",
+  "sha": "711299587ce7",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "f0ef3a61b1b7",
+  "sha": "8f4f97affdaa",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.9.0-export": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "344ba566a2df",
+  "sha": "8960d1451149",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.9.0-roundtrip": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "ddc65ba9d55f",
+  "sha": "293f846fb60f",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.9.1-export": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "e8e902266d16",
+  "sha": "3aef3b32c0f9",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.9.1-roundtrip": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "e8e902266d16",
+  "sha": "3aef3b32c0f9",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.9.2-export": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "4a98e9c59135",
+  "sha": "5aecb5698535",
   "status": "ok"
  },
  "SAP_Signavio_Process_Manager_19.9.0_C.9.2-roundtrip": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "61a7bbda62b8",
+  "sha": "b40134e552df",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_A.1.0-export": {
@@ -4077,14 +4077,14 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "f012350f6a51",
+  "sha": "c07411663cd6",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "91c74ebac143",
+  "sha": "f1ca4e79920e",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_A.4.0-export": {
@@ -4119,378 +4119,378 @@
   "err": "",
   "n_edges": 30,
   "n_nodes": 31,
-  "sha": "d3903687ef52",
+  "sha": "355fd8fa5248",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "c106a2290190",
+  "sha": "70fe10a0eeee",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_B.2.0-export": {
   "err": "",
   "n_edges": 79,
   "n_nodes": 85,
-  "sha": "e27155bcbdbd",
+  "sha": "ee96abebfb56",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 94,
-  "sha": "e1e86c0dcd33",
+  "sha": "d3a237a79e8c",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "0ac8a7fe31b5",
+  "sha": "8d1663f49e7a",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "350848fc7287",
+  "sha": "412223a58710",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "bceaf51b8b29",
+  "sha": "60eb088eefe6",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "b973304b6e2c",
+  "sha": "5b8791bbc991",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "b1d03f818a40",
+  "sha": "2cc2fefc96d3",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "c488f28f6ade",
+  "sha": "c07062373009",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_C.3.0-export": {
   "err": "",
   "n_edges": 14,
   "n_nodes": 14,
-  "sha": "54282ed02deb",
+  "sha": "e615b3e78861",
   "status": "ok"
  },
  "Trisotech_BPMN_Visio_Add_in_5.0.1_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "f225ecd34935",
+  "sha": "f5ea51a1660e",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "2f05158e8ccb",
+  "sha": "9d33bc405bec",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "9176614023d5",
+  "sha": "e9dd68abcbbb",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "82246f927a1b",
+  "sha": "06491af7c954",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "54157c615540",
+  "sha": "70806e326e3f",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "49c98900e439",
+  "sha": "8129b40d5cd8",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "5ce882030162",
+  "sha": "22393088cddc",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "8ce83fc5584f",
+  "sha": "154ca0b8abe1",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1da7bb05dd24",
+  "sha": "e60c0576b5a1",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "2d58099366da",
+  "sha": "ac0122b24799",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "c0d144fe7a67",
+  "sha": "bd6be59b9c38",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "c0ca102b5c52",
+  "sha": "16ccba30aac8",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "fbf5cdc22bac",
+  "sha": "c9f829a487ab",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_B.1.0-export": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 28,
-  "sha": "dbd96081ba5f",
+  "sha": "8d665a7996e6",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 28,
-  "sha": "41c3c68ccb14",
+  "sha": "53c198d1470e",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_B.2.0-export": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "04b0bae10db1",
+  "sha": "3aba46f8125a",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 91,
-  "sha": "6c6d030934d2",
+  "sha": "5dc14ba9997c",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "2c01686ad0fb",
+  "sha": "c91daa623c1c",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "086db93a0e8f",
+  "sha": "afffac8f22d4",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "d0cabe2a0bbf",
+  "sha": "9bcb86f223eb",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "521cdb3aae34",
+  "sha": "d073954a887e",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "fdfe352b0a75",
+  "sha": "6e1141d239bd",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "041ec52a56a7",
+  "sha": "6e4282d0f12c",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "3e0485673724",
+  "sha": "f4b4cf321f02",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "a2fe467dc493",
+  "sha": "34162dac9181",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.4.0-export": {
   "err": "",
   "n_edges": 53,
   "n_nodes": 47,
-  "sha": "a5ef4ce33b10",
+  "sha": "45c785c14931",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "4d3711fd1bb9",
+  "sha": "aeb1e98fe004",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.5.0-export": {
   "err": "",
   "n_edges": 64,
   "n_nodes": 46,
-  "sha": "336aee931f50",
+  "sha": "df22c4b38c19",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "fa485459237c",
+  "sha": "480efe65f0e2",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "9ee1538e64fe",
+  "sha": "e11300a779bd",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "885a0640dbf4",
+  "sha": "acbd63be6dc3",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.7.0-export": {
   "err": "",
   "n_edges": 18,
   "n_nodes": 16,
-  "sha": "a454e7fa91cc",
+  "sha": "bd4d193d56f7",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.7.0-roundtrip": {
   "err": "",
   "n_edges": 18,
   "n_nodes": 16,
-  "sha": "92eebd60f926",
+  "sha": "0709e28a3523",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.8.0-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "a4511854095b",
+  "sha": "9c4439393885",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "884721cbe7fc",
+  "sha": "fbed56d96ac2",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.8.1-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "2995caed238a",
+  "sha": "6c52ccd731e2",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "b5e0bb2d93d0",
+  "sha": "ff579a5a2c38",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.9.0-export": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "05fe861f0fd4",
+  "sha": "379c436e2dbf",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.9.0-roundtrip": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "88a9be99258e",
+  "sha": "d56ce5ca347e",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.9.1-export": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "b20a0fbab2f8",
+  "sha": "1d1eaeb4b62e",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.9.1-roundtrip": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "a7aa1103d800",
+  "sha": "9bd072126179",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.9.2-export": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "0d1a50f37dc2",
+  "sha": "4ee625277df8",
   "status": "ok"
  },
  "Trisotech_Workflow_Modeler_12.13.0_C.9.2-roundtrip": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "d67cdd5b8f92",
+  "sha": "5ae9c06641de",
   "status": "ok"
  },
  "Visual_Paradigm_11.1_A.1.0-roundtrip": {
@@ -4511,7 +4511,7 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "7f6fcc2c8eb0",
+  "sha": "b5353658c0eb",
   "status": "ok"
  },
  "Visual_Paradigm_11.1_A.4.0-roundtrip": {
@@ -4532,413 +4532,413 @@
   "err": "",
   "n_edges": 31,
   "n_nodes": 30,
-  "sha": "96dc8b1f5ddd",
+  "sha": "4c9edfa631b7",
   "status": "ok"
  },
  "Visual_Paradigm_11.1_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 93,
-  "sha": "0aa400ed2e0d",
+  "sha": "4783d77f9c98",
   "status": "ok"
  },
  "Visual_Paradigm_11.1_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "ea24f4fe5ca8",
+  "sha": "f5382633d3db",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "601c5dcb3195",
+  "sha": "78e54c1251ac",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "9601ee7d93f0",
+  "sha": "9d348520e63e",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "87f2fc1284a0",
+  "sha": "c73d813e67e3",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "a27f783e9226",
+  "sha": "20c2ab7ba708",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "2125a25c0024",
+  "sha": "11f5ade5ec89",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "f4b964b92d04",
+  "sha": "2264b295123c",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "8423be823c2d",
+  "sha": "6bfdd1889bfb",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1b45b548b673",
+  "sha": "68fd866d0ae8",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "c8b05eb330c1",
+  "sha": "84cf7d4c3d80",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "091b2d9efc50",
+  "sha": "e30af59a33ce",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "b7bfd6014eb5",
+  "sha": "3398c4687063",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "dde9fe23e6f6",
+  "sha": "d25e46bc23e1",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_B.1.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 31,
-  "sha": "4ad6cb62cfad",
+  "sha": "6972b758075b",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "bc87c62d5fc5",
+  "sha": "cca7f01e2526",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_B.2.0-export": {
   "err": "",
   "n_edges": 84,
   "n_nodes": 90,
-  "sha": "bf37a0c04846",
+  "sha": "ae9e49eb1f2a",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 89,
   "n_nodes": 94,
-  "sha": "974e24cf7130",
+  "sha": "e5fa8ecc9162",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "cebaa37e4a5f",
+  "sha": "06862645c95e",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "f2431ddf707a",
+  "sha": "99435e14344b",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 10,
-  "sha": "bf3e797d47a1",
+  "sha": "4561417a47f9",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "3043a4865f14",
+  "sha": "7875d3c702ab",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "9c5b0249c30a",
+  "sha": "c36e51e72003",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "5ebb5b98ca12",
+  "sha": "4a3a333bb2fc",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "5a8398e2ce6a",
+  "sha": "0a50bb591547",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 13,
-  "sha": "d0e0e54a9d0e",
+  "sha": "98712d1a61d2",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.4.0-export": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "f749a59c50e7",
+  "sha": "3c6823fc0061",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "3eb7c2691083",
+  "sha": "f00250701e62",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.5.0-export": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 43,
-  "sha": "d08fae55516c",
+  "sha": "5e7f4850b918",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.10.4_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "8d8497adb65f",
+  "sha": "2a153782b192",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "33aba16b6dcc",
+  "sha": "427d009fbfe2",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "0f4d7e7854a6",
+  "sha": "c7bd07449bb0",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "932db536c4da",
+  "sha": "a903b8318c02",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "972499bc6c6d",
+  "sha": "4abf2a66f6a5",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "2a9b20fad5ef",
+  "sha": "a7ebeff431ad",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "2a9b20fad5ef",
+  "sha": "a7ebeff431ad",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "88071ce98864",
+  "sha": "770db01b0009",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1da7bb05dd24",
+  "sha": "5102842be5a1",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "f3cdf8f7794d",
+  "sha": "c38f4a7e399e",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "e71b809ae8f0",
+  "sha": "a54b056d94dd",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "9a630e7737eb",
+  "sha": "249e1e88867c",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "58b29f74d65e",
+  "sha": "b480ee641a84",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_B.1.0-export": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 30,
-  "sha": "6208399c6617",
+  "sha": "ed8fc716b6a8",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "3eba2fbb1580",
+  "sha": "c2c3454db814",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_B.2.0-export": {
   "err": "",
   "n_edges": 88,
   "n_nodes": 90,
-  "sha": "aac9c9e30667",
+  "sha": "98b3c86948aa",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 94,
-  "sha": "890fbc5a0b2d",
+  "sha": "e59ebc423fd3",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "181e70aa880c",
+  "sha": "7116f751008a",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "181e70aa880c",
+  "sha": "7116f751008a",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "43f3cf610f59",
+  "sha": "257efbccc082",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "43f3cf610f59",
+  "sha": "257efbccc082",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "c6c3b55c6905",
+  "sha": "bb69e22ae06e",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "6c62497aff75",
+  "sha": "2801c9923c22",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "d448698b4ec8",
+  "sha": "31994840744b",
   "status": "ok"
  },
  "W4_BPMN_Composer_V.9.4_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "d448698b4ec8",
+  "sha": "31994840744b",
   "status": "ok"
  },
  "Work_in_Progress_A.1.1": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "2711ca419dd5",
+  "sha": "525792abfd22",
   "status": "ok"
  },
  "Work_in_Progress_A.1.2": {
   "err": "",
   "n_edges": 10,
   "n_nodes": 9,
-  "sha": "a852e9c4506e",
+  "sha": "afa0befdeab1",
   "status": "ok"
  },
  "Work_in_Progress_Imports-BPMN_ModelD_1_1.0_modeld.1": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 12,
-  "sha": "fce8b71a7027",
+  "sha": "8d6775c3abc6",
   "status": "ok"
  },
  "Work_in_Progress_Imports-BPMN_ModelD_2_1.0_modeld.2": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "d2c4cb1a50ab",
+  "sha": "dc99f46d190a",
   "status": "ok"
  },
  "Work_in_Progress_Imports-BPMN_ModelD_3_1.0_modeld.3": {
@@ -4952,504 +4952,504 @@
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "6bd4c68b1769",
+  "sha": "44ceb7268dde",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "6601cf08f7d3",
+  "sha": "42cfc1d5528c",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "9135b2460e3c",
+  "sha": "88ca8b77e3ff",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "90349534e025",
+  "sha": "cfa66f3650fb",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.2.1-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "ffbd09969db3",
+  "sha": "9ef7d3922b93",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "bbdbb3947621",
+  "sha": "5b1d0d2fd369",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "9a8acfd7cb6d",
+  "sha": "5bdcb2d4c80f",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "b98d4a98bb44",
+  "sha": "207999592aae",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "52ea8f8728fd",
+  "sha": "7ba7b81abbf6",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "bd9fc1ac54bb",
+  "sha": "25f674f97f4f",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "668418952480",
+  "sha": "5633866708ad",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "7fdc750344db",
+  "sha": "97fcf4444036",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_B.1.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 30,
-  "sha": "1e98df76b21f",
+  "sha": "52f619bb1097",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "7f69fc04aad5",
+  "sha": "845ef6ce5e1f",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_B.2.0-export": {
   "err": "",
   "n_edges": 88,
   "n_nodes": 91,
-  "sha": "06817218e6d3",
+  "sha": "5801c82d3070",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 94,
-  "sha": "9b03fe960b78",
+  "sha": "440f3647595f",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "74a977f5fc3f",
+  "sha": "2b310a6490b7",
   "status": "ok"
  },
  "Yaoqiang_BPMN_Editor_4.0_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "181e70aa880c",
+  "sha": "7116f751008a",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "8a0cec08adff",
+  "sha": "4c15b87b21d9",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "81e959514abc",
+  "sha": "42424b8c5d1c",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "24a52e8c709a",
+  "sha": "88eefc14ab99",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "bcc06c87bc74",
+  "sha": "d6319a8806e7",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 7,
-  "sha": "b978ad2534a3",
+  "sha": "c6dcbc3d600f",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "ba3823c91fd8",
+  "sha": "d5276763d2fa",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "54ceff2831f1",
+  "sha": "637a0d0660e3",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "775764b7c9f5",
+  "sha": "7f582d962860",
   "status": "ok"
  },
  "actiBPM_3.E-8_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "a488d6d69d5a",
+  "sha": "42e87e88097a",
   "status": "ok"
  },
  "actiBPM_3.E-8_B.1.0-export": {
   "err": "",
   "n_edges": 26,
   "n_nodes": 26,
-  "sha": "b4fbf173e766",
+  "sha": "22b3a8bded8e",
   "status": "ok"
  },
  "actiBPM_3.E-8_B.2.0-export": {
   "err": "",
   "n_edges": 85,
   "n_nodes": 89,
-  "sha": "3f2c93b4f34c",
+  "sha": "90e0d185cb27",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "6c98b83d68d6",
+  "sha": "ae36f3d0006a",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "8731275cc17c",
+  "sha": "d936042b62c2",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "a131dc5aaf13",
+  "sha": "be1135d37022",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "e4ba1671af8a",
+  "sha": "9e2e1129b3b2",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.2.0-rountrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "54157c615540",
+  "sha": "a82ba3015650",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.2.1-export": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "360423ee9b05",
+  "sha": "d721bbab0ad6",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.2.1-roundtrip": {
   "err": "",
   "n_edges": 11,
   "n_nodes": 8,
-  "sha": "dcdb8854ed22",
+  "sha": "ccd8b2b53225",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "8180ce810a82",
+  "sha": "e84fa54ca772",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "b99256059674",
+  "sha": "6addb5d2d9ef",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "2612b2444e7d",
+  "sha": "f5186885108d",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "07d4ca8a9ce0",
+  "sha": "7f6a44a2aa3b",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "085add008944",
+  "sha": "0f4259008e6f",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "3a1a855641db",
+  "sha": "9d7056618b55",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_B.1.0-export": {
   "err": "",
   "n_edges": 29,
   "n_nodes": 27,
-  "sha": "3fd188d238f7",
+  "sha": "d08aaf19b2a4",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 27,
   "n_nodes": 25,
-  "sha": "6d2107fbfc67",
+  "sha": "397cf30ed8a7",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_B.2.0-export": {
   "err": "",
   "n_edges": 87,
   "n_nodes": 90,
-  "sha": "769183a44a02",
+  "sha": "df8aa95c20d0",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 81,
   "n_nodes": 83,
-  "sha": "86ed6c611551",
+  "sha": "01e75a4e92d3",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.1.0-export": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "1b31304243f2",
+  "sha": "2457ca3b2271",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "6dfbbe229378",
+  "sha": "34f0d488e036",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.1.1-export": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "cead411a3093",
+  "sha": "370915792857",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "d3e499a0afa0",
+  "sha": "858e5fafb0ca",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.2.0-export": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "dd1998e3ba50",
+  "sha": "3915ffa80522",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "49a42e019260",
+  "sha": "bcce556e64b6",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.3.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "d2b5e57b09a6",
+  "sha": "8c1ea2ad2e90",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "bdfa0157f83f",
+  "sha": "a52a33c5e81f",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.4.0-export": {
   "err": "",
   "n_edges": 28,
   "n_nodes": 24,
-  "sha": "51d6dada1257",
+  "sha": "c41aba7c7b9f",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.4.0-roundtrip": {
   "err": "",
   "n_edges": 54,
   "n_nodes": 47,
-  "sha": "341868c4a0e9",
+  "sha": "158bf6164577",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.5.0-export": {
   "err": "",
   "n_edges": 58,
   "n_nodes": 40,
-  "sha": "dafbba6a3de0",
+  "sha": "0cc540ec10ee",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.5.0-roundtrip": {
   "err": "",
   "n_edges": 65,
   "n_nodes": 46,
-  "sha": "3ca85fa96474",
+  "sha": "87a13a09e99a",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.6.0-export": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "2706274d5747",
+  "sha": "eadcaf2f4fdd",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.6.0-roundtrip": {
   "err": "",
   "n_edges": 36,
   "n_nodes": 40,
-  "sha": "53904bbd5997",
+  "sha": "8112bc55aa29",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.7.0-export": {
   "err": "",
   "n_edges": 17,
   "n_nodes": 16,
-  "sha": "dd2006edd8e2",
+  "sha": "315d5dc030a7",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.7.0-roundtrip": {
   "err": "",
   "n_edges": 17,
   "n_nodes": 16,
-  "sha": "33bcf2fee6db",
+  "sha": "89a9fb1637c6",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.8.0-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "aed4d6051892",
+  "sha": "fd37d6aa65f4",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.8.0-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "80f2a4dca25a",
+  "sha": "417d8d7d4ed5",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.8.1-export": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "a01a63dbe562",
+  "sha": "ed3a23fb062c",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.8.1-roundtrip": {
   "err": "",
   "n_edges": 22,
   "n_nodes": 24,
-  "sha": "92aee202754e",
+  "sha": "0e027873b693",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.9.0-export": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "00b8460968d6",
+  "sha": "0cc675a6dcf1",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.9.0-roundtrip": {
   "err": "",
   "n_edges": 21,
   "n_nodes": 23,
-  "sha": "7704715dae2e",
+  "sha": "60ccc51184bf",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.9.1-export": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "38fef70158ab",
+  "sha": "e85fc8735add",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.9.1-roundtrip": {
   "err": "",
   "n_edges": 7,
   "n_nodes": 10,
-  "sha": "a7aa1103d800",
+  "sha": "e062dce7a29b",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.9.2-export": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "a9cd8b4e113c",
+  "sha": "655d6b3e3957",
   "status": "ok"
  },
  "bpmn.io_Camunda_Modeler_18.6.1_C.9.2-roundtrip": {
   "err": "",
   "n_edges": 12,
   "n_nodes": 17,
-  "sha": "cfa8c3634613",
+  "sha": "462bdc4547a8",
   "status": "ok"
  },
  "iGrafx_FlowCharter_2013_15.1.1.1580_A.1.0-export": {
@@ -5519,7 +5519,7 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "97187a481f03",
+  "sha": "e819e2cd381f",
   "status": "ok"
  },
  "iGrafx_FlowCharter_2013_15.1.1.1580_A.4.0-export": {
@@ -5554,7 +5554,7 @@
   "err": "",
   "n_edges": 33,
   "n_nodes": 34,
-  "sha": "47fe5ff32430",
+  "sha": "a12eb5220790",
   "status": "ok"
  },
  "iGrafx_FlowCharter_2013_15.1.1.1580_B.1.0-roundtrip": {
@@ -5568,7 +5568,7 @@
   "err": "",
   "n_edges": 102,
   "n_nodes": 95,
-  "sha": "cd76bce08417",
+  "sha": "e4efd769f15d",
   "status": "ok"
  },
  "iGrafx_FlowCharter_2013_15.1.1.1580_B.2.0-roundtrip": {
@@ -5610,14 +5610,14 @@
   "err": "",
   "n_edges": 10,
   "n_nodes": 10,
-  "sha": "57183b2c4ef7",
+  "sha": "ef50bce6e8a7",
   "status": "ok"
  },
  "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "97187a481f03",
+  "sha": "e819e2cd381f",
   "status": "ok"
  },
  "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_A.4.0-export": {
@@ -5645,7 +5645,7 @@
   "err": "",
   "n_edges": 30,
   "n_nodes": 29,
-  "sha": "c228eb4bdfcc",
+  "sha": "ac185448c097",
   "status": "ok"
  },
  "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_B.1.0-roundtrip": {
@@ -5659,7 +5659,7 @@
   "err": "",
   "n_edges": 88,
   "n_nodes": 95,
-  "sha": "50b27c9bbf3b",
+  "sha": "fa09fac52ade",
   "status": "ok"
  },
  "iGrafx_Process_2013_for_Six_Sigma_15.0.4.1565_B.2.0-roundtrip": {
@@ -5687,7 +5687,7 @@
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "c6983ef1ada8",
+  "sha": "6c03f6a98282",
   "status": "ok"
  },
  "ibo_Prometheus_3.9.0.0_A.4.0-roundtrip": {
@@ -5708,175 +5708,175 @@
   "err": "",
   "n_edges": 27,
   "n_nodes": 25,
-  "sha": "58f4065c2e4a",
+  "sha": "798c8a82a95d",
   "status": "ok"
  },
  "ibo_Prometheus_3.9.0.0_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 82,
   "n_nodes": 83,
-  "sha": "ff6e667f7dc9",
+  "sha": "8af41602f218",
   "status": "ok"
  },
  "ibo_Prometheus_3.9.0.0_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "d43e7dd589f5",
+  "sha": "7cc738353a8f",
   "status": "ok"
  },
  "ibo_Prometheus_3.9.0.0_C.1.1-roundtrip": {
   "err": "",
   "n_edges": 13,
   "n_nodes": 13,
-  "sha": "18f65cc6c802",
+  "sha": "8eb57380c23b",
   "status": "ok"
  },
  "ibo_Prometheus_3.9.0.0_C.2.0-roundtrip": {
   "err": "",
   "n_edges": 30,
   "n_nodes": 28,
-  "sha": "0d8f55f9daea",
+  "sha": "a9371734e6d0",
   "status": "ok"
  },
  "ibo_Prometheus_3.9.0.0_C.3.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 14,
-  "sha": "6d348205645d",
+  "sha": "cdb7cc2b5a8a",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.0-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "991ca3c797d5",
+  "sha": "704b242c5f7f",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.0-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "050dcf889e88",
+  "sha": "07eeae0051fb",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.1-export": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "98318bd7e795",
+  "sha": "338fa9bbedf7",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.1-roundtrip": {
   "err": "",
   "n_edges": 4,
   "n_nodes": 5,
-  "sha": "4a826142d4f5",
+  "sha": "7f269ec375fd",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.2-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "d95724b30a2f",
+  "sha": "91c3fc3c7ef7",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.1.2-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 9,
-  "sha": "ac013055b013",
+  "sha": "21eb6cc6531e",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.2.0-export": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "0d313f285c08",
+  "sha": "7ad902402524",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.2.0-roundtrip": {
   "err": "",
   "n_edges": 9,
   "n_nodes": 8,
-  "sha": "da21732e68ed",
+  "sha": "35b65c8ba504",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.3.0-export": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "ad6f5a188ee7",
+  "sha": "0a9db343cc3d",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.3.0-roundtrip": {
   "err": "",
   "n_edges": 8,
   "n_nodes": 10,
-  "sha": "1bdc165d422c",
+  "sha": "66d0563f4eee",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.4.0-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "9b4912cd53cc",
+  "sha": "fd1294d5b17a",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.4.0-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "a48ccc707c78",
+  "sha": "be857bee1b36",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.4.1-export": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "4c4c7709d5c9",
+  "sha": "d21ed0d976e0",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_A.4.1-roundtrip": {
   "err": "",
   "n_edges": 15,
   "n_nodes": 15,
-  "sha": "07c4ce5e093b",
+  "sha": "561c8a04e1d2",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_B.1.0-export": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "6fbaa4bc0a9d",
+  "sha": "749e349862da",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_B.1.0-roundtrip": {
   "err": "",
   "n_edges": 31,
   "n_nodes": 31,
-  "sha": "5ae693f89636",
+  "sha": "c51c4b8ada5c",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_B.2.0-export": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 94,
-  "sha": "4ef2f6579e21",
+  "sha": "acd131ecf0ea",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_B.2.0-roundtrip": {
   "err": "",
   "n_edges": 90,
   "n_nodes": 94,
-  "sha": "f8e6571ac4b5",
+  "sha": "b6fec99ec961",
   "status": "ok"
  },
  "itp-commerce_Process_Modeler_for_Microsoft_Visio_6_C.1.0-roundtrip": {
   "err": "",
   "n_edges": 25,
   "n_nodes": 21,
-  "sha": "a98a81255356",
+  "sha": "3459cac24d64",
   "status": "ok"
  }
 }
