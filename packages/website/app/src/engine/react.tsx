@@ -20,7 +20,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
-import { createShapeId, type Editor, type Shape, type ShapeId } from "../../../../packages/js-canvas/dist/index.js";
+import { createShapeId, type Editor, type Shape, type ShapeId } from "../../../../../packages/js-canvas/dist/index.js";
 
 const num = (v: unknown, fallback = 0): number =>
   typeof v === "number" && Number.isFinite(v) ? v : fallback;

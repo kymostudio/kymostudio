@@ -1,9 +1,9 @@
 <h1 align="center">kymostudio</h1>
 
 <p align="center">
-  <a href="https://kymostudio.github.io/app/">Live Editor</a>
+  <a href="https://kymo.studio/app/">Live Editor</a>
   <span>|</span>
-  <a href="https://kymostudio.github.io/">Website</a>
+  <a href="https://kymo.studio/">Website</a>
   <span>|</span>
   <a href="./docs/guide/getting-started.md">Documentation</a>
 </p>

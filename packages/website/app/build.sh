@@ -14,10 +14,11 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 echo "→ compiling kymostudio JS package to dist/"
-npm --prefix ../../packages/js run build
+npm --prefix ../../js run build
 
 echo "→ compiling canvas engine to dist/"
-npm --prefix ../../packages/js-canvas run build
+[ -d ../../js-canvas/node_modules ] || npm --prefix ../../js-canvas ci
+npm --prefix ../../js-canvas run build
 
 echo "→ installing playground deps"
 npm ci

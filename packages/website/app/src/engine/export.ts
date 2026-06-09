@@ -7,8 +7,8 @@
  * glyphs are fetched async, so the exporter pre-warms `glyphCache` before the
  * (sync) `toSvg` reads it. SVG-only MVP (PNG via canvas follows).
  */
-import type { Editor, Shape } from "../../../../packages/js-canvas/dist/index.js";
-import { getIcon } from "../../../../packages/js/dist/index.js";
+import type { Editor, Shape } from "../../../../../packages/js-canvas/dist/index.js";
+import { getIcon } from "../../../../../packages/js/dist/index.js";
 
 /** Shared icon-glyph cache: `useGlyph` (shapes.tsx) populates/reads it during
  *  render; `boardToSvg` pre-warms it before the (sync) per-util `toSvg` reads it.
