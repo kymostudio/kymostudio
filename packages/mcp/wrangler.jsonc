@@ -12,5 +12,12 @@
   "migrations": [
     { "tag": "v1", "new_sqlite_classes": ["KymoMCP", "EditorRoom"] }
   ],
+  "kv_namespaces": [
+    { "binding": "OAUTH_KV", "id": "b0a941d0b5d74c86bebe5a4583fadee8" }
+  ],
+  "vars": {
+    "GOOGLE_CLIENT_ID": "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com",
+    "ALLOWED_EMAILS": "anhv.ict91@gmail.com"
+  },
   "observability": { "enabled": true }
 }

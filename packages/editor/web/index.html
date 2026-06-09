@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>kymo · flowchart</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
     <style>
       :root { --bg:#0f1115; --panel:#171a21; --border:#262b35; --fg:#e6e9ef; --muted:#8b93a3; --accent:#5b9dff; --error:#ff6b6b; }
       * { box-sizing: border-box; }
@@ -13,6 +14,8 @@
       header h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: 0.2px; }
       header h1 span { color: var(--accent); }
       .spacer { flex: 1; }
+      .who { font-size:12px; color:var(--muted); }
+      .who b { color: var(--fg); font-weight:600; }
       button { background:#1f2430; color:var(--fg); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font:inherit; cursor:pointer; }
       button:hover { border-color: var(--accent); }
       main { flex: 1; display: flex; min-height: 0; }
@@ -29,6 +32,8 @@
     <header>
       <h1>kymo<span>·</span>flowchart</h1>
       <div class="spacer"></div>
+      <span class="who" id="whoami"></span>
+      <div id="gbtn"></div>
       <button id="download">⬇ Tải SVG</button>
     </header>
     <main>
