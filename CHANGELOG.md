@@ -11,6 +11,19 @@ packages share a version number.
 
 ### Added
 
+- **Pure-Rust D2 → SVG (and Mermaid → SVG) — the core's first flowchart renderer.**
+  `kymostudio-core` gains a **D2 importer** (`crate::d2` — the inverse of the d2
+  emitter: parses D2's flowchart subset — direction, node shapes, edges with
+  labels/dash, containers → subgraphs — into the shared flowchart IR) and a
+  **pure-Rust flowchart SVG renderer** (`crate::flowchart_svg` — outline shapes
+  with interior labels, anchor-routed orthogonal edges, cluster regions). Together:
+  `d2_to_svg` renders D2 to SVG **entirely in Rust** (no external `d2` binary),
+  and `mermaid_to_svg` does the same for Mermaid (the Rust CLI can now render
+  flowcharts, not just convert). Also `d2_to_kymojson` (D2 as a kymo import
+  source). Surfaced on the `kymo` CLI (`kymo flow.d2` → `flow.svg`,
+  `kymo flow.mmd flow.svg`) and via PyO3 + wasm (`d2ToSvg` / `mermaidToSvg` /
+  `d2ToKymoJson`). Output is the core's own flowchart look (not byte-identical to
+  the Python/JS renderers). Validated by rasterizing the SVG through resvg.
 - **draw.io export (`Diagram → mxGraph XML`), a source-agnostic encoder.** A new
   `kymostudio-core` encoder (`drawio::to_drawio`) turns any resolved diagram into a
   draw.io document that opens directly in app.diagrams.net — shaped (rectangle /

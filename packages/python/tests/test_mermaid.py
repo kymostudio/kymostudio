@@ -125,6 +125,20 @@ def test_convert_to_drawio() -> None:
     assert diagram_to_drawio(import_mermaid(src)) == xml
 
 
+_HAS_SVG = _HAS_MERMAID and hasattr(_core, "d2_to_svg")
+
+
+@pytest.mark.skipif(not _HAS_SVG, reason="core lacks the pure-Rust SVG renderer / D2 importer")
+def test_d2_and_mermaid_to_svg() -> None:
+    """Pure-Rust D2 → SVG and Mermaid → SVG render the diamond + labels."""
+    d2 = _core.d2_to_svg('direction: down\nA: Go\nB: "ok?" { shape: diamond }\nA -> B')
+    assert d2.startswith("<?xml") and '<polygon class="fc-shape"' in d2 and ">ok?<" in d2
+    mmd = _core.mermaid_to_svg("flowchart TD\nA[Go] --> B{ok?}")
+    assert "fc-shape" in mmd and ">ok?<" in mmd
+    # D2 import carries the diamond shape into the kymo model.
+    assert '"shape": "diamond"' in _core.d2_to_kymojson('A -> B\nB: x { shape: diamond }')
+
+
 def test_iconless_component_renders_outline() -> None:
     """A bare icon-less component renders a shape outline + interior label
     instead of fetching an icon (which would KeyError on the empty key)."""

@@ -12,8 +12,10 @@ use resvg::{tiny_skia, usvg};
 // The shared diagram engine — pure Rust, no SVG deps. Mermaid import parses
 // into [`model::Diagram`], lays it out, and serializes to the `.kymo.json`
 // interchange format the Python/JS front-ends consume.
+pub mod d2;
 pub mod drawio;
 pub mod flowchart;
+pub mod flowchart_svg;
 pub mod kymojson;
 pub mod layout;
 pub mod mermaid;
@@ -161,6 +163,28 @@ pub fn mermaid_to_drawio(src: &str) -> Result<String, mermaid::MermaidError> {
     Ok(drawio::to_drawio(&layout::layout_flowchart(&fc)))
 }
 
+/// Render Mermaid flowchart source → SVG (parse → layout → the pure-Rust
+/// [`flowchart_svg`] renderer). The Rust core's own flowchart SVG (its own look,
+/// not byte-identical to the Python/JS renderers).
+pub fn mermaid_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    let fc = mermaid::parse(src)?;
+    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
+/// Render D2 flowchart source → SVG, fully in Rust: parse D2 → flowchart IR →
+/// `layout_flowchart` → the [`flowchart_svg`] renderer. No external `d2` binary.
+pub fn d2_to_svg(src: &str) -> Result<String, d2::D2Error> {
+    let fc = d2::parse(src)?;
+    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
+/// Import D2 flowchart source → the resolved `.kymo.json` model (D2 as a kymo
+/// source format — the inverse of `mermaid_to_d2`).
+pub fn d2_to_kymojson(src: &str) -> Result<String, d2::D2Error> {
+    let fc = d2::parse(src)?;
+    Ok(kymojson::export(&layout::layout_flowchart(&fc)))
+}
+
 /// Encode **any** resolved diagram (a `.kymo.json` model body or full envelope) to
 /// draw.io — the source-agnostic encoder surface used by the Python/JS `--drawio`
 /// flag. Needs the JSON reader, so it ships with the `bpmn` feature (which carries
@@ -186,5 +210,17 @@ mod tests {
     fn pdf_has_magic() {
         let pdf = super::svg_to_pdf(SVG).expect("render pdf");
         assert_eq!(&pdf[..5], b"%PDF-");
+    }
+
+    #[test]
+    fn mermaid_and_d2_to_svg() {
+        // mmd → SVG and the equivalent D2 → SVG both render the diamond + label.
+        let mmd = super::mermaid_to_svg("flowchart TD\nA[Go] --> B{ok?}").unwrap();
+        assert!(mmd.starts_with("<?xml") && mmd.contains("fc-shape") && mmd.contains(">ok?<"));
+        let d2src = "direction: down\nA: Go\nB: \"ok?\" { shape: diamond }\nA -> B";
+        let d2 = super::d2_to_svg(d2src).unwrap();
+        assert!(d2.contains("<polygon class=\"fc-shape\"") && d2.contains(">ok?<"));
+        // D2 import → kymo.json carries the diamond shape.
+        assert!(super::d2_to_kymojson(d2src).unwrap().contains("\"shape\": \"diamond\""));
     }
 }
