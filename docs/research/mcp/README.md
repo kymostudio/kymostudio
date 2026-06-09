@@ -12,7 +12,7 @@
 | Subjects          | Notable Model Context Protocol (MCP) servers that produce diagrams — Mermaid, draw.io, Excalidraw, Kroki-backed multi-format, and chart/data-viz servers |
 | Licenses          | Each surveyed project under its own license (linked inline); no third-party code is used in this repository    |
 | Access Date       | 2026-06-09 (star counts and "official" claims are point-in-time)                                               |
-| Related Documents | `RES-CLI-001`, `REF-DRAWIO-001`, `REF-D2-001`, `REF-PLANTUML-001`                                              |
+| Related Documents | `RES-SKILLS-001`, `RES-CLI-001`, `REF-DRAWIO-001`, `REF-D2-001`, `REF-PLANTUML-001`                            |
 
 This is a **research note on prior art** — a survey of how the MCP ecosystem exposes diagram
 generation to AI agents. It is **not a specification**: nothing in this repository depends on it,
