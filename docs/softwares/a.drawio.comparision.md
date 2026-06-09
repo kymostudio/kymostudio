@@ -136,8 +136,8 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 
 | # | Criterion | draw.io | kymo | Why |
 |---|-----------|:------:|:----:|-----|
-| D1 | Output-format breadth | 8 | 6 | draw.io emits SVG/PNG/PDF/HTML; kymo is SVG-first plus animated WebP and Figma/Excalidraw (no PNG/PDF yet). |
-| D2 | Round-trip / data interchange | 6 | 5 | `.drawio` round-trips within the draw.io/Confluence ecosystem; kymo's exporters are one-way and there is no standard interchange format. |
+| D1 | Output-format breadth | 8 | 6 | draw.io emits SVG/PNG/PDF/HTML; kymo is SVG-first plus PNG, vector PDF, animated WebP, Figma/Excalidraw, and **draw.io** (mxGraph XML). _(Score predates the PNG/PDF/draw.io additions — a class-wide kymo recalibration is a separate task.)_ |
+| D2 | Round-trip / data interchange | 6 | 5 | `.drawio` round-trips within the draw.io/Confluence ecosystem; kymo now **exports `.drawio`** (a real bridge into that world) but import stays one-way. |
 | D3 | Embeddability / API | 7 | 6 | draw.io embeds as an editor with Confluence/Jira integrations and self-host; kymo is a Python module + JS port (no service/API). |
 | | **Category total / 30** | **21** | **17** | **draw.io +4** — wider raster formats and an embeddable editor. |
 

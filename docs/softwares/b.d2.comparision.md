@@ -146,7 +146,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 | # | Criterion | D2 | kymo | Why |
 |---|-----------|:--:|:----:|-----|
 | D1 | Output format breadth | 8 | 6 | D2 emits SVG/PNG/PDF/animated-SVG; kymo is SVG-first plus animated WebP and Figma/Excalidraw exporters (no PNG/PDF yet). |
-| D2 | Round-trip with editors | 3 | 6 | D2 is source-to-image only; kymo's Figma/Excalidraw exporters are one-way today but provide a real bridge. |
+| D2 | Round-trip with editors | 3 | 6 | D2 is source-to-image only; kymo's Figma/Excalidraw exporters are one-way, but kymo now also **imports _and_ exports D2 itself** (`d2_to_svg`/`d2_to_kymojson` ↔ `mermaid_to_d2`, via the shared flowchart IR) — a true text round-trip. _(Score predates this; a class-wide recalibration is separate.)_ |
 | D3 | Cross-language portability | 8 | 8 | D2 is a Go lib with Python/JS/C# SDKs; kymo ships a Python source-of-truth **and** a JS/TS data-model port. A wash. |
 | | **Category total / 30** | **19** | **20** | **kymo +1** — kymo's exporter bridge and JS port edge out D2's wider raster formats. |
 

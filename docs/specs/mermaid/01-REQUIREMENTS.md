@@ -100,7 +100,12 @@ Pipeline: `mermaid::parse` (dispatch by header) → `layout::layout_flowchart`
 - **NFR-3 (contract fidelity)** Output round-trips through Python `from_kymojson`
   and re-exports byte-identically via `to_kymojson`.
 
-**Out of scope (Phase 1):** rendering Mermaid to SVG inside Rust (no renderer in
-the core); the Python/JS renderer changes needed to draw icon-less flowchart nodes
-and the `diamond` glyph (deferred parity phase); diagram types other than
-flowchart; inline `-- text --` edge labels; nested-region nesting.
+**Out of scope (Phase 1):** diagram types other than flowchart; inline
+`-- text --` edge labels; nested-region nesting.
+
+> **Since shipped (later phases):** the items originally deferred here have since
+> landed — the Python/JS renderers draw icon-less flowchart nodes + the `diamond`
+> glyph (Phase 2), and the core gained a **pure-Rust flowchart SVG renderer**
+> (`crate::flowchart_svg`, `mermaid_to_svg`). The flowchart IR also feeds text
+> emitters (Mermaid/D2/DOT), a draw.io encoder, and D2/DOT *importers* — see
+> MERMAID-MAP-001 §8.

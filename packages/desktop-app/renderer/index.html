@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self' 'unsafe-inline'" />
+    <title>kymo · flowchart</title>
+    <style>
+      :root {
+        --bg: #0f1115;
+        --panel: #171a21;
+        --border: #262b35;
+        --fg: #e6e9ef;
+        --muted: #8b93a3;
+        --accent: #5b9dff;
+        --error: #ff6b6b;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel);
+      }
+      header h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: 0.2px; }
+      header h1 span { color: var(--accent); }
+      .spacer { flex: 1; }
+      button {
+        background: #1f2430; color: var(--fg);
+        border: 1px solid var(--border); border-radius: 6px;
+        padding: 6px 10px; font: inherit; cursor: pointer;
+      }
+      button:hover { border-color: var(--accent); }
+      main { flex: 1; display: flex; min-height: 0; }
+      .pane { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+      .pane + .pane { border-left: 1px solid var(--border); }
+      textarea {
+        flex: 1; width: 100%; resize: none; border: 0; outline: none;
+        padding: 14px; background: #12141a; color: var(--fg);
+        font: 13px/1.6 ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+        tab-size: 2;
+      }
+      #preview {
+        flex: 1; overflow: auto; display: flex;
+        align-items: center; justify-content: center; padding: 20px;
+        background: repeating-conic-gradient(#14171d 0% 25%, #11141a 0% 50%) 50% / 22px 22px;
+      }
+      #preview svg { max-width: 100%; height: auto; }
+      .status {
+        font-size: 12px; padding: 6px 12px; border-top: 1px solid var(--border);
+        color: var(--muted); min-height: 28px; white-space: pre-wrap;
+      }
+      .status.error { color: var(--error); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>kymo<span>·</span>flowchart</h1>
+      <div class="spacer"></div>
+      <button id="download">⬇ Tải SVG</button>
+    </header>
+
+    <main>
+      <section class="pane">
+        <textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+      </section>
+      <section class="pane">
+        <div id="preview"></div>
+      </section>
+    </main>
+    <div class="status" id="status">Sẵn sàng.</div>
+
+    <script>
+      // The kymo flowchart-as-code: a `flowchart [DIR] { }` block. The body is
+      // flowchart syntax — nodes with shapes (`[ ]` box, `{ }` diamond,
+      // `( )` round, `(( ))` circle) and `-->` edges with `|label|`. The engine
+      // auto-lays it out in the given direction (TD / LR / …).
+      const SAMPLE = `flowchart TD {
+  A[Nhận đơn hàng] --> B{Còn hàng?}
+  B -->|Có| C[Thanh toán]
+  B -->|Không| D[Thông báo khách]
+  C --> E[Đóng gói]
+  E --> F((Giao hàng))
+  D --> G[Hủy đơn]
+}`;
+
+      const $ = (id) => document.getElementById(id);
+      const srcEl = $("src");
+      const previewEl = $("preview");
+      const statusEl = $("status");
+      let lastSvg = "";
+
+      function setStatus(msg, kind) {
+        statusEl.textContent = msg;
+        statusEl.classList.toggle("error", kind === "error");
+      }
+
+      let timer = null;
+      function scheduleRender() {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(render, 350);
+      }
+
+      async function render() {
+        const source = srcEl.value;
+        if (!source.trim()) {
+          previewEl.innerHTML = "";
+          setStatus("Nhập nguồn flowchart…");
+          return;
+        }
+        setStatus("Đang render…", "busy");
+        try {
+          const svg = await window.kymo.render(source);
+          lastSvg = svg;
+          previewEl.innerHTML = svg;
+          setStatus("OK · " + svg.length + " bytes");
+        } catch (e) {
+          // IPC rejections arrive as an Error whose message carries the
+          // renderer's stderr.
+          setStatus(String(e && e.message ? e.message : e), "error");
+        }
+      }
+
+      srcEl.addEventListener("input", scheduleRender);
+      $("download").addEventListener("click", () => {
+        if (!lastSvg) return;
+        const blob = new Blob([lastSvg], { type: "image/svg+xml" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "flowchart.svg";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+
+      srcEl.value = SAMPLE;
+      render();
+    </script>
+  </body>
+</html>

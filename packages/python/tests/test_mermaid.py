@@ -113,6 +113,35 @@ def test_convert_to_d2_dot_mermaid() -> None:
     assert 'B{"ok?"}' in mmd and "-.->|no|" in mmd
 
 
+@pytest.mark.skipif(not _HAS_CONVERT, reason="core lacks mermaid convert bindings")
+def test_convert_to_drawio() -> None:
+    """mmd → draw.io (mxGraph XML); the any-source `diagram_to_drawio` agrees."""
+    from kymo._core import diagram_to_drawio, import_mermaid, mermaid_to_drawio
+    src = "flowchart TD\nA[Start] --> B{ok?}\nB -->|yes| C([Done])\n"
+    xml = mermaid_to_drawio(src)
+    assert xml.startswith("<mxfile") and xml.rstrip().endswith("</mxfile>")
+    assert "rhombus;" in xml and 'source="A" target="B"' in xml
+    # The generic any-source encoder matches the Mermaid path byte-for-byte.
+    assert diagram_to_drawio(import_mermaid(src)) == xml
+
+
+_HAS_SVG = _HAS_MERMAID and hasattr(_core, "d2_to_svg")
+
+
+@pytest.mark.skipif(not _HAS_SVG, reason="core lacks the pure-Rust SVG renderer / D2 importer")
+def test_d2_and_mermaid_to_svg() -> None:
+    """Pure-Rust D2 → SVG and Mermaid → SVG render the diamond + labels."""
+    d2 = _core.d2_to_svg('direction: down\nA: Go\nB: "ok?" { shape: diamond }\nA -> B')
+    assert d2.startswith("<?xml") and '<polygon class="fc-shape"' in d2 and ">ok?<" in d2
+    mmd = _core.mermaid_to_svg("flowchart TD\nA[Go] --> B{ok?}")
+    assert "fc-shape" in mmd and ">ok?<" in mmd
+    # Graphviz DOT → SVG (pure Rust) renders the diamond too.
+    dot = _core.dot_to_svg('digraph G {\n A [label="Go"];\n B [label="ok?", shape=diamond];\n A -> B;\n}')
+    assert '<polygon class="fc-shape"' in dot and ">ok?<" in dot
+    # D2/DOT import carries the diamond shape into the kymo model.
+    assert '"shape": "diamond"' in _core.d2_to_kymojson('A -> B\nB: x { shape: diamond }')
+
+
 def test_iconless_component_renders_outline() -> None:
     """A bare icon-less component renders a shape outline + interior label
     instead of fetching an icon (which would KeyError on the empty key)."""

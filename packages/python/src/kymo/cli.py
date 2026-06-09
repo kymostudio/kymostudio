@@ -45,6 +45,10 @@ dev console (Plugins menu → Development → Open console).
 `--excalidraw` emits an Excalidraw scene v2 JSON; open it directly in
 excalidraw.com (Menu → Open) or the Excalidraw desktop app.
 
+`--drawio` emits a draw.io (mxGraph) XML document — works for any source
+(`.kymo`, `.bpmn`, `.mmd`, `.kymo.json`); open it in app.diagrams.net or
+the draw.io desktop app. Encoding is the shared Rust core (kymostudio-core).
+
 `kymo lint <file.bpmn> [...]` runs the BPMN linter instead of rendering:
 it reports import-fidelity problems (shapes with no DI bounds, edges with
 too few waypoints, dangling source/target refs, nodes/flows with no DI)
@@ -317,6 +321,7 @@ def main() -> None:
     animate    = "--animate"    in flags
     figma      = "--figma"      in flags
     excalidraw = "--excalidraw" in flags
+    drawio     = "--drawio"     in flags
     bpmn       = "--bpmn"       in flags
     json_out   = "--json"       in flags
 
@@ -328,6 +333,15 @@ def main() -> None:
         out.write_text(payload, encoding="utf-8")
         rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
         print(f"✓ wrote {rel} (excalidraw)  ({diagram.width}×{diagram.height}, {len(payload):,} bytes)")
+        return
+
+    if drawio:
+        from ._core import diagram_to_drawio
+        payload = diagram_to_drawio(diagram)
+        out = src.with_suffix(".drawio")
+        out.write_text(payload, encoding="utf-8")
+        rel = out.relative_to(Path.cwd()) if out.is_relative_to(Path.cwd()) else out
+        print(f"✓ wrote {rel} (draw.io)  ({diagram.width}×{diagram.height}, {len(payload):,} bytes)")
         return
 
     if figma:

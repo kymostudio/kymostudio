@@ -84,9 +84,9 @@ a later explicit wrapper upgrades its label and shape.
 | `id>text]` | asymmetric flag | `box` |
 
 `diamond` is a **new** kymo shape introduced for Mermaid decisions; the Python/JS
-SVG renderers gain the glyph when they consume Mermaid kymojson (deferred — see
-§7). All components are emitted with `accent: "blue"`, `icon: ""`, and an explicit
-`size` computed from the label.
+SVG renderers (and the core's own `flowchart_svg`) draw the glyph when they consume
+the kymojson — see §7. All components are emitted with `accent: "blue"`,
+`icon: ""`, and an explicit `size` computed from the label.
 
 ## 4. Edges
 
@@ -161,6 +161,22 @@ target lays the graph out itself.
 | **Mermaid** | `mermaid_to_mermaid` · `kymo f.mmd norm.mmd` | inverse of §3 (round-trip / normalize) |
 | **D2** | `mermaid_to_d2` · `kymo f.mmd f.d2` | circle→`circle`, diamond→`diamond`, hex→`hexagon`, cylinder→`cylinder`, stadium→`oval`, box→default; subgraph→container (members ref'd as `g.id`) |
 | **Graphviz DOT** | `mermaid_to_dot` · `kymo f.mmd f.dot` | box/circle/diamond/hexagon/cylinder native; stadium→`box,style=rounded`; subgraph→`cluster_*` |
+| **draw.io** (mxGraph) | `mermaid_to_drawio` · `kymo f.mmd f.drawio` · `kymo any.kymo --drawio` | box→`rounded=0`, circle→`ellipse`, diamond→`rhombus`, hex→`shape=hexagon`, cylinder→`shape=cylinder3`, stadium→`rounded=1`; subgraph→`cluster` vertex; edges by `source`/`target` |
+
+> **Note:** D2 / DOT / Mermaid emit the *positionless* IR (the target lays out).
+> **draw.io is different** — a generic WYSIWYG format that needs explicit geometry,
+> so it is an *encoder* (RES-PIPELINE-001 §3.4) consuming the **positioned**
+> `Diagram` from `layout_flowchart`. `drawio_from_kymojson` exposes the same
+> encoder for any `.kymo.json` model (any source, not just Mermaid); icon / BPMN /
+> AWS shapes degrade to a labelled rectangle.
+>
+> **Reverse + render:** D2 and Graphviz DOT are also *import* sources — `crate::d2`
+> / `crate::dot` parse each language's flowchart subset back into the IR
+> (`d2_to_kymojson` / `dot_to_kymojson`), and the core's own pure-Rust flowchart
+> renderer (`crate::flowchart_svg`) turns the laid-out diagram into SVG, so
+> `d2_to_svg` / `dot_to_svg` / `mermaid_to_svg` render entirely in Rust (no external
+> `d2` / `dot` binary; the Rust `kymo` CLI now does `kymo flow.d2` / `kymo flow.dot`
+> → `flow.svg`).
 
 Edge style carries over (dashed → D2 `style.stroke-dash` / DOT `style=dashed`;
 no-arrow → D2 `--` / DOT `dir=none`). Output is deterministic (declaration order

@@ -1,0 +1,14 @@
+{
+  "name": "@kymostudio/desktop-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron desktop app to render the kymo flowchart DSL (flowchart { } block) to SVG — a live editor with preview.",
+  "license": "Apache-2.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

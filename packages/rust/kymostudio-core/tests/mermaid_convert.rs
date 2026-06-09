@@ -12,7 +12,9 @@
 use std::fs;
 use std::path::PathBuf;
 
-use kymostudio_core::{flowchart, mermaid, mermaid_to_d2, mermaid_to_dot, mermaid_to_mermaid};
+use kymostudio_core::{
+    flowchart, mermaid, mermaid_to_d2, mermaid_to_dot, mermaid_to_drawio, mermaid_to_mermaid,
+};
 
 fn fixtures_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/mermaid")
@@ -45,6 +47,7 @@ fn convert_fixtures_match_golden() {
             ("mmd", mermaid_to_mermaid(&src).unwrap()),
             ("d2", mermaid_to_d2(&src).unwrap()),
             ("dot", mermaid_to_dot(&src).unwrap()),
+            ("drawio", mermaid_to_drawio(&src).unwrap()),
         ] {
             let golden = golden_dir.join(format!("{name}.{ext}"));
             if update {
@@ -103,7 +106,7 @@ fn mermaid_round_trip_is_structural_fixpoint() {
 fn emitters_are_deterministic() {
     for (name, path) in cases() {
         let src = fs::read_to_string(&path).unwrap();
-        for f in [mermaid_to_mermaid, mermaid_to_d2, mermaid_to_dot] {
+        for f in [mermaid_to_mermaid, mermaid_to_d2, mermaid_to_dot, mermaid_to_drawio] {
             assert_eq!(f(&src).unwrap(), f(&src).unwrap(), "{name}: non-deterministic emit");
         }
     }

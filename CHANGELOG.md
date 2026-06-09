@@ -11,6 +11,33 @@ packages share a version number.
 
 ### Added
 
+- **Pure-Rust flowchart SVG rendering + D2 / DOT importers — the core's first
+  flowchart renderer.** `kymostudio-core` gains **importers** for D2 (`crate::d2`)
+  and Graphviz DOT (`crate::dot`) — the inverses of the d2/dot emitters: they parse
+  each language's flowchart subset (direction, node shapes, edges with labels/dash,
+  containers → subgraphs) into the shared flowchart IR — and a **pure-Rust flowchart
+  SVG renderer** (`crate::flowchart_svg` — outline shapes with interior labels,
+  anchor-routed orthogonal edges, cluster regions). Together: `d2_to_svg`,
+  `dot_to_svg` and `mermaid_to_svg` render **entirely in Rust** (no external `d2` /
+  `dot` binary) — the Rust CLI can now render flowcharts, not just convert. Also
+  `d2_to_kymojson` / `dot_to_kymojson` (D2/DOT as kymo import sources). Surfaced on
+  the `kymo` CLI (`kymo flow.d2` / `kymo flow.dot` → `flow.svg`; `kymo flow.mmd
+  flow.svg`) and via PyO3 + wasm (`d2ToSvg` / `dotToSvg` / `mermaidToSvg` + the
+  `*ToKymoJson` importers). Output is the core's own flowchart look (not
+  byte-identical to the Python/JS renderers). Validated by rasterizing through resvg.
+- **draw.io export (`Diagram → mxGraph XML`), a source-agnostic encoder.** A new
+  `kymostudio-core` encoder (`drawio::to_drawio`) turns any resolved diagram into a
+  draw.io document that opens directly in app.diagrams.net — shaped (rectangle /
+  ellipse / rhombus / hexagon / cylinder / stadium), laid-out, subgraph-clustered,
+  edges auto-routed (dashed / no-arrow honoured). Per RES-PIPELINE-001 this is a
+  pure *encoder* (it consumes only the positioned `Diagram`). Two entry points:
+  `mermaid_to_drawio` (`kymo flow.mmd flow.drawio`) and `drawio_from_kymojson`
+  (any `.kymo.json` model). Reaches every source via a **`--drawio`** flag on the
+  Python CLI and a `.drawio` output on the JS CLI, both delegating to the one Rust
+  encoder — so draw.io output is byte-identical across Python and JS. PyO3 + wasm
+  bindings; non-flowchart shapes (icons / BPMN / AWS) degrade to a labelled
+  rectangle. The Rust `kymo` CLI's converter dispatch is now a small `{ext → fn}`
+  registry (a first step toward RES-PIPELINE-001's "registry, not if/elif").
 - **Native `flowchart [DIR] { … }` DSL block.** Author a flowchart inline in a
   `.kymo` file — the block body is Mermaid flowchart syntax, laid out by the core
   (mirrors the `bpmn { }` block). Direction is optional (`flowchart LR { … }`,

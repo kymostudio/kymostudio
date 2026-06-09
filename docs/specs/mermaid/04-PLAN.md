@@ -15,6 +15,7 @@ related_documents:
   - TEST-MERMAID-001
   - PLAN-MERMAID-FLOWCHART-001
   - MERMAID-MAP-001
+  - FEAT-FLOWCHART-001          # the conversion hub Mermaid feeds (D2/DOT/SVG/draw.io spokes)
 authors:
   - Vũ Anh
 language: en
@@ -66,6 +67,20 @@ Status: **implemented** (Python + JS). Make the kymojson actually render:
   errors clearly), and a `flowchart` conformance sample + golden SVGs are deferred
   until the core that ships the binding is released and the Python/JS floors raised.
 - vscode-extension `.mmd` dispatch: still pending.
+
+## Flowchart conversion hub (its own feature — `FEAT-FLOWCHART-001`)
+
+The Phase-1 parse model was lifted into a format-neutral **flowchart IR**
+(`crate::flowchart`), turning the Mermaid front-end into one **spoke** of a small
+conversion hub: D2/DOT importers, text emitters (mmd/d2/dot), a pure-Rust SVG
+renderer, and the draw.io encoder. That hub is now its **own feature** —
+**`FEAT-FLOWCHART-001`** (with `D2-MAP-001` / `DOT-MAP-001` / `DRAWIO-MAP-001` and
+modules `FEAT-FLOWCHART-{D2,DOT,SVG}-001`); Mermaid is its first source spoke.
+
+These are not Mermaid *diagram types* (Phase 3 below) — they are the flowchart
+family's other source/target formats, sharing the same IR + layout. See
+`FEAT-FLOWCHART-001` for the hub; this spec continues to own the Mermaid front-end
+and the diagram-type roadmap.
 
 ## Phase 3+ — More diagram types (per module)
 
