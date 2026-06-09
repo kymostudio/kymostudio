@@ -18,6 +18,8 @@
 //!     mermaid_to_svg(src: str) -> str      # Mermaid flowchart → SVG (pure Rust)
 //!     d2_to_svg(src: str) -> str           # D2 flowchart → SVG (pure Rust)
 //!     d2_to_kymojson(src: str) -> str      # D2 flowchart → .kymo.json (import)
+//!     dot_to_svg(src: str) -> str          # Graphviz DOT → SVG (pure Rust)
+//!     dot_to_kymojson(src: str) -> str     # Graphviz DOT → .kymo.json (import)
 //!
 //! The BPMN functions exchange the canonical `.kymo.json` model on the JSON seam, so
 //! Python can deserialize the result into its dataclasses and delegate to this one
@@ -145,6 +147,18 @@ fn d2_to_kymojson(src: &str) -> PyResult<String> {
     crate::d2_to_kymojson(src).map_err(|e| PyValueError::new_err(e.to_string()))
 }
 
+/// Render Graphviz DOT flowchart source → SVG (pure-Rust DOT importer + renderer).
+#[pyfunction]
+fn dot_to_svg(src: &str) -> PyResult<String> {
+    crate::dot_to_svg(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
+/// Import Graphviz DOT flowchart source → the resolved `.kymo.json` model.
+#[pyfunction]
+fn dot_to_kymojson(src: &str) -> PyResult<String> {
+    crate::dot_to_kymojson(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
 #[pymodule]
 fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
@@ -168,5 +182,7 @@ fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(mermaid_to_svg, m)?)?;
     m.add_function(wrap_pyfunction!(d2_to_svg, m)?)?;
     m.add_function(wrap_pyfunction!(d2_to_kymojson, m)?)?;
+    m.add_function(wrap_pyfunction!(dot_to_svg, m)?)?;
+    m.add_function(wrap_pyfunction!(dot_to_kymojson, m)?)?;
     Ok(())
 }
