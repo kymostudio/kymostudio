@@ -2,14 +2,22 @@
   "name": "@kymostudio/web-app",
   "version": "0.1.0",
   "private": true,
-  "description": "Web playground to render flowcharts (Mermaid / D2 / Graphviz DOT) to SVG via the kymo Rust CLI.",
+  "description": "Web playground + MCP server to render the kymo flowchart DSL (flowchart { } block) to SVG/PNG.",
   "type": "module",
   "license": "Apache-2.0",
+  "bin": {
+    "kymo-mcp": "mcp-server.js"
+  },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "mcp": "node mcp-server.js"
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.8"
   }
 }

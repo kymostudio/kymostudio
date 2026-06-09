@@ -9,27 +9,40 @@
 // this path uses the Python engine + the `kymostudio-core` layout core.
 
 import { createServer } from "node:http";
-import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderToSvg, PYTHON, PYTHONPATH } from "./render.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 4173;
 const HOST = process.env.HOST || "0.0.0.0";
 
-// Python interpreter: the in-package venv, else `python3` on PATH.
-function resolvePython() {
-  if (process.env.KYMO_PYTHON) return process.env.KYMO_PYTHON;
-  const venv = join(__dirname, ".venv/bin/python");
-  return existsSync(venv) ? venv : "python3";
+// ── Live document state ────────────────────────────────────────────────
+// The current editor source, shared across all connected browsers AND the
+// MCP server (which edits/reads it via /api/doc). Updates are pushed to every
+// open browser over Server-Sent Events, so an MCP `set_diagram` shows up live.
+const DEFAULT_DOC = `flowchart TD {
+  A[Nhận đơn hàng] --> B{Còn hàng?}
+  B -->|Có| C[Thanh toán]
+  B -->|Không| D[Thông báo khách]
+  C --> E[Đóng gói]
+  E --> F((Giao hàng))
+  D --> G[Hủy đơn]
+}`;
+let currentDoc = DEFAULT_DOC;
+const sseClients = new Set();
+
+function broadcastDoc(origin) {
+  const data = `data: ${JSON.stringify({ source: currentDoc, origin })}\n\n`;
+  for (const c of sseClients) {
+    try {
+      c.write(data);
+    } catch {
+      sseClients.delete(c);
+    }
+  }
 }
-const PYTHON = resolvePython();
-// Where the `kymo` Python package lives (so `import kymo` resolves).
-const PYTHONPATH =
-  process.env.KYMO_PYTHONPATH || resolve(__dirname, "../python/src");
-const RENDER_SCRIPT = join(__dirname, "render_kymo.py");
 
 function send(res, status, body, headers = {}) {
   res.writeHead(status, { "Cache-Control": "no-store", ...headers });
@@ -59,27 +72,6 @@ function readBody(req, limit = 1024 * 1024) {
   });
 }
 
-// Pipe `source` through render_kymo.py and resolve with the SVG (or reject
-// with the renderer's stderr).
-function renderToSvg(source) {
-  return new Promise((resolveRun, rejectRun) => {
-    const proc = spawn(PYTHON, [RENDER_SCRIPT], {
-      env: { ...process.env, PYTHONPATH },
-      timeout: 15_000,
-    });
-    let out = "";
-    let err = "";
-    proc.stdout.on("data", (d) => (out += d));
-    proc.stderr.on("data", (d) => (err += d));
-    proc.on("error", (e) => rejectRun(new Error(e.message)));
-    proc.on("close", (code) => {
-      if (code === 0) resolveRun(out);
-      else rejectRun(new Error((err || `renderer exited ${code}`).trim()));
-    });
-    proc.stdin.end(source);
-  });
-}
-
 const server = createServer(async (req, res) => {
   try {
     if (req.method === "POST" && req.url === "/api/render") {
@@ -100,8 +92,44 @@ const server = createServer(async (req, res) => {
       }
     }
 
+    // Current shared document (read by the browser on load and by MCP get).
+    if (req.method === "GET" && req.url === "/api/doc") {
+      return sendJson(res, 200, { source: currentDoc });
+    }
+
+    // Set the shared document (from a browser edit or an MCP set_diagram) and
+    // push it to every other open browser via SSE.
+    if (req.method === "POST" && req.url === "/api/doc") {
+      const raw = await readBody(req);
+      let payload;
+      try {
+        payload = JSON.parse(raw || "{}");
+      } catch {
+        return sendJson(res, 400, { error: "invalid JSON body" });
+      }
+      if (typeof payload.source !== "string") {
+        return sendJson(res, 400, { error: "source must be a string" });
+      }
+      currentDoc = payload.source;
+      broadcastDoc(payload.origin || "unknown");
+      return sendJson(res, 200, { ok: true });
+    }
+
+    // Live document stream (Server-Sent Events).
+    if (req.method === "GET" && req.url === "/api/events") {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      });
+      res.write(`data: ${JSON.stringify({ source: currentDoc, origin: "init" })}\n\n`);
+      sseClients.add(res);
+      req.on("close", () => sseClients.delete(res));
+      return;
+    }
+
     if (req.method === "GET" && req.url === "/api/health") {
-      return sendJson(res, 200, { ok: true, python: PYTHON, pythonpath: PYTHONPATH });
+      return sendJson(res, 200, { ok: true, python: PYTHON, pythonpath: PYTHONPATH, clients: sseClients.size });
     }
 
     if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) {

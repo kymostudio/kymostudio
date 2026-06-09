@@ -111,6 +111,9 @@
       const previewEl = $("preview");
       const statusEl = $("status");
       let lastSvg = "";
+      // Identifies this browser so it can ignore the echo of its own edits that
+      // come back over the live (SSE) channel.
+      const myId = "c" + Math.random().toString(36).slice(2);
 
       function setStatus(msg, kind) {
         statusEl.textContent = msg;
@@ -118,9 +121,25 @@
       }
 
       let timer = null;
-      function scheduleRender() {
+      function scheduleLocalEdit() {
         if (timer) clearTimeout(timer);
-        timer = setTimeout(render, 350);
+        timer = setTimeout(() => {
+          render();
+          pushDoc();
+        }, 350);
+      }
+
+      // Share a local edit with the server (→ other browsers + MCP get_diagram).
+      async function pushDoc() {
+        try {
+          await fetch("api/doc", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ source: srcEl.value, origin: myId }),
+          });
+        } catch {
+          /* offline / non-shared mode — ignore */
+        }
       }
 
       async function render() {
@@ -150,7 +169,7 @@
         }
       }
 
-      srcEl.addEventListener("input", scheduleRender);
+      srcEl.addEventListener("input", scheduleLocalEdit);
       $("download").addEventListener("click", () => {
         if (!lastSvg) return;
         const blob = new Blob([lastSvg], { type: "image/svg+xml" });
@@ -161,8 +180,46 @@
         URL.revokeObjectURL(a.href);
       });
 
-      srcEl.value = SAMPLE;
-      render();
+      // Apply a document pushed by someone else (another browser, or the MCP
+      // server via set_diagram) — update the editor live and re-render.
+      function applyRemote(source) {
+        if (typeof source !== "string" || source === srcEl.value) return;
+        srcEl.value = source;
+        render();
+      }
+
+      // Live channel: receive document updates as they happen.
+      try {
+        const es = new EventSource("api/events");
+        es.onmessage = (ev) => {
+          let d;
+          try {
+            d = JSON.parse(ev.data);
+          } catch {
+            return;
+          }
+          if (d.origin === myId) return; // ignore the echo of our own edits
+          applyRemote(d.source);
+        };
+      } catch {
+        /* EventSource unavailable — fall back to load-once below */
+      }
+
+      // Boot: load the current shared document (so a fresh load reflects an
+      // edit MCP already made), falling back to the built-in sample.
+      (async () => {
+        try {
+          const r = await fetch("api/doc");
+          const d = await r.json();
+          srcEl.value =
+            d && typeof d.source === "string" && d.source.trim()
+              ? d.source
+              : SAMPLE;
+        } catch {
+          srcEl.value = SAMPLE;
+        }
+        render();
+      })();
     </script>
   </body>
 </html>
