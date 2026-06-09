@@ -2,13 +2,12 @@
   "name": "kymo-mcp",
   "private": true,
   "type": "module",
-  "scripts": {
-    "deploy": "wrangler deploy",
-    "dev": "wrangler dev"
-  },
+  "scripts": { "deploy": "wrangler deploy", "dev": "wrangler dev" },
   "dependencies": {
+    "@cloudflare/workers-oauth-provider": "latest",
     "agents": "latest",
     "@modelcontextprotocol/sdk": "^1.12.0",
+    "jose": "^5.9.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

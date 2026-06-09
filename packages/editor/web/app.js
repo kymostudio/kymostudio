@@ -1,7 +1,7 @@
-// Client-side render: parse the kymo flowchart DSL and render SVG entirely in
-// the browser via the JS engine (kymostudio) + kymostudio-core wasm (inlined).
-// No server round-trip for rendering. A WebSocket to the kymo-mcp Worker keeps
-// the doc in sync so Claude (via MCP set_diagram) can push diagrams live.
+// Client-side render (kymostudio + kymostudio-core wasm, inlined). Local editing
+// and rendering need no auth. To RECEIVE live updates (Claude's set_diagram push
+// over the kymo-mcp WebSocket), the user signs in with Google — only then does the
+// editor open the authenticated /ws channel.
 import { initSync, setManifest, setIconBaseURL, parseDiagram, renderSVG } from "kymostudio";
 import manifest from "kymostudio/icons-manifest.json";
 import wasmBytes from "kymostudio-core/kymostudio_core_bg.wasm";
@@ -10,6 +10,7 @@ initSync(wasmBytes);
 setManifest(manifest);
 setIconBaseURL("https://cdn.jsdelivr.net/gh/kymostudio/kymostudio@main/packages/icons");
 
+const GOOGLE_CLIENT_ID = "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com";
 const MCP_WS = "wss://kymo-mcp.anhv-ict91.workers.dev/ws";
 
 const SAMPLE = `flowchart TD {
@@ -22,7 +23,7 @@ const SAMPLE = `flowchart TD {
 }`;
 
 const $ = (id) => document.getElementById(id);
-const srcEl = $("src"), previewEl = $("preview"), statusEl = $("status");
+const srcEl = $("src"), previewEl = $("preview"), statusEl = $("status"), whoEl = $("whoami");
 let lastSvg = "";
 let live = false;
 
@@ -55,9 +56,9 @@ $("download").addEventListener("click", () => {
   a.download = "flowchart.svg"; a.click(); URL.revokeObjectURL(a.href);
 });
 
-// ---- Live sync with the kymo-mcp editor room (Claude pushes via set_diagram) ----
+// ---- Live sync (requires Google sign-in) ----
 const myId = Math.random().toString(36).slice(2);
-let ws = null;
+let ws = null, idToken = null;
 
 function pushDoc() {
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -66,21 +67,44 @@ function pushDoc() {
 }
 
 function connect() {
-  try { ws = new WebSocket(MCP_WS); } catch { return; }
+  if (!idToken) return;
+  try { ws = new WebSocket(MCP_WS + "?id_token=" + encodeURIComponent(idToken)); }
+  catch { return; }
   ws.addEventListener("open", () => { live = true; render(); });
-  ws.addEventListener("close", () => { live = false; render(); setTimeout(connect, 2000); });
+  ws.addEventListener("close", () => { live = false; render(); });
   ws.addEventListener("error", () => { try { ws.close(); } catch {} });
   ws.addEventListener("message", (e) => {
     let data; try { data = JSON.parse(e.data); } catch { return; }
     if (!data || data.type !== "doc" || data.origin === myId) return;
     const incoming = String(data.source ?? "");
-    if (!incoming.trim()) { pushDoc(); return; } // seed an empty room with our content
+    if (!incoming.trim()) { pushDoc(); return; }
     if (incoming === srcEl.value) return;
     srcEl.value = incoming;
     render();
   });
 }
 
+function emailOf(jwt) {
+  try { return JSON.parse(atob(jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).email; }
+  catch { return null; }
+}
+
+function onCredential(resp) {
+  idToken = resp.credential;
+  const email = emailOf(idToken);
+  whoEl.innerHTML = email ? `<b>${email}</b> · live` : "live";
+  const btn = $("gbtn"); if (btn) btn.style.display = "none";
+  connect();
+}
+
+function initGoogle() {
+  if (!window.google || !google.accounts || !google.accounts.id) { setTimeout(initGoogle, 150); return; }
+  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onCredential, auto_select: true });
+  google.accounts.id.renderButton($("gbtn"), { type: "standard", theme: "filled_black", size: "medium", text: "signin_with" });
+  google.accounts.id.prompt(); // One Tap for returning users
+}
+
 srcEl.value = SAMPLE;
 render();
-connect();
+whoEl.textContent = "Đăng nhập để nhận live update →";
+initGoogle();
