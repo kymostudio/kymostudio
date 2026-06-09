@@ -1,0 +1,19 @@
+{
+  "name": "kymo-mcp",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "dependencies": {
+    "agents": "latest",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "wrangler": "latest",
+    "@cloudflare/workers-types": "latest",
+    "typescript": "^5.5.0"
+  }
+}
