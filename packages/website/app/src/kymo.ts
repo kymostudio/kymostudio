@@ -9,13 +9,13 @@
  * serves on-demand per-set files like `sets/ai.json`).
  * esbuild's `text` loader inlines the sample files as strings at build time.
  */
-import { setManifest, setIconBaseURL } from "../../../packages/js/dist/index.js";
-import manifest from "../../../packages/icons/icons-manifest.json";
+import { setManifest, setIconBaseURL } from "../../../../packages/js/dist/index.js";
+import manifest from "../../../../packages/icons/icons-manifest.json";
 
-import aiqSrc from "../../../samples/aiq.kymo";
-import dataSrc from "../../../samples/data.kymo";
-import awsSrc from "../../../samples/aws_1.kymo";
-import orderBpmn from "../../../samples/order.bpmn";
+import aiqSrc from "../../../../samples/aiq.kymo";
+import dataSrc from "../../../../samples/data.kymo";
+import awsSrc from "../../../../samples/aws_1.kymo";
+import orderBpmn from "../../../../samples/order.bpmn";
 
 setManifest(manifest as Parameters<typeof setManifest>[0]);
 setIconBaseURL("https://cdn.jsdelivr.net/gh/kymostudio/kymostudio@main/packages/icons");

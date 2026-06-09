@@ -9,8 +9,8 @@
  * render immediately, matching the original.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { init, parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../packages/js/dist/index.js";
-import type { Editor } from "../../../packages/js-canvas/dist/index.js";
+import { init, parseDiagram, parseBpmn, renderSVG, type Diagram } from "../../../../packages/js/dist/index.js";
+import type { Editor } from "../../../../packages/js-canvas/dist/index.js";
 import { SAMPLES, DEFAULT_SAMPLE, isBpmn, svgBackground, type Theme } from "./kymo";
 import { syncURL, loadFromURL } from "./share";
 import { EngineBoard } from "./engine/EngineBoard";
