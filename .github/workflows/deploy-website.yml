@@ -1,10 +1,10 @@
-name: Deploy website to kymostudio.github.io
+name: Deploy website to Cloudflare Pages
 
-# Publishes packages/website (landing page + client-side playground at /app/)
-# to the org Pages repo kymostudio/kymostudio.github.io, served at kymo.studio.
+# Publishes packages/website (landing + client-side playground at /app/) to the
+# Cloudflare Pages project "kymo-studio", served at https://kymo.studio.
 # build.sh assembles dist/ from src/ + the committed app/kymo.bundle.js (no JS
-# recompile — the bundle is a committed artifact). Cross-repo push uses the
-# fine-grained PAT PAGES_DEPLOY_TOKEN (the org has deploy keys disabled).
+# recompile). Auth via the CLOUDFLARE_API_TOKEN (Pages:Edit) + CLOUDFLARE_ACCOUNT_ID
+# repo secrets.
 
 on:
   push:
@@ -21,9 +21,6 @@ concurrency:
   group: website-deploy
   cancel-in-progress: false
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -32,15 +29,9 @@ jobs:
       - name: Build website -> dist/
         run: ./build.sh
         working-directory: packages/website
-      - name: Publish dist/ -> kymostudio.github.io
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          personal_token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
-          external_repository: kymostudio/kymostudio.github.io
-          publish_branch: main
-          publish_dir: ./packages/website/dist
-          force_orphan: true
-          cname: kymo.studio
-          user_name: kymostudio-ci
-          user_email: ci@users.noreply.github.com
-          commit_message: "deploy: ${{ github.sha }}"
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy packages/website/dist --project-name=kymo-studio --branch=main
