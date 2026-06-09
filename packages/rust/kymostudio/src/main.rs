@@ -7,7 +7,9 @@
 //!     kymo flow.mmd flow.d2         # -> D2     (convert via the flowchart IR)
 //!     kymo flow.mmd flow.dot        # -> Graphviz DOT
 //!     kymo flow.mmd flow.drawio     # -> draw.io (mxGraph XML)
-//!     kymo flow.mmd norm.mmd        # -> Mermaid (round-trip / normalize)
+//!     kymo flow.mmd flow.svg        # -> SVG (pure-Rust flowchart renderer)
+//!     kymo flow.d2                  # -> flow.svg (D2 -> SVG, pure Rust)
+//!     kymo flow.d2 flow.kymo.json   # -> import D2 to the kymo model
 //!
 //! Pure Rust (resvg/svg2pdf via kymostudio-core) — no browser, no system image
 //! libraries. The operation is chosen by the INPUT extension: `.mmd`/`.mermaid`
@@ -53,7 +55,8 @@ EXAMPLES:
     kymo flow.mmd flow.d2               # -> D2 (convert via the flowchart IR)
     kymo flow.mmd flow.dot              # -> Graphviz DOT
     kymo flow.mmd flow.drawio           # -> draw.io (mxGraph XML)
-    kymo flow.mmd norm.mmd              # -> Mermaid (round-trip / normalize)
+    kymo flow.mmd flow.svg              # -> SVG (pure-Rust flowchart renderer)
+    kymo flow.d2                        # -> flow.svg (D2 -> SVG, pure Rust)
 ";
 
 struct Args {
@@ -115,6 +118,8 @@ fn parse(argv: &[String]) -> Result<Parsed, String> {
     let input = input.ok_or("missing required input (use -i <file>)")?;
     let default_ext = if is_mermaid(&input) {
         "kymo.json"
+    } else if is_d2(&input) {
+        "svg"
     } else {
         "png"
     };
@@ -135,19 +140,20 @@ fn is_mermaid(path: &std::path::Path) -> bool {
     has_ext(path, "mmd") || has_ext(path, "mermaid")
 }
 
+fn is_d2(path: &std::path::Path) -> bool {
+    has_ext(path, "d2")
+}
+
 fn run(args: Args) -> Result<(), String> {
     // Mermaid input: import to `.kymo.json`, or convert to another flowchart DSL.
     // The OUTPUT extension picks the target: `.d2` / `.dot`|`.gv` / `.mmd`|`.mermaid`
     // (round-trip) / else `.kymo.json`.
     if is_mermaid(&args.input) {
-        if has_ext(&args.output, "svg")
-            || has_ext(&args.output, "png")
-            || has_ext(&args.output, "pdf")
-        {
+        if has_ext(&args.output, "png") || has_ext(&args.output, "pdf") {
             return Err(format!(
-                "cannot render Mermaid to {} — Rust imports/converts only \
-                 (.kymo.json | .d2 | .dot | .mmd); render to SVG/PNG/PDF with the \
-                 Python or JS kymo CLI",
+                "cannot rasterize Mermaid to {} in Rust — convert to \
+                 .svg / .kymo.json / .d2 / .dot / .mmd / .drawio (PNG/PDF: pipe the \
+                 .svg through the Python or JS kymo CLI)",
                 args.output.display()
             ));
         }
@@ -157,6 +163,7 @@ fn run(args: Args) -> Result<(), String> {
         // toward RES-PIPELINE-001's "registry, not if/elif"). Default → kymo.json.
         type Conv = fn(&str) -> Result<String, kymostudio_core::mermaid::MermaidError>;
         const CONVERTERS: &[(&str, Conv)] = &[
+            ("svg", kymostudio_core::mermaid_to_svg),
             ("d2", kymostudio_core::mermaid_to_d2),
             ("dot", kymostudio_core::mermaid_to_dot),
             ("gv", kymostudio_core::mermaid_to_dot),
@@ -170,6 +177,35 @@ fn run(args: Args) -> Result<(), String> {
             .map(|&(ext, f)| (f, ext))
             .unwrap_or((kymostudio_core::mermaid_to_kymojson, "kymo.json"));
         let out = conv(&src).map_err(|e| e.to_string())?;
+        std::fs::write(&args.output, &out)
+            .map_err(|e| format!("cannot write {}: {e}", args.output.display()))?;
+        eprintln!(
+            "{} -> {} ({kind}, {} bytes)",
+            args.input.display(),
+            args.output.display(),
+            out.len()
+        );
+        return Ok(());
+    }
+
+    // D2 input: render to SVG (pure-Rust D2 → IR → layout → SVG) or import to
+    // `.kymo.json`. Output extension picks the target (default → SVG).
+    if is_d2(&args.input) {
+        if has_ext(&args.output, "png") || has_ext(&args.output, "pdf") {
+            return Err(format!(
+                "cannot rasterize D2 to {} in Rust — render to .svg (or import to \
+                 .kymo.json); for PNG/PDF pipe the .svg through the Python/JS CLI",
+                args.output.display()
+            ));
+        }
+        let src = std::fs::read_to_string(&args.input)
+            .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
+        let (out, kind) = if has_ext(&args.output, "kymo.json") || has_ext(&args.output, "json") {
+            (kymostudio_core::d2_to_kymojson(&src), "kymo.json")
+        } else {
+            (kymostudio_core::d2_to_svg(&src), "svg")
+        };
+        let out = out.map_err(|e| e.to_string())?;
         std::fs::write(&args.output, &out)
             .map_err(|e| format!("cannot write {}: {e}", args.output.display()))?;
         eprintln!(

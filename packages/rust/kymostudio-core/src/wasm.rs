@@ -9,6 +9,7 @@
 //!     mermaidToKymoJson(src: string): string
 //!     mermaidToD2(src): string   mermaidToDot(src): string   mermaidToMermaid(src): string
 //!     mermaidToDrawio(src): string   drawioFromKymoJson(json): string
+//!     mermaidToSvg(src): string   d2ToSvg(src): string   d2ToKymoJson(src): string
 
 use wasm_bindgen::prelude::*;
 
@@ -93,6 +94,24 @@ pub fn mermaid_to_mermaid(src: &str) -> Result<String, JsError> {
 #[wasm_bindgen(js_name = mermaidToDrawio)]
 pub fn mermaid_to_drawio(src: &str) -> Result<String, JsError> {
     crate::mermaid_to_drawio(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Render Mermaid flowchart source → SVG (pure-Rust flowchart renderer).
+#[wasm_bindgen(js_name = mermaidToSvg)]
+pub fn mermaid_to_svg(src: &str) -> Result<String, JsError> {
+    crate::mermaid_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Render D2 flowchart source → SVG (pure-Rust D2 importer + renderer).
+#[wasm_bindgen(js_name = d2ToSvg)]
+pub fn d2_to_svg(src: &str) -> Result<String, JsError> {
+    crate::d2_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Import D2 flowchart source → the resolved `.kymo.json` model.
+#[wasm_bindgen(js_name = d2ToKymoJson)]
+pub fn d2_to_kymojson(src: &str) -> Result<String, JsError> {
+    crate::d2_to_kymojson(src).map_err(|e| JsError::new(&e.to_string()))
 }
 
 /// Encode any resolved diagram (`.kymo.json` model) → draw.io (mxGraph XML).

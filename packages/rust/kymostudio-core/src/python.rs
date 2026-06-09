@@ -15,6 +15,9 @@
 //!     mermaid_to_mermaid(src: str) -> str  # Mermaid round-trip / normalize
 //!     mermaid_to_drawio(src: str) -> str   # Mermaid flowchart → draw.io (mxGraph XML)
 //!     drawio_from_kymojson(json: str) -> str  # any .kymo.json model → draw.io
+//!     mermaid_to_svg(src: str) -> str      # Mermaid flowchart → SVG (pure Rust)
+//!     d2_to_svg(src: str) -> str           # D2 flowchart → SVG (pure Rust)
+//!     d2_to_kymojson(src: str) -> str      # D2 flowchart → .kymo.json (import)
 //!
 //! The BPMN functions exchange the canonical `.kymo.json` model on the JSON seam, so
 //! Python can deserialize the result into its dataclasses and delegate to this one
@@ -124,6 +127,24 @@ fn mermaid_to_drawio(src: &str) -> PyResult<String> {
     crate::mermaid_to_drawio(src).map_err(|e| PyValueError::new_err(e.to_string()))
 }
 
+/// Render Mermaid flowchart source → SVG (pure-Rust flowchart renderer).
+#[pyfunction]
+fn mermaid_to_svg(src: &str) -> PyResult<String> {
+    crate::mermaid_to_svg(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
+/// Render D2 flowchart source → SVG (pure-Rust D2 importer + renderer).
+#[pyfunction]
+fn d2_to_svg(src: &str) -> PyResult<String> {
+    crate::d2_to_svg(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
+/// Import D2 flowchart source → the resolved `.kymo.json` model.
+#[pyfunction]
+fn d2_to_kymojson(src: &str) -> PyResult<String> {
+    crate::d2_to_kymojson(src).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
 #[pymodule]
 fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
@@ -144,5 +165,8 @@ fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(mermaid_to_dot, m)?)?;
     m.add_function(wrap_pyfunction!(mermaid_to_mermaid, m)?)?;
     m.add_function(wrap_pyfunction!(mermaid_to_drawio, m)?)?;
+    m.add_function(wrap_pyfunction!(mermaid_to_svg, m)?)?;
+    m.add_function(wrap_pyfunction!(d2_to_svg, m)?)?;
+    m.add_function(wrap_pyfunction!(d2_to_kymojson, m)?)?;
     Ok(())
 }
