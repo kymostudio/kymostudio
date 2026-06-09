@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gaphor xmlns="http://gaphor.sourceforge.net/model" version="3.0" gaphor-version="2.6.5">
+<Package id="pkg">
+<name>
+<val>New model</val>
+</name>
+<ownedDiagram>
+<reflist>
+<ref refid="dgm"/>
+</reflist>
+</ownedDiagram>
+</Package>
+<Diagram id="dgm">
+<element>
+<ref refid="pkg"/>
+</element>
+<name>
+<val>main</val>
+</name>
+<ownedPresentation>
+<reflist>
+<ref refid="lli-0"/>
+<ref refid="lli-1"/>
+<ref refid="mi-0"/>
+<ref refid="mi-1"/>
+<ref refid="mi-2"/>
+<ref refid="mi-3"/>
+<ref refid="mi-4"/>
+<ref refid="mi-5"/>
+</reflist>
+</ownedPresentation>
+</Diagram>
+<LifelineItem id="lli-0">
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 24.0, 40.0)</val>
+</matrix>
+<width>
+<val>100.0</val>
+</width>
+<height>
+<val>40.0</val>
+</height>
+<diagram>
+<ref refid="dgm"/>
+</diagram>
+<subject>
+<ref refid="ll-0"/>
+</subject>
+<lifetime-length>
+<val>548.0</val>
+</lifetime-length>
+</LifelineItem>
+<LifelineItem id="lli-1">
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 174.0, 40.0)</val>
+</matrix>
+<width>
+<val>100.0</val>
+</width>
+<height>
+<val>40.0</val>
+</height>
+<diagram>
+<ref refid="dgm"/>
+</diagram>
+<subject>
+<ref refid="ll-1"/>
+</subject>
+<lifetime-length>
+<val>548.0</val>
+</lifetime-length>
+</LifelineItem>
+<MessageItem id="mi-0">
+<diagram>
+<ref refid="dgm"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<orthogonal>
+<val>0</val>
+</orthogonal>
+<subject>
+<ref refid="msg-0"/>
+</subject>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)</val>
+</matrix>
+<points>
+<val>[(74.0, 140.0), (224.0, 140.0)]</val>
+</points>
+<head-connection>
+<ref refid="lli-0"/>
+</head-connection>
+<tail-connection>
+<ref refid="lli-1"/>
+</tail-connection>
+</MessageItem>
+<MessageItem id="mi-1">
+<diagram>
+<ref refid="dgm"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<orthogonal>
+<val>0</val>
+</orthogonal>
+<subject>
+<ref refid="msg-1"/>
+</subject>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)</val>
+</matrix>
+<points>
+<val>[(224.0, 180.0), (74.0, 180.0)]</val>
+</points>
+<head-connection>
+<ref refid="lli-1"/>
+</head-connection>
+<tail-connection>
+<ref refid="lli-0"/>
+</tail-connection>
+</MessageItem>
+<MessageItem id="mi-2">
+<diagram>
+<ref refid="dgm"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<orthogonal>
+<val>0</val>
+</orthogonal>
+<subject>
+<ref refid="msg-2"/>
+</subject>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)</val>
+</matrix>
+<points>
+<val>[(224.0, 242.0), (74.0, 242.0)]</val>
+</points>
+<head-connection>
+<ref refid="lli-1"/>
+</head-connection>
+<tail-connection>
+<ref refid="lli-0"/>
+</tail-connection>
+</MessageItem>
+<MessageItem id="mi-3">
+<diagram>
+<ref refid="dgm"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<orthogonal>
+<val>0</val>
+</orthogonal>
+<subject>
+<ref refid="msg-3"/>
+</subject>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)</val>
+</matrix>
+<points>
+<val>[(74.0, 362.0), (224.0, 362.0)]</val>
+</points>
+<head-connection>
+<ref refid="lli-0"/>
+</head-connection>
+<tail-connection>
+<ref refid="lli-1"/>
+</tail-connection>
+</MessageItem>
+<MessageItem id="mi-4">
+<diagram>
+<ref refid="dgm"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<orthogonal>
+<val>0</val>
+</orthogonal>
+<subject>
+<ref refid="msg-4"/>
+</subject>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)</val>
+</matrix>
+<points>
+<val>[(224.0, 478.0), (74.0, 478.0)]</val>
+</points>
+<head-connection>
+<ref refid="lli-1"/>
+</head-connection>
+<tail-connection>
+<ref refid="lli-0"/>
+</tail-connection>
+</MessageItem>
+<MessageItem id="mi-5">
+<diagram>
+<ref refid="dgm"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<orthogonal>
+<val>0</val>
+</orthogonal>
+<subject>
+<ref refid="msg-5"/>
+</subject>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)</val>
+</matrix>
+<points>
+<val>[(224.0, 540.0), (74.0, 540.0)]</val>
+</points>
+<head-connection>
+<ref refid="lli-1"/>
+</head-connection>
+<tail-connection>
+<ref refid="lli-0"/>
+</tail-connection>
+</MessageItem>
+<Lifeline id="ll-0">
+<coveredBy>
+<reflist>
+<ref refid="snd-0"/>
+<ref refid="rcv-1"/>
+<ref refid="rcv-2"/>
+<ref refid="snd-3"/>
+<ref refid="rcv-4"/>
+<ref refid="rcv-5"/>
+</reflist>
+</coveredBy>
+<name>
+<val>Client</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="lli-0"/>
+</reflist>
+</presentation>
+</Lifeline>
+<Lifeline id="ll-1">
+<coveredBy>
+<reflist>
+<ref refid="rcv-0"/>
+<ref refid="snd-1"/>
+<ref refid="snd-2"/>
+<ref refid="rcv-3"/>
+<ref refid="snd-4"/>
+<ref refid="snd-5"/>
+</reflist>
+</coveredBy>
+<name>
+<val>Server</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="lli-1"/>
+</reflist>
+</presentation>
+</Lifeline>
+<Message id="msg-0">
+<name>
+<val>GET /data</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="mi-0"/>
+</reflist>
+</presentation>
+<receiveEvent>
+<ref refid="rcv-0"/>
+</receiveEvent>
+<sendEvent>
+<ref refid="snd-0"/>
+</sendEvent>
+</Message>
+<MessageOccurrenceSpecification id="snd-0">
+<covered>
+<ref refid="ll-0"/>
+</covered>
+<sendMessage>
+<ref refid="msg-0"/>
+</sendMessage>
+</MessageOccurrenceSpecification>
+<MessageOccurrenceSpecification id="rcv-0">
+<covered>
+<ref refid="ll-1"/>
+</covered>
+<receiveMessage>
+<ref refid="msg-0"/>
+</receiveMessage>
+</MessageOccurrenceSpecification>
+<Message id="msg-1">
+<messageSort>
+<val>reply</val>
+</messageSort>
+<name>
+<val>200 OK</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="mi-1"/>
+</reflist>
+</presentation>
+<receiveEvent>
+<ref refid="rcv-1"/>
+</receiveEvent>
+<sendEvent>
+<ref refid="snd-1"/>
+</sendEvent>
+</Message>
+<MessageOccurrenceSpecification id="snd-1">
+<covered>
+<ref refid="ll-1"/>
+</covered>
+<sendMessage>
+<ref refid="msg-1"/>
+</sendMessage>
+</MessageOccurrenceSpecification>
+<MessageOccurrenceSpecification id="rcv-1">
+<covered>
+<ref refid="ll-0"/>
+</covered>
+<receiveMessage>
+<ref refid="msg-1"/>
+</receiveMessage>
+</MessageOccurrenceSpecification>
+<Message id="msg-2">
+<messageSort>
+<val>reply</val>
+</messageSort>
+<name>
+<val>401 Unauthorized</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="mi-2"/>
+</reflist>
+</presentation>
+<receiveEvent>
+<ref refid="rcv-2"/>
+</receiveEvent>
+<sendEvent>
+<ref refid="snd-2"/>
+</sendEvent>
+</Message>
+<MessageOccurrenceSpecification id="snd-2">
+<covered>
+<ref refid="ll-1"/>
+</covered>
+<sendMessage>
+<ref refid="msg-2"/>
+</sendMessage>
+</MessageOccurrenceSpecification>
+<MessageOccurrenceSpecification id="rcv-2">
+<covered>
+<ref refid="ll-0"/>
+</covered>
+<receiveMessage>
+<ref refid="msg-2"/>
+</receiveMessage>
+</MessageOccurrenceSpecification>
+<Message id="msg-3">
+<name>
+<val>retry</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="mi-3"/>
+</reflist>
+</presentation>
+<receiveEvent>
+<ref refid="rcv-3"/>
+</receiveEvent>
+<sendEvent>
+<ref refid="snd-3"/>
+</sendEvent>
+</Message>
+<MessageOccurrenceSpecification id="snd-3">
+<covered>
+<ref refid="ll-0"/>
+</covered>
+<sendMessage>
+<ref refid="msg-3"/>
+</sendMessage>
+</MessageOccurrenceSpecification>
+<MessageOccurrenceSpecification id="rcv-3">
+<covered>
+<ref refid="ll-1"/>
+</covered>
+<receiveMessage>
+<ref refid="msg-3"/>
+</receiveMessage>
+</MessageOccurrenceSpecification>
+<Message id="msg-4">
+<name>
+<val>event A</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="mi-4"/>
+</reflist>
+</presentation>
+<receiveEvent>
+<ref refid="rcv-4"/>
+</receiveEvent>
+<sendEvent>
+<ref refid="snd-4"/>
+</sendEvent>
+</Message>
+<MessageOccurrenceSpecification id="snd-4">
+<covered>
+<ref refid="ll-1"/>
+</covered>
+<sendMessage>
+<ref refid="msg-4"/>
+</sendMessage>
+</MessageOccurrenceSpecification>
+<MessageOccurrenceSpecification id="rcv-4">
+<covered>
+<ref refid="ll-0"/>
+</covered>
+<receiveMessage>
+<ref refid="msg-4"/>
+</receiveMessage>
+</MessageOccurrenceSpecification>
+<Message id="msg-5">
+<name>
+<val>event B</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="mi-5"/>
+</reflist>
+</presentation>
+<receiveEvent>
+<ref refid="rcv-5"/>
+</receiveEvent>
+<sendEvent>
+<ref refid="snd-5"/>
+</sendEvent>
+</Message>
+<MessageOccurrenceSpecification id="snd-5">
+<covered>
+<ref refid="ll-1"/>
+</covered>
+<sendMessage>
+<ref refid="msg-5"/>
+</sendMessage>
+</MessageOccurrenceSpecification>
+<MessageOccurrenceSpecification id="rcv-5">
+<covered>
+<ref refid="ll-0"/>
+</covered>
+<receiveMessage>
+<ref refid="msg-5"/>
+</receiveMessage>
+</MessageOccurrenceSpecification>
+<StyleSheet id="css"/>
+</gaphor>

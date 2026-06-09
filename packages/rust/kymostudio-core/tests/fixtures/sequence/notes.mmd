@@ -1,0 +1,8 @@
+sequenceDiagram
+    participant A
+    participant B
+    Note over A,B: handshake begins
+    A->>B: SYN
+    Note right of B: B is now listening
+    B-->>A: SYN-ACK
+    Note left of A: connection established

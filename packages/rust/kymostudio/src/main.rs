@@ -6,16 +6,22 @@
 //!     kymo flow.mmd                 # -> flow.kymo.json (Mermaid import)
 //!     kymo flow.mmd flow.d2         # -> D2     (convert via the flowchart IR)
 //!     kymo flow.mmd flow.dot        # -> Graphviz DOT
+//!     kymo flow.mmd norm.mmd        # -> Mermaid (round-trip / normalize)
 //!     kymo flow.mmd flow.drawio     # -> draw.io (mxGraph XML)
 //!     kymo flow.mmd flow.svg        # -> SVG (pure-Rust flowchart renderer)
 //!     kymo flow.d2                  # -> flow.svg (D2 -> SVG, pure Rust)
 //!     kymo flow.dot                 # -> flow.svg (Graphviz DOT -> SVG, pure Rust)
 //!     kymo flow.d2 flow.kymo.json   # -> import D2 to the kymo model
+//!     kymo seq.mmd  seq.xmi         # -> XMI 2.5.1 (UML sequenceDiagram)
+//!     kymo seq.mmd  seq.mdj         # -> StarUML .mdj (sequence + layout)
+//!     kymo seq.mmd  seq.gaphor      # -> Gaphor .gaphor (sequence + layout)
 //!
 //! Pure Rust (resvg/svg2pdf via kymostudio-core) — no browser, no system image
 //! libraries. The operation is chosen by the INPUT extension: `.mmd`/`.mermaid`
-//! parse a Mermaid flowchart, then the OUTPUT extension picks the target —
-//! `.kymo.json` (default interchange), `.d2`, `.dot`/`.gv`, or `.mmd` (round-trip).
+//! parse a Mermaid diagram, then the OUTPUT extension picks the target —
+//! `.kymo.json` (default interchange), `.d2`, `.dot`/`.gv`, `.mmd` (round-trip),
+//! or for a `sequenceDiagram` source `.xmi` (OMG XMI 2.5.1 model), `.mdj`
+//! (StarUML native — model + laid-out diagram), or `.gaphor` (Gaphor native).
 //! Any other input is treated as SVG and the OUTPUT extension picks PNG (default)
 //! or PDF. Rust does not render `.kymo.json` to SVG — feed it to the Python/JS renderer.
 
@@ -55,9 +61,13 @@ EXAMPLES:
     kymo flow.mmd                       # -> flow.kymo.json (Mermaid import)
     kymo flow.mmd flow.d2               # -> D2 (convert via the flowchart IR)
     kymo flow.mmd flow.dot              # -> Graphviz DOT
+    kymo flow.mmd norm.mmd              # -> Mermaid (round-trip / normalize)
     kymo flow.mmd flow.drawio           # -> draw.io (mxGraph XML)
     kymo flow.mmd flow.svg              # -> SVG (pure-Rust flowchart renderer)
     kymo flow.d2                        # -> flow.svg (D2 -> SVG, pure Rust)
+    kymo seq.mmd  seq.xmi               # -> XMI 2.5.1 (UML sequenceDiagram)
+    kymo seq.mmd  seq.mdj               # -> StarUML .mdj (sequence diagram + layout)
+    kymo seq.mmd  seq.gaphor            # -> Gaphor .gaphor (sequence diagram + layout)
 ";
 
 struct Args {
@@ -166,6 +176,7 @@ fn run(args: Args) -> Result<(), String> {
             .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
         // Output registry: the OUTPUT extension picks the converter (a small step
         // toward RES-PIPELINE-001's "registry, not if/elif"). Default → kymo.json.
+        // The `.xmi`/`.mdj`/`.gaphor` targets require a `sequenceDiagram` source.
         type Conv = fn(&str) -> Result<String, kymostudio_core::mermaid::MermaidError>;
         const CONVERTERS: &[(&str, Conv)] = &[
             ("svg", kymostudio_core::mermaid_to_svg),
@@ -175,6 +186,9 @@ fn run(args: Args) -> Result<(), String> {
             ("mmd", kymostudio_core::mermaid_to_mermaid),
             ("mermaid", kymostudio_core::mermaid_to_mermaid),
             ("drawio", kymostudio_core::mermaid_to_drawio),
+            ("xmi", kymostudio_core::mermaid_to_xmi),
+            ("mdj", kymostudio_core::mermaid_to_mdj),
+            ("gaphor", kymostudio_core::mermaid_to_gaphor),
         ];
         let (conv, kind): (Conv, &str) = CONVERTERS
             .iter()

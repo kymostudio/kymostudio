@@ -1,0 +1,675 @@
+{
+    "_type": "Project",
+    "_id": "proj-1",
+    "name": "Untitled",
+    "ownedElements": [
+        {
+            "_type": "UMLModel",
+            "_id": "model-1",
+            "_parent": {
+                "$ref": "proj-1"
+            },
+            "name": "Model",
+            "ownedElements": []
+        },
+        {
+            "_type": "UMLCollaboration",
+            "_id": "collab-1",
+            "_parent": {
+                "$ref": "proj-1"
+            },
+            "name": "Collaboration1",
+            "ownedElements": [
+                {
+                    "_type": "UMLInteraction",
+                    "_id": "int-1",
+                    "_parent": {
+                        "$ref": "collab-1"
+                    },
+                    "name": "Interaction1",
+                    "ownedElements": [
+                        {
+                            "_type": "UMLSequenceDiagram",
+                            "_id": "sd-1",
+                            "_parent": {
+                                "$ref": "int-1"
+                            },
+                            "name": "SequenceDiagram1",
+                            "ownedViews": [
+                                {
+                                    "_type": "UMLFrameView",
+                                    "_id": "frame-1",
+                                    "_parent": {
+                                        "$ref": "sd-1"
+                                    },
+                                    "model": {
+                                        "$ref": "sd-1"
+                                    },
+                                    "subViews": [
+                                        {
+                                            "_type": "LabelView",
+                                            "_id": "frame-name",
+                                            "_parent": {
+                                                "$ref": "frame-1"
+                                            },
+                                            "font": "Arial;13;1",
+                                            "left": 33,
+                                            "top": 13,
+                                            "width": 120,
+                                            "height": 13,
+                                            "text": "SequenceDiagram1"
+                                        },
+                                        {
+                                            "_type": "LabelView",
+                                            "_id": "frame-type",
+                                            "_parent": {
+                                                "$ref": "frame-1"
+                                            },
+                                            "font": "Arial;13;1",
+                                            "left": 13,
+                                            "top": 13,
+                                            "width": 15,
+                                            "height": 13,
+                                            "text": "sd"
+                                        }
+                                    ],
+                                    "font": "Arial;13;0",
+                                    "left": 8,
+                                    "top": 8,
+                                    "width": 290,
+                                    "height": 264,
+                                    "nameLabel": {
+                                        "$ref": "frame-name"
+                                    },
+                                    "frameTypeLabel": {
+                                        "$ref": "frame-type"
+                                    }
+                                },
+                                {
+                                    "_type": "UMLSeqLifelineView",
+                                    "_id": "llv-0",
+                                    "_parent": {
+                                        "$ref": "sd-1"
+                                    },
+                                    "model": {
+                                        "$ref": "lifeline-0"
+                                    },
+                                    "subViews": [
+                                        {
+                                            "_type": "UMLNameCompartmentView",
+                                            "_id": "nc-0",
+                                            "_parent": {
+                                                "$ref": "llv-0"
+                                            },
+                                            "model": {
+                                                "$ref": "lifeline-0"
+                                            },
+                                            "subViews": [
+                                                {
+                                                    "_type": "LabelView",
+                                                    "_id": "nc-0-st",
+                                                    "_parent": {
+                                                        "$ref": "nc-0"
+                                                    },
+                                                    "visible": false,
+                                                    "font": "Arial;13;0",
+                                                    "height": 13
+                                                },
+                                                {
+                                                    "_type": "LabelView",
+                                                    "_id": "nc-0-nm",
+                                                    "_parent": {
+                                                        "$ref": "nc-0"
+                                                    },
+                                                    "font": "Arial;13;1",
+                                                    "left": 30,
+                                                    "top": 47,
+                                                    "width": 88,
+                                                    "height": 13,
+                                                    "text": "Alice"
+                                                },
+                                                {
+                                                    "_type": "LabelView",
+                                                    "_id": "nc-0-ns",
+                                                    "_parent": {
+                                                        "$ref": "nc-0"
+                                                    },
+                                                    "visible": false,
+                                                    "font": "Arial;13;0",
+                                                    "height": 13
+                                                },
+                                                {
+                                                    "_type": "LabelView",
+                                                    "_id": "nc-0-pr",
+                                                    "_parent": {
+                                                        "$ref": "nc-0"
+                                                    },
+                                                    "visible": false,
+                                                    "font": "Arial;13;0",
+                                                    "height": 13
+                                                }
+                                            ],
+                                            "font": "Arial;13;0",
+                                            "left": 24,
+                                            "top": 40,
+                                            "width": 100,
+                                            "height": 40,
+                                            "stereotypeLabel": {
+                                                "$ref": "nc-0-st"
+                                            },
+                                            "nameLabel": {
+                                                "$ref": "nc-0-nm"
+                                            },
+                                            "namespaceLabel": {
+                                                "$ref": "nc-0-ns"
+                                            },
+                                            "propertyLabel": {
+                                                "$ref": "nc-0-pr"
+                                            }
+                                        },
+                                        {
+                                            "_type": "UMLLinePartView",
+                                            "_id": "lp-0",
+                                            "_parent": {
+                                                "$ref": "llv-0"
+                                            },
+                                            "model": {
+                                                "$ref": "lifeline-0"
+                                            },
+                                            "font": "Arial;13;0",
+                                            "left": 74,
+                                            "top": 80,
+                                            "width": 1,
+                                            "height": 176
+                                        }
+                                    ],
+                                    "font": "Arial;13;0",
+                                    "left": 24,
+                                    "top": 40,
+                                    "width": 100,
+                                    "height": 216,
+                                    "nameCompartment": {
+                                        "$ref": "nc-0"
+                                    },
+                                    "linePart": {
+                                        "$ref": "lp-0"
+                                    }
+                                },
+                                {
+                                    "_type": "UMLSeqLifelineView",
+                                    "_id": "llv-1",
+                                    "_parent": {
+                                        "$ref": "sd-1"
+                                    },
+                                    "model": {
+                                        "$ref": "lifeline-1"
+                                    },
+                                    "subViews": [
+                                        {
+                                            "_type": "UMLNameCompartmentView",
+                                            "_id": "nc-1",
+                                            "_parent": {
+                                                "$ref": "llv-1"
+                                            },
+                                            "model": {
+                                                "$ref": "lifeline-1"
+                                            },
+                                            "subViews": [
+                                                {
+                                                    "_type": "LabelView",
+                                                    "_id": "nc-1-st",
+                                                    "_parent": {
+                                                        "$ref": "nc-1"
+                                                    },
+                                                    "visible": false,
+                                                    "font": "Arial;13;0",
+                                                    "height": 13
+                                                },
+                                                {
+                                                    "_type": "LabelView",
+                                                    "_id": "nc-1-nm",
+                                                    "_parent": {
+                                                        "$ref": "nc-1"
+                                                    },
+                                                    "font": "Arial;13;1",
+                                                    "left": 180,
+                                                    "top": 47,
+                                                    "width": 88,
+                                                    "height": 13,
+                                                    "text": "John"
+                                                },
+                                                {
+                                                    "_type": "LabelView",
+                                                    "_id": "nc-1-ns",
+                                                    "_parent": {
+                                                        "$ref": "nc-1"
+                                                    },
+                                                    "visible": false,
+                                                    "font": "Arial;13;0",
+                                                    "height": 13
+                                                },
+                                                {
+                                                    "_type": "LabelView",
+                                                    "_id": "nc-1-pr",
+                                                    "_parent": {
+                                                        "$ref": "nc-1"
+                                                    },
+                                                    "visible": false,
+                                                    "font": "Arial;13;0",
+                                                    "height": 13
+                                                }
+                                            ],
+                                            "font": "Arial;13;0",
+                                            "left": 174,
+                                            "top": 40,
+                                            "width": 100,
+                                            "height": 40,
+                                            "stereotypeLabel": {
+                                                "$ref": "nc-1-st"
+                                            },
+                                            "nameLabel": {
+                                                "$ref": "nc-1-nm"
+                                            },
+                                            "namespaceLabel": {
+                                                "$ref": "nc-1-ns"
+                                            },
+                                            "propertyLabel": {
+                                                "$ref": "nc-1-pr"
+                                            }
+                                        },
+                                        {
+                                            "_type": "UMLLinePartView",
+                                            "_id": "lp-1",
+                                            "_parent": {
+                                                "$ref": "llv-1"
+                                            },
+                                            "model": {
+                                                "$ref": "lifeline-1"
+                                            },
+                                            "font": "Arial;13;0",
+                                            "left": 224,
+                                            "top": 80,
+                                            "width": 1,
+                                            "height": 176
+                                        }
+                                    ],
+                                    "font": "Arial;13;0",
+                                    "left": 174,
+                                    "top": 40,
+                                    "width": 100,
+                                    "height": 216,
+                                    "nameCompartment": {
+                                        "$ref": "nc-1"
+                                    },
+                                    "linePart": {
+                                        "$ref": "lp-1"
+                                    }
+                                },
+                                {
+                                    "_type": "UMLSeqMessageView",
+                                    "_id": "message-view-0",
+                                    "_parent": {
+                                        "$ref": "sd-1"
+                                    },
+                                    "model": {
+                                        "$ref": "message-0"
+                                    },
+                                    "subViews": [
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-0-nm",
+                                            "_parent": {
+                                                "$ref": "message-view-0"
+                                            },
+                                            "model": {
+                                                "$ref": "message-0"
+                                            },
+                                            "font": "Arial;13;0",
+                                            "left": 119,
+                                            "top": 96,
+                                            "width": 60,
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-0"
+                                            },
+                                            "edgePosition": 1,
+                                            "text": "Hello John, how are you?"
+                                        },
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-0-st",
+                                            "_parent": {
+                                                "$ref": "message-view-0"
+                                            },
+                                            "model": {
+                                                "$ref": "message-0"
+                                            },
+                                            "visible": false,
+                                            "font": "Arial;13;0",
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-0"
+                                            },
+                                            "edgePosition": 1
+                                        },
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-0-pr",
+                                            "_parent": {
+                                                "$ref": "message-view-0"
+                                            },
+                                            "model": {
+                                                "$ref": "message-0"
+                                            },
+                                            "visible": false,
+                                            "font": "Arial;13;0",
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-0"
+                                            },
+                                            "edgePosition": 1
+                                        }
+                                    ],
+                                    "font": "Arial;13;0",
+                                    "head": {
+                                        "$ref": "lp-1"
+                                    },
+                                    "tail": {
+                                        "$ref": "lp-0"
+                                    },
+                                    "points": "74:112;224:112",
+                                    "nameLabel": {
+                                        "$ref": "message-view-0-nm"
+                                    },
+                                    "stereotypeLabel": {
+                                        "$ref": "message-view-0-st"
+                                    },
+                                    "propertyLabel": {
+                                        "$ref": "message-view-0-pr"
+                                    }
+                                },
+                                {
+                                    "_type": "UMLSeqMessageView",
+                                    "_id": "message-view-1",
+                                    "_parent": {
+                                        "$ref": "sd-1"
+                                    },
+                                    "model": {
+                                        "$ref": "message-1"
+                                    },
+                                    "subViews": [
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-1-nm",
+                                            "_parent": {
+                                                "$ref": "message-view-1"
+                                            },
+                                            "model": {
+                                                "$ref": "message-1"
+                                            },
+                                            "font": "Arial;13;0",
+                                            "left": 119,
+                                            "top": 136,
+                                            "width": 60,
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-1"
+                                            },
+                                            "edgePosition": 1,
+                                            "text": "Great!"
+                                        },
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-1-st",
+                                            "_parent": {
+                                                "$ref": "message-view-1"
+                                            },
+                                            "model": {
+                                                "$ref": "message-1"
+                                            },
+                                            "visible": false,
+                                            "font": "Arial;13;0",
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-1"
+                                            },
+                                            "edgePosition": 1
+                                        },
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-1-pr",
+                                            "_parent": {
+                                                "$ref": "message-view-1"
+                                            },
+                                            "model": {
+                                                "$ref": "message-1"
+                                            },
+                                            "visible": false,
+                                            "font": "Arial;13;0",
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-1"
+                                            },
+                                            "edgePosition": 1
+                                        }
+                                    ],
+                                    "font": "Arial;13;0",
+                                    "head": {
+                                        "$ref": "lp-0"
+                                    },
+                                    "tail": {
+                                        "$ref": "lp-1"
+                                    },
+                                    "points": "224:152;74:152",
+                                    "nameLabel": {
+                                        "$ref": "message-view-1-nm"
+                                    },
+                                    "stereotypeLabel": {
+                                        "$ref": "message-view-1-st"
+                                    },
+                                    "propertyLabel": {
+                                        "$ref": "message-view-1-pr"
+                                    }
+                                },
+                                {
+                                    "_type": "UMLSeqMessageView",
+                                    "_id": "message-view-2",
+                                    "_parent": {
+                                        "$ref": "sd-1"
+                                    },
+                                    "model": {
+                                        "$ref": "message-2"
+                                    },
+                                    "subViews": [
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-2-nm",
+                                            "_parent": {
+                                                "$ref": "message-view-2"
+                                            },
+                                            "model": {
+                                                "$ref": "message-2"
+                                            },
+                                            "font": "Arial;13;0",
+                                            "left": 119,
+                                            "top": 176,
+                                            "width": 60,
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-2"
+                                            },
+                                            "edgePosition": 1,
+                                            "text": "See you later"
+                                        },
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-2-st",
+                                            "_parent": {
+                                                "$ref": "message-view-2"
+                                            },
+                                            "model": {
+                                                "$ref": "message-2"
+                                            },
+                                            "visible": false,
+                                            "font": "Arial;13;0",
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-2"
+                                            },
+                                            "edgePosition": 1
+                                        },
+                                        {
+                                            "_type": "EdgeLabelView",
+                                            "_id": "message-view-2-pr",
+                                            "_parent": {
+                                                "$ref": "message-view-2"
+                                            },
+                                            "model": {
+                                                "$ref": "message-2"
+                                            },
+                                            "visible": false,
+                                            "font": "Arial;13;0",
+                                            "height": 13,
+                                            "alpha": 1.5707963267948966,
+                                            "distance": 15,
+                                            "hostEdge": {
+                                                "$ref": "message-view-2"
+                                            },
+                                            "edgePosition": 1
+                                        }
+                                    ],
+                                    "font": "Arial;13;0",
+                                    "head": {
+                                        "$ref": "lp-1"
+                                    },
+                                    "tail": {
+                                        "$ref": "lp-0"
+                                    },
+                                    "points": "74:192;224:192",
+                                    "nameLabel": {
+                                        "$ref": "message-view-2-nm"
+                                    },
+                                    "stereotypeLabel": {
+                                        "$ref": "message-view-2-st"
+                                    },
+                                    "propertyLabel": {
+                                        "$ref": "message-view-2-pr"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "participants": [
+                        {
+                            "_type": "UMLLifeline",
+                            "_id": "lifeline-0",
+                            "_parent": {
+                                "$ref": "int-1"
+                            },
+                            "name": "Alice",
+                            "represent": {
+                                "$ref": "attr-0"
+                            },
+                            "isMultiInstance": false
+                        },
+                        {
+                            "_type": "UMLLifeline",
+                            "_id": "lifeline-1",
+                            "_parent": {
+                                "$ref": "int-1"
+                            },
+                            "name": "John",
+                            "represent": {
+                                "$ref": "attr-1"
+                            },
+                            "isMultiInstance": false
+                        }
+                    ],
+                    "messages": [
+                        {
+                            "_type": "UMLMessage",
+                            "_id": "message-0",
+                            "_parent": {
+                                "$ref": "int-1"
+                            },
+                            "name": "Hello John, how are you?",
+                            "source": {
+                                "$ref": "lifeline-0"
+                            },
+                            "target": {
+                                "$ref": "lifeline-1"
+                            }
+                        },
+                        {
+                            "_type": "UMLMessage",
+                            "_id": "message-1",
+                            "_parent": {
+                                "$ref": "int-1"
+                            },
+                            "name": "Great!",
+                            "source": {
+                                "$ref": "lifeline-1"
+                            },
+                            "target": {
+                                "$ref": "lifeline-0"
+                            },
+                            "messageSort": "reply"
+                        },
+                        {
+                            "_type": "UMLMessage",
+                            "_id": "message-2",
+                            "_parent": {
+                                "$ref": "int-1"
+                            },
+                            "name": "See you later",
+                            "source": {
+                                "$ref": "lifeline-0"
+                            },
+                            "target": {
+                                "$ref": "lifeline-1"
+                            },
+                            "messageSort": "asynchCall"
+                        }
+                    ],
+                    "fragments": []
+                }
+            ],
+            "attributes": [
+                {
+                    "_type": "UMLAttribute",
+                    "_id": "attr-0",
+                    "_parent": {
+                        "$ref": "collab-1"
+                    },
+                    "name": "Alice",
+                    "type": ""
+                },
+                {
+                    "_type": "UMLAttribute",
+                    "_id": "attr-1",
+                    "_parent": {
+                        "$ref": "collab-1"
+                    },
+                    "name": "John",
+                    "type": ""
+                }
+            ]
+        }
+    ]
+}

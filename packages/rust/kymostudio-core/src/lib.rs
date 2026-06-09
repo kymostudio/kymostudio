@@ -21,6 +21,7 @@ pub mod kymojson;
 pub mod layout;
 pub mod mermaid;
 pub mod model;
+pub mod sequence;
 
 // Language-binding facades — each compiled only when its feature is on.
 #[cfg(feature = "python")]
@@ -151,6 +152,35 @@ pub fn mermaid_to_dot(src: &str) -> Result<String, mermaid::MermaidError> {
 /// Round-trip / normalize Mermaid flowchart source through the IR.
 pub fn mermaid_to_mermaid(src: &str) -> Result<String, mermaid::MermaidError> {
     Ok(flowchart::emit::to_mermaid(&mermaid::parse(src)?))
+}
+
+/// Convert a Mermaid `sequenceDiagram` to OMG XMI 2.5.1 (a UML 2.5.1
+/// `Interaction` — lifelines, messages, activations, combined fragments, notes).
+///
+/// Parse-then-emit through the [`sequence`] IR; no layout (XMI carries no
+/// geometry). Flowchart sources are rejected with [`mermaid::MermaidError`].
+pub fn mermaid_to_xmi(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(sequence::emit::to_xmi(&mermaid::parse_sequence(src)?))
+}
+
+/// Convert a Mermaid `sequenceDiagram` to a StarUML native `.mdj` (metadata-
+/// JSON) carrying a laid-out sequence diagram.
+///
+/// Unlike [`mermaid_to_xmi`] (model only), the `.mdj` includes the diagram
+/// *views* with geometry, so opening it in StarUML (File → Open) draws the
+/// diagram. See [`sequence::mdj`].
+pub fn mermaid_to_mdj(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(sequence::mdj::to_mdj(&mermaid::parse_sequence(src)?))
+}
+
+/// Convert a Mermaid `sequenceDiagram` to a Gaphor native `.gaphor` file
+/// (XML v3.0) carrying a laid-out sequence diagram.
+///
+/// Like [`mermaid_to_mdj`] but for Gaphor. Note Gaphor cannot represent
+/// combined fragments (alt/loop/opt/par) — they are flattened to their inner
+/// messages. See [`sequence::gaphor`].
+pub fn mermaid_to_gaphor(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(sequence::gaphor::to_gaphor(&mermaid::parse_sequence(src)?))
 }
 
 /// Convert Mermaid flowchart source → draw.io (mxGraph XML).

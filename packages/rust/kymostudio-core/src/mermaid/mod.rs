@@ -11,6 +11,7 @@
 
 mod lexer;
 mod parser;
+mod sequence;
 
 use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
 use crate::model::Shape;
@@ -93,6 +94,28 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
         )?;
     }
     Ok(fc)
+}
+
+/// Parse a Mermaid `sequenceDiagram` into a [`crate::sequence::Sequence`].
+///
+/// The sequence family does NOT use `;` as a statement separator (unlike
+/// flowcharts), so the body is split on newlines only. The header line selects
+/// the diagram type; anything other than `sequenceDiagram` is reported as
+/// [`MermaidError::Unsupported`].
+pub fn parse_sequence(src: &str) -> Result<crate::sequence::Sequence, MermaidError> {
+    let stmts: Vec<(usize, String)> = src
+        .lines()
+        .enumerate()
+        .map(|(i, line)| (i + 1, strip_comment(line).trim().to_string()))
+        .filter(|(_, s)| !s.is_empty())
+        .collect();
+
+    let header = stmts.first().ok_or(MermaidError::Empty)?;
+    let (kind, _dir) = detect_type(&header.1)?;
+    if kind != "sequenceDiagram" {
+        return Err(MermaidError::Unsupported(kind));
+    }
+    sequence::parse_sequence(&stmts[1..])
 }
 
 fn handle_statement(

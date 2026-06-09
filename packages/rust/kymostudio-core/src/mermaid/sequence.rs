@@ -1,0 +1,428 @@
+//! Mermaid `sequenceDiagram` front-end → [`crate::sequence::Sequence`].
+//!
+//! Line-oriented (Mermaid uses no `;` separator in sequence diagrams, so each
+//! statement is one source line). The header is stripped by
+//! [`crate::mermaid::parse_sequence`]; this module parses the body.
+//!
+//! Supported grammar (the common Mermaid subset):
+//! - `participant X` / `participant X as Label` / `actor X` / `actor X as Label`
+//!   (implicit participants are created in first-appearance order from messages);
+//! - messages `A<arrow>B: text`, arrow → [`MessageSort`]:
+//!   `->>`→synchCall, `-->>`→reply, `-)`/`--)`→asynchCall, `-x`/`--x`→asynchCall,
+//!   `->`/`-->`→asynchSignal; with `+`/`-` activation shorthand after the arrow;
+//! - `activate X` / `deactivate X`;
+//! - `Note left of X: t` / `Note right of X: t` / `Note over X[,Y]: t`;
+//! - combined fragments `loop` / `alt`…`else`…  / `opt` / `par`…`and`… `end`.
+//!
+//! Unknown styling directives (`autonumber`, `box`, `rect`, `title`, `link`,
+//! `create`/`destroy`, …) are accepted and ignored rather than erroring.
+
+use crate::mermaid::MermaidError;
+use crate::sequence::{
+    Fragment, FragmentOp, Item, Message, MessageSort, Note, NotePlacement, Operand, Participant,
+    Sequence,
+};
+
+/// An open combined fragment while parsing — accumulates operands.
+struct FragFrame {
+    operator: FragmentOp,
+    operands: Vec<Operand>,
+    cur_guard: String,
+    cur_items: Vec<Item>,
+}
+
+/// Mermaid arrow tokens → [`MessageSort`]. Order is irrelevant: the scanner
+/// picks the match at the earliest index, longest at that index (so `-->>`
+/// wins over `-->` / `->>`).
+const ARROWS: &[(&str, MessageSort)] = &[
+    ("-->>", MessageSort::Reply),
+    ("-->", MessageSort::AsynchSignal),
+    ("--x", MessageSort::AsynchCall),
+    ("--)", MessageSort::AsynchCall),
+    ("->>", MessageSort::SynchCall),
+    ("->", MessageSort::AsynchSignal),
+    ("-x", MessageSort::AsynchCall),
+    ("-)", MessageSort::AsynchCall),
+];
+
+/// Parse the body statements (header already stripped) into a [`Sequence`].
+pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidError> {
+    let mut seq = Sequence {
+        participants: Vec::new(),
+        items: Vec::new(),
+        autonumber: false,
+    };
+    let mut stack: Vec<FragFrame> = Vec::new();
+
+    for (lineno, raw) in stmts {
+        let stmt = raw.trim();
+        if stmt.is_empty() {
+            continue;
+        }
+        let lower = stmt.to_ascii_lowercase();
+
+        // Participant / actor declarations.
+        if let Some(rest) = strip_kw(stmt, "participant") {
+            ensure_decl(&mut seq, rest, false);
+            continue;
+        }
+        if let Some(rest) = strip_kw(stmt, "actor") {
+            ensure_decl(&mut seq, rest, true);
+            continue;
+        }
+
+        // `autonumber` — flag only.
+        if lower == "autonumber" || lower.starts_with("autonumber ") {
+            seq.autonumber = true;
+            continue;
+        }
+
+        // Combined-fragment control.
+        if let Some((op, guard)) = frag_open(&lower, stmt) {
+            stack.push(FragFrame {
+                operator: op,
+                operands: Vec::new(),
+                cur_guard: guard,
+                cur_items: Vec::new(),
+            });
+            continue;
+        }
+        if lower == "else" || lower.starts_with("else ") {
+            new_operand(&mut stack, *lineno, stmt["else".len()..].trim().to_string())?;
+            continue;
+        }
+        if lower == "and" || lower.starts_with("and ") {
+            new_operand(&mut stack, *lineno, stmt["and".len()..].trim().to_string())?;
+            continue;
+        }
+        if lower == "end" {
+            if !stack.is_empty() {
+                close_fragment(&mut seq, &mut stack);
+            }
+            continue;
+        }
+
+        // activate / deactivate.
+        if let Some(rest) = strip_kw(stmt, "activate") {
+            let id = rest.trim().to_string();
+            ensure_participant(&mut seq, &id);
+            push_item(&mut seq, &mut stack, Item::Activate(id));
+            continue;
+        }
+        if let Some(rest) = strip_kw(stmt, "deactivate") {
+            let id = rest.trim().to_string();
+            ensure_participant(&mut seq, &id);
+            push_item(&mut seq, &mut stack, Item::Deactivate(id));
+            continue;
+        }
+
+        // Note.
+        if let Some(note) = parse_note(stmt) {
+            for t in &note.targets {
+                ensure_participant(&mut seq, t);
+            }
+            push_item(&mut seq, &mut stack, Item::Note(note));
+            continue;
+        }
+
+        // Message.
+        if let Some(msg) = parse_message(stmt) {
+            ensure_participant(&mut seq, &msg.from);
+            ensure_participant(&mut seq, &msg.to);
+            push_item(&mut seq, &mut stack, Item::Message(msg));
+            continue;
+        }
+
+        // Unknown directive (box / rect / title / link / create / …) — ignore.
+    }
+
+    // Auto-close any unbalanced fragments (lenient).
+    while !stack.is_empty() {
+        close_fragment(&mut seq, &mut stack);
+    }
+    Ok(seq)
+}
+
+/// `loop`/`alt`/`opt`/`par` opener → (operator, guard label).
+fn frag_open(lower: &str, stmt: &str) -> Option<(FragmentOp, String)> {
+    for (kw, op) in [
+        ("loop", FragmentOp::Loop),
+        ("alt", FragmentOp::Alt),
+        ("opt", FragmentOp::Opt),
+        ("par", FragmentOp::Par),
+    ] {
+        if lower == kw || lower.starts_with(&format!("{kw} ")) {
+            return Some((op, stmt[kw.len()..].trim().to_string()));
+        }
+    }
+    None
+}
+
+/// Push an item into the current container (innermost fragment, else root).
+fn push_item(seq: &mut Sequence, stack: &mut [FragFrame], item: Item) {
+    match stack.last_mut() {
+        Some(frame) => frame.cur_items.push(item),
+        None => seq.items.push(item),
+    }
+}
+
+/// Start a new operand (`else` / `and`) in the innermost open fragment.
+fn new_operand(stack: &mut [FragFrame], lineno: usize, guard: String) -> Result<(), MermaidError> {
+    let frame = stack.last_mut().ok_or(MermaidError::Syntax {
+        line: lineno,
+        msg: "`else`/`and` outside a combined fragment".to_string(),
+    })?;
+    let items = std::mem::take(&mut frame.cur_items);
+    let prev_guard = std::mem::take(&mut frame.cur_guard);
+    frame.operands.push(Operand {
+        guard: prev_guard,
+        items,
+    });
+    frame.cur_guard = guard;
+    Ok(())
+}
+
+/// Close the innermost fragment and append it to its parent container.
+fn close_fragment(seq: &mut Sequence, stack: &mut Vec<FragFrame>) {
+    let mut frame = stack.pop().expect("close_fragment called with empty stack");
+    let items = std::mem::take(&mut frame.cur_items);
+    frame.operands.push(Operand {
+        guard: std::mem::take(&mut frame.cur_guard),
+        items,
+    });
+    let fragment = Fragment {
+        operator: frame.operator,
+        operands: frame.operands,
+    };
+    push_item(seq, stack, Item::Fragment(fragment));
+}
+
+/// `participant`/`actor` declaration body → upsert a participant.
+fn ensure_decl(seq: &mut Sequence, rest: &str, is_actor: bool) {
+    let rest = rest.trim();
+    if rest.is_empty() {
+        return;
+    }
+    let (id, label) = match split_as(rest) {
+        Some((l, r)) => (l.trim().to_string(), r.trim().to_string()),
+        None => (rest.to_string(), rest.to_string()),
+    };
+    if let Some(p) = seq.participants.iter_mut().find(|p| p.id == id) {
+        p.label = label;
+        p.is_actor = p.is_actor || is_actor;
+    } else {
+        seq.participants.push(Participant {
+            id,
+            label,
+            is_actor,
+        });
+    }
+}
+
+/// Create a participant on first reference if it was never declared.
+fn ensure_participant(seq: &mut Sequence, id: &str) {
+    if !seq.participants.iter().any(|p| p.id == id) {
+        seq.participants.push(Participant {
+            id: id.to_string(),
+            label: id.to_string(),
+            is_actor: false,
+        });
+    }
+}
+
+/// Split on a case-insensitive ` as ` separator.
+fn split_as(s: &str) -> Option<(&str, &str)> {
+    let lower = s.to_ascii_lowercase();
+    lower.find(" as ").map(|i| (&s[..i], &s[i + 4..]))
+}
+
+/// Strip a leading keyword that is followed by whitespace (case-insensitive).
+fn strip_kw<'a>(stmt: &'a str, kw: &str) -> Option<&'a str> {
+    let bytes = stmt.as_bytes();
+    if bytes.len() > kw.len()
+        && bytes[..kw.len()].eq_ignore_ascii_case(kw.as_bytes())
+        && bytes[kw.len()].is_ascii_whitespace()
+    {
+        Some(stmt[kw.len()..].trim_start())
+    } else {
+        None
+    }
+}
+
+/// Strip a case-insensitive ASCII prefix.
+fn strip_ci<'a>(s: &'a str, prefix: &str) -> Option<&'a str> {
+    let bytes = s.as_bytes();
+    if bytes.len() >= prefix.len() && bytes[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
+    {
+        Some(&s[prefix.len()..])
+    } else {
+        None
+    }
+}
+
+/// Parse `Note left of X: t` / `Note right of X: t` / `Note over X[,Y]: t`.
+fn parse_note(stmt: &str) -> Option<Note> {
+    let rest = strip_kw(stmt, "note")?;
+    let (placement, after) = if let Some(r) = strip_ci(rest, "left of ") {
+        (NotePlacement::LeftOf, r)
+    } else if let Some(r) = strip_ci(rest, "right of ") {
+        (NotePlacement::RightOf, r)
+    } else if let Some(r) = strip_ci(rest, "over ") {
+        (NotePlacement::Over, r)
+    } else {
+        return None;
+    };
+    let (targets_part, text) = match after.split_once(':') {
+        Some((t, x)) => (t.trim(), x.trim().to_string()),
+        None => (after.trim(), String::new()),
+    };
+    let targets: Vec<String> = targets_part
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if targets.is_empty() {
+        return None;
+    }
+    Some(Note {
+        placement,
+        targets,
+        text,
+    })
+}
+
+/// Parse a message `A<arrow>B: text` (with optional `+`/`-` activation).
+fn parse_message(stmt: &str) -> Option<Message> {
+    let (left, text) = match stmt.split_once(':') {
+        Some((l, r)) => (l.trim(), r.trim().to_string()),
+        None => (stmt.trim(), String::new()),
+    };
+    let (start, end, sort) = find_arrow(left)?;
+    let from = left[..start].trim().to_string();
+    let mut rhs = left[end..].trim();
+    let mut activate_target = false;
+    let mut deactivate_source = false;
+    if let Some(r) = rhs.strip_prefix('+') {
+        activate_target = true;
+        rhs = r.trim_start();
+    } else if let Some(r) = rhs.strip_prefix('-') {
+        deactivate_source = true;
+        rhs = r.trim_start();
+    }
+    let to = rhs.trim().to_string();
+    if from.is_empty() || to.is_empty() {
+        return None;
+    }
+    Some(Message {
+        from,
+        to,
+        text,
+        sort,
+        activate_target,
+        deactivate_source,
+    })
+}
+
+/// Locate the message arrow: earliest start index, longest match at that index.
+fn find_arrow(left: &str) -> Option<(usize, usize, MessageSort)> {
+    let mut best: Option<(usize, usize, MessageSort)> = None;
+    for (pat, sort) in ARROWS {
+        if let Some(start) = left.find(pat) {
+            let end = start + pat.len();
+            best = match best {
+                Some((bs, be, _)) if bs < start || (bs == start && be >= end) => best,
+                _ => Some((start, end, *sort)),
+            };
+        }
+    }
+    best
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse(src: &str) -> Sequence {
+        let stmts: Vec<(usize, String)> = src
+            .lines()
+            .enumerate()
+            .map(|(i, l)| (i + 1, l.trim().to_string()))
+            .filter(|(_, s)| !s.is_empty())
+            .collect();
+        parse_sequence(&stmts).unwrap()
+    }
+
+    #[test]
+    fn arrow_sorts() {
+        assert_eq!(find_arrow("A->>B").unwrap().2, MessageSort::SynchCall);
+        assert_eq!(find_arrow("A-->>B").unwrap().2, MessageSort::Reply);
+        assert_eq!(find_arrow("A->B").unwrap().2, MessageSort::AsynchSignal);
+        assert_eq!(find_arrow("A-->B").unwrap().2, MessageSort::AsynchSignal);
+        assert_eq!(find_arrow("A-)B").unwrap().2, MessageSort::AsynchCall);
+        assert_eq!(find_arrow("A--xB").unwrap().2, MessageSort::AsynchCall);
+        assert!(find_arrow("A B").is_none());
+    }
+
+    #[test]
+    fn implicit_participants_in_order() {
+        let s = parse("Alice->>John: Hi\nJohn-->>Alice: Hello\nAlice->>Bob: Hey");
+        let ids: Vec<_> = s.participants.iter().map(|p| p.id.as_str()).collect();
+        assert_eq!(ids, ["Alice", "John", "Bob"]);
+    }
+
+    #[test]
+    fn explicit_decl_with_alias_and_actor() {
+        let s = parse("participant A as Alice\nactor B as Bob\nA->>B: Hi");
+        assert_eq!(s.participants[0].id, "A");
+        assert_eq!(s.participants[0].label, "Alice");
+        assert!(!s.participants[0].is_actor);
+        assert_eq!(s.participants[1].id, "B");
+        assert_eq!(s.participants[1].label, "Bob");
+        assert!(s.participants[1].is_actor);
+    }
+
+    #[test]
+    fn activation_shorthand() {
+        let s = parse("Alice->>+John: Hi\nJohn-->>-Alice: Bye");
+        let Item::Message(m0) = &s.items[0] else {
+            panic!()
+        };
+        assert!(m0.activate_target && !m0.deactivate_source);
+        let Item::Message(m1) = &s.items[1] else {
+            panic!()
+        };
+        assert!(m1.deactivate_source && !m1.activate_target);
+    }
+
+    #[test]
+    fn nested_fragments_and_operands() {
+        let s = parse(
+            "alt is ok\nA->>B: yes\nelse not ok\nA->>B: no\nloop retry\nB->>A: again\nend\nend",
+        );
+        assert_eq!(s.items.len(), 1);
+        let Item::Fragment(alt) = &s.items[0] else {
+            panic!("expected fragment")
+        };
+        assert_eq!(alt.operator, FragmentOp::Alt);
+        assert_eq!(alt.operands.len(), 2);
+        assert_eq!(alt.operands[0].guard, "is ok");
+        assert_eq!(alt.operands[1].guard, "not ok");
+        // The nested loop lives inside the second operand, after its message.
+        assert!(matches!(alt.operands[1].items[1], Item::Fragment(_)));
+    }
+
+    #[test]
+    fn note_over_two() {
+        let s = parse("A->>B: hi\nNote over A,B: shared\nNote left of A: solo");
+        let Item::Note(n0) = &s.items[1] else {
+            panic!()
+        };
+        assert_eq!(n0.placement, NotePlacement::Over);
+        assert_eq!(n0.targets, ["A", "B"]);
+        assert_eq!(n0.text, "shared");
+        let Item::Note(n1) = &s.items[2] else {
+            panic!()
+        };
+        assert_eq!(n1.placement, NotePlacement::LeftOf);
+    }
+}
