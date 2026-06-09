@@ -1,7 +1,7 @@
 # @kymostudio/desktop-app
 
 An Electron desktop app that renders the **kymo flowchart DSL** to SVG — a live
-editor with preview. The desktop sibling of `packages/web-app` (same syntax,
+editor with preview. The desktop sibling of `packages/editor` (same syntax,
 same Python renderer; IPC instead of HTTP).
 
 ## The syntax
@@ -32,7 +32,7 @@ edges with optional `|label|`. A direction (`TD` / `LR` / `RL` / `BT`) after
   and returns the SVG.
 
 > The Rust `kymo` CLI does not render the `.kymo` DSL; this uses the Python
-> engine, like the web-app.
+> engine, like the editor.
 
 ## Run
 
