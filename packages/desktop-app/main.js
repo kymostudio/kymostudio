@@ -1,11 +1,11 @@
 // kymostudio desktop-app — Electron main process.
 //
-// Mirrors the web-app: a live editor that renders the kymo flowchart DSL (the
+// Mirrors the editor: a live editor that renders the kymo flowchart DSL (the
 // `flowchart { }` block) to SVG. The renderer process sends the source over IPC
 // (`kymo:render`); here we pipe it through the Python reference renderer
 // (`render_kymo.py`: parse -> kymostudio-core layout -> to_svg) and return the
 // SVG. The Rust CLI does not render the `.kymo` DSL, so this uses the Python
-// engine, exactly like the web-app's server.
+// engine, exactly like the editor's server.
 
 const { app, BrowserWindow, ipcMain } = require("electron");
 const { spawn } = require("node:child_process");

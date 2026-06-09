@@ -15,7 +15,7 @@ import { z } from "zod";
 import { writeFile } from "node:fs/promises";
 import { renderToSvg, svgToPng } from "./render.js";
 
-// The running web-app (server.js). set_diagram / get_diagram drive its live
+// The running editor (server.js). set_diagram / get_diagram drive its live
 // editor, so an edit here shows up in every open browser tab.
 const APP_URL = process.env.KYMO_APP_URL || "http://localhost:4173";
 
@@ -112,7 +112,7 @@ server.tool(
 
 server.tool(
   "set_diagram",
-  `Open/replace the flowchart in the LIVE web-app editor (${APP_URL}) and render it. ` +
+  `Open/replace the flowchart in the LIVE editor editor (${APP_URL}) and render it. ` +
     `The new diagram appears immediately in every open browser tab. Returns a PNG preview.\n\n${SYNTAX}`,
   {
     source: z
@@ -140,7 +140,7 @@ server.tool(
     } catch (e) {
       return {
         isError: true,
-        content: [{ type: "text", text: `Could not reach the web-app at ${APP_URL}: ${e.message}` }],
+        content: [{ type: "text", text: `Could not reach the editor at ${APP_URL}: ${e.message}` }],
       };
     }
     const out = [];
@@ -157,7 +157,7 @@ server.tool(
 
 server.tool(
   "get_diagram",
-  `Get the current flowchart source from the LIVE web-app editor (${APP_URL}).`,
+  `Get the current flowchart source from the LIVE editor editor (${APP_URL}).`,
   {},
   async () => {
     try {
@@ -168,7 +168,7 @@ server.tool(
     } catch (e) {
       return {
         isError: true,
-        content: [{ type: "text", text: `Could not reach the web-app at ${APP_URL}: ${e.message}` }],
+        content: [{ type: "text", text: `Could not reach the editor at ${APP_URL}: ${e.message}` }],
       };
     }
   },

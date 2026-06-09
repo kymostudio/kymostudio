@@ -1,4 +1,4 @@
-// kymostudio web-app — a tiny zero-dependency Node server that renders the
+// kymostudio editor — a tiny zero-dependency Node server that renders the
 // kymo flowchart DSL (the native `bpmn { }` block) to SVG.
 //
 //   POST /api/render  { source }  ->  { svg } | { error }
@@ -144,5 +144,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`kymo web-app on http://${HOST}:${PORT}  (python: ${PYTHON})`);
+  console.log(`kymo editor on http://${HOST}:${PORT}  (python: ${PYTHON})`);
 });

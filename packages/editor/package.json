@@ -1,5 +1,5 @@
 {
-  "name": "@kymostudio/web-app",
+  "name": "@kymostudio/editor",
   "version": "0.1.0",
   "private": true,
   "description": "Web playground + MCP server to render the kymo flowchart DSL (flowchart { } block) to SVG/PNG.",

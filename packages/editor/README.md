@@ -1,4 +1,4 @@
-# @kymostudio/web-app
+# @kymostudio/editor
 
 A web playground **and an MCP server** that render the **kymo flowchart DSL**
 (`flowchart { }` block) to SVG/PNG. Type a `.kymo` flowchart on the left, see
@@ -89,7 +89,7 @@ Claude Desktop's `claude_desktop_config.json` / Cursor's `mcp.json`:
   "mcpServers": {
     "kymostudio": {
       "command": "node",
-      "args": ["/abs/path/to/packages/web-app/mcp-server.js"]
+      "args": ["/abs/path/to/packages/editor/mcp-server.js"]
     }
   }
 }
