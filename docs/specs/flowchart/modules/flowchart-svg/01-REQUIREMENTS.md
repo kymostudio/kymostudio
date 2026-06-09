@@ -1,6 +1,6 @@
 ---
 title: Pure-Rust flowchart SVG renderer — Requirements (module)
-document_id: FEAT-PIPECLI-SVG-001
+document_id: FEAT-FLOWCHART-SVG-001
 version: "0.1"
 issue_date: 2026-06-09
 status: Implemented
@@ -10,9 +10,9 @@ audience: Engineers maintaining the Rust flowchart SVG renderer
 review_cycle: On renderer change
 supersedes: null
 related_documents:
-  - FEAT-PIPECLI-001          # Pipeline & CLI (umbrella)
-  - FEAT-PIPECLI-D2-001       # D2 spoke (feeds this)
-  - FEAT-PIPECLI-DOT-001      # DOT spoke (feeds this)
+  - FEAT-FLOWCHART-001          # Pipeline & CLI (umbrella)
+  - FEAT-FLOWCHART-D2-001       # D2 spoke (feeds this)
+  - FEAT-FLOWCHART-DOT-001      # DOT spoke (feeds this)
   - MERMAID-MAP-001           # Mermaid spoke (feeds this)
   - KYMOJSON-MAP-001          # the resolved model it renders
 authors:

@@ -1,6 +1,6 @@
 ---
 title: Graphviz DOT spoke — Requirements (module)
-document_id: FEAT-PIPECLI-DOT-001
+document_id: FEAT-FLOWCHART-DOT-001
 version: "0.1"
 issue_date: 2026-06-09
 status: Implemented
@@ -10,10 +10,10 @@ audience: Engineers maintaining the DOT importer/emitter
 review_cycle: On DOT spoke change
 supersedes: null
 related_documents:
-  - FEAT-PIPECLI-001          # Pipeline & CLI (umbrella)
+  - FEAT-FLOWCHART-001          # Pipeline & CLI (umbrella)
   - DOT-MAP-001               # DOT ↔ kymo element mapping (normative)
-  - FEAT-PIPECLI-D2-001       # sibling D2 spoke
-  - FEAT-PIPECLI-SVG-001      # the renderer these feed
+  - FEAT-FLOWCHART-D2-001       # sibling D2 spoke
+  - FEAT-FLOWCHART-SVG-001      # the renderer these feed
 authors:
   - Vũ Anh
 language: en
@@ -27,7 +27,8 @@ keywords:
 # Graphviz DOT spoke — Requirements (module)
 
 **Status: implemented.** Graphviz DOT is a bidirectional spoke on the flowchart IR
-(`crate::flowchart`), realising `FR-PC-2` / `FR-PC-7`.
+(`crate::flowchart`), realising `FR-FC-2` (importer) / `FR-FC-3` (emitter); it also plugs
+into the pipeline registry (`FR-PC-7`).
 
 - **FR-DOT-1 (import).** `crate::dot::parse(src) -> Flowchart` parses the DOT flowchart
   subset (`digraph`/`graph` + `rankdir`, node `shape`/`style`/`label`, edges, `subgraph
