@@ -84,9 +84,9 @@ a later explicit wrapper upgrades its label and shape.
 | `id>text]` | asymmetric flag | `box` |
 
 `diamond` is a **new** kymo shape introduced for Mermaid decisions; the Python/JS
-SVG renderers gain the glyph when they consume Mermaid kymojson (deferred — see
-§7). All components are emitted with `accent: "blue"`, `icon: ""`, and an explicit
-`size` computed from the label.
+SVG renderers (and the core's own `flowchart_svg`) draw the glyph when they consume
+the kymojson — see §7. All components are emitted with `accent: "blue"`,
+`icon: ""`, and an explicit `size` computed from the label.
 
 ## 4. Edges
 

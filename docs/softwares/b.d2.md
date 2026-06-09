@@ -49,7 +49,9 @@ upstream:
 | Access Date       | 2026-05-18                                                     |
 | Related Documents | [`d2.comparision.md`](./b.d2.comparision.md), `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
-This is a **reference note on prior art**, not a specification of kymo. It captures D2's design choices so the team can consult them when evolving kymo's DSL, layout, and render pipeline. No code or behavior in this repository depends on D2.
+This is a **reference note on prior art**, not a specification of kymo. It captures D2's design choices so the team can consult them when evolving kymo's DSL, layout, and render pipeline.
+
+> **Update — kymo now interops with D2 (bidirectional).** The Rust core **imports** D2 (`crate::d2`: D2's flowchart subset → the shared flowchart IR → `d2_to_svg` / `d2_to_kymojson`) and **exports** to D2 (`flowchart::emit::to_d2`, i.e. `mermaid_to_d2`, round-trip-fixpoint tested). Same for Graphviz DOT (`crate::dot`). See MERMAID-MAP-001 §8.
 
 ## 1. Overview
 

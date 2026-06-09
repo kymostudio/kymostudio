@@ -98,7 +98,10 @@ Importers (parsers producing a `Diagram`):
 | `.bpmn`      | `packages/python/src/kymo/from_bpmn.py`                 | Already positioned via DI bounds |
 | `.kymo.json` | `packages/python/src/kymo/from_kymojson.py`             | Already resolved                 |
 | `.py`        | dynamic `importlib` in `cli.py`                         | `mod.DIAGRAM` convention         |
-| `.drawio`    | `packages/js/src/drawio2svg/`                           | JS-only; no Python importer yet  |
+| `.mmd`       | `kymostudio-core` `crate::mermaid`                       | Mermaid flowchart → IR → layout  |
+| `.d2`        | `kymostudio-core` `crate::d2`                            | D2 flowchart → IR → layout       |
+| `.dot`       | `kymostudio-core` `crate::dot`                           | Graphviz DOT → IR → layout       |
+| `.drawio`    | `packages/js/src/drawio2svg/` (→ SVG, dev tool)         | faithful mxGraph render; not yet an IR importer |
 | `.svg`       | — (none)                                                | Used only by Rust rasterizer     |
 
 Transforms (model → model):
@@ -119,6 +122,9 @@ Renderers (`Diagram` → encoded bytes/string):
 | `excalidraw`  | `packages/python/src/kymo/to_excalidraw.py`       | Excalidraw scene JSON        |
 | `bpmn`        | `packages/python/src/kymo/to_bpmn.py`             | BPMN 2.0 XML                 |
 | `kymojson`    | `packages/python/src/kymo/to_kymojson.py`         | Resolved model JSON          |
+| `drawio`      | `kymostudio-core` `crate::drawio`                 | mxGraph XML (source-agnostic encoder) |
+| `mermaid`/`d2`/`dot` | `kymostudio-core` `flowchart::emit`        | text DSL (from the flowchart IR, not `Diagram`) |
+| `svg` (flowchart) | `kymostudio-core` `crate::flowchart_svg`      | SVG, pure Rust (no external binary) |
 | `png`         | `packages/rust/kymostudio-core` (`svg_to_png`)    | PNG bytes (from SVG input)   |
 | `webp`        | `packages/python/src/kymo/to_webp.py`             | Animated WebP (from SVG)     |
 
@@ -145,10 +151,15 @@ compose passes from the command line.
 
 ### 2.3 The Rust CLI
 
-`packages/rust/kymostudio-core/src/main.rs` is a separate `kymo` binary that accepts **only `.svg`**
-via `-i` and writes PNG. It shares no architecture with the Python CLI. Aligning both binaries to the
-same pipeline shape — and sharing `kymojson` as the wire format between them — is one of the wins this
-proposal enables.
+The `kymo` binary now lives in its own crate (`packages/rust/kymostudio`). It started as
+an SVG→PNG rasterizer but has since grown a real front-end + an **output-extension
+registry** (`{ext → fn}`, the proposal's invariant #4 in miniature): it imports
+`.mmd` / `.d2` / `.dot` (Mermaid / D2 / Graphviz DOT → the shared flowchart IR) and
+writes `.svg` (a pure-Rust flowchart renderer), `.d2` / `.dot` / `.mmd` (text emitters),
+`.drawio` (mxGraph encoder), or `.kymo.json`. So `kymo flow.d2 flow.svg` and
+`kymo flow.mmd flow.drawio` already work. Aligning the *whole* CLI (all stages, all
+sources) with the Python CLI — sharing `kymojson` as the wire format — remains the win
+this proposal enables.
 
 ---
 
@@ -259,6 +270,7 @@ ENCODERS = {
     "excalidraw": to_excalidraw.render,
     "bpmn":       to_bpmn.export,
     "kymojson":   to_kymojson.export,
+    "drawio":     rust_core.drawio_from_kymojson,   # mxGraph XML — SHIPPED (source-agnostic)
     "png":        compose(to_svg.render, rust_core.svg_to_png),
     "webp":       compose(to_svg.render, rust_core.svg_to_webp),
 }
@@ -370,11 +382,16 @@ packages/python/src/kymo/
 
 ## 7. What this unlocks
 
-- Adding a `.drawio` Python importer = one file in `pipeline/importers/` + one registry entry.
-  Today: edit `cli.py:58-72`.
-- Adding a `.pdf` output = one file in `pipeline/encoders/`. **Now shipped**: vector PDF via
-  `kymostudio-core`'s `svg_to_pdf` (svg2pdf), dispatched by the `.pdf` output extension in all three
-  CLIs (`cli.py`, the Rust `kymo`, and the JS CLI) — no dedicated flag.
+- Adding a new flowchart **source** = one importer crate + one registry arm. **Now
+  shipped** for the Rust core: D2 (`crate::d2`) and Graphviz DOT (`crate::dot`) parse
+  into the shared flowchart IR (`d2_to_kymojson` / `dot_to_kymojson` / `d2_to_svg` / …).
+- Adding a new **encoder** = one function the registry dispatches by output extension.
+  **Now shipped**: the draw.io encoder (`Diagram → mxGraph XML`, source-agnostic
+  `drawio_from_kymojson`, RES §3.4), the text emitters (`flowchart::emit` → Mermaid/D2/DOT),
+  and a pure-Rust flowchart SVG renderer (`crate::flowchart_svg`) — all wired into the
+  Rust `kymo` CLI's `{ext → fn}` output registry (the proposal's invariant #4, in miniature).
+- Adding a `.pdf` output = one encoder. **Shipped**: vector PDF via `kymostudio-core`'s
+  `svg_to_pdf` (svg2pdf), dispatched by the `.pdf` output extension in all three CLIs.
 - `kymo -i a.bpmn -i b.kymo -filter_complex concat -o out.svg` works without touching the core.
 - Per-stage unit tests (importer with fixed JSON, filter with fixed `Diagram`, encoder with fixed
   `Diagram`) replace today's end-to-end-only coverage.

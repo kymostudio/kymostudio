@@ -49,7 +49,9 @@ upstream:
 | Access Date       | 2026-05-20                                                     |
 | Related Documents | [`drawio.comparision.md`](./a.drawio.comparision.md), `bpmn/README.md`, `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md) |
 
-This is a **reference note on prior art**, not a specification of kymo. It captures draw.io's design choices so the team can consult them when evolving kymo's render and export pipeline. No code or behaviour in this repository depends on draw.io. draw.io is a **general-purpose** diagram editor (BPMN is one of many shape libraries), included here because it is a common way teams draw BPMN and because, like bpmn.io, it is a client-side SVG engine.
+This is a **reference note on prior art**, not a specification of kymo. It captures draw.io's design choices so the team can consult them when evolving kymo's render and export pipeline. draw.io is a **general-purpose** diagram editor (BPMN is one of many shape libraries), included here because it is a common way teams draw BPMN and because, like bpmn.io, it is a client-side SVG engine.
+
+> **Update — kymo now interops with draw.io.** kymo **exports** to draw.io (mxGraph XML) via the source-agnostic encoder `drawio_from_kymojson` (`crate::drawio`), reached from the `--drawio` flag / `.drawio` output in all three CLIs. The ad-hoc `tools/drawio-to-svg.py` also wraps the **draw.io desktop** app to render any `.drawio` → SVG. (A `.drawio` → kymo-IR *importer* is not yet built — see RES-PIPELINE-001.)
 
 ## 1. Overview
 
