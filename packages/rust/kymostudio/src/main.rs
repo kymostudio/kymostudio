@@ -9,6 +9,7 @@
 //!     kymo flow.mmd flow.drawio     # -> draw.io (mxGraph XML)
 //!     kymo flow.mmd flow.svg        # -> SVG (pure-Rust flowchart renderer)
 //!     kymo flow.d2                  # -> flow.svg (D2 -> SVG, pure Rust)
+//!     kymo flow.dot                 # -> flow.svg (Graphviz DOT -> SVG, pure Rust)
 //!     kymo flow.d2 flow.kymo.json   # -> import D2 to the kymo model
 //!
 //! Pure Rust (resvg/svg2pdf via kymostudio-core) — no browser, no system image
@@ -118,7 +119,7 @@ fn parse(argv: &[String]) -> Result<Parsed, String> {
     let input = input.ok_or("missing required input (use -i <file>)")?;
     let default_ext = if is_mermaid(&input) {
         "kymo.json"
-    } else if is_d2(&input) {
+    } else if is_d2(&input) || is_dot(&input) {
         "svg"
     } else {
         "png"
@@ -142,6 +143,10 @@ fn is_mermaid(path: &std::path::Path) -> bool {
 
 fn is_d2(path: &std::path::Path) -> bool {
     has_ext(path, "d2")
+}
+
+fn is_dot(path: &std::path::Path) -> bool {
+    has_ext(path, "dot") || has_ext(path, "gv")
 }
 
 fn run(args: Args) -> Result<(), String> {
@@ -204,6 +209,34 @@ fn run(args: Args) -> Result<(), String> {
             (kymostudio_core::d2_to_kymojson(&src), "kymo.json")
         } else {
             (kymostudio_core::d2_to_svg(&src), "svg")
+        };
+        let out = out.map_err(|e| e.to_string())?;
+        std::fs::write(&args.output, &out)
+            .map_err(|e| format!("cannot write {}: {e}", args.output.display()))?;
+        eprintln!(
+            "{} -> {} ({kind}, {} bytes)",
+            args.input.display(),
+            args.output.display(),
+            out.len()
+        );
+        return Ok(());
+    }
+
+    // Graphviz DOT input: render to SVG (pure Rust) or import to `.kymo.json`.
+    if is_dot(&args.input) {
+        if has_ext(&args.output, "png") || has_ext(&args.output, "pdf") {
+            return Err(format!(
+                "cannot rasterize DOT to {} in Rust — render to .svg (or import to \
+                 .kymo.json); for PNG/PDF pipe the .svg through the Python/JS CLI",
+                args.output.display()
+            ));
+        }
+        let src = std::fs::read_to_string(&args.input)
+            .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
+        let (out, kind) = if has_ext(&args.output, "kymo.json") || has_ext(&args.output, "json") {
+            (kymostudio_core::dot_to_kymojson(&src), "kymo.json")
+        } else {
+            (kymostudio_core::dot_to_svg(&src), "svg")
         };
         let out = out.map_err(|e| e.to_string())?;
         std::fs::write(&args.output, &out)

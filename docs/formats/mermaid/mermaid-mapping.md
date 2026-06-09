@@ -170,11 +170,13 @@ target lays the graph out itself.
 > encoder for any `.kymo.json` model (any source, not just Mermaid); icon / BPMN /
 > AWS shapes degrade to a labelled rectangle.
 >
-> **Reverse + render:** D2 is also an *import* source — `crate::d2` parses the D2
-> flowchart subset back into the IR (`d2_to_kymojson`), and the core's own
-> pure-Rust flowchart renderer (`crate::flowchart_svg`) turns the laid-out diagram
-> into SVG, so `d2_to_svg` / `mermaid_to_svg` render entirely in Rust (no external
-> `d2` binary; the Rust `kymo` CLI now does `kymo flow.d2` → `flow.svg`).
+> **Reverse + render:** D2 and Graphviz DOT are also *import* sources — `crate::d2`
+> / `crate::dot` parse each language's flowchart subset back into the IR
+> (`d2_to_kymojson` / `dot_to_kymojson`), and the core's own pure-Rust flowchart
+> renderer (`crate::flowchart_svg`) turns the laid-out diagram into SVG, so
+> `d2_to_svg` / `dot_to_svg` / `mermaid_to_svg` render entirely in Rust (no external
+> `d2` / `dot` binary; the Rust `kymo` CLI now does `kymo flow.d2` / `kymo flow.dot`
+> → `flow.svg`).
 
 Edge style carries over (dashed → D2 `style.stroke-dash` / DOT `style=dashed`;
 no-arrow → D2 `--` / DOT `dir=none`). Output is deterministic (declaration order

@@ -10,6 +10,7 @@
 //!     mermaidToD2(src): string   mermaidToDot(src): string   mermaidToMermaid(src): string
 //!     mermaidToDrawio(src): string   drawioFromKymoJson(json): string
 //!     mermaidToSvg(src): string   d2ToSvg(src): string   d2ToKymoJson(src): string
+//!     dotToSvg(src): string   dotToKymoJson(src): string
 
 use wasm_bindgen::prelude::*;
 
@@ -112,6 +113,18 @@ pub fn d2_to_svg(src: &str) -> Result<String, JsError> {
 #[wasm_bindgen(js_name = d2ToKymoJson)]
 pub fn d2_to_kymojson(src: &str) -> Result<String, JsError> {
     crate::d2_to_kymojson(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Render Graphviz DOT flowchart source → SVG (pure-Rust DOT importer + renderer).
+#[wasm_bindgen(js_name = dotToSvg)]
+pub fn dot_to_svg(src: &str) -> Result<String, JsError> {
+    crate::dot_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Import Graphviz DOT flowchart source → the resolved `.kymo.json` model.
+#[wasm_bindgen(js_name = dotToKymoJson)]
+pub fn dot_to_kymojson(src: &str) -> Result<String, JsError> {
+    crate::dot_to_kymojson(src).map_err(|e| JsError::new(&e.to_string()))
 }
 
 /// Encode any resolved diagram (`.kymo.json` model) → draw.io (mxGraph XML).

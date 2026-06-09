@@ -13,6 +13,7 @@ use resvg::{tiny_skia, usvg};
 // into [`model::Diagram`], lays it out, and serializes to the `.kymo.json`
 // interchange format the Python/JS front-ends consume.
 pub mod d2;
+pub mod dot;
 pub mod drawio;
 pub mod flowchart;
 pub mod flowchart_svg;
@@ -185,6 +186,20 @@ pub fn d2_to_kymojson(src: &str) -> Result<String, d2::D2Error> {
     Ok(kymojson::export(&layout::layout_flowchart(&fc)))
 }
 
+/// Render Graphviz DOT flowchart source → SVG, fully in Rust: parse DOT →
+/// flowchart IR → `layout_flowchart` → the [`flowchart_svg`] renderer. No external
+/// `dot` binary.
+pub fn dot_to_svg(src: &str) -> Result<String, dot::DotError> {
+    let fc = dot::parse(src)?;
+    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
+/// Import Graphviz DOT flowchart source → the resolved `.kymo.json` model.
+pub fn dot_to_kymojson(src: &str) -> Result<String, dot::DotError> {
+    let fc = dot::parse(src)?;
+    Ok(kymojson::export(&layout::layout_flowchart(&fc)))
+}
+
 /// Encode **any** resolved diagram (a `.kymo.json` model body or full envelope) to
 /// draw.io — the source-agnostic encoder surface used by the Python/JS `--drawio`
 /// flag. Needs the JSON reader, so it ships with the `bpmn` feature (which carries
@@ -222,5 +237,9 @@ mod tests {
         assert!(d2.contains("<polygon class=\"fc-shape\"") && d2.contains(">ok?<"));
         // D2 import → kymo.json carries the diamond shape.
         assert!(super::d2_to_kymojson(d2src).unwrap().contains("\"shape\": \"diamond\""));
+        // Graphviz DOT → SVG (same graph) renders the diamond too.
+        let dotsrc = "digraph G {\n A [label=\"Go\"];\n B [label=\"ok?\", shape=diamond];\n A -> B;\n}";
+        let dot = super::dot_to_svg(dotsrc).unwrap();
+        assert!(dot.contains("<polygon class=\"fc-shape\"") && dot.contains(">ok?<"));
     }
 }

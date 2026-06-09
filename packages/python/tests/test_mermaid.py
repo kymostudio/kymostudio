@@ -135,7 +135,10 @@ def test_d2_and_mermaid_to_svg() -> None:
     assert d2.startswith("<?xml") and '<polygon class="fc-shape"' in d2 and ">ok?<" in d2
     mmd = _core.mermaid_to_svg("flowchart TD\nA[Go] --> B{ok?}")
     assert "fc-shape" in mmd and ">ok?<" in mmd
-    # D2 import carries the diamond shape into the kymo model.
+    # Graphviz DOT → SVG (pure Rust) renders the diamond too.
+    dot = _core.dot_to_svg('digraph G {\n A [label="Go"];\n B [label="ok?", shape=diamond];\n A -> B;\n}')
+    assert '<polygon class="fc-shape"' in dot and ">ok?<" in dot
+    # D2/DOT import carries the diamond shape into the kymo model.
     assert '"shape": "diamond"' in _core.d2_to_kymojson('A -> B\nB: x { shape: diamond }')
 
 
