@@ -1,0 +1,15 @@
+{
+  "name": "@kymostudio/web-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Web playground to render flowcharts (Mermaid / D2 / Graphviz DOT) to SVG via the kymo Rust CLI.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
