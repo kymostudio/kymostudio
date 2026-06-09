@@ -1,0 +1,16 @@
+{
+  "name": "kymo-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-05-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [
+      { "class_name": "KymoMCP", "name": "MCP_OBJECT" },
+      { "class_name": "EditorRoom", "name": "EDITOR_ROOM" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["KymoMCP", "EditorRoom"] }
+  ],
+  "observability": { "enabled": true }
+}
