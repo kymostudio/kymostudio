@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>kymo — diagram-as-code DSL</title>
+  <meta name="description" content="Declarative architecture diagrams to animated SVG / WebP. Write a .kymo file, get a self-contained SVG with auto-layout, orthogonal edge routing, and CSS animation.">
+  <meta property="og:title" content="kymo — diagram-as-code DSL">
+  <meta property="og:description" content="Declarative architecture diagrams to animated SVG / WebP.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/nvidia-aiq-animated.webp">
+  <meta property="og:url" content="https://kymo.studio/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='3' width='18' height='18' rx='4' fill='%2376b900'/></svg>">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span class="brand-dot"></span>kymo</div>
+    <div class="nav-links">
+      <a href="app/">Playground</a>
+      <a href="#samples">Samples</a>
+      <a href="https://github.com/kymostudio/kymostudio">GitHub →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <h1>Diagrams as code,<br>animated by default.</h1>
+  <p class="lead">
+    A tiny DSL for architecture diagrams. Write a <code>.kymo</code> file,
+    get a self-contained SVG — auto-layout, orthogonal edge routing,
+    flowing-dash animation, exportable to animated WebP without a headless browser.
+  </p>
+  <div class="install">uv tool install git+https://github.com/kymostudio/kymostudio</div>
+  <div class="ctas">
+    <a class="btn btn-primary" href="app/">Open playground →</a>
+    <a class="btn btn-ghost" href="https://github.com/kymostudio/kymostudio">View on GitHub</a>
+    <a class="btn btn-ghost" href="#samples">See samples ↓</a>
+  </div>
+</header>
+
+<div class="preview">
+  <div class="preview-frame">
+    <img
+      src="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/nvidia-aiq-animated.webp"
+      alt="kymo demo — NVIDIA AIQ replica, animated WebP">
+  </div>
+</div>
+
+<section class="samples" id="samples">
+  <div class="section-header">
+    <h2>Samples</h2>
+    <span class="hint">Click a card to view source + rendered output side by side.</span>
+  </div>
+
+  <div class="grid">
+    <article class="card"
+      data-title="NVIDIA AIQ — Autonomous Deep Researcher"
+      data-source="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/aiq.kymo"
+      data-preview="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/nvidia-aiq-animated.svg"
+      data-github="https://github.com/kymostudio/kymostudio/blob/main/samples/aiq.kymo">
+      <div class="card-preview">
+        <img
+          src="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/nvidia-aiq-animated.svg"
+          alt="NVIDIA AIQ — Autonomous Deep Researcher">
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">NVIDIA AIQ — Autonomous Deep Researcher</h3>
+        <p class="card-desc">
+          Multi-region architecture: routing chain, sub-agents, RAG pipeline,
+          shared file system, and three loop-back rails.
+        </p>
+        <div class="card-meta">
+          <span>aiq.kymo</span><span>·</span><span>1367 × 759</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="card"
+      data-title="AWS — Lex chatbot + Bedrock RAG"
+      data-source="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/aws_1.kymo"
+      data-preview="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/aws-1-animated.svg"
+      data-github="https://github.com/kymostudio/kymostudio/blob/main/samples/aws_1.kymo">
+      <div class="card-preview">
+        <img
+          src="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/aws-1-animated.svg"
+          alt="AWS — Lex chatbot + Bedrock RAG">
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">AWS — Lex chatbot + Bedrock RAG</h3>
+        <p class="card-desc">
+          Lex chatbot meeting Bedrock RAG inside us-east-1, with numbered
+          step badges and dashed async fan-out to DynamoDB / Kendra.
+        </p>
+        <div class="card-meta">
+          <span>aws_1.kymo</span><span>·</span><span>1280 × 680</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="card"
+      data-title="NIM container architecture"
+      data-source="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/data.kymo"
+      data-preview="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/data-animated.svg"
+      data-github="https://github.com/kymostudio/kymostudio/blob/main/samples/data.kymo">
+      <div class="card-preview">
+        <img
+          src="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/data-animated.svg"
+          alt="NIM container architecture">
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">NIM container architecture</h3>
+        <p class="card-desc">
+          Tutorial 01: code-server IDE → NVIDIA Brev (GPU pod) → NVIDIA Cloud,
+          grid layout with cross-region row alignment.
+        </p>
+        <div class="card-meta">
+          <span>data.kymo</span><span>·</span><span>1080 × 658</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<footer>
+  <a href="https://github.com/kymostudio/kymostudio">github.com/kymostudio/kymostudio</a> · Apache 2.0
+</footer>
+
+<!-- ── Sample detail modal ───────────────────────────────────────── -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="modal-overlay" data-close></div>
+  <div class="modal-content">
+    <header class="modal-header">
+      <h3 class="modal-title" id="modal-title">…</h3>
+      <div class="modal-actions">
+        <a class="modal-gh" href="#" target="_blank" rel="noopener">View on GitHub ↗</a>
+        <button class="modal-close" data-close aria-label="Close">✕</button>
+      </div>
+    </header>
+    <div class="modal-body">
+      <div class="modal-pane-source"><pre><code id="modal-source"># Loading…</code></pre></div>
+      <div class="modal-pane-preview"><img id="modal-preview" alt=""></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const modal      = document.getElementById('modal');
+  const titleEl    = document.getElementById('modal-title');
+  const sourceEl   = document.getElementById('modal-source');
+  const previewEl  = document.getElementById('modal-preview');
+  const ghEl       = modal.querySelector('.modal-gh');
+
+  // Container kinds (`outer`/`inner`/`horizontal`/`vertical`) + container
+  // options (`padding`, `dash`, `pos`, `gap`, etc) + `row` + `external`/`above`.
+  // The DSL has no `component`/`region`/`layout` keywords (v2.0+).
+  const KEYWORDS_INLINE = /\b(outer|inner|horizontal|vertical|row|external|above|pos|gap|align|padding-bottom|padding|dash|stroke|icon|label-position|label-anchor)\b/g;
+  const DIRECTIVES_LINE_START = /^(\s*)(canvas:|title:|subtitle:)/;
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+
+  function highlightDsl(text) {
+    return text.split('\n').map(line => {
+      if (/^\s*#/.test(line)) {
+        return `<span class="tok-comment">${escapeHtml(line)}</span>`;
+      }
+      let s = escapeHtml(line);
+      s = s.replace(/"([^"]*)"/g, '<span class="tok-str">"$1"</span>');
+      s = s.replace(/(--&gt;|==&gt;)/g, '<span class="tok-op">$1</span>');
+      s = s.replace(DIRECTIVES_LINE_START, '$1<span class="tok-kw">$2</span>');
+      s = s.replace(KEYWORDS_INLINE, '<span class="tok-kw">$1</span>');
+      return s;
+    }).join('\n');
+  }
+
+  async function openModal(card) {
+    titleEl.textContent  = card.dataset.title;
+    previewEl.src        = card.dataset.preview;
+    previewEl.alt        = card.dataset.title;
+    ghEl.href            = card.dataset.github;
+    sourceEl.innerHTML   = '<span class="tok-comment"># Loading…</span>';
+    document.body.classList.add('modal-open');
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    try {
+      const res = await fetch(card.dataset.source, { cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status);
+      sourceEl.innerHTML = highlightDsl(await res.text());
+    } catch (err) {
+      sourceEl.textContent = '(failed to load source — open on GitHub instead)';
+    }
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => openModal(card));
+  });
+  modal.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', closeModal);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+})();
+</script>
+
+</body>
+</html>

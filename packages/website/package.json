@@ -1,0 +1,15 @@
+{
+  "name": "@kymostudio/website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "kymostudio website (kymo.studio) — landing page + client-side diagram playground at /app/. Built by build.sh into dist/, deployed to GitHub Pages.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "./build.sh",
+    "dev": "cd dist && python3 -m http.server 4321",
+    "typecheck": "npm --prefix app run typecheck",
+    "test:e2e": "npm --prefix app run test:e2e"
+  },
+  "engines": { "node": ">=18" }
+}

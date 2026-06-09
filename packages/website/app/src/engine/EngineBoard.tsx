@@ -14,8 +14,8 @@ import {
   createShapeId,
   type Shape,
   type ShapePartial,
-} from "../../../../packages/js-canvas/dist/index.js";
-import type { Diagram } from "../../../../packages/js/dist/index.js";
+} from "../../../../../packages/js-canvas/dist/index.js";
+import type { Diagram } from "../../../../../packages/js/dist/index.js";
 import { diagramToShapes } from "../diagramToShapes";
 import { patchPositions, type XY } from "../patchDsl";
 import { EngineCanvas, type Tool, type ViewApi } from "./react";

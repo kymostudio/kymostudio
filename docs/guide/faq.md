@@ -103,7 +103,7 @@ It's dependency-free and ships TypeScript types. The Python package offers an eq
 Install the **kymo VS Code extension** for side-by-side preview of `.kymo` and `.bpmn` files
 that re-renders as you type:
 [Marketplace listing](https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode).
-Or use the [browser playground](https://kymostudio.github.io/app/) — no install needed.
+Or use the [browser playground](https://kymo.studio/app/) — no install needed.
 
 ## Still stuck?
 

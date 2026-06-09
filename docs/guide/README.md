@@ -25,7 +25,7 @@ reach for the spec when you need the exact grammar.
 The browser playground runs the whole engine client-side — type DSL on the left,
 see the SVG on the right, share via URL:
 
-**<https://kymostudio.github.io/app/>**
+**<https://kymo.studio/app/>**
 
 ## Where to go next
 

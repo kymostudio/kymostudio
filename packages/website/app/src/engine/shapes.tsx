@@ -9,8 +9,8 @@
  * fragment in shape-local coords — consumed by the board exporter (FR-J-03).
  */
 import { useEffect, useState } from "react";
-import { ShapeUtil, Rectangle2d, type Shape } from "../../../../packages/js-canvas/dist/index.js";
-import { getIcon } from "../../../../packages/js/dist/index.js";
+import { ShapeUtil, Rectangle2d, type Shape } from "../../../../../packages/js-canvas/dist/index.js";
+import { getIcon } from "../../../../../packages/js/dist/index.js";
 import { HTMLContainer } from "./react";
 import { glyphCache } from "./export";
 

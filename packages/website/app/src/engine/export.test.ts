@@ -7,7 +7,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createShapeId, type Editor, type Shape } from "../../../../packages/js-canvas/dist/index.js";
+import { createShapeId, type Editor, type Shape } from "../../../../../packages/js-canvas/dist/index.js";
 import { boardToSvg } from "./export.ts";
 
 const mkShape = (seed: string, x: number, y: number): Shape =>

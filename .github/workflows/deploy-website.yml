@@ -1,17 +1,17 @@
 name: Deploy website to kymostudio.github.io
 
-# Publishes the static site in `website/` (landing page + the client-side
-# playground at /app/) to the org Pages repo `kymostudio/kymostudio.github.io`,
-# which serves it at https://kymostudio.github.io/. Cross-repo push uses a
-# fine-grained PAT (secret PAGES_DEPLOY_TOKEN) because the org has deploy keys
-# disabled. The bundle is committed, so this just publishes `website/` as-is.
+# Publishes packages/website (landing page + client-side playground at /app/)
+# to the org Pages repo kymostudio/kymostudio.github.io, served at kymo.studio.
+# build.sh assembles dist/ from src/ + the committed app/kymo.bundle.js (no JS
+# recompile — the bundle is a committed artifact). Cross-repo push uses the
+# fine-grained PAT PAGES_DEPLOY_TOKEN (the org has deploy keys disabled).
 
 on:
   push:
     branches: [main]
     paths:
-      - 'website/**'
-      - '.github/workflows/deploy-website.yml'
+      - "packages/website/**"
+      - ".github/workflows/deploy-website.yml"
   workflow_dispatch:
 
 permissions:
@@ -22,9 +22,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Opt JS actions into Node 24 ahead of GitHub's 2026-06-16 forced switch —
-  # silences the Node 20 deprecation warnings (some pinned actions have no
-  # Node24-native release yet).
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
@@ -32,14 +29,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Publish website/ → kymostudio.github.io
+      - name: Build website -> dist/
+        run: ./build.sh
+        working-directory: packages/website
+      - name: Publish dist/ -> kymostudio.github.io
         uses: peaceiris/actions-gh-pages@v4
         with:
           personal_token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
           external_repository: kymostudio/kymostudio.github.io
           publish_branch: main
-          publish_dir: ./website
+          publish_dir: ./packages/website/dist
           force_orphan: true
+          cname: kymo.studio
           user_name: kymostudio-ci
           user_email: ci@users.noreply.github.com
           commit_message: "deploy: ${{ github.sha }}"

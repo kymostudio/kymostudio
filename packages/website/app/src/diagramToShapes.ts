@@ -5,11 +5,11 @@
  * stable; every shape is tagged `meta.kymo` so the freeform layer stays
  * untouched. (Built-in consolidation, `FR-J-01`; tldraw-free since `FR-J-04`.)
  */
-import { createShapeId, type ShapeId, type ShapePartial } from "../../../packages/js-canvas/dist/index.js";
+import { createShapeId, type ShapeId, type ShapePartial } from "../../../../packages/js-canvas/dist/index.js";
 import {
   anchor, componentHalf, resolveAnchors,
   type Component, type Diagram, type Region,
-} from "../../../packages/js/dist/index.js";
+} from "../../../../packages/js/dist/index.js";
 
 export const nodeShapeId = (id: string): ShapeId => createShapeId("kymo-node-" + id);
 export const regionShapeId = (id: string): ShapeId => createShapeId("kymo-region-" + id);
