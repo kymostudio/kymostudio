@@ -1,16 +1,21 @@
-name: Deploy editor to Hetzner
+name: Deploy editor to Cloudflare Pages
 
-# packages/editor runs as a Node server + Python (kymostudio-core) on a Hetzner box,
-# fronted by cloudflared at editor.kymo.studio. On a push touching the editor or the
-# Python engine, SSH in and run the on-box deploy (git pull + venv + restart) to apply
-# changes immediately. Secrets: EDITOR_SSH_KEY (deploy private key), EDITOR_SSH_HOST.
+# packages/editor is a client-side static app: the kymo flowchart DSL renders
+# entirely in the browser via the kymostudio JS engine + kymostudio-core wasm
+# (inlined into the bundle). No server. This build compiles the wasm core +
+# packages/js (the published npm engine predates flowchart{}), esbuild-bundles
+# the editor, and deploys dist/ to the Cloudflare Pages project kymo-editor
+# (editor.kymo.studio).
 
 on:
   push:
     branches: [main]
     paths:
-      - "packages/editor/**"
-      - "packages/python/**"
+      - "packages/editor/web/**"
+      - "packages/editor/build.sh"
+      - "packages/editor/package.json"
+      - "packages/js/**"
+      - "packages/rust/kymostudio-core/**"
       - ".github/workflows/deploy-editor.yml"
   workflow_dispatch:
 
@@ -25,9 +30,34 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Apply on the editor box
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+      - name: Build kymostudio-core wasm
+        working-directory: packages/rust/kymostudio-core
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
+      - name: Build packages/js with the fresh core
+        working-directory: packages/js
         run: |
-          mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf "%s\n" "${{ secrets.EDITOR_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh -o StrictHostKeyChecking=accept-new claude-code@${{ secrets.EDITOR_SSH_HOST }} "sudo /usr/local/bin/kymo-editor-deploy"
+          npm ci
+          npm install --no-save ../rust/kymostudio-core/pkg
+          npm run build
+      - name: Build the editor bundle
+        working-directory: packages/editor
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          ./build.sh
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/editor
+          command: pages deploy dist --project-name=kymo-editor --branch=main
