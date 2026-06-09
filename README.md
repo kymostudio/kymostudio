@@ -1,7 +1,7 @@
 <h1 align="center">kymostudio</h1>
 
 <p align="center">
-  <a href="https://kymo.studio/app/">Live Editor</a>
+  <a href="https://editor.kymo.studio">Live Editor</a>
   <span>|</span>
   <a href="https://kymo.studio/">Website</a>
   <span>|</span>
