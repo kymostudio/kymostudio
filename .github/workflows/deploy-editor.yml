@@ -1,0 +1,59 @@
+name: Deploy editor to Cloudflare Pages
+
+# Publishes packages/editor (the live flowchart editor UI + a /api/render Pages
+# Function) to the Cloudflare Pages project "kymo-editor", served at
+# editor.kymo.studio. The Function renders server-side in the Worker using the
+# JS engine (packages/js) + a freshly built kymostudio-core wasm — so this build
+# compiles the wasm core and packages/js first (the published npm engine does not
+# yet support flowchart { } blocks).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/editor/**"
+      - "packages/js/**"
+      - "packages/rust/kymostudio-core/**"
+      - ".github/workflows/deploy-editor.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: editor-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+      - name: Build kymostudio-core wasm
+        working-directory: packages/rust/kymostudio-core
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
+      - name: Build packages/js with the fresh core
+        working-directory: packages/js
+        run: |
+          npm ci
+          npm install --no-save ../rust/kymostudio-core/pkg
+          npm run build
+      - name: Install editor deps (local engine via file: links)
+        working-directory: packages/editor
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/editor
+          command: pages deploy public --project-name=kymo-editor --branch=main
