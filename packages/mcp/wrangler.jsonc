@@ -19,5 +19,8 @@
     "GOOGLE_CLIENT_ID": "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com",
     "ALLOWED_EMAILS": ""
   },
+  "routes": [
+    { "pattern": "mcp.kymo.studio", "custom_domain": true }
+  ],
   "observability": { "enabled": true }
 }
