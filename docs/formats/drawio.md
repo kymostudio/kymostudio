@@ -12,6 +12,7 @@ supersedes: null
 related_documents:
   - FEAT-PIPECLI-001          # Pipeline & CLI — registered encoders (umbrella)
   - FEAT-PIPECLI-DRAWIO-001   # draw.io encoder — module requirements
+  - FEAT-FLOWCHART-001        # the flowchart hub that reaches this encoder as an output
   - KYMOJSON-MAP-001          # .kymo.json — the resolved model the encoder consumes
   - REF-DRAWIO-001            # draw.io prior-art reference
   - FEAT-DRAWIO-001           # the complementary .drawio → SVG *import* feature (separate)

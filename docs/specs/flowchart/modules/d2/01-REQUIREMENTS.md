@@ -1,6 +1,6 @@
 ---
 title: D2 spoke — Requirements (module)
-document_id: FEAT-PIPECLI-D2-001
+document_id: FEAT-FLOWCHART-D2-001
 version: "0.1"
 issue_date: 2026-06-09
 status: Implemented
@@ -10,10 +10,10 @@ audience: Engineers maintaining the D2 importer/emitter
 review_cycle: On D2 spoke change
 supersedes: null
 related_documents:
-  - FEAT-PIPECLI-001          # Pipeline & CLI (umbrella)
+  - FEAT-FLOWCHART-001          # Pipeline & CLI (umbrella)
   - D2-MAP-001                # D2 ↔ kymo element mapping (normative)
-  - FEAT-PIPECLI-DOT-001      # sibling DOT spoke
-  - FEAT-PIPECLI-SVG-001      # the renderer these feed
+  - FEAT-FLOWCHART-DOT-001      # sibling DOT spoke
+  - FEAT-FLOWCHART-SVG-001      # the renderer these feed
   - MERMAID-MAP-001           # the first flowchart spoke
 authors:
   - Vũ Anh
@@ -28,8 +28,8 @@ keywords:
 # D2 spoke — Requirements (module)
 
 **Status: implemented.** D2 is a bidirectional spoke on the flowchart IR
-(`crate::flowchart`), realising the pipeline's "one importer/encoder per format"
-requirement (`FR-PC-2`, `FR-PC-7`).
+(`crate::flowchart`), realising `FR-FC-2` (importer) / `FR-FC-3` (emitter); it also plugs
+into the pipeline's registered-importer model (`FR-PC-2`, `FR-PC-7`).
 
 - **FR-D2-1 (import).** `crate::d2::parse(src) -> Flowchart` parses the D2 flowchart
   subset (direction, node shapes, edges, containers, qualified refs) into the IR. Per
@@ -46,7 +46,7 @@ requirement (`FR-PC-2`, `FR-PC-7`).
   round-trip-fixpoint tests in `tests/mermaid_convert.rs`).
 
 **Verification:** D2-parser unit tests (`src/d2/mod.rs`), convert goldens, and SVG
-validated by rasterizing through resvg. See `03-TEST` (umbrella) and `D2-MAP-001` §5.
+validated by rasterizing through resvg. See `TEST-FLOWCHART-001` and `D2-MAP-001` §5.
 
 ## Annex A — Revision History
 

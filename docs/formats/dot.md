@@ -10,8 +10,8 @@ audience: Engineers using or maintaining the kymo DOT importer/emitter
 review_cycle: On DOT-mapping change
 supersedes: null
 related_documents:
-  - FEAT-PIPECLI-001          # Pipeline & CLI — registered importers/encoders (umbrella)
-  - FEAT-PIPECLI-DOT-001      # DOT spoke — module requirements
+  - FEAT-FLOWCHART-001        # Flowchart conversion hub (umbrella)
+  - FEAT-FLOWCHART-DOT-001      # DOT spoke — module requirements
   - D2-MAP-001                # sibling flowchart format (D2)
   - MERMAID-MAP-001           # sibling flowchart format (Mermaid)
   - KYMOJSON-MAP-001          # .kymo.json — serialization the importer produces
@@ -111,4 +111,4 @@ Version-controlled at `docs/formats/dot.md`; authoritative source is the main-br
 working tree. Update when the DOT importer/emitter changes an element mapping; increment
 `version` and append to Annex A. References: Graphviz DOT grammar
 (<https://graphviz.org/doc/info/lang.html>); `DOT-MAP-001`, `KYMOJSON-MAP-001`,
-`FEAT-PIPECLI-DOT-001`.
+`FEAT-FLOWCHART-DOT-001`.
