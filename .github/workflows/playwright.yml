@@ -8,13 +8,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'website/**'
+      - 'packages/website/**'
       - 'packages/js-canvas/**'
       - 'packages/js/**'
       - '.github/workflows/playwright.yml'
   pull_request:
     paths:
-      - 'website/**'
+      - 'packages/website/**'
       - 'packages/js-canvas/**'
       - 'packages/js/**'
       - '.github/workflows/playwright.yml'
@@ -59,10 +59,10 @@ jobs:
         run: npm install --no-save ../rust/kymostudio-core/pkg
       - name: Build the playground bundle (js + js-canvas → esbuild)
         run: ./build.sh # builds packages/js + packages/js-canvas dist, npm ci (app), esbuild → kymo.bundle.js
-        working-directory: website/app
+        working-directory: packages/website/app
       - name: Install Playwright (chromium only)
         run: npx playwright install --with-deps chromium
-        working-directory: website/app
+        working-directory: packages/website/app
       - name: Run the render-count guard
         run: npm run test:e2e
-        working-directory: website/app
+        working-directory: packages/website/app
