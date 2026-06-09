@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.5.1" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.omg.org/spec/UML/20161101">
+  <uml:Model xmi:id="model-1" name="SequenceModel">
+    <packagedElement xmi:type="uml:Interaction" xmi:id="interaction-1" name="Sequence">
+      <lifeline xmi:type="uml:Lifeline" xmi:id="lifeline-1" name="Alice"/>
+      <lifeline xmi:type="uml:Lifeline" xmi:id="lifeline-2" name="John"/>
+      <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-4" covered="lifeline-1" message="message-3"/>
+      <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-5" covered="lifeline-2" message="message-3"/>
+      <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-7" covered="lifeline-2" message="message-6"/>
+      <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-8" covered="lifeline-1" message="message-6"/>
+      <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-10" covered="lifeline-1" message="message-9"/>
+      <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-11" covered="lifeline-2" message="message-9"/>
+      <message xmi:type="uml:Message" xmi:id="message-3" name="Hello John, how are you?" messageSort="synchCall" sendEvent="occ-4" receiveEvent="occ-5"/>
+      <message xmi:type="uml:Message" xmi:id="message-6" name="Great!" messageSort="reply" sendEvent="occ-7" receiveEvent="occ-8"/>
+      <message xmi:type="uml:Message" xmi:id="message-9" name="See you later" messageSort="asynchCall" sendEvent="occ-10" receiveEvent="occ-11"/>
+    </packagedElement>
+  </uml:Model>
+</xmi:XMI>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.5.1" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.omg.org/spec/UML/20161101">
+  <uml:Model xmi:id="model-1" name="SequenceModel">
+    <packagedElement xmi:type="uml:Interaction" xmi:id="interaction-1" name="Sequence">
+      <lifeline xmi:type="uml:Lifeline" xmi:id="lifeline-1" name="Client"/>
+      <lifeline xmi:type="uml:Lifeline" xmi:id="lifeline-2" name="Server"/>
+      <fragment xmi:type="uml:CombinedFragment" xmi:id="frag-3" interactionOperator="alt" covered="lifeline-1 lifeline-2">
+        <operand xmi:type="uml:InteractionOperand" xmi:id="operand-4" covered="lifeline-1 lifeline-2">
+          <guard xmi:type="uml:InteractionConstraint" xmi:id="guard-5">
+            <specification xmi:type="uml:LiteralString" xmi:id="spec-6" value="is authorized"/>
+          </guard>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-8" covered="lifeline-1" message="message-7"/>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-9" covered="lifeline-2" message="message-7"/>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-11" covered="lifeline-2" message="message-10"/>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-12" covered="lifeline-1" message="message-10"/>
+        </operand>
+        <operand xmi:type="uml:InteractionOperand" xmi:id="operand-13" covered="lifeline-1 lifeline-2">
+          <guard xmi:type="uml:InteractionConstraint" xmi:id="guard-14">
+            <specification xmi:type="uml:LiteralString" xmi:id="spec-15" value="unauthorized"/>
+          </guard>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-17" covered="lifeline-2" message="message-16"/>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-18" covered="lifeline-1" message="message-16"/>
+        </operand>
+      </fragment>
+      <fragment xmi:type="uml:CombinedFragment" xmi:id="frag-19" interactionOperator="opt" covered="lifeline-1 lifeline-2">
+        <operand xmi:type="uml:InteractionOperand" xmi:id="operand-20" covered="lifeline-1 lifeline-2">
+          <guard xmi:type="uml:InteractionConstraint" xmi:id="guard-21">
+            <specification xmi:type="uml:LiteralString" xmi:id="spec-22" value="retry on flake"/>
+          </guard>
+          <fragment xmi:type="uml:CombinedFragment" xmi:id="frag-23" interactionOperator="loop" covered="lifeline-1 lifeline-2">
+            <operand xmi:type="uml:InteractionOperand" xmi:id="operand-24" covered="lifeline-1 lifeline-2">
+              <guard xmi:type="uml:InteractionConstraint" xmi:id="guard-25">
+                <specification xmi:type="uml:LiteralString" xmi:id="spec-26" value="up to 3 times"/>
+              </guard>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-28" covered="lifeline-1" message="message-27"/>
+              <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-29" covered="lifeline-2" message="message-27"/>
+            </operand>
+          </fragment>
+        </operand>
+      </fragment>
+      <fragment xmi:type="uml:CombinedFragment" xmi:id="frag-30" interactionOperator="par" covered="lifeline-1 lifeline-2">
+        <operand xmi:type="uml:InteractionOperand" xmi:id="operand-31" covered="lifeline-1 lifeline-2">
+          <guard xmi:type="uml:InteractionConstraint" xmi:id="guard-32">
+            <specification xmi:type="uml:LiteralString" xmi:id="spec-33" value="notify"/>
+          </guard>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-35" covered="lifeline-2" message="message-34"/>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-36" covered="lifeline-1" message="message-34"/>
+        </operand>
+        <operand xmi:type="uml:InteractionOperand" xmi:id="operand-37" covered="lifeline-1 lifeline-2">
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-39" covered="lifeline-2" message="message-38"/>
+          <fragment xmi:type="uml:MessageOccurrenceSpecification" xmi:id="occ-40" covered="lifeline-1" message="message-38"/>
+        </operand>
+      </fragment>
+      <message xmi:type="uml:Message" xmi:id="message-7" name="GET /data" messageSort="synchCall" sendEvent="occ-8" receiveEvent="occ-9"/>
+      <message xmi:type="uml:Message" xmi:id="message-10" name="200 OK" messageSort="reply" sendEvent="occ-11" receiveEvent="occ-12"/>
+      <message xmi:type="uml:Message" xmi:id="message-16" name="401 Unauthorized" messageSort="reply" sendEvent="occ-17" receiveEvent="occ-18"/>
+      <message xmi:type="uml:Message" xmi:id="message-27" name="retry" messageSort="synchCall" sendEvent="occ-28" receiveEvent="occ-29"/>
+      <message xmi:type="uml:Message" xmi:id="message-34" name="event A" messageSort="synchCall" sendEvent="occ-35" receiveEvent="occ-36"/>
+      <message xmi:type="uml:Message" xmi:id="message-38" name="event B" messageSort="synchCall" sendEvent="occ-39" receiveEvent="occ-40"/>
+    </packagedElement>
+  </uml:Model>
+</xmi:XMI>

@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    alt is authorized
+        C->>S: GET /data
+        S-->>C: 200 OK
+    else unauthorized
+        S-->>C: 401 Unauthorized
+    end
+    opt retry on flake
+        loop up to 3 times
+            C->>S: retry
+        end
+    end
+    par notify
+        S->>C: event A
+    and
+        S->>C: event B
+    end

@@ -7,11 +7,14 @@
 //!     kymo flow.mmd flow.d2         # -> D2     (convert via the flowchart IR)
 //!     kymo flow.mmd flow.dot        # -> Graphviz DOT
 //!     kymo flow.mmd norm.mmd        # -> Mermaid (round-trip / normalize)
+//!     kymo seq.mmd  seq.xmi         # -> XMI 2.5.1 (UML sequenceDiagram)
 //!
 //! Pure Rust (resvg/svg2pdf via kymostudio-core) — no browser, no system image
 //! libraries. The operation is chosen by the INPUT extension: `.mmd`/`.mermaid`
-//! parse a Mermaid flowchart, then the OUTPUT extension picks the target —
-//! `.kymo.json` (default interchange), `.d2`, `.dot`/`.gv`, or `.mmd` (round-trip).
+//! parse a Mermaid diagram, then the OUTPUT extension picks the target —
+//! `.kymo.json` (default interchange), `.d2`, `.dot`/`.gv`, `.mmd` (round-trip),
+//! or for a `sequenceDiagram` source `.xmi` (OMG XMI 2.5.1 model), `.mdj`
+//! (StarUML native — model + laid-out diagram), or `.gaphor` (Gaphor native).
 //! Any other input is treated as SVG and the OUTPUT extension picks PNG (default)
 //! or PDF. Rust does not render `.kymo.json` to SVG — feed it to the Python/JS renderer.
 
@@ -52,6 +55,9 @@ EXAMPLES:
     kymo flow.mmd flow.d2               # -> D2 (convert via the flowchart IR)
     kymo flow.mmd flow.dot              # -> Graphviz DOT
     kymo flow.mmd norm.mmd              # -> Mermaid (round-trip / normalize)
+    kymo seq.mmd  seq.xmi               # -> XMI 2.5.1 (UML sequenceDiagram)
+    kymo seq.mmd  seq.mdj               # -> StarUML .mdj (sequence diagram + layout)
+    kymo seq.mmd  seq.gaphor            # -> Gaphor .gaphor (sequence diagram + layout)
 ";
 
 struct Args {
@@ -157,6 +163,12 @@ fn run(args: Args) -> Result<(), String> {
             (kymostudio_core::mermaid_to_dot(&src), "dot")
         } else if has_ext(&args.output, "mmd") || has_ext(&args.output, "mermaid") {
             (kymostudio_core::mermaid_to_mermaid(&src), "mermaid")
+        } else if has_ext(&args.output, "xmi") {
+            (kymostudio_core::mermaid_to_xmi(&src), "xmi")
+        } else if has_ext(&args.output, "mdj") {
+            (kymostudio_core::mermaid_to_mdj(&src), "mdj")
+        } else if has_ext(&args.output, "gaphor") {
+            (kymostudio_core::mermaid_to_gaphor(&src), "gaphor")
         } else {
             (kymostudio_core::mermaid_to_kymojson(&src), "kymo.json")
         };

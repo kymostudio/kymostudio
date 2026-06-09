@@ -1,0 +1,7 @@
+sequenceDiagram
+    actor User
+    participant S as Server
+    User->>+S: Request
+    S->>+S: Process
+    S-->>-User: Response
+    deactivate S
