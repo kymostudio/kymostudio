@@ -8,6 +8,7 @@
 //!     bpmnLayout(blocksJson): string   bpmnRender(json, animate?, background?): string
 //!     mermaidToKymoJson(src: string): string
 //!     mermaidToD2(src): string   mermaidToDot(src): string   mermaidToMermaid(src): string
+//!     mermaidToDrawio(src): string   drawioFromKymoJson(json): string
 
 use wasm_bindgen::prelude::*;
 
@@ -86,6 +87,19 @@ pub fn mermaid_to_dot(src: &str) -> Result<String, JsError> {
 #[wasm_bindgen(js_name = mermaidToMermaid)]
 pub fn mermaid_to_mermaid(src: &str) -> Result<String, JsError> {
     crate::mermaid_to_mermaid(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Convert Mermaid flowchart source → draw.io (mxGraph XML).
+#[wasm_bindgen(js_name = mermaidToDrawio)]
+pub fn mermaid_to_drawio(src: &str) -> Result<String, JsError> {
+    crate::mermaid_to_drawio(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Encode any resolved diagram (`.kymo.json` model) → draw.io (mxGraph XML).
+#[cfg(feature = "bpmn")]
+#[wasm_bindgen(js_name = drawioFromKymoJson)]
+pub fn drawio_from_kymojson(json: &str) -> Result<String, JsError> {
+    crate::drawio_from_kymojson(json).map_err(|e| JsError::new(&e))
 }
 
 /// The crate version, exposed to JS as `version()`.

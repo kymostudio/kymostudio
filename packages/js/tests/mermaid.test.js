@@ -17,6 +17,7 @@ import { dirname, join } from "node:path";
 import {
   parseMermaid, parseDiagram, renderSVG,
   mermaidToD2, mermaidToDot, normalizeMermaid,
+  mermaidToDrawio, diagramToDrawio,
 } from "../dist/index.js";
 
 const SAMPLES = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "samples");
@@ -63,6 +64,15 @@ test("convert mmd → d2 / dot / mermaid via the flowchart IR", () => {
   const mmd = normalizeMermaid(src);
   assert.ok(mmd.startsWith("flowchart TD"));
   assert.ok(mmd.includes('B{"ok?"}') && mmd.includes("-.->|no|"));
+});
+
+test("convert mmd → draw.io (mxGraph XML); any-source path agrees", () => {
+  const src = "flowchart TD\nA[Start] --> B{ok?}\nB -->|yes| C([Done])\n";
+  const xml = mermaidToDrawio(src);
+  assert.ok(xml.startsWith("<mxfile") && xml.trimEnd().endsWith("</mxfile>"));
+  assert.ok(xml.includes("rhombus;") && xml.includes('source="A" target="B"'));
+  // The generic any-source encoder matches the Mermaid path byte-for-byte.
+  assert.equal(diagramToDrawio(parseMermaid(src)), xml);
 });
 
 test("native flowchart { } block resolves through the core", () => {

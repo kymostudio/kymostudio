@@ -36,6 +36,8 @@ export {
   coreMermaidToD2 as mermaidToD2,
   coreMermaidToDot as mermaidToDot,
   coreNormalizeMermaid as normalizeMermaid,
+  coreMermaidToDrawio as mermaidToDrawio,
+  coreDiagramToDrawio as diagramToDrawio,
   coreToBpmn as toBpmn,
   coreApplyLayout as bpmnLayout,
 } from "./core.js";

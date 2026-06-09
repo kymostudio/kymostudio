@@ -113,6 +113,18 @@ def test_convert_to_d2_dot_mermaid() -> None:
     assert 'B{"ok?"}' in mmd and "-.->|no|" in mmd
 
 
+@pytest.mark.skipif(not _HAS_CONVERT, reason="core lacks mermaid convert bindings")
+def test_convert_to_drawio() -> None:
+    """mmd → draw.io (mxGraph XML); the any-source `diagram_to_drawio` agrees."""
+    from kymo._core import diagram_to_drawio, import_mermaid, mermaid_to_drawio
+    src = "flowchart TD\nA[Start] --> B{ok?}\nB -->|yes| C([Done])\n"
+    xml = mermaid_to_drawio(src)
+    assert xml.startswith("<mxfile") and xml.rstrip().endswith("</mxfile>")
+    assert "rhombus;" in xml and 'source="A" target="B"' in xml
+    # The generic any-source encoder matches the Mermaid path byte-for-byte.
+    assert diagram_to_drawio(import_mermaid(src)) == xml
+
+
 def test_iconless_component_renders_outline() -> None:
     """A bare icon-less component renders a shape outline + interior label
     instead of fetching an icon (which would KeyError on the empty key)."""

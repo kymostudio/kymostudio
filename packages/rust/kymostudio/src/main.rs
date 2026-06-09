@@ -6,6 +6,7 @@
 //!     kymo flow.mmd                 # -> flow.kymo.json (Mermaid import)
 //!     kymo flow.mmd flow.d2         # -> D2     (convert via the flowchart IR)
 //!     kymo flow.mmd flow.dot        # -> Graphviz DOT
+//!     kymo flow.mmd flow.drawio     # -> draw.io (mxGraph XML)
 //!     kymo flow.mmd norm.mmd        # -> Mermaid (round-trip / normalize)
 //!
 //! Pure Rust (resvg/svg2pdf via kymostudio-core) — no browser, no system image
@@ -51,6 +52,7 @@ EXAMPLES:
     kymo flow.mmd                       # -> flow.kymo.json (Mermaid import)
     kymo flow.mmd flow.d2               # -> D2 (convert via the flowchart IR)
     kymo flow.mmd flow.dot              # -> Graphviz DOT
+    kymo flow.mmd flow.drawio           # -> draw.io (mxGraph XML)
     kymo flow.mmd norm.mmd              # -> Mermaid (round-trip / normalize)
 ";
 
@@ -151,16 +153,23 @@ fn run(args: Args) -> Result<(), String> {
         }
         let src = std::fs::read_to_string(&args.input)
             .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
-        let (out, kind) = if has_ext(&args.output, "d2") {
-            (kymostudio_core::mermaid_to_d2(&src), "d2")
-        } else if has_ext(&args.output, "dot") || has_ext(&args.output, "gv") {
-            (kymostudio_core::mermaid_to_dot(&src), "dot")
-        } else if has_ext(&args.output, "mmd") || has_ext(&args.output, "mermaid") {
-            (kymostudio_core::mermaid_to_mermaid(&src), "mermaid")
-        } else {
-            (kymostudio_core::mermaid_to_kymojson(&src), "kymo.json")
-        };
-        let out = out.map_err(|e| e.to_string())?;
+        // Output registry: the OUTPUT extension picks the converter (a small step
+        // toward RES-PIPELINE-001's "registry, not if/elif"). Default → kymo.json.
+        type Conv = fn(&str) -> Result<String, kymostudio_core::mermaid::MermaidError>;
+        const CONVERTERS: &[(&str, Conv)] = &[
+            ("d2", kymostudio_core::mermaid_to_d2),
+            ("dot", kymostudio_core::mermaid_to_dot),
+            ("gv", kymostudio_core::mermaid_to_dot),
+            ("mmd", kymostudio_core::mermaid_to_mermaid),
+            ("mermaid", kymostudio_core::mermaid_to_mermaid),
+            ("drawio", kymostudio_core::mermaid_to_drawio),
+        ];
+        let (conv, kind): (Conv, &str) = CONVERTERS
+            .iter()
+            .find(|(ext, _)| has_ext(&args.output, ext))
+            .map(|&(ext, f)| (f, ext))
+            .unwrap_or((kymostudio_core::mermaid_to_kymojson, "kymo.json"));
+        let out = conv(&src).map_err(|e| e.to_string())?;
         std::fs::write(&args.output, &out)
             .map_err(|e| format!("cannot write {}: {e}", args.output.display()))?;
         eprintln!(
