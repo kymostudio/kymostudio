@@ -72,8 +72,12 @@ on Linux/macOS/Windows and `cargo check --no-default-features`. Added:
 - Wheel smoke: `_kymostudio_core.mermaid_to_kymojson(...)` returns a `diamond`-bearing
   kymojson.
 
-## 5. Not yet verified (deferred)
+## 5. End-to-end rendering (now verified)
 
-End-to-end **rendering** of Mermaid output is not tested here because the Python/JS
-renderers do not yet draw icon-less flowchart nodes or the `diamond` glyph. That is
-the parity phase (PLAN-MERMAID-001); its tests will render the fixtures to SVG.
+End-to-end **rendering** of Mermaid output is now tested (the parity phase shipped):
+the Python/JS renderers draw icon-less flowchart nodes + the `diamond` glyph
+(`packages/python/tests/test_mermaid.py`, `packages/js/tests/mermaid.test.js`), and
+the core's own **pure-Rust flowchart SVG renderer** (`crate::flowchart_svg`) renders
+`mermaid_to_svg` / `d2_to_svg` / `dot_to_svg` — validated by rasterizing through
+resvg. Transpilation + draw.io encoding are covered by `tests/mermaid_convert.rs`
+and `src/drawio.rs` unit tests.

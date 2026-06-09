@@ -67,6 +67,27 @@ Status: **implemented** (Python + JS). Make the kymojson actually render:
   until the core that ships the binding is released and the Python/JS floors raised.
 - vscode-extension `.mmd` dispatch: still pending.
 
+## Flowchart conversion hub (shipped alongside)
+
+The Phase-1 parse model was lifted into a format-neutral **flowchart IR**
+(`crate::flowchart`), turning the Mermaid front-end into one spoke of a small
+conversion hub. Shipped on top of it (see MERMAID-MAP-001 §8 for the mapping):
+
+- **Importers → IR:** `crate::mermaid`, **`crate::d2`** (D2), **`crate::dot`**
+  (Graphviz DOT). So `d2_to_svg` / `dot_to_svg` / `d2_to_kymojson` / `dot_to_kymojson`.
+- **Text emitters (IR → DSL):** `flowchart::emit::{to_mermaid, to_d2, to_dot}` —
+  `mermaid_to_{mermaid,d2,dot}` (`kymo flow.mmd flow.d2`, round-trip-fixpoint tested).
+- **draw.io encoder (`Diagram → mxGraph XML`):** `crate::drawio`, source-agnostic —
+  `mermaid_to_drawio` + `drawio_from_kymojson`; reached from Python `--drawio` / JS
+  `.drawio` and (any source) `kymo … flow.drawio`. RES-PIPELINE-001 §3.4 encoder.
+- **Pure-Rust flowchart SVG renderer (`crate::flowchart_svg`):** the core's own
+  `Diagram → SVG` — `kymo flow.{mmd,d2,dot} → flow.svg`, no external binary.
+- **Rust CLI output registry** (`{ext → fn}`) — a first step toward
+  RES-PIPELINE-001's "registry, not if/elif".
+
+These are not Mermaid *diagram types* (Phase 3 below) — they are the flowchart
+family's other source/target formats, sharing the same IR + layout.
+
 ## Phase 3+ — More diagram types (per module)
 
 Add modules under `modules/<type>/`, each with its own 4-file set:

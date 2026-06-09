@@ -1,7 +1,7 @@
 ---
 title: Pipeline & CLI Architecture — Requirements
 document_id: FEAT-PIPECLI-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -17,6 +17,14 @@ related_documents:
   - RES-CLI-001                 # Research: FFmpeg-inspired CLI grammar
   - KYMOJSON-MAP-001            # .kymo.json — the interchange wire format
   - BPMN-MAP-001                # BPMN import/export (a registered importer/encoder)
+  - MERMAID-MAP-001             # Mermaid importer (the first flowchart spoke)
+  - D2-MAP-001                  # D2 import/export mapping
+  - DOT-MAP-001                 # Graphviz DOT import/export mapping
+  - DRAWIO-MAP-001              # draw.io encoder mapping
+  - FEAT-PIPECLI-D2-001         # module: D2 spoke
+  - FEAT-PIPECLI-DOT-001        # module: DOT spoke
+  - FEAT-PIPECLI-DRAWIO-001     # module: draw.io encoder
+  - FEAT-PIPECLI-SVG-001        # module: pure-Rust flowchart SVG renderer
 authors:
   - Vũ Anh
 language: en
@@ -77,6 +85,25 @@ encoder, `-o` drives the mux. Specifying them apart would let the two drift.
 The document set: this `FEAT` (requirements) · `DESIGN-PIPECLI-001` (architecture &
 mapping) · `TEST-PIPECLI-001` (V&V) · `PLAN-PIPECLI-001` (phased migration). The
 normative interchange schema between implementations is `KYMOJSON-MAP-001`.
+
+### 0.1 Realized spokes (modules)
+
+The **Rust `kymo` CLI** already runs a first slice of this design: an output-extension
+**`{ext → fn}` registry** (`FR-PC-7`, in miniature) over a set of registered importers and
+encoders that all flow through the shared flowchart IR (`crate::flowchart`) and the resolved
+`Diagram`. Each is a module under `modules/`, with a format-mapping reference under
+`docs/formats/`:
+
+| Module | document_id | Format mapping | What |
+|---|---|---|---|
+| D2 spoke | `FEAT-PIPECLI-D2-001` | `D2-MAP-001` (`docs/formats/d2.md`) | import + emit D2 |
+| DOT spoke | `FEAT-PIPECLI-DOT-001` | `DOT-MAP-001` (`docs/formats/dot.md`) | import + emit Graphviz DOT |
+| draw.io encoder | `FEAT-PIPECLI-DRAWIO-001` | `DRAWIO-MAP-001` (`docs/formats/drawio.md`) | `Diagram` → mxGraph XML (source-agnostic) |
+| Flowchart SVG renderer | `FEAT-PIPECLI-SVG-001` | — | `Diagram` → SVG, pure Rust |
+
+The Mermaid importer (`MERMAID-MAP-001`) is the first such spoke; BPMN (`BPMN-MAP-001`) and
+`.kymo.json` (`KYMOJSON-MAP-001`) are the others. The broader Python/JS-side migration to a
+six-stage registry (and the verb-less CLI grammar) remains the work this `FEAT` specifies.
 
 ## 1. Scope and stakeholder needs (`SN-PC`)
 
@@ -160,6 +187,7 @@ live in the research notes; this baseline takes only what §2/§3 require.
 | 0.1     | 2026-06-06 | Vũ Anh | Initial requirements. Promotes `RES-PIPELINE-001` (six-stage architecture) and `RES-CLI-001` (verb-less grammar) into one baselined feature; minted needs `SN-PC-01..07`, requirements `FR-PC-1..17`, `NFR-PC-1..5`. |
 | 0.2     | 2026-06-06 | Vũ Anh | Review corrections. Restated `FR-PC-17` (JS already ships a `bin`; the gap is verb-less grammar parity, not an absent binary) and `NFR-PC-4` (JS *library* is dependency-free; its CLI's lone dep stays `kymostudio-core`). Clarified `FR-PC-6` `resolved` as a per-`Diagram` flag covering the DSL-with-`bpmn{}` case. Replaced fragile `cli.py:NN` citations with function names (`load()`, `main()`, `_load_resolved()`). |
 | 0.3     | 2026-06-06 | Vũ Anh | Grammar-consistency fix (review finding #5). `FR-PC-8`: converter is verb-less; `icons`/`lint` are reserved tooling subcommands beside it. `FR-PC-14`: split aux modes — `--probe`/`--watch` are converter-run flags, `icons`/`lint` are subcommands, **no `--lint` flag** (deliberate divergence from `RES-CLI-001` §4). See `DESIGN-PIPECLI-001` §3 for the grammar layers + parser-tokenisation rules that resolve the `-f`/`-formats`, `-t`/`-targets` ambiguity. |
+| 0.4     | 2026-06-09 | Vũ Anh | Added §0.1 "Realized spokes" — the Rust `kymo` CLI's shipped `{ext→fn}` output registry + the D2/DOT importers, draw.io encoder, and pure-Rust flowchart SVG renderer, each a `modules/` entry (`FEAT-PIPECLI-{D2,DOT,DRAWIO,SVG}-001`) with a `docs/formats/` mapping (`D2-MAP-001`, `DOT-MAP-001`, `DRAWIO-MAP-001`). |
 
 ## Annex B — Document Control
 

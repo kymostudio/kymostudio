@@ -233,6 +233,8 @@ Flowcharts are supported by virtually every diagramming tool; the relevant ones 
 
 Because the symbol set is standardised, a flowchart authored in one tool is generally legible in any other; only the specialised symbols ([§9](#9-specialised-symbols)) and swimlane styling vary in practice.
 
+**kymo's flowchart support.** The kymo engine treats the flowchart as a small conversion hub around a format-neutral IR (`crate::flowchart`). It **imports** Mermaid (`MERMAID-MAP-001`), D2 (`D2-MAP-001`), and Graphviz DOT (`DOT-MAP-001`); **emits** Mermaid / D2 / DOT text from the IR; **encodes** to draw.io mxGraph XML (`DRAWIO-MAP-001`); and renders to SVG with its own pure-Rust renderer — so `kymo flow.{mmd,d2,dot} flow.svg` and `kymo flow.mmd flow.{d2,dot,drawio}` work without any external binary. The spokes are specified under `FEAT-PIPECLI-001` (modules `FEAT-PIPECLI-{D2,DOT,DRAWIO,SVG}-001`). draw.io *import* (`.drawio` → SVG) is a separate path — `FEAT-DRAWIO-001` and the ad-hoc `tools/drawio-to-svg.py`.
+
 ---
 
 ## 14. References
@@ -260,6 +262,7 @@ Because the symbol set is standardised, a flowchart authored in one tool is gene
 | Version | Date       | Author | Changes                              |
 |---------|------------|--------|--------------------------------------|
 | 1.0     | 2026-06-08 | Vũ Anh | Initial flowchart notation reference. |
+| 1.1     | 2026-06-09 | Vũ Anh | §13: added "kymo's flowchart support" — import (Mermaid/D2/DOT), text emit, draw.io encode, pure-Rust SVG render; pointers to `FEAT-PIPECLI-001` modules + format mappings. |
 
 ---
 
