@@ -1,0 +1,133 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "kymo-diagram",
+  "scopeName": "source.kymo",
+  "patterns": [
+    { "include": "#string" },
+    { "include": "#color" },
+    { "include": "#comment" },
+    { "include": "#bpmn-block" },
+    { "include": "#flowchart-block" },
+    { "include": "#directive" },
+    { "include": "#edge-arrow" },
+    { "include": "#leaf-spec" },
+    { "include": "#placement" },
+    { "include": "#option-key" },
+    { "include": "#container-keyword" },
+    { "include": "#constant" },
+    { "include": "#number" },
+    { "include": "#operator" }
+  ],
+  "repository": {
+    "comment": {
+      "comment": "A '#' begins a line comment, UNLESS it is immediately followed by a hex digit (then it is a colour literal — handled by #color, included earlier).",
+      "name": "comment.line.number-sign.kymo",
+      "match": "#.*$"
+    },
+    "string": {
+      "comment": "Double-quoted string. No escape sequences; a literal '\"' cannot appear inside (KYMO-DSL-LEX-001 §5.5).",
+      "name": "string.quoted.double.kymo",
+      "begin": "\"",
+      "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.kymo" } },
+      "end": "\"",
+      "endCaptures": { "0": { "name": "punctuation.definition.string.end.kymo" } }
+    },
+    "color": {
+      "comment": "Hex colour literal: 3, 6 or 8 hex digits (KYMO-DSL-LEX-001 §5.8). Matched before #comment so '#76b900' is a colour, not a comment.",
+      "name": "constant.other.color.rgb-value.kymo",
+      "match": "#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-fA-F])"
+    },
+    "number": {
+      "name": "constant.numeric.integer.kymo",
+      "match": "(?<![\\w-])-?\\d+\\b"
+    },
+    "directive": {
+      "comment": "Top-level metadata directives (KYMO-DSL-GRAMMAR-001 §6.3).",
+      "match": "^\\s*(canvas|title|subtitle|external)\\b",
+      "captures": { "1": { "name": "keyword.control.directive.kymo" } }
+    },
+    "edge-arrow": {
+      "comment": "File-scope edge arrows (§6.7): '-->' default, '==>' highlight/external.",
+      "name": "keyword.operator.edge.kymo",
+      "match": "-->|==>"
+    },
+    "leaf-spec": {
+      "comment": "The shape/icon/accent triple that identifies a leaf component (§6.4), e.g. 'hex/hex-agent/green'.",
+      "match": "(?<![\\w/-])([A-Za-z][\\w-]*)(/)([A-Za-z0-9_-]+)(/)([A-Za-z0-9_]+)",
+      "captures": {
+        "1": { "name": "storage.type.shape.kymo" },
+        "2": { "name": "punctuation.separator.kymo" },
+        "3": { "name": "entity.name.icon.kymo" },
+        "4": { "name": "punctuation.separator.kymo" },
+        "5": { "name": "constant.language.accent.kymo" }
+      }
+    },
+    "placement": {
+      "comment": "'@' introduces a placement (absolute pos or parent-relative ref), §6.4.",
+      "name": "keyword.operator.placement.kymo",
+      "match": "@"
+    },
+    "container-keyword": {
+      "comment": "Container kinds and block openers (§6.5, §6.9–6.11).",
+      "name": "keyword.other.container.kymo",
+      "match": "\\b(outer|inner|horizontal|vertical|layout|bpmn|flowchart|row)\\b"
+    },
+    "option-key": {
+      "comment": "Region options (§6.5.3) and edge options (§6.7).",
+      "name": "support.type.property-name.kymo",
+      "match": "\\b(padding-bottom|padding|dash|stroke|icon|label-position|label-anchor|label_offset|label_pos|label_at|pos|gap|align|above|inside|src|dst|via|route|small|dashed|shared)\\b"
+    },
+    "constant": {
+      "comment": "Side / alignment / routing keyword constants (§6.8).",
+      "name": "constant.language.kymo",
+      "match": "\\b(top|right|bottom|left|center|start|middle|end|auto|over|under|curve|straight|elbow)\\b"
+    },
+    "operator": {
+      "name": "keyword.operator.kymo",
+      "match": "[=:;]|x"
+    },
+    "bpmn-block": {
+      "comment": "A 'bpmn { … }' process block (§6.9): typed nodes + flow arrows, auto-laid-out.",
+      "begin": "^\\s*(bpmn)\\s*(\\{)",
+      "beginCaptures": {
+        "1": { "name": "keyword.other.container.kymo" },
+        "2": { "name": "punctuation.section.block.begin.kymo" }
+      },
+      "end": "^\\s*(\\})",
+      "endCaptures": { "1": { "name": "punctuation.section.block.end.kymo" } },
+      "patterns": [
+        { "include": "#string" },
+        { "include": "#color" },
+        { "include": "#comment" },
+        {
+          "comment": "BPMN node-kind keywords. 'end!' listed first so it wins over 'end'.",
+          "name": "keyword.other.bpmn-node.kymo",
+          "match": "(?<![\\w!-])(end!|start|end|task|xor|and|or|event|subprocess|note|data|store)(?![\\w-])"
+        },
+        {
+          "comment": "BPMN flow arrows: '->' sequence, '~>' message, '..>' association.",
+          "name": "keyword.operator.bpmn-flow.kymo",
+          "match": "\\.\\.>|->|~>"
+        },
+        { "include": "#option-key" },
+        { "include": "#number" },
+        { "include": "#operator" }
+      ]
+    },
+    "flowchart-block": {
+      "comment": "A 'flowchart [DIR] { … }' block (§6.11) whose body is Mermaid flowchart syntax. Embeds source.mermaid when that grammar is present; otherwise falls back to basic tokens.",
+      "begin": "^\\s*(flowchart)\\b(.*)(\\{)\\s*$",
+      "beginCaptures": {
+        "1": { "name": "keyword.other.container.kymo" },
+        "3": { "name": "punctuation.section.block.begin.kymo" }
+      },
+      "end": "^\\s*(\\})",
+      "endCaptures": { "1": { "name": "punctuation.section.block.end.kymo" } },
+      "patterns": [
+        { "include": "source.mermaid" },
+        { "include": "#comment" },
+        { "include": "#string" }
+      ]
+    }
+  }
+}

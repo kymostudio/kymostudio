@@ -14,6 +14,9 @@ by the bundled, dependency-free [`kymostudio`](../js) JS engine.
 
 ## Features
 
+- **Syntax highlighting** for `.kymo` files — comments, strings, hex colours,
+  the `shape/icon/accent` leaf triple, edge arrows (`-->` / `==>`), directives,
+  and `bpmn { }` / `flowchart { }` blocks, via a bundled TextMate grammar.
 - **Open Preview to the Side** button in the editor title bar for `.bpmn` /
   `.kymo` files (also in the Command Palette and the Explorer context menu).
 - **Live re-render** as you type (debounced) — toggle with

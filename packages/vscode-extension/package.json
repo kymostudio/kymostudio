@@ -2,7 +2,7 @@
   "name": "kymostudio-vscode",
   "displayName": "kymostudio — Diagram Preview",
   "description": "Type it. See it appear. Watch it animate.",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "license": "Apache-2.0",
   "icon": "media/icon.png",
   "publisher": "kymostudio",
@@ -51,6 +51,13 @@
           ".kymo"
         ],
         "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "kymo-diagram",
+        "scopeName": "source.kymo",
+        "path": "./syntaxes/kymo.tmLanguage.json"
       }
     ],
     "commands": [
@@ -140,6 +147,8 @@
     "@types/vscode": "^1.85.0",
     "esbuild": "^0.28.0",
     "jsdom": "^29.1.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.3.2"
   }
 }
