@@ -3,7 +3,7 @@
 Install kymo, write a six-line diagram, and render it to SVG — all in about five minutes.
 
 > **Just want to try it?** Skip installation entirely and open the
-> [browser playground](https://kymostudio.github.io/kymostudio/app/): type `.kymo` on the
+> [browser playground](https://kymostudio.github.io/app/): type `.kymo` on the
 > left, watch the SVG appear on the right.
 
 ## Install
