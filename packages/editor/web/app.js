@@ -11,7 +11,7 @@ setManifest(manifest);
 setIconBaseURL("https://cdn.jsdelivr.net/gh/kymostudio/kymostudio@main/packages/icons");
 
 const GOOGLE_CLIENT_ID = "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com";
-const MCP_WS = "wss://kymo-mcp.anhv-ict91.workers.dev/ws";
+const MCP_WS = "wss://mcp.kymo.studio/ws";
 
 const SAMPLE = `flowchart TD {
   A[Nhận đơn hàng] --> B{Còn hàng?}
