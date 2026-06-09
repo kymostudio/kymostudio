@@ -22,7 +22,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 const USAGE = [
   "usage: kymo <input> [output] [--scale N]",
   "  <input>   .svg | .kymo | .bpmn | .kymo.json",
-  "  <output>  .svg, .png or .pdf; omitted → input name with .svg",
+  "  <output>  .svg, .png, .pdf or .drawio; omitted → input name with .svg",
   "            (or .png when the input is a .svg)",
   "  -s, --scale N   PNG scale factor, 1.0 = intrinsic size (PNG output only)",
   "  -h, --help",
@@ -62,21 +62,30 @@ async function initCore(lib) {
 }
 
 /** Source → SVG string, dispatching by input extension. */
-async function renderToSvg(input) {
-  const lib = await import("../dist/index.js");
+async function loadDiagram(lib, input) {
   const text = readFileSync(input, "utf-8");
   const low = input.toLowerCase();
   const isMermaid = low.endsWith(".mmd") || low.endsWith(".mermaid");
   // BPMN import + `bpmn { }` layout (in .bpmn / .kymo) and Mermaid import all
   // delegate to the wasm core, which must be initialized before the calls.
   if (low.endsWith(".bpmn") || low.endsWith(".kymo") || isMermaid) await initCore(lib);
-  let diagram;
-  if (low.endsWith(".bpmn")) diagram = lib.parseBpmn(text);
-  else if (low.endsWith(".json")) diagram = lib.parseKymoJson(text);
-  else if (isMermaid) diagram = lib.parseMermaid(text);
-  else if (low.endsWith(".kymo")) diagram = lib.parseDiagram(text);
-  else throw new Error(`unsupported source: ${input} (expected .kymo, .kymo.json, .bpmn, .mmd or .svg)`);
-  return lib.renderSVG(diagram);
+  if (low.endsWith(".bpmn")) return lib.parseBpmn(text);
+  if (low.endsWith(".json")) return lib.parseKymoJson(text);
+  if (isMermaid) return lib.parseMermaid(text);
+  if (low.endsWith(".kymo")) return lib.parseDiagram(text);
+  throw new Error(`unsupported source: ${input} (expected .kymo, .kymo.json, .bpmn, .mmd or .svg)`);
+}
+
+async function renderToSvg(input) {
+  const lib = await import("../dist/index.js");
+  return lib.renderSVG(await loadDiagram(lib, input));
+}
+
+/** Source → draw.io (mxGraph XML), via the shared Rust encoder. */
+async function convertToDrawio(input) {
+  const lib = await import("../dist/index.js");
+  await initCore(lib);
+  return lib.diagramToDrawio(await loadDiagram(lib, input));
 }
 
 /**
@@ -115,6 +124,21 @@ export async function run(argv) {
   const low = input.toLowerCase();
   const isSvgInput = low.endsWith(".svg");
   const outLow = output?.toLowerCase();
+
+  // draw.io output: decode the source → Diagram → mxGraph XML (no SVG step).
+  if (outLow !== undefined && outLow.endsWith(".drawio")) {
+    let xml;
+    try {
+      xml = await convertToDrawio(input);
+    } catch (e) {
+      console.error(`kymo: ${e.message}`);
+      return 1;
+    }
+    writeFileSync(output, xml);
+    console.error(`${input} -> ${output} (${Buffer.byteLength(xml)} bytes)`);
+    return 0;
+  }
+
   const pdfMode = outLow !== undefined && outLow.endsWith(".pdf");
   // A bare `.svg` source defaults to PNG; a `.pdf` output path overrides that.
   const pngMode = !pdfMode && (isSvgInput || (outLow !== undefined && outLow.endsWith(".png")));

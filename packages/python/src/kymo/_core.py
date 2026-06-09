@@ -55,6 +55,18 @@ def normalize_mermaid(src: str) -> str:
     return _kcore.mermaid_to_mermaid(src)
 
 
+def mermaid_to_drawio(src: str) -> str:
+    """Convert Mermaid flowchart source → draw.io (mxGraph XML)."""
+    return _kcore.mermaid_to_drawio(src)
+
+
+def diagram_to_drawio(diagram: Diagram) -> str:
+    """Encode any resolved `Diagram` → draw.io (mxGraph XML) via the shared Rust
+    encoder — the source-agnostic surface behind the `--drawio` CLI flag."""
+    import json
+    return _kcore.drawio_from_kymojson(json.dumps(model_dict(diagram)))
+
+
 
 def layout_bpmn(blocks: list) -> Diagram:
     """Lay out positionless `bpmn { }` blocks (the `dsl.BpmnBlock` ASTs) → `Diagram`."""

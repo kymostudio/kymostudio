@@ -161,6 +161,14 @@ target lays the graph out itself.
 | **Mermaid** | `mermaid_to_mermaid` · `kymo f.mmd norm.mmd` | inverse of §3 (round-trip / normalize) |
 | **D2** | `mermaid_to_d2` · `kymo f.mmd f.d2` | circle→`circle`, diamond→`diamond`, hex→`hexagon`, cylinder→`cylinder`, stadium→`oval`, box→default; subgraph→container (members ref'd as `g.id`) |
 | **Graphviz DOT** | `mermaid_to_dot` · `kymo f.mmd f.dot` | box/circle/diamond/hexagon/cylinder native; stadium→`box,style=rounded`; subgraph→`cluster_*` |
+| **draw.io** (mxGraph) | `mermaid_to_drawio` · `kymo f.mmd f.drawio` · `kymo any.kymo --drawio` | box→`rounded=0`, circle→`ellipse`, diamond→`rhombus`, hex→`shape=hexagon`, cylinder→`shape=cylinder3`, stadium→`rounded=1`; subgraph→`cluster` vertex; edges by `source`/`target` |
+
+> **Note:** D2 / DOT / Mermaid emit the *positionless* IR (the target lays out).
+> **draw.io is different** — a generic WYSIWYG format that needs explicit geometry,
+> so it is an *encoder* (RES-PIPELINE-001 §3.4) consuming the **positioned**
+> `Diagram` from `layout_flowchart`. `drawio_from_kymojson` exposes the same
+> encoder for any `.kymo.json` model (any source, not just Mermaid); icon / BPMN /
+> AWS shapes degrade to a labelled rectangle.
 
 Edge style carries over (dashed → D2 `style.stroke-dash` / DOT `style=dashed`;
 no-arrow → D2 `--` / DOT `dir=none`). Output is deterministic (declaration order

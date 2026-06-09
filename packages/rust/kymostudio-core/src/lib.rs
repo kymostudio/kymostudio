@@ -12,6 +12,7 @@ use resvg::{tiny_skia, usvg};
 // The shared diagram engine — pure Rust, no SVG deps. Mermaid import parses
 // into [`model::Diagram`], lays it out, and serializes to the `.kymo.json`
 // interchange format the Python/JS front-ends consume.
+pub mod drawio;
 pub mod flowchart;
 pub mod kymojson;
 pub mod layout;
@@ -147,6 +148,26 @@ pub fn mermaid_to_dot(src: &str) -> Result<String, mermaid::MermaidError> {
 /// Round-trip / normalize Mermaid flowchart source through the IR.
 pub fn mermaid_to_mermaid(src: &str) -> Result<String, mermaid::MermaidError> {
     Ok(flowchart::emit::to_mermaid(&mermaid::parse(src)?))
+}
+
+/// Convert Mermaid flowchart source → draw.io (mxGraph XML).
+///
+/// Unlike the D2/DOT/Mermaid spokes (which emit the positionless IR), draw.io
+/// needs geometry, so this lays the graph out first: parse → `layout_flowchart`
+/// → the [`drawio`] encoder. The encoder itself is source-agnostic — any
+/// resolved [`model::Diagram`] can be encoded.
+pub fn mermaid_to_drawio(src: &str) -> Result<String, mermaid::MermaidError> {
+    let fc = mermaid::parse(src)?;
+    Ok(drawio::to_drawio(&layout::layout_flowchart(&fc)))
+}
+
+/// Encode **any** resolved diagram (a `.kymo.json` model body or full envelope) to
+/// draw.io — the source-agnostic encoder surface used by the Python/JS `--drawio`
+/// flag. Needs the JSON reader, so it ships with the `bpmn` feature (which carries
+/// `serde_json`), like the other model-JSON entries.
+#[cfg(feature = "bpmn")]
+pub fn drawio_from_kymojson(json: &str) -> Result<String, String> {
+    drawio::to_drawio_kymojson(json)
 }
 
 #[cfg(test)]

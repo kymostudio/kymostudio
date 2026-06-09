@@ -11,6 +11,19 @@ packages share a version number.
 
 ### Added
 
+- **draw.io export (`Diagram → mxGraph XML`), a source-agnostic encoder.** A new
+  `kymostudio-core` encoder (`drawio::to_drawio`) turns any resolved diagram into a
+  draw.io document that opens directly in app.diagrams.net — shaped (rectangle /
+  ellipse / rhombus / hexagon / cylinder / stadium), laid-out, subgraph-clustered,
+  edges auto-routed (dashed / no-arrow honoured). Per RES-PIPELINE-001 this is a
+  pure *encoder* (it consumes only the positioned `Diagram`). Two entry points:
+  `mermaid_to_drawio` (`kymo flow.mmd flow.drawio`) and `drawio_from_kymojson`
+  (any `.kymo.json` model). Reaches every source via a **`--drawio`** flag on the
+  Python CLI and a `.drawio` output on the JS CLI, both delegating to the one Rust
+  encoder — so draw.io output is byte-identical across Python and JS. PyO3 + wasm
+  bindings; non-flowchart shapes (icons / BPMN / AWS) degrade to a labelled
+  rectangle. The Rust `kymo` CLI's converter dispatch is now a small `{ext → fn}`
+  registry (a first step toward RES-PIPELINE-001's "registry, not if/elif").
 - **Native `flowchart [DIR] { … }` DSL block.** Author a flowchart inline in a
   `.kymo` file — the block body is Mermaid flowchart syntax, laid out by the core
   (mirrors the `bpmn { }` block). Direction is optional (`flowchart LR { … }`,

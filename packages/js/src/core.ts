@@ -21,6 +21,8 @@ import initWasm, {
   mermaidToD2,
   mermaidToDot,
   mermaidToMermaid,
+  mermaidToDrawio,
+  drawioFromKymoJson,
 } from "kymostudio-core";
 
 import { modelFromDict, parseKymoJson } from "./from-kymojson.js";
@@ -90,6 +92,19 @@ export function coreMermaidToDot(src: string): string {
 export function coreNormalizeMermaid(src: string): string {
   ensureReady();
   return mermaidToMermaid(src);
+}
+
+/** Convert Mermaid flowchart source → draw.io (mxGraph XML). */
+export function coreMermaidToDrawio(src: string): string {
+  ensureReady();
+  return mermaidToDrawio(src);
+}
+
+/** Encode any resolved `Diagram` → draw.io (mxGraph XML) via the shared Rust
+ *  encoder — the source-agnostic surface (works for `.kymo`/`.bpmn`/`.mmd`). */
+export function coreDiagramToDrawio(d: Diagram): string {
+  ensureReady();
+  return drawioFromKymoJson(JSON.stringify(modelDict(d)));
 }
 
 /** Resolve a diagram's `flowchart { }` blocks in place — feed each block's body
