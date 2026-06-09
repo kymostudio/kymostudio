@@ -17,7 +17,7 @@
   ],
   "vars": {
     "GOOGLE_CLIENT_ID": "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com",
-    "ALLOWED_EMAILS": "anhv.ict91@gmail.com"
+    "ALLOWED_EMAILS": ""
   },
   "observability": { "enabled": true }
 }
