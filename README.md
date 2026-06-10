@@ -17,7 +17,7 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
 </p>
 
-> **Type it. See it appear. Watch it animate.**
+> **Diagram superpowers** — type it, see it appear, watch it animate.
 
 **Kymostudio** is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
 

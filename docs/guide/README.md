@@ -1,6 +1,6 @@
 # kymo User Guide
 
-**Type it. See it appear. Watch it animate.**
+**Diagram superpowers** — type it, see it appear, watch it animate.
 
 kymo turns a small, line-oriented text language (`.kymo`) into clean, **animated SVG**
 diagrams — architecture diagrams, cloud reference designs, data flows, and BPMN

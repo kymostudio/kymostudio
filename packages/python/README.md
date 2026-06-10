@@ -1,6 +1,6 @@
 # kymostudio
 
-**Type it. See it appear. Watch it animate.**
+**Diagram superpowers** — type it, see it appear, watch it animate.
 
 ## Install
 

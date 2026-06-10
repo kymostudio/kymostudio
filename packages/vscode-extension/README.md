@@ -1,6 +1,6 @@
 # kymostudio — Diagram Preview (VS Code)
 
-**Type it. See it appear. Watch it animate.**
+**Diagram superpowers** — type it, see it appear, watch it animate.
 
 Live SVG preview for [kymostudio](https://github.com/kymostudio/kymostudio)
 diagrams, right inside VS Code. Both formats render **natively**, in-process,
