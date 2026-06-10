@@ -15,6 +15,7 @@
       header h1 span { color: var(--accent); }
       .spacer { flex: 1; }
       .muted { font-size: 12px; color: var(--muted); }
+      .diagram-name { font-size: 13px; font-weight: 500; color: var(--muted); }
       button { background:#1f2430; color:var(--fg); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font:inherit; cursor:pointer; }
       button:hover { border-color: var(--accent); }
       [hidden] { display: none !important; }
@@ -41,9 +42,8 @@
   </head>
   <body>
     <header>
-      <h1>kymo<span>·</span>flowchart</h1>
+      <span class="diagram-name" id="diagram-label"></span>
       <div class="spacer"></div>
-      <span class="muted" id="diagram-label"></span>
       <span class="muted" id="signin-hint"></span>
       <div id="gbtn"></div>
       <div class="account" id="account" hidden>
