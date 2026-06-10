@@ -5,22 +5,39 @@ import { DIAGRAMS_API } from "./const";
 
 type Item = { id: string; title: string; updatedAt: number };
 
+function timeAgo(ms: number): string {
+  if (!ms) return "";
+  const s = Math.max(1, (Date.now() - ms) / 1000);
+  if (s < 60) return "just now";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m} minute${m > 1 ? "s" : ""} ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hour${h > 1 ? "s" : ""} ago`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d} day${d > 1 ? "s" : ""} ago`;
+  const mo = Math.floor(d / 30);
+  if (mo < 12) return `${mo} month${mo > 1 ? "s" : ""} ago`;
+  const y = Math.floor(mo / 12);
+  return `${y} year${y > 1 ? "s" : ""} ago`;
+}
+
 export default function DiagramsPage() {
   const { idToken, claims, signOut } = useAuth();
   const [items, setItems] = useState<Item[]>([]);
-  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
+  const [q, setQ] = useState("");
+
+  useEffect(() => { document.title = "Diagrams · kymo"; return () => { document.title = "kymo · flowchart"; }; }, []);
 
   const load = useCallback(async () => {
     if (!idToken) return;
-    setStatus("Loading…");
     try {
       const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
-      if (!r.ok) { setStatus(r.status === 401 ? "Session expired — sign in again." : "Error " + r.status); return; }
+      if (!r.ok) { setError(r.status === 401 ? "Session expired — sign in again." : "Error " + r.status); return; }
       const j = await r.json();
-      const list: Item[] = (j.diagrams || []).slice().sort((a: Item, b: Item) => (b.updatedAt || 0) - (a.updatedAt || 0));
-      setItems(list);
-      setStatus(list.length ? `${list.length} diagram${list.length > 1 ? "s" : ""}` : "No diagrams yet — create one.");
-    } catch (e: any) { setStatus("Error: " + e.message); }
+      setError("");
+      setItems((j.diagrams || []).slice().sort((a: Item, b: Item) => (b.updatedAt || 0) - (a.updatedAt || 0)));
+    } catch (e: any) { setError("Error: " + e.message); }
   }, [idToken]);
 
   useEffect(() => { load(); }, [load]);
@@ -41,44 +58,60 @@ export default function DiagramsPage() {
     if (!window.confirm(`Delete "${dd.title || "Untitled"}"? This cannot be undone.`)) return;
     try {
       const r = await fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" });
-      if (!r.ok) { setStatus(`Delete failed (${r.status})`); return; }
+      if (!r.ok) { setError(`Delete failed (${r.status})`); return; }
       load();
-    } catch (e: any) { setStatus("Delete failed: " + e.message); }
+    } catch (e: any) { setError("Delete failed: " + e.message); }
   }
 
+  const filtered = q.trim()
+    ? items.filter((i) => (i.title || "Untitled").toLowerCase().includes(q.trim().toLowerCase()))
+    : items;
+
   return (
-    <div className="layout">
-      <header>
-        <strong>My diagrams</strong>
-        <div className="spacer" />
-        {claims && <span className="muted">{claims.email}</span>}
-        {claims && <button onClick={load}>Refresh</button>}
-        {claims && <button onClick={newDiagram}>+ New</button>}
-        <Link className="btn" to="/">Editor</Link>
-        {claims && <button onClick={signOut}>Sign out</button>}
-      </header>
-      <main className="scroll">
-        <div className="wrap">
-          {!claims ? (
-            <div className="signin"><p className="muted">Sign in with Google to see your diagrams.</p><GoogleButton /></div>
-          ) : (
-            <>
-              <div className="status-line muted">{status}</div>
-              <div className="list">
-                {items.map((dd) => (
-                  <div key={dd.id} className="row">
-                    <a className="row-main" href={"/?d=" + encodeURIComponent(dd.id)}>
-                      <span className="title">{dd.title || "Untitled"}</span>
-                      <span className="meta">{new Date(dd.updatedAt).toLocaleString()}</span>
-                    </a>
-                    <button className="row-del" title="Delete diagram" onClick={() => remove(dd)}>Delete</button>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+    <main className="scroll" style={{ height: "100%" }}>
+      <div className="page">
+        <div className="page-head">
+          <h1>Diagrams</h1>
+          <div className="head-actions">
+            <Link className="pill" to="/">Editor</Link>
+            {claims && <button className="pill pill-dark" onClick={newDiagram}>New diagram</button>}
+          </div>
         </div>
-      </main>
-    </div>
+
+        {!claims ? (
+          <div className="signin">
+            <p className="muted">Sign in with Google to see your diagrams.</p>
+            <GoogleButton />
+          </div>
+        ) : (
+          <>
+            <div className="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
+              </svg>
+              <input placeholder="Search diagrams…" value={q} onChange={(e) => setQ(e.target.value)} />
+            </div>
+            {error && <div className="empty">{error}</div>}
+            <div className="rows">
+              {filtered.map((dd) => (
+                <a key={dd.id} className="rrow" href={"/?d=" + encodeURIComponent(dd.id)}>
+                  <span className="rtitle">{dd.title || "Untitled"}</span>
+                  <button className="rdel" title="Delete diagram"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); remove(dd); }}>Delete</button>
+                  <span className="rtime">{timeAgo(dd.updatedAt)}</span>
+                </a>
+              ))}
+              {!filtered.length && !error && (
+                <div className="empty">{q ? "No diagrams match your search." : "No diagrams yet — create one."}</div>
+              )}
+            </div>
+            <div className="foot">
+              <span>Signed in as {claims.email}</span>
+              <button className="linklike" onClick={signOut}>Sign out</button>
+            </div>
+          </>
+        )}
+      </div>
+    </main>
   );
 }
