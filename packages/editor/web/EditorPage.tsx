@@ -1,14 +1,36 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
-import { SAMPLE } from "./const";
+import { DIAGRAMS_API, SAMPLE } from "./const";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const d = params.get("d");
-  const roomId = d || (claims ? `u-${claims.sub}-default` : null);
+  const roomId = d;
+
+  // No ?d: once signed in, jump to the most-recent diagram (or a fresh one).
+  useEffect(() => {
+    if (d || !idToken) return;
+    let stop = false;
+    (async () => {
+      let id: string | null = null;
+      try {
+        const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
+        if (r.ok) {
+          const j = await r.json();
+          const list = (j.diagrams || []).slice().sort((a: any, b: any) => (b.updatedAt || 0) - (a.updatedAt || 0));
+          if (list.length) id = list[0].id;
+        }
+      } catch {}
+      if (stop) return;
+      if (!id) id = (self.crypto && crypto.randomUUID) ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2, 10);
+      navigate("/?d=" + id, { replace: true });
+    })();
+    return () => { stop = true; };
+  }, [d, idToken, navigate]);
 
   const [source, setSource] = useState(SAMPLE);
   const [svg, setSvg] = useState("");
@@ -69,7 +91,7 @@ export default function EditorPage() {
     return () => document.removeEventListener("click", h);
   }, []);
 
-  const diagramLabel = title || (d ? d : "Default");
+  const diagramLabel = title || d || "";
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
 
   function download() {
