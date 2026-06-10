@@ -58,7 +58,7 @@ export function GoogleButton() {
       const g = (window as any).google?.accounts?.id;
       if (!g || !ref.current) { setTimeout(r, 150); return; }
       ref.current.innerHTML = "";
-      g.renderButton(ref.current, { type: "standard", theme: "filled_black", size: "medium", text: "signin_with" });
+      g.renderButton(ref.current, { type: "standard", theme: "outline", size: "medium", text: "signin_with" });
     }
     r();
     return () => { stop = true; };
