@@ -12,7 +12,7 @@ function fmt(ms) { try { return new Date(ms).toLocaleString(); } catch { return 
 async function loadList(t) {
   $("status").textContent = "Loading…";
   try {
-    const r = await fetch(API + "?id_token=" + encodeURIComponent(t));
+    const r = await fetch(API + "?id_token=" + encodeURIComponent(t), { cache: "no-store" });
     if (!r.ok) {
       if (r.status === 401) { signedOut(); return; }
       $("status").textContent = "Error " + r.status; return;
@@ -63,6 +63,10 @@ $("signout").addEventListener("click", () => {
   if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect();
   signedOut();
 });
+
+function autoRefresh() { const t = token(); if (tokenValid(t) && !$("app").hidden) loadList(t); }
+document.addEventListener("visibilitychange", () => { if (!document.hidden) autoRefresh(); });
+window.addEventListener("focus", autoRefresh);
 
 const t = token();
 if (tokenValid(t)) signedIn(t); else signedOut();
