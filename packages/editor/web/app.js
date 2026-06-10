@@ -1,6 +1,7 @@
 // Client-side render (kymostudio + kymostudio-core wasm). Local edit/render need
-// no auth. Receiving live updates over the kymo-mcp WebSocket requires Google
-// sign-in. Each diagram is its own room: editor.kymo.studio/?d=<id>.
+// no auth. Live updates over the kymo-mcp WebSocket require Google sign-in. Each
+// diagram is its own room: editor.kymo.studio/?d=<id>. The diagram name is
+// editable (click → rename), synced over the WebSocket.
 import { initSync, setManifest, setIconBaseURL, parseDiagram, renderSVG } from "kymostudio";
 import manifest from "kymostudio/icons-manifest.json";
 import wasmBytes from "kymostudio-core/kymostudio_core_bg.wasm";
@@ -44,7 +45,7 @@ $("download").addEventListener("click", () => {
   if (!lastSvg) return;
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([lastSvg], { type: "image/svg+xml" }));
-  a.download = "flowchart.svg"; a.click(); URL.revokeObjectURL(a.href);
+  a.download = (diagramTitle || diagramIdLabel || "flowchart") + ".svg"; a.click(); URL.revokeObjectURL(a.href);
 });
 $("newbtn").addEventListener("click", () => {
   const id = (self.crypto && crypto.randomUUID) ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2, 10);
@@ -59,11 +60,38 @@ $("account-btn").addEventListener("click", (e) => {
   $("account-btn").setAttribute("aria-expanded", String(open));
 });
 $("account-menu").addEventListener("click", (e) => e.stopPropagation());
-document.addEventListener("click", () => {
-  $("account-menu").hidden = true;
-  $("account-btn").setAttribute("aria-expanded", "false");
-});
+document.addEventListener("click", () => { $("account-menu").hidden = true; $("account-btn").setAttribute("aria-expanded", "false"); });
 $("signout-btn").addEventListener("click", () => doSignOut());
+
+// ---- diagram name + rename ----
+let diagramTitle = "", diagramIdLabel = "Default";
+function updateDiagramLabel() { $("diagram-label").textContent = diagramTitle || diagramIdLabel; }
+function setTitle(t) { diagramTitle = (t && t !== "Untitled") ? t : ""; updateDiagramLabel(); }
+
+let renameCancelled = false;
+function openRename() {
+  if (!idToken) return;
+  const lbl = $("diagram-label"), inp = $("diagram-input");
+  inp.value = diagramTitle || (diagramIdLabel === "Default" ? "" : diagramIdLabel);
+  lbl.hidden = true; inp.hidden = false; inp.focus(); inp.select();
+}
+function closeRename() { $("diagram-input").hidden = true; $("diagram-label").hidden = false; }
+function commitRename() {
+  const v = $("diagram-input").value.trim();
+  if (v && v !== diagramTitle) {
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "rename", title: v, origin: myId }));
+    diagramTitle = v; updateDiagramLabel();
+  }
+  closeRename();
+}
+$("diagram-label").addEventListener("click", openRename);
+$("diagram-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); $("diagram-input").blur(); }
+  else if (e.key === "Escape") { renameCancelled = true; $("diagram-input").blur(); }
+});
+$("diagram-input").addEventListener("blur", () => {
+  if (renameCancelled) { renameCancelled = false; closeRename(); } else commitRename();
+});
 
 // ---- live sync (per-diagram room, requires Google sign-in) ----
 const myId = Math.random().toString(36).slice(2);
@@ -79,7 +107,11 @@ function connect() {
   ws.addEventListener("error", () => { try { ws.close(); } catch {} });
   ws.addEventListener("message", (e) => {
     let data; try { data = JSON.parse(e.data); } catch { return; }
-    if (!data || data.type !== "doc" || data.origin === myId) return;
+    if (!data) return;
+    if (data.type === "meta") { setTitle(data.title); return; }
+    if (data.type !== "doc") return;
+    if (data.title !== undefined) setTitle(data.title);
+    if (data.origin === myId) return;
     const incoming = String(data.source ?? "");
     if (!incoming.trim()) { pushDoc(); return; }
     if (incoming === srcEl.value) return;
@@ -90,25 +122,19 @@ function connect() {
 function jwtField(jwt, field) {
   try { return JSON.parse(atob(jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")))[field]; } catch { return null; }
 }
-function colorFor(str) {
-  let h = 0;
-  for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return `hsl(${h % 360} 68% 64%)`;
-}
+function colorFor(str) { let h = 0; for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return `hsl(${h % 360} 68% 64%)`; }
 function tokenValid(t) { const exp = t && jwtField(t, "exp"); return !!(exp && exp * 1000 > Date.now() + 30000); }
 
 function applyToken(token) {
   idToken = token;
-  const email = jwtField(token, "email"), sub = jwtField(token, "sub");
+  const email = jwtField(token, "email"), sub = jwtField(token, "sub"), name = jwtField(token, "name");
   const d = new URLSearchParams(location.search).get("d");
   roomId = d || ("u-" + sub + "-default");
-  const name = jwtField(token, "name");
   const initial = ((email || name || "?").trim()[0] || "?").toUpperCase();
-  const av = $("account-avatar");
-  av.textContent = initial;
-  av.style.background = colorFor((email || name || "x").toLowerCase());
+  const av = $("account-avatar"); av.textContent = initial; av.style.background = colorFor((email || name || "x").toLowerCase());
   $("menu-email").textContent = email || "";
-  $("diagram-label").textContent = d ? d : "Default";
+  diagramIdLabel = d ? d : "Default"; diagramTitle = ""; updateDiagramLabel();
+  $("diagram-label").classList.add("editable");
   $("signin-hint").textContent = "";
   $("gbtn").hidden = true;
   $("account").hidden = false;
@@ -116,9 +142,8 @@ function applyToken(token) {
 }
 
 function showSignedOut(rerender) {
-  $("account").hidden = true;
-  $("account-menu").hidden = true;
-  $("diagram-label").textContent = "";
+  $("account").hidden = true; $("account-menu").hidden = true;
+  $("diagram-label").textContent = ""; $("diagram-label").classList.remove("editable");
   $("signin-hint").textContent = "Sign in to receive live updates";
   $("gbtn").hidden = false;
   if (rerender) render();
@@ -132,22 +157,15 @@ function signOut() {
 }
 function doSignOut() {
   if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect();
-  signOut();
-  showSignedOut(true);
+  signOut(); showSignedOut(true);
 }
 
-function onCredential(resp) {
-  try { localStorage.setItem("kymo_idtoken", resp.credential); } catch {}
-  applyToken(resp.credential);
-}
+function onCredential(resp) { try { localStorage.setItem("kymo_idtoken", resp.credential); } catch {} applyToken(resp.credential); }
 
 let googleInited = false;
 function initGoogle(prompt) {
   if (!window.google || !google.accounts || !google.accounts.id) { setTimeout(() => initGoogle(prompt), 150); return; }
-  if (!googleInited) {
-    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onCredential, auto_select: !!prompt });
-    googleInited = true;
-  }
+  if (!googleInited) { google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onCredential, auto_select: !!prompt }); googleInited = true; }
   google.accounts.id.renderButton($("gbtn"), { type: "standard", theme: "filled_black", size: "medium", text: "signin_with" });
   if (prompt) google.accounts.id.prompt();
 }
