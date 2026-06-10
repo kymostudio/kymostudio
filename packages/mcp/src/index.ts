@@ -87,10 +87,11 @@ export class EditorRoom extends DurableObject<Env> {
       const b = (await request.json()) as { source?: string; origin?: string; owner?: string; title?: string };
       if (this.owner && b.owner && this.owner !== b.owner) return Response.json({ error: "forbidden" }, { status: 403 });
       if (!this.owner && b.owner) { this.owner = b.owner; await this.ctx.storage.put("owner", b.owner); }
-      this.source = String(b.source ?? "");
-      await this.ctx.storage.put("source", this.source);
-      if (typeof b.title === "string") { this.title = b.title; await this.ctx.storage.put("title", b.title); }
-      this.broadcast({ type: "doc", source: this.source, title: this.title, origin: b.origin ?? "mcp" });
+      let changedSource = false, changedTitle = false;
+      if (typeof b.source === "string") { this.source = b.source; await this.ctx.storage.put("source", this.source); changedSource = true; }
+      if (typeof b.title === "string") { this.title = b.title; await this.ctx.storage.put("title", this.title); changedTitle = true; }
+      if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, origin: b.origin ?? "mcp" });
+      else if (changedTitle) this.broadcast({ type: "meta", title: this.title });
       return Response.json({ ok: true, bytes: this.source.length, clients: this.ctx.getWebSockets().length });
     }
     if (url.pathname.endsWith("/get")) {
@@ -170,28 +171,39 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       async () => {
         const list = await listIndex(this.env, me());
         if (!list.length) return { content: [{ type: "text", text: "No diagrams yet — use new_diagram." }] };
-        return { content: [{ type: "text", text: list.map((d) => `- ${d.id} · ${d.title} · ${link(d.id)}`).join("\n") }] };
+        list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        const lines = list.map((d) => {
+          const when = d.updatedAt ? new Date(d.updatedAt).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "";
+          return `- ${d.title || "Untitled"} — ${link(d.id)} (id ${d.id}${when ? `, updated ${when}` : ""})`;
+        });
+        return { content: [{ type: "text", text: `${list.length} diagram(s):\n${lines.join("\n")}` }] };
       }
     );
 
     this.server.tool(
-      "set_diagram",
-      "Push kymo DSL to one of your diagrams (live). Pass `id` to target a specific diagram; if omitted, updates your most-recent one. Use the `flowchart TD { ... }` syntax.",
+      "edit_diagram",
+      "Edit one of your diagrams: update its content (`source`) and/or rename it (`title`). Pushes live to editor.kymo.studio. Pass `id` to target a specific diagram; omit to use your most recent. At least one of source/title is required. Use the `flowchart TD { ... }` block syntax for source.",
       {
-        source: z.string().describe("The full kymo flowchart DSL."),
+        source: z.string().optional().describe("New full kymo flowchart DSL (replaces the content)."),
+        title: z.string().optional().describe("New name for the diagram (rename)."),
         id: z.string().optional().describe("Diagram id (from new_diagram/list_diagrams). Omit to use your most recent."),
       },
-      async ({ source, id }) => {
+      async ({ source, title, id }) => {
+        if (source === undefined && title === undefined) return { content: [{ type: "text", text: "Provide `source` and/or `title` to edit." }] };
         const did = id ?? (await this.env.OAUTH_KV.get(`last:${me()}`));
         if (!did) return { content: [{ type: "text", text: "No diagram yet — call new_diagram first (or pass id)." }] };
+        const body: Record<string, unknown> = { origin: "mcp", owner: me() };
+        if (source !== undefined) body.source = source;
+        if (title !== undefined) body.title = title;
         const r = await roomFor(this.env, did).fetch("https://room/set", {
           method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ source, origin: "mcp", owner: me() }),
+          body: JSON.stringify(body),
         });
         if (r.status === 403) return { content: [{ type: "text", text: `Diagram ${did} isn't yours.` }] };
         const j = (await r.json()) as { clients: number };
-        await touchIndex(this.env, me(), did);
-        return { content: [{ type: "text", text: `Updated "${did}" (${j.clients} live tab(s)). ${link(did)}` }] };
+        await touchIndex(this.env, me(), did, title);
+        const what = [source !== undefined ? "content" : null, title !== undefined ? `renamed to \"${title}\"` : null].filter(Boolean).join(", ");
+        return { content: [{ type: "text", text: `Edited ${did} (${what}; ${j.clients} live tab(s)). ${link(did)}` }] };
       }
     );
 
