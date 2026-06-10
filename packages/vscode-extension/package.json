@@ -51,6 +51,41 @@
           ".kymo"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "d2",
+        "aliases": [
+          "D2",
+          "d2"
+        ],
+        "extensions": [
+          ".d2"
+        ],
+        "configuration": "./language-configuration-d2.json"
+      },
+      {
+        "id": "mermaid",
+        "aliases": [
+          "Mermaid",
+          "mermaid"
+        ],
+        "extensions": [
+          ".mmd",
+          ".mermaid"
+        ],
+        "configuration": "./language-configuration-mermaid.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "d2",
+        "scopeName": "source.d2",
+        "path": "./syntaxes/d2.tmLanguage.json"
+      },
+      {
+        "language": "mermaid",
+        "scopeName": "source.mermaid",
+        "path": "./syntaxes/mermaid.tmLanguage.json"
       }
     ],
     "commands": [

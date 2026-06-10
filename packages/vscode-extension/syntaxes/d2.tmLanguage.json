@@ -1,0 +1,99 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "D2",
+  "scopeName": "source.d2",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#block-string" },
+    { "include": "#connection" },
+    { "include": "#container" },
+    { "include": "#keyword-value" },
+    { "include": "#string" },
+    { "include": "#key" }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.number-sign.d2",
+      "match": "#.*$"
+    },
+    "block-string": {
+      "comment": "Block / markdown / code strings delimited by | or |xxx … |",
+      "begin": "(\\|)([a-z]*)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.string.begin.d2" },
+        "2": { "name": "storage.type.string.d2" }
+      },
+      "end": "\\|",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.d2" }
+      },
+      "name": "string.unquoted.block.d2"
+    },
+    "connection": {
+      "comment": "Edge connectors: -> <- <-> --",
+      "match": "(<->|->|<-|--)",
+      "name": "keyword.operator.connection.d2"
+    },
+    "container": {
+      "comment": "A container / map opener: key { ... }",
+      "match": "(\\{|\\})",
+      "name": "punctuation.section.block.d2"
+    },
+    "keyword-value": {
+      "comment": "Reserved keywords and well-known attribute values.",
+      "patterns": [
+        {
+          "match": "\\b(direction|shape|style|label|icon|near|tooltip|link|width|height|top|left|constraint|source-arrowhead|target-arrowhead|grid-rows|grid-columns|grid-gap|vertical-gap|horizontal-gap|class|classes|vars|layers|scenarios|steps)\\b",
+          "name": "keyword.control.d2"
+        },
+        {
+          "match": "\\b(stroke|stroke-width|stroke-dash|fill|fill-pattern|opacity|border-radius|font|font-size|font-color|bold|italic|underline|shadow|multiple|double-border|3d|animated|filled|text-transform)\\b",
+          "name": "support.type.property-name.d2"
+        },
+        {
+          "match": "\\b(rectangle|square|page|parallelogram|document|cylinder|queue|package|step|callout|stored_data|person|diamond|oval|circle|hexagon|cloud|text|code|class|sql_table|image|sequence_diagram)\\b",
+          "name": "support.constant.shape.d2"
+        },
+        {
+          "match": "\\b(up|down|left|right|true|false|null)\\b",
+          "name": "constant.language.d2"
+        },
+        {
+          "match": "\\b\\d+(\\.\\d+)?\\b",
+          "name": "constant.numeric.d2"
+        },
+        {
+          "match": "(#)[0-9a-fA-F]{3,8}\\b",
+          "name": "constant.other.color.d2"
+        }
+      ]
+    },
+    "string": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.d2",
+          "begin": "\"",
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.d2" } },
+          "end": "\"",
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end.d2" } },
+          "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.d2" }]
+        },
+        {
+          "name": "string.quoted.single.d2",
+          "begin": "'",
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.d2" } },
+          "end": "'",
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end.d2" } }
+        }
+      ]
+    },
+    "key": {
+      "comment": "A key (identifier) optionally followed by `:`; dotted keys are containers.",
+      "match": "([\\w.-]+)\\s*(:)?",
+      "captures": {
+        "1": { "name": "variable.other.key.d2" },
+        "2": { "name": "punctuation.separator.key-value.d2" }
+      }
+    }
+  }
+}

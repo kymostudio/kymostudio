@@ -2,6 +2,13 @@
 
 All notable changes to the kymostudio VS Code extension.
 
+## Unreleased
+
+- Syntax highlighting for **D2** (`.d2`) and **Mermaid** (`.mmd`, `.mermaid`)
+  source files, via bundled TextMate grammars and per-language editor
+  configuration (comments, brackets, auto-closing pairs). These complement the
+  existing diagram preview, which already accepts both formats.
+
 ## 0.4.1
 
 - Version bump to realign the extension with the monorepo release (catching up from 0.3.5 through 0.4.0). No change to the extension's behaviour.

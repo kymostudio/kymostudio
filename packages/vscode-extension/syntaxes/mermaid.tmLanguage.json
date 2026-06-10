@@ -1,0 +1,95 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Mermaid",
+  "scopeName": "source.mermaid",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#diagram-type" },
+    { "include": "#keyword" },
+    { "include": "#direction" },
+    { "include": "#arrow" },
+    { "include": "#edge-label" },
+    { "include": "#node-text" },
+    { "include": "#string" },
+    { "include": "#number" },
+    { "include": "#identifier" }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.percentage.mermaid",
+      "match": "%%.*$"
+    },
+    "diagram-type": {
+      "comment": "The diagram declaration on (usually) the first line.",
+      "match": "(?i)^\\s*(graph|flowchart|sequenceDiagram|classDiagram(-v2)?|stateDiagram(-v2)?|erDiagram|journey|gantt|pie|gitGraph|mindmap|timeline|quadrantChart|requirementDiagram|sankey-beta|xychart-beta|block-beta|packet-beta|C4Context|C4Container|C4Component|C4Dynamic|C4Deployment)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.diagram.mermaid" }
+      }
+    },
+    "keyword": {
+      "patterns": [
+        {
+          "match": "\\b(subgraph|end|direction|participant|actor|note|over|right of|left of|loop|alt|else|opt|par|and|critical|option|break|rect|activate|deactivate|autonumber|box|create|destroy)\\b",
+          "name": "keyword.control.mermaid"
+        },
+        {
+          "match": "\\b(class|state|click|call|callback|href|style|linkStyle|classDef|class|cssClass|interpolate|accTitle|accDescr)\\b",
+          "name": "keyword.other.mermaid"
+        },
+        {
+          "match": "\\b(title|dateFormat|axisFormat|section|excludes|includes|todayMarker|tickInterval|weekday|done|active|crit|milestone|after)\\b",
+          "name": "keyword.other.gantt.mermaid"
+        },
+        {
+          "match": "\\b(requirement|functionalRequirement|performanceRequirement|interfaceRequirement|physicalRequirement|designConstraint|element|verifyMethod|risk|satisfies|contains|copies|derives|traces|refines)\\b",
+          "name": "keyword.other.requirement.mermaid"
+        }
+      ]
+    },
+    "direction": {
+      "match": "(?<=\\s)(TB|TD|BT|RL|LR)(?=\\s|$)",
+      "name": "constant.language.direction.mermaid"
+    },
+    "arrow": {
+      "comment": "Flowchart, sequence, class and ER relationship connectors.",
+      "match": "(--[xo>]?|-\\.->|-\\.-|==+>|==+|--+>|--+|<?-->?|<?==>?|->>|-->>|--[)x]|<<-->>|<<->>|->|<-|\\.\\.>|\\.\\.|\\|[ox=<>]\\||\\}o--|\\}\\|--|--o\\{|--\\|\\{|\\|\\|--|--\\|\\||o\\{|\\}o|\\|o|o\\|)",
+      "name": "keyword.operator.arrow.mermaid"
+    },
+    "edge-label": {
+      "comment": "Edge text between pipes: A -->|label| B",
+      "begin": "\\|",
+      "beginCaptures": { "0": { "name": "punctuation.definition.label.begin.mermaid" } },
+      "end": "\\|",
+      "endCaptures": { "0": { "name": "punctuation.definition.label.end.mermaid" } },
+      "name": "string.other.edge-label.mermaid",
+      "patterns": [{ "include": "#string" }]
+    },
+    "node-text": {
+      "comment": "Node shapes carrying text: [..] (..) {..} ((..)) ([..]) [[..]] [(..)] [/../] {{..}}",
+      "begin": "(\\(\\(|\\(\\[|\\[\\[|\\[\\(|\\{\\{|\\[/|\\[\\\\|\\[|\\(|\\{|>)",
+      "beginCaptures": { "1": { "name": "punctuation.definition.node.begin.mermaid" } },
+      "end": "(\\)\\)|\\]\\)|\\]\\]|\\)\\]|\\}\\}|/\\]|\\\\\\]|\\]|\\)|\\})",
+      "endCaptures": { "1": { "name": "punctuation.definition.node.end.mermaid" } },
+      "name": "meta.node.mermaid",
+      "patterns": [
+        { "include": "#string" },
+        { "match": "[^\\]\\)\\}\"]+", "name": "string.unquoted.node-text.mermaid" }
+      ]
+    },
+    "string": {
+      "name": "string.quoted.double.mermaid",
+      "begin": "\"",
+      "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.mermaid" } },
+      "end": "\"",
+      "endCaptures": { "0": { "name": "punctuation.definition.string.end.mermaid" } }
+    },
+    "number": {
+      "match": "\\b\\d+(\\.\\d+)?\\b",
+      "name": "constant.numeric.mermaid"
+    },
+    "identifier": {
+      "match": "\\b[A-Za-z_][\\w-]*\\b",
+      "name": "variable.other.node-id.mermaid"
+    }
+  }
+}
