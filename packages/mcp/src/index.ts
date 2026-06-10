@@ -281,11 +281,30 @@ const oauthProvider = new OAuthProvider({
 // /ws is handled before the OAuth provider (it would drop the WebSocket upgrade).
 // The diagram id comes from ?d=<id>; auth + ownership are enforced in the DO.
 export default {
-  fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> | Response {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === "/ws") {
       const d = url.searchParams.get("d") || "default";
       return roomFor(env, d).fetch(request);
+    }
+    // Browser-callable list of the signed-in user's diagrams (Google id_token).
+    if (url.pathname === "/api/diagrams") {
+      const cors: Record<string, string> = {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, OPTIONS",
+        "access-control-allow-headers": "authorization, content-type",
+      };
+      if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+      const idToken = url.searchParams.get("id_token") || (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+      try {
+        const pl = await verifyGoogleIdToken(idToken, env.GOOGLE_CLIENT_ID);
+        if (!emailAllowed(pl.email, env)) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
+        const raw = await env.OAUTH_KV.get(`idx:${pl.email}`);
+        const diagrams = raw ? JSON.parse(raw) : [];
+        return Response.json({ email: pl.email, diagrams }, { headers: cors });
+      } catch {
+        return Response.json({ error: "unauthorized" }, { status: 401, headers: cors });
+      }
     }
     return oauthProvider.fetch(request, env, ctx);
   },

@@ -7,6 +7,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 rm -rf dist && mkdir -p dist
 cp web/index.html dist/index.html
+cp web/diagrams.html dist/diagrams.html
+cp web/diagrams.js dist/diagrams.js
 npx esbuild web/app.js --bundle --format=esm --target=es2022 \
   --loader:.wasm=binary --minify --outfile=dist/app.js
 echo "✓ built dist/ ($(du -sh dist | cut -f1)) — app.js $(du -h dist/app.js | cut -f1)"
