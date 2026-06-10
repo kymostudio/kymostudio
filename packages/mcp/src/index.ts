@@ -50,6 +50,29 @@ async function touchIndex(env: Env, email: string, id: string, title?: string) {
   await env.OAUTH_KV.put(`last:${email}`, id);
 }
 
+async function removeFromIndex(env: Env, email: string, id: string) {
+  const key = `idx:${email}`;
+  const raw = await env.OAUTH_KV.get(key);
+  const list = raw ? (JSON.parse(raw) as IdxEntry[]) : [];
+  const next = list.filter((d) => d.id !== id);
+  await env.OAUTH_KV.put(key, JSON.stringify(next));
+  const last = await env.OAUTH_KV.get(`last:${email}`);
+  if (last === id) {
+    if (next.length) await env.OAUTH_KV.put(`last:${email}`, next[0].id);
+    else await env.OAUTH_KV.delete(`last:${email}`);
+  }
+}
+
+async function destroyDiagram(env: Env, email: string, id: string): Promise<number> {
+  const r = await roomFor(env, id).fetch("https://room/destroy", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ owner: email }),
+  });
+  if (r.status === 403) return 403;
+  await removeFromIndex(env, email, id);
+  return 200;
+}
+
 // ---- One diagram = one EditorRoom DO (keyed by diagram id). Owner-scoped. ----
 export class EditorRoom extends DurableObject<Env> {
   source = ""; owner = ""; title = ""; diagramId = "";
@@ -93,6 +116,14 @@ export class EditorRoom extends DurableObject<Env> {
       if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, origin: b.origin ?? "mcp" });
       else if (changedTitle) this.broadcast({ type: "meta", title: this.title });
       return Response.json({ ok: true, bytes: this.source.length, clients: this.ctx.getWebSockets().length });
+    }
+    if (url.pathname.endsWith("/destroy") && request.method === "POST") {
+      const b = (await request.json()) as { owner?: string };
+      if (this.owner && b.owner !== this.owner) return Response.json({ error: "forbidden" }, { status: 403 });
+      for (const ws of this.ctx.getWebSockets()) { try { ws.close(1000, "deleted"); } catch {} }
+      await this.ctx.storage.deleteAll();
+      this.source = ""; this.owner = ""; this.title = ""; this.diagramId = "";
+      return Response.json({ ok: true });
     }
     if (url.pathname.endsWith("/get")) {
       const requester = url.searchParams.get("email") ?? "";
@@ -220,6 +251,17 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         return { content: [{ type: "text", text: j.source && j.source.length ? j.source : "(empty)" }] };
       }
     );
+
+    this.server.tool(
+      "delete_diagram",
+      "Permanently delete one of your diagrams (content and listing). Cannot be undone.",
+      { id: z.string().describe("Diagram id to delete (from list_diagrams).") },
+      async ({ id }) => {
+        const st = await destroyDiagram(this.env, me(), id);
+        if (st === 403) return { content: [{ type: "text", text: `Diagram ${id} isn't yours.` }] };
+        return { content: [{ type: "text", text: `Deleted diagram ${id}.` }] };
+      }
+    );
   }
 }
 
@@ -303,7 +345,7 @@ export default {
     if (url.pathname === "/api/diagrams") {
       const cors: Record<string, string> = {
         "access-control-allow-origin": "*",
-        "access-control-allow-methods": "GET, OPTIONS",
+        "access-control-allow-methods": "GET, DELETE, OPTIONS",
         "access-control-allow-headers": "authorization, content-type",
       };
       if (request.method === "OPTIONS") return new Response(null, { headers: cors });
@@ -311,6 +353,13 @@ export default {
       try {
         const pl = await verifyGoogleIdToken(idToken, env.GOOGLE_CLIENT_ID);
         if (!emailAllowed(pl.email, env)) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
+        if (request.method === "DELETE") {
+          const id = url.searchParams.get("id") || "";
+          if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+          const st = await destroyDiagram(env, pl.email!, id);
+          if (st === 403) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
+          return Response.json({ ok: true }, { headers: cors });
+        }
         const raw = await env.OAUTH_KV.get(`idx:${pl.email}`);
         const diagrams = raw ? JSON.parse(raw) : [];
         return Response.json({ email: pl.email, diagrams }, { headers: cors });

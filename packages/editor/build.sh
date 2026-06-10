@@ -6,6 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 rm -rf dist && mkdir -p dist
 cp web/index.html dist/index.html
+cp web/index.html dist/diagrams.html
 cp web/styles.css dist/styles.css
 printf '/* /index.html 200\n' > dist/_redirects
 npx esbuild web/main.tsx --bundle --format=esm --splitting --outdir=dist \

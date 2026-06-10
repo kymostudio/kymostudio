@@ -36,6 +36,16 @@ export default function DiagramsPage() {
     location.href = "/?d=" + id;
   }
 
+  async function remove(dd: Item) {
+    if (!idToken) return;
+    if (!window.confirm(`Delete "${dd.title || "Untitled"}"? This cannot be undone.`)) return;
+    try {
+      const r = await fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" });
+      if (!r.ok) { setStatus(`Delete failed (${r.status})`); return; }
+      load();
+    } catch (e: any) { setStatus("Delete failed: " + e.message); }
+  }
+
   return (
     <div className="layout">
       <header>
@@ -56,10 +66,13 @@ export default function DiagramsPage() {
               <div className="status-line muted">{status}</div>
               <div className="list">
                 {items.map((dd) => (
-                  <a key={dd.id} className="row" href={"/?d=" + encodeURIComponent(dd.id)}>
-                    <span className="title">{dd.title || "Untitled"}</span>
-                    <span className="meta">{dd.id} · {new Date(dd.updatedAt).toLocaleString()}</span>
-                  </a>
+                  <div key={dd.id} className="row">
+                    <a className="row-main" href={"/?d=" + encodeURIComponent(dd.id)}>
+                      <span className="title">{dd.title || "Untitled"}</span>
+                      <span className="meta">{new Date(dd.updatedAt).toLocaleString()}</span>
+                    </a>
+                    <button className="row-del" title="Delete diagram" onClick={() => remove(dd)}>Delete</button>
+                  </div>
                 ))}
               </div>
             </>
