@@ -1,0 +1,35 @@
+<svg viewBox="0 0 1280 640" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="640" fill="#242131"/>
+  <!-- faint diagram motif, right side -->
+  <g stroke="#ffffff" stroke-opacity="0.06" stroke-width="6" stroke-linecap="round" fill="none">
+    <line x1="1020" y1="120" x2="1170" y2="210"/>
+    <line x1="1170" y1="210" x2="1090" y2="350"/>
+    <line x1="1090" y1="350" x2="1230" y2="450"/>
+    <line x1="1090" y1="350" x2="960" y2="470"/>
+  </g>
+  <g fill="#ffffff" fill-opacity="0.10">
+    <circle cx="1020" cy="120" r="14"/>
+    <circle cx="1170" cy="210" r="14"/>
+    <circle cx="1090" cy="350" r="14"/>
+    <circle cx="1230" cy="450" r="14"/>
+    <circle cx="960" cy="470" r="14"/>
+  </g>
+  <!-- logo tile 200px -->
+  <g transform="translate(140 220) scale(2.0)">
+    <rect width="100" height="100" rx="18" fill="#e0095f"/>
+    <g transform="translate(50 50) scale(0.98) translate(-50 -50)">
+      <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+      <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+      <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+      <circle cx="33" cy="26.5" r="5.8" fill="#fff"/><circle cx="33" cy="26.5" r="2.44" fill="#e0095f"/>
+      <circle cx="65.5" cy="27" r="5.8" fill="#fff"/><circle cx="65.5" cy="27" r="2.44" fill="#e0095f"/>
+      <circle cx="33" cy="73.5" r="5.8" fill="#fff"/><circle cx="33" cy="73.5" r="2.44" fill="#e0095f"/>
+      <circle cx="34" cy="58.5" r="5.8" fill="#fff"/><circle cx="34" cy="58.5" r="2.44" fill="#e0095f"/>
+      <circle cx="48" cy="49.5" r="5.8" fill="#fff"/><circle cx="48" cy="49.5" r="2.44" fill="#e0095f"/>
+      <circle cx="67" cy="73" r="5.8" fill="#fff"/><circle cx="67" cy="73" r="2.44" fill="#e0095f"/>
+    </g>
+  </g>
+  <!-- wordmark: two-tone -->
+  <text x="400" y="338" font-family="SF Pro Rounded" font-weight="900" font-size="112" fill="#ffffff">kymo<tspan fill="#e0095f">studio</tspan></text>
+  <text x="404" y="408" font-family="SF Pro Rounded" font-weight="500" font-size="36" fill="#DDECEE">Diagram superpowers</text>
+</svg>

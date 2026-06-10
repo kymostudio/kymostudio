@@ -13,6 +13,8 @@ colour palette.
 | `favicon.ico` | Legacy favicon, **48 + 32 px** (no 16 — see note). |
 | `favicon-32.png`, `favicon-48.png` | PNG favicons. |
 | `apple-touch-icon.png` | iOS / `apple-touch-icon` (180×180, rendered from the full master). |
+| `social-preview.svg` | **Social-preview banner source** (1280×640 viewBox) — GitHub og-image, horizontal lockup: tile + two-tone wordmark + tagline "Diagram superpowers". |
+| `social-preview.png` | Rendered banner (2560×1280, 2×). The committed render is canonical — see font caveat below. |
 
 **Favicon ≠ a shrunk master.** The master's node-dot handles turn to mush at
 small sizes, so the favicon (`favicon.svg`) is a separate glyph: the same pink
@@ -38,6 +40,21 @@ magick favicon-48.png favicon-32.png \
   -background none -type TrueColorAlpha -depth 8 -strip favicon.ico
 rsvg-convert -w 180 -h 180 logo.svg -o apple-touch-icon.png   # apple-touch from the master
 ```
+
+Regenerate the social-preview banner (after a tagline/layout change):
+
+```bash
+cd docs/brand
+rsvg-convert -w 2560 -h 1280 social-preview.svg -o social-preview.png
+```
+
+**Banner font caveat.** Unlike the master logo (pure geometry), the banner's
+wordmark + tagline are `<text>` set in **SF Pro Rounded** (Black 900 / Medium
+500) — the same face as `favicon.svg`'s glyph, but *not* outlined. Rendering
+therefore requires SF Pro Rounded installed (macOS with Apple's SF fonts);
+elsewhere the text falls back to whatever fontconfig picks. The committed
+`social-preview.png` is the canonical render — re-render only on a machine with
+the font. Upload it at repo **Settings → Social preview** (no API; web UI only).
 
 **ICO quality notes** — what makes this lossless / maximum-quality:
 
