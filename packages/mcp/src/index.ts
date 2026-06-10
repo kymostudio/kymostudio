@@ -52,13 +52,14 @@ async function touchIndex(env: Env, email: string, id: string, title?: string) {
 
 // ---- One diagram = one EditorRoom DO (keyed by diagram id). Owner-scoped. ----
 export class EditorRoom extends DurableObject<Env> {
-  source = ""; owner = ""; title = "";
+  source = ""; owner = ""; title = ""; diagramId = "";
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     ctx.blockConcurrencyWhile(async () => {
       this.source = (await ctx.storage.get<string>("source")) ?? "";
       this.owner = (await ctx.storage.get<string>("owner")) ?? "";
       this.title = (await ctx.storage.get<string>("title")) ?? "";
+      this.diagramId = (await ctx.storage.get<string>("diagramId")) ?? "";
     });
   }
 
@@ -72,7 +73,9 @@ export class EditorRoom extends DurableObject<Env> {
         email = p.email;
         if (!emailAllowed(email, this.env)) return new Response("forbidden", { status: 403 });
       } catch { return new Response("unauthorized", { status: 401 }); }
-      if (!this.owner) { this.owner = email!; await this.ctx.storage.put("owner", email!); }
+      const dParam = url.searchParams.get("d");
+      if (dParam && this.diagramId !== dParam) { this.diagramId = dParam; await this.ctx.storage.put("diagramId", dParam); }
+      if (!this.owner) { this.owner = email!; await this.ctx.storage.put("owner", email!); await this.indexUpsert(); }
       else if (this.owner !== email) return new Response("forbidden: not your diagram", { status: 403 });
       const pair = new WebSocketPair();
       const client = pair[0], server = pair[1];
@@ -106,6 +109,25 @@ export class EditorRoom extends DurableObject<Env> {
       await this.ctx.storage.put("source", this.source);
       this.broadcast({ type: "doc", source: this.source, title: this.title, origin: data.origin ?? "browser" }, ws);
     }
+    if (data && data.type === "rename" && typeof data.title === "string") {
+      this.title = data.title;
+      await this.ctx.storage.put("title", this.title);
+      await this.indexUpsert();
+      this.broadcast({ type: "meta", title: this.title }, ws);
+    }
+  }
+
+  async indexUpsert() {
+    if (!this.owner || !this.diagramId) return;
+    const key = `idx:${this.owner}`;
+    const raw = await this.env.OAUTH_KV.get(key);
+    const list = raw ? (JSON.parse(raw) as { id: string; title: string; updatedAt: number }[]) : [];
+    const i = list.findIndex((d) => d.id === this.diagramId);
+    const now = Date.now();
+    if (i >= 0) { if (this.title) list[i].title = this.title; list[i].updatedAt = now; }
+    else list.push({ id: this.diagramId, title: this.title || "Untitled", updatedAt: now });
+    list.sort((a, b) => b.updatedAt - a.updatedAt);
+    await this.env.OAUTH_KV.put(key, JSON.stringify(list));
   }
   async webSocketClose(ws: WebSocket) { try { ws.close(); } catch {} }
   broadcast(obj: unknown, except?: WebSocket) {

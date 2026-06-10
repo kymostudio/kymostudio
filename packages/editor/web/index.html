@@ -15,7 +15,10 @@
       header h1 span { color: var(--accent); }
       .spacer { flex: 1; }
       .muted { font-size: 12px; color: var(--muted); }
-      .diagram-name { font-size: 13px; font-weight: 500; color: var(--muted); }
+      .diagram-name { font-size: 13px; font-weight: 500; color: var(--muted); padding: 2px 6px; border-radius: 6px; }
+      .diagram-name.editable { cursor: text; }
+      .diagram-name.editable:hover { color: var(--fg); background: #1c212b; }
+      .diagram-input { font: inherit; font-size: 13px; background: #12141a; border: 1px solid var(--accent); border-radius: 6px; color: var(--fg); padding: 2px 6px; outline: none; min-width: 120px; }
       button { background:#1f2430; color:var(--fg); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font:inherit; cursor:pointer; }
       button:hover { border-color: var(--accent); }
       [hidden] { display: none !important; }
@@ -42,7 +45,8 @@
   </head>
   <body>
     <header>
-      <span class="diagram-name" id="diagram-label"></span>
+      <span class="diagram-name" id="diagram-label" title="Đổi tên"></span>
+      <input class="diagram-input" id="diagram-input" maxlength="60" placeholder="Tên diagram" hidden />
       <div class="spacer"></div>
       <span class="muted" id="signin-hint"></span>
       <div id="gbtn"></div>
