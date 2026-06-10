@@ -1,12 +1,9 @@
-<h1 align="center">kymostudio</h1>
-
-<p align="center">
-  <a href="https://editor.kymo.studio">Live Editor</a>
-  <span>|</span>
-  <a href="https://kymo.studio/">Website</a>
-  <span>|</span>
-  <a href="./docs/guide/getting-started.md">Documentation</a>
-</p>
+<div align="center">
+	<picture>
+		<source media="(prefers-color-scheme: dark)" srcset="https://github.com/kymostudio/kymostudio/raw/main/docs/brand/github-hero-dark.png" />
+		<img alt="kymostudio — Diagram superpowers" src="https://github.com/kymostudio/kymostudio/raw/main/docs/brand/github-hero-light.png" />
+	</picture>
+</div>
 
 <p align="center">
   <a href="https://pypi.org/project/kymostudio/"><img alt="PyPI" src="https://img.shields.io/pypi/v/kymostudio?logo=pypi&logoColor=white&label=PyPI"></a>
@@ -17,7 +14,13 @@
   <a href="./LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
 </p>
 
-> **Diagram superpowers** — type it, see it appear, watch it animate.
+<h3 align="center">
+  Type it. See it appear. Watch it animate.
+</h3>
+
+<p align="center">
+  <a href="https://editor.kymo.studio">Live Editor</a> · <a href="https://kymo.studio/">Website</a> · <a href="./docs/guide/getting-started.md">Documentation</a>
+</p>
 
 **Kymostudio** is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
 

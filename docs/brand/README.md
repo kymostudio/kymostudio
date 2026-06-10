@@ -15,6 +15,8 @@ colour palette.
 | `apple-touch-icon.png` | iOS / `apple-touch-icon` (180×180, rendered from the full master). |
 | `social-preview.svg` | **Social-preview banner source** (1280×640 viewBox) — GitHub og-image, horizontal lockup: tile + two-tone wordmark + tagline "Diagram superpowers". |
 | `social-preview.png` | Rendered banner (2560×1280, 2×). The committed render is canonical — see font caveat below. |
+| `github-hero-dark.svg` / `-light.svg` | **README hero source** (1000×280 viewBox, transparent bg) — tile + two-tone wordmark + tagline; dark = white primary, light = navy primary. |
+| `github-hero-dark.png` / `-light.png` | Rendered heroes (2000×560, 2×) used by the root README's `<picture>` (dark/light via `prefers-color-scheme`). Same font caveat as the banner. |
 
 **Favicon ≠ a shrunk master.** The master's node-dot handles turn to mush at
 small sizes, so the favicon (`favicon.svg`) is a separate glyph: the same pink
@@ -46,6 +48,8 @@ Regenerate the social-preview banner (after a tagline/layout change):
 ```bash
 cd docs/brand
 rsvg-convert -w 2560 -h 1280 social-preview.svg -o social-preview.png
+rsvg-convert -w 2000 -h 560 github-hero-dark.svg -o github-hero-dark.png
+rsvg-convert -w 2000 -h 560 github-hero-light.svg -o github-hero-light.png
 ```
 
 **Banner font caveat.** Unlike the master logo (pure geometry), the banner's
