@@ -1,12 +1,41 @@
 // Generated from database.sqlite by generate_schema.py — do not edit by hand.
 
 
+Table criteria {
+  category text [not null]
+  key text [not null]
+  name text [not null]
+  weight real [not null]
+  description text [not null]
+
+  indexes {
+    (category, key) [pk]
+  }
+
+  Note: 'CHECK (category IN (\'type\',\'tool\')) · CHECK (weight > 0 AND weight <= 1)'
+}
+
+Table diagram_metric_history {
+  key text [not null]
+  metric text [not null]
+  year integer [not null]
+  value real [not null]
+  unit text [not null]
+  source text [not null]
+  note text
+
+  indexes {
+    (key, metric, year) [pk]
+  }
+}
+
 Table diagram_rankings {
   year integer [not null]
   rank integer [not null]
   key text [not null]
   label text [not null]
   evidence text [not null]
+  score real
 
   indexes {
     (year, rank) [pk]
@@ -16,14 +45,100 @@ Table diagram_rankings {
   Note: 'CHECK (rank BETWEEN 1 AND 10)'
 }
 
+Table diagram_scores {
+  year integer [not null]
+  key text [not null]
+  criterion text [not null]
+  score real [not null]
+
+  indexes {
+    (year, key, criterion) [pk]
+  }
+
+  Note: 'CHECK (score >= 0 AND score <= 10)'
+}
+
 Table diagrams {
   key text [pk]
   name text [not null]
 }
 
+Table github_stars {
+  repo text [not null]
+  year integer [not null]
+  stars_gained integer [not null]
+  fetched_at text [not null]
+
+  indexes {
+    (repo, year) [pk]
+  }
+}
+
+Table google_books_ngram {
+  ngram text [not null]
+  year integer [not null]
+  frequency real [not null]
+  corpus text [not null]
+  fetched_at text [not null]
+
+  indexes {
+    (ngram, year) [pk]
+  }
+}
+
+Table npm_downloads {
+  package text [not null]
+  month text [not null]
+  downloads integer [not null]
+  fetched_at text [not null]
+
+  indexes {
+    (package, month) [pk]
+  }
+}
+
+Table stack_overflow_tags {
+  tag text [not null]
+  year integer [not null]
+  questions integer [not null]
+  fetched_at text [not null]
+
+  indexes {
+    (tag, year) [pk]
+  }
+}
+
 Table timeline {
   year integer [pk]
   remark text
+}
+
+Table tool_metric_history {
+  key text [not null]
+  metric text [not null]
+  year integer [not null]
+  value real [not null]
+  unit text [not null]
+  source text [not null]
+  note text
+
+  indexes {
+    (key, metric, year) [pk]
+  }
+}
+
+Table tool_metrics {
+  key text [not null]
+  metric text [not null]
+  value real [not null]
+  unit text [not null]
+  as_of text [not null]
+  source text [not null]
+  note text
+
+  indexes {
+    (key, metric, as_of) [pk]
+  }
 }
 
 Table tool_rankings {
@@ -32,6 +147,7 @@ Table tool_rankings {
   key text [not null]
   label text [not null]
   evidence text [not null]
+  score real
 
   indexes {
     (year, rank) [pk]
@@ -41,10 +157,39 @@ Table tool_rankings {
   Note: 'CHECK (rank BETWEEN 1 AND 10)'
 }
 
+Table tool_scores {
+  year integer [not null]
+  key text [not null]
+  criterion text [not null]
+  score real [not null]
+
+  indexes {
+    (year, key, criterion) [pk]
+  }
+
+  Note: 'CHECK (score >= 0 AND score <= 10)'
+}
+
 Table tools {
   key text [pk]
   name text [not null]
 }
 
+Table wikipedia_pageviews {
+  article text [not null]
+  month text [not null]
+  views integer [not null]
+  fetched_at text [not null]
+
+  indexes {
+    (article, month) [pk]
+  }
+}
+
+Ref: diagram_metric_history.key > diagrams.key
 Ref: diagram_rankings.key > diagrams.key
+Ref: diagram_scores.key > diagrams.key
+Ref: tool_metric_history.key > tools.key
+Ref: tool_metrics.key > tools.key
 Ref: tool_rankings.key > tools.key
+Ref: tool_scores.key > tools.key
