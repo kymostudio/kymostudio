@@ -181,7 +181,7 @@ export class EditorRoom extends DurableObject<Env> {
       const pair = new WebSocketPair();
       const client = pair[0], server = pair[1];
       this.ctx.acceptWebSocket(server);
-      server.send(JSON.stringify({ type: "doc", source: this.source, title: this.title, kind: this.kind || undefined, origin: "server" }));
+      server.send(JSON.stringify({ type: "doc", source: this.source, title: this.title, kind: this.kind || "kymo", origin: "server" }));
       return new Response(null, { status: 101, webSocket: client });
     }
     if (url.pathname.endsWith("/set") && request.method === "POST") {
@@ -193,7 +193,7 @@ export class EditorRoom extends DurableObject<Env> {
       if (typeof b.kind === "string") { this.kind = b.kind; await this.ctx.storage.put("kind", this.kind); }
       if (typeof b.source === "string") { this.source = b.source; await this.ctx.storage.put("source", this.source); changedSource = true; }
       if (typeof b.title === "string") { this.title = b.title; await this.ctx.storage.put("title", this.title); changedTitle = true; }
-      if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || undefined, origin: b.origin ?? "mcp" });
+      if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || "kymo", origin: b.origin ?? "mcp" });
       else if (changedTitle) this.broadcast({ type: "meta", title: this.title });
       await this.indexUpsert(); // one write per API call (MCP edits), not per-keystroke
       return Response.json({ ok: true, bytes: this.source.length, clients: this.ctx.getWebSockets().length });
@@ -223,7 +223,7 @@ export class EditorRoom extends DurableObject<Env> {
       let kindChanged = false;
       if (typeof data.kind === "string" && data.kind !== this.kind) { this.kind = data.kind; await this.ctx.storage.put("kind", this.kind); kindChanged = true; }
       if (kindChanged || Date.now() - this.lastIdx > 30_000) await this.indexUpsert(); // kind changes are rare — index immediately
-      this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || undefined, origin: data.origin ?? "browser" }, ws);
+      this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || "kymo", origin: data.origin ?? "browser" }, ws);
     }
     if (data && data.type === "rename" && typeof data.title === "string") {
       this.title = data.title;
