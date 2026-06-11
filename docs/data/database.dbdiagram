@@ -41,6 +41,84 @@
         "schemaName": "public",
         "x": 12,
         "y": 714
+      },
+      {
+        "name": "criteria",
+        "schemaName": "public",
+        "x": 12,
+        "y": 860
+      },
+      {
+        "name": "diagram_scores",
+        "schemaName": "public",
+        "x": 259.353515625,
+        "y": 860
+      },
+      {
+        "name": "tool_scores",
+        "schemaName": "public",
+        "x": 504.1953125,
+        "y": 860
+      },
+      {
+        "name": "metrics",
+        "schemaName": "public",
+        "x": 12,
+        "y": 1102
+      },
+      {
+        "name": "metric_history",
+        "schemaName": "public",
+        "x": 12,
+        "y": 1408
+      },
+      {
+        "name": "diagram_metric_history",
+        "schemaName": "public",
+        "x": 12,
+        "y": 1102
+      },
+      {
+        "name": "tool_metric_history",
+        "schemaName": "public",
+        "x": 299.70703125,
+        "y": 1102
+      },
+      {
+        "name": "tool_metrics",
+        "schemaName": "public",
+        "x": 559.21142578125,
+        "y": 1102
+      },
+      {
+        "name": "github_stars",
+        "schemaName": "public",
+        "x": 12,
+        "y": 1408
+      },
+      {
+        "name": "google_books_ngram",
+        "schemaName": "public",
+        "x": 286.78173828125,
+        "y": 1408
+      },
+      {
+        "name": "npm_downloads",
+        "schemaName": "public",
+        "x": 555.66162109375,
+        "y": 1408
+      },
+      {
+        "name": "stack_overflow_tags",
+        "schemaName": "public",
+        "x": 819.6650390625,
+        "y": 1408
+      },
+      {
+        "name": "wikipedia_pageviews",
+        "schemaName": "public",
+        "x": 12,
+        "y": 1618
       }
     ],
     "tableGroupCollapseStates": [],
@@ -66,6 +144,111 @@
           "key"
         ],
         "firstTableName": "tool_rankings",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "tools",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "diagram_scores",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "diagrams",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "tool_scores",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "tools",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "metrics",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "tools",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "metric_history",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "tools",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "diagram_metric_history",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "diagrams",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "tool_metric_history",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "tools",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "tool_metrics",
         "firstSchemaName": "public",
         "firstRelation": "*",
         "secondFieldNames": [

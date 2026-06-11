@@ -3,7 +3,7 @@
 | Field             | Value                                                                                                                    |
 |-------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Document ID       | RES-DIAGRAM-TIMELINE-001                                                                                                  |
-| Version           | 1.2                                                                                                                      |
+| Version           | 1.3                                                                                                                      |
 | Issue Date        | 2026-06-11                                                                                                               |
 | Status            | Draft                                                                                                                    |
 | Classification    | Internal                                                                                                                |
@@ -16,7 +16,7 @@ This is a **research note on the history of diagramming** (1995–2025), not a s
 
 Dates were verified against primary sources where possible (W3C, OMG, official sites, project repositories, funding announcements). The top-10 rankings are **evidence-based estimates** — no per-year market-share survey of diagramming exists — anchored to contemporary press, buyer's guides, SEC filings, funding rounds, user-count claims, and GitHub/npm statistics. Where a year had no single dominant event, the page says so plainly.
 
-**The rankings are managed in [`docs/data/database.sqlite`](../../data/database.sqlite)** — entity tables `diagrams(key, name)` and `tools(key, name)` hold the canonical identities across years, while `diagram_rankings` / `tool_rankings(year, rank, key → FK, label, evidence)` hold the per-year top-10s and `timeline(year, remark)` the per-year remarks. The per-page tables — including the Δ column and the dropped-out lists — are generated from it by [`render_tables.py`](render_tables.py); edit the DB, then run `python3 render_tables.py` to refresh all 31 pages. The DB schema is documented in [`docs/data/database.dbml`](../../data/database.dbml), regenerated via `uv run generate_schema.py` inside the `docs/data` uv project.
+**The rankings are managed in [`docs/data/database.sqlite`](../../data/database.sqlite)** — entity tables `diagrams(key, name)` and `tools(key, name)` hold the canonical identities across years, while `diagram_rankings` / `tool_rankings(year, rank, key → FK, label, evidence, score)` hold the per-year top-10s and `timeline(year, remark)` the per-year remarks. Each rank is the descending order of a **weighted composite score** over per-criterion scores (`criteria` weights × `diagram_scores`/`tool_scores`), computed by the canonical function [`docs/data/compute_rankings.py`](../../data/compute_rankings.py) — the method is specified in [`METHOD.md`](METHOD.md) (`RES-DIAGRAM-TIMELINE-002`). The per-page tables — including the Δ column and the dropped-out lists — are generated from it by [`render_tables.py`](render_tables.py); edit the DB, then run `python3 render_tables.py` to refresh all 31 pages. The DB schema is documented in [`docs/data/database.dbml`](../../data/database.dbml), regenerated via `uv run generate_schema.py` inside the `docs/data` uv project.
 
 ## 1. Three eras
 
