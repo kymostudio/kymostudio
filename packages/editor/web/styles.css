@@ -56,6 +56,12 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .acct-head b { display: block; color: var(--ink); font-size: 13px; font-weight: 600; margin-top: 2px; word-break: break-all; }
 .acct-item { display: block; width: 100%; text-align: left; background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 8px 10px; margin-top: 4px; color: var(--ink); font-weight: 500; }
 .acct-item:hover { background: var(--bg-soft); border-color: transparent; }
+.exp-menu { min-width: 190px; }
+.exp-item { display: flex; align-items: center; gap: 9px; font-size: 13.5px; }
+.exp-item svg { flex: none; color: var(--dim); }
+.exp-item:hover svg { color: var(--accent); }
+.menu-sep { height: 1px; background: var(--border); margin: 4px 6px; }
+.chev-inline { font-size: 10px; color: var(--dim); margin-left: 2px; }
 
 /* ---- editor panes ---- */
 main { flex: 1; display: flex; min-height: 0; }

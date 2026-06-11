@@ -41,6 +41,7 @@ export default function EditorPage() {
   const [title, setTitle] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
@@ -118,7 +119,7 @@ export default function EditorPage() {
   }, [source]); // eslint-disable-line
 
   useEffect(() => {
-    const h = () => setMenuOpen(false);
+    const h = () => { setMenuOpen(false); setExportOpen(false); };
     document.addEventListener("click", h);
     return () => document.removeEventListener("click", h);
   }, []);
@@ -127,11 +128,37 @@ export default function EditorPage() {
   const booting = (!d && !!idToken) || syncing; // redirecting to the latest diagram, or waiting for the first doc
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
 
+  function saveBlob(blob: Blob, name: string) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name; a.click(); URL.revokeObjectURL(a.href);
+  }
   function download() {
     if (!lastSvg.current) return;
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([lastSvg.current], { type: "image/svg+xml" }));
-    a.download = (diagramLabel || "flowchart") + ".svg"; a.click(); URL.revokeObjectURL(a.href);
+    saveBlob(new Blob([lastSvg.current], { type: "image/svg+xml" }), (diagramLabel || "flowchart") + ".svg");
+  }
+  async function exportPNG(scale = 2) {
+    if (!lastSvg.current) return;
+    const url = URL.createObjectURL(new Blob([lastSvg.current], { type: "image/svg+xml" }));
+    try {
+      const img = new Image();
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (!w || !h) {
+        const m = lastSvg.current.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
+        w = m ? Math.ceil(parseFloat(m[1])) : 800; h = m ? Math.ceil(parseFloat(m[2])) : 600;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w * scale; canvas.height = h * scale;
+      const ctx = canvas.getContext("2d")!;
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((b) => { if (b) saveBlob(b, (diagramLabel || "flowchart") + ".png"); }, "image/png");
+    } finally { URL.revokeObjectURL(url); }
+  }
+  function exportSource() {
+    if (!source.trim()) return;
+    saveBlob(new Blob([source], { type: "text/plain;charset=utf-8" }), (diagramLabel || "flowchart") + ".kymo");
   }
   function newDiagram() {
     navigate("/?d=" + newId());
@@ -175,7 +202,26 @@ export default function EditorPage() {
         )}
         <Link className="btn" to="/diagrams">Diagrams</Link>
         <button className="btn-primary" onClick={newDiagram} title="New diagram">+ New</button>
-        <button onClick={download}>Download SVG</button>
+        <div className="account" onClick={(e) => e.stopPropagation()}>
+          <button onClick={() => setExportOpen((o) => !o)}>Export <span className="chev-inline">▾</span></button>
+          {exportOpen && (
+            <div className="acct-menu exp-menu">
+              <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></svg>
+                To SVG
+              </button>
+              <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportPNG(); }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>
+                To PNG
+              </button>
+              <div className="menu-sep" />
+              <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m16 18 6-6-6-6" /><path d="m8 6-6 6 6 6" /></svg>
+                Source (.kymo)
+              </button>
+            </div>
+          )}
+        </div>
       </header>
       <main>
         {booting ? (
