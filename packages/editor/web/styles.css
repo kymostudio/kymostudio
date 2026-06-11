@@ -190,3 +190,15 @@ button:active, .btn:active, .pill:active, .ws-pill:active { transform: translate
   button, .btn, .pill, .ws-pill, .kind-select, .rmove, .acct-item, .linklike, .chev, .chev-icon, .ws-check { transition: none; }
   button:hover, .btn:hover, .pill:hover, .ws-pill:hover, .kind-select:hover, button:active, .btn:active, .pill:active, .ws-pill:active { transform: none; }
 }
+
+/* CodeMirror source editor */
+.code-editor { flex: 1; min-height: 0; overflow: hidden; }
+.code-editor .cm-editor { height: 100%; }
+
+/* draggable pane splitter (dbdiagram-style) */
+.splitter { flex: none; width: 7px; cursor: col-resize; background: var(--bg); border-left: 1px solid var(--border); position: relative; z-index: 5; touch-action: none; transition: background-color 0.15s ease, border-color 0.15s ease; }
+.splitter::after { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2px; height: 38px; border-radius: 2px; background: var(--border-strong); transition: background-color 0.15s ease, height 0.15s ease; }
+.splitter:hover, body.splitting .splitter { background: var(--accent-soft); border-left-color: rgba(224, 9, 95, 0.35); }
+.splitter:hover::after, body.splitting .splitter::after { background: var(--accent); height: 52px; }
+body.splitting { user-select: none; cursor: col-resize; }
+body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }

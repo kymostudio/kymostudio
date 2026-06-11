@@ -6,6 +6,11 @@
     "build": "./build.sh"
   },
   "dependencies": {
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-xml": "^6.1.0",
+    "@codemirror/legacy-modes": "^6.5.3",
+    "@lezer/highlight": "^1.2.3",
+    "codemirror": "^6.0.2",
     "kymostudio": "file:../js",
     "kymostudio-core": "file:../rust/kymostudio-core/pkg",
     "lucide-react": "^1.17.0",

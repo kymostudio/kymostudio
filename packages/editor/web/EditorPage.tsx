@@ -4,6 +4,7 @@ import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
 import { WorkspaceSwitcher, useWorkspace, assignDiagram } from "./workspace";
 import { KINDS, renderKroki } from "./kroki";
+import { CodeEditor } from "./codeeditor";
 import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
@@ -49,6 +50,15 @@ export default function EditorPage() {
   const [syncing, setSyncing] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
+  // split = width of the source pane in % (dbdiagram-style draggable divider)
+  const [split, setSplit] = useState(() => {
+    const v = parseFloat(localStorage.getItem("kymo_split") || "");
+    return v >= 15 && v <= 85 ? v : 50;
+  });
+  const splitRef = useRef(split);
+  splitRef.current = split;
+  const mainRef = useRef<HTMLElement>(null);
+  const draggingSplit = useRef(false);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
@@ -192,6 +202,28 @@ export default function EditorPage() {
     setEditingName(false);
   }
 
+  function splitDown(e: React.PointerEvent) {
+    e.preventDefault();
+    draggingSplit.current = true;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    document.body.classList.add("splitting");
+  }
+  function splitMove(e: React.PointerEvent) {
+    if (!draggingSplit.current || !mainRef.current) return;
+    const r = mainRef.current.getBoundingClientRect();
+    setSplit(Math.min(85, Math.max(15, ((e.clientX - r.left) / r.width) * 100)));
+  }
+  function splitUp() {
+    if (!draggingSplit.current) return;
+    draggingSplit.current = false;
+    document.body.classList.remove("splitting");
+    try { localStorage.setItem("kymo_split", splitRef.current.toFixed(1)); } catch {}
+  }
+  function splitReset() {
+    setSplit(50);
+    try { localStorage.setItem("kymo_split", "50"); } catch {}
+  }
+
   return (
     <div className="layout">
       <header>
@@ -246,7 +278,7 @@ export default function EditorPage() {
           )}
         </div>
       </header>
-      <main>
+      <main ref={mainRef}>
         {booting ? (
           <div className="boot">
             <div className="kloader" role="img" aria-label="Loading">
@@ -275,7 +307,7 @@ export default function EditorPage() {
           </div>
         ) : (
           <>
-            <section className="pane">
+            <section className="pane" style={{ flex: `0 0 ${split}%` }}>
               <div className="pane-bar">
                 <select className="kind-select" value={kind} title="Diagram type"
                   onChange={(e) => {
@@ -288,8 +320,10 @@ export default function EditorPage() {
                   {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
                 </select>
               </div>
-              <textarea value={source} spellCheck={false} onChange={(e) => { userEdited.current = true; setSource(e.target.value); }} />
+              <CodeEditor value={source} kind={kind} onChange={(v) => { userEdited.current = true; setSource(v); }} />
             </section>
+            <div className="splitter" title="Kéo để chỉnh kích thước · double-click về 50/50"
+              onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />
             <section className="pane"><div id="preview" dangerouslySetInnerHTML={{ __html: svg }} /></section>
           </>
         )}
