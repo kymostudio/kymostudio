@@ -28,6 +28,7 @@ export default function DiagramsPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [error, setError] = useState("");
   const [q, setQ] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => { document.title = "Diagrams · Kymostudio"; return () => { document.title = "Kymostudio"; }; }, []);
 
@@ -40,6 +41,7 @@ export default function DiagramsPage() {
       setError("");
       setItems((j.diagrams || []).slice().sort((a: Item, b: Item) => (b.updatedAt || 0) - (a.updatedAt || 0)));
     } catch (e: any) { setError("Error: " + e.message); }
+    setLoaded(true);
   }, [idToken]);
 
   useEffect(() => { load(); }, [load]);
@@ -94,6 +96,12 @@ export default function DiagramsPage() {
             </div>
             {error && <div className="empty">{error}</div>}
             <div className="rows">
+              {!loaded && !items.length && !error && [0, 1, 2].map((i) => (
+                <div key={"skel" + i} className="rrow">
+                  <span className="rtitle"><span className="skeleton" style={{ width: 180 }} /></span>
+                  <span className="rtime"><span className="skeleton" style={{ width: 80 }} /></span>
+                </div>
+              ))}
               {filtered.map((dd) => (
                 <a key={dd.id} className="rrow" href={"/?d=" + encodeURIComponent(dd.id)}>
                   <span className="rtitle">{dd.title || "Untitled"}</span>
@@ -102,7 +110,7 @@ export default function DiagramsPage() {
                   <span className="rtime">{timeAgo(dd.updatedAt)}</span>
                 </a>
               ))}
-              {!filtered.length && !error && (
+              {loaded && !filtered.length && !error && (
                 <div className="empty">{q ? "No diagrams match your search." : "No diagrams yet — create one."}</div>
               )}
             </div>

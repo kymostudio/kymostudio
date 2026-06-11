@@ -40,6 +40,7 @@ export default function EditorPage() {
   const [live, setLive] = useState(false);
   const [title, setTitle] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [editingName, setEditingName] = useState(false);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
@@ -68,6 +69,17 @@ export default function EditorPage() {
     return () => { stop = true; };
   }, []); // eslint-disable-line
 
+  // Hold a loading state from "room requested" to "first doc received" so the
+  // header/title and source don't render a placeholder and then flip (5s failsafe).
+  useEffect(() => {
+    if (d && idToken) {
+      setSyncing(true);
+      const t = setTimeout(() => setSyncing(false), 5000);
+      return () => clearTimeout(t);
+    }
+    setSyncing(false);
+  }, [d, idToken]);
+
   // Rooms are switched client-side (+ New uses navigate()), so reset per-room state on ?d change.
   useEffect(() => {
     setSource(SAMPLE); setTitle(""); setEditingName(false);
@@ -75,9 +87,10 @@ export default function EditorPage() {
   }, [d]);
 
   const room = useRoom(roomId, idToken, {
-    onLive: setLive,
+    onLive: setLive, // not cleared here: the OLD socket closing on room switch would kill the boot state
     onMeta: (t) => setTitle(t && t !== "Untitled" ? t : ""),
     onDoc: (src, t, fromSelf) => {
+      setSyncing(false);
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
       synced.current = true;
       if (fromSelf) return;
@@ -111,6 +124,7 @@ export default function EditorPage() {
   }, []);
 
   const diagramLabel = title || "Untitled";
+  const booting = (!d && !!idToken) || syncing; // redirecting to the latest diagram, or waiting for the first doc
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
 
   function download() {
@@ -133,7 +147,7 @@ export default function EditorPage() {
       <header>
         <a className="brand" href="/"><img src="/favicon.svg" alt="" />kymo</a>
         <span className="sep">/</span>
-        {claims ? (
+        {booting ? <span className="skeleton name-skel" /> : claims ? (
           editingName ? (
             <input className="diagram-input" autoFocus maxLength={60} defaultValue={title} placeholder="Untitled"
               onKeyDown={(e) => { if (e.key === "Enter") commitRename((e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditingName(false); }}
@@ -164,8 +178,14 @@ export default function EditorPage() {
         <button onClick={download}>Download SVG</button>
       </header>
       <main>
-        <section className="pane"><textarea value={source} spellCheck={false} onChange={(e) => { userEdited.current = true; setSource(e.target.value); }} /></section>
-        <section className="pane"><div id="preview" dangerouslySetInnerHTML={{ __html: svg }} /></section>
+        {booting ? (
+          <div className="boot"><div className="spinner" /></div>
+        ) : (
+          <>
+            <section className="pane"><textarea value={source} spellCheck={false} onChange={(e) => { userEdited.current = true; setSource(e.target.value); }} /></section>
+            <section className="pane"><div id="preview" dangerouslySetInnerHTML={{ __html: svg }} /></section>
+          </>
+        )}
       </main>
       <div className={"status" + (statusErr ? " error" : "")}>{(live ? "⚡ " : "") + status}</div>
     </div>
