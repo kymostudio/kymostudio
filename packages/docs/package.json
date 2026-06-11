@@ -1,0 +1,16 @@
+{
+  "name": "@kymostudio/docs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KymoStudio documentation site (VitePress) — content sourced from the repo docs/ tree at build time, deployed to Cloudflare Pages (kymo-docs).",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "./build.sh",
+    "dev": "vitepress dev site"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.0"
+  },
+  "engines": { "node": ">=18" }
+}

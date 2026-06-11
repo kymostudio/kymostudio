@@ -1,0 +1,46 @@
+name: Deploy docs to Cloudflare Pages
+
+# Publishes packages/docs (VitePress; content sourced from docs/) to the
+# Cloudflare Pages project "kymo-docs". Auth via the CLOUDFLARE_API_TOKEN
+# (Pages:Edit) + CLOUDFLARE_ACCOUNT_ID repo secrets.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/docs/**"
+      - "docs/guide/**"
+      - "docs/diagrams/**"
+      - "docs/brand/logo.svg"
+      - "docs/brand/favicon.svg"
+      - ".github/workflows/deploy-docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: npm install --no-audit --no-fund
+        working-directory: packages/docs
+      - name: Build
+        run: ./build.sh
+        working-directory: packages/docs
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/docs
+          command: pages deploy dist --project-name=kymo-docs --branch=main

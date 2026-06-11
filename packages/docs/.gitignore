@@ -1,0 +1,7 @@
+node_modules/
+dist/
+site/.vitepress/cache/
+site/guide/
+site/diagrams/
+site/public/logo.svg
+site/public/favicon.svg
