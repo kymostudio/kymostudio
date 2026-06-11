@@ -113,7 +113,7 @@ export default function EditorPage() {
   return (
     <div className="layout">
       <header>
-        <a className="brand" href="/"><span className="brand-dot" />kymo</a>
+        <a className="brand" href="/"><img src="/favicon.svg" alt="" />kymo</a>
         <span className="sep">/</span>
         {claims ? (
           editingName ? (
