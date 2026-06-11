@@ -13,4 +13,9 @@ printf '/* /index.html 200\n' > dist/_redirects
 npx esbuild web/main.tsx --bundle --format=esm --splitting --outdir=dist \
   --loader:.wasm=binary --jsx=automatic --jsx-import-source=react \
   --target=es2022 --minify --entry-names="[name]" --chunk-names="chunks/[name]-[hash]"
+# Cache-bust: Pages serves assets with max-age=14400, so version the URLs —
+# browsers refetch immediately after every deploy instead of up to 4h later.
+V=$(date +%s)
+sed -i "s|/styles.css|/styles.css?v=$V|g; s|/main.js|/main.js?v=$V|g" dist/index.html dist/diagrams.html
+
 echo "✓ built dist/ ($(du -sh dist | cut -f1))"
