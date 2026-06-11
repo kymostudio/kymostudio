@@ -113,6 +113,8 @@ export default function EditorPage() {
   return (
     <div className="layout">
       <header>
+        <a className="brand" href="/"><span className="brand-dot" />kymo</a>
+        <span className="sep">/</span>
         {claims ? (
           editingName ? (
             <input className="diagram-input" autoFocus maxLength={60} defaultValue={title || (d || "")}
@@ -140,7 +142,7 @@ export default function EditorPage() {
           </div>
         )}
         <Link className="btn" to="/diagrams">Diagrams</Link>
-        <button onClick={newDiagram} title="New diagram">+ New</button>
+        <button className="btn-primary" onClick={newDiagram} title="New diagram">+ New</button>
         <button onClick={download}>Download SVG</button>
       </header>
       <main>
