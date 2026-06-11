@@ -1,0 +1,17 @@
+/* KymoStudio brand (docs/brand): pink #E0095F / navy #242131 / teal #DDECEE */
+:root {
+  --vp-c-brand-1: #e0095f;
+  --vp-c-brand-2: #c70854;
+  --vp-c-brand-3: #e0095f;
+  --vp-c-brand-soft: rgba(224, 9, 95, 0.14);
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #242131 30%, #e0095f);
+  --vp-button-brand-bg: #e0095f;
+  --vp-button-brand-hover-bg: #c70854;
+  --vp-button-brand-active-bg: #c70854;
+}
+.dark {
+  --vp-c-brand-1: #ff4d94;
+  --vp-c-brand-2: #e0095f;
+  --vp-c-brand-soft: rgba(224, 9, 95, 0.22);
+}
