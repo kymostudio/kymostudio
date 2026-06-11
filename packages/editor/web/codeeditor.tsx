@@ -82,10 +82,13 @@ const theme = EditorView.theme({
   ".cm-cursor": { borderLeftColor: "var(--accent)", borderLeftWidth: "2px" },
   "&.cm-focused": { outline: "none" },
   ".cm-line": { padding: "0 8px 0 6px" },
-  ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": { backgroundColor: "rgba(224, 9, 95, 0.12)" },
+  "& > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground":
+    { backgroundColor: "rgba(224, 9, 95, 0.16)" },
   ".cm-gutters": { backgroundColor: "var(--bg)", color: "var(--border-strong)", border: "none", fontSize: "12.5px" },
   ".cm-lineNumbers .cm-gutterElement": { padding: "0 6px 0 16px", minWidth: "40px" },
-  ".cm-activeLine": { backgroundColor: "var(--bg-soft)" },
+  // translucent, NOT opaque: the line element paints above the selection layer,
+  // so an opaque active-line background would hide same-line selections
+  ".cm-activeLine": { backgroundColor: "rgba(36, 33, 49, 0.04)" },
   ".cm-activeLineGutter": { backgroundColor: "var(--bg-soft)", color: "var(--dim)" },
   ".cm-matchingBracket": { backgroundColor: "rgba(224, 9, 95, 0.14)", outline: "none" },
 });
