@@ -76,6 +76,7 @@ async function destroyDiagram(env: Env, email: string, id: string): Promise<numb
 // ---- One diagram = one EditorRoom DO (keyed by diagram id). Owner-scoped. ----
 export class EditorRoom extends DurableObject<Env> {
   source = ""; owner = ""; title = ""; diagramId = "";
+  lastIdx = 0; // last indexUpsert (in-memory) — throttles KV writes during typing
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     ctx.blockConcurrencyWhile(async () => {
@@ -98,7 +99,7 @@ export class EditorRoom extends DurableObject<Env> {
       } catch { return new Response("unauthorized", { status: 401 }); }
       const dParam = url.searchParams.get("d");
       if (dParam && this.diagramId !== dParam) { this.diagramId = dParam; await this.ctx.storage.put("diagramId", dParam); }
-      if (!this.owner) { this.owner = email!; await this.ctx.storage.put("owner", email!); await this.indexUpsert(); }
+      if (!this.owner) { this.owner = email!; await this.ctx.storage.put("owner", email!); } // index happens on first write, not on connect
       else if (this.owner !== email) return new Response("forbidden: not your diagram", { status: 403 });
       const pair = new WebSocketPair();
       const client = pair[0], server = pair[1];
@@ -139,6 +140,7 @@ export class EditorRoom extends DurableObject<Env> {
     if (data && data.type === "set" && typeof data.source === "string") {
       this.source = data.source;
       await this.ctx.storage.put("source", this.source);
+      if (Date.now() - this.lastIdx > 30_000) await this.indexUpsert();
       this.broadcast({ type: "doc", source: this.source, title: this.title, origin: data.origin ?? "browser" }, ws);
     }
     if (data && data.type === "rename" && typeof data.title === "string") {
@@ -160,6 +162,7 @@ export class EditorRoom extends DurableObject<Env> {
     else list.push({ id: this.diagramId, title: this.title || "Untitled", updatedAt: now });
     list.sort((a, b) => b.updatedAt - a.updatedAt);
     await this.env.OAUTH_KV.put(key, JSON.stringify(list));
+    this.lastIdx = Date.now();
   }
   async webSocketClose(ws: WebSocket) { try { ws.close(); } catch {} }
   broadcast(obj: unknown, except?: WebSocket) {
