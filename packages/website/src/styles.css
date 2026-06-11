@@ -46,12 +46,12 @@ nav {
   display: flex; align-items: center; justify-content: space-between;
 }
 .brand {
-  font-weight: 700; font-size: 18px;
-  display: flex; align-items: center; gap: 9px;
+  font-weight: 800; font-size: 22px;
+  display: flex; align-items: center; gap: 11px;
   color: var(--ink);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
-.brand img { width: 26px; height: 26px; display: block; }
+.brand img { width: 36px; height: 36px; display: block; }
 .nav-links { display: flex; gap: 22px; font-size: 14px; }
 .nav-links a { color: var(--dim); font-weight: 500; }
 .nav-links a:hover { color: var(--accent); text-decoration: none; }
