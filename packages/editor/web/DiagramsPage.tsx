@@ -156,7 +156,7 @@ export default function DiagramsPage() {
                     navigate("/?d=" + encodeURIComponent(dd.id));
                   }}>
                   <span className="rtitle">{dd.title || "Untitled"}</span>
-                  {dd.kind && dd.kind !== "kymo" && <span className="rkind">{kindLabel(dd.kind)}</span>}
+                  {dd.kind && <span className="rkind">{kindLabel(dd.kind)}</span>}
                   <select className="rmove" value={dd.ws || ""} title="Move to workspace"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     onChange={(e) => { e.stopPropagation(); move(dd, e.target.value); }}>
