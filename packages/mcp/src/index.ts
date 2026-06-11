@@ -253,7 +253,7 @@ export class EditorRoom extends DurableObject<Env> {
 
 // ---- MCP server: per-user multi-diagram tools (owner = props.email). ----
 export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: string }> {
-  server = new McpServer({ name: "kymo-editor", version: "0.3.0" });
+  server = new McpServer({ name: "kymo-editor", version: "0.4.0" });
 
   async init() {
     const me = () => this.props.email;
