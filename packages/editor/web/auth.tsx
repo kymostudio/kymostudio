@@ -8,7 +8,7 @@ export function tokenValid(t: string | null): boolean {
   const e = t && jwtField(t, "exp");
   return !!(e && e * 1000 > Date.now() + 30000);
 }
-const AVATAR_COLORS = ["#76b900", "#a3e635", "#34d399", "#22d3ee", "#93c5fd", "#c4b5fd", "#fbbf24", "#fb923c"];
+const AVATAR_COLORS = ["#f5b8d0", "#ddecee", "#c7e3f5", "#fde2b8", "#d9d4f7", "#c9efc9", "#f7d4c4", "#e3e1ea"];
 export function colorFor(str: string): string {
   let h = 0; for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return AVATAR_COLORS[h % AVATAR_COLORS.length];
@@ -59,7 +59,7 @@ export function GoogleButton() {
       const g = (window as any).google?.accounts?.id;
       if (!g || !ref.current) { setTimeout(r, 150); return; }
       ref.current.innerHTML = "";
-      g.renderButton(ref.current, { type: "standard", theme: "filled_black", size: "medium", text: "signin_with" });
+      g.renderButton(ref.current, { type: "standard", theme: "outline", size: "medium", text: "signin_with" });
     }
     r();
     return () => { stop = true; };

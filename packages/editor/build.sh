@@ -8,6 +8,7 @@ rm -rf dist && mkdir -p dist
 cp web/index.html dist/index.html
 cp web/index.html dist/diagrams.html
 cp web/styles.css dist/styles.css
+cp ../../docs/brand/favicon.svg ../../docs/brand/favicon.ico ../../docs/brand/favicon-32.png ../../docs/brand/favicon-48.png ../../docs/brand/apple-touch-icon.png dist/
 printf '/* /index.html 200\n' > dist/_redirects
 npx esbuild web/main.tsx --bundle --format=esm --splitting --outdir=dist \
   --loader:.wasm=binary --jsx=automatic --jsx-import-source=react \
