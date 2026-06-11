@@ -110,7 +110,7 @@ function App() {
     <>
       <nav>
         <div className="nav-inner">
-          <div className="brand"><img src="./favicon.svg" alt="" />KymoStudio</div>
+          <div className="brand"><img src="./logo.svg" alt="" />KymoStudio</div>
           <div className="nav-links">
             <a href="https://editor.kymo.studio">Editor</a>
             <a href="#features">Features</a>

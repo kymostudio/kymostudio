@@ -32,9 +32,9 @@ mkdir -p dist/app
 echo "→ landing  (src/ → dist/)"
 cp src/index.html src/styles.css src/landing.bundle.js src/CNAME src/.nojekyll dist/
 
-echo "→ brand favicons  (docs/brand → dist/)"
-cp ../../docs/brand/favicon.svg ../../docs/brand/favicon-32.png ../../docs/brand/favicon-48.png \
-   ../../docs/brand/favicon.ico ../../docs/brand/apple-touch-icon.png dist/
+echo "→ brand assets  (docs/brand → dist/)"
+cp ../../docs/brand/logo.svg ../../docs/brand/favicon.svg ../../docs/brand/favicon-32.png \
+   ../../docs/brand/favicon-48.png ../../docs/brand/favicon.ico ../../docs/brand/apple-touch-icon.png dist/
 
 # Cache-bust: Pages serves assets with max-age=14400, so version the URLs —
 # browsers refetch immediately after every deploy instead of up to 4h later.
