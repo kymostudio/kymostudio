@@ -253,7 +253,7 @@ export class EditorRoom extends DurableObject<Env> {
 
 // ---- MCP server: per-user multi-diagram tools (owner = props.email). ----
 export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: string }> {
-  server = new McpServer({ name: "kymo-editor", version: "0.4.0" });
+  server = new McpServer({ name: "kymostudio", version: "0.4.1" });
 
   async init() {
     const me = () => this.props.email;
@@ -357,13 +357,13 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 function loginPage(clientId: string, oauthReqJson: string): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sign in &middot; kymo editor</title>
+<title>Sign in &middot; kymostudio</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <style>body{font-family:system-ui,sans-serif;display:grid;place-items:center;height:100vh;margin:0;background:#0b0b0c;color:#eee}
 .card{text-align:center;padding:32px 40px;border:1px solid #222;border-radius:14px;background:#141416}
 h2{margin:0 0 4px}p{color:#9aa;margin:6px 0 18px}#msg{color:#f66;min-height:1.2em;margin-top:14px}</style></head>
 <body><div class="card">
-<h2>kymo editor</h2><p>Sign in with Google to authorize Claude.</p>
+<h2>kymostudio</h2><p>Sign in with Google to authorize Claude.</p>
 <div id="g_id_onload" data-client_id="${clientId}" data-callback="onCred" data-auto_prompt="false"></div>
 <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-size="large"></div>
 <p id="msg"></p></div>
