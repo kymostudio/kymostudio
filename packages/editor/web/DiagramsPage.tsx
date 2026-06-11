@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth, GoogleButton } from "./auth";
 import { DIAGRAMS_API } from "./const";
 import { newId } from "./util";
@@ -76,7 +76,6 @@ export default function DiagramsPage() {
         <div className="page-head">
           <h1>Diagrams</h1>
           <div className="head-actions">
-            <Link className="pill" to="/">Editor</Link>
             {claims && <button className="pill pill-dark" onClick={newDiagram}>New diagram</button>}
           </div>
         </div>
