@@ -348,10 +348,10 @@ The model/diagram split mirrors a broader principle: the *meaning* of a process 
 
 ## 17. Tooling and Ecosystem
 
-BPMN 2.0's standard XML format supports a broad ecosystem of interoperable tools. Each tool below has a per-tool reference note under [`docs/softwares/`](../../softwares/). Representative categories:
+BPMN 2.0's standard XML format supports a broad ecosystem of interoperable tools. Each tool below has a per-tool reference note under [`docs/tools/`](../../tools/). Representative categories:
 
-- **Modelers and web renderers** — [bpmn.io / `bpmn-js`](../../softwares/b.bpmn-io.md) (the embeddable JavaScript renderer/editor behind many products), [SAP Signavio](../../softwares/z.signavio.md), [Bizagi Modeler](../../softwares/z.bizagi.md), [Sparx Enterprise Architect](../../softwares/z.sparx-enterprise-architect.md), [Visual Paradigm](../../softwares/a.visual-paradigm.md), [Lucidchart](../../softwares/a.lucidchart.md), [draw.io](../../softwares/a.drawio.md).
-- **Process / execution engines** — [Camunda](../../softwares/b.camunda.md), [Flowable](../../softwares/z.flowable.md), [Activiti](../../softwares/z.activiti.md), [jBPM](../../softwares/z.jbpm.md): they import BPMN XML and execute it, relying on the Common Executable conformance subset.
+- **Modelers and web renderers** — [bpmn.io / `bpmn-js`](../../tools/b.bpmn-io.md) (the embeddable JavaScript renderer/editor behind many products), [SAP Signavio](../../tools/z.signavio.md), [Bizagi Modeler](../../tools/z.bizagi.md), [Sparx Enterprise Architect](../../tools/z.sparx-enterprise-architect.md), [Visual Paradigm](../../tools/a.visual-paradigm.md), [Lucidchart](../../tools/a.lucidchart.md), [draw.io](../../tools/a.drawio.md).
+- **Process / execution engines** — [Camunda](../../tools/b.camunda.md), [Flowable](../../tools/z.flowable.md), [Activiti](../../tools/z.activiti.md), [jBPM](../../tools/z.jbpm.md): they import BPMN XML and execute it, relying on the Common Executable conformance subset.
 - **Standards bridges** — BPMN-to-WS-BPEL mapping (the **BPEL Process Execution** conformance type) for engines built on the BPEL stack; **DMN** (Decision Model and Notation, also OMG) is frequently paired with BPMN Business Rule tasks.
 
 Because the interchange format is standardised, a model authored in one modeler can, in principle, be opened, edited, and executed in another — the practical payoff of the metamodel + DI design in [§16](#16-interchange--bpmn-xml-and-diagram-interchange).

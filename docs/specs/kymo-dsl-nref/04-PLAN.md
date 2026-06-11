@@ -105,7 +105,7 @@ Fibonacci SP; calibration: **3 ≈ the descriptive 5-doc `kymo-dsl` set**
 | README index (frontmatter carrying ≈25 related docs + 10 sub-ids; Contents table; full Annex A 1.0→2.6) | P1 | 2 | breadth of the related-document graph; provenance fidelity |
 | 10 clause files (verbatim lift + H1/doc-control/Annex wrappers; **heading texts preserved**) | P1 | 2 | anchor fidelity (`RK-KND-01`); per-file annex boilerplate |
 | Relative-path depth fix (`../`→`../../../`) | P1 | 1 | locate the few real markdown links amid inline-code paths |
-| `docs/softwares/*.md` (~26) repoint — frontmatter + doc-control row + footer | P2 | 2 | breadth (26 files); uniform but error-prone |
+| `docs/tools/*.md` (~26) repoint — frontmatter + doc-control row + footer | P2 | 2 | breadth (26 files); uniform but error-prone |
 | `docs/guide/` deep anchors → clause files (most-specific-first) | P2 | 2 | each fragment routes to the right clause file (`RK-KND-01`) |
 | Tail repoint + delete (`diagrams/bpmn`, `BEST_PRACTICE`, `CONTRIBUTING`, PR-template, `CHANGELOG`, issue-template URL; `git rm`) | P2 | 1 | depth-two link; historical-entry care |
 | Engineering spec set (this `*-KYMO-NREF-001` quartet + plan) | P3 | 3 | five ISO-structured docs with traceability |
@@ -129,7 +129,7 @@ Fibonacci SP; calibration: **3 ≈ the descriptive 5-doc `kymo-dsl` set**
 - **Create** — `docs/formats/kymo-dsl/README.md` + `01-scope.md` … `10-examples.md`
   (11); `docs/specs/kymo-dsl-nref/{01-REQUIREMENTS,02-DESIGN,03-TEST,04-PLAN}.md`
   (this is `04-PLAN.md`).
-- **Modify** — `docs/softwares/*.md` (~26); `docs/guide/{dsl-guide,faq,README}.md`;
+- **Modify** — `docs/tools/*.md` (~26); `docs/guide/{dsl-guide,faq,README}.md`;
   `docs/diagrams/bpmn/README.md`; `docs/BEST_PRACTICE_DIAGRAMS.md`;
   `CONTRIBUTING.md`; `.github/PULL_REQUEST_TEMPLATE.md`; `CHANGELOG.md`;
   `.github/ISSUE_TEMPLATE/config.yml`.
@@ -156,7 +156,7 @@ Per TEST-KYMO-NREF-001 (TC-1…7) and the matrix in its §5. In brief: structure
 
 | # | Question | Disposition |
 |---|----------|-------------|
-| 1 | Convert `docs/softwares/*.md` path-based `related_documents` to cite-by-`document_id` (the `CLAUDE.md` convention)? | Deferred — separate cleanup; this feature only repoints existing paths (FEAT §4). |
+| 1 | Convert `docs/tools/*.md` path-based `related_documents` to cite-by-`document_id` (the `CLAUDE.md` convention)? | Deferred — separate cleanup; this feature only repoints existing paths (FEAT §4). |
 | 2 | Add a top-level `docs/formats/README.md` index registering both `bpmn/` and `kymo-dsl/`? | Deferred — each set is self-contained (mirrors the BPMN set, which has no parent index). |
 
 ## Annex C — Worklog
@@ -167,6 +167,6 @@ Annex A, which records edits to *this document*. Newest at the bottom; dates ISO
 | Date       | Phase / area | Work | Status | Ref |
 |------------|--------------|------|--------|-----|
 | 2026-05-25 | P1 — Build set | Created `docs/formats/kymo-dsl/`: `README.md` (v2.6 index with Contents table + full Annex A 1.0→2.6) + `01-scope.md`…`10-examples.md` (`KYMO-DSL-<X>-001`), §1–§10 lifted verbatim, headings preserved, per-file Annex A/B, `../`→`../../../` path fix. Verified 11 files, unique ids, anchors present. | ✅ | `TC-1`,`TC-3`,`TC-4`,`TC-7` |
-| 2026-05-25 | P2 — Repoint + delete | Repointed all `../KYMO_DSL.md` path/anchor links: ~26 `docs/softwares/*`, `docs/guide/*` deep anchors → `06-grammar.md`/`07-semantics.md`, `docs/diagrams/bpmn/README.md` (depth-two), `BEST_PRACTICE_DIAGRAMS.md`, `CONTRIBUTING.md`, PR template, `CHANGELOG.md`, `.github/ISSUE_TEMPLATE/config.yml`. Deleted `docs/KYMO_DSL.md`. Verified zero `KYMO_DSL` tokens repo-wide; `KYMO-DSL-001` defined once. | ✅ | `TC-2`,`TC-5` |
+| 2026-05-25 | P2 — Repoint + delete | Repointed all `../KYMO_DSL.md` path/anchor links: ~26 `docs/tools/*`, `docs/guide/*` deep anchors → `06-grammar.md`/`07-semantics.md`, `docs/diagrams/bpmn/README.md` (depth-two), `BEST_PRACTICE_DIAGRAMS.md`, `CONTRIBUTING.md`, PR template, `CHANGELOG.md`, `.github/ISSUE_TEMPLATE/config.yml`. Deleted `docs/KYMO_DSL.md`. Verified zero `KYMO_DSL` tokens repo-wide; `KYMO-DSL-001` defined once. | ✅ | `TC-2`,`TC-5` |
 | 2026-05-25 | P3 — Spec set | Authored this engineering set (`INTRO`/`FEATURE`/`DESIGN`/`TEST`/`PLAN-KYMO-NREF-001`) at the detailed `canvas-studio` format — stakeholder needs, FR/NFR tables, anchor/link-rewrite design, TC + traceability, phased plan + sizing + risk register. | ✅ | `FEAT-KYMO-NREF-001` |
 | 2026-05-25 | P4 — Verify | Integrity greps + `pytest -q` + `npm test`. | ⏳ | `TC-6` |

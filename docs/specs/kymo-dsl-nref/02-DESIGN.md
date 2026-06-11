@@ -149,7 +149,7 @@ files) — avoiding fragile cross-file anchor maintenance.
 
 | # | Reference group | Old form | New form |
 |---|-----------------|----------|----------|
-| 1 | `docs/softwares/*.md` (~26) — frontmatter entry, doc-control "Related Documents" row, "factual basis" footer | `../KYMO_DSL.md` (+ display text `` `KYMO_DSL.md` ``) | `../formats/kymo-dsl/README.md` (display text `` `kymo-dsl/` ``) |
+| 1 | `docs/tools/*.md` (~26) — frontmatter entry, doc-control "Related Documents" row, "factual basis" footer | `../KYMO_DSL.md` (+ display text `` `KYMO_DSL.md` ``) | `../formats/kymo-dsl/README.md` (display text `` `kymo-dsl/` ``) |
 | 2 | `docs/guide/dsl-guide.md`, `faq.md` — **deep anchors** | `../KYMO_DSL.md#<frag>` | `../formats/kymo-dsl/06-grammar.md#<frag>` or `…/07-semantics.md#<frag>` (Table 4.1) |
 | 3 | `docs/guide/*` — plain links | `../KYMO_DSL.md` | `../formats/kymo-dsl/README.md` |
 | 4 | `docs/diagrams/bpmn/README.md` (depth-two) | `../../KYMO_DSL.md` | `../../formats/kymo-dsl/README.md` |

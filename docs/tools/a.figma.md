@@ -387,6 +387,6 @@ All accessed 2026-05-18.
 
 ### Cross-references within this repo
 
-- `docs/softwares/d2.md` — sibling reference doc on the D2 text-to-diagram language (same template).
+- `docs/tools/d2.md` — sibling reference doc on the D2 text-to-diagram language (same template).
 - `packages/python/src/kymo/to_figma.py` — kymo's Figma Plugin API emitter; hybrid auto-layout path at `:161` (`_tree_to_js`), flat fallback at `:261` (`_component_flat_js`), edge vector-network emission at `:77` (`edge_to_js`).
 - `packages/python/src/kymo/cli.py:79` — `--figma` flag handling.
