@@ -4,6 +4,17 @@ import { createRoot } from "react-dom/client";
 const RAW = "https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples";
 const GH = "https://github.com/kymostudio/kymostudio";
 
+type Feature = { title: string; desc: string };
+const FEATURES: Feature[] = [
+  { title: "Draws what you actually need", desc: "Software architecture, process flows and standard BPMN, all rendered faithfully." },
+  { title: "Starts from any source", desc: "Author in the .kymo DSL, or feed it BPMN, JSON or Python." },
+  { title: "Write once, export anywhere", desc: "One source compiles to SVG, PNG, WebP, Figma and Excalidraw." },
+  { title: "Diagrams as code", desc: "Describe your diagram in a clean, line-oriented .kymo syntax — no dragging boxes around." },
+  { title: "Animated by default", desc: "Edges come alive with built-in flowing animation, straight to a self-contained SVG." },
+  { title: "Smart auto-layout", desc: "Frames, anchoring, edge routing and canvas sizing are figured out for you." },
+  { title: "A rich icon library", desc: "2,460 icons spanning AWS, Azure, GCP, Kubernetes, on-prem and more." },
+];
+
 type Sample = { title: string; desc: string; file: string; preview: string; size: string };
 const SAMPLES: Sample[] = [
   {
@@ -101,8 +112,9 @@ function App() {
         <div className="nav-inner">
           <div className="brand"><img src="./favicon.svg" alt="" />kymo</div>
           <div className="nav-links">
-            <a href="app/">Playground</a>
             <a href="https://editor.kymo.studio">Editor</a>
+            <a href="app/">Playground</a>
+            <a href="#features">Features</a>
             <a href="#samples">Samples</a>
             <a href={GH}>GitHub →</a>
           </div>
@@ -110,17 +122,29 @@ function App() {
       </nav>
 
       <header className="hero">
-        <h1>Diagrams as code,<br /><span className="accent">animated by default.</span></h1>
+        <h1>Type it. See it appear.<br /><span className="accent">Watch it animate.</span></h1>
         <p className="lead">
-          A tiny DSL for architecture diagrams. Write a <code>.kymo</code> file,
-          get a self-contained SVG — auto-layout, orthogonal edge routing,
-          flowing-dash animation, exportable to animated WebP without a headless browser.
+          Kymostudio turns diagram-as-code source into animated SVG — and PNG, WebP,
+          Figma and Excalidraw. Write a <code>.kymo</code> file (or feed it BPMN, JSON,
+          Python), get auto-layout, orthogonal edge routing and flowing-dash animation,
+          no headless browser required.
         </p>
-        <div className="install">uv tool install git+https://github.com/kymostudio/kymostudio</div>
+        <div className="install install-multi">
+          <span className="install-row">pip install kymostudio</span>
+          <span className="install-row">npm install kymostudio</span>
+          <span className="install-row">cargo install kymostudio</span>
+        </div>
         <div className="ctas">
-          <a className="btn btn-primary" href="app/">Open playground →</a>
+          <a className="btn btn-primary" href="https://editor.kymo.studio">Open live editor →</a>
+          <a className="btn btn-ghost" href="app/">Playground</a>
           <a className="btn btn-ghost" href={GH}>View on GitHub</a>
           <a className="btn btn-ghost" href="#samples">See samples ↓</a>
+        </div>
+        <div className="reg-badges">
+          <a href="https://pypi.org/project/kymostudio/"><img alt="PyPI" src="https://img.shields.io/pypi/v/kymostudio?logo=pypi&logoColor=white&label=PyPI&color=e0095f" /></a>
+          <a href="https://www.npmjs.com/package/kymostudio"><img alt="npm" src="https://img.shields.io/npm/v/kymostudio?logo=npm&label=npm&color=e0095f" /></a>
+          <a href="https://crates.io/crates/kymostudio"><img alt="crates.io" src="https://img.shields.io/crates/v/kymostudio?logo=rust&logoColor=white&label=crates.io&color=e0095f" /></a>
+          <a href="https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode"><img alt="VS Code Extension" src="https://img.shields.io/badge/VS%20Code-Extension-e0095f?logo=visualstudiocode&logoColor=white" /></a>
         </div>
       </header>
 
@@ -129,6 +153,20 @@ function App() {
           <img src={`${RAW}/nvidia-aiq-animated.webp`} alt="kymo demo — NVIDIA AIQ replica, animated WebP" />
         </div>
       </div>
+
+      <section className="features" id="features">
+        <div className="section-header">
+          <h2>Features</h2>
+        </div>
+        <div className="feature-grid">
+          {FEATURES.map((f) => (
+            <div className="feature" key={f.title}>
+              <h3>{f.title}</h3>
+              <p>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="samples" id="samples">
         <div className="section-header">

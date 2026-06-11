@@ -273,3 +273,37 @@ footer {
 }
 footer a { color: var(--dim); }
 footer a:hover { color: var(--accent); }
+
+/* ── Install (multi-line) + registry badges ──────────────────── */
+.install-multi { flex-direction: column; align-items: flex-start; gap: 6px; text-align: left; }
+.install-multi::before { content: none; }
+.install-row::before { content: "$ "; color: var(--accent); font-weight: 700; }
+.reg-badges { margin-top: 26px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.reg-badges img { display: block; height: 20px; }
+
+/* ── Features grid ───────────────────────────────────────────── */
+section.features {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--pad) 20px;
+}
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.feature {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+.feature:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  box-shadow: 0 10px 28px rgba(36, 33, 49, 0.1);
+}
+.feature h3 { margin: 0 0 6px; font-size: 15.5px; font-weight: 700; color: var(--ink); }
+.feature h3::before { content: "✦ "; color: var(--accent); }
+.feature p { margin: 0; font-size: 14px; color: var(--dim); }
