@@ -2,12 +2,16 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
+import { WorkspaceSwitcher, useWorkspace, assignDiagram } from "./workspace";
+import { KINDS, renderKroki } from "./kroki";
+import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { ChevronDown, Download, FileCode2, FileImage, Code2 } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
+  const { currentWs } = useWorkspace();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const d = params.get("d");
@@ -35,6 +39,7 @@ export default function EditorPage() {
   }, [d, idToken, navigate]);
 
   const [source, setSource] = useState(SAMPLE);
+  const [kind, setKind] = useState("kymo");
   const [svg, setSvg] = useState("");
   const [status, setStatus] = useState("Loading engine…");
   const [statusErr, setStatusErr] = useState(false);
@@ -53,21 +58,34 @@ export default function EditorPage() {
   const userEdited = useRef(false); // the user actually typed in this room
   const titleRef = useRef(title);
   titleRef.current = title;
+  const kindRef = useRef(kind);
+  kindRef.current = kind;
+  const renderSeq = useRef(0); // kroki renders are async fetches — drop stale responses
 
-  const doRender = useCallback(async (src: string) => {
-    if (!renderRef.current) return;
-    if (!src.trim()) { setSvg(""); setStatus("Enter flowchart source…"); setStatusErr(false); return; }
+  const doRender = useCallback(async (src: string, k: string) => {
+    const seq = ++renderSeq.current;
+    if (!src.trim()) { setSvg(""); setStatus("Enter diagram source…"); setStatusErr(false); return; }
     const t0 = performance.now();
     try {
-      const out = await renderRef.current(src);
+      let out: string;
+      if (k === "kymo") {
+        if (!renderRef.current) return;
+        out = await renderRef.current(src);
+      } else {
+        out = await renderKroki(k, src);
+      }
+      if (seq !== renderSeq.current) return;
       lastSvg.current = out; setSvg(out);
       setStatus(`OK · ${out.length} bytes · ${Math.round(performance.now() - t0)}ms`); setStatusErr(false);
-    } catch (e: any) { setStatus(String(e?.message ?? e)); setStatusErr(true); }
+    } catch (e: any) {
+      if (seq !== renderSeq.current) return;
+      setStatus(String(e?.message ?? e)); setStatusErr(true);
+    }
   }, []);
 
   useEffect(() => {
     let stop = false;
-    import("./engine").then((m) => { if (stop) return; renderRef.current = m.renderDiagram; doRender(source); });
+    import("./engine").then((m) => { if (stop) return; renderRef.current = m.renderDiagram; if (kindRef.current === "kymo") doRender(source, "kymo"); });
     return () => { stop = true; };
   }, []); // eslint-disable-line
 
@@ -84,18 +102,19 @@ export default function EditorPage() {
 
   // Rooms are switched client-side (+ New uses navigate()), so reset per-room state on ?d change.
   useEffect(() => {
-    setSource(SAMPLE); setTitle(""); setEditingName(false);
+    setSource(SAMPLE); setKind("kymo"); setTitle(""); setEditingName(false);
     synced.current = false; fresh.current = false; userEdited.current = false;
   }, [d]);
 
   const room = useRoom(roomId, idToken, {
     onLive: setLive, // not cleared here: the OLD socket closing on room switch would kill the boot state
     onMeta: (t) => setTitle(t && t !== "Untitled" ? t : ""),
-    onDoc: (src, t, fromSelf) => {
+    onDoc: (src, t, fromSelf, k) => {
       setSyncing(false);
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
       synced.current = true;
       if (fromSelf) return;
+      if (k) setKind(k);
       if (!src.trim()) { fresh.current = true; return; } // brand-new room: keep the sample local until the user edits
       fresh.current = false;
       applyingRemote.current = true;
@@ -105,19 +124,19 @@ export default function EditorPage() {
 
   useEffect(() => {
     const id = setTimeout(() => {
-      doRender(source);
+      doRender(source, kind);
       if (applyingRemote.current) { applyingRemote.current = false; return; }
       if (!synced.current) return;
       if (fresh.current && !userEdited.current) return; // untouched sample: nothing worth persisting
-      room.sendSource(source);
+      room.sendSource(source, kind);
       if (fresh.current) {
         fresh.current = false;
-        const t = titleFrom(source);
+        const t = kind === "kymo" ? titleFrom(source) : "Untitled";
         if (!titleRef.current && t !== "Untitled") { setTitle(t); room.sendRename(t); }
       }
-    }, 120);
+    }, kind === "kymo" ? 120 : 450); // remote (kroki) renders get a longer debounce
     return () => clearTimeout(id);
-  }, [source]); // eslint-disable-line
+  }, [source, kind]); // eslint-disable-line
 
   useEffect(() => {
     const h = () => { setMenuOpen(false); setExportOpen(false); };
@@ -159,10 +178,13 @@ export default function EditorPage() {
   }
   function exportSource() {
     if (!source.trim()) return;
-    saveBlob(new Blob([source], { type: "text/plain;charset=utf-8" }), (diagramLabel || "flowchart") + ".kymo");
+    const ext = kind === "kymo" ? ".kymo" : `.${kind}.txt`;
+    saveBlob(new Blob([source], { type: "text/plain;charset=utf-8" }), (diagramLabel || "flowchart") + ext);
   }
   function newDiagram() {
-    navigate("/?d=" + newId());
+    const id = newId();
+    assignDiagram(idToken, id, currentWs); // lands in the workspace you're looking at
+    navigate("/?d=" + id);
   }
   function commitRename(v: string) {
     const t = v.trim();
@@ -173,7 +195,8 @@ export default function EditorPage() {
   return (
     <div className="layout">
       <header>
-        <a className="brand" href="/"><img src="/favicon.svg" alt="" />kymo</a>
+        <a className="brand" href="/"><img src="/favicon.svg" alt="" /></a>
+        {claims && <WorkspaceSwitcher />}
         <span className="sep">/</span>
         {booting ? <span className="skeleton name-skel" /> : claims ? (
           editingName ? (
@@ -185,7 +208,6 @@ export default function EditorPage() {
           )
         ) : <span className="diagram-name" />}
         <div className="spacer" />
-        {!claims && <span className="muted">Sign in to receive live updates</span>}
         {!claims && <GoogleButton />}
         {claims && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
@@ -253,7 +275,21 @@ export default function EditorPage() {
           </div>
         ) : (
           <>
-            <section className="pane"><textarea value={source} spellCheck={false} onChange={(e) => { userEdited.current = true; setSource(e.target.value); }} /></section>
+            <section className="pane">
+              <div className="pane-bar">
+                <select className="kind-select" value={kind} title="Diagram type"
+                  onChange={(e) => {
+                    // kroki.io behaviour: switching type loads that type's example and renders it
+                    const k = e.target.value;
+                    userEdited.current = true;
+                    setKind(k);
+                    setSource(k === "kymo" ? SAMPLE : (SAMPLES[k] ?? ""));
+                  }}>
+                  {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
+                </select>
+              </div>
+              <textarea value={source} spellCheck={false} onChange={(e) => { userEdited.current = true; setSource(e.target.value); }} />
+            </section>
             <section className="pane"><div id="preview" dangerouslySetInnerHTML={{ __html: svg }} /></section>
           </>
         )}

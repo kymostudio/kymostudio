@@ -126,3 +126,67 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .foot { margin-top: 26px; font-size: 13px; color: var(--dim); display: flex; gap: 10px; align-items: center; }
 .linklike { background: none; border: 0; padding: 0; color: var(--dim); font-size: 13px; font-weight: 400; cursor: pointer; text-decoration: underline; }
 .linklike:hover { color: var(--ink); }
+
+/* workspaces */
+.ws-btn { display: inline-flex; align-items: center; gap: 5px; background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 6px 9px; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.ws-btn:hover { background: var(--bg-soft); }
+.ws-menu { left: 0; right: auto; min-width: 235px; }
+.ws-head { font-size: 11.5px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 10px 2px; }
+.ws-item { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; text-decoration: none; font-size: 14px; }
+.ws-check { width: 16px; display: inline-flex; justify-content: center; flex: none; color: var(--accent); }
+.ws-new { color: var(--dim); }
+.ws-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 14px 0 4px; }
+.ws-pill { border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; background: var(--bg); border: 1px solid var(--border-strong); color: var(--ink); cursor: pointer; }
+.ws-pill:hover { border-color: var(--dim); background: var(--bg-soft); }
+.ws-pill.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.ws-add { display: inline-flex; align-items: center; padding: 6px 9px; color: var(--dim); }
+.ws-actions { display: inline-flex; gap: 12px; margin-left: 6px; }
+.rmove { opacity: 0; flex: none; border: 1px solid var(--border); background: var(--bg); color: var(--dim); font-size: 12.5px; border-radius: 7px; padding: 3px 6px; cursor: pointer; }
+.rrow:hover .rmove, .rmove:focus { opacity: 1; }
+
+/* diagram kind selector (kroki-style) */
+.pane-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg); }
+.kind-select { border: 1px solid var(--border-strong); border-radius: 8px; padding: 5px 9px; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--bg); cursor: pointer; }
+.kind-select:hover { border-color: var(--dim); }
+
+/* ---- hover polish ----
+   Solid buttons lift 1px with a soft shadow; the primary button gets an accent
+   glow; flat controls (menu items, avatar, workspace switcher) stay in place
+   and only fade. Declared last so it wins the cascade over the base rules. */
+button, .btn, .pill, .ws-pill, .kind-select, .rmove, .acct-item, .linklike, .diagram-name.editable {
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease,
+    box-shadow 0.18s ease, transform 0.14s ease, opacity 0.14s ease;
+}
+.chev, .chev-icon, .exp-item svg { transition: color 0.15s ease, transform 0.18s ease; }
+
+button:hover, .btn:hover { border-color: var(--border-strong); background: var(--bg-soft); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(36, 33, 49, 0.1), 0 1px 3px rgba(36, 33, 49, 0.06); }
+.btn-primary { box-shadow: 0 1px 2px rgba(224, 9, 95, 0.18); }
+.btn-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); box-shadow: 0 5px 16px rgba(224, 9, 95, 0.3), 0 2px 5px rgba(224, 9, 95, 0.18); }
+
+.pill:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(36, 33, 49, 0.1); }
+.pill-dark { box-shadow: 0 1px 2px rgba(224, 9, 95, 0.18); }
+.pill-dark:hover { box-shadow: 0 5px 16px rgba(224, 9, 95, 0.3); }
+.ws-pill:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(36, 33, 49, 0.1); }
+.ws-pill.active:hover { box-shadow: 0 4px 12px rgba(36, 33, 49, 0.22); }
+.kind-select:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(36, 33, 49, 0.08); }
+
+/* flat controls: no lift, just a clean fade (+ their own accents) */
+.acct-btn:hover, .ws-btn:hover, .acct-item:hover, .rdel:hover, .rmove:hover, .linklike:hover { transform: none; box-shadow: none; }
+.acct-btn:hover { background: var(--border); box-shadow: 0 0 0 3px var(--accent-soft); }
+.ws-btn:hover { background: var(--bg-soft); }
+.ws-btn:hover .chev { color: var(--accent); transform: translateY(1px); }
+.acct-item:hover { background: var(--bg-raise); }
+.ws-item:hover .ws-check { transform: scale(1.12); }
+.ws-check { transition: transform 0.15s ease; }
+.rdel:hover { color: var(--error); background: rgba(180, 35, 24, 0.08); }
+.rmove:hover { border-color: var(--border-strong); color: var(--ink); }
+.linklike:hover { color: var(--accent); }
+
+/* press: settle back down, tighter shadow, instant response */
+button:active, .btn:active, .pill:active, .ws-pill:active { transform: translateY(0) scale(0.98); box-shadow: 0 1px 2px rgba(36, 33, 49, 0.08); transition-duration: 0.05s; }
+.acct-item:active, .ws-btn:active, .acct-btn:active, .linklike:active { transform: scale(0.98); box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  button, .btn, .pill, .ws-pill, .kind-select, .rmove, .acct-item, .linklike, .chev, .chev-icon, .ws-check { transition: none; }
+  button:hover, .btn:hover, .pill:hover, .ws-pill:hover, .kind-select:hover, button:active, .btn:active, .pill:active, .ws-pill:active { transform: none; }
+}
