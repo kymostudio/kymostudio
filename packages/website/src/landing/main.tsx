@@ -152,10 +152,9 @@ function App() {
       </nav>
 
       <header className="hero">
-        <h1>Type it. See it appear.<br /><span className="accent">Watch it animate.</span></h1>
+        <h1>Diagram <span className="accent">superpowers</span></h1>
         <p className="lead">
-          The diagram-as-code studio — turn a <code>.kymo</code> file (or BPMN, JSON, Python)
-          into an animated, self-contained SVG.
+          Type it. See it appear. Watch it animate.
         </p>
         <div className="ctas">
           <a className="btn btn-primary" href="https://editor.kymo.studio">Start Free →</a>
