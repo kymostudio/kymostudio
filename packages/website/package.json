@@ -1,15 +1,25 @@
 {
   "name": "@kymostudio/website",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "kymostudio website (kymo.studio) — landing page + client-side diagram playground at /app/. Built by build.sh into dist/, deployed to GitHub Pages.",
+  "description": "kymostudio website (kymo.studio) — React landing page + client-side diagram playground at /app/. Built by build.sh into dist/, deployed to Cloudflare Pages (kymo-studio).",
   "license": "Apache-2.0",
   "scripts": {
     "build": "./build.sh",
+    "bundle": "./build.sh --bundle",
     "dev": "cd dist && python3 -m http.server 4321",
     "typecheck": "npm --prefix app run typecheck",
     "test:e2e": "npm --prefix app run test:e2e"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.28.0"
   },
   "engines": { "node": ">=18" }
 }
