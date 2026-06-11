@@ -33,32 +33,63 @@ function roomFor(env: Env, id: string) {
   return env.EDITOR_ROOM.get(env.EDITOR_ROOM.idFromName(id));
 }
 
-// per-user diagram index (which diagram ids a user owns), stored in OAUTH_KV under idx:<email>
+// per-user diagram index: one KV key per diagram (idx:<email>:<id>), the entry
+// kept in the key's metadata. The old single shared list value raced — every
+// per-diagram DO did a read-modify-write of the whole list, so concurrent
+// writers lost each other's entries (KV is last-write-wins). One key per
+// diagram means one writer per key, so nothing can be clobbered.
 type IdxEntry = { id: string; title: string; updatedAt: number };
+function idxKey(email: string, id: string) { return `idx:${email}:${id}`; }
+async function putIndexEntry(env: Env, email: string, e: IdxEntry) {
+  await env.OAUTH_KV.put(idxKey(email, e.id), "1", { metadata: e });
+}
 async function listIndex(env: Env, email: string): Promise<IdxEntry[]> {
-  const raw = await env.OAUTH_KV.get(`idx:${email}`);
-  return raw ? (JSON.parse(raw) as IdxEntry[]) : [];
+  const out = new Map<string, IdxEntry>();
+  let cursor: string | undefined;
+  do {
+    const page = await env.OAUTH_KV.list<IdxEntry>({ prefix: `idx:${email}:`, cursor });
+    for (const k of page.keys) {
+      const id = k.name.slice(`idx:${email}:`.length);
+      out.set(id, { id, title: k.metadata?.title ?? "Untitled", updatedAt: k.metadata?.updatedAt ?? 0 });
+    }
+    cursor = "cursor" in page ? page.cursor : undefined;
+  } while (cursor);
+  // Lazy migration of the legacy single-value index. KV list() lags writes, so
+  // keep the legacy value as a merge source and only delete it once the prefix
+  // list already shows every legacy id — deleting it on first read would leave
+  // the list empty until list() catches up.
+  const legacy = await env.OAUTH_KV.get(`idx:${email}`);
+  if (legacy != null) {
+    let allVisible = true;
+    try {
+      for (const e of JSON.parse(legacy) as IdxEntry[]) {
+        if (e && e.id && !out.has(e.id)) {
+          allVisible = false;
+          out.set(e.id, e);
+          await putIndexEntry(env, email, e);
+        }
+      }
+    } catch {}
+    if (allVisible) await env.OAUTH_KV.delete(`idx:${email}`);
+  }
+  return [...out.values()].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 }
 async function touchIndex(env: Env, email: string, id: string, title?: string) {
-  const list = await listIndex(env, email);
-  const i = list.findIndex((d) => d.id === id);
-  const now = Date.now();
-  if (i >= 0) { if (title != null) list[i].title = title; list[i].updatedAt = now; }
-  else list.push({ id, title: title ?? "Untitled", updatedAt: now });
-  list.sort((a, b) => b.updatedAt - a.updatedAt);
-  await env.OAUTH_KV.put(`idx:${email}`, JSON.stringify(list));
+  let t = title;
+  if (t == null) {
+    const cur = await env.OAUTH_KV.getWithMetadata<IdxEntry>(idxKey(email, id));
+    t = cur.metadata?.title ?? "Untitled";
+  }
+  await putIndexEntry(env, email, { id, title: t, updatedAt: Date.now() });
   await env.OAUTH_KV.put(`last:${email}`, id);
 }
 
 async function removeFromIndex(env: Env, email: string, id: string) {
-  const key = `idx:${email}`;
-  const raw = await env.OAUTH_KV.get(key);
-  const list = raw ? (JSON.parse(raw) as IdxEntry[]) : [];
-  const next = list.filter((d) => d.id !== id);
-  await env.OAUTH_KV.put(key, JSON.stringify(next));
+  await env.OAUTH_KV.delete(idxKey(email, id));
   const last = await env.OAUTH_KV.get(`last:${email}`);
   if (last === id) {
-    if (next.length) await env.OAUTH_KV.put(`last:${email}`, next[0].id);
+    const rest = (await listIndex(env, email)).filter((d) => d.id !== id); // list may still echo the deleted key
+    if (rest.length) await env.OAUTH_KV.put(`last:${email}`, rest[0].id);
     else await env.OAUTH_KV.delete(`last:${email}`);
   }
 }
@@ -153,15 +184,9 @@ export class EditorRoom extends DurableObject<Env> {
 
   async indexUpsert() {
     if (!this.owner || !this.diagramId) return;
-    const key = `idx:${this.owner}`;
-    const raw = await this.env.OAUTH_KV.get(key);
-    const list = raw ? (JSON.parse(raw) as { id: string; title: string; updatedAt: number }[]) : [];
-    const i = list.findIndex((d) => d.id === this.diagramId);
-    const now = Date.now();
-    if (i >= 0) { if (this.title) list[i].title = this.title; list[i].updatedAt = now; }
-    else list.push({ id: this.diagramId, title: this.title || "Untitled", updatedAt: now });
-    list.sort((a, b) => b.updatedAt - a.updatedAt);
-    await this.env.OAUTH_KV.put(key, JSON.stringify(list));
+    await this.env.OAUTH_KV.put(`idx:${this.owner}:${this.diagramId}`, "1", {
+      metadata: { id: this.diagramId, title: this.title || "Untitled", updatedAt: Date.now() },
+    });
     this.lastIdx = Date.now();
   }
   async webSocketClose(ws: WebSocket) { try { ws.close(); } catch {} }
@@ -363,8 +388,7 @@ export default {
           if (st === 403) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
           return Response.json({ ok: true }, { headers: cors });
         }
-        const raw = await env.OAUTH_KV.get(`idx:${pl.email}`);
-        const diagrams = raw ? JSON.parse(raw) : [];
+        const diagrams = await listIndex(env, pl.email!);
         return Response.json({ email: pl.email, diagrams }, { headers: cors });
       } catch {
         return Response.json({ error: "unauthorized" }, { status: 401, headers: cors });
