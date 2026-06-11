@@ -2,13 +2,18 @@
   "name": "kymo-editor-web",
   "private": true,
   "type": "module",
-  "scripts": { "build": "./build.sh" },
+  "scripts": {
+    "build": "./build.sh"
+  },
   "dependencies": {
     "kymostudio": "file:../js",
     "kymostudio-core": "file:../rust/kymostudio-core/pkg",
+    "lucide-react": "^1.17.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0"
   },
-  "devDependencies": { "esbuild": "^0.25.0" }
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
 }
