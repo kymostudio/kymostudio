@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth, GoogleButton } from "./auth";
 import { DIAGRAMS_API } from "./const";
+import { newId } from "./util";
 
 type Item = { id: string; title: string; updatedAt: number };
 
@@ -23,6 +24,7 @@ function timeAgo(ms: number): string {
 
 export default function DiagramsPage() {
   const { idToken, claims, signOut } = useAuth();
+  const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [error, setError] = useState("");
   const [q, setQ] = useState("");
@@ -49,8 +51,7 @@ export default function DiagramsPage() {
   }, [load]);
 
   function newDiagram() {
-    const id = (self.crypto && crypto.randomUUID) ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2, 10);
-    location.href = "/?d=" + id;
+    navigate("/?d=" + newId());
   }
 
   async function remove(dd: Item) {

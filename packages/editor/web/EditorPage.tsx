@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
 import { DIAGRAMS_API, SAMPLE } from "./const";
+import { newId, titleFrom } from "./util";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -26,7 +27,7 @@ export default function EditorPage() {
         }
       } catch {}
       if (stop) return;
-      if (!id) id = (self.crypto && crypto.randomUUID) ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2, 10);
+      if (!id) id = newId();
       navigate("/?d=" + id, { replace: true });
     })();
     return () => { stop = true; };
@@ -45,6 +46,10 @@ export default function EditorPage() {
   const applyingRemote = useRef(false);
   const synced = useRef(false);
   const lastSvg = useRef("");
+  const fresh = useRef(false);      // room exists on the server but has no document yet
+  const userEdited = useRef(false); // the user actually typed in this room
+  const titleRef = useRef(title);
+  titleRef.current = title;
 
   const doRender = useCallback(async (src: string) => {
     if (!renderRef.current) return;
@@ -63,6 +68,12 @@ export default function EditorPage() {
     return () => { stop = true; };
   }, []); // eslint-disable-line
 
+  // Rooms are switched client-side (+ New uses navigate()), so reset per-room state on ?d change.
+  useEffect(() => {
+    setSource(SAMPLE); setTitle(""); setEditingName(false);
+    synced.current = false; fresh.current = false; userEdited.current = false;
+  }, [d]);
+
   const room = useRoom(roomId, idToken, {
     onLive: setLive,
     onMeta: (t) => setTitle(t && t !== "Untitled" ? t : ""),
@@ -70,7 +81,8 @@ export default function EditorPage() {
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
       synced.current = true;
       if (fromSelf) return;
-      if (!src.trim()) { room.sendSource(source); return; }
+      if (!src.trim()) { fresh.current = true; return; } // brand-new room: keep the sample local until the user edits
+      fresh.current = false;
       applyingRemote.current = true;
       setSource(src);
     },
@@ -80,7 +92,14 @@ export default function EditorPage() {
     const id = setTimeout(() => {
       doRender(source);
       if (applyingRemote.current) { applyingRemote.current = false; return; }
-      if (synced.current) room.sendSource(source);
+      if (!synced.current) return;
+      if (fresh.current && !userEdited.current) return; // untouched sample: nothing worth persisting
+      room.sendSource(source);
+      if (fresh.current) {
+        fresh.current = false;
+        const t = titleFrom(source);
+        if (!titleRef.current && t !== "Untitled") { setTitle(t); room.sendRename(t); }
+      }
     }, 120);
     return () => clearTimeout(id);
   }, [source]); // eslint-disable-line
@@ -101,8 +120,7 @@ export default function EditorPage() {
     a.download = (diagramLabel || "flowchart") + ".svg"; a.click(); URL.revokeObjectURL(a.href);
   }
   function newDiagram() {
-    const id = (self.crypto && crypto.randomUUID) ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2, 10);
-    location.href = "/?d=" + id;
+    navigate("/?d=" + newId());
   }
   function commitRename(v: string) {
     const t = v.trim();
@@ -146,7 +164,7 @@ export default function EditorPage() {
         <button onClick={download}>Download SVG</button>
       </header>
       <main>
-        <section className="pane"><textarea value={source} spellCheck={false} onChange={(e) => setSource(e.target.value)} /></section>
+        <section className="pane"><textarea value={source} spellCheck={false} onChange={(e) => { userEdited.current = true; setSource(e.target.value); }} /></section>
         <section className="pane"><div id="preview" dangerouslySetInnerHTML={{ __html: svg }} /></section>
       </main>
       <div className={"status" + (statusErr ? " error" : "")}>{(live ? "⚡ " : "") + status}</div>
