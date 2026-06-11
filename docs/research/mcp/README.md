@@ -73,7 +73,7 @@ the axis that most distinguishes these projects.
 | [uml-mcp](https://github.com/antoinebou12/uml-mcp) | `antoinebou12` | 30+ formats via [Kroki](https://kroki.io/) | UML (class/sequence/activity/state/…), Mermaid, D2, Graphviz, TikZ, ERD, BlockDiag, BPMN, C4. |
 | [diagram-bridge-mcp](https://glama.ai/mcp/servers/@tohachan/diagram-bridge-mcp) | `tohachan` | format selection → instruction → Kroki render | Three-tool pipeline: it *picks* the best format for the request, then generates and renders it. Covers Mermaid, PlantUML, C4, D2, GraphViz, BPMN, Structurizr, Excalidraw, Vega-Lite. |
 
-Both lean on **Kroki** (`REF` — see `docs/softwares/b.kroki.md`), a render proxy that fronts dozens
+Both lean on **Kroki** (`REF` — see `docs/tools/b.kroki.md`), a render proxy that fronts dozens
 of diagram engines behind one HTTP endpoint — the multi-format shortcut.
 
 ### 2.5 Chart / data-viz (adjacent, not strictly diagrams)

@@ -60,7 +60,7 @@ Read this first if you need ground truth on how Kroki actually behaves; the opin
 
 **Kroki** is an open-source **unified API gateway** that "creates diagrams from textual descriptions." Built by **Yuzu tech** and released under the **MIT license**, it exposes a single HTTP endpoint in front of ~28 different diagram engines (PlantUML, GraphViz, Mermaid, D2, BPMN, Excalidraw, the BlockDiag family, C4, Structurizr, Vega, and more). The value proposition is *learn one API, render any of them*: instead of installing and learning each tool's toolchain, a caller sends `(diagram_type, source, output_format)` and gets back an image.
 
-Crucially, **Kroki has no diagram language of its own.** It is a passthrough/aggregation layer: every syntax it accepts belongs to a third-party engine. That places it in a different tool class from the DSLs surveyed elsewhere in `docs/softwares/` — it is *infrastructure for rendering*, not a notation.
+Crucially, **Kroki has no diagram language of its own.** It is a passthrough/aggregation layer: every syntax it accepts belongs to a third-party engine. That places it in a different tool class from the DSLs surveyed elsewhere in `docs/tools/` — it is *infrastructure for rendering*, not a notation.
 
 - Repository: <https://github.com/yuzutech/kroki>
 - Homepage: <https://kroki.io/>

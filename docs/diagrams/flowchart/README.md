@@ -226,10 +226,10 @@ The Böhm–Jacopini theorem (1966) guarantees these three constructs suffice to
 
 ## 13. Tooling and Ecosystem
 
-Flowcharts are supported by virtually every diagramming tool; the relevant ones for this project each have a per-tool reference note under [`docs/softwares/`](../../softwares/):
+Flowcharts are supported by virtually every diagramming tool; the relevant ones for this project each have a per-tool reference note under [`docs/tools/`](../../tools/):
 
-- **Diagram-as-code** — [Mermaid](../../softwares/a.mermaid.md) (`REF-MERMAID-001`): the `flowchart` / `graph` grammar renders the classic symbols from text. This is the flowchart source the kymo engine imports; the syntax-to-model mapping, supported node shapes and edge operators, and the Phase-1 gaps are documented in `MERMAID-MAP-001`.
-- **Interactive editors** — [draw.io / diagrams.net](../../softwares/a.drawio.md) (`REF-DRAWIO-001`), [Lucidchart](../../softwares/a.lucidchart.md) (`REF-LUCIDCHART-001`), and Microsoft Visio: drag-and-drop canvases with full ISO 5807 stencils and swimlane support.
+- **Diagram-as-code** — [Mermaid](../../tools/a.mermaid.md) (`REF-MERMAID-001`): the `flowchart` / `graph` grammar renders the classic symbols from text. This is the flowchart source the kymo engine imports; the syntax-to-model mapping, supported node shapes and edge operators, and the Phase-1 gaps are documented in `MERMAID-MAP-001`.
+- **Interactive editors** — [draw.io / diagrams.net](../../tools/a.drawio.md) (`REF-DRAWIO-001`), [Lucidchart](../../tools/a.lucidchart.md) (`REF-LUCIDCHART-001`), and Microsoft Visio: drag-and-drop canvases with full ISO 5807 stencils and swimlane support.
 
 Because the symbol set is standardised, a flowchart authored in one tool is generally legible in any other; only the specialised symbols ([§9](#9-specialised-symbols)) and swimlane styling vary in practice.
 

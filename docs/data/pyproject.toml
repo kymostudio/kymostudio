@@ -1,0 +1,6 @@
+[project]
+name = "kymo-docs-data"
+version = "0.1.0"
+description = "Tooling for docs/data/database.sqlite (diagram-timeline rankings) — schema generation"
+requires-python = ">=3.13"
+dependencies = []

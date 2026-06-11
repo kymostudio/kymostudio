@@ -1,0 +1,50 @@
+// Generated from database.sqlite by generate_schema.py — do not edit by hand.
+
+
+Table diagram_rankings {
+  year integer [not null]
+  rank integer [not null]
+  key text [not null]
+  label text [not null]
+  evidence text [not null]
+
+  indexes {
+    (year, rank) [pk]
+    (year, key) [unique]
+  }
+
+  Note: 'CHECK (rank BETWEEN 1 AND 10)'
+}
+
+Table diagrams {
+  key text [pk]
+  name text [not null]
+}
+
+Table timeline {
+  year integer [pk]
+  remark text
+}
+
+Table tool_rankings {
+  year integer [not null]
+  rank integer [not null]
+  key text [not null]
+  label text [not null]
+  evidence text [not null]
+
+  indexes {
+    (year, rank) [pk]
+    (year, key) [unique]
+  }
+
+  Note: 'CHECK (rank BETWEEN 1 AND 10)'
+}
+
+Table tools {
+  key text [pk]
+  name text [not null]
+}
+
+Ref: diagram_rankings.key > diagrams.key
+Ref: tool_rankings.key > tools.key

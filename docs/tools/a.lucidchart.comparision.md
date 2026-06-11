@@ -97,7 +97,7 @@ The matrix in §1 says *what* differs; this section grades *how well* each tool 
 | 3–4  | Limited; users routinely hit the ceiling. |
 | 1–2  | Absent or unusable. |
 
-**Caveats.** Scores for `kymo` reflect what is observable in this repo as of 2026-05-21 (`packages/python/src/kymo/`, `icons/`, `samples/`, `showcase/`, the layout-tree + Figma/Excalidraw exporters) and are held **consistent across every general-tool comparison in `docs/softwares/`** so kymo is judged the same way each time. Scores for `Lucidchart` reflect the Lucidchart cloud product as documented in [`lucidchart.md`](a.lucidchart.md) on 2026-05-20. The comparison is cross-model (collaborative canvas vs DSL), so the **Why** column is load-bearing — read it, not the bare number.
+**Caveats.** Scores for `kymo` reflect what is observable in this repo as of 2026-05-21 (`packages/python/src/kymo/`, `icons/`, `samples/`, `showcase/`, the layout-tree + Figma/Excalidraw exporters) and are held **consistent across every general-tool comparison in `docs/tools/`** so kymo is judged the same way each time. Scores for `Lucidchart` reflect the Lucidchart cloud product as documented in [`lucidchart.md`](a.lucidchart.md) on 2026-05-20. The comparison is cross-model (collaborative canvas vs DSL), so the **Why** column is load-bearing — read it, not the bare number.
 
 ### 3.1 Category A — Authoring & Source
 
@@ -210,5 +210,5 @@ These follow from the comparison and the borrowable ideas catalogued in [`lucidc
 
 - Comparison subject: Lucidchart cloud as documented in [`lucidchart.md`](a.lucidchart.md) on 2026-05-20.
 - Factual basis for the Lucidchart column: [`lucidchart.md`](a.lucidchart.md).
-- Factual basis for the kymo column: this repository's `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]] at B3). The kymo cell scores follow the shared general-tool kymo column used across `docs/softwares/*.comparision.md` so kymo is judged consistently.
+- Factual basis for the kymo column: this repository's `kymo-dsl/`, [`best-practices.md`](../diagrams/best-practices.md), the `packages/python/src/kymo/` tree, and team feedback recorded in memory (notably [[feedback-kymo-edge-routing]] at B3). The kymo cell scores follow the shared general-tool kymo column used across `docs/tools/*.comparision.md` so kymo is judged consistently.
 - Edits should restate the tradeoff, not just the conclusion — a future reader needs the *why* to judge whether the conclusion still holds.

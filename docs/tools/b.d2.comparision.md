@@ -51,7 +51,7 @@ upstream:
 
 This document isolates the **prior-art comparison** between [D2](https://d2lang.com/) and kymo. The factual reference (DSL syntax, shape catalog, layout engines, output formats) lives in [`d2.md`](b.d2.md); read that first if you need ground truth on how D2 actually behaves.
 
-The comparison is kept separate so it can evolve at a different cadence than the factual reference: it is **an opinion shaped by kymo's current direction**, not a description of an external tool. Update it when kymo's DSL, layout, or render pipeline changes — even if upstream D2 does not. Of all the tools surveyed in `docs/softwares/`, **D2 is the closest peer to kymo**: both are text-to-diagram languages with an owned render pipeline, so this is a same-category, like-for-like comparison (unlike the BPMN engines or WYSIWYG editors).
+The comparison is kept separate so it can evolve at a different cadence than the factual reference: it is **an opinion shaped by kymo's current direction**, not a description of an external tool. Update it when kymo's DSL, layout, or render pipeline changes — even if upstream D2 does not. Of all the tools surveyed in `docs/tools/`, **D2 is the closest peer to kymo**: both are text-to-diagram languages with an owned render pipeline, so this is a same-category, like-for-like comparison (unlike the BPMN engines or WYSIWYG editors).
 
 ## 1. At-a-glance matrix
 

@@ -1,0 +1,82 @@
+{
+  "version": "2.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "currentViewName": null,
+  "defaultView": {
+    "detailLevel": "All",
+    "tablePositions": [
+      {
+        "name": "diagram_rankings",
+        "schemaName": "public",
+        "x": 418.841796875,
+        "y": 472
+      },
+      {
+        "name": "diagrams",
+        "schemaName": "public",
+        "x": 12,
+        "y": 472
+      },
+      {
+        "name": "notes",
+        "schemaName": "public",
+        "x": 12,
+        "y": 12
+      },
+      {
+        "name": "tool_rankings",
+        "schemaName": "public",
+        "x": 418.841796875,
+        "y": 194
+      },
+      {
+        "name": "tools",
+        "schemaName": "public",
+        "x": 12,
+        "y": 194
+      },
+      {
+        "name": "timeline",
+        "schemaName": "public",
+        "x": 12,
+        "y": 714
+      }
+    ],
+    "tableGroupCollapseStates": [],
+    "stickyNoteLayouts": [],
+    "referencePaths": [
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "diagram_rankings",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "diagrams",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "key"
+        ],
+        "firstTableName": "tool_rankings",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "key"
+        ],
+        "secondTableName": "tools",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      }
+    ]
+  },
+  "views": {}
+}

@@ -67,7 +67,7 @@ kymo can already **import** BPMN 2.0 XML (`from_bpmn`, BPMN-MAP-001) and, since
 KYMO-DSL-001 §6.9, **author** BPMN textually with the `bpmn { }` block. But all of
 kymo's *output* paths are **one-way**: SVG, animated WebP, Figma, and Excalidraw —
 none is a standard, machine-readable interchange format. The tool comparisons under
-`docs/softwares/` make this the recurring gap: bpmn.io (REF-BPMNIO-CMP-001), Camunda
+`docs/tools/` make this the recurring gap: bpmn.io (REF-BPMNIO-CMP-001), Camunda
 (REF-CAMUNDA-CMP-001), Signavio (REF-SIGNAVIO-CMP-001), and Flowable
 (REF-FLOWABLE-CMP-001) all *"round-trip standard BPMN 2.0 XML losslessly"* while
 *"kymo's exporters are one-way with no standard interchange format."*

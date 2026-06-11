@@ -199,7 +199,7 @@ normative language definition and **without** breaking any existing cross-refere
 | Item | Where it lives | Why out |
 |------|----------------|---------|
 | Grammar + statement semantics (the language definition itself) | `KYMO-DSL-001` clauses + `dsl.py` (unchanged) | This feature is a **restructure**, not a language change; content is lifted verbatim and stays dual-sourced with the reference implementation. |
-| Converting `docs/softwares/*.md` path-based `related_documents` to cite-by-`document_id` | the repository's citation convention (`CLAUDE.md`) | A separate cleanup; here we only **repoint** the existing paths to the new location. |
+| Converting `docs/tools/*.md` path-based `related_documents` to cite-by-`document_id` | the repository's citation convention (`CLAUDE.md`) | A separate cleanup; here we only **repoint** the existing paths to the new location. |
 | Non-English editions | — | The whole repository is English-only; matching every sibling doc set. |
 
 ## Annex A — Revision History
