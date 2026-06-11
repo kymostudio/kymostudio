@@ -202,3 +202,6 @@ button:active, .btn:active, .pill:active, .ws-pill:active { transform: translate
 .splitter:hover::after, body.splitting .splitter::after { background: var(--accent); height: 52px; }
 body.splitting { user-select: none; cursor: col-resize; }
 body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
+
+/* diagram kind badge on list rows */
+.rkind { flex: none; font-size: 11.5px; font-weight: 600; color: var(--dim); background: var(--bg-raise); border-radius: 999px; padding: 2px 9px; letter-spacing: 0.01em; }

@@ -2,11 +2,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, GoogleButton } from "./auth";
 import { useWorkspace, assignDiagram } from "./workspace";
+import { kindLabel } from "./kroki";
 import { DIAGRAMS_API } from "./const";
 import { newId } from "./util";
 import { Search, Plus } from "lucide-react";
 
-type Item = { id: string; title: string; updatedAt: number; ws?: string };
+type Item = { id: string; title: string; updatedAt: number; ws?: string; kind?: string };
 
 function timeAgo(ms: number): string {
   if (!ms) return "";
@@ -147,8 +148,15 @@ export default function DiagramsPage() {
                 </div>
               ))}
               {filtered.map((dd) => (
-                <a key={dd.id} className="rrow" href={"/?d=" + encodeURIComponent(dd.id)}>
+                <a key={dd.id} className="rrow" href={"/?d=" + encodeURIComponent(dd.id)}
+                  onClick={(e) => {
+                    // SPA navigation → the editor's boot loader shows instead of a blank full-page reload
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                    e.preventDefault();
+                    navigate("/?d=" + encodeURIComponent(dd.id));
+                  }}>
                   <span className="rtitle">{dd.title || "Untitled"}</span>
+                  {dd.kind && dd.kind !== "kymo" && <span className="rkind">{kindLabel(dd.kind)}</span>}
                   <select className="rmove" value={dd.ws || ""} title="Move to workspace"
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     onChange={(e) => { e.stopPropagation(); move(dd, e.target.value); }}>

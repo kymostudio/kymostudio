@@ -7,6 +7,7 @@ import * as jose from "jose";
 
 export interface Env {
   OAUTH_KV: KVNamespace;
+  DB: D1Database;
   MCP_OBJECT: DurableObjectNamespace;
   EDITOR_ROOM: DurableObjectNamespace;
   OAUTH_PROVIDER: any;
@@ -33,63 +34,35 @@ function roomFor(env: Env, id: string) {
   return env.EDITOR_ROOM.get(env.EDITOR_ROOM.idFromName(id));
 }
 
-// per-user diagram index: one KV key per diagram (idx:<email>:<id>), the entry
-// kept in the key's metadata. The old single shared list value raced — every
-// per-diagram DO did a read-modify-write of the whole list, so concurrent
-// writers lost each other's entries (KV is last-write-wins). One key per
-// diagram means one writer per key, so nothing can be clobbered.
-type IdxEntry = { id: string; title: string; updatedAt: number };
-function idxKey(email: string, id: string) { return `idx:${email}:${id}`; }
-async function putIndexEntry(env: Env, email: string, e: IdxEntry) {
-  await env.OAUTH_KV.put(idxKey(email, e.id), "1", { metadata: e });
-}
+// ---- Diagram + workspace persistence: Cloudflare D1 (database of record). ----
+// The EditorRoom DO holds the live document; D1 keeps the queryable copy:
+// metadata always, plus a source snapshot (refreshed on rename/kind change,
+// throttled during typing, flushed when a tab closes).
+type IdxEntry = { id: string; title: string; updatedAt: number; kind?: string; ws?: string };
+
 async function listIndex(env: Env, email: string): Promise<IdxEntry[]> {
-  const out = new Map<string, IdxEntry>();
-  let cursor: string | undefined;
-  do {
-    const page = await env.OAUTH_KV.list<IdxEntry>({ prefix: `idx:${email}:`, cursor });
-    for (const k of page.keys) {
-      const id = k.name.slice(`idx:${email}:`.length);
-      out.set(id, { id, title: k.metadata?.title ?? "Untitled", updatedAt: k.metadata?.updatedAt ?? 0 });
-    }
-    cursor = "cursor" in page ? page.cursor : undefined;
-  } while (cursor);
-  // Lazy migration of the legacy single-value index. KV list() lags writes, so
-  // keep the legacy value as a merge source and only delete it once the prefix
-  // list already shows every legacy id — deleting it on first read would leave
-  // the list empty until list() catches up.
-  const legacy = await env.OAUTH_KV.get(`idx:${email}`);
-  if (legacy != null) {
-    let allVisible = true;
-    try {
-      for (const e of JSON.parse(legacy) as IdxEntry[]) {
-        if (e && e.id && !out.has(e.id)) {
-          allVisible = false;
-          out.set(e.id, e);
-          await putIndexEntry(env, email, e);
-        }
-      }
-    } catch {}
-    if (allVisible) await env.OAUTH_KV.delete(`idx:${email}`);
-  }
-  return [...out.values()].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  await migrateKvToD1(env, email);
+  const rs = await env.DB.prepare(
+    "SELECT id, title, kind, ws, updated_at FROM diagrams WHERE owner = ?1 ORDER BY updated_at DESC"
+  ).bind(email).all<{ id: string; title: string; kind: string; ws: string; updated_at: number }>();
+  return (rs.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind, ws: r.ws, updatedAt: r.updated_at }));
 }
-async function touchIndex(env: Env, email: string, id: string, title?: string) {
-  let t = title;
-  if (t == null) {
-    const cur = await env.OAUTH_KV.getWithMetadata<IdxEntry>(idxKey(email, id));
-    t = cur.metadata?.title ?? "Untitled";
-  }
-  await putIndexEntry(env, email, { id, title: t, updatedAt: Date.now() });
+
+async function touchIndex(env: Env, email: string, id: string, title?: string, kind?: string) {
+  await env.DB.prepare(
+    `INSERT INTO diagrams (id, owner, title, kind, updated_at) VALUES (?1, ?2, COALESCE(?3, 'Untitled'), COALESCE(?4, 'kymo'), ?5)
+     ON CONFLICT(id) DO UPDATE SET title = COALESCE(?3, title), kind = COALESCE(?4, kind), updated_at = ?5`
+  ).bind(id, email, title ?? null, kind ?? null, Date.now()).run();
   await env.OAUTH_KV.put(`last:${email}`, id);
 }
 
 async function removeFromIndex(env: Env, email: string, id: string) {
-  await env.OAUTH_KV.delete(idxKey(email, id));
+  await env.DB.prepare("DELETE FROM diagrams WHERE id = ?1 AND owner = ?2").bind(id, email).run();
   const last = await env.OAUTH_KV.get(`last:${email}`);
   if (last === id) {
-    const rest = (await listIndex(env, email)).filter((d) => d.id !== id); // list may still echo the deleted key
-    if (rest.length) await env.OAUTH_KV.put(`last:${email}`, rest[0].id);
+    const next = await env.DB.prepare("SELECT id FROM diagrams WHERE owner = ?1 ORDER BY updated_at DESC LIMIT 1")
+      .bind(email).first<{ id: string }>();
+    if (next) await env.OAUTH_KV.put(`last:${email}`, next.id);
     else await env.OAUTH_KV.delete(`last:${email}`);
   }
 }
@@ -101,28 +74,79 @@ async function destroyDiagram(env: Env, email: string, id: string): Promise<numb
   });
   if (r.status === 403) return 403;
   await removeFromIndex(env, email, id);
-  await assignWorkspace(env, email, id, "");
   return 200;
 }
 
-// ---- Workspaces: named groups of diagrams. The "Personal" workspace is
-// implicit (ws id "" = any diagram with no wsmap entry). Both keys are only
-// written from user-initiated /api calls (no per-keystroke writers), so a
-// single JSON value per user is race-safe enough here, unlike the old index.
+// One-time per-user migration of the old KV layout (idx:<email>:<id> metadata
+// keys, legacy idx:<email> list value, wss/wsmap JSON values) into D1. Sources
+// come from each room DO. Guarded by a d1done flag; INSERT OR IGNORE keeps it
+// idempotent if KV list() lag echoes already-deleted keys.
+function idxKey(email: string, id: string) { return `idx:${email}:${id}`; }
+async function migrateKvToD1(env: Env, email: string) {
+  if (await env.OAUTH_KV.get(`d1done:${email}`)) return;
+  const wssRaw = await env.OAUTH_KV.get(`wss:${email}`);
+  if (wssRaw != null) {
+    try {
+      for (const w of JSON.parse(wssRaw) as { id: string; name: string; createdAt?: number }[]) {
+        if (w && w.id) await env.DB.prepare("INSERT OR IGNORE INTO workspaces (id, owner, name, created_at) VALUES (?1, ?2, ?3, ?4)")
+          .bind(w.id, email, w.name || "Workspace", w.createdAt ?? Date.now()).run();
+      }
+    } catch {}
+    await env.OAUTH_KV.delete(`wss:${email}`);
+  }
+  let wsmap: Record<string, string> = {};
+  const wsmapRaw = await env.OAUTH_KV.get(`wsmap:${email}`);
+  try { wsmap = JSON.parse(wsmapRaw || "{}"); } catch {}
+
+  const entries = new Map<string, IdxEntry>();
+  const legacy = await env.OAUTH_KV.get(`idx:${email}`);
+  if (legacy != null) {
+    try { for (const e of JSON.parse(legacy) as IdxEntry[]) if (e && e.id) entries.set(e.id, e); } catch {}
+  }
+  let cursor: string | undefined;
+  do {
+    const page = await env.OAUTH_KV.list<IdxEntry>({ prefix: `idx:${email}:`, cursor });
+    for (const k of page.keys) {
+      const id = k.name.slice(`idx:${email}:`.length);
+      entries.set(id, { id, title: k.metadata?.title ?? "Untitled", updatedAt: k.metadata?.updatedAt ?? 0, kind: k.metadata?.kind });
+    }
+    cursor = "cursor" in page ? page.cursor : undefined;
+  } while (cursor);
+
+  for (const e of entries.values()) {
+    let kind = e.kind, source = "";
+    try {
+      const r = await roomFor(env, e.id).fetch(`https://room/get?email=${encodeURIComponent(email)}`);
+      if (r.ok) { const j = (await r.json()) as { source?: string; kind?: string }; source = j.source ?? ""; kind = kind || j.kind; }
+    } catch {}
+    await env.DB.prepare(
+      "INSERT OR IGNORE INTO diagrams (id, owner, title, kind, ws, source, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)"
+    ).bind(e.id, email, e.title || "Untitled", kind || "kymo", wsmap[e.id] || "", source, e.updatedAt || Date.now()).run();
+    await env.OAUTH_KV.delete(idxKey(email, e.id));
+  }
+  if (legacy != null) await env.OAUTH_KV.delete(`idx:${email}`);
+  if (wsmapRaw != null) await env.OAUTH_KV.delete(`wsmap:${email}`);
+  await env.OAUTH_KV.put(`d1done:${email}`, "1");
+}
+
+// ---- Workspaces: named groups of diagrams (D1 rows; ws "" = Personal). ----
 type Workspace = { id: string; name: string; createdAt: number };
 async function listWorkspaces(env: Env, email: string): Promise<Workspace[]> {
-  try { return JSON.parse((await env.OAUTH_KV.get(`wss:${email}`)) || "[]"); } catch { return []; }
-}
-async function saveWorkspaces(env: Env, email: string, list: Workspace[]) {
-  await env.OAUTH_KV.put(`wss:${email}`, JSON.stringify(list));
-}
-async function getWsMap(env: Env, email: string): Promise<Record<string, string>> {
-  try { return JSON.parse((await env.OAUTH_KV.get(`wsmap:${email}`)) || "{}"); } catch { return {}; }
+  await migrateKvToD1(env, email);
+  const rs = await env.DB.prepare("SELECT id, name, created_at FROM workspaces WHERE owner = ?1 ORDER BY created_at")
+    .bind(email).all<{ id: string; name: string; created_at: number }>();
+  return (rs.results ?? []).map((r) => ({ id: r.id, name: r.name, createdAt: r.created_at }));
 }
 async function assignWorkspace(env: Env, email: string, diagramId: string, ws: string) {
-  const map = await getWsMap(env, email);
-  if (ws) map[diagramId] = ws; else delete map[diagramId];
-  await env.OAUTH_KV.put(`wsmap:${email}`, JSON.stringify(map));
+  if (ws) {
+    // a brand-new diagram may not be indexed yet — create the row so it lands in the workspace
+    await env.DB.prepare(
+      `INSERT INTO diagrams (id, owner, ws, updated_at) VALUES (?1, ?2, ?3, ?4)
+       ON CONFLICT(id) DO UPDATE SET ws = ?3`
+    ).bind(diagramId, email, ws, Date.now()).run();
+  } else {
+    await env.DB.prepare("UPDATE diagrams SET ws = '' WHERE id = ?1 AND owner = ?2").bind(diagramId, email).run();
+  }
 }
 
 // ---- One diagram = one EditorRoom DO (keyed by diagram id). Owner-scoped. ----
@@ -161,15 +185,17 @@ export class EditorRoom extends DurableObject<Env> {
       return new Response(null, { status: 101, webSocket: client });
     }
     if (url.pathname.endsWith("/set") && request.method === "POST") {
-      const b = (await request.json()) as { source?: string; origin?: string; owner?: string; title?: string; kind?: string };
+      const b = (await request.json()) as { source?: string; origin?: string; owner?: string; title?: string; kind?: string; id?: string };
       if (this.owner && b.owner && this.owner !== b.owner) return Response.json({ error: "forbidden" }, { status: 403 });
       if (!this.owner && b.owner) { this.owner = b.owner; await this.ctx.storage.put("owner", b.owner); }
+      if (b.id && this.diagramId !== b.id) { this.diagramId = b.id; await this.ctx.storage.put("diagramId", b.id); }
       let changedSource = false, changedTitle = false;
       if (typeof b.kind === "string") { this.kind = b.kind; await this.ctx.storage.put("kind", this.kind); }
       if (typeof b.source === "string") { this.source = b.source; await this.ctx.storage.put("source", this.source); changedSource = true; }
       if (typeof b.title === "string") { this.title = b.title; await this.ctx.storage.put("title", this.title); changedTitle = true; }
       if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || undefined, origin: b.origin ?? "mcp" });
       else if (changedTitle) this.broadcast({ type: "meta", title: this.title });
+      await this.indexUpsert(); // one write per API call (MCP edits), not per-keystroke
       return Response.json({ ok: true, bytes: this.source.length, clients: this.ctx.getWebSockets().length });
     }
     if (url.pathname.endsWith("/destroy") && request.method === "POST") {
@@ -194,8 +220,9 @@ export class EditorRoom extends DurableObject<Env> {
     if (data && data.type === "set" && typeof data.source === "string") {
       this.source = data.source;
       await this.ctx.storage.put("source", this.source);
-      if (typeof data.kind === "string" && data.kind !== this.kind) { this.kind = data.kind; await this.ctx.storage.put("kind", this.kind); }
-      if (Date.now() - this.lastIdx > 30_000) await this.indexUpsert();
+      let kindChanged = false;
+      if (typeof data.kind === "string" && data.kind !== this.kind) { this.kind = data.kind; await this.ctx.storage.put("kind", this.kind); kindChanged = true; }
+      if (kindChanged || Date.now() - this.lastIdx > 30_000) await this.indexUpsert(); // kind changes are rare — index immediately
       this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || undefined, origin: data.origin ?? "browser" }, ws);
     }
     if (data && data.type === "rename" && typeof data.title === "string") {
@@ -208,12 +235,16 @@ export class EditorRoom extends DurableObject<Env> {
 
   async indexUpsert() {
     if (!this.owner || !this.diagramId) return;
-    await this.env.OAUTH_KV.put(`idx:${this.owner}:${this.diagramId}`, "1", {
-      metadata: { id: this.diagramId, title: this.title || "Untitled", updatedAt: Date.now() },
-    });
+    await this.env.DB.prepare(
+      `INSERT INTO diagrams (id, owner, title, kind, source, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+       ON CONFLICT(id) DO UPDATE SET title = ?3, kind = ?4, source = ?5, updated_at = ?6`
+    ).bind(this.diagramId, this.owner, this.title || "Untitled", this.kind || "kymo", this.source, Date.now()).run();
     this.lastIdx = Date.now();
   }
-  async webSocketClose(ws: WebSocket) { try { ws.close(); } catch {} }
+  async webSocketClose(ws: WebSocket) {
+    try { ws.close(); } catch {}
+    await this.indexUpsert(); // flush the latest source to D1 when a tab disconnects
+  }
   broadcast(obj: unknown, except?: WebSocket) {
     const msg = JSON.stringify(obj);
     for (const ws of this.ctx.getWebSockets()) { if (ws === except) continue; try { ws.send(msg); } catch {} }
@@ -241,10 +272,10 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         const src = source ?? `flowchart TD {\n  A[${title ?? "Bắt đầu"}]\n}`;
         await roomFor(this.env, id).fetch("https://room/set", {
           method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ source: src, origin: "mcp", owner: me(), title: title ?? "Untitled", kind: kind && kind !== "kymo" ? kind : undefined }),
+          body: JSON.stringify({ id, source: src, origin: "mcp", owner: me(), title: title ?? "Untitled", kind: kind && kind !== "kymo" ? kind : undefined }),
         });
-        await touchIndex(this.env, me(), id, title ?? "Untitled");
-        return { content: [{ type: "text", text: `Created diagram "${title ?? "Untitled"}" (id ${id}). Open: ${link(id)}` }] };
+        await touchIndex(this.env, me(), id, title ?? "Untitled", kind && kind !== "kymo" ? kind : "kymo");
+        return { content: [{ type: "text", text: `Created ${kind ?? "kymo"} diagram "${title ?? "Untitled"}" (id ${id}). Open: ${link(id)}` }] };
       }
     );
 
@@ -258,7 +289,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
         const lines = list.map((d) => {
           const when = d.updatedAt ? new Date(d.updatedAt).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "";
-          return `- ${d.title || "Untitled"} — ${link(d.id)} (id ${d.id}${when ? `, updated ${when}` : ""})`;
+          return `- ${d.title || "Untitled"} [${d.kind || "kymo"}] — ${link(d.id)} (id ${d.id}${when ? `, updated ${when}` : ""})`;
         });
         return { content: [{ type: "text", text: `${list.length} diagram(s):\n${lines.join("\n")}` }] };
       }
@@ -277,7 +308,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         if (source === undefined && title === undefined && kind === undefined) return { content: [{ type: "text", text: "Provide `source`, `title` and/or `kind` to edit." }] };
         const did = id ?? (await this.env.OAUTH_KV.get(`last:${me()}`));
         if (!did) return { content: [{ type: "text", text: "No diagram yet — call new_diagram first (or pass id)." }] };
-        const body: Record<string, unknown> = { origin: "mcp", owner: me() };
+        const body: Record<string, unknown> = { id: did, origin: "mcp", owner: me() };
         if (source !== undefined) body.source = source;
         if (title !== undefined) body.title = title;
         if (kind !== undefined) body.kind = kind === "kymo" ? "" : kind;
@@ -287,7 +318,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         });
         if (r.status === 403) return { content: [{ type: "text", text: `Diagram ${did} isn't yours.` }] };
         const j = (await r.json()) as { clients: number };
-        await touchIndex(this.env, me(), did, title);
+        await touchIndex(this.env, me(), did, title, kind === undefined ? undefined : (kind === "kymo" || kind === "" ? "kymo" : kind));
         const what = [source !== undefined ? "content" : null, title !== undefined ? `renamed to \"${title}\"` : null].filter(Boolean).join(", ");
         return { content: [{ type: "text", text: `Edited ${did} (${what}; ${j.clients} live tab(s)). ${link(did)}` }] };
       }
@@ -302,8 +333,11 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         if (!did) return { content: [{ type: "text", text: "(no diagram)" }] };
         const r = await roomFor(this.env, did).fetch(`https://room/get?email=${encodeURIComponent(me())}`);
         if (r.status === 403) return { content: [{ type: "text", text: `Diagram ${did} isn't yours.` }] };
-        const j = (await r.json()) as { source: string };
-        return { content: [{ type: "text", text: j.source && j.source.length ? j.source : "(empty)" }] };
+        const j = (await r.json()) as { source: string; kind?: string };
+        return { content: [
+          { type: "text", text: j.source && j.source.length ? j.source : "(empty)" },
+          { type: "text", text: `(kind: ${j.kind || "kymo"})` },
+        ] };
       }
     );
 
@@ -419,30 +453,26 @@ export default {
           const b = (await request.json().catch(() => ({}))) as { name?: string };
           const name = (b.name || "").trim().slice(0, 40);
           if (!name) return Response.json({ error: "missing name" }, { status: 400, headers: cors });
-          const list = await listWorkspaces(env, email);
           const ws: Workspace = { id: crypto.randomUUID().slice(0, 8), name, createdAt: Date.now() };
-          await saveWorkspaces(env, email, [...list, ws]);
+          await env.DB.prepare("INSERT INTO workspaces (id, owner, name, created_at) VALUES (?1, ?2, ?3, ?4)")
+            .bind(ws.id, email, ws.name, ws.createdAt).run();
           return Response.json({ ok: true, workspace: ws }, { headers: cors });
         }
         if (request.method === "PATCH") {
           const b = (await request.json().catch(() => ({}))) as { id?: string; name?: string };
           const name = (b.name || "").trim().slice(0, 40);
           if (!b.id || !name) return Response.json({ error: "missing id/name" }, { status: 400, headers: cors });
-          const list = await listWorkspaces(env, email);
-          const ws = list.find((w) => w.id === b.id);
-          if (!ws) return Response.json({ error: "not found" }, { status: 404, headers: cors });
-          ws.name = name;
-          await saveWorkspaces(env, email, list);
-          return Response.json({ ok: true, workspace: ws }, { headers: cors });
+          const res = await env.DB.prepare("UPDATE workspaces SET name = ?1 WHERE id = ?2 AND owner = ?3")
+            .bind(name, b.id, email).run();
+          if (!res.meta.changes) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+          return Response.json({ ok: true, workspace: { id: b.id, name } }, { headers: cors });
         }
         if (request.method === "DELETE") {
           const id = url.searchParams.get("id") || "";
           if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
-          await saveWorkspaces(env, email, (await listWorkspaces(env, email)).filter((w) => w.id !== id));
+          await env.DB.prepare("DELETE FROM workspaces WHERE id = ?1 AND owner = ?2").bind(id, email).run();
           // its diagrams fall back to Personal
-          const map = await getWsMap(env, email);
-          for (const k of Object.keys(map)) if (map[k] === id) delete map[k];
-          await env.OAUTH_KV.put(`wsmap:${email}`, JSON.stringify(map));
+          await env.DB.prepare("UPDATE diagrams SET ws = '' WHERE owner = ?1 AND ws = ?2").bind(email, id).run();
           return Response.json({ ok: true }, { headers: cors });
         }
         return Response.json({ workspaces: await listWorkspaces(env, email) }, { headers: cors });
@@ -462,12 +492,9 @@ export default {
         await assignWorkspace(env, email, b.id, b.ws || "");
         return Response.json({ ok: true }, { headers: cors });
       }
-      const [diagrams, map, workspaces] = await Promise.all([listIndex(env, email), getWsMap(env, email), listWorkspaces(env, email)]);
-      return Response.json({
-        email,
-        diagrams: diagrams.map((d) => ({ ...d, ws: map[d.id] || "" })),
-        workspaces,
-      }, { headers: cors });
+      const diagrams = await listIndex(env, email); // migrate runs here first, so workspaces sees D1 rows
+      const workspaces = await listWorkspaces(env, email);
+      return Response.json({ email, diagrams, workspaces }, { headers: cors });
     }
     return oauthProvider.fetch(request, env, ctx);
   },
