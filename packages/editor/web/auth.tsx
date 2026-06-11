@@ -14,6 +14,20 @@ export function colorFor(str: string): string {
   return AVATAR_COLORS[h % AVATAR_COLORS.length];
 }
 
+// GIS requires initialize() before renderButton(), but React runs the
+// GoogleButton (child) effect before the AuthProvider (parent) effect.
+// Route both through one idempotent init so call order doesn't matter.
+let gsiCallback: ((resp: any) => void) | null = null;
+let gsiInitialized = false;
+function ensureGsiInit(g: any) {
+  if (gsiInitialized) return;
+  gsiInitialized = true;
+  g.initialize({
+    client_id: GOOGLE_CLIENT_ID, auto_select: true,
+    callback: (resp: any) => gsiCallback?.(resp),
+  });
+}
+
 type Claims = { email: string; name?: string; sub: string };
 type AuthVal = { idToken: string | null; claims: Claims | null; signOut: () => void };
 const Ctx = createContext<AuthVal>({ idToken: null, claims: null, signOut: () => {} });
@@ -25,14 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
   useEffect(() => {
     let stop = false;
+    gsiCallback = (resp: any) => { try { localStorage.setItem("kymo_idtoken", resp.credential); } catch {} setIdToken(resp.credential); };
     function init() {
       if (stop) return;
       const g = (window as any).google?.accounts?.id;
       if (!g) { setTimeout(init, 150); return; }
-      g.initialize({
-        client_id: GOOGLE_CLIENT_ID, auto_select: true,
-        callback: (resp: any) => { try { localStorage.setItem("kymo_idtoken", resp.credential); } catch {} setIdToken(resp.credential); },
-      });
+      ensureGsiInit(g);
       if (!tokenValid(localStorage.getItem("kymo_idtoken"))) g.prompt();
     }
     init();
@@ -58,6 +70,7 @@ export function GoogleButton() {
       if (stop) return;
       const g = (window as any).google?.accounts?.id;
       if (!g || !ref.current) { setTimeout(r, 150); return; }
+      ensureGsiInit(g);
       ref.current.innerHTML = "";
       g.renderButton(ref.current, { type: "standard", theme: "outline", size: "medium", text: "signin_with" });
     }

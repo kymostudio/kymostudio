@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { MCP_WS } from "./const";
 
 type Handlers = {
-  onDoc?: (source: string, title: string | undefined, fromSelf: boolean) => void;
+  onDoc?: (source: string, title: string | undefined, fromSelf: boolean, kind?: string) => void;
   onMeta?: (title: string) => void;
   onLive?: (live: boolean) => void;
 };
@@ -26,13 +26,13 @@ export function useRoom(roomId: string | null, idToken: string | null, handlers:
       if (!data) return;
       if (data.type === "meta") { hRef.current.onMeta?.(data.title); return; }
       if (data.type !== "doc") return;
-      hRef.current.onDoc?.(String(data.source ?? ""), data.title, data.origin === myId);
+      hRef.current.onDoc?.(String(data.source ?? ""), data.title, data.origin === myId, data.kind);
     });
     return () => { try { ws.close(); } catch {} wsRef.current = null; };
   }, [roomId, idToken, myId]);
 
-  const sendSource = useCallback((source: string) => {
-    const ws = wsRef.current; if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: "set", source, origin: myId }));
+  const sendSource = useCallback((source: string, kind?: string) => {
+    const ws = wsRef.current; if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: "set", source, kind, origin: myId }));
   }, [myId]);
   const sendRename = useCallback((title: string) => {
     const ws = wsRef.current; if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: "rename", title, origin: myId }));

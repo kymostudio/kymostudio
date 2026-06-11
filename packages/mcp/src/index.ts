@@ -101,12 +101,33 @@ async function destroyDiagram(env: Env, email: string, id: string): Promise<numb
   });
   if (r.status === 403) return 403;
   await removeFromIndex(env, email, id);
+  await assignWorkspace(env, email, id, "");
   return 200;
+}
+
+// ---- Workspaces: named groups of diagrams. The "Personal" workspace is
+// implicit (ws id "" = any diagram with no wsmap entry). Both keys are only
+// written from user-initiated /api calls (no per-keystroke writers), so a
+// single JSON value per user is race-safe enough here, unlike the old index.
+type Workspace = { id: string; name: string; createdAt: number };
+async function listWorkspaces(env: Env, email: string): Promise<Workspace[]> {
+  try { return JSON.parse((await env.OAUTH_KV.get(`wss:${email}`)) || "[]"); } catch { return []; }
+}
+async function saveWorkspaces(env: Env, email: string, list: Workspace[]) {
+  await env.OAUTH_KV.put(`wss:${email}`, JSON.stringify(list));
+}
+async function getWsMap(env: Env, email: string): Promise<Record<string, string>> {
+  try { return JSON.parse((await env.OAUTH_KV.get(`wsmap:${email}`)) || "{}"); } catch { return {}; }
+}
+async function assignWorkspace(env: Env, email: string, diagramId: string, ws: string) {
+  const map = await getWsMap(env, email);
+  if (ws) map[diagramId] = ws; else delete map[diagramId];
+  await env.OAUTH_KV.put(`wsmap:${email}`, JSON.stringify(map));
 }
 
 // ---- One diagram = one EditorRoom DO (keyed by diagram id). Owner-scoped. ----
 export class EditorRoom extends DurableObject<Env> {
-  source = ""; owner = ""; title = ""; diagramId = "";
+  source = ""; owner = ""; title = ""; diagramId = ""; kind = ""; // kind "" = kymo (native)
   lastIdx = 0; // last indexUpsert (in-memory) — throttles KV writes during typing
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -115,6 +136,7 @@ export class EditorRoom extends DurableObject<Env> {
       this.owner = (await ctx.storage.get<string>("owner")) ?? "";
       this.title = (await ctx.storage.get<string>("title")) ?? "";
       this.diagramId = (await ctx.storage.get<string>("diagramId")) ?? "";
+      this.kind = (await ctx.storage.get<string>("kind")) ?? "";
     });
   }
 
@@ -135,17 +157,18 @@ export class EditorRoom extends DurableObject<Env> {
       const pair = new WebSocketPair();
       const client = pair[0], server = pair[1];
       this.ctx.acceptWebSocket(server);
-      server.send(JSON.stringify({ type: "doc", source: this.source, title: this.title, origin: "server" }));
+      server.send(JSON.stringify({ type: "doc", source: this.source, title: this.title, kind: this.kind || undefined, origin: "server" }));
       return new Response(null, { status: 101, webSocket: client });
     }
     if (url.pathname.endsWith("/set") && request.method === "POST") {
-      const b = (await request.json()) as { source?: string; origin?: string; owner?: string; title?: string };
+      const b = (await request.json()) as { source?: string; origin?: string; owner?: string; title?: string; kind?: string };
       if (this.owner && b.owner && this.owner !== b.owner) return Response.json({ error: "forbidden" }, { status: 403 });
       if (!this.owner && b.owner) { this.owner = b.owner; await this.ctx.storage.put("owner", b.owner); }
       let changedSource = false, changedTitle = false;
+      if (typeof b.kind === "string") { this.kind = b.kind; await this.ctx.storage.put("kind", this.kind); }
       if (typeof b.source === "string") { this.source = b.source; await this.ctx.storage.put("source", this.source); changedSource = true; }
       if (typeof b.title === "string") { this.title = b.title; await this.ctx.storage.put("title", this.title); changedTitle = true; }
-      if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, origin: b.origin ?? "mcp" });
+      if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || undefined, origin: b.origin ?? "mcp" });
       else if (changedTitle) this.broadcast({ type: "meta", title: this.title });
       return Response.json({ ok: true, bytes: this.source.length, clients: this.ctx.getWebSockets().length });
     }
@@ -154,13 +177,13 @@ export class EditorRoom extends DurableObject<Env> {
       if (this.owner && b.owner !== this.owner) return Response.json({ error: "forbidden" }, { status: 403 });
       for (const ws of this.ctx.getWebSockets()) { try { ws.close(1000, "deleted"); } catch {} }
       await this.ctx.storage.deleteAll();
-      this.source = ""; this.owner = ""; this.title = ""; this.diagramId = "";
+      this.source = ""; this.owner = ""; this.title = ""; this.diagramId = ""; this.kind = "";
       return Response.json({ ok: true });
     }
     if (url.pathname.endsWith("/get")) {
       const requester = url.searchParams.get("email") ?? "";
       if (this.owner && requester && this.owner !== requester) return Response.json({ error: "forbidden" }, { status: 403 });
-      return Response.json({ source: this.source, title: this.title, owner: this.owner });
+      return Response.json({ source: this.source, title: this.title, owner: this.owner, kind: this.kind || "kymo" });
     }
     return new Response("not found", { status: 404 });
   }
@@ -171,8 +194,9 @@ export class EditorRoom extends DurableObject<Env> {
     if (data && data.type === "set" && typeof data.source === "string") {
       this.source = data.source;
       await this.ctx.storage.put("source", this.source);
+      if (typeof data.kind === "string" && data.kind !== this.kind) { this.kind = data.kind; await this.ctx.storage.put("kind", this.kind); }
       if (Date.now() - this.lastIdx > 30_000) await this.indexUpsert();
-      this.broadcast({ type: "doc", source: this.source, title: this.title, origin: data.origin ?? "browser" }, ws);
+      this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || undefined, origin: data.origin ?? "browser" }, ws);
     }
     if (data && data.type === "rename" && typeof data.title === "string") {
       this.title = data.title;
@@ -210,13 +234,14 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       {
         title: z.string().optional().describe("A short name for the diagram (for list_diagrams)."),
         source: z.string().optional().describe("Optional initial kymo DSL (flowchart TD { ... }). Defaults to a minimal scaffold."),
+        kind: z.string().optional().describe("Diagram kind: 'kymo' (default, native DSL) or a kroki.io type (plantuml, c4plantuml, mermaid, graphviz, d2, dbml, ditaa, erd, excalidraw, nomnoml, pikchr, structurizr, svgbob, symbolator, tikz, umlet, vega, vegalite, wavedrom, wireviz, bpmn, bytefield, blockdiag, seqdiag, actdiag, nwdiag, packetdiag, rackdiag)."),
       },
-      async ({ title, source }) => {
+      async ({ title, source, kind }) => {
         const id = crypto.randomUUID().slice(0, 8);
         const src = source ?? `flowchart TD {\n  A[${title ?? "Bắt đầu"}]\n}`;
         await roomFor(this.env, id).fetch("https://room/set", {
           method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ source: src, origin: "mcp", owner: me(), title: title ?? "Untitled" }),
+          body: JSON.stringify({ source: src, origin: "mcp", owner: me(), title: title ?? "Untitled", kind: kind && kind !== "kymo" ? kind : undefined }),
         });
         await touchIndex(this.env, me(), id, title ?? "Untitled");
         return { content: [{ type: "text", text: `Created diagram "${title ?? "Untitled"}" (id ${id}). Open: ${link(id)}` }] };
@@ -243,17 +268,19 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       "edit_diagram",
       "Edit one of your diagrams: update its content (`source`) and/or rename it (`title`). Pushes live to editor.kymo.studio. Pass `id` to target a specific diagram; omit to use your most recent. At least one of source/title is required. Use the `flowchart TD { ... }` block syntax for source.",
       {
-        source: z.string().optional().describe("New full kymo flowchart DSL (replaces the content)."),
+        source: z.string().optional().describe("New full diagram source (replaces the content)."),
         title: z.string().optional().describe("New name for the diagram (rename)."),
         id: z.string().optional().describe("Diagram id (from new_diagram/list_diagrams). Omit to use your most recent."),
+        kind: z.string().optional().describe("Change the diagram kind: 'kymo' or a kroki.io type (plantuml, mermaid, graphviz, …)."),
       },
-      async ({ source, title, id }) => {
-        if (source === undefined && title === undefined) return { content: [{ type: "text", text: "Provide `source` and/or `title` to edit." }] };
+      async ({ source, title, id, kind }) => {
+        if (source === undefined && title === undefined && kind === undefined) return { content: [{ type: "text", text: "Provide `source`, `title` and/or `kind` to edit." }] };
         const did = id ?? (await this.env.OAUTH_KV.get(`last:${me()}`));
         if (!did) return { content: [{ type: "text", text: "No diagram yet — call new_diagram first (or pass id)." }] };
         const body: Record<string, unknown> = { origin: "mcp", owner: me() };
         if (source !== undefined) body.source = source;
         if (title !== undefined) body.title = title;
+        if (kind !== undefined) body.kind = kind === "kymo" ? "" : kind;
         const r = await roomFor(this.env, did).fetch("https://room/set", {
           method: "POST", headers: { "content-type": "application/json" },
           body: JSON.stringify(body),
@@ -369,30 +396,78 @@ export default {
       const d = url.searchParams.get("d") || "default";
       return roomFor(env, d).fetch(request);
     }
-    // Browser-callable list of the signed-in user's diagrams (Google id_token).
-    if (url.pathname === "/api/diagrams") {
+    // Browser-callable APIs for the signed-in user (Google id_token).
+    if (url.pathname === "/api/diagrams" || url.pathname === "/api/workspaces") {
       const cors: Record<string, string> = {
         "access-control-allow-origin": "*",
-        "access-control-allow-methods": "GET, DELETE, OPTIONS",
+        "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
         "access-control-allow-headers": "authorization, content-type",
       };
       if (request.method === "OPTIONS") return new Response(null, { headers: cors });
       const idToken = url.searchParams.get("id_token") || (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+      let email: string;
       try {
         const pl = await verifyGoogleIdToken(idToken, env.GOOGLE_CLIENT_ID);
         if (!emailAllowed(pl.email, env)) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
-        if (request.method === "DELETE") {
-          const id = url.searchParams.get("id") || "";
-          if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
-          const st = await destroyDiagram(env, pl.email!, id);
-          if (st === 403) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
-          return Response.json({ ok: true }, { headers: cors });
-        }
-        const diagrams = await listIndex(env, pl.email!);
-        return Response.json({ email: pl.email, diagrams }, { headers: cors });
+        email = pl.email!;
       } catch {
         return Response.json({ error: "unauthorized" }, { status: 401, headers: cors });
       }
+
+      if (url.pathname === "/api/workspaces") {
+        if (request.method === "POST") {
+          const b = (await request.json().catch(() => ({}))) as { name?: string };
+          const name = (b.name || "").trim().slice(0, 40);
+          if (!name) return Response.json({ error: "missing name" }, { status: 400, headers: cors });
+          const list = await listWorkspaces(env, email);
+          const ws: Workspace = { id: crypto.randomUUID().slice(0, 8), name, createdAt: Date.now() };
+          await saveWorkspaces(env, email, [...list, ws]);
+          return Response.json({ ok: true, workspace: ws }, { headers: cors });
+        }
+        if (request.method === "PATCH") {
+          const b = (await request.json().catch(() => ({}))) as { id?: string; name?: string };
+          const name = (b.name || "").trim().slice(0, 40);
+          if (!b.id || !name) return Response.json({ error: "missing id/name" }, { status: 400, headers: cors });
+          const list = await listWorkspaces(env, email);
+          const ws = list.find((w) => w.id === b.id);
+          if (!ws) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+          ws.name = name;
+          await saveWorkspaces(env, email, list);
+          return Response.json({ ok: true, workspace: ws }, { headers: cors });
+        }
+        if (request.method === "DELETE") {
+          const id = url.searchParams.get("id") || "";
+          if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+          await saveWorkspaces(env, email, (await listWorkspaces(env, email)).filter((w) => w.id !== id));
+          // its diagrams fall back to Personal
+          const map = await getWsMap(env, email);
+          for (const k of Object.keys(map)) if (map[k] === id) delete map[k];
+          await env.OAUTH_KV.put(`wsmap:${email}`, JSON.stringify(map));
+          return Response.json({ ok: true }, { headers: cors });
+        }
+        return Response.json({ workspaces: await listWorkspaces(env, email) }, { headers: cors });
+      }
+
+      if (request.method === "DELETE") {
+        const id = url.searchParams.get("id") || "";
+        if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+        const st = await destroyDiagram(env, email, id);
+        if (st === 403) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
+        return Response.json({ ok: true }, { headers: cors });
+      }
+      if (request.method === "PATCH") {
+        // move a diagram to a workspace ("" = Personal)
+        const b = (await request.json().catch(() => ({}))) as { id?: string; ws?: string };
+        if (!b.id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+        await assignWorkspace(env, email, b.id, b.ws || "");
+        return Response.json({ ok: true }, { headers: cors });
+      }
+      const [diagrams, map, workspaces] = await Promise.all([listIndex(env, email), getWsMap(env, email), listWorkspaces(env, email)]);
+      return Response.json({
+        email,
+        diagrams: diagrams.map((d) => ({ ...d, ws: map[d.id] || "" })),
+        workspaces,
+      }, { headers: cors });
     }
     return oauthProvider.fetch(request, env, ctx);
   },
