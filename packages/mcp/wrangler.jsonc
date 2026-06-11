@@ -15,6 +15,9 @@
   "kv_namespaces": [
     { "binding": "OAUTH_KV", "id": "b0a941d0b5d74c86bebe5a4583fadee8" }
   ],
+  "d1_databases": [
+    { "binding": "DB", "database_name": "kymo-editor", "database_id": "ad04fd23-3c19-4327-ab2e-d0e307f84a8d" }
+  ],
   "vars": {
     "GOOGLE_CLIENT_ID": "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com",
     "ALLOWED_EMAILS": ""
