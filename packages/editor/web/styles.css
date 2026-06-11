@@ -35,7 +35,7 @@ header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; bord
 .spacer { flex: 1; }
 .muted { font-size: 12.5px; color: var(--dim); }
 
-button, .btn { background: var(--bg); color: var(--ink); border: 1px solid var(--border-strong); border-radius: var(--radius-btn); padding: 7px 14px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+button, .btn { background: var(--bg); color: var(--ink); border: 1px solid var(--border-strong); border-radius: var(--radius-btn); padding: 7px 14px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft); }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
 .btn-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
@@ -50,18 +50,19 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .acct-btn { display: inline-flex; align-items: center; gap: 2px; padding: 3px 5px 3px 3px; border-radius: 999px; background: var(--bg-raise); border-color: transparent; }
 .acct-btn:hover { background: var(--border); border-color: transparent; }
 .avatar { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; color: var(--ink); }
-.acct-btn .chev { color: var(--dim); font-size: 11px; line-height: 1; padding: 0 3px; }
+.acct-btn .chev { color: var(--dim); margin: 0 2px; }
 .acct-menu { position: absolute; right: 0; top: calc(100% + 6px); min-width: 220px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px; box-shadow: 0 12px 32px rgba(36, 33, 49, 0.14); z-index: 20; }
 .acct-head { padding: 8px 10px 10px; font-size: 12px; color: var(--dim); border-bottom: 1px solid var(--border); }
 .acct-head b { display: block; color: var(--ink); font-size: 13px; font-weight: 600; margin-top: 2px; word-break: break-all; }
 .acct-item { display: block; width: 100%; text-align: left; background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 8px 10px; margin-top: 4px; color: var(--ink); font-weight: 500; }
 .acct-item:hover { background: var(--bg-soft); border-color: transparent; }
 .exp-menu { min-width: 190px; }
+.exp-menu::before { content: ""; position: absolute; top: -8px; left: 0; right: 0; height: 8px; } /* hover bridge over the gap */
 .exp-item { display: flex; align-items: center; gap: 9px; font-size: 13.5px; }
 .exp-item svg { flex: none; color: var(--dim); }
 .exp-item:hover svg { color: var(--accent); }
 .menu-sep { height: 1px; background: var(--border); margin: 4px 6px; }
-.chev-inline { font-size: 10px; color: var(--dim); margin-left: 2px; }
+.chev-icon { color: var(--dim); margin-right: -3px; }
 
 /* ---- editor panes ---- */
 main { flex: 1; display: flex; min-height: 0; }

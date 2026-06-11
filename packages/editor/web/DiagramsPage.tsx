@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth, GoogleButton } from "./auth";
 import { DIAGRAMS_API } from "./const";
 import { newId } from "./util";
+import { Search } from "lucide-react";
 
 type Item = { id: string; title: string; updatedAt: number };
 
@@ -88,9 +89,7 @@ export default function DiagramsPage() {
         ) : (
           <>
             <div className="search">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" />
-              </svg>
+              <Search size={17} strokeWidth={2} />
               <input placeholder="Search diagrams…" value={q} onChange={(e) => setQ(e.target.value)} />
             </div>
             {error && <div className="empty">{error}</div>}

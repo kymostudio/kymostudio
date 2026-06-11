@@ -4,6 +4,7 @@ import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
+import { ChevronDown, Download, FileCode2, FileImage, Code2 } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -190,7 +191,7 @@ export default function EditorPage() {
           <div className="account" onClick={(e) => e.stopPropagation()}>
             <button className="acct-btn" onClick={() => setMenuOpen((o) => !o)} title="Account">
               <span className="avatar" style={{ background: colorFor((claims.email || "x").toLowerCase()) }}>{initial}</span>
-              <span className="chev">▾</span>
+              <ChevronDown size={14} strokeWidth={2.2} className="chev" />
             </button>
             {menuOpen && (
               <div className="acct-menu">
@@ -202,21 +203,21 @@ export default function EditorPage() {
         )}
         <Link className="btn" to="/diagrams">Diagrams</Link>
         <button className="btn-primary" onClick={newDiagram} title="New diagram">+ New</button>
-        <div className="account" onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => setExportOpen((o) => !o)}>Export <span className="chev-inline">▾</span></button>
+        <div className="account" onClick={(e) => e.stopPropagation()} onMouseEnter={() => setExportOpen(true)} onMouseLeave={() => setExportOpen(false)}>
+          <button onClick={() => setExportOpen((o) => !o)}><Download size={16} strokeWidth={2} />Export <ChevronDown size={16} strokeWidth={2.2} className="chev-icon" /></button>
           {exportOpen && (
             <div className="acct-menu exp-menu">
               <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></svg>
+                <FileCode2 size={17} strokeWidth={1.9} />
                 To SVG
               </button>
               <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportPNG(); }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>
+                <FileImage size={17} strokeWidth={1.9} />
                 To PNG
               </button>
               <div className="menu-sep" />
               <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m16 18 6-6-6-6" /><path d="m8 6-6 6 6 6" /></svg>
+                <Code2 size={17} strokeWidth={1.9} />
                 Source (.kymo)
               </button>
             </div>
