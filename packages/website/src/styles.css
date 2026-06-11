@@ -307,3 +307,34 @@ section.features {
 .feature h3 { margin: 0 0 6px; font-size: 15.5px; font-weight: 700; color: var(--ink); }
 .feature h3::before { content: "✦ "; color: var(--accent); }
 .feature p { margin: 0; font-size: 14px; color: var(--dim); }
+
+/* ── Hero v2: nav Start-free + tabbed install ────────────────── */
+.nav-right { display: flex; align-items: center; gap: 22px; }
+.btn-sm { padding: 7px 14px; font-size: 13.5px; border-radius: 8px; }
+.hero-note { margin: 18px 0 0; font-size: 13px; color: var(--dim); }
+.install-tabs {
+  margin-top: 26px;
+  display: inline-flex; align-items: center; gap: 0;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.install-tabs .tabs { display: flex; border-right: 1px solid var(--border); }
+.install-tabs .tabs button {
+  border: 0; background: transparent; cursor: pointer;
+  padding: 11px 14px; font-family: var(--mono); font-size: 13px;
+  color: var(--dim);
+  transition: color 0.14s ease, background-color 0.14s ease, box-shadow 0.14s ease;
+}
+.install-tabs .tabs button:hover { color: var(--ink); background: var(--bg-raise); }
+.install-tabs .tabs button.active { color: var(--accent); font-weight: 700; box-shadow: inset 0 -2px 0 var(--accent); background: var(--bg); }
+.install-tabs .cmd { padding: 11px 18px; font-size: 14px; color: var(--ink); white-space: nowrap; }
+.install-tabs .prompt { color: var(--accent); font-weight: 700; }
+.install-tabs .copy {
+  border: 0; border-left: 1px solid var(--border); background: transparent;
+  padding: 11px 14px; font-size: 12.5px; font-weight: 600; color: var(--dim); cursor: pointer;
+  transition: color 0.14s ease, background-color 0.14s ease;
+}
+.install-tabs .copy:hover { color: var(--accent); background: var(--bg-raise); }
+footer .reg-badges { margin: 0 0 16px; }

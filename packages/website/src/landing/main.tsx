@@ -104,6 +104,34 @@ function Modal({ sample, onClose }: { sample: Sample; onClose: () => void }) {
   );
 }
 
+function InstallTabs() {
+  const CMDS: Record<string, string> = {
+    pip: "pip install kymostudio",
+    npm: "npm install kymostudio",
+    cargo: "cargo install kymostudio",
+  };
+  const [tab, setTab] = useState("pip");
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(CMDS[tab]);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {}
+  }
+  return (
+    <div className="install-tabs">
+      <div className="tabs">
+        {Object.keys(CMDS).map((k) => (
+          <button key={k} className={k === tab ? "active" : ""} onClick={() => setTab(k)}>{k}</button>
+        ))}
+      </div>
+      <code className="cmd"><span className="prompt">$ </span>{CMDS[tab]}</code>
+      <button className="copy" onClick={copy} title="Copy">{copied ? "✓ Copied" : "Copy"}</button>
+    </div>
+  );
+}
+
 function App() {
   const [selected, setSelected] = useState<Sample | null>(null);
   return (
@@ -111,11 +139,14 @@ function App() {
       <nav>
         <div className="nav-inner">
           <div className="brand"><img src="./logo.svg" alt="" />KymoStudio</div>
-          <div className="nav-links">
-            <a href="https://editor.kymo.studio">Editor</a>
-            <a href="#features">Features</a>
-            <a href="#samples">Samples</a>
-            <a href={GH}>GitHub →</a>
+          <div className="nav-right">
+            <div className="nav-links">
+              <a href="https://editor.kymo.studio">Editor</a>
+              <a href="#features">Features</a>
+              <a href="#samples">Samples</a>
+              <a href={GH}>GitHub →</a>
+            </div>
+            <a className="btn btn-primary btn-sm" href="https://editor.kymo.studio">Start free</a>
           </div>
         </div>
       </nav>
@@ -123,27 +154,15 @@ function App() {
       <header className="hero">
         <h1>Type it. See it appear.<br /><span className="accent">Watch it animate.</span></h1>
         <p className="lead">
-          Kymostudio turns diagram-as-code source into animated SVG — and PNG, WebP,
-          Figma and Excalidraw. Write a <code>.kymo</code> file (or feed it BPMN, JSON,
-          Python), get auto-layout, orthogonal edge routing and flowing-dash animation,
-          no headless browser required.
+          The diagram-as-code studio — turn a <code>.kymo</code> file (or BPMN, JSON, Python)
+          into an animated, self-contained SVG.
         </p>
-        <div className="install install-multi">
-          <span className="install-row">pip install kymostudio</span>
-          <span className="install-row">npm install kymostudio</span>
-          <span className="install-row">cargo install kymostudio</span>
-        </div>
         <div className="ctas">
-          <a className="btn btn-primary" href="https://editor.kymo.studio">Open live editor →</a>
+          <a className="btn btn-primary" href="https://editor.kymo.studio">Start Free →</a>
           <a className="btn btn-ghost" href={GH}>View on GitHub</a>
-          <a className="btn btn-ghost" href="#samples">See samples ↓</a>
         </div>
-        <div className="reg-badges">
-          <a href="https://pypi.org/project/kymostudio/"><img alt="PyPI" src="https://img.shields.io/pypi/v/kymostudio?logo=pypi&logoColor=white&label=PyPI&color=e0095f" /></a>
-          <a href="https://www.npmjs.com/package/kymostudio"><img alt="npm" src="https://img.shields.io/npm/v/kymostudio?logo=npm&label=npm&color=e0095f" /></a>
-          <a href="https://crates.io/crates/kymostudio"><img alt="crates.io" src="https://img.shields.io/crates/v/kymostudio?logo=rust&logoColor=white&label=crates.io&color=e0095f" /></a>
-          <a href="https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode"><img alt="VS Code Extension" src="https://img.shields.io/badge/VS%20Code-Extension-e0095f?logo=visualstudiocode&logoColor=white" /></a>
-        </div>
+        <InstallTabs />
+        <p className="hero-note">Free &amp; open source · Apache 2.0</p>
       </header>
 
       <div className="preview">
@@ -186,6 +205,12 @@ function App() {
       </section>
 
       <footer>
+        <div className="reg-badges">
+          <a href="https://pypi.org/project/kymostudio/"><img alt="PyPI" src="https://img.shields.io/pypi/v/kymostudio?logo=pypi&logoColor=white&label=PyPI&color=e0095f" /></a>
+          <a href="https://www.npmjs.com/package/kymostudio"><img alt="npm" src="https://img.shields.io/npm/v/kymostudio?logo=npm&label=npm&color=e0095f" /></a>
+          <a href="https://crates.io/crates/kymostudio"><img alt="crates.io" src="https://img.shields.io/crates/v/kymostudio?logo=rust&logoColor=white&label=crates.io&color=e0095f" /></a>
+          <a href="https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode"><img alt="VS Code Extension" src="https://img.shields.io/badge/VS%20Code-Extension-e0095f?logo=visualstudiocode&logoColor=white" /></a>
+        </div>
         <a href={GH}>github.com/kymostudio/kymostudio</a> · Apache 2.0
       </footer>
 
