@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>30 Years of Diagrams — Rankings Visualized (1995–2025)</title>
+<style>
+  :root { --ink:#1f2430; --muted:#6b7280; --line:#e5e7eb; --bg:#ffffff;
+          --eraA:#f3f7fb; --eraB:#f4fbf4; --eraC:#fdf6f1; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+  .wrap { max-width:1240px; margin:0 auto; padding:28px 24px 64px; }
+  h1 { font-size:26px; margin:0 0 4px; }
+  h2 { font-size:19px; margin:40px 0 4px; }
+  p.sub { color:var(--muted); margin:0 0 18px; }
+  .toggle { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin:8px 0 4px; }
+  .toggle button { border:0; background:#fff; padding:7px 18px; font:inherit; cursor:pointer; color:var(--muted); }
+  .toggle button.on { background:var(--ink); color:#fff; }
+  .hint { color:var(--muted); font-size:13px; margin-left:12px; }
+  svg text { font:12px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  .era-label { fill:#9aa3af; font-size:11px; letter-spacing:.06em; }
+  .axis text { fill:var(--muted); }
+  .axis line { stroke:var(--line); }
+  .bump path.ln { fill:none; stroke-width:2.4; opacity:.85; transition:opacity .15s; }
+  .bump circle.pt { stroke:#fff; stroke-width:1.2; transition:opacity .15s; }
+  .bump text.lbl { font-size:11.5px; cursor:default; transition:opacity .15s; }
+  .bump text.lbl.mid { opacity:0; }
+  .bump .hot text.lbl.mid { opacity:1; }
+  .bump.sel path.ln, .bump.sel circle.pt, .bump.sel text.lbl { opacity:.12; }
+  .bump.sel .hot path.ln, .bump.sel .hot circle.pt, .bump.sel .hot text.lbl { opacity:1; }
+  .bump.sel .hot path.ln { stroke-width:3.4; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:26px; margin-top:14px; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:14px 16px 8px; }
+  .card h3 { margin:0 0 2px; font-size:14.5px; }
+  .card p { margin:0 0 6px; color:var(--muted); font-size:12.5px; }
+  .mini path { fill:none; stroke-width:2; }
+  .mini text { fill:var(--muted); font-size:10.5px; }
+  .mini line { stroke:var(--line); }
+  .legend { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--muted); margin:4px 0 2px; }
+  .legend span::before { content:""; display:inline-block; width:10px; height:10px; border-radius:3px;
+                         margin-right:5px; background:var(--c); vertical-align:-1px; }
+  footer { color:var(--muted); font-size:12.5px; margin-top:48px; border-top:1px solid var(--line); padding-top:14px; }
+  a { color:#2563eb; text-decoration:none; } a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>30 Years of Diagrams — Rankings Visualized</h1>
+  <p class="sub">Top-10 tools and diagram types per year, 1995–2025 (<a href="README.md">RES-DIAGRAM-TIMELINE-001</a>) ·
+     weighted-composite method per <a href="METHOD.md">RES-DIAGRAM-TIMELINE-002</a> ·
+     data: <code>docs/data/database.sqlite</code></p>
+
+  <div class="toggle" id="toggle">
+    <button data-cat="tool" class="on">Tools</button>
+    <button data-cat="type">Diagram types</button>
+  </div>
+  <span class="hint">hover to trace a line · click to pin · click background to clear</span>
+  <div id="bump-host"></div>
+
+  <h2>Measured signals</h2>
+  <p class="sub">Verifiable series from the database (see METHOD §4) — read each chart for its shape; absolute scales differ per source.</p>
+  <div class="grid" id="cards"></div>
+
+  <footer>Generated from <code>docs/data/database.sqlite</code> by <code>render_html.py</code>.
+  Rankings are evidence-based estimates; the measured series are independently verifiable
+  (sources in the database). Eras: A — Desktop &amp; standardization · B — Web &amp; SaaS · C — Collaborative &amp; AI-native.</footer>
+</div>
+<script>
+const DATA = {"years":[1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"tool":{"visio":{"name":"Microsoft Visio","points":[[1995,1,8.2,"Visio 4.0"],[1996,1,7.025,"Visio 4.x"],[1997,1,7.225,"Visio 5.0"],[1998,1,7.425,"Visio"],[1999,1,7.625,"Visio 2000"],[2000,1,7.825,"Microsoft Visio"],[2001,1,8.025,"Microsoft Visio 2002"],[2002,1,8.225,"Microsoft Visio 2002"],[2003,1,8.425,"Microsoft Office Visio 2003"],[2004,1,8.625,"Microsoft Office Visio 2003"],[2005,1,8.625,"Microsoft Visio"],[2006,1,8.625,"Microsoft Visio"],[2007,1,8.625,"Microsoft Visio 2007"],[2008,1,8.625,"Microsoft Visio"],[2009,1,8.625,"Microsoft Visio"],[2010,1,8.625,"Microsoft Visio 2010"],[2011,1,8.625,"Microsoft Visio"],[2012,1,8.625,"Microsoft Visio"],[2013,1,8.625,"Microsoft Visio 2013"],[2014,1,8.625,"Microsoft Visio"],[2015,1,8.625,"Microsoft Visio"],[2016,1,8.625,"Microsoft Visio"],[2017,1,8.625,"Microsoft Visio"],[2018,1,8.625,"Microsoft Visio"],[2019,1,8.625,"Microsoft Visio"],[2020,1,8.625,"Microsoft Visio"],[2021,1,8.625,"Visio (Microsoft 365)"],[2022,2,7.825,"Microsoft Visio"],[2023,5,5.7,"Microsoft Visio"],[2024,6,5.725,"Microsoft Visio"],[2025,6,6.0,"Microsoft Visio"]]},"abc":{"name":"iGrafx FlowCharter","points":[[1995,2,7.4,"Micrografx ABC FlowCharter"],[1996,2,6.5,"ABC FlowCharter 6.0"],[1997,3,5.9,"ABC FlowCharter"],[1998,5,4.775,"ABC FlowCharter"],[1999,5,5.525,"ABC FlowCharter / iGrafx v8 (Micrografx)"],[2000,6,4.925,"iGrafx FlowCharter 2000"],[2001,7,4.6,"iGrafx FlowCharter"]]},"erwin":{"name":"ERwin","points":[[1995,3,6.6,"Logic Works ERwin"],[1996,3,5.975,"ERwin"],[1997,4,5.375,"ERwin"],[1998,3,6.88,"ERwin"],[1999,4,5.775,"ERwin"],[2000,4,6.25,"ERwin (CA)"],[2001,4,6.45,"ERwin (CA AllFusion)"],[2002,5,5.85,"ERwin (CA)"],[2003,5,6.325,"ERwin (CA)"],[2004,6,5.725,"ERwin (CA)"],[2005,7,4.734,"ERwin Data Modeler"],[2006,7,4.779,"ERwin"],[2007,10,2.529,"ERwin"]]},"allclear":{"name":"allCLEAR","points":[[1995,4,5.8,"CLEAR Software allCLEAR (+ EasyFlow, RFFlow tier)"],[1996,5,4.65,"allCLEAR / Inspiration tier"],[1997,6,4.325,"allCLEAR"],[1998,8,3.2,"allCLEAR"]]},"rose":{"name":"Rational RSA / Rose","points":[[1995,5,5.0,"Rational Rose"],[1996,4,5.955,"Rational Rose"],[1997,2,7.207,"Rational Rose"],[1998,2,6.9,"Rational Rose"],[1999,2,7.1,"Rational Rose"],[2000,2,7.3,"Rational Rose"],[2001,2,7.5,"Rational Rose (+ XDE)"],[2002,2,7.7,"Rational Rose / XDE"],[2003,2,7.9,"IBM Rational Rose / XDE"],[2004,2,8.1,"IBM Rational (Rose/XDE \u2192 RSA)"],[2005,2,8.1,"IBM Rational Rose / XDE"],[2006,3,7.3,"Rational Rose / RSA"],[2007,5,5.975,"Rational RSA / Rose"]]},"orgplus":{"name":"OrgPlus","points":[[1995,6,4.2,"OrgPlus (Banner Blue)"],[1996,6,4.4,"OrgPlus"],[1997,9,2.2,"OrgPlus"],[1998,9,3.179,"OrgPlus"],[1999,8,4.255,"OrgPlus"]]},"corelflow":{"name":"CorelFLOW 3","points":[[1995,7,3.4,"CorelFLOW 2/3"],[1996,7,3.875,"CorelFLOW 3"]]},"easyflow":{"name":"EasyFlow for Windows 2.0","points":[[1995,8,2.6,"EasyFlow (HavenTree)"],[1996,9,2.55,"EasyFlow for Windows 2.0"]]},"pd":{"name":"PowerDesigner","points":[[1995,9,1.8,"PowerDesigner (Sybase, ex-S-Designor)"],[1997,8,3.9,"PowerDesigner 6 (Sybase)"],[1998,7,4.625,"PowerDesigner"],[1999,7,4.275,"PowerDesigner 7"],[2000,8,3.675,"PowerDesigner"],[2001,8,4.15,"PowerDesigner"],[2002,8,4.084,"PowerDesigner"],[2003,8,4.41,"PowerDesigner 10"],[2004,10,2.804,"PowerDesigner"]]},"inspiration":{"name":"Inspiration","points":[[1995,10,1.0,"Inspiration 4.0"],[1997,10,2.18,"Inspiration"]]},"smartdraw":{"name":"SmartDraw","points":[[1996,8,3.856,"SmartDraw"],[1997,5,5.356,"SmartDraw"],[1998,4,6.2,"SmartDraw"],[1999,3,6.925,"SmartDraw"],[2000,3,6.575,"SmartDraw"],[2001,3,6.775,"SmartDraw"],[2002,3,6.975,"SmartDraw"],[2003,3,7.175,"SmartDraw"],[2004,4,6.575,"SmartDraw"],[2005,3,8.079,"SmartDraw"],[2006,2,8.604,"SmartDraw"],[2007,2,8.1,"SmartDraw"],[2008,2,8.1,"SmartDraw"],[2009,2,8.1,"SmartDraw"],[2010,2,8.1,"SmartDraw"],[2011,3,7.3,"SmartDraw"],[2012,6,5.175,"SmartDraw"],[2013,6,6.0,"SmartDraw"],[2014,7,5.2,"SmartDraw"],[2015,7,5.475,"SmartDraw"],[2016,8,4.675,"SmartDraw"],[2017,8,4.95,"SmartDraw"]]},"bpwin":{"name":"BPwin 1.6 (Logic Works)","points":[[1996,10,2.529,"BPwin 1.6 (Logic Works)"]]},"sysarch":{"name":"Popkin System Architect","points":[[1997,7,4.304,"Popkin System Architect"],[1998,6,4.754,"Popkin System Architect"],[1999,6,4.6,"Popkin System Architect"],[2000,9,2.4,"Popkin System Architect"]]},"oracle":{"name":"Oracle Designer","points":[[1998,10,2.925,"Oracle Designer"]]},"mindmanager":{"name":"MindManager","points":[[1999,9,3.45,"MindManager"],[2000,10,2.025,"MindManager"],[2001,9,3.575,"MindManager 2002"],[2002,9,3.225,"MindManager"],[2003,7,4.428,"MindManager X5"],[2004,7,4.675,"MindManager X5 Pro"],[2007,8,4.179,"MindManager"],[2008,9,3.75,"MindManager"]]},"together":{"name":"Borland Together","points":[[1999,10,2.925,"TogetherJ (TogetherSoft)"],[2000,7,4.905,"Together ControlCenter"],[2001,6,5.15,"Together ControlCenter"],[2002,4,6.675,"Together ControlCenter"],[2003,6,4.45,"Borland Together"],[2004,8,3.6,"Borland Together"],[2005,8,4.35,"Borland Together"]]},"oss":{"name":"Dia / ArgoUML open-source tier","points":[[2000,5,5.55,"Open-source tier (Dia, ArgoUML, Graphviz, Kivio)"],[2001,10,1.2,"Dia / ArgoUML open-source tier"]]},"omnigraffle":{"name":"OmniGraffle","points":[[2001,5,5.55,"OmniGraffle"],[2002,6,4.125,"OmniGraffle"],[2003,10,1.4,"OmniGraffle"],[2004,5,6.556,"OmniGraffle 3"],[2005,4,6.6,"OmniGraffle"],[2006,5,5.45,"OmniGraffle"],[2007,4,7.0,"OmniGraffle"],[2008,4,6.65,"OmniGraffle"],[2009,5,6.05,"OmniGraffle"],[2010,4,6.704,"OmniGraffle"],[2011,4,7.05,"OmniGraffle"],[2012,4,6.98,"OmniGraffle"],[2013,5,6.25,"OmniGraffle"],[2014,5,6.154,"OmniGraffle"],[2015,6,5.725,"OmniGraffle"],[2016,6,5.104,"OmniGraffle"],[2017,6,6.0,"OmniGraffle"],[2018,7,5.2,"OmniGraffle"]]},"ea":{"name":"Sparx Enterprise Architect","points":[[2002,7,4.104,"Sparx Enterprise Architect"],[2003,4,6.55,"Sparx Enterprise Architect"],[2004,3,6.725,"Sparx Enterprise Architect"],[2005,5,4.775,"Sparx Enterprise Architect"],[2006,4,6.6,"Sparx Enterprise Architect"],[2007,3,7.325,"Sparx Enterprise Architect"],[2008,3,6.975,"Sparx Enterprise Architect"],[2009,3,7.175,"Sparx Enterprise Architect"],[2010,5,5.775,"Sparx Enterprise Architect"],[2011,6,5.725,"Sparx Enterprise Architect"],[2012,7,5.155,"Sparx Enterprise Architect"],[2013,7,5.475,"Sparx Enterprise Architect"],[2014,8,4.675,"Sparx Enterprise Architect"],[2015,8,4.95,"Sparx Enterprise Architect"],[2016,7,5.083,"Sparx Enterprise Architect"],[2017,7,5.475,"Sparx Enterprise Architect"],[2018,8,4.675,"Sparx Enterprise Architect"]]},"poseidon":{"name":"Poseidon for UML (Gentleware)","points":[[2002,10,2.925,"Poseidon for UML (Gentleware)"]]},"magicdraw":{"name":"MagicDraw","points":[[2003,9,3.45,"MagicDraw (No Magic)"],[2004,9,2.825,"MagicDraw"],[2005,6,4.755,"MagicDraw"],[2006,6,4.8,"MagicDraw"],[2007,7,4.2,"MagicDraw"],[2008,8,3.875,"MagicDraw"],[2009,9,3.55,"MagicDraw"]]},"conceptdraw":{"name":"ConceptDraw","points":[[2005,9,3.45,"ConceptDraw"]]},"argouml":{"name":"ArgoUML","points":[[2005,10,2.925,"ArgoUML"],[2006,10,2.3,"ArgoUML"]]},"vp":{"name":"Visual Paradigm","points":[[2006,8,3.975,"Visual Paradigm"],[2007,9,2.55,"Visual Paradigm"]]},"gliffy":{"name":"Gliffy","points":[[2006,9,3.45,"Gliffy"],[2007,6,5.5,"Gliffy"],[2008,5,5.675,"Gliffy"],[2009,6,4.525,"Gliffy"],[2010,6,5.0,"Gliffy"],[2011,7,4.4,"Gliffy"],[2012,5,6.75,"Gliffy"],[2013,8,3.725,"Gliffy"],[2014,6,6.135,"Gliffy"],[2015,4,6.556,"Gliffy"],[2016,4,6.756,"Gliffy"],[2017,5,6.25,"Gliffy"],[2018,6,5.529,"Gliffy"],[2019,7,5.004,"Gliffy"]]},"balsamiq":{"name":"Balsamiq","points":[[2008,6,5.025,"Balsamiq"],[2009,4,6.275,"Balsamiq"],[2010,3,6.725,"Balsamiq"],[2011,2,7.45,"Balsamiq"],[2012,2,7.1,"Balsamiq"],[2013,3,6.5,"Balsamiq"],[2014,4,6.175,"Balsamiq"],[2015,9,2.925,"Balsamiq"],[2016,9,4.225,"Balsamiq"],[2017,9,4.425,"Balsamiq"]]},"axure":{"name":"Axure RP","points":[[2008,7,4.5,"Axure RP"],[2009,7,3.875,"Axure RP"],[2010,7,4.075,"Axure RP"],[2011,8,3.475,"Axure RP"],[2012,9,3.15,"Axure RP"],[2013,9,3.625,"Axure RP"],[2014,9,3.825,"Axure RP"]]},"creately":{"name":"Creately","points":[[2008,10,2.925,"Creately"],[2009,8,3.857,"Creately"],[2010,10,1.95,"Creately"],[2016,10,3.25,"Creately"]]},"aris":{"name":"ARIS Express","points":[[2009,10,2.925,"ARIS Express"]]},"lucid":{"name":"Lucid","points":[[2010,8,3.975,"Lucidchart"],[2011,5,6.025,"Lucidchart"],[2012,3,7.0,"Lucidchart"],[2013,2,7.45,"Lucidchart"],[2014,2,7.1,"Lucidchart"],[2015,2,7.3,"Lucidchart"],[2016,2,7.5,"Lucidchart"],[2017,2,7.7,"Lucidchart"],[2018,2,7.9,"Lucidchart"],[2019,2,8.1,"Lucidchart"],[2020,2,8.1,"Lucidchart"],[2021,3,7.3,"Lucidchart"],[2022,3,7.575,"Lucidchart"],[2023,2,7.806,"Lucidchart"],[2024,2,8.005,"Lucid"],[2025,3,7.3,"Lucid"]]},"cacoo":{"name":"Cacoo","points":[[2010,9,3.45,"Cacoo"],[2011,9,2.825,"Cacoo"],[2012,10,2.225,"Cacoo"],[2013,10,2.7,"Cacoo"],[2015,10,2.904,"Cacoo"],[2017,10,3.65,"Cacoo"]]},"drawio":{"name":"diagrams.net","points":[[2011,10,2.806,"Diagramly"],[2012,8,4.175,"draw.io"],[2013,4,6.479,"draw.io"],[2014,3,6.925,"draw.io"],[2015,3,6.575,"draw.io"],[2016,3,6.775,"draw.io"],[2017,3,6.975,"draw.io"],[2018,3,7.175,"draw.io"],[2019,3,7.375,"draw.io"],[2020,4,6.705,"diagrams.net"],[2021,4,7.05,"diagrams.net"],[2022,4,7.05,"diagrams.net"],[2023,4,7.05,"diagrams.net"],[2024,4,6.756,"diagrams.net"],[2025,5,6.25,"diagrams.net"]]},"plantuml":{"name":"PlantUML","points":[[2014,10,2.925,"PlantUML"],[2015,5,6.3,"PlantUML"],[2016,5,5.125,"PlantUML"],[2017,4,6.4,"PlantUML"],[2018,4,6.05,"PlantUML"],[2019,5,5.45,"PlantUML"],[2020,7,4.325,"PlantUML"],[2021,8,3.505,"PlantUML"],[2022,7,4.105,"PlantUML"],[2023,8,4.559,"PlantUML"],[2024,9,3.881,"PlantUML"],[2025,9,3.655,"PlantUML"]]},"miro":{"name":"Miro","points":[[2018,5,5.55,"RealtimeBoard / Miro"],[2019,4,6.0,"Miro"],[2020,3,6.725,"Miro"],[2021,2,7.45,"Miro"],[2022,1,8.175,"Miro"],[2023,1,7.825,"Miro"],[2024,1,8.025,"Miro"],[2025,1,8.225,"Miro"]]},"mswb":{"name":"Microsoft Whiteboard","points":[[2018,9,3.45,"Microsoft Whiteboard"],[2019,10,2.025,"Microsoft Whiteboard"],[2020,9,3.575,"Microsoft Whiteboard"],[2021,10,2.425,"Microsoft Whiteboard"]]},"whimsical":{"name":"Whimsical","points":[[2018,10,2.925,"Whimsical"],[2019,8,4.175,"Whimsical"],[2020,10,1.95,"Whimsical"],[2022,10,2.38,"Whimsical"]]},"mermaid":{"name":"Mermaid","points":[[2019,6,5.025,"Mermaid"],[2020,5,5.475,"Mermaid"],[2021,7,3.525,"Mermaid"],[2022,5,6.15,"Mermaid"],[2023,3,7.4,"Mermaid"],[2024,3,6.775,"Mermaid"],[2025,2,8.05,"Mermaid"]]},"mural":{"name":"Mural","points":[[2019,9,3.45,"Mural"],[2020,6,5.455,"Mural"],[2021,6,4.6,"Mural"],[2022,9,2.4,"Mural"],[2023,10,2.625,"Mural"]]},"excalidraw":{"name":"Excalidraw","points":[[2020,8,3.975,"Excalidraw"],[2021,9,2.55,"Excalidraw"],[2022,8,4.086,"Excalidraw"],[2023,7,4.58,"Excalidraw"],[2024,5,6.35,"Excalidraw"],[2025,4,6.8,"Excalidraw"]]},"figjam":{"name":"FigJam","points":[[2021,5,5.55,"FigJam"],[2022,6,4.125,"FigJam"],[2023,6,4.6,"FigJam"],[2024,7,4.0,"FigJam"],[2025,8,3.675,"FigJam"]]},"llm":{"name":"ChatGPT / Claude as diagram generators","points":[[2023,9,3.45,"ChatGPT / Claude as diagram generators"],[2024,8,3.9,"ChatGPT / Claude as diagram generators"],[2025,7,4.625,"ChatGPT / Claude as diagram generators"]]},"eraser":{"name":"Eraser","points":[[2024,10,2.925,"Eraser"],[2025,10,2.3,"Eraser"]]}},"type":{"flowchart":{"name":"Flowchart","points":[[1995,1,7.075,"Flowchart / process map"],[1996,1,6.65,"Flowchart / process map"],[1997,1,6.975,"Flowchart / process map"],[1998,1,7.3,"Flowchart / process map"],[1999,1,7.625,"Flowchart / process map"],[2000,1,7.95,"Flowchart / process map"],[2001,1,8.275,"Flowchart / process map"],[2002,1,8.6,"Flowchart / process map"],[2003,1,8.925,"Flowchart / process map"],[2004,1,9.25,"Flowchart / process map"],[2005,1,9.25,"Flowchart"],[2006,1,9.25,"Flowchart"],[2007,1,9.25,"Flowchart"],[2008,1,9.25,"Flowchart"],[2009,1,9.25,"Flowchart"],[2010,1,9.25,"Flowchart"],[2011,1,9.25,"Flowchart"],[2012,1,9.25,"Flowchart"],[2013,1,9.25,"Flowchart"],[2014,1,9.25,"Flowchart"],[2015,1,9.25,"Flowchart / process"],[2016,1,9.25,"Flowchart"],[2017,1,9.25,"Flowchart"],[2018,1,9.25,"Flowchart"],[2019,1,9.25,"Flowchart"],[2020,1,9.25,"Flowchart"],[2021,1,9.25,"Flowchart"],[2022,1,9.25,"Flowchart"],[2023,1,9.25,"Flowchart"],[2024,1,9.25,"Flowchart"],[2025,1,9.25,"Flowchart"]]},"orgchart":{"name":"Org chart","points":[[1995,2,6.4,"Org chart"],[1996,2,6.125,"Org chart"],[1997,3,5.775,"Org chart"],[1998,4,5.575,"Org chart"],[1999,4,5.906,"Org chart"],[2000,5,5.7,"Org chart"],[2001,4,6.556,"Org chart"],[2002,4,7.025,"Org chart"],[2003,5,6.655,"Org chart"],[2004,6,6.279,"Org chart"],[2005,5,7.45,"Org chart"],[2006,6,6.475,"Org chart"],[2007,6,6.625,"Org chart"],[2008,8,5.119,"Org chart"],[2009,9,4.9,"Org chart"],[2010,9,5.05,"Org chart"],[2011,9,4.594,"Org chart"],[2012,9,5.05,"Org chart"],[2013,10,2.556,"Org chart"],[2014,10,3.89,"Org chart"],[2015,6,6.979,"Org chart"],[2016,7,4.634,"Org chart"],[2017,10,3.055,"Org chart"]]},"erd":{"name":"ER diagram","points":[[1995,3,5.725,"ER diagram / data model"],[1996,3,5.6,"ER diagram"],[1997,4,5.25,"ER diagram"],[1998,5,5.05,"ER diagram"],[1999,5,5.525,"ER diagram"],[2000,4,6.231,"ER diagram"],[2001,5,6.025,"ER diagram"],[2002,6,5.825,"ER diagram"],[2003,6,6.3,"ER diagram"],[2004,7,5.95,"ER diagram"],[2005,4,8.275,"ER diagram"],[2006,5,7.0,"ER diagram"],[2007,5,7.15,"ER diagram"],[2008,6,5.159,"ER diagram"],[2009,6,5.037,"ER diagram"],[2010,6,6.625,"ER diagram"],[2011,6,4.657,"ER diagram"],[2012,6,5.989,"ER diagram"],[2013,6,5.865,"ER diagram"],[2014,6,6.625,"ER diagram"],[2015,4,7.529,"ER diagram"],[2016,6,4.657,"ER diagram"],[2017,5,6.834,"ER diagram"],[2018,4,7.687,"ER diagram"],[2019,5,5.356,"ER diagram"],[2020,5,7.15,"ER diagram"],[2021,6,4.655,"ER diagram"],[2022,4,8.029,"ER diagram"],[2023,4,7.675,"ER diagram"],[2024,5,5.356,"ER diagram"],[2025,5,6.186,"ER diagram"]]},"dfd":{"name":"Data-flow diagram","points":[[1995,4,5.05,"DFD / structured-analysis"],[1996,5,4.4,"DFD / IDEF0"],[1997,6,4.2,"DFD / structured analysis"],[1998,9,2.65,"DFD"],[2005,6,5.3,"Data-flow diagram"]]},"network":{"name":"Network diagram","points":[[1995,5,4.375,"Network diagram"],[1996,4,5.375,"Network diagram"],[1997,2,6.9,"Network diagram"],[1998,2,6.775,"Network diagram"],[1999,2,7.1,"Network diagram"],[2000,2,7.425,"Network diagram"],[2001,2,7.75,"Network diagram"],[2002,3,7.4,"Network diagram"],[2003,3,7.731,"Network diagram"],[2004,4,7.381,"Network diagram"],[2005,3,8.5,"Network / IT infrastructure"],[2006,4,7.525,"Network / infrastructure"],[2007,4,7.675,"Network / infrastructure"],[2008,5,5.18,"Network / infrastructure"],[2009,5,5.054,"Network / infrastructure"],[2010,5,6.842,"Network / infrastructure"],[2015,7,6.4,"Network diagram"],[2016,8,4.617,"Network diagram"]]},"gantt":{"name":"Gantt / roadmap","points":[[1995,6,3.7,"Gantt / project charts"],[1996,6,4.025,"Gantt / project charts"],[1997,7,3.675,"Gantt / project charts"],[1998,8,3.475,"Gantt / project charts"],[1999,8,3.806,"Gantt / project charts"],[2000,8,4.255,"Gantt / project charts"],[2001,8,4.58,"Gantt / project charts"],[2002,8,4.629,"Gantt / project charts"],[2003,8,4.906,"Gantt / project charts"],[2004,8,5.575,"Gantt / project charts"],[2005,8,5.259,"Gantt / project charts"],[2006,8,5.431,"Gantt / project charts"],[2007,9,4.9,"Gantt / project charts"],[2008,9,5.05,"Gantt / project charts"],[2009,8,4.995,"Gantt / project charts"],[2010,8,5.575,"Gantt / project charts"],[2011,8,4.615,"Gantt / project charts"],[2012,8,5.575,"Gantt / project charts"],[2013,8,5.575,"Gantt / project charts"],[2014,9,3.91,"Gantt / project charts"],[2015,9,5.05,"Gantt / roadmap"],[2016,10,4.375,"Gantt / roadmap"]]},"oo":{"name":"OO class/object diagrams","points":[[1995,7,3.025,"OO object-model diagrams (OMT/Booch, pre-UML)"],[1996,7,3.5,"OO class/object diagrams"]]},"idef0":{"name":"IDEF0","points":[[1995,8,2.35,"IDEF0 process models"],[1997,10,2.225,"IDEF0"]]},"bp":{"name":"BPMN","points":[[1995,9,1.675,"Swimlane / deployment flowcharts"],[1996,8,3.275,"Swimlane / deployment flowcharts"],[2000,9,3.075,"Swimlane / cross-functional flowcharts"],[2001,7,4.6,"Swimlane / business-process maps"],[2002,5,5.975,"Business-process / swimlane"],[2003,4,6.675,"Business-process / swimlane"],[2004,2,8.2,"Business process (BPMN / swimlane)"],[2006,3,7.85,"Business process / BPMN"],[2007,3,7.875,"Business process / BPMN"],[2008,3,8.2,"Business process / BPMN"],[2009,2,9.025,"Business process / BPMN"],[2010,3,6.882,"Business process / BPMN"],[2011,3,6.756,"Business process / BPMN"],[2012,4,6.029,"Business process / BPMN"],[2013,4,5.907,"Business process / BPMN"],[2014,4,7.035,"Business process / BPMN"],[2015,5,7.0,"BPMN"],[2016,3,8.65,"BPMN"],[2017,6,6.175,"BPMN"],[2018,8,3.48,"BPMN"],[2019,8,3.805,"BPMN"],[2020,9,3.455,"BPMN"],[2021,9,3.305,"BPMN"],[2022,9,4.055,"BPMN"],[2023,10,3.255,"BPMN"],[2024,10,4.525,"BPMN"]]},"floor":{"name":"Floor / space plans","points":[[1995,10,1.0,"Floor / space plans"],[1996,10,1.925,"Floor / space plans"]]},"mind":{"name":"Mind map / canvas boards","points":[[1996,9,2.575,"Mind / concept maps"],[2000,10,2.225,"Mind maps"],[2001,9,3.075,"Mind maps"],[2002,9,3.1,"Mind maps"],[2003,7,4.925,"Mind / concept maps"],[2004,5,6.3,"Mind / concept maps"],[2005,9,3.475,"Mind map"],[2006,9,4.4,"Mind map"],[2007,7,6.225,"Mind map"],[2008,7,5.14,"Mind map"],[2009,7,5.016,"Mind map"],[2010,7,6.1,"Mind map"],[2011,7,4.636,"Mind map"],[2012,7,5.972,"Mind map"],[2013,7,5.844,"Mind map"],[2014,8,3.93,"Mind map"],[2015,8,5.575,"Mind map"],[2016,9,4.596,"Mind map"],[2017,8,3.605,"Mind map"],[2018,10,3.08,"Mind map"],[2020,3,8.056,"Mind map / brainstorm boards"],[2021,7,4.636,"Mind map"],[2022,5,7.6,"Mind map / canvas boards"],[2023,6,4.655,"Mind map / canvas boards"],[2024,7,5.314,"Mind map / canvas boards"],[2025,8,5.405,"Mind map / canvas boards"]]},"uml":{"name":"UML sequence","points":[[1997,5,4.675,"UML class diagram"],[1998,3,6.05,"UML class diagram"],[1999,3,5.925,"UML class diagram"],[2000,3,6.25,"UML class (+ sequence)"],[2001,3,6.575,"UML class + sequence"],[2002,2,7.725,"UML class + sequence"],[2003,2,7.75,"UML (class/sequence/use case)"],[2004,3,7.4,"UML diagrams"],[2005,2,8.7,"UML class/sequence"],[2006,2,8.725,"UML"],[2007,2,8.725,"UML"],[2008,2,8.725,"UML"],[2009,3,8.05,"UML"],[2010,4,6.861,"UML"],[2011,4,6.735,"UML"],[2012,5,6.012,"UML"],[2013,5,5.886,"UML / sequence"],[2014,5,7.014,"UML sequence/class"],[2015,2,9.229,"UML class & sequence"],[2016,2,8.725,"UML sequence/class"],[2017,2,8.725,"UML sequence"],[2018,3,7.706,"UML sequence"],[2019,3,7.732,"UML sequence"],[2020,4,7.525,"UML sequence"],[2021,4,7.675,"UML sequence"],[2022,2,9.175,"UML sequence"],[2023,2,8.725,"UML sequence"],[2024,3,8.05,"UML sequence"],[2025,4,6.205,"UML sequence"]]},"usecase":{"name":"UML use case diagram","points":[[1997,8,3.1,"UML use case diagram"],[1998,6,4.475,"UML use case diagram"],[1999,6,4.35,"UML use case diagram"],[2000,6,4.675,"UML use case diagram"],[2001,6,5.0,"UML use case diagram"],[2002,7,4.65,"UML use case diagram"],[2005,7,5.281,"UML use case diagram"],[2006,7,5.45,"UML use case diagram"],[2007,8,5.1,"UML use case diagram"],[2008,10,4.225,"UML use case diagram"]]},"seq":{"name":"UML sequence diagram","points":[[1997,9,2.575,"UML sequence diagram"],[1998,7,3.95,"UML sequence diagram"],[1999,7,3.825,"UML sequence diagram"]]},"sitemap":{"name":"Sitemap","points":[[1998,10,2.05,"Sitemap / web-structure diagrams"],[1999,9,2.75,"Sitemap / web diagrams"],[2000,7,4.275,"Sitemap / web diagrams"],[2001,10,2.125,"Sitemap / web diagrams"],[2002,10,2.9,"Sitemap / IA diagrams"],[2003,10,2.555,"Sitemap / IA diagrams"],[2004,10,2.43,"Sitemap / early wireframes"],[2005,10,3.455,"Sitemap"],[2006,10,4.2,"Sitemap"],[2007,10,4.525,"Sitemap"],[2015,10,4.825,"Sitemap"]]},"state":{"name":"State machine / agent-state graph","points":[[1999,10,2.05,"State diagrams / statecharts"],[2025,10,2.225,"State machine / agent-state graph"]]},"vsm":{"name":"Value-stream map","points":[[2003,9,2.575,"Value-stream maps"],[2004,9,2.45,"Value-stream maps"],[2009,10,2.55,"Value-stream map"],[2010,10,2.575,"Value-stream map"]]},"wireframe":{"name":"Wireframe","points":[[2008,4,5.2,"Wireframe / mockup"],[2009,4,5.075,"Wireframe / mockup"],[2010,2,6.9,"Wireframe / mockup"],[2011,2,6.775,"Wireframe / mockup"],[2012,2,7.1,"Wireframe / mockup"],[2013,2,7.425,"Wireframe / mockup"],[2014,3,7.055,"Wireframe / mockup"],[2015,3,7.55,"Wireframe / mockup"],[2016,4,7.2,"Wireframe"],[2017,4,6.855,"Wireframe"],[2018,6,4.657,"Wireframe"],[2019,6,5.337,"Wireframe"]]},"cloud":{"name":"System / agent architecture","points":[[2011,5,4.675,"Network \u2192 cloud architecture"],[2012,3,6.05,"Cloud / architecture"],[2013,3,5.925,"Cloud / architecture"],[2014,2,7.075,"Cloud / software architecture"],[2017,3,6.875,"Cloud / architecture"],[2018,2,7.725,"Cloud architecture"],[2019,2,7.75,"Cloud architecture"],[2020,2,8.075,"Cloud architecture"],[2021,2,8.4,"Cloud architecture"],[2022,3,8.05,"Cloud architecture"],[2023,3,8.2,"System / cloud architecture"],[2024,2,9.025,"System architecture"],[2025,2,8.725,"System / agent architecture"]]},"xfunc":{"name":"Swimlane / cross-functional","points":[[2011,10,2.05,"Swimlane / cross-functional (distinct from BPMN)"],[2012,10,1.925,"Swimlane / cross-functional"]]},"journey":{"name":"User journey","points":[[2013,9,2.575,"Customer journey map"],[2014,7,3.95,"Customer journey map"],[2017,9,3.075,"User journey map"],[2018,9,3.1,"User journey"],[2019,9,3.425,"User journey"],[2020,7,4.03,"User journey"],[2021,3,7.975,"User-journey / workshop boards"],[2022,6,5.525,"User journey"],[2023,8,4.614,"User journey"],[2024,9,4.556,"User journey"],[2025,9,5.05,"User journey"]]},"archimate":{"name":"EA / ArchiMate views","points":[[2016,5,4.675,"EA / ArchiMate views"]]},"umlclass":{"name":"UML class","points":[[2017,7,3.625,"UML class (split out)"],[2018,7,3.5,"UML class"],[2019,7,3.825,"UML class"],[2020,8,3.475,"UML class"]]},"c4":{"name":"C4","points":[[2018,5,4.675,"C4"],[2019,4,5.375,"C4"],[2020,6,4.05,"C4"],[2021,8,3.325,"C4"],[2022,7,4.775,"C4"],[2023,7,4.636,"C4"],[2024,6,5.334,"C4"],[2025,6,5.975,"C4"]]},"dag":{"name":"Data-pipeline / DAG","points":[[2019,10,2.05,"Data-pipeline / DAG"],[2020,10,1.925,"Data-pipeline / DAG"],[2021,10,2.25,"Data-pipeline / DAG"],[2022,8,4.075,"Data-pipeline / DAG"],[2023,9,3.275,"Data-pipeline / DAG"],[2024,8,4.575,"Data-pipeline / lineage DAG"],[2025,7,5.425,"Data-pipeline / DAG"]]},"sketch":{"name":"Hand-drawn sketch diagrams","points":[[2021,5,4.675,"Hand-drawn sketch diagrams"]]},"gitgraph":{"name":"Gitgraph / Gantt-as-code","points":[[2022,10,2.05,"Gitgraph / Gantt-as-code"]]},"ai":{"name":"AI-generated diagrams","points":[[2023,5,4.675,"AI-generated diagrams"],[2024,4,5.375,"AI-generated diagrams"],[2025,3,6.225,"AI-generated diagrams"]]}},"series":{"npm":{"mermaid":[[2015,6429.0],[2016,33867.0],[2017,134840.0],[2018,526937.0],[2019,2039092.0],[2020,4149559.0],[2021,6082948.0],[2022,10558383.0],[2023,21532092.0],[2024,36311590.0],[2025,74663623.0]],"excalidraw":[[2020,268.0],[2021,233318.0],[2022,620667.0],[2023,2604247.0],[2024,3875767.0],[2025,3290233.0]],"tldraw":[[2024,1065588.0],[2025,2773982.0]],"bpmnjs":[[2015,6680.0],[2016,21687.0],[2017,54289.0],[2018,215036.0],[2019,516101.0],[2020,864199.0],[2021,1282035.0],[2022,2104771.0],[2023,2734342.0],[2024,3328378.0],[2025,4539682.0]]},"stars":{"mermaid":[[2014,5043.0],[2015,2076.0],[2016,2246.0],[2017,6061.0],[2018,6279.0],[2019,6222.0],[2020,6716.0],[2021,5822.0],[2022,13185.0],[2023,11377.0],[2024,10064.0],[2025,8879.0]],"excalidraw":[[2020,14281.0],[2021,11773.0],[2022,12303.0],[2023,22215.0],[2024,27082.0],[2025,18464.0]],"tldraw":[[2021,4901.0],[2022,6500.0],[2023,17840.0],[2024,8999.0],[2025,4537.0]],"d2":[[2022,8728.0],[2023,5529.0],[2024,4030.0],[2025,2673.0]],"drawio":[[2012,182.0],[2013,139.0],[2016,1487.0],[2017,3606.0],[2018,3235.0],[2019,6851.0],[2020,6739.0],[2021,6138.0],[2022,5705.0],[2023,4915.0],[2024,4784.0],[2025,2116.0]],"plantuml":[[2013,2.0],[2014,19.0],[2015,93.0],[2016,189.0],[2017,457.0],[2018,726.0],[2019,1079.0],[2020,1123.0],[2021,1393.0],[2022,2212.0],[2023,1809.0],[2024,1820.0],[2025,1306.0]]},"ngram":{"uml":[[1995,156.056],[1996,168.364],[1997,395.13],[1998,761.633],[1999,1273.403],[2000,1712.181],[2001,1910.518],[2002,2632.562],[2003,3997.226],[2004,3027.591],[2005,3377.529],[2006,2291.709],[2007,1816.913],[2008,1666.109],[2009,1976.603],[2010,1690.956],[2011,1622.467],[2012,1162.066],[2013,981.282],[2014,797.081],[2015,703.734],[2016,716.967],[2017,810.002],[2018,614.546],[2019,657.842]],"flowchart":[[1995,525.975],[1996,508.024],[1997,481.394],[1998,539.291],[1999,536.077],[2000,535.721],[2001,529.257],[2002,574.604],[2003,551.275],[2004,611.687],[2005,640.136],[2006,551.209],[2007,563.553],[2008,607.748],[2009,632.725],[2010,717.402],[2011,717.454],[2012,773.471],[2013,672.328],[2014,636.189],[2015,695.885],[2016,645.949],[2017,676.05],[2018,582.689],[2019,642.991]],"mind":[[1995,26.072],[1996,21.889],[1997,22.973],[1998,27.683],[1999,36.176],[2000,38.069],[2001,32.305],[2002,38.777],[2003,46.07],[2004,58.022],[2005,71.105],[2006,82.365],[2007,73.173],[2008,94.464],[2009,114.095],[2010,125.777],[2011,106.683],[2012,128.416],[2013,144.787],[2014,134.33],[2015,149.846],[2016,158.683],[2017,145.806],[2018,122.514],[2019,126.806]],"gantt":[[1995,75.418],[1996,68.284],[1997,71.779],[1998,72.017],[1999,80.166],[2000,88.79],[2001,90.716],[2002,108.597],[2003,102.663],[2004,157.971],[2005,125.133],[2006,131.289],[2007,168.19],[2008,190.552],[2009,171.794],[2010,184.249],[2011,193.818],[2012,174.307],[2013,172.097],[2014,122.663],[2015,154.109],[2016,166.023],[2017,117.247],[2018,104.398],[2019,127.598]],"seq":[[1995,11.489],[1996,12.361],[1997,17.511],[1998,51.064],[1999,65.545],[2000,79.972],[2001,110.815],[2002,134.508],[2003,190.442],[2004,165.612],[2005,198.78],[2006,126.748],[2007,106.629],[2008,131.673],[2009,98.864],[2010,106.93],[2011,129.787],[2012,82.305],[2013,83.539],[2014,67.69],[2015,64.869],[2016,57.159],[2017,68.564],[2018,46.612],[2019,70.878]]},"so":{"uml":[[2009,240.0],[2010,443.0],[2011,561.0],[2012,578.0],[2013,720.0],[2014,692.0],[2015,570.0],[2016,576.0],[2017,477.0],[2018,432.0],[2019,369.0],[2020,389.0],[2021,326.0],[2022,297.0],[2023,189.0],[2024,133.0],[2025,42.0]],"bp":[[2009,2.0],[2010,6.0],[2011,29.0],[2012,39.0],[2013,51.0],[2014,100.0],[2015,115.0],[2016,129.0],[2017,107.0],[2018,108.0],[2019,100.0],[2020,72.0],[2021,76.0],[2022,83.0],[2023,61.0],[2024,25.0],[2025,4.0]],"flowchart":[[2009,17.0],[2010,43.0],[2011,25.0],[2012,33.0],[2013,42.0],[2014,31.0],[2015,37.0],[2016,28.0],[2017,35.0],[2018,56.0],[2019,46.0],[2020,31.0],[2021,51.0],[2022,54.0],[2023,22.0],[2024,16.0],[2025,5.0]],"state":[[2009,51.0],[2010,86.0],[2011,134.0],[2012,151.0],[2013,154.0],[2014,120.0],[2015,145.0],[2016,121.0],[2017,115.0],[2018,105.0],[2019,112.0],[2020,101.0],[2021,110.0],[2022,96.0],[2023,74.0],[2024,48.0],[2025,11.0]],"erd":[[2009,90.0],[2010,185.0],[2011,318.0],[2012,264.0],[2013,318.0],[2014,282.0],[2015,216.0],[2016,255.0],[2017,226.0],[2018,186.0],[2019,151.0],[2020,142.0],[2021,119.0],[2022,98.0],[2023,56.0],[2024,43.0],[2025,11.0]]}},"names":{"visio":"Microsoft Visio","abc":"iGrafx FlowCharter","erwin":"ERwin","allclear":"allCLEAR","rose":"Rational RSA / Rose","orgplus":"OrgPlus","corelflow":"CorelFLOW 3","easyflow":"EasyFlow for Windows 2.0","pd":"PowerDesigner","inspiration":"Inspiration","smartdraw":"SmartDraw","bpwin":"BPwin 1.6 (Logic Works)","sysarch":"Popkin System Architect","oracle":"Oracle Designer","mindmanager":"MindManager","together":"Borland Together","oss":"Dia / ArgoUML open-source tier","omnigraffle":"OmniGraffle","ea":"Sparx Enterprise Architect","poseidon":"Poseidon for UML (Gentleware)","magicdraw":"MagicDraw","conceptdraw":"ConceptDraw","argouml":"ArgoUML","vp":"Visual Paradigm","gliffy":"Gliffy","balsamiq":"Balsamiq","axure":"Axure RP","creately":"Creately","aris":"ARIS Express","lucid":"Lucid","cacoo":"Cacoo","drawio":"draw.io","plantuml":"PlantUML","miro":"Miro","mswb":"Microsoft Whiteboard","whimsical":"Whimsical","mermaid":"Mermaid","mural":"Mural","excalidraw":"Excalidraw","figjam":"FigJam","llm":"ChatGPT / Claude as diagram generators","eraser":"Eraser","flowchart":"Flowchart","orgchart":"Org chart","erd":"ERD","dfd":"Data-flow diagram","network":"Network diagram","gantt":"Gantt","oo":"OO class/object diagrams","idef0":"IDEF0","bp":"BPMN","floor":"Floor / space plans","mind":"Mind map","uml":"UML","usecase":"UML use case diagram","seq":"Sequence diagram","sitemap":"Sitemap","state":"State machine","vsm":"Value-stream map","wireframe":"Wireframe","cloud":"System / agent architecture","xfunc":"Swimlane / cross-functional","journey":"User journey","archimate":"EA / ArchiMate views","umlclass":"UML class","c4":"C4","dag":"Data-pipeline / DAG","sketch":"Hand-drawn sketch diagrams","gitgraph":"Gitgraph / Gantt-as-code","ai":"AI-generated diagrams","bpmnjs":"bpmn-js","d2":"D2"}};
+const NS = "http://www.w3.org/2000/svg";
+const hue = i => `hsl(${(i*137.508)%360} 62% ${44 + (i%3)*4}%)`;
+function el(tag, attrs, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const [k,v] of Object.entries(attrs||{})) n.setAttribute(k, v);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+
+/* ---------- bump chart ---------- */
+const ERAS = [[1995,2004,"var(--eraA)","ERA A — DESKTOP & STANDARDIZATION"],
+              [2005,2014,"var(--eraB)","ERA B — WEB & SAAS"],
+              [2015,2025,"var(--eraC)","ERA C — COLLABORATIVE & AI-NATIVE"]];
+function bump(cat) {
+  const entities = DATA[cat], years = DATA.years;
+  const W=1192, M={t:42,r:170,b:28,l:36}, rowH=40, H=M.t+M.b+rowH*10;
+  const x = y => M.l + (y-1995)/(2025-1995)*(W-M.l-M.r);
+  const ry = r => M.t + (r-0.5)*rowH;
+  const host = document.getElementById("bump-host");
+  host.innerHTML = "";
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`, width:"100%", class:"bump"}, null);
+  host.appendChild(svg);
+  for (const [a,b,fill,name] of ERAS) {
+    el("rect", {x:x(a)-12, y:M.t-26, width:x(b)-x(a)+24, height:rowH*10+30, fill, rx:8}, svg);
+    const t = el("text", {x:(x(a)+x(b))/2, y:M.t-12, "text-anchor":"middle", class:"era-label"}, svg);
+    t.textContent = name;
+  }
+  const ax = el("g", {class:"axis"}, svg);
+  for (const y of years) {
+    if (y % 5 && y !== 2025) continue;
+    const t = el("text", {x:x(y), y:H-8, "text-anchor":"middle"}, ax); t.textContent = y;
+  }
+  for (let r=1; r<=10; r++) {
+    const t = el("text", {x:M.l-14, y:ry(r)+4, "text-anchor":"middle"}, ax); t.textContent = r;
+    el("line", {x1:M.l-6, y1:ry(r), x2:W-M.r+10, y2:ry(r), "stroke-dasharray":"2 5"}, ax);
+  }
+  const keys = Object.keys(entities);
+  keys.forEach((key, i) => {
+    const e = entities[key], color = hue(i);
+    const g = el("g", {class:"ent", "data-key":key}, svg);
+    let seg = [];
+    const flush = () => {
+      if (seg.length > 1)
+        el("path", {class:"ln", stroke:color,
+          d:"M" + seg.map(p=>`${x(p[0])},${ry(p[1])}`).join(" L")}, g);
+      seg = [];
+    };
+    const by = new Map(e.points.map(p=>[p[0], p]));
+    for (const y of years) { if (by.has(y)) seg.push(by.get(y)); else flush(); }
+    flush();
+    for (const [y, r, score, label] of e.points) {
+      const c = el("circle", {class:"pt", cx:x(y), cy:ry(r), r:4.2, fill:color}, g);
+      const tt = el("title", {}, c);
+      tt.textContent = `${label} — ${y}\nrank ${r} · score ${score}`;
+    }
+    const last = e.points[e.points.length-1];
+    const ended = last[0] !== 2025;   // dropped out: label only on hover/pin
+    const t = el("text", {class: ended ? "lbl mid" : "lbl", fill:color,
+      x: ended ? x(last[0])+8 : W-M.r+16,
+      y: ry(last[1]) + (ended ? -8 : 4)}, g);
+    t.textContent = e.name.length > 24 ? e.name.slice(0, 23) + "…" : e.name;
+    el("title", {}, t).textContent = e.name;
+  });
+  let pinned = null;
+  const setHot = key => {
+    svg.classList.toggle("sel", !!key);
+    for (const g of svg.querySelectorAll("g.ent"))
+      g.classList.toggle("hot", g.dataset.key === key);
+  };
+  for (const g of svg.querySelectorAll("g.ent")) {
+    g.addEventListener("mouseenter", () => !pinned && setHot(g.dataset.key));
+    g.addEventListener("mouseleave", () => !pinned && setHot(null));
+    g.addEventListener("click", ev => { ev.stopPropagation();
+      pinned = pinned === g.dataset.key ? null : g.dataset.key; setHot(pinned); });
+  }
+  svg.addEventListener("click", () => { pinned = null; setHot(null); });
+}
+
+/* ---------- measured-signal mini charts ---------- */
+function mini(card, series, opts) {
+  const W=560, H=190, M={t:10,r:8,b:22,l:46};
+  const pts = Object.values(series).flat();
+  const xs = pts.map(p=>p[0]), x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const vmax = Math.max(...pts.map(p=>p[1]));
+  const yv = opts.log ? v => Math.log10(Math.max(v,1)) : v => v;
+  const ymax = yv(vmax);
+  const x = v => M.l + (v-x0)/(x1-x0)*(W-M.l-M.r);
+  const y = v => H-M.b - yv(v)/ymax*(H-M.t-M.b);
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`, width:"100%", class:"mini"}, null);
+  card.appendChild(svg);
+  for (const gy of opts.ticks) {
+    el("line", {x1:M.l, y1:y(gy), x2:W-M.r, y2:y(gy)}, svg);
+    const t = el("text", {x:M.l-4, y:y(gy)+3, "text-anchor":"end"}, svg);
+    t.textContent = opts.fmt(gy);
+  }
+  for (let v=x0; v<=x1; v++) {
+    if (v % 5) continue;
+    const t = el("text", {x:x(v), y:H-6, "text-anchor":"middle"}, svg); t.textContent = v;
+  }
+  const legend = document.createElement("div"); legend.className = "legend";
+  Object.entries(series).forEach(([key, rows], i) => {
+    const color = hue(i+2);
+    el("path", {stroke:color, d:"M"+rows.map(p=>`${x(p[0])},${y(p[1])}`).join(" L")}, svg);
+    const s = document.createElement("span");
+    s.style.setProperty("--c", color); s.textContent = DATA.names[key] || key;
+    legend.appendChild(s);
+  });
+  card.appendChild(legend);
+}
+const fmtSI = v => v >= 1e6 ? (v/1e6)+"M" : v >= 1e3 ? (v/1e3)+"k" : v;
+const CARDS = [
+  ["npm downloads / year (log)", "npm registry range API, 2015–2025 — Mermaid's measured adoption curve",
+   DATA.series.npm, {log:true, ticks:[1e4,1e6,1e8], fmt:fmtSI}],
+  ["GitHub stars gained / year", "GH Archive WatchEvents — launch spikes and the 2022 Mermaid inflection",
+   DATA.series.stars, {log:false, ticks:[10000,20000], fmt:fmtSI}],
+  ["Google Books term frequency (per 10⁹ words)", "corpus en-2019, 1995–2019 — the rise and fall of the UML/CASE era",
+   DATA.series.ngram, {log:false, ticks:[1500,3000], fmt:fmtSI}],
+  ["Stack Overflow questions / year", "Stack Exchange API, 2009–2025 — developer attention per notation",
+   DATA.series.so, {log:false, ticks:[500,1000], fmt:fmtSI}],
+];
+for (const [title, sub, series, opts] of CARDS) {
+  const card = document.createElement("div"); card.className = "card";
+  card.innerHTML = `<h3>${title}</h3><p>${sub}</p>`;
+  document.getElementById("cards").appendChild(card);
+  mini(card, series, opts);
+}
+
+/* ---------- toggle ---------- */
+document.getElementById("toggle").addEventListener("click", ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  for (const x of ev.currentTarget.querySelectorAll("button")) x.classList.toggle("on", x===b);
+  bump(b.dataset.cat);
+});
+bump("tool");
+</script>
+</body>
+</html>
