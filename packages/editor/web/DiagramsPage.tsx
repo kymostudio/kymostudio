@@ -27,7 +27,7 @@ export default function DiagramsPage() {
   const [error, setError] = useState("");
   const [q, setQ] = useState("");
 
-  useEffect(() => { document.title = "Diagrams · kymo"; return () => { document.title = "kymo · flowchart"; }; }, []);
+  useEffect(() => { document.title = "Diagrams · Kymostudio"; return () => { document.title = "Kymostudio"; }; }, []);
 
   const load = useCallback(async () => {
     if (!idToken) return;
