@@ -113,7 +113,6 @@ function App() {
           <div className="brand"><img src="./favicon.svg" alt="" />kymo</div>
           <div className="nav-links">
             <a href="https://editor.kymo.studio">Editor</a>
-            <a href="app/">Playground</a>
             <a href="#features">Features</a>
             <a href="#samples">Samples</a>
             <a href={GH}>GitHub →</a>
@@ -136,7 +135,6 @@ function App() {
         </div>
         <div className="ctas">
           <a className="btn btn-primary" href="https://editor.kymo.studio">Open live editor →</a>
-          <a className="btn btn-ghost" href="app/">Playground</a>
           <a className="btn btn-ghost" href={GH}>View on GitHub</a>
           <a className="btn btn-ghost" href="#samples">See samples ↓</a>
         </div>
