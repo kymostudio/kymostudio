@@ -91,7 +91,7 @@ export default function EditorPage() {
     return () => document.removeEventListener("click", h);
   }, []);
 
-  const diagramLabel = title || d || "";
+  const diagramLabel = title || "Untitled";
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
 
   function download() {
@@ -117,11 +117,11 @@ export default function EditorPage() {
         <span className="sep">/</span>
         {claims ? (
           editingName ? (
-            <input className="diagram-input" autoFocus maxLength={60} defaultValue={title || (d || "")}
+            <input className="diagram-input" autoFocus maxLength={60} defaultValue={title} placeholder="Untitled"
               onKeyDown={(e) => { if (e.key === "Enter") commitRename((e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditingName(false); }}
               onBlur={(e) => commitRename(e.target.value)} />
           ) : (
-            <span className="diagram-name editable" title="Đổi tên" onClick={() => setEditingName(true)}>{diagramLabel}</span>
+            <span className={"diagram-name editable" + (title ? "" : " untitled")} title="Đổi tên" onClick={() => setEditingName(true)}>{diagramLabel}</span>
           )
         ) : <span className="diagram-name" />}
         <div className="spacer" />

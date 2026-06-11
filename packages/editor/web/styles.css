@@ -42,6 +42,7 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 
 .diagram-name { font-size: 14px; font-weight: 600; color: var(--ink); padding: 3px 8px; border-radius: 7px; }
 .diagram-name.editable { cursor: text; }
+.diagram-name.untitled { color: var(--dim); font-weight: 500; }
 .diagram-name.editable:hover { background: var(--bg-raise); }
 .diagram-input { font: inherit; font-size: 14px; font-weight: 600; background: var(--bg); border: 1px solid var(--accent); border-radius: 7px; color: var(--ink); padding: 3px 8px; outline: none; min-width: 160px; }
 
