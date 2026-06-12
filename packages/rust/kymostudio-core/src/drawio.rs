@@ -34,7 +34,9 @@ pub fn to_drawio(d: &Diagram) -> String {
         ));
     }
     for (i, e) in d.edges.iter().enumerate() {
-        cells.push_str(&edge_cell(i, &e.label, &e.src, &e.dst, e.dashed, e.no_arrow));
+        cells.push_str(&edge_cell(
+            i, &e.label, &e.src, &e.dst, e.dashed, e.no_arrow,
+        ));
     }
     envelope(d.width, d.height, &cells)
 }
@@ -55,9 +57,16 @@ pub fn to_drawio_kymojson(json: &str) -> Result<String, String> {
     };
     let i = |v: &Value, k: &str| v.get(k).and_then(Value::as_i64).unwrap_or(0) as i32;
     let s = |v: &Value, k: &str| v.get(k).and_then(Value::as_str).unwrap_or("").to_string();
-    let nth = |v: &Value, k: usize| v.as_array().and_then(|a| a.get(k)).and_then(Value::as_i64).unwrap_or(0) as i32;
+    let nth = |v: &Value, k: usize| {
+        v.as_array()
+            .and_then(|a| a.get(k))
+            .and_then(Value::as_i64)
+            .unwrap_or(0) as i32
+    };
     let pair = |v: &Value| -> Option<(i32, i32)> {
-        v.as_array().filter(|a| a.len() >= 2).map(|_| (nth(v, 0), nth(v, 1)))
+        v.as_array()
+            .filter(|a| a.len() >= 2)
+            .map(|_| (nth(v, 0), nth(v, 1)))
     };
     let empty = Vec::new();
     let mut cells = String::new();
@@ -72,7 +81,11 @@ pub fn to_drawio_kymojson(json: &str) -> Result<String, String> {
             nth(b, 3),
         ));
     }
-    for c in d.get("components").and_then(Value::as_array).unwrap_or(&empty) {
+    for c in d
+        .get("components")
+        .and_then(Value::as_array)
+        .unwrap_or(&empty)
+    {
         let (w, h) = pair(&c["size"]).unwrap_or((60, 40));
         let (cx, cy) = pair(&c["pos"]).unwrap_or((0, 0));
         cells.push_str(&vertex_cell(
@@ -85,9 +98,22 @@ pub fn to_drawio_kymojson(json: &str) -> Result<String, String> {
             h,
         ));
     }
-    for (k, e) in d.get("edges").and_then(Value::as_array).unwrap_or(&empty).iter().enumerate() {
+    for (k, e) in d
+        .get("edges")
+        .and_then(Value::as_array)
+        .unwrap_or(&empty)
+        .iter()
+        .enumerate()
+    {
         let b = |key: &str| e.get(key).and_then(Value::as_bool).unwrap_or(false);
-        cells.push_str(&edge_cell(k, &s(e, "label"), &s(e, "src"), &s(e, "dst"), b("dashed"), b("no_arrow")));
+        cells.push_str(&edge_cell(
+            k,
+            &s(e, "label"),
+            &s(e, "src"),
+            &s(e, "dst"),
+            b("dashed"),
+            b("no_arrow"),
+        ));
     }
     Ok(envelope(i(d, "width"), i(d, "height"), &cells))
 }
@@ -199,9 +225,11 @@ mod tests {
             (Shape::Badge, "arcSize=40;"),
         ];
         for (shape, needle) in cases {
-            let mut d = Diagram::default();
-            d.width = 100;
-            d.height = 100;
+            let mut d = Diagram {
+                width: 100,
+                height: 100,
+                ..Default::default()
+            };
             d.components.push(node("A", "L", shape, (50, 50), (60, 40)));
             assert!(to_drawio(&d).contains(needle), "{needle}");
         }
@@ -209,19 +237,24 @@ mod tests {
 
     #[test]
     fn vertex_geometry_is_top_left_from_centre() {
-        let mut d = Diagram::default();
-        d.width = 200;
-        d.height = 100;
-        d.components.push(node("A", "L", Shape::Box, (100, 50), (60, 40)));
+        let mut d = Diagram {
+            width: 200,
+            height: 100,
+            ..Default::default()
+        };
+        d.components
+            .push(node("A", "L", Shape::Box, (100, 50), (60, 40)));
         // centre (100,50), size 60x40 → x=70 y=30.
         assert!(to_drawio(&d).contains("x=\"70\" y=\"30\" width=\"60\" height=\"40\""));
     }
 
     #[test]
     fn edge_flags_and_label() {
-        let mut d = Diagram::default();
-        d.width = 100;
-        d.height = 100;
+        let mut d = Diagram {
+            width: 100,
+            height: 100,
+            ..Default::default()
+        };
         let mut e = Edge::routed("A", "B", "go");
         e.dashed = true;
         d.edges.push(e);
@@ -236,9 +269,11 @@ mod tests {
 
     #[test]
     fn region_is_cluster_cell() {
-        let mut d = Diagram::default();
-        d.width = 100;
-        d.height = 100;
+        let mut d = Diagram {
+            width: 100,
+            height: 100,
+            ..Default::default()
+        };
         let mut r = Region::cluster("G", "Grp", vec!["A".into()]);
         r.bounds = (10, 20, 80, 60);
         d.regions.push(r);
@@ -251,9 +286,11 @@ mod tests {
     fn non_flowchart_shape_falls_back_and_escapes() {
         // A generic icon component (size None, BPMN shape, special chars) proves
         // the encoder is source-agnostic and XML-safe.
-        let mut d = Diagram::default();
-        d.width = 100;
-        d.height = 100;
+        let mut d = Diagram {
+            width: 100,
+            height: 100,
+            ..Default::default()
+        };
         let mut c = Component::flowchart("X", "a & b <c>", Shape::BpmnTask);
         c.pos = (40, 30);
         d.components.push(c);
@@ -268,10 +305,13 @@ mod tests {
     fn any_source_path_matches_typed() {
         // to_drawio_kymojson(export(d)) == to_drawio(d) — the generic encoder
         // surface agrees with the typed one (proves source-agnostic round-trip).
-        let mut d = Diagram::default();
-        d.width = 200;
-        d.height = 100;
-        d.components.push(node("A", "Start", Shape::Diamond, (100, 50), (80, 60)));
+        let mut d = Diagram {
+            width: 200,
+            height: 100,
+            ..Default::default()
+        };
+        d.components
+            .push(node("A", "Start", Shape::Diamond, (100, 50), (80, 60)));
         let mut e = Edge::routed("A", "A", "x");
         e.dashed = true;
         d.edges.push(e);
@@ -284,13 +324,18 @@ mod tests {
 
     #[test]
     fn well_formed_envelope() {
-        let mut d = Diagram::default();
-        d.width = 100;
-        d.height = 100;
-        d.components.push(node("A", "L", Shape::Box, (50, 50), (60, 40)));
+        let mut d = Diagram {
+            width: 100,
+            height: 100,
+            ..Default::default()
+        };
+        d.components
+            .push(node("A", "L", Shape::Box, (50, 50), (60, 40)));
         let out = to_drawio(&d);
         assert!(out.starts_with("<mxfile"));
-        assert!(out.contains("<mxCell id=\"0\"/>") && out.contains("<mxCell id=\"1\" parent=\"0\"/>"));
+        assert!(
+            out.contains("<mxCell id=\"0\"/>") && out.contains("<mxCell id=\"1\" parent=\"0\"/>")
+        );
         assert!(out.trim_end().ends_with("</mxfile>"));
     }
 }

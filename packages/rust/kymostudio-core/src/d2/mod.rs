@@ -167,7 +167,11 @@ pub fn parse(src: &str) -> Result<Flowchart, D2Error> {
             };
             let title = title.unwrap_or_else(|| id.clone());
             let sub_idx = b.fc.subgraphs.len();
-            b.fc.subgraphs.push(Subgraph { id: id.clone(), title, members: Vec::new() });
+            b.fc.subgraphs.push(Subgraph {
+                id: id.clone(),
+                title,
+                members: Vec::new(),
+            });
             b.stack.push(sub_idx);
             continue;
         }
@@ -248,8 +252,18 @@ fn handle_edge(b: &mut Builder, line: &str) -> Option<()> {
         b.touch(&a, None, None);
         b.touch(&c, None, None);
         let (src, dst) = if rev { (c, a) } else { (a, c) };
-        let lbl = if k == ops.len() - 1 { label.clone() } else { String::new() };
-        b.fc.edges.push(FlowEdge { src, dst, label: lbl, dashed, no_arrow });
+        let lbl = if k == ops.len() - 1 {
+            label.clone()
+        } else {
+            String::new()
+        };
+        b.fc.edges.push(FlowEdge {
+            src,
+            dst,
+            label: lbl,
+            dashed,
+            no_arrow,
+        });
     }
     Some(())
 }
@@ -268,16 +282,26 @@ fn handle_node(b: &mut Builder, line: &str) {
     // `id.shape: value` — set the shape of an existing/implicit node.
     if let Some(p) = line.find(".shape:") {
         let id = leaf(line[..p].trim()).to_string();
-        b.touch(&id, None, Some(shape_of(line[p + ".shape:".len()..].trim())));
+        b.touch(
+            &id,
+            None,
+            Some(shape_of(line[p + ".shape:".len()..].trim())),
+        );
         return;
     }
     // Optional inline `{ … }` attribute block (read `shape:`).
     let (head, shape) = match (line.find('{'), line.rfind('}')) {
         (Some(o), Some(c)) if c > o => {
             let inner = &line[o + 1..c];
-            let sh = inner
-                .find("shape:")
-                .map(|k| shape_of(inner[k + "shape:".len()..].split(';').next().unwrap_or("").trim()));
+            let sh = inner.find("shape:").map(|k| {
+                shape_of(
+                    inner[k + "shape:".len()..]
+                        .split(';')
+                        .next()
+                        .unwrap_or("")
+                        .trim(),
+                )
+            });
             (line[..o].trim(), sh)
         }
         _ => (line.trim(), None),
@@ -310,7 +334,14 @@ mod tests {
         assert_eq!(fc.nodes[0].shape, Shape::Circle);
         assert_eq!(fc.nodes[1].shape, Shape::Diamond);
         assert_eq!(fc.edges.len(), 2);
-        assert_eq!((fc.edges[0].src.as_str(), fc.edges[0].dst.as_str(), fc.edges[0].label.as_str()), ("A", "B", "go"));
+        assert_eq!(
+            (
+                fc.edges[0].src.as_str(),
+                fc.edges[0].dst.as_str(),
+                fc.edges[0].label.as_str()
+            ),
+            ("A", "B", "go")
+        );
         assert!(fc.edges[1].no_arrow); // `--`
     }
 
@@ -326,7 +357,10 @@ mod tests {
         assert_eq!(fc.subgraphs[0].title, "Group");
         assert_eq!(fc.subgraphs[0].members, ["A", "B"]);
         // `Start -> G.A` resolves the qualified ref to leaf `A`.
-        assert_eq!((fc.edges[0].src.as_str(), fc.edges[0].dst.as_str()), ("Start", "A"));
+        assert_eq!(
+            (fc.edges[0].src.as_str(), fc.edges[0].dst.as_str()),
+            ("Start", "A")
+        );
         assert!(fc.edges[1].dashed);
     }
 
@@ -340,6 +374,9 @@ mod tests {
 
     #[test]
     fn empty_is_error() {
-        assert_eq!(parse("  \n # only a comment\n").unwrap_err(), D2Error::Empty);
+        assert_eq!(
+            parse("  \n # only a comment\n").unwrap_err(),
+            D2Error::Empty
+        );
     }
 }

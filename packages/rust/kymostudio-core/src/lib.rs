@@ -41,7 +41,8 @@ pub mod bpmn;
 /// from PNG/PDF output. Registered fonts are loaded into the fontdb on each
 /// render; the first registered face also becomes the generic-family fallback
 /// (sans-serif &c.) so the renderers' CSS stacks resolve.
-static EXTRA_FONTS: std::sync::OnceLock<std::sync::Mutex<Vec<Vec<u8>>>> = std::sync::OnceLock::new();
+static EXTRA_FONTS: std::sync::OnceLock<std::sync::Mutex<Vec<Vec<u8>>>> =
+    std::sync::OnceLock::new();
 
 /// Register a font (TTF/OTF bytes) for `<text>` rendering in [`svg_to_png`] /
 /// [`svg_to_pdf`]. Cumulative; intended for wasm/Workers where no system
@@ -316,9 +317,12 @@ mod tests {
         let d2 = super::d2_to_svg(d2src).unwrap();
         assert!(d2.contains("<polygon class=\"fc-shape\"") && d2.contains(">ok?<"));
         // D2 import → kymo.json carries the diamond shape.
-        assert!(super::d2_to_kymojson(d2src).unwrap().contains("\"shape\": \"diamond\""));
+        assert!(super::d2_to_kymojson(d2src)
+            .unwrap()
+            .contains("\"shape\": \"diamond\""));
         // Graphviz DOT → SVG (same graph) renders the diamond too.
-        let dotsrc = "digraph G {\n A [label=\"Go\"];\n B [label=\"ok?\", shape=diamond];\n A -> B;\n}";
+        let dotsrc =
+            "digraph G {\n A [label=\"Go\"];\n B [label=\"ok?\", shape=diamond];\n A -> B;\n}";
         let dot = super::dot_to_svg(dotsrc).unwrap();
         assert!(dot.contains("<polygon class=\"fc-shape\"") && dot.contains(">ok?<"));
     }

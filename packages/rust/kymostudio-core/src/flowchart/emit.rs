@@ -38,7 +38,11 @@ pub fn to_mermaid(fc: &Flowchart) -> String {
         if sg.title.is_empty() {
             out.push_str(&format!("  subgraph {}\n", sg.id));
         } else {
-            out.push_str(&format!("  subgraph {} [{}]\n", sg.id, mmd_quote(&sg.title)));
+            out.push_str(&format!(
+                "  subgraph {} [{}]\n",
+                sg.id,
+                mmd_quote(&sg.title)
+            ));
         }
         for m in &sg.members {
             out.push_str(&format!("    {m}\n"));
@@ -242,13 +246,33 @@ mod tests {
     use crate::model::Shape;
 
     fn n(id: &str, label: &str, shape: Shape) -> FlowNode {
-        FlowNode { id: id.into(), label: label.into(), shape }
+        FlowNode {
+            id: id.into(),
+            label: label.into(),
+            shape,
+        }
     }
     fn e(src: &str, dst: &str, label: &str, dashed: bool, no_arrow: bool) -> FlowEdge {
-        FlowEdge { src: src.into(), dst: dst.into(), label: label.into(), dashed, no_arrow }
+        FlowEdge {
+            src: src.into(),
+            dst: dst.into(),
+            label: label.into(),
+            dashed,
+            no_arrow,
+        }
     }
-    fn fc(dir: Direction, nodes: Vec<FlowNode>, edges: Vec<FlowEdge>, subgraphs: Vec<Subgraph>) -> Flowchart {
-        Flowchart { direction: dir, nodes, edges, subgraphs }
+    fn fc(
+        dir: Direction,
+        nodes: Vec<FlowNode>,
+        edges: Vec<FlowEdge>,
+        subgraphs: Vec<Subgraph>,
+    ) -> Flowchart {
+        Flowchart {
+            direction: dir,
+            nodes,
+            edges,
+            subgraphs,
+        }
     }
     fn one(shape: Shape) -> Flowchart {
         fc(Direction::Tb, vec![n("A", "Lbl", shape)], vec![], vec![])
@@ -295,7 +319,12 @@ mod tests {
         assert!(to_mermaid(&one_label("a\"b")).contains("A[\"a'b\"]"));
     }
     fn one_label(label: &str) -> Flowchart {
-        fc(Direction::Tb, vec![n("A", label, Shape::Box)], vec![], vec![])
+        fc(
+            Direction::Tb,
+            vec![n("A", label, Shape::Box)],
+            vec![],
+            vec![],
+        )
     }
 
     #[test]
@@ -304,7 +333,11 @@ mod tests {
             Direction::Tb,
             vec![n("S", "S", Shape::Box), n("A", "A", Shape::Box)],
             vec![],
-            vec![Subgraph { id: "G".into(), title: "Grp".into(), members: vec!["A".into()] }],
+            vec![Subgraph {
+                id: "G".into(),
+                title: "Grp".into(),
+                members: vec!["A".into()],
+            }],
         );
         let out = to_mermaid(&g);
         // All nodes declared first (in IR order), then membership-only refs.
@@ -330,7 +363,10 @@ mod tests {
         let g = fc(
             Direction::Tb,
             vec![n("A", "A", Shape::Box), n("B", "B", Shape::Box)],
-            vec![e("A", "B", "lbl", true, false), e("A", "B", "", false, true)],
+            vec![
+                e("A", "B", "lbl", true, false),
+                e("A", "B", "", false, true),
+            ],
             vec![],
         );
         let out = to_d2(&g);
@@ -344,7 +380,11 @@ mod tests {
             Direction::Tb,
             vec![n("A", "A", Shape::Box), n("B", "B", Shape::Box)],
             vec![e("A", "B", "", false, false)],
-            vec![Subgraph { id: "G".into(), title: "T".into(), members: vec!["B".into()] }],
+            vec![Subgraph {
+                id: "G".into(),
+                title: "T".into(),
+                members: vec!["B".into()],
+            }],
         );
         let out = to_d2(&g);
         assert!(out.contains("G: \"T\" {"));
@@ -380,7 +420,11 @@ mod tests {
             Direction::Tb,
             vec![n("A", "A", Shape::Box)],
             vec![],
-            vec![Subgraph { id: "G".into(), title: "T".into(), members: vec!["A".into()] }],
+            vec![Subgraph {
+                id: "G".into(),
+                title: "T".into(),
+                members: vec!["A".into()],
+            }],
         );
         let out = to_dot(&g);
         assert!(out.contains("subgraph cluster_G {"));
