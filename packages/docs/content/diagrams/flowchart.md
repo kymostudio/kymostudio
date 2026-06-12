@@ -1,29 +1,31 @@
+---
+layout: page
+title: Flowchart
+---
+
+<DiagramQuickstart set="flowchart">
+
 # Flowchart
 
 A flowchart shows a process as steps connected by arrows. kymo reads the
 [Mermaid](https://mermaid.js.org/syntax/flowchart.html) `flowchart` / `graph`
 syntax — a diagram you already have in Mermaid works unchanged.
 
-The fastest way to try everything on this page is the
-**[editor](https://editor.kymo.studio)**: pick **mermaid** in the diagram-type
-dropdown, type on the left, and the preview updates live. Every example below
-has a *Try it in the editor* link that opens it pre-loaded.
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the rendered result for the section you're reading. **Copy**
+grabs the source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
 
-```mermaid
-flowchart TD
-    Start((Start)) --> Submit[Submit request]
-    Submit --> Review{Approved?}
-    Review -->|yes| Provision[Provision]
-    Review -->|no| Reject[Reject]
-    Provision --> Done((Done))
-    Reject --> Done
-```
+<ExampleMarker id="fc-intro" />
 
-[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxLy8kvT85ILCpRCHHhUgCC4BIgR0MDTGlqKujq2ikElyblZpZEQyiFotTC0tTikliIaogYSFVQallmanm1Y0FBUX5Zaop9LVgBRBSkoKYytbhGIQAomVmcmZ8XDWfFoivMy68BcrNSk0uiIRREBVwD2DqX_LxUDQ0QqakJNQCkFC7HBQCDlkXW)
-
-![Approval flowchart rendered by kymo](/samples/approval.svg)
+The example on the right is a complete approval flow: a start/end terminal, a
+decision with two labelled exits, and a merge back to a single end node —
+seven lines of text.
 
 ## Direction
+
+<ExampleMarker id="fc-direction" />
 
 The header names the diagram type (`flowchart` and `graph` are synonyms) and an
 optional direction:
@@ -35,12 +37,9 @@ optional direction:
 | `LR` | left → right |
 | `RL` | right → left |
 
-```mermaid
-flowchart LR
-    A[Source] --> B[Build]
-```
-
 ## Node shapes
+
+<ExampleMarker id="fc-shapes" />
 
 A node is an identifier plus an optional label wrapped in shape delimiters.
 Without delimiters (`A --> B`), the node renders as a rectangle labelled with
@@ -58,21 +57,6 @@ its own id.
 | `A{{text}}` | hexagon | hexagon |
 | `A>text]` | asymmetric flag | rectangle |
 
-```mermaid
-flowchart LR
-    A[Rect] --> B(Rounded)
-    B ==> C([Stadium])
-    C -.-> D[(Database)]
-    D --- E((Circle))
-    E --> F{Decision}
-    F -->|ok| G{{Hexagon}}
-    G --> H[[Subroutine]]
-```
-
-[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJwljL0OgyAUhXef4o440DfQpIo_QycdCQPCbUuqkiCkTbTvXopn_L5zzn22b_WUzsNtyCDmygdUXgClJVRksGHVqPOkKiiKEmrCRy-1CYs4cQ30EsuMEya9nOSGuUiCxRMKDSG1cWrG_Kw36brdGSqzGbt-E23_9LCvA7p97_EjH9GcqkuDnvMxTM4Gb1YUIvsBE9Yy6Q)
-
-![Shape gallery rendered by kymo](/samples/flow-shapes.svg)
-
 Labels may be double-quoted to include characters that would otherwise close
 the shape: `A["a label with (parens)"]`.
 
@@ -80,6 +64,8 @@ the shape: `A["a label with (parens)"]`.
 > are not supported yet — the parser reports a syntax error.
 
 ## Links between nodes
+
+<ExampleMarker id="fc-links" />
 
 A link is two nodes joined by an edge operator. kymo distinguishes **solid vs
 dashed** and **arrow vs plain line**:
@@ -93,27 +79,13 @@ dashed** and **arrow vs plain line**:
 | `A ==> B` | accepted; rendered as a regular solid arrow |
 | `A --x B` | accepted; rendered as a solid arrow |
 
-Label an edge either with pipes after the operator or with the inline `--`
-form — both are supported:
-
-```mermaid
-flowchart TD
-    A[Submit] --> B{Approved?}
-    B -->|yes| C[Provision]
-    B -- no --> D[Reject]
-    C -.-> E[Audit log]
-    D --- E
-```
-
-[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxLy8kvT85ILCpRCHHhUgACx-jg0qTczJJYBV1dOwWnaseCgqL8stQU-1qwtBNIuKYytbhGwTk6ACiTWZyZnxcLl1PIywdrdIkOSs1KTS6ByDgr6OoBBV2jHUtTMksUcvLTIeIuQLW6Cq5cAIRXJT4)
-
-![Edge styles rendered by kymo](/samples/flow-links.svg)
+Label an edge either with pipes after the operator (`-->|yes|`) or with the
+inline `--` form (`-- no -->`) — both are supported, as the example shows.
 
 Links chain on a single line; each operator connects the two nodes around it:
 
-```mermaid
-flowchart LR
-    A --> B --> C --> D
+```text
+A --> B --> C --> D
 ```
 
 > The `&` fan-out shorthand (`A & B --> C`) is not supported — write one link
@@ -121,23 +93,11 @@ flowchart LR
 
 ## Subgraphs
 
+<ExampleMarker id="fc-subgraph" />
+
 `subgraph … end` groups nodes into a labelled container. The id and the title
 are both optional (`subgraph Title`, `subgraph id [Title]`, or a bare
 `subgraph`), titles may be quoted, and subgraphs nest.
-
-```mermaid
-flowchart TB
-    Start --> A
-    subgraph G [Worker Pool]
-        A[Fetch] --> B[Transform]
-        B --> C[Write]
-    end
-    C --> End[Done]
-```
-
-[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxLy8kvT85ILCpRCHHiUgCC4BIQR1fXTsERzC8uTUovSizIUHBXiA7PL8pOLVIIyM_PiQVLgoBjtFtqSXJGLFiPU3RIUWJecVp-US5ChRNYyjk6vCizJBUinJqXAqadwVKueSnRLvl5QDkAYsQm9Q)
-
-![Subgraph rendered by kymo](/samples/flow-subgraph.svg)
 
 A `direction` statement inside a subgraph is accepted but ignored — the whole
 diagram flows in the header direction.
@@ -146,7 +106,7 @@ diagram flows in the header direction.
 
 Lines starting with `%%` are comments:
 
-```mermaid
+```text
 flowchart LR
     %% this line is ignored
     A --> B
@@ -195,3 +155,5 @@ nodes, links, subgraphs, and comments.
 - [Flowchart Notation (ISO 5807)](./flowchart-notation) — background reference
   on classic flowchart symbols and conventions.
 - [Best Practices](./best-practices) — layout and readability guidance.
+
+</DiagramQuickstart>
