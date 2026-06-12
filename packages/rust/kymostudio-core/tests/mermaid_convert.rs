@@ -25,7 +25,10 @@ fn cases() -> Vec<(String, PathBuf)> {
     for entry in fs::read_dir(fixtures_dir()).expect("read fixtures dir") {
         let path = entry.unwrap().path();
         if path.extension().and_then(|e| e.to_str()) == Some("mmd") {
-            out.push((path.file_stem().unwrap().to_string_lossy().to_string(), path));
+            out.push((
+                path.file_stem().unwrap().to_string_lossy().to_string(),
+                path,
+            ));
         }
     }
     out.sort();
@@ -88,7 +91,15 @@ fn mermaid_round_trip_is_structural_fixpoint() {
         let edges = |fc: &flowchart::Flowchart| {
             fc.edges
                 .iter()
-                .map(|e| (e.src.clone(), e.dst.clone(), e.label.clone(), e.dashed, e.no_arrow))
+                .map(|e| {
+                    (
+                        e.src.clone(),
+                        e.dst.clone(),
+                        e.label.clone(),
+                        e.dashed,
+                        e.no_arrow,
+                    )
+                })
                 .collect::<Vec<_>>()
         };
         assert_eq!(edges(&a), edges(&b), "{name}: edges");
@@ -106,8 +117,17 @@ fn mermaid_round_trip_is_structural_fixpoint() {
 fn emitters_are_deterministic() {
     for (name, path) in cases() {
         let src = fs::read_to_string(&path).unwrap();
-        for f in [mermaid_to_mermaid, mermaid_to_d2, mermaid_to_dot, mermaid_to_drawio] {
-            assert_eq!(f(&src).unwrap(), f(&src).unwrap(), "{name}: non-deterministic emit");
+        for f in [
+            mermaid_to_mermaid,
+            mermaid_to_d2,
+            mermaid_to_dot,
+            mermaid_to_drawio,
+        ] {
+            assert_eq!(
+                f(&src).unwrap(),
+                f(&src).unwrap(),
+                "{name}: non-deterministic emit"
+            );
         }
     }
 }

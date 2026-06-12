@@ -103,7 +103,10 @@ fn push_attr(out: &mut Vec<(String, String)>, key: &mut String, val: &mut String
 }
 
 fn attr<'a>(attrs: &'a [(String, String)], key: &str) -> Option<&'a str> {
-    attrs.iter().find(|(k, _)| k == key).map(|(_, v)| v.as_str())
+    attrs
+        .iter()
+        .find(|(k, _)| k == key)
+        .map(|(_, v)| v.as_str())
 }
 
 struct Builder {
@@ -171,7 +174,9 @@ pub fn parse(src: &str) -> Result<Flowchart, DotError> {
         // `[strict] digraph|graph [name] {` — root scope.
         let lower = line.to_ascii_lowercase();
         if line.ends_with('{')
-            && (lower.starts_with("digraph") || lower.starts_with("graph") || lower.starts_with("strict"))
+            && (lower.starts_with("digraph")
+                || lower.starts_with("graph")
+                || lower.starts_with("strict"))
         {
             b.stack.push(None);
             continue;
@@ -208,7 +213,7 @@ pub fn parse(src: &str) -> Result<Flowchart, DotError> {
         // `label="…"` inside a cluster → its title.
         if lower.starts_with("label") && line.contains('=') {
             if let Some(Some(idx)) = b.stack.last() {
-                if let Some(v) = line.splitn(2, '=').nth(1) {
+                if let Some(v) = line.split_once('=').map(|x| x.1) {
                     b.fc.subgraphs[*idx].title = unquote(v).to_string();
                 }
             }
@@ -244,13 +249,25 @@ fn handle_edge(b: &mut Builder, line: &str) {
     let label = attr(&attrs, "label").map(unquote).unwrap_or("").to_string();
 
     // `--` (graph) edges are arrowless; `->` (digraph) carry an arrow.
-    let (sep, no_arrow_op) = if body.contains("->") { ("->", false) } else { ("--", true) };
-    let segs: Vec<&str> = body.split(sep).map(str::trim).filter(|s| !s.is_empty()).collect();
+    let (sep, no_arrow_op) = if body.contains("->") {
+        ("->", false)
+    } else {
+        ("--", true)
+    };
+    let segs: Vec<&str> = body
+        .split(sep)
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .collect();
     for w in segs.windows(2) {
         let (a, c) = (unquote(w[0]).to_string(), unquote(w[1]).to_string());
         b.touch(&a, None, None);
         b.touch(&c, None, None);
-        let lbl = if std::ptr::eq(w[1], *segs.last().unwrap()) { label.clone() } else { String::new() };
+        let lbl = if std::ptr::eq(w[1], *segs.last().unwrap()) {
+            label.clone()
+        } else {
+            String::new()
+        };
         b.fc.edges.push(FlowEdge {
             src: a,
             dst: c,
@@ -269,8 +286,7 @@ fn handle_node(b: &mut Builder, line: &str) {
     }
     let attrs = parse_attrs(attr_body);
     let label = attr(&attrs, "label").map(unquote);
-    let shape = attr(&attrs, "shape")
-        .map(|sh| shape_of(sh, attr(&attrs, "style").unwrap_or("")));
+    let shape = attr(&attrs, "shape").map(|sh| shape_of(sh, attr(&attrs, "style").unwrap_or("")));
     b.touch(id, label, shape);
 }
 
@@ -315,7 +331,10 @@ mod tests {
         // `shape=box, style=rounded` → stadium Badge.
         let stage = fc.nodes.iter().find(|n| n.id == "Stage").unwrap();
         assert_eq!(stage.shape, Shape::Badge);
-        assert_eq!((fc.edges[0].src.as_str(), fc.edges[0].dst.as_str()), ("Start", "Stage"));
+        assert_eq!(
+            (fc.edges[0].src.as_str(), fc.edges[0].dst.as_str()),
+            ("Start", "Stage")
+        );
     }
 
     #[test]

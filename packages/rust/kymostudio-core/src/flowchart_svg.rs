@@ -1,7 +1,7 @@
 //! Pure-Rust flowchart **SVG renderer**: a resolved [`Diagram`] → an SVG string.
 //!
-//! The Rust counterpart of the Python `to_svg` flowchart path (`render_flowchart_node`
-//! + point-less edge routing) and the only non-BPMN SVG renderer in the core. It
+//! The Rust counterpart of the Python `to_svg` flowchart path (`render_flowchart_node` +
+//! point-less edge routing) and the only non-BPMN SVG renderer in the core. It
 //! draws icon-less flowchart nodes (the shape outline with the label inside),
 //! anchor-routed orthogonal edges, and subgraph cluster regions. Unlike BPMN
 //! (whose edges carry explicit `points`), flowchart edges are point-less, so this
@@ -35,7 +35,8 @@ stroke-linecap=\"round\" stroke-linejoin=\"round\"/></marker>\
 
 /// Render a resolved flowchart diagram to a self-contained SVG document.
 pub fn render(d: &Diagram) -> String {
-    let by_id: HashMap<&str, &Component> = d.components.iter().map(|c| (c.id.as_str(), c)).collect();
+    let by_id: HashMap<&str, &Component> =
+        d.components.iter().map(|c| (c.id.as_str(), c)).collect();
 
     let regions: String = d.regions.iter().map(region_rect).collect();
     let edges: String = d.edges.iter().map(|e| edge_svg(e, &by_id)).collect();
@@ -66,44 +67,66 @@ fn half(c: &Component) -> (i32, i32) {
 fn node_svg(c: &Component) -> String {
     let (cx, cy) = c.pos;
     let (hw, hh) = half(c);
-    let glyph = match c.shape {
-        Shape::Circle => format!("<ellipse class=\"fc-shape\" cx=\"{cx}\" cy=\"{cy}\" rx=\"{hw}\" ry=\"{hh}\"/>"),
-        Shape::Diamond => {
-            let pts = format!("{cx},{} {},{cy} {cx},{} {},{cy}", cy - hh, cx + hw, cy + hh, cx - hw);
-            format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
-        }
-        Shape::Hex => {
-            let s = hh.min(hw / 2);
-            let pts = format!(
-                "{},{cy} {},{} {},{} {},{cy} {},{} {},{}",
-                cx - hw, cx - hw + s, cy - hh, cx + hw - s, cy - hh,
-                cx + hw, cx + hw - s, cy + hh, cx - hw + s, cy + hh,
-            );
-            format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
-        }
-        Shape::Cylinder => {
-            let ry = (4).max(((hh as f64) * 0.22).round() as i32);
-            let (top, bot) = (cy - hh + ry, cy + hh - ry);
-            format!(
+    let glyph =
+        match c.shape {
+            Shape::Circle => format!(
+                "<ellipse class=\"fc-shape\" cx=\"{cx}\" cy=\"{cy}\" rx=\"{hw}\" ry=\"{hh}\"/>"
+            ),
+            Shape::Diamond => {
+                let pts = format!(
+                    "{cx},{} {},{cy} {cx},{} {},{cy}",
+                    cy - hh,
+                    cx + hw,
+                    cy + hh,
+                    cx - hw
+                );
+                format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
+            }
+            Shape::Hex => {
+                let s = hh.min(hw / 2);
+                let pts = format!(
+                    "{},{cy} {},{} {},{} {},{cy} {},{} {},{}",
+                    cx - hw,
+                    cx - hw + s,
+                    cy - hh,
+                    cx + hw - s,
+                    cy - hh,
+                    cx + hw,
+                    cx + hw - s,
+                    cy + hh,
+                    cx - hw + s,
+                    cy + hh,
+                );
+                format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
+            }
+            Shape::Cylinder => {
+                let ry = (4).max(((hh as f64) * 0.22).round() as i32);
+                let (top, bot) = (cy - hh + ry, cy + hh - ry);
+                format!(
                 "<path class=\"fc-shape\" d=\"M{},{top} V{bot} A{hw},{ry} 0 0 0 {},{bot} V{top} \
                  A{hw},{ry} 0 0 1 {},{top} Z\"/>\
                  <path class=\"fc-shape-line\" d=\"M{},{top} A{hw},{ry} 0 0 0 {},{top}\"/>",
                 cx - hw, cx + hw, cx - hw, cx - hw, cx + hw,
             )
-        }
-        Shape::Badge => format!(
+            }
+            Shape::Badge => format!(
             "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{hh}\"/>",
             cx - hw, cy - hh, 2 * hw, 2 * hh,
         ),
-        _ => format!(
+            _ => {
+                format!(
             "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"6\"/>",
             cx - hw, cy - hh, 2 * hw, 2 * hh,
-        ),
-    };
+        )
+            }
+        };
     let label = if c.name.is_empty() {
         String::new()
     } else {
-        format!("<text class=\"fc-label\" x=\"{cx}\" y=\"{cy}\">{}</text>", esc(&c.name))
+        format!(
+            "<text class=\"fc-label\" x=\"{cx}\" y=\"{cy}\">{}</text>",
+            esc(&c.name)
+        )
     };
     format!("{glyph}{label}\n")
 }
@@ -129,7 +152,11 @@ fn resolve_anchors(s: &Component, t: &Component) -> (Anchor, Anchor) {
     let (tx, ty) = t.pos;
     let (dx, dy) = (tx - sx, ty - sy);
     if dy.abs() > 2 * dx.abs() {
-        if dy >= 0 { (Anchor::Bottom, Anchor::Top) } else { (Anchor::Top, Anchor::Bottom) }
+        if dy >= 0 {
+            (Anchor::Bottom, Anchor::Top)
+        } else {
+            (Anchor::Top, Anchor::Bottom)
+        }
     } else if dx >= 0 {
         (Anchor::Right, Anchor::Left)
     } else {
@@ -161,12 +188,23 @@ fn edge_svg(e: &Edge, by_id: &HashMap<&str, &Component>) -> String {
     let sp = anchor_pos(s, sa);
     let dp = anchor_pos(t, da);
     let path = edge_path(sp, dp, sa);
-    let dash = if e.dashed { " style=\"stroke-dasharray:6 4\"" } else { "" };
-    let marker = if e.no_arrow { "" } else { " marker-end=\"url(#arrow)\"" };
+    let dash = if e.dashed {
+        " style=\"stroke-dasharray:6 4\""
+    } else {
+        ""
+    };
+    let marker = if e.no_arrow {
+        ""
+    } else {
+        " marker-end=\"url(#arrow)\""
+    };
     let mut out = format!("<path class=\"edge-path\"{dash} d=\"{path}\"{marker}/>\n");
     if !e.label.is_empty() {
         let (lx, ly) = ((sp.0 + dp.0) / 2, (sp.1 + dp.1) / 2);
-        out.push_str(&format!("<text class=\"edge-label\" x=\"{lx}\" y=\"{ly}\">{}</text>\n", esc(&e.label)));
+        out.push_str(&format!(
+            "<text class=\"edge-label\" x=\"{lx}\" y=\"{ly}\">{}</text>\n",
+            esc(&e.label)
+        ));
     }
     out
 }
@@ -186,13 +224,19 @@ fn region_label(r: &Region) -> String {
         return String::new();
     }
     let (x, y, _w, _h) = r.bounds;
-    format!("<text class=\"region-label\" text-anchor=\"start\" x=\"{}\" y=\"{}\">{}</text>\n",
-        x + 12, y + 16, esc(&r.label))
+    format!(
+        "<text class=\"region-label\" text-anchor=\"start\" x=\"{}\" y=\"{}\">{}</text>\n",
+        x + 12,
+        y + 16,
+        esc(&r.label)
+    )
 }
 
 /// Escape `& < >` for XML text content.
 fn esc(s: &str) -> String {
-    s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
 }
 
 #[cfg(test)]
@@ -201,7 +245,11 @@ mod tests {
     use crate::model::{Component, Diagram, Edge, Region, Shape};
 
     fn diamond_diagram() -> Diagram {
-        let mut d = Diagram { width: 200, height: 200, ..Default::default() };
+        let mut d = Diagram {
+            width: 200,
+            height: 200,
+            ..Default::default()
+        };
         let mut a = Component::flowchart("A", "Start", Shape::Box);
         a.pos = (100, 40);
         a.size = Some((80, 46));
@@ -230,7 +278,11 @@ mod tests {
 
     #[test]
     fn no_arrow_omits_marker_and_region_cluster() {
-        let mut d = Diagram { width: 100, height: 100, ..Default::default() };
+        let mut d = Diagram {
+            width: 100,
+            height: 100,
+            ..Default::default()
+        };
         let mut a = Component::flowchart("A", "", Shape::Circle);
         a.pos = (50, 30);
         a.size = Some((40, 40));

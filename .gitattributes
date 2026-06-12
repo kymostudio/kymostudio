@@ -11,3 +11,7 @@ packages/rust/kymostudio-core/tests/fixtures/mermaid/*.mmd text eol=lf
 packages/rust/kymostudio-core/tests/fixtures/mermaid/golden/*.kymo.json text eol=lf
 samples/*.mmd text eol=lf
 samples/*.kymo.json text eol=lf
+
+# Same again for the mmd→{mmd,d2,dot,drawio} converter goldens:
+# tests/mermaid_convert.rs byte-compares them against emitter output (LF).
+packages/rust/kymostudio-core/tests/fixtures/mermaid/convert_golden/* text eol=lf
