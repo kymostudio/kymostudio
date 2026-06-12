@@ -22,10 +22,12 @@
   <a href="https://editor.kymo.studio">Live Editor</a> · <a href="https://kymo.studio/">Website</a> · <a href="./docs/guide/getting-started.md">Documentation</a>
 </p>
 
-**Kymostudio** is a collection of libraries and tools to turn diagram-as-code source into animated SVG and related formats such as PNG, WebP, Figma and Excalidraw.
+**Kymostudio** turns diagram-as-code source — or prompts from coding agents over MCP — into self-contained, animated SVG, with PNG, WebP, Figma and Excalidraw export.
 
 ## ✨ Features
 
+- **Built for coding agents**  
+  A hosted MCP server (`mcp.kymo.studio`) lets Claude Code, Cursor or Copilot create and edit diagrams that render live in the editor.
 - **Draws what you actually need**  
   Software architecture, process flows and standard BPMN, all rendered faithfully.
 - **Starts from any source**  
