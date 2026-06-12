@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 674" width="320" height="674" style="max-width:100%;height:auto" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+<style>text{fill:#1f2937}.bg-grid{fill:url(#dot-grid)}.fc-shape{fill:#eff6ff;stroke:#3b82f6;stroke-width:1.6}.fc-shape-line{fill:none;stroke:#3b82f6;stroke-width:1.6;stroke-linecap:round}.fc-label{font-size:13px;font-weight:600;fill:#1e3a8a;text-anchor:middle;dominant-baseline:central}.edge-path{fill:none;stroke:#64748b;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}.edge-label{font-size:11.5px;font-weight:500;fill:#334155;text-anchor:middle;paint-order:stroke;stroke:#fafafa;stroke-width:4;stroke-linejoin:round}.region-rect{fill:#eaf3ff;stroke:#b8d0ee;stroke-width:1.2}.region-label{font-size:11px;font-weight:500;fill:#475569;paint-order:stroke;stroke:#eaf3ff;stroke-width:3}</style>
+<defs><marker id="arrow" viewBox="0 0 12 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse"><path d="M2,1 L11,5 L2,9" fill="none" stroke="#64748b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><pattern id="dot-grid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="#0f172a" fill-opacity="0.05"/></pattern></defs>
+<rect width="320" height="674" fill="#fafafa"/>
+<rect width="320" height="674" class="bg-grid"/>
+<path class="edge-path" d="M212,102 L212,142 L212,142 L212,182" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M212,228 L212,268 L212,268 L212,308" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M212,372 L212,412 L212,412 L212,452" marker-end="url(#arrow)"/>
+<text class="edge-label" x="212" y="412">yes</text>
+<path class="edge-path" d="M154,340 L134,340 L134,475 L114,475" marker-end="url(#arrow)"/>
+<text class="edge-label" x="134" y="407">no</text>
+<path class="edge-path" d="M212,498 L212,538 L212,538 L212,578" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M114,475 L149,475 L149,606 L184,606" marker-end="url(#arrow)"/>
+<ellipse class="fc-shape" cx="212" cy="71" rx="31" ry="31"/><text class="fc-label" x="212" y="71">Start</text>
+<rect class="fc-shape" x="145" y="182" width="134" height="46" rx="6"/><text class="fc-label" x="212" y="205">Submit request</text>
+<polygon class="fc-shape" points="212,308 270,340 212,372 154,340"/><text class="fc-label" x="212" y="340">Approved?</text>
+<rect class="fc-shape" x="164" y="452" width="96" height="46" rx="6"/><text class="fc-label" x="212" y="475">Provision</text>
+<rect class="fc-shape" x="40" y="452" width="74" height="46" rx="6"/><text class="fc-label" x="77" y="475">Reject</text>
+<ellipse class="fc-shape" cx="212" cy="606" rx="28" ry="28"/><text class="fc-label" x="212" y="606">Done</text>
+</svg>

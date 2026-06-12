@@ -16,10 +16,17 @@ cp ../../docs/guide/getting-started.md   site/guide/
 cp ../../docs/guide/dsl-guide.md         site/guide/
 cp ../../docs/guide/cookbook.md          site/guide/
 cp ../../docs/guide/faq.md               site/guide/
-cp ../../docs/diagrams/flowchart/README.md   site/diagrams/flowchart.md
+cp ../../docs/diagrams/flowchart/README.md   site/diagrams/flowchart-notation.md
 cp ../../docs/diagrams/bpmn/README.md        site/diagrams/bpmn.md
 cp ../../docs/diagrams/best-practices.md     site/diagrams/best-practices.md
 cp ../../docs/brand/logo.svg ../../docs/brand/favicon.svg site/public/
+
+# Site-only markdown (authored for the docs site, not mirrored from docs/)
+# lives in content/ and is overlaid onto the synced tree.
+cp -R content/. site/
+# Rendered sample images referenced by content/ pages (served from /samples/).
+mkdir -p site/public/samples
+cp ../../samples/approval.svg ../../samples/flow-shapes.svg site/public/samples/
 # No landing page — the root redirects straight to the guide (Cloudflare Pages
 # reads _redirects from the deploy root).
 printf '/ /guide/ 302\n' > site/public/_redirects
