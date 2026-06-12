@@ -11,14 +11,21 @@ export interface DiagramExample {
   /** How the preview was produced — shown as a small caption. */
   renderer: "kymo" | "mermaid";
   code: string;
+  /**
+   * 1-indexed inclusive line ranges the section is about. When present, the
+   * code pane highlights these lines and dims the rest (Stripe-style).
+   */
+  hl?: Array<[number, number]>;
 }
 
-const fc = (id: string, label: string, image: string, code: string): DiagramExample => ({
-  id, label, image, code, renderer: "kymo",
-});
-const sq = (id: string, label: string, image: string, code: string): DiagramExample => ({
-  id, label, image, code, renderer: "mermaid",
-});
+const fc = (
+  id: string, label: string, image: string, code: string,
+  hl?: Array<[number, number]>,
+): DiagramExample => ({ id, label, image, code, renderer: "kymo", hl });
+const sq = (
+  id: string, label: string, image: string, code: string,
+  hl?: Array<[number, number]>,
+): DiagramExample => ({ id, label, image, code, renderer: "mermaid", hl });
 
 export const SETS: Record<string, DiagramExample[]> = {
   flowchart: [
@@ -34,7 +41,7 @@ export const SETS: Record<string, DiagramExample[]> = {
     fc("fc-direction", "direction.mmd", "/samples/flow-direction.svg",
 `flowchart LR
     A[Source] --> B[Build]
-`),
+`, [[1, 1]]),
     fc("fc-shapes", "shapes.mmd", "/samples/flow-shapes.svg",
 `flowchart LR
     A[Rect] --> B(Rounded)
@@ -49,10 +56,10 @@ export const SETS: Record<string, DiagramExample[]> = {
 `flowchart TD
     A[Submit] --> B{Approved?}
     B -->|yes| C[Provision]
-    B -- no --> D[Reject]
+    B -->|no| D[Reject]
     C -.-> E[Audit log]
     D --- E
-`),
+`, [[2, 6]]),
     fc("fc-subgraph", "subgraph.mmd", "/samples/flow-subgraph.svg",
 `flowchart TB
     Start --> A
@@ -61,7 +68,7 @@ export const SETS: Record<string, DiagramExample[]> = {
         B --> C[Write]
     end
     C --> End[Done]
-`),
+`, [[3, 6]]),
   ],
   sequence: [
     sq("sq-intro", "basic.mmd", "/samples/seq-basic.svg",
@@ -77,7 +84,7 @@ export const SETS: Record<string, DiagramExample[]> = {
     participant C as Client
     actor U as User
     U->>C: click
-`),
+`, [[2, 3]]),
     sq("sq-messages", "messages.mmd", "/samples/seq-messages.svg",
 `sequenceDiagram
     participant A
@@ -86,12 +93,12 @@ export const SETS: Record<string, DiagramExample[]> = {
     B-->>A: reply
     A->B: async signal
     A-)B: async call
-`),
+`, [[4, 7]]),
     sq("sq-activations", "activations.mmd", "/samples/seq-activations.svg",
 `sequenceDiagram
     Alice->>+John: Hello John
     John-->>-Alice: Great!
-`),
+`, [[2, 3]]),
     sq("sq-notes", "notes.mmd", "/samples/seq-notes.svg",
 `sequenceDiagram
     participant A
@@ -101,7 +108,7 @@ export const SETS: Record<string, DiagramExample[]> = {
     Note right of B: B is now listening
     B-->>A: SYN-ACK
     Note left of A: connection established
-`),
+`, [[4, 4], [6, 6], [8, 8]]),
     sq("sq-fragments", "fragments.mmd", "/samples/seq-fragments.svg",
 `sequenceDiagram
     participant C as Client
@@ -122,13 +129,13 @@ export const SETS: Record<string, DiagramExample[]> = {
     and
         S->>C: event B
     end
-`),
+`, [[4, 19]]),
     sq("sq-autonumber", "autonumber.mmd", "/samples/seq-autonumber.svg",
 `sequenceDiagram
     autonumber
     Alice->>John: Hello
     John-->>Alice: Hi
-`),
+`, [[2, 2]]),
   ],
 };
 

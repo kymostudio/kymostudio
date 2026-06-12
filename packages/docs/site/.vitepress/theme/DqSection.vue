@@ -1,7 +1,7 @@
 <script setup lang="ts">
-// Scroll anchor for DiagramQuickstart: marks where an example's section
-// starts. On narrow screens (no sticky pane) it renders the example inline —
-// code, "open in editor" link, and the preview image.
+// Stripe-style step card: wraps one doc section, registers itself for
+// scroll-spy, activates on click (highlighting the matching code lines in the
+// sticky pane), and renders the example inline on narrow screens.
 import { computed, inject, onBeforeUnmount, onMounted, ref, type Ref } from "vue";
 import { ALL, editorUrl } from "./examples";
 
@@ -9,18 +9,28 @@ const props = defineProps<{ id: string }>();
 const root = ref<HTMLElement>();
 const register = inject<(id: string, el: HTMLElement) => void>("dq-register");
 const unregister = inject<(id: string) => void>("dq-unregister");
+const activeId = inject<Ref<string>>("dq-active");
+const activate = inject<(id: string) => void>("dq-activate");
 
 onMounted(() => root.value && register?.(props.id, root.value));
 onBeforeUnmount(() => unregister?.(props.id));
 
+const isActive = computed(() => activeId?.value === props.id);
 const ex = computed(() => ALL[props.id]);
+
+function onClick(event: MouseEvent) {
+  // Plain links inside the card keep their behaviour.
+  if ((event.target as HTMLElement).closest("a")) return;
+  activate?.(props.id);
+}
 async function openEditor() {
   if (ex.value) window.open(await editorUrl(ex.value.code), "_blank", "noopener");
 }
 </script>
 
 <template>
-  <div ref="root" class="dq-marker">
+  <section ref="root" class="dq-section" :class="{ active: isActive }" @click="onClick">
+    <slot />
     <div v-if="ex" class="dq-inline">
       <pre class="dq-inline-code"><code>{{ ex.code }}</code></pre>
       <p class="dq-inline-try">
@@ -28,18 +38,36 @@ async function openEditor() {
       </p>
       <img :src="ex.image" :alt="`Rendered ${ex.label}`" loading="lazy" />
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-.dq-marker {
-  /* zero-height anchor on desktop; the pane shows the example instead */
-  min-height: 1px;
+.dq-section {
+  position: relative;
+  margin: 0 -20px;
+  padding: 20px 20px 8px;
+  border-left: 4px solid transparent;
+  border-bottom: 1px solid var(--vp-c-divider);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.dq-section.active {
+  border-left-color: var(--vp-c-brand-1);
+  background: var(--vp-c-bg-soft);
+}
+.dq-section :deep(h2) {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
 }
 .dq-inline {
   display: none;
 }
 @media (max-width: 1099px) {
+  .dq-section {
+    cursor: auto;
+  }
   .dq-inline {
     display: block;
     margin: 16px 0;

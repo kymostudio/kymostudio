@@ -17,24 +17,28 @@ source; **▶ Open in editor** loads it into
 [editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
 diagram-type dropdown when starting from scratch).
 
-<ExampleMarker id="sq-intro" />
+<DqSection id="sq-intro">
 
 Beyond the live preview, kymo converts sequence sources into a proper **UML
 interaction model** — ready to open in StarUML, Gaphor, or any XMI-consuming
 UML tool. See [Exporting to UML tools](#exporting-to-uml-tools).
 
-## Participants
+</DqSection>
 
-<ExampleMarker id="sq-participants" />
+<DqSection id="sq-participants">
+
+## Participants
 
 Declare participants with `participant`, or `actor` for a stick-figure actor.
 The optional `as` alias sets the display label; the id is what you use in
 messages. Participants you don't declare are created automatically the first
 time a message references them, in order of appearance.
 
-## Messages
+</DqSection>
 
-<ExampleMarker id="sq-messages" />
+<DqSection id="sq-messages">
+
+## Messages
 
 A message is `Sender<arrow>Receiver: text`. Each arrow maps to a UML message
 sort, so the distinction survives into the exported model:
@@ -52,9 +56,11 @@ sort, so the distinction survives into the exported model:
 
 Self-messages (`A->>A: think`) are supported.
 
-## Activations
+</DqSection>
 
-<ExampleMarker id="sq-activations" />
+<DqSection id="sq-activations">
+
+## Activations
 
 Mark when a participant is actively processing with the `+` / `-` shorthand on
 the arrow, or with explicit statements:
@@ -68,16 +74,20 @@ deactivate John
 
 `+` activates the **target** after the message; `-` deactivates the **source**.
 
-## Notes
+</DqSection>
 
-<ExampleMarker id="sq-notes" />
+<DqSection id="sq-notes">
+
+## Notes
 
 Attach commentary to one participant or span several. `Note left of X`,
 `Note right of X`, and `Note over X` (or `Note over X,Y`) are all supported.
 
-## Fragments: loop, alt, opt, par
+</DqSection>
 
-<ExampleMarker id="sq-fragments" />
+<DqSection id="sq-fragments">
+
+## Fragments: loop, alt, opt, par
 
 Combined fragments group messages under an operator, close with `end`, and
 nest arbitrarily:
@@ -92,11 +102,15 @@ nest arbitrarily:
 These map to UML combined fragments (`loop`, `alt`, `opt`, `par`) with the
 labels carried as guards.
 
+</DqSection>
+
+<DqSection id="sq-autonumber">
+
 ## Numbering
 
-<ExampleMarker id="sq-autonumber" />
-
 `autonumber` switches on sequential message numbering.
+
+</DqSection>
 
 ## Exporting to UML tools
 

@@ -17,15 +17,17 @@ grabs the source; **▶ Open in editor** loads it into
 [editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
 diagram-type dropdown when starting from scratch).
 
-<ExampleMarker id="fc-intro" />
+<DqSection id="fc-intro">
 
 The example on the right is a complete approval flow: a start/end terminal, a
 decision with two labelled exits, and a merge back to a single end node —
 seven lines of text.
 
-## Direction
+</DqSection>
 
-<ExampleMarker id="fc-direction" />
+<DqSection id="fc-direction">
+
+## Direction
 
 The header names the diagram type (`flowchart` and `graph` are synonyms) and an
 optional direction:
@@ -37,9 +39,11 @@ optional direction:
 | `LR` | left → right |
 | `RL` | right → left |
 
-## Node shapes
+</DqSection>
 
-<ExampleMarker id="fc-shapes" />
+<DqSection id="fc-shapes">
+
+## Node shapes
 
 A node is an identifier plus an optional label wrapped in shape delimiters.
 Without delimiters (`A --> B`), the node renders as a rectangle labelled with
@@ -63,9 +67,11 @@ the shape: `A["a label with (parens)"]`.
 > Mermaid's trapezoid (`[/ /]`, `[\ \]`) and double-circle (`((( )))`) shapes
 > are not supported yet — the parser reports a syntax error.
 
-## Links between nodes
+</DqSection>
 
-<ExampleMarker id="fc-links" />
+<DqSection id="fc-links">
+
+## Links between nodes
 
 A link is two nodes joined by an edge operator. kymo distinguishes **solid vs
 dashed** and **arrow vs plain line**:
@@ -79,8 +85,8 @@ dashed** and **arrow vs plain line**:
 | `A ==> B` | accepted; rendered as a regular solid arrow |
 | `A --x B` | accepted; rendered as a solid arrow |
 
-Label an edge either with pipes after the operator (`-->|yes|`) or with the
-inline `--` form (`-- no -->`) — both are supported, as the example shows.
+Label an edge with pipes right after the operator, as the example shows:
+`B -->|yes| C`.
 
 Links chain on a single line; each operator connects the two nodes around it:
 
@@ -88,12 +94,15 @@ Links chain on a single line; each operator connects the two nodes around it:
 A --> B --> C --> D
 ```
 
-> The `&` fan-out shorthand (`A & B --> C`) is not supported — write one link
-> per line instead.
+> The `&` fan-out shorthand (`A & B --> C`) and Mermaid's inline label form
+> (`A -- text --> B`) are not supported — use one link per line and the
+> `|text|` label form instead.
+
+</DqSection>
+
+<DqSection id="fc-subgraph">
 
 ## Subgraphs
-
-<ExampleMarker id="fc-subgraph" />
 
 `subgraph … end` groups nodes into a labelled container. The id and the title
 are both optional (`subgraph Title`, `subgraph id [Title]`, or a bare
@@ -101,6 +110,8 @@ are both optional (`subgraph Title`, `subgraph id [Title]`, or a bare
 
 A `direction` statement inside a subgraph is accepted but ignored — the whole
 diagram flows in the header direction.
+
+</DqSection>
 
 ## Comments
 
@@ -148,6 +159,10 @@ kymo implements the structural core of the flowchart grammar. Styling and
 interactivity directives are **not** supported and are reported as syntax
 errors: `style`, `classDef`, `class`, `click`, and `linkStyle`. Keep sources to
 nodes, links, subgraphs, and comments.
+
+Also note that the inline edge-label form (`A -- text --> B`) is currently
+mis-read as a chain through a node named `text` — always label edges with the
+`|text|` form.
 
 ## See also
 
