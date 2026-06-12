@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════════════════════
    kymo.studio — "living diagram paper"
    Brand (docs/brand): pink #E0095F · navy #242131 · teal #DDECEE
-   Display: Bricolage Grotesque · Body: Instrument Sans · Mono: JetBrains Mono
+   Fonts per docs/brand: SF Pro Rounded (display) · Inter (body) · JetBrains Mono
    ════════════════════════════════════════════════════════════════ */
 :root {
   --paper:         #fcfcfd;
@@ -19,8 +19,8 @@
   --radius:        16px;
   --max:           1240px;
   --pad:           24px;
-  --display: "Bricolage Grotesque", "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
-  --font: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "SF Pro Rounded", ui-rounded, "Inter", -apple-system, system-ui, sans-serif;
+  --font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 * { box-sizing: border-box; }
