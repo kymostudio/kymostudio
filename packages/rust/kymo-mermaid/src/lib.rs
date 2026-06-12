@@ -37,7 +37,7 @@ pub fn flowchart_to_svg(source: &str) -> Result<String, String> {
     let measurer = VendoredFontMetricsTextMeasurer::default();
     let layout = layout_flowchart_v2(&semantic, &config, &measurer, None)
         .map_err(|e| format!("layout: {e}"))?;
-    render_flowchart_v2_svg(
+    let svg = render_flowchart_v2_svg(
         &layout,
         &semantic,
         &serde_json::Value::Null,
@@ -45,7 +45,21 @@ pub fn flowchart_to_svg(source: &str) -> Result<String, String> {
         &measurer,
         &SvgRenderOptions::default(),
     )
-    .map_err(|e| format!("svg: {e}"))
+    .map_err(|e| format!("svg: {e}"))?;
+    Ok(unescape_label_paragraph_wrapper(&svg))
+}
+
+/// merman parity gap (rev 8964149): for labels with <br/>, the measuring layer
+/// wraps the label in a <p> (mirroring mermaid's markdown pass) but the SVG
+/// emitter then entity-escapes that very wrapper — mermaid.js emits a real
+/// <p> element inside the nodeLabel/edgeLabel span. Un-escape exactly that
+/// wrapper, bounded to the span edges so arbitrary user text is never touched.
+/// (If a user literally types <p> in a label, mermaid.js renders it as an
+/// element too — so this matches reference behaviour in that case as well.)
+fn unescape_label_paragraph_wrapper(svg: &str) -> String {
+    svg.replace(r#"<span class="nodeLabel">&lt;p&gt;"#, r#"<span class="nodeLabel"><p>"#)
+        .replace(r#"<span class="edgeLabel">&lt;p&gt;"#, r#"<span class="edgeLabel"><p>"#)
+        .replace("&lt;/p&gt;</span>", "</p></span>")
 }
 
 #[cfg(feature = "wasm")]
@@ -93,6 +107,18 @@ mod tests {
         for label in ["Bắt đầu", "Đăng ký", "Xác thực?", "Hoàn tất", "Có"] {
             assert!(svg.contains(label), "missing {label}");
         }
+    }
+
+    #[test]
+    fn br_labels_keep_a_real_paragraph_element() {
+        // Regression for the merman parity gap: mermaid.js emits
+        // <span class="nodeLabel"><p>…<br>…</p></span>; merman escapes the <p>
+        // wrapper. Caught live on 2026-06-12 — the editor showed a literal
+        // "<p>" before the label text.
+        let svg = flowchart_to_svg("flowchart TD
+  A[dòng một<br/>dòng hai] --> B").unwrap();
+        assert!(svg.contains(r#"<span class="nodeLabel"><p>dòng một"#), "real <p> missing");
+        assert!(!svg.contains("&lt;p&gt;"), "escaped <p> still present");
     }
 
     #[test]
