@@ -40,9 +40,17 @@ export function kindLabel(kind: string): string {
 
 // Kroki SVG is rendered from source we don't control (share links put the source
 // in the URL, so it can be an attacker's). Strip scripts, event handlers and
-// foreignObject before the markup is injected into the page.
+// javascript: URLs before the markup is injected into the page. foreignObject
+// must stay: Mermaid (htmlLabels) puts every node/edge label in HTML inside one,
+// so its content is sanitized with the html profile instead of being dropped —
+// DOMPurify only treats SVG→HTML transitions as valid at HTML_INTEGRATION_POINTS,
+// which by default excludes foreignObject.
 export function sanitizeSvg(svg: string): string {
-  return DOMPurify.sanitize(svg, { USE_PROFILES: { svg: true, svgFilters: true }, ADD_TAGS: ["use"] });
+  return DOMPurify.sanitize(svg, {
+    USE_PROFILES: { svg: true, svgFilters: true, html: true },
+    ADD_TAGS: ["use", "foreignObject"],
+    HTML_INTEGRATION_POINTS: { "annotation-xml": true, foreignobject: true },
+  });
 }
 
 export async function renderKroki(kind: string, source: string): Promise<string> {
