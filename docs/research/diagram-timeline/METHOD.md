@@ -3,10 +3,10 @@
 | Field       | Value                                            |
 |-------------|--------------------------------------------------|
 | Document ID | RES-DIAGRAM-TIMELINE-002                         |
-| Version     | 1.0                                              |
-| Issue Date  | 2026-06-11                                        |
+| Version     | 1.1                                              |
+| Issue Date  | 2026-06-12                                        |
 | Status      | Draft                                            |
-| Related     | `RES-DIAGRAM-TIMELINE-001` ([Index](README.md)) · `docs/data/database.sqlite` · `docs/data/compute_rankings.py` |
+| Related     | `RES-DIAGRAM-TIMELINE-001` ([Index](README.md)) · `docs/data/database.sqlite` · `docs/data/compute_rankings.py` · `docs/data/seed_forecast.py` |
 
 This page defines **how the per-year top-10 rankings are computed**. The rankings are not bare editorial ordinals: each entry carries per-criterion scores (0–10) and the rank is the descending order of a **weighted composite**. The weights, scores, and the canonical ranking function all live in `docs/data/`; this page is the normative description.
 
@@ -113,6 +113,16 @@ External published rankings were considered and largely rejected as anchors: no 
 - Scores inherit the uncertainty of the underlying estimates; treat second-decimal differences as noise.
 - Momentum is derived from list movement, so it is partly circular by construction — it encodes the researched delta rather than an independent measurement.
 - Criteria and weights are themselves editorial choices; revisit them if the field's success factors shift (e.g. agent-operability may deserve its own criterion beyond 2025).
+
+## 6. Forecast years (2026–2055)
+
+The database also carries thirty **forecast** years, rendered as `forecast-2026.md` … `forecast-2055.md`. They use the *same* schema, composite function, `--check` invariant, and rendering pipeline as the measured years — but their epistemic status is categorically different, and every surface that shows them says so:
+
+- **The scenario is authored, not researched.** The per-year orderings live as data in [`docs/data/seed_forecast.py`](../../data/seed_forecast.py), which is the complete and only record of the forecast's content: an internally consistent extrapolation of the trajectories visible in 2025 (agent-operable canvases, diagram-as-code as agent interchange, live system views), written 2026-06-12. Grounding decays with distance — the per-year pages and eras D/E/F state this explicitly.
+- **Scores decompose the scenario, not evidence.** `seed_forecast.py` seeds the per-criterion scores from the authored order using the *same heuristics as §3* (position → Adoption/Prevalence, list-tenure → Longevity/Persistence, movement → Momentum, means for the rest) plus the §3 calibration pass, so `compute_rankings.py --check` is green across all 61 years. The numbers make the scenario auditable and editable; they carry no evidentiary weight.
+- **No fabricated sources.** Forecast pages replace the historical `## Sources` section with `## Signals` — real, present-day references for the trends being extrapolated. Projected events are never given citations, and invented future entities use generic category names (e.g. "Live-architecture platforms"), never invented brands.
+- **The metrics layer (§4) ends at 2025.** Nothing in `*_metric_history` or the raw tables extends into the forecast; the measured series stopping at the divider is itself the honest signal. `render_html_forecast.py` renders the 61-year view (`forecast.html`) with the forecast region explicitly marked; `render_html.py` / `index.html` remain measured-only.
+- **Editing the forecast** = edit the authored lists in `seed_forecast.py`, re-run it (idempotent for years ≥ 2026), then `compute_rankings.py --check`, `render_tables.py`, and `render_html_forecast.py`. When reality diverges, prefer annotating the falsified page over silently rewriting it — a wrong forecast is better history than a corrected one.
 
 ---
 

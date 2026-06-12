@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Render the per-year Top-10 tables in 1995.md…2025.md from docs/data/database.sqlite.
+"""Render the per-year Top-10 tables in 1995.md…2025.md and the forecast pages
+forecast-2026.md…forecast-2055.md from docs/data/database.sqlite.
 
 The database is the source of truth for the rankings:
   diagrams(key, name) / tools(key, name)          — canonical entities
   diagram_rankings / tool_rankings(year, rank 1-10, key FK, label, evidence)
   timeline(year, remark)
 `key` is the canonical identity of a type/tool across years; rank movement
-(Δ) and drop-outs are computed from it. After editing the DB, run:
+(Δ) and drop-outs are computed from it. Years ≥ 2026 are scenario projections
+(seeded by docs/data/seed_forecast.py) and get a forecast note instead of the
+evidence-based one. After editing the DB, run:
   python3 render_tables.py
 """
 import re
@@ -15,16 +18,22 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 DB = HERE.parent.parent / "data" / "database.sqlite"
-YEARS = range(1995, 2026)
+YEARS = range(1995, 2056)
+FORECAST_FROM = 2026
 HEAD = {"type": "Top 10 diagram types", "tool": "Top 10 tools"}
 COL = {"type": "Type", "tool": "Tool"}
 
 # Matches the whole rankings block: the (Top 5|Top 10) types heading through
-# the italic estimates note that closes the tools table.
+# the italic estimates/projections note that closes the tools table.
 BLOCK = re.compile(
-    r"## Top \d+ diagram types\n.*?\n\*Rankings are evidence-based estimates[^\n]*\*",
+    r"## Top \d+ diagram types\n.*?"
+    r"\n\*Rankings are (?:evidence-based estimates|scenario projections)[^\n]*\*",
     re.S,
 )
+
+
+def page(year):
+    return HERE / (f"{year}.md" if year < FORECAST_FROM else f"forecast-{year}.md")
 
 
 def delta(rank, prev_rank, first_year, year):
@@ -71,7 +80,10 @@ def main():
             if gone:
                 dropped.append(f"{', '.join(sorted(gone))} ({cat}s)")
 
-        note = "*Rankings are evidence-based estimates — no per-year market-share survey exists; Δ is the rank change vs the previous year (new = first appearance, back = re-entry)."
+        if year >= FORECAST_FROM:
+            note = "*Rankings are scenario projections, not evidence — an authored extrapolation (METHOD §6); Δ is the rank change vs the previous year (new = first appearance, back = re-entry)."
+        else:
+            note = "*Rankings are evidence-based estimates — no per-year market-share survey exists; Δ is the rank change vs the previous year (new = first appearance, back = re-entry)."
         if dropped:
             note += f" Dropped out vs {year - 1}: {'; '.join(dropped)}."
         if remarks.get(year):
@@ -79,7 +91,7 @@ def main():
         note += "*"
 
         block = "\n\n".join(parts) + "\n\n" + note
-        path = HERE / f"{year}.md"
+        path = page(year)
         text = path.read_text()
         new_text, n = BLOCK.subn(lambda _m: block, text, count=1)
         if n != 1:
