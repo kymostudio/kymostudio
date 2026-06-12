@@ -9,6 +9,13 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-06-12
+
+### Changed
+
+- New slogan across every package description and README: **"Prompt it. See it
+  appear. Watch it animate."** (replaces "Type it. …").
+
 ### Added
 
 - **Pure-Rust flowchart SVG rendering + D2 / DOT importers — the core's first
