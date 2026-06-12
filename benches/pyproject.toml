@@ -38,6 +38,13 @@ svg2pdf = [
 # CLI engines for svg2pdf are system software, NOT pip deps — each skipped if its
 # binary is absent: rsvg-convert (librsvg2-bin), inkscape, libreoffice, and a
 # Chrome/Chromium binary. See benches/svg2pdf/README.md.
+# Browser harness for the editor first-load bench — drives your installed Chrome
+# by default (channel "chrome"), so no browser download needed; run
+# `uv run playwright install chromium` only for the bundled one. See
+# `benches/editor/README.md`. Install with: `uv sync --extra editor`.
+editor = [
+    "playwright>=1.45",
+]
 
 [tool.uv.sources]
 kymostudio = { path = "../packages/python", editable = true }

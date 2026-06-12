@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "timestamp": "2026-06-12T07:00:46+00:00",
+    "base_url": "https://editor.kymo.studio",
+    "host": "anhvu2-01.local",
+    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3",
+    "browser_channel": "chrome",
+    "throttle": {
+      "offline": false,
+      "downloadThroughput": 1061683,
+      "uploadThroughput": 354240,
+      "latency": 165
+    }
+  },
+  "scenarios": [
+    {
+      "key": "mermaid-share",
+      "title": "kroki share link (mermaid, 19-node Vietnamese flowchart)",
+      "reps": 5,
+      "failed_reps": 3,
+      "median": {
+        "ttfb_ms": 278,
+        "fcp_ms": 924,
+        "kroki_start_ms": 747,
+        "kroki_end_ms": 3399,
+        "diagram_ms": 3408,
+        "transfer_kb_total": 211,
+        "engine_transfer_kb": 0
+      },
+      "engine_fetched": false,
+      "runs": [
+        {
+          "ttfb_ms": 307,
+          "fcp_ms": 1004,
+          "kroki_start_ms": 763,
+          "kroki_end_ms": 3406,
+          "diagram_ms": 3416,
+          "transfer_kb_total": 212,
+          "engine_transfer_kb": 0,
+          "ok": true
+        },
+        {
+          "ttfb_ms": 354,
+          "fcp_ms": 1104,
+          "kroki_start_ms": 894,
+          "kroki_end_ms": 1340,
+          "diagram_ms": null,
+          "transfer_kb_total": 209,
+          "engine_transfer_kb": 0,
+          "ok": false
+        },
+        {
+          "ttfb_ms": 265,
+          "fcp_ms": 920,
+          "kroki_start_ms": 708,
+          "kroki_end_ms": 1351,
+          "diagram_ms": null,
+          "transfer_kb_total": 209,
+          "engine_transfer_kb": 0,
+          "ok": false
+        },
+        {
+          "ttfb_ms": 250,
+          "fcp_ms": 844,
+          "kroki_start_ms": 731,
+          "kroki_end_ms": 3392,
+          "diagram_ms": 3401,
+          "transfer_kb_total": 210,
+          "engine_transfer_kb": 0,
+          "ok": true
+        },
+        {
+          "ttfb_ms": 264,
+          "fcp_ms": 1148,
+          "kroki_start_ms": 663,
+          "kroki_end_ms": 2576,
+          "diagram_ms": null,
+          "transfer_kb_total": 212,
+          "engine_transfer_kb": 0,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "key": "kymo-default",
+      "title": "signed-out editor root (kymo sample, wasm engine)",
+      "reps": 5,
+      "failed_reps": 0,
+      "median": {
+        "ttfb_ms": 274,
+        "fcp_ms": 1616,
+        "kroki_start_ms": null,
+        "kroki_end_ms": null,
+        "diagram_ms": 4465,
+        "transfer_kb_total": 2677,
+        "engine_transfer_kb": 2465
+      },
+      "engine_fetched": true,
+      "runs": [
+        {
+          "ttfb_ms": 396,
+          "fcp_ms": 980,
+          "kroki_start_ms": null,
+          "kroki_end_ms": null,
+          "diagram_ms": 3738,
+          "transfer_kb_total": 2678,
+          "engine_transfer_kb": 2466,
+          "ok": true
+        },
+        {
+          "ttfb_ms": 660,
+          "fcp_ms": 3984,
+          "kroki_start_ms": null,
+          "kroki_end_ms": null,
+          "diagram_ms": 6623,
+          "transfer_kb_total": 2677,
+          "engine_transfer_kb": 2465,
+          "ok": true
+        },
+        {
+          "ttfb_ms": 228,
+          "fcp_ms": 1616,
+          "kroki_start_ms": null,
+          "kroki_end_ms": null,
+          "diagram_ms": 4362,
+          "transfer_kb_total": 2677,
+          "engine_transfer_kb": 2465,
+          "ok": true
+        },
+        {
+          "ttfb_ms": 204,
+          "fcp_ms": 1800,
+          "kroki_start_ms": null,
+          "kroki_end_ms": null,
+          "diagram_ms": 4465,
+          "transfer_kb_total": 2677,
+          "engine_transfer_kb": 2466,
+          "ok": true
+        },
+        {
+          "ttfb_ms": 274,
+          "fcp_ms": 1020,
+          "kroki_start_ms": null,
+          "kroki_end_ms": null,
+          "diagram_ms": 7037,
+          "transfer_kb_total": 2677,
+          "engine_transfer_kb": 2465,
+          "ok": true
+        }
+      ]
+    }
+  ]
+}
