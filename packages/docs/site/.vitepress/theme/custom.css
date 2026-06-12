@@ -22,3 +22,9 @@
 .VPContent.has-sidebar:has(.dq) {
   padding-right: 16px !important;
 }
+
+/* Code-group tab rows (e.g. the MCP client picker) wrap instead of clipping
+   when there are more tabs than fit one line. */
+.vp-code-group .tabs {
+  flex-wrap: wrap;
+}

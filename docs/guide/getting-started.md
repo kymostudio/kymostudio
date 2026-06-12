@@ -12,7 +12,7 @@ kymo ships as two independent, feature-equivalent packages — pick whichever fi
 Both provide the same `kymo` command-line tool and the same `.kymo` language.
 
 ```bash
-# Python (PyPI) — requires Python >= 3.13
+# Python (PyPI) — requires Python >= 3.10
 pip install kymostudio
 # …or, with uv:
 uv tool install kymostudio

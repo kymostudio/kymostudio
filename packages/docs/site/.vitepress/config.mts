@@ -13,10 +13,10 @@ export default defineConfig({
   themeConfig: {
     logo: "/logo.svg",
     // No landing page — the brand mark goes straight to the guide.
-    logoLink: "/guide/",
+    logoLink: "/guide/getting-started",
     siteTitle: "KymoStudio",
     nav: [
-      { text: "Guide", link: "/guide/" },
+      { text: "Guide", link: "/guide/getting-started" },
       { text: "Diagrams", link: "/diagrams/flowchart" },
       { text: "Editor", link: "https://editor.kymo.studio" },
       { text: "Website", link: "https://kymo.studio" },
@@ -25,11 +25,8 @@ export default defineConfig({
       {
         text: "Guide",
         items: [
-          { text: "Introduction", link: "/guide/" },
           { text: "Getting Started", link: "/guide/getting-started" },
-          { text: "The .kymo Language", link: "/guide/dsl-guide" },
-          { text: "Cookbook", link: "/guide/cookbook" },
-          { text: "FAQ & Troubleshooting", link: "/guide/faq" },
+          { text: "MCP Server", link: "/guide/mcp" },
         ],
       },
       {
@@ -42,9 +39,11 @@ export default defineConfig({
       {
         text: "References",
         items: [
+          { text: "The .kymo Language", link: "/guide/dsl-guide" },
           { text: "BPMN", link: "/diagrams/bpmn" },
           { text: "Best Practices", link: "/diagrams/best-practices" },
-          { text: "Flowchart Notation (ISO 5807)", link: "/diagrams/flowchart-notation" },
+          { text: "Flowchart Notation", link: "/diagrams/flowchart-notation" },
+          { text: "FAQ & Troubleshooting", link: "/guide/faq" },
         ],
       },
     ],
