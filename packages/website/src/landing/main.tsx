@@ -163,7 +163,7 @@ function App() {
           <p className="lead">Prompt it. See it appear. Watch it animate.</p>
           <div className="ctas">
             <a className="btn btn-primary btn-pill" href="https://docs.kymo.studio/guide/getting-started">Getting Started</a>
-            <a className="btn btn-alt btn-pill" href="#mcp">Connect Your AI</a>
+            <a className="btn btn-alt btn-pill" href="#mcp">Connect Your Agent</a>
             <a className="btn btn-alt btn-pill" href="https://editor.kymo.studio">Open the live Editor ↗</a>
           </div>
         </div>
@@ -186,14 +186,14 @@ function App() {
       <section className="mcp" id="mcp">
         <div className="mcp-inner">
           <div className="mcp-copy">
-            <h2>Connect any AI, over MCP</h2>
+            <h2>Connect your coding agent, over MCP</h2>
             <p>
-              kymo runs a hosted <strong>MCP server</strong> at <code>mcp.kymo.studio</code>. Claude,
-              ChatGPT, Cursor — any MCP client — can create and edit your diagrams, rendering live in
-              the editor while the agent types.
+              kymo runs a hosted <strong>MCP server</strong> at <code>mcp.kymo.studio</code>. Claude
+              Code, Cursor, Copilot — any MCP client — can create and edit your diagrams, rendering
+              live in the editor while the agent types.
             </p>
             <ol className="mcp-steps">
-              <li>Add the server to your AI — one line of config.</li>
+              <li>Add the server to your agent — one line of config.</li>
               <li>Ask for a diagram — the agent writes .kymo source and calls the tools.</li>
               <li>Watch it draw at editor.kymo.studio — animated SVG, ready to export.</li>
             </ol>
