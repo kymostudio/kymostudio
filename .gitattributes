@@ -4,14 +4,10 @@
 # byte-for-byte comparison. See packages/rust/kymostudio-core/tests/bpmn_conformance.rs.
 conformance/golden/bpmn_svg/*.svg text eol=lf
 
-# Same reason for the Mermaid importer: tests/mermaid_golden.rs byte-compares the
-# .kymo.json goldens against mermaid_to_kymojson output (LF). Pin the fixtures,
-# goldens and samples to LF so Windows CI doesn't checkout CRLF and break it.
-packages/rust/kymostudio-core/tests/fixtures/mermaid/*.mmd text eol=lf
-packages/rust/kymostudio-core/tests/fixtures/mermaid/golden/*.kymo.json text eol=lf
+# Same reason for every golden suite under tests/fixtures (mermaid_golden,
+# mermaid_convert, sequence_{xmi,mdj,gaphor}): they byte-compare emitter output
+# (LF) against checked-in goldens, and all fixtures are text. Pin the whole
+# tree + samples to LF so Windows CI doesn't checkout CRLF and break them.
+packages/rust/kymostudio-core/tests/fixtures/** text eol=lf
 samples/*.mmd text eol=lf
 samples/*.kymo.json text eol=lf
-
-# Same again for the mmd→{mmd,d2,dot,drawio} converter goldens:
-# tests/mermaid_convert.rs byte-compares them against emitter output (LF).
-packages/rust/kymostudio-core/tests/fixtures/mermaid/convert_golden/* text eol=lf
