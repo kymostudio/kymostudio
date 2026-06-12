@@ -3,13 +3,13 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
 import { WorkspaceSwitcher, useWorkspace, assignDiagram } from "./workspace";
-import { KINDS, renderKroki } from "./kroki";
+import { KINDS, renderKroki, sanitizeSvg } from "./kroki";
 import { CodeEditor } from "./codeeditor";
 import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -55,6 +55,7 @@ export default function EditorPage() {
   const [syncing, setSyncing] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [shareError, setShareError] = useState<string | null>(null);
   const [editingName, setEditingName] = useState(false);
   // split = width of the source pane in % (dbdiagram-style draggable divider)
   const [split, setSplit] = useState(() => {
@@ -72,10 +73,13 @@ export default function EditorPage() {
   const lastSvg = useRef("");
   const fresh = useRef(false);      // room exists on the server but has no document yet
   const userEdited = useRef(false); // the user actually typed in this room
+  const pendingImport = useRef<{ source: string; kind: string } | null>(null); // "Save a copy": carry shared content into the new room
   const titleRef = useRef(title);
   titleRef.current = title;
   const kindRef = useRef(kind);
   kindRef.current = kind;
+  const sourceRef = useRef(source);
+  sourceRef.current = source;
   const renderSeq = useRef(0); // kroki renders are async fetches — drop stale responses
 
   const doRender = useCallback(async (src: string, k: string) => {
@@ -88,7 +92,9 @@ export default function EditorPage() {
         if (!renderRef.current) return;
         out = await renderRef.current(src);
       } else {
-        out = await renderKroki(k, src);
+        // Kroki SVG is third-party markup — and with ?s= links the source can be
+        // anyone's. Strip scripts/handlers before it touches the DOM.
+        out = sanitizeSvg(await renderKroki(k, src));
       }
       if (seq !== renderSeq.current) return;
       lastSvg.current = out; setSvg(out);
@@ -101,7 +107,8 @@ export default function EditorPage() {
 
   useEffect(() => {
     let stop = false;
-    import("./engine").then((m) => { if (stop) return; renderRef.current = m.renderDiagram; if (kindRef.current === "kymo") doRender(source, "kymo"); });
+    // refs, not state: by the time the wasm lands, a share link may have replaced the sample
+    import("./engine").then((m) => { if (stop) return; renderRef.current = m.renderDiagram; if (kindRef.current === "kymo") doRender(sourceRef.current, "kymo"); });
     return () => { stop = true; };
   }, []); // eslint-disable-line
 
@@ -118,24 +125,32 @@ export default function EditorPage() {
 
   // Rooms are switched client-side (+ New uses navigate()), so reset per-room state on ?d change.
   useEffect(() => {
-    setSource(SAMPLE); setKind("kymo"); setTitle(""); setEditingName(false);
-    synced.current = false; fresh.current = false; userEdited.current = false;
+    const imp = pendingImport.current; pendingImport.current = null;
+    setSource(imp ? imp.source : SAMPLE); setKind(imp ? imp.kind : "kymo");
+    setTitle(""); setEditingName(false); setShareError(null);
+    synced.current = false; fresh.current = false; userEdited.current = !!imp;
   }, [d]);
 
-  // Shared link: inflate the ?s= payload into the editor.
+  // Shared link: inflate the ?s= payload into the editor. Re-runs on history
+  // navigation (Back from "+ New" must restore the shared content, not the sample).
   useEffect(() => {
-    if (!shared || !sharedSrc) return;
+    if (!shared || !sharedSrc) { setShareError(null); return; }
     let stop = false;
     decodeShare(sharedSrc)
       .then((src) => {
         if (stop) return;
         if (sharedKind && KINDS.some((k) => k.value === sharedKind)) setKind(sharedKind);
-        userEdited.current = true; // shared content is real content — keep the URL live as it's edited
+        userEdited.current = false; // pristine shared content — leave the URL alone until they type
+        setShareError(null);
         setSource(src);
       })
-      .catch(() => { setStatus("Link share không hợp lệ"); setStatusErr(true); });
+      .catch(() => {
+        if (stop) return;
+        setSource(""); // don't show the sample as if it were the shared diagram
+        setShareError("Link chia sẻ không hợp lệ — không đọc được diagram từ URL. Link có thể đã bị cắt ngắn khi gửi.");
+      });
     return () => { stop = true; };
-  }, []); // eslint-disable-line
+  }, [d, sharedSrc, sharedKind]); // eslint-disable-line
 
   const room = useRoom(roomId, idToken, {
     onLive: setLive, // not cleared here: the OLD socket closing on room switch would kill the boot state
@@ -146,7 +161,18 @@ export default function EditorPage() {
       synced.current = true;
       if (fromSelf) return;
       if (k) setKind(k);
-      if (!src.trim()) { fresh.current = true; return; } // brand-new room: keep the sample local until the user edits
+      if (!src.trim()) {
+        fresh.current = true;
+        // "Save a copy" / typed-before-sync: content is already waiting in the editor.
+        // Nothing will touch `source` again, so persist it now instead of on next keystroke.
+        if (userEdited.current) {
+          fresh.current = false;
+          room.sendSource(source, kind);
+          const t2 = kind === "kymo" ? titleFrom(source) : "Untitled";
+          if (t2 !== "Untitled") { setTitle(t2); room.sendRename(t2); }
+        }
+        return;
+      }
       fresh.current = false;
       applyingRemote.current = true;
       setSource(src);
@@ -170,9 +196,10 @@ export default function EditorPage() {
   }, [source, kind]); // eslint-disable-line
 
   // Editing without a room (signed out / shared link): keep the kroki-style ?s=
-  // URL in sync so the address bar is always a working share link.
+  // URL in sync so the address bar is always a working share link. Only after a
+  // real local edit — never rewrite a pristine share URL (Back must keep it intact).
   useEffect(() => {
-    if (d || (!userEdited.current && !shared)) return;
+    if (d || !userEdited.current || !source.trim()) return;
     const t = setTimeout(async () => {
       window.history.replaceState(null, "", shareUrl(kind, await encodeShare(source)));
     }, 300);
@@ -185,9 +212,16 @@ export default function EditorPage() {
     return () => document.removeEventListener("click", h);
   }, []);
 
-  const diagramLabel = title || "Untitled";
+  // Without a room there's no stored title — derive one from the source so share
+  // links and the guest editor aren't a blank "/" in the header (kymo kind only).
+  const localTitle = !d && kind === "kymo" ? titleFrom(source) : "Untitled";
+  const diagramLabel = title || (localTitle !== "Untitled" ? localTitle : "Untitled");
   const booting = (!d && !!idToken && !shared) || syncing; // redirecting to the latest diagram, or waiting for the first doc
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
+
+  useEffect(() => {
+    document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
+  }, [diagramLabel]);
 
   function saveBlob(blob: Blob, name: string) {
     const a = document.createElement("a");
@@ -223,6 +257,13 @@ export default function EditorPage() {
     try { await navigator.clipboard.writeText(url); } catch { window.prompt("Copy link:", url); return; }
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+    if (url.length > 2000) {
+      setStatus(`Đã copy link · ${url.length} ký tự — link dài, một số app chat có thể cắt; cân nhắc Export SVG/PNG`);
+      setStatusErr(true);
+    } else {
+      setStatus("Đã copy link chia sẻ — ai mở cũng xem được, không cần đăng nhập");
+      setStatusErr(false);
+    }
   }
   function exportSource() {
     if (!source.trim()) return;
@@ -230,8 +271,23 @@ export default function EditorPage() {
     saveBlob(new Blob([source], { type: "text/plain;charset=utf-8" }), (diagramLabel || "flowchart") + ext);
   }
   function newDiagram() {
+    if (!idToken) {
+      // Guests have no rooms — a ?d= URL would be a dead room that silently loses
+      // everything typed into it. Reset to a fresh local sample instead.
+      setSource(SAMPLE); setKind("kymo"); setTitle(""); setShareError(null);
+      userEdited.current = false;
+      navigate("/");
+      return;
+    }
     const id = newId();
     assignDiagram(idToken, id, currentWs); // lands in the workspace you're looking at
+    navigate("/?d=" + id);
+  }
+  // Signed-in user viewing a share link: import the shared content into a real room.
+  function saveCopy() {
+    const id = newId();
+    pendingImport.current = { source, kind };
+    assignDiagram(idToken, id, currentWs);
     navigate("/?d=" + id);
   }
   function commitRename(v: string) {
@@ -276,7 +332,7 @@ export default function EditorPage() {
           ) : (
             <span className={"diagram-name editable" + (title ? "" : " untitled")} title="Đổi tên" onClick={() => setEditingName(true)}>{diagramLabel}</span>
           )
-        ) : <span className="diagram-name" />}
+        ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")}>{diagramLabel}</span>}
         <div className="spacer" />
         {!claims && <GoogleButton />}
         {claims && (
@@ -293,8 +349,14 @@ export default function EditorPage() {
             )}
           </div>
         )}
-        <Link className="btn" to="/diagrams">Diagrams</Link>
+        {claims && <Link className="btn" to="/diagrams">Diagrams</Link>}
         <button className="btn-primary" onClick={newDiagram} title="New diagram">+ New</button>
+        {shared && claims && (
+          <button onClick={saveCopy} title="Lưu một bản copy vào Diagrams của bạn">
+            <Save size={16} strokeWidth={2} />
+            Save a copy
+          </button>
+        )}
         <button onClick={copyShareLink} title="Copy link chia sẻ — toàn bộ diagram nằm trong URL, không cần đăng nhập để mở">
           {copied ? <Check size={16} strokeWidth={2.2} /> : <Link2 size={16} strokeWidth={2} />}
           {copied ? "Copied!" : "Share"}
@@ -362,11 +424,14 @@ export default function EditorPage() {
                   {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
                 </select>
               </div>
-              <CodeEditor value={source} kind={kind} onChange={(v) => { userEdited.current = true; setSource(v); }} />
+              <CodeEditor value={source} kind={kind} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
             <div className="splitter" title="Kéo để chỉnh kích thước · double-click về 50/50"
               onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />
-            <section className="pane"><div id="preview" dangerouslySetInnerHTML={{ __html: svg }} /></section>
+            <section className="pane">
+              {shareError && <div className="share-error">{shareError}</div>}
+              <div id="preview" dangerouslySetInnerHTML={{ __html: svg }} />
+            </section>
           </>
         )}
       </main>

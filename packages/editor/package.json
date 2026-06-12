@@ -11,6 +11,7 @@
     "@codemirror/legacy-modes": "^6.5.3",
     "@lezer/highlight": "^1.2.3",
     "codemirror": "^6.0.2",
+    "dompurify": "^3.4.9",
     "kymostudio": "file:../js",
     "kymostudio-core": "file:../rust/kymostudio-core/pkg",
     "lucide-react": "^1.17.0",

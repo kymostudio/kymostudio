@@ -73,7 +73,9 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 #preview { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 28px; background: var(--bg-soft) radial-gradient(circle, var(--border) 1px, transparent 1px); background-size: 24px 24px; }
 #preview svg { max-width: 100%; height: auto; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: 0 12px 36px rgba(36, 33, 49, 0.1); }
 .status { font: 12px/1.5 var(--mono); padding: 7px 14px; border-top: 1px solid var(--border); color: var(--dim); min-height: 28px; white-space: pre-wrap; background: var(--bg); }
-.status.error { color: var(--error); }
+.status.error { color: var(--error); background: rgba(180, 35, 24, 0.06); border-top-color: rgba(180, 35, 24, 0.25); font-weight: 600; }
+/* invalid share link: a banner the user can't miss (the status line races with renders) */
+.share-error { margin: 14px 14px 0; padding: 11px 14px; border: 1px solid rgba(180, 35, 24, 0.3); background: rgba(180, 35, 24, 0.06); color: var(--error); border-radius: 10px; font-size: 13.5px; font-weight: 500; }
 
 /* ---- loading ---- */
 .skeleton { display: inline-block; height: 13px; border-radius: 7px; background: linear-gradient(90deg, var(--bg-raise) 25%, var(--border) 50%, var(--bg-raise) 75%); background-size: 200% 100%; animation: shimmer 1.1s linear infinite; }
@@ -205,3 +207,16 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
 
 /* diagram kind badge on list rows */
 .rkind { flex: none; font-size: 11.5px; font-weight: 600; color: var(--dim); background: var(--bg-raise); border-radius: 999px; padding: 2px 9px; letter-spacing: 0.01em; }
+
+/* ---- mobile: share links are mostly opened from chat on phones ---- */
+@media (max-width: 720px) {
+  header { flex-wrap: wrap; row-gap: 8px; padding: 10px 12px; }
+  main { flex-direction: column; }
+  /* the source pane carries an inline flex-basis from the drag-splitter — override it */
+  .pane { flex: 1 1 50% !important; min-width: 0; min-height: 0; }
+  .pane + .pane { border-left: 0; }
+  /* diagram first: recipients want to see it, not the source */
+  .pane:last-child { order: -1; border-bottom: 1px solid var(--border); }
+  .splitter { display: none; }
+  #preview { padding: 14px; }
+}

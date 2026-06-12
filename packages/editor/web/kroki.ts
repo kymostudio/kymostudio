@@ -1,3 +1,5 @@
+import DOMPurify from "dompurify";
+
 // Diagram kinds: "kymo" renders locally (wasm); everything else goes through
 // the free https://kroki.io render API (POST source, get SVG back).
 export const KINDS: { value: string; label: string }[] = [
@@ -34,6 +36,13 @@ export const KINDS: { value: string; label: string }[] = [
 
 export function kindLabel(kind: string): string {
   return KINDS.find((k) => k.value === kind)?.label ?? kind;
+}
+
+// Kroki SVG is rendered from source we don't control (share links put the source
+// in the URL, so it can be an attacker's). Strip scripts, event handlers and
+// foreignObject before the markup is injected into the page.
+export function sanitizeSvg(svg: string): string {
+  return DOMPurify.sanitize(svg, { USE_PROFILES: { svg: true, svgFilters: true }, ADD_TAGS: ["use"] });
 }
 
 export async function renderKroki(kind: string, source: string): Promise<string> {
