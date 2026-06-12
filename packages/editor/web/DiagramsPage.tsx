@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, GoogleButton } from "./auth";
+import { useAuth } from "./auth";
 import { useWorkspace, assignDiagram } from "./workspace";
 import { kindLabel } from "./kroki";
 import { DIAGRAMS_API } from "./const";
@@ -26,7 +26,7 @@ function timeAgo(ms: number): string {
 }
 
 export default function DiagramsPage() {
-  const { idToken, claims, signOut } = useAuth();
+  const { idToken, claims, signOut, expireSession } = useAuth();
   const { workspaces, currentWs, currentName, setCurrentWs, createWorkspace, renameWorkspace, deleteWorkspace } = useWorkspace();
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
@@ -36,17 +36,23 @@ export default function DiagramsPage() {
 
   useEffect(() => { document.title = "Diagrams · Kymostudio"; return () => { document.title = "Kymostudio"; }; }, []);
 
+  // Auth wall: no session (never signed in, or it just expired) → /login.
+  useEffect(() => {
+    if (!claims) navigate("/login?next=/diagrams", { replace: true });
+  }, [claims, navigate]);
+
   const load = useCallback(async () => {
     if (!idToken) return;
     try {
       const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
-      if (!r.ok) { setError(r.status === 401 ? "Session expired — sign in again." : "Error " + r.status); return; }
+      if (r.status === 401) { expireSession(); return; } // server says expired → the auth wall redirects to /login
+      if (!r.ok) { setError("Error " + r.status); return; }
       const j = await r.json();
       setError("");
       setItems((j.diagrams || []).slice().sort((a: Item, b: Item) => (b.updatedAt || 0) - (a.updatedAt || 0)));
     } catch (e: any) { setError("Error: " + e.message); }
     setLoaded(true);
-  }, [idToken]);
+  }, [idToken, expireSession]);
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
@@ -115,12 +121,7 @@ export default function DiagramsPage() {
           </div>
         </div>
 
-        {!claims ? (
-          <div className="signin">
-            <p className="muted">Sign in with Google to see your diagrams.</p>
-            <GoogleButton />
-          </div>
-        ) : (
+        {!claims ? null /* the auth wall above is redirecting to /login */ : (
           <>
             <div className="ws-bar">
               <button className={"ws-pill" + (currentWs === "" ? " active" : "")} onClick={() => setCurrentWs("")}>Personal</button>

@@ -125,6 +125,10 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .rdel:hover { color: var(--error); background: rgba(180, 35, 24, 0.08); }
 .empty { color: var(--dim); padding: 28px 10px; font-size: 15px; }
 .signin { display: grid; place-items: center; gap: 14px; padding: 90px 0; }
+.login-card { padding: 120px 0 0; text-align: center; }
+.login-card .brand img { width: 44px; height: 44px; }
+.login-card h1 { font-weight: 800; font-size: 28px; letter-spacing: -0.02em; margin: 6px 0 0; }
+.login-card .muted { margin: 0 0 10px; line-height: 1.7; }
 .foot { margin-top: 26px; font-size: 13px; color: var(--dim); display: flex; gap: 10px; align-items: center; }
 .linklike { background: none; border: 0; padding: 0; color: var(--dim); font-size: 13px; font-weight: 400; cursor: pointer; text-decoration: underline; }
 .linklike:hover { color: var(--ink); }
