@@ -197,16 +197,32 @@ function KindsStrip() {
   );
 }
 
-const MCP_SNIPPETS = [
-  { key: "claude", label: "Claude Code", code: `claude mcp add --transport sse kymo \\\n  https://mcp.kymo.studio/sse` },
-  { key: "any", label: "Any MCP client", code: `{ "mcpServers": {\n    "kymo": { "url": "https://mcp.kymo.studio/mcp" }\n} }` },
+// Per-client connect recipes — commands verified against each client's docs.
+const SSE = "https://mcp.kymo.studio/sse";
+const HTTP = "https://mcp.kymo.studio/mcp";
+// btoa('{"url":"https://mcp.kymo.studio/sse"}')
+const CURSOR_DEEPLINK = "cursor://anysphere.cursor-deeplink/mcp/install?name=kymo&config=eyJ1cmwiOiJodHRwczovL21jcC5reW1vLnN0dWRpby9zc2UifQ==";
+const VSCODE_INSTALL = `https://vscode.dev/redirect/mcp/install?name=kymo&config=${encodeURIComponent(JSON.stringify({ type: "sse", url: SSE }))}`;
+
+type Agent = { key: string; label: string; context: string; code: string; deeplink?: { href: string; text: string } };
+const AGENTS: Agent[] = [
+  { key: "claude-code", label: "Claude Code", context: "terminal", code: `claude mcp add --transport sse kymo \\\n  ${SSE}` },
+  { key: "cursor", label: "Cursor", context: "~/.cursor/mcp.json", code: `{ "mcpServers": {\n    "kymo": { "url": "${SSE}" }\n} }`, deeplink: { href: CURSOR_DEEPLINK, text: "Add to Cursor ↗" } },
+  { key: "vscode", label: "VS Code", context: "terminal · Copilot", code: `code --add-mcp \\\n  '{"name":"kymo","type":"sse","url":"${SSE}"}'`, deeplink: { href: VSCODE_INSTALL, text: "Install in VS Code ↗" } },
+  { key: "codex", label: "Codex", context: "terminal", code: `codex mcp add kymo --url ${HTTP}` },
+  { key: "gemini", label: "Gemini CLI", context: "terminal", code: `gemini mcp add --transport sse kymo ${SSE}` },
+  { key: "windsurf", label: "Windsurf", context: "~/.codeium/windsurf/mcp_config.json", code: `{ "mcpServers": {\n    "kymo": { "serverUrl": "${SSE}" }\n} }` },
+  { key: "claude", label: "Claude", context: "web · desktop · mobile", code: `# Settings → Connectors\nAdd custom connector\nURL: ${HTTP}` },
+  { key: "chatgpt", label: "ChatGPT", context: "developer mode", code: `# Settings → Apps → Create\nConnector URL: ${HTTP}` },
+  { key: "any", label: "Any MCP client", context: "mcp.json", code: `{ "mcpServers": {\n    "kymo": { "url": "${HTTP}" }\n} }` },
 ];
 
 function McpTerminal() {
   const [tab, setTab] = useState(0);
   const [copied, setCopied] = useState(false);
+  const agent = AGENTS[tab];
   const copy = () => {
-    const text = MCP_SNIPPETS[tab].code;
+    const text = agent.code;
     const done = () => { setCopied(true); setTimeout(() => setCopied(false), 1600); };
     const fallback = () => {
       const ta = document.createElement("textarea");
@@ -223,21 +239,29 @@ function McpTerminal() {
   };
   return (
     <div className="mcp-snippets">
+      <div className="mcp-agents" role="tablist" aria-label="Pick your agent">
+        {AGENTS.map((a, i) => (
+          <button key={a.key} role="tab" aria-selected={i === tab} className={i === tab ? "mcp-agent active" : "mcp-agent"} onClick={() => { setTab(i); setCopied(false); }}>
+            {a.label}
+          </button>
+        ))}
+      </div>
       <div className="mcp-term">
         <div className="mcp-term-bar">
           <span className="mcp-term-dots" aria-hidden="true"><i /><i /><i /></span>
-          <div className="mcp-tabs" role="tablist" aria-label="Connect snippet">
-            {MCP_SNIPPETS.map((s, i) => (
-              <button key={s.key} role="tab" aria-selected={i === tab} className={i === tab ? "mcp-tab active" : "mcp-tab"} onClick={() => { setTab(i); setCopied(false); }}>
-                {s.label}
-              </button>
-            ))}
-          </div>
+          <span className="mcp-term-label">{agent.context}</span>
           <button className="mcp-copy-btn" onClick={copy} aria-live="polite">{copied ? "Copied ✓" : "Copy"}</button>
         </div>
-        <pre><code>{MCP_SNIPPETS[tab].code}</code></pre>
+        <pre><code>{agent.code}</code></pre>
       </div>
-      <p className="mcp-note">Sign in with Google on first connect — diagrams open live in the editor.</p>
+      <p className="mcp-note">
+        Sign in with Google on first connect — diagrams open live in the editor.
+        {agent.deeplink && (
+          <>
+            {" "}<a className="mcp-deeplink" href={agent.deeplink.href}>{agent.deeplink.text}</a>
+          </>
+        )}
+      </p>
     </div>
   );
 }
@@ -318,8 +342,9 @@ function App() {
             </svg>
             <p>
               kymo runs a hosted <strong>MCP server</strong> at <code>mcp.kymo.studio</code>. Claude
-              Code, Cursor, Copilot — any MCP client — can create and edit your diagrams, rendering
-              live in the editor while the agent types.
+              Code, Cursor, Copilot, Codex — even ChatGPT and Claude in your browser — any MCP
+              client can create and edit your diagrams, rendering live in the editor while the
+              agent types.
             </p>
             <ol className="mcp-steps">
               <li>Add the server to your agent — one line of config.</li>
