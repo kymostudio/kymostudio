@@ -1,7 +1,7 @@
 ---
 title: Kymo DSL Normative-Reference Set — Test Documentation
 document_id: TEST-KYMO-NREF-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-25
 status: Released
 classification: Internal
@@ -33,7 +33,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | TEST-KYMO-NREF-001                                |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
@@ -57,7 +57,7 @@ Verifies the requirements in FEAT-KYMO-NREF-001 (FR/NFR ids). Covers ISO/IEC/IEE
 
 The new set under `docs/formats/kymo-dsl/`; the repointed links across `docs/`,
 `CONTRIBUTING.md`, `CHANGELOG.md`, `.github/`; the spec set under
-`docs/specs/kymo-dsl-nref/` (spec set + `PLAN.md`). Tooling: `grep`/`git
+`docs/specs/kymo-syntax/modules/nref/` (spec set + `PLAN.md`). Tooling: `grep`/`git
 grep`, `git show HEAD:docs/KYMO_DSL.md` for the diff baseline, and the package test
 runners (`uv run --group dev python -m pytest -q`; `npm test`).
 
@@ -71,7 +71,7 @@ runners (`uv run --group dev python -m pytest -q`; `npm test`).
 | **TC-2** | FR-2, NFR-1 | grep | `grep -rn "^document_id: KYMO-DSL-001$" docs/` returns **exactly one** hit — `docs/formats/kymo-dsl/README.md`. Each clause file declares a unique `KYMO-DSL-<X>-001` (`SCOPE`/`NORMREF`/`TERMS`/`ABBR`/`LEX`/`GRAMMAR`/`SEMANTICS`/`AUTHORING`/`CONF`/`EXAMPLES`); no `document_id` is duplicated. |
 | **TC-3** | FR-3 | diff | For each clause, the body between the doc-control table and Annex A is **content-equal** to the matching section of `git show HEAD~:docs/KYMO_DSL.md`, modulo (a) the H1/doc-control/annex wrappers and (b) the `../` → `../../../` path-depth fix. No grammar/EBNF token differs. |
 | **TC-4** | FR-3, NFR-2 | grep | Every anchor in DESIGN §4 Table 4.1 resolves: the verbatim heading text exists in its target clause file (`### 6.4 Leaf Components` in `06-grammar.md`, `### 7.4 Auto-Canvas` in `07-semantics.md`, …), and the repointed guide links carry those exact fragments. |
-| **TC-5** | FR-4, NFR-2 | grep | No link, frontmatter path entry, or URL to the deleted monolith remains: `grep -rn "](.*KYMO_DSL" .` and `grep -rn "/KYMO_DSL\.md" .` (ex `node_modules`) return **0**. Every repointed relative link resolves to an existing file. *(Prose mentions of the historical path inside this `kymo-dsl-nref` set are non-link provenance and are exempt — see `RK-KND-05`.)* |
+| **TC-5** | FR-4, NFR-2 | grep | No link, frontmatter path entry, or URL to the deleted monolith remains: `grep -rn "](.*KYMO_DSL" .` and `grep -rn "/KYMO_DSL\.md" .` (ex `node_modules`) return **0**. Every repointed relative link resolves to an existing file. *(Prose mentions of the historical path inside this nref module's set are non-link provenance and are exempt — see `RK-KND-05`.)* |
 | **TC-6** | NFR-3 | CI | No `.py`/`.ts` file references `KYMO_DSL`. `uv run --group dev python -m pytest -q` and `npm test` are **green** and unchanged from before the restructure. |
 | **TC-7** | FR-5 | grep | The index `README.md` declares `version: "2.6"` and its Annex A holds the **full** revision history (rows 1.0 → 2.6, the 2.6 row describing the split). Each clause file declares `version: "2.6"`. |
 
@@ -105,11 +105,12 @@ investigate, not a re-baseline.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-25 | Vũ Anh | Initial issue — test documentation (TC-1…7 + traceability) for the kymo DSL normative-reference restructure. |
+| 1.1     | 2026-06-12 | Vũ Anh | **Relocated** into `docs/specs/kymo-syntax/modules/nref/` (module of the kymo-syntax umbrella); §2 and Annex B.1 paths updated, TC-5 exemption note reworded for the new location. No test content changed. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/kymo-dsl-nref/03-TEST.md`; authoritative source is
+Version-controlled at `docs/specs/kymo-syntax/modules/nref/03-TEST.md`; authoritative source is
 the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

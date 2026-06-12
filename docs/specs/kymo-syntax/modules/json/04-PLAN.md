@@ -1,7 +1,7 @@
 ---
 title: kymo.json Interchange Format — Plan
 document_id: PLAN-KYMOJSON-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-05-25
 status: Released
 classification: Internal
@@ -33,7 +33,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-KYMOJSON-001                                  |
-| Version      | 1.1                                                |
+| Version      | 1.2                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
@@ -100,7 +100,7 @@ cross-language model conformance gate.
 
 ## 7. Change requests
 
-Changes to the baselined spec (`docs/specs/kymo-json/`) are raised, assessed, and logged in
+Changes to the baselined spec (`docs/specs/kymo-syntax/modules/json/`) are raised, assessed, and logged in
 [`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
 yet — see [`CR/README.md`](CR/README.md).
 
@@ -112,11 +112,12 @@ yet — see [`CR/README.md`](CR/README.md).
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — records the `.kymo.json` feature (P1–P5) complete, cross-language byte parity incl. `layout_trees`. |
 | 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §7 Change-requests (`CR/`). |
+| 1.2     | 2026-06-12 | Vũ Anh | **Relocated** into `docs/specs/kymo-syntax/modules/json/` (the kymo-syntax umbrella's json module). Annex B.1 path updated. No plan content changed. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/kymo-json/PLAN.md`; authoritative source is the
+Version-controlled at `docs/specs/kymo-syntax/modules/json/04-PLAN.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

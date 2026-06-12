@@ -1,7 +1,7 @@
 ---
 title: Kymo DSL Front-End — Plan
 document_id: PLAN-KYMO-DSL-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-05-25
 status: Released
 classification: Internal
@@ -32,7 +32,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-KYMO-DSL-001                                  |
-| Version      | 1.1                                                |
+| Version      | 1.2                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
@@ -113,7 +113,7 @@ the effort and risk; everything else is comparatively mechanical.
 
 ## 7. Change requests
 
-Changes to the baselined spec (`docs/specs/kymo-dsl/`) are raised, assessed, and logged in
+Changes to the baselined spec (`docs/specs/kymo-syntax/modules/dsl/`) are raised, assessed, and logged in
 [`CR/`](CR/) (raise → assess → approve → implement → re-baseline). None raised
 yet — see [`CR/README.md`](CR/README.md).
 
@@ -125,11 +125,12 @@ yet — see [`CR/README.md`](CR/README.md).
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — descriptive plan for the shipped `.kymo` front-end. |
 | 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** Added §7 Change-requests (`CR/`). |
+| 1.2     | 2026-06-12 | Vũ Anh | **Relocated** into `docs/specs/kymo-syntax/modules/dsl/` (the kymo-syntax umbrella's dsl module). Annex B.1 path updated. No plan content changed. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/kymo-dsl/PLAN.md`; authoritative source is the
+Version-controlled at `docs/specs/kymo-syntax/modules/dsl/04-PLAN.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

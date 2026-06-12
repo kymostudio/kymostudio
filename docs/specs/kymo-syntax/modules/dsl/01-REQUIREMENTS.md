@@ -1,8 +1,8 @@
 ---
 title: Kymo DSL Front-End — Requirements
 document_id: FEAT-KYMO-DSL-001
-version: "2.0"
-issue_date: 2026-06-06
+version: "2.1"
+issue_date: 2026-06-12
 status: Released
 classification: Internal
 owner: diagrams/ project
@@ -14,6 +14,8 @@ related_documents:
   - TEST-KYMO-DSL-001        # Test documentation
   - PLAN-KYMO-DSL-001        # Plan
   - FEAT-BPMN-DSL-001        # bpmn { } block requirements (delegated subset)
+  - FEAT-KYMO-SYNTAX-001     # Parent umbrella (this folder is its dsl module)
+  - FEAT-KYMO-NREF-001       # Sibling nref module — the normative-reference restructure
   - KYMOJSON-MAP-001         # .kymo.json — serialization of the resolved model
 authors:
   - Vũ Anh
@@ -39,11 +41,11 @@ iso_compliance:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KYMO-DSL-001` |
-| Version           | 2.0 |
+| Version           | 2.1 |
 | Status            | Released |
-| Issue Date        | 2026-06-06 |
+| Issue Date        | 2026-06-12 |
 | Owner             | `diagrams/` project |
-| Related Documents | DESIGN-TEST-PLAN-KYMO-DSL-001; FEAT-BPMN-DSL-001; KYMOJSON-MAP-001 |
+| Related Documents | DESIGN-TEST-PLAN-KYMO-DSL-001; FEAT-KYMO-SYNTAX-001 (umbrella); FEAT-BPMN-DSL-001; FEAT-KYMO-NREF-001 (sibling module); KYMOJSON-MAP-001 |
 
 ---
 
@@ -206,8 +208,13 @@ Cross-document references use **`document_id`** (never file paths); the numeric 
 reading-order aid only. The normative grammar (EBNF + statement semantics) is **KYMO-DSL-001**; this
 set references it rather than restating it.
 
+**Umbrella.** This set is the `dsl` module of the **kymo-syntax** feature (`FEAT-KYMO-SYNTAX-001`),
+which groups the syntax surfaces of the resolved model: this DSL front-end (`modules/dsl/`), the
+`.kymo.json` interchange format (`modules/json/`, `FEAT-KYMOJSON-001`), and the completed
+`KYMO-DSL-001` reference restructure (`modules/nref/`, `FEAT-KYMO-NREF-001`).
+
 **Change management:** a change to this baselined spec is raised as a change-request in
-`docs/specs/kymo-dsl/CR/` and re-baselined (bump version + record in Annex A).
+`docs/specs/kymo-syntax/modules/dsl/CR/` and re-baselined (bump version + record in Annex A).
 
 ---
 
@@ -363,12 +370,13 @@ surface that meets those needs; the scope/out-of-scope boundary is in §4.
 | 1.1     | 2026-05-25 | Vũ Anh | **Doc reorganization.** §6 reworked to a document map that defers the ISO/lifecycle model to the standard and adds `00-PRODUCT` (`FEAT-KYMO-DSL-001`) + a change-management pointer to `docs/specs/kymo-dsl/CR/`; §1 reading map updated to include the product description. (FEAT-KYMO-DSL-001 v1.1) |
 | 0.1     | 2026-05-25 | Vũ Anh | Initial product description. Extracted from `FEAT-KYMO-DSL-001` §1–§3 (purpose/background/concept) and `FEAT-KYMO-DSL-001` §1 (scope & stakeholder needs); minted feature-scoped needs `SN-KYMO-DSL-01..04`. (FEAT-KYMO-DSL-001 v0.1) |
 | 2.0     | 2026-06-06 | Vũ Anh | **Consolidation.** Merged `00-PRODUCT.md` (FEAT-KYMO-DSL-001), `01-INTRO.md` (FEAT-KYMO-DSL-001), and `02-FEATURE.md` (FEAT-KYMO-DSL-001) into this single `01-REQUIREMENTS.md` under the 4-file spec structure. Content losslessly preserved as Part A (ConOps/StRS), Part B (Introduction), and Part C (SRS). |
+| 2.1     | 2026-06-12 | Vũ Anh | **Folder merge into the kymo-syntax umbrella.** Relocated `docs/specs/kymo-dsl/` → `docs/specs/kymo-syntax/modules/dsl/`, alongside the sibling modules `json/` (ex `docs/specs/kymo-json/`, `*-KYMOJSON-001`) and `nref/` (ex `docs/specs/kymo-dsl-nref/`, `*-KYMO-NREF-001`) under the new `FEAT-KYMO-SYNTAX-001` parent set. Added the §6 Umbrella note; related documents gained `FEAT-KYMO-SYNTAX-001` and `FEAT-KYMO-NREF-001`; self-paths updated (incl. fixing the stale `03-DESIGN`/`04-TEST`/`PLAN.md` filenames in Annex B.1 of the siblings). No requirement content changed; all `*-KYMO-DSL-001` document_ids unchanged. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
 Version-controlled in the project repository at
-`docs/specs/kymo-dsl/01-REQUIREMENTS.md`; the authoritative source is the main-branch
+`docs/specs/kymo-syntax/modules/dsl/01-REQUIREMENTS.md`; the authoritative source is the main-branch
 working tree, with history via `git log`.
 
 ### B.2 Distribution

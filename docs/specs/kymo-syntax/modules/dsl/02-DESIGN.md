@@ -1,7 +1,7 @@
 ---
 title: Kymo DSL Front-End — Design
 document_id: DESIGN-KYMO-DSL-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -36,7 +36,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | DESIGN-KYMO-DSL-001                                |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
@@ -171,11 +171,12 @@ dual-sourced: a change to `dsl.py` is reconciled into KYMO-DSL-001 in lockstep
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — design of the shipped `.kymo` front-end. |
+| 1.1     | 2026-06-12 | Vũ Anh | **Relocated** into `docs/specs/kymo-syntax/modules/dsl/` (the kymo-syntax umbrella's dsl module). Annex B.1 path updated. No design content changed. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/kymo-dsl/03-DESIGN.md`; authoritative source is
+Version-controlled at `docs/specs/kymo-syntax/modules/dsl/02-DESIGN.md`; authoritative source is
 the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution
