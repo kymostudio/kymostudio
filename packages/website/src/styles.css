@@ -60,18 +60,18 @@ nav {
 .nav-inner {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 16px var(--pad);
+  padding: 22px var(--pad);
   display: flex; align-items: center; justify-content: space-between;
 }
 .brand {
-  font-weight: 800; font-size: 21px;
-  display: flex; align-items: center; gap: 10px;
+  font-weight: 800; font-size: 26px;
+  display: flex; align-items: center; gap: 12px;
   color: var(--ink);
   letter-spacing: -0.02em;
 }
-.brand img { width: 34px; height: 34px; display: block; }
-.nav-right { display: flex; align-items: center; gap: 26px; }
-.nav-links { display: flex; gap: 26px; font-size: 14.5px; }
+.brand img { width: 42px; height: 42px; display: block; }
+.nav-right { display: flex; align-items: center; gap: 30px; }
+.nav-links { display: flex; gap: 30px; font-size: 16px; }
 .nav-links a { color: var(--dim); font-weight: 500; }
 .nav-links a:hover { color: var(--accent); text-decoration: none; }
 
@@ -102,7 +102,7 @@ nav {
   border-color: var(--accent); color: var(--accent);
   box-shadow: 0 6px 16px rgba(36, 33, 49, 0.08);
 }
-.btn-sm { padding: 8px 16px; font-size: 13.5px; }
+.btn-sm { padding: 11px 22px; font-size: 15px; }
 .btn-pill { border-radius: 999px; }
 
 /* ── Hero ────────────────────────────────────────────────────── */
