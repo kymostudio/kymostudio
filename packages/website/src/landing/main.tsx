@@ -155,7 +155,7 @@ function App() {
           </g>
         </svg>
         <div className="hero-text">
-          <p className="eyebrow"><span className="eyebrow-dot" />MCP server · diagram-as-code · animated SVG</p>
+          <p className="eyebrow"><span className="eyebrow-dot" />The diagram studio for coding agents</p>
           <h1>
             <span className="name">KymoStudio</span><br />
             <span className="strap">Diagram <em>superpowers</em></span>

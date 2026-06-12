@@ -12,7 +12,7 @@ colour palette.
 | **Tagline** | `Diagram superpowers` | banner/hero assets (this folder), landing-hero strap, GitHub repo description, docs site description, User Guide intro |
 | **Slogan** | `Prompt it. See it appear. Watch it animate.` | landing hero lead, root README, package registry descriptions (PyPI / npm / crates.io / VS Code Marketplace) |
 | **Positioning** | the diagram renderer for **coding agents** — connect them over MCP; output is a self-contained, animated SVG *file*, not a canvas locked in a platform | strategy direction (`RES-STRATEGY-001`); landing eyebrow + `#mcp` section; README intro + Features |
-| **Eyebrow / keywords** | `MCP server · diagram-as-code · animated SVG` | landing hero eyebrow |
+| **Eyebrow** | `The diagram studio for coding agents` — a category phrase (tldraw/Linear pattern), not a keyword list; "studio" echoes the wordmark ("renderer" stays the technical term in strategy docs) | landing hero eyebrow |
 | **One-liner** (listings) | `Generate animated SVG diagrams from text — or from coding agents over MCP. Diagram-as-code with PNG, WebP, Figma & Excalidraw export.` | GitHub repo About |
 
 Rules of thumb:
