@@ -72,21 +72,21 @@ def _report(q: dict, p: dict) -> str:
         "",
         "## Performance — cold load on Fast 4G (medians)",
         "",
-        "| Scenario | reps (failed) | TTFB | FCP | kroki sent | kroki done | **diagram visible** | wire KB (engine KB) |",
+        "| Scenario | reps (failed) | TTFB_MS | FCP_MS | KROKI_SENT_MS | KROKI_DONE_MS | **DIAGRAM_VISIBLE_MS** | WIRE_TOTAL_KB (WIRE_ENGINE_KB) |",
         "|---|---|---|---|---|---|---|---|",
     ]
     for r in p["scenarios"]:
         md = r["median"]
         lines.append(
-            f"| {r['key']} | {r['reps']} ({r['failed_reps']}) | {_fmt(md['ttfb_ms'])} ms | {_fmt(md['fcp_ms'])} ms "
-            f"| {_fmt(md['kroki_start_ms'])} ms | {_fmt(md['kroki_end_ms'])} ms | **{_fmt(md['diagram_ms'])} ms** "
-            f"| {_fmt(md['transfer_kb_total'])} ({_fmt(md['engine_transfer_kb'])}) |"
+            f"| {r['key']} | {r['reps']} ({r['failed_reps']}) | {_fmt(md['TTFB_MS'])} ms | {_fmt(md['FCP_MS'])} ms "
+            f"| {_fmt(md['KROKI_SENT_MS'])} ms | {_fmt(md['KROKI_DONE_MS'])} ms | **{_fmt(md['DIAGRAM_VISIBLE_MS'])} ms** "
+            f"| {_fmt(md['WIRE_TOTAL_KB'])} ({_fmt(md['WIRE_ENGINE_KB'])}) |"
         )
     lines += [
         "",
-        "Metric of record is **diagram visible** — first SVG in the preview pane.",
-        "`kroki done − kroki sent` is kroki.io's own server-side render; the editor",
-        "controls everything to the left of it (see `research/` for the analyses).",
+        "Metric of record is **DIAGRAM_VISIBLE_MS** — first SVG in the preview pane.",
+        "`KROKI_DONE_MS − KROKI_SENT_MS` is kroki.io's own server-side render; the",
+        "editor controls everything to the left of it (see `research/` for the analyses).",
         "",
     ]
     return "\n".join(lines)

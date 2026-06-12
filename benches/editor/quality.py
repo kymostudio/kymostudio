@@ -43,12 +43,12 @@ RETRIES = 1  # re-run a scenario once if it failed on a kroki server error
 def _grade(scn: dict, obs: dict) -> dict:
     missing = [l for l in scn["expect_labels"] if l not in obs["preview_text"]]
     checks = {
-        "rendered": obs["diagram_ms"] is not None,
+        "rendered": obs["DIAGRAM_VISIBLE_MS"] is not None,
         "labels": not missing,
         "engine_chunk": obs["engine_fetched"] == scn["expect_engine_chunk"],
     }
     if scn["expect_early_adopted"] is True:
-        checks["early_adopted"] = obs["early_kroki"] == "undefined" and obs["diagram_ms"] is not None
+        checks["early_adopted"] = obs["early_kroki"] == "undefined" and obs["DIAGRAM_VISIBLE_MS"] is not None
     return {
         "key": scn["key"],
         "title": scn["title"],
@@ -58,7 +58,7 @@ def _grade(scn: dict, obs: dict) -> dict:
         "engine_fetched": obs["engine_fetched"],
         "status": obs["status"],
         "share_error": obs["share_error"],
-        "infra_error": bool(obs["status_error"]) and obs["diagram_ms"] is None,
+        "infra_error": bool(obs["status_error"]) and obs["DIAGRAM_VISIBLE_MS"] is None,
     }
 
 
