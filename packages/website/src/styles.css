@@ -71,12 +71,26 @@ nav {
 }
 .brand img { width: 42px; height: 42px; display: block; }
 .nav-right { display: flex; align-items: center; gap: 30px; }
-.nav-links { display: flex; gap: 30px; font-size: 16px; }
-.nav-links a { color: var(--dim); font-weight: 500; }
-.nav-links a:hover { color: var(--accent); text-decoration: none; }
-.nav-gh { display: flex; align-items: center; color: var(--dim); }
-.nav-gh:hover { color: var(--accent); }
+.nav-gh {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 12px 10px 16px;
+  border-radius: var(--radius);
+  background: var(--ink); color: #fff;
+  font-size: 15px; font-weight: 700;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.nav-gh:hover {
+  text-decoration: none; transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(36, 33, 49, 0.25);
+}
+.nav-gh:active { transform: translateY(0) scale(0.98); }
 .nav-gh svg { display: block; }
+.nav-gh-count {
+  background: var(--teal); color: var(--ink);
+  border-radius: 999px;
+  padding: 2px 11px;
+  font-size: 13.5px; font-weight: 700;
+}
 
 /* ── Buttons ─────────────────────────────────────────────────── */
 .btn {
