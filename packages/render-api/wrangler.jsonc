@@ -1,0 +1,15 @@
+// Kroki-compatible render API: kymo/mermaid/d2/graphviz/bpmn render right here
+// (kymostudio JS engine + kymostudio-core wasm), every other kroki kind is
+// proxied to kroki.io — all behind one content-hash edge cache.
+//
+// The wasm module rides in via wrangler's built-in CompiledWasm rule (~6 MB raw
+// / ~2 MB compressed upload). Fonts ship as Data modules: the wasm build has no
+// system fonts, so they're registered into the rasterizer at init (registerFont).
+{
+  "name": "kymo-render-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-01",
+  "rules": [{ "type": "Data", "globs": ["**/*.ttf"], "fallthrough": true }],
+  "routes": [{ "pattern": "kroki.kymo.studio", "custom_domain": true }],
+  "observability": { "enabled": true }
+}
