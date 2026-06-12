@@ -1,7 +1,7 @@
 ---
 title: Editor Share — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KSHARE-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-12
 status: Implemented
 classification: Internal
@@ -43,7 +43,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KSHARE-001` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KRENDER-001` (sibling — render & editing surface), `FEAT-KLIVE-001` (sibling — accounts & live documents), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KEMCP-001` (sibling — MCP channel), `REF-KROKI-001` (the encoding it stays compatible with) |
@@ -113,7 +113,7 @@ Cross-module seams: the SVG being exported is the last successful render from **
 
 ### B.4 Status & ownership
 
-- **Status:** Implemented — **as-built carve-out**; shipped under kymo-editor P6 (export) + P9 (URL sharing) (`PLAN-KEDITOR-001`). **Note:** the post-v0.2 commits `6577011`/`607b156` (share popover with copy variants; auto-copy on open) land on this surface and are the first candidate re-baseline of this module.
+- **Status:** Implemented — **as-built carve-out**; shipped under kymo-editor P6 (export) + P9 (URL sharing) + P10 (share popover — see `PLAN-KEDITOR-001` v0.3). The popover commits `6577011`/`607b156` flagged at v0.1 as the first candidate re-baseline are folded in as of v0.2 (`FR-SH-03`).
 - **Owner:** `diagrams/` project (Vũ Anh).
 - **Traceability:** `FR-SH-*` are covered by `TEST-KEDITOR-001` TC-KE-04, 15, 16, 23 (via the former IDs in its matrix).
 - **Change management:** changes are raised as CRs under `docs/specs/kymo-editor/CR/` (umbrella) or module-local `CR/` once this doc-set grows, and re-baselined here (bump version + Annex A).
@@ -130,7 +130,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 |----|-------------|-------------|
 | **FR-SH-01** | The editor SHALL encode share links **kroki-style**: source → raw-deflate (`CompressionStream("deflate")`, zlib) → **base64url** (`+`→`-`, `/`→`_`, padding stripped) → `/?s=<payload>`, with `&k=<kind>` prepended for non-kymo kinds (omitted for kymo). Decoding SHALL accept payloads lifted from kroki.io GET URLs unchanged; an undecodable payload SHALL surface as a status-line error. | SN-SH-02 |
 | **FR-SH-02** | When editing **without a room** (signed out, or a shared link), the editor SHALL keep the address bar a **working share link** — re-encoding into `?s=` via `history.replaceState` on a 300 ms debounce. A `?d=` room link takes precedence over `?s=` when both are present. | SN-SH-02 |
-| **FR-SH-03** | A **Share** action SHALL copy the current share URL to the clipboard (with a prompt fallback) and confirm visually ("Copied!"). | SN-SH-01, SN-SH-02 |
+| **FR-SH-03** | The **Share** action SHALL open a **popover** that copies the share URL to the clipboard immediately on open (with a prompt fallback) and confirms visually. The popover SHALL offer: the URL in a select-on-focus field with a **Copy** button; a **length warning** when the link exceeds 2 000 characters (chat apps may truncate); **Copy Markdown link** (`[<title>](<url>)`); and — for non-kymo kinds — **Copy Markdown image**, a kroki.io **GET** URL (`https://kroki.io/<kind>/svg/<payload>`) built from the same `?s=` payload (the `NFR-SH-01` interchange, usable directly in a GitHub README). *(v0.2: popover with copy variants + auto-copy replaces the v0.1 single copy-button — commits `6577011`/`607b156`.)* **Known gap:** kroki.io enforces a server-side URL-length limit (~4 k) on GET renders; a long source can produce a Markdown image link that kroki refuses, and the 2 000-character warning currently covers only the editor link, not the GET URL. | SN-SH-01, SN-SH-02 |
 
 ### C.2 Functional requirements — Export (`FR-SH-04..06`)
 
@@ -149,7 +149,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 ### C.4 Acceptance criteria (module-level)
 
 1. Signed out: editing keeps the address bar a working `?s=` link; opening that link in a private window reproduces the diagram (source + kind); a kroki.io GET payload pasted into `?s=` decodes; a corrupted payload shows the invalid-link error.
-2. Share copies the working URL to the clipboard with visible confirmation; with clipboard blocked, the prompt fallback appears.
+2. Opening Share puts the working URL straight in the clipboard and shows the popover (URL field, Copy, Markdown-link variant; Markdown-image variant for non-kymo kinds); with clipboard blocked, the prompt fallback appears; a link over 2 000 characters shows the truncation warning.
 3. Export produces `<title>.svg` (bytes equal the displayed SVG), `<title>.png` at 2× on white, and the source file named by kind.
 
 ---
@@ -159,3 +159,4 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-12 | Vũ Anh | Initial **as-built carve-out** from `FEAT-KEDITOR-001` v0.2 under the kymo-editor umbrella decomposition. Re-homes `SN-KE-02/10/11 → SN-SH-01..03`, `FR-KE-25/26/27/03/28/29 → FR-SH-01..06`, `NFR-KE-07 → NFR-SH-01`. Stub doc-set (01 only); design/V&V remain in `DESIGN-KEDITOR-001` / `TEST-KEDITOR-001`. Post-v0.2 share-popover commits noted as the first candidate re-baseline. |
+| 0.2     | 2026-06-12 | Vũ Anh | **Re-baseline `FR-SH-03` to the shipped share popover** (commits `6577011`/`607b156`, P10 in `PLAN-KEDITOR-001` v0.3): auto-copy on open, URL field + Copy, > 2 000-char truncation warning, Copy Markdown link, and Copy Markdown image (kroki.io GET URL from the same `?s=` payload — the `NFR-SH-01` interchange). Recorded the known gap that kroki.io's ~4 k GET URL limit is not separately warned about. Acceptance #2 updated; TC-KE-16 revised in `TEST-KEDITOR-001` v0.3. |

@@ -1,7 +1,7 @@
 ---
 title: Editor Render — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KRENDER-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-12
 status: Implemented
 classification: Internal
@@ -38,6 +38,8 @@ keywords:
   - samples
   - codemirror
   - splitter
+  - dompurify
+  - svg-sanitization
 ---
 
 # Editor Render — Requirements (ConOps, StRS & SRS)
@@ -45,7 +47,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KRENDER-001` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KSHARE-001` (sibling — sharing & export), `FEAT-KLIVE-001` (sibling — accounts & live documents), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KEMCP-001` (sibling — MCP channel), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine reused unchanged), `REF-KROKI-001` (the external render gateway) |
@@ -128,7 +130,7 @@ kymo-editor (FEAT-KEDITOR-001) → UMBRELLA — the shipped editor.kymo.studio p
 
 - **Status:** Implemented — **as-built carve-out**; shipped under kymo-editor P2 + P7 (`PLAN-KEDITOR-001`). No new code is implied by the split.
 - **Owner:** `diagrams/` project (Vũ Anh).
-- **Traceability:** `FR-RD-*` are covered by `TEST-KEDITOR-001` TC-KE-01..03, 05, 06, 17, 18 (via the former IDs in its matrix).
+- **Traceability:** `FR-RD-*` are covered by `TEST-KEDITOR-001` TC-KE-01..03, 05, 06, 17, 18 (via the former IDs in its matrix) and TC-KE-24 (FR-RD-09, sanitization).
 - **Change management:** changes are raised as CRs under `docs/specs/kymo-editor/CR/` (umbrella) or module-local `CR/` once this doc-set grows, and re-baselined here (bump version + Annex A).
 
 ---
@@ -137,7 +139,7 @@ kymo-editor (FEAT-KEDITOR-001) → UMBRELLA — the shipped editor.kymo.studio p
 
 Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KEDITOR-001` v0.2 (internal references rewritten to module IDs).
 
-### C.1 Functional requirements — Render (`FR-RD-01..04`)
+### C.1 Functional requirements — Render (`FR-RD-01..04`, `FR-RD-09`)
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
@@ -145,6 +147,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 | **FR-RD-02** | The editor SHALL re-render on input with a debounce of **120 ms for kymo** and **450 ms for kroki kinds**, SHALL discard stale async render responses (a sequence guard), and SHALL show a status line `OK · <n> bytes · <ms>ms` on success. | SN-RD-01 |
 | **FR-RD-03** | The editor SHALL resolve icon art from a CDN base URL (`setIconBaseURL` → jsDelivr `gh/kymostudio/kymostudio@main/packages/icons`), so no icon assets are bundled or served locally. | SN-RD-02 |
 | **FR-RD-04** | On a parse/render error (engine exception or a kroki error response), the editor SHALL surface the message in the status line (error state) and SHALL NOT crash the page. | SN-RD-01 |
+| **FR-RD-09** | SVG returned by kroki.io is **third-party markup rendered from source the editor does not control** (a `?s=` share link can carry anyone's source — see `FEAT-KSHARE-001`). Before injection into the page, the editor SHALL **sanitize** it with DOMPurify (`USE_PROFILES: svg + svgFilters + html`), stripping scripts, event handlers, and `javascript:` URLs. `foreignObject` SHALL be **preserved** (Mermaid `htmlLabels` puts every node/edge label in HTML inside one) with its HTML content sanitized via the html profile (`HTML_INTEGRATION_POINTS` extended to `foreignobject`, which DOMPurify excludes by default). Kymo output (the local, trusted engine) does not pass through sanitization. *(As-built: commits `51d08ec`, `a5ff7b5` — module-native requirement, no former `FR-KE` id.)* | SN-RD-03 |
 
 ### C.2 Functional requirements — Diagram kinds & samples (`FR-RD-05..06`)
 
@@ -173,6 +176,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 2. Switching the kind to (e.g.) Mermaid loads the Mermaid sample, renders it via kroki.io, and switches the syntax highlighting; a slow kroki response never paints over a newer one.
 3. Line numbers, undo/redo, bracket match, and Tab-indent work; the splitter drags (clamped 15–85 %), persists across reload, and resets on double-click.
 4. Malformed source (kymo or kroki) surfaces in the status line without crashing the page.
+5. A kroki SVG carrying `<script>`, event-handler attributes, or `javascript:` URLs renders with all of them stripped — nothing executes in the preview; ordinary Mermaid `htmlLabels` (foreignObject) still display.
 
 ---
 
@@ -181,3 +185,4 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-12 | Vũ Anh | Initial **as-built carve-out** from `FEAT-KEDITOR-001` v0.2 under the kymo-editor umbrella decomposition. Re-homes `SN-KE-01/06/09/12 → SN-RD-01..04`, `FR-KE-01/02/04/05/13/14/15/16 → FR-RD-01..08`, `NFR-KE-01/05 → NFR-RD-01..02`. Stub doc-set (01 only); design/V&V remain in `DESIGN-KEDITOR-001` / `TEST-KEDITOR-001`. |
+| 0.2     | 2026-06-12 | Vũ Anh | **As-built reconciliation: third-party SVG sanitization.** Added **`FR-RD-09`** — kroki SVG is sanitized with DOMPurify before DOM injection (scripts/handlers/`javascript:` stripped; `foreignObject` preserved with html-profile-sanitized content for Mermaid `htmlLabels`); kymo output stays unsanitized (trusted local engine). Module-native id (no former `FR-KE`); shipped in commits `51d08ec`/`a5ff7b5` but previously undocumented. Added acceptance #5; traceability extended to TC-KE-24 (`TEST-KEDITOR-001` v0.3); see ADR-9 in `DESIGN-KEDITOR-001` v0.3. |

@@ -1,7 +1,7 @@
 ---
 title: Kymo Editor (editor.kymo.studio) — Verification & Validation
 document_id: TEST-KEDITOR-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-12
 status: Implemented
 classification: Internal
@@ -36,7 +36,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | `TEST-KEDITOR-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (requirements), `DESIGN-KEDITOR-001` (design), `PLAN-KEDITOR-001` (plan) |
@@ -72,7 +72,7 @@ keywords:
 | **TC-KE-13** | Transports & routing | `/mcp` completes a Streamable-HTTP MCP handshake behind OAuth (`/authorize` → GIS → `/token`); `/sse` serves the legacy transport; `/` returns the banner; `/set`/`/get` are **not** reachable as public Worker routes (404). | FR-KE-11, FR-KE-12 |
 | **TC-KE-14** | Deploy shape | A push touching `packages/editor/web/**` triggers `deploy-editor.yml`: wasm → js → `build.sh` → `pages deploy` to project `kymo-editor`. `dist/` contains the SPA `_redirects`, cache-busted asset URLs, and a separate `chunks/engine-*.js`. | NFR-KE-02, NFR-KE-03 |
 | **TC-KE-15** | Share round-trip | Edit signed-out → address bar gains `?s=` (300 ms); open that URL in a private window → identical source + kind restored; a kroki.io GET payload pasted into `?s=` decodes; a corrupted payload shows the invalid-link error. | FR-KE-25, FR-KE-26, NFR-KE-07 |
-| **TC-KE-16** | Share button | Share → clipboard holds the working URL, "Copied!" confirms; with clipboard blocked, the prompt fallback appears. | FR-KE-27 |
+| **TC-KE-16** | Share popover | Open Share → the working URL is already in the clipboard and the popover shows it (select-on-focus field + Copy, per-variant "Copied" state); Copy Markdown link yields `[<title>](<url>)`; on a non-kymo kind, Copy Markdown image yields a `https://kroki.io/<kind>/svg/<payload>` GET URL that renders the same diagram when fetched; a link > 2 000 chars shows the truncation warning; with clipboard blocked, the prompt fallback appears. | FR-KE-27 (re-baselined as `FR-SH-03` v0.2) |
 | **TC-KE-17** | Kind switch + samples | Select Mermaid → Mermaid sample loads, renders via kroki.io, syntax highlight switches; the library row shows the kind badge. `?k=` on a share link restores the kind (unknown `k` ignored → kymo). | FR-KE-13, FR-KE-14, FR-KE-15 |
 | **TC-KE-18** | Editing surface | Line numbers, undo/redo (Ctrl/Cmd-Z), bracket match, Tab indents; drag the splitter (clamps 15–85 %), reload → position kept; double-click → 50/50. | FR-KE-15, FR-KE-16 |
 | **TC-KE-19** | Ownership enforcement | Account B opens A's `?d=` URL → WS refused (403), no content leaks; B's REST `DELETE`/`PATCH` on A's diagram → 403/forbidden; B's MCP `edit_diagram(id)` → "isn't yours". | FR-KE-19, NFR-KE-06 |
@@ -80,6 +80,7 @@ keywords:
 | **TC-KE-21** | Library page | `/diagrams`: rows sorted by recency with relative times; search filters by title; switching workspace tabs filters; move selector re-homes a row; delete (with confirm) removes row + room; window re-focus refreshes the list. | FR-KE-20 |
 | **TC-KE-22** | Workspaces | Create (name ≤ 40), rename, delete a workspace; deletion moves its diagrams back to Personal; + New lands in the selected workspace; a deleted-but-stored `kymo_ws` falls back to Personal. | FR-KE-23, FR-KE-24 |
 | **TC-KE-23** | PNG / source export | Export → To PNG → `<title>.png` at 2× with white background; Export → Source → `<title>.kymo` (kymo) / `<title>.<kind>.txt` (other kinds), bytes equal the buffer. | FR-KE-28, FR-KE-29 |
+| **TC-KE-24** | Kroki SVG sanitization | Craft a Mermaid (or other kroki-kind) source whose labels embed `<script>`, an event-handler attribute (e.g. `onload`/`onerror`), and a `javascript:` link; open it via a `?s=` share link in a fresh session → the diagram renders but **nothing executes** and the injected preview DOM contains no script/handler/`javascript:` URL; an ordinary Mermaid diagram with `htmlLabels` (foreignObject) still shows all its labels. | FR-RD-09 (`FEAT-KRENDER-001` v0.2), NFR-KE-06 |
 
 ## 3. Regression gates (must stay green)
 
@@ -98,7 +99,7 @@ If an engine gate moves because of an editor change, the change is **out of scop
 - **NFR-KE-03 (portability):** inspect `dist/` — SPA shell + split chunks, engine (wasm-inlined) in its own chunk, `?v=` cache-busted URLs; load `/diagrams` cold and confirm the engine chunk is not fetched.
 - **NFR-KE-04 (reliability):** TC-KE-09 — DO hibernation/restore plus the D1 flush on disconnect.
 - **NFR-KE-05 (compatibility):** §3 regression gates — kymo output is the unchanged `kymostudio` engine.
-- **NFR-KE-06 (security):** TC-KE-19; additionally confirm a forged/expired ID token is rejected (401) on `/ws` and `/api/*`.
+- **NFR-KE-06 (security):** TC-KE-19; additionally confirm a forged/expired ID token is rejected (401) on `/ws` and `/api/*`. Client-side, TC-KE-24 covers the third-party-SVG surface (kroki output sanitized before DOM injection — FR-RD-09).
 - **NFR-KE-07 (share compatibility):** TC-KE-15's kroki-payload interchange in both directions.
 
 ## 5. Traceability matrix
@@ -134,12 +135,13 @@ If an engine gate moves because of an editor change, the change is **out of scop
 | FR-KE-27 | TC-KE-16 |
 | FR-KE-28 | TC-KE-23 |
 | FR-KE-29 | TC-KE-23 |
+| FR-RD-09 (`FEAT-KRENDER-001`) | TC-KE-24 |
 | NFR-KE-01 | TC-KE-02, TC-KE-03 |
 | NFR-KE-02 | TC-KE-14 |
 | NFR-KE-03 | TC-KE-14, §4 |
 | NFR-KE-04 | TC-KE-09 |
 | NFR-KE-05 | §3 regression gates |
-| NFR-KE-06 | TC-KE-19, §4 |
+| NFR-KE-06 | TC-KE-19, TC-KE-24, §4 |
 | NFR-KE-07 | TC-KE-15 |
 
 ---
@@ -150,3 +152,4 @@ If an engine gate moves because of an editor change, the change is **out of scop
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-10 | Vũ Anh | Initial V&V. `TC-KE-01..14` covering client render/debounce/offline/download/error, two-tab live sync, empty-room seed, persist/replay, reconnect, `set_diagram`/`get_diagram`, transports, and deploy shape. Regression gates pin the unchanged engine output. Full FR/NFR → TC traceability. |
 | 0.2     | 2026-06-12 | Vũ Anh | **Re-baseline alongside `FEAT-KEDITOR-001` v0.2.** Revised `TC-KE-02` (per-kind debounce + stale guard), `TC-KE-04` (title-named SVG), `TC-KE-07..09` (per-diagram rooms, lazy-seed + auto-title, DO + D1 persistence), `TC-KE-10` (socket-loss expectation — **no timed reconnect**, replacing the v0.1 reconnect case), `TC-KE-11..13` (per-user MCP tool set behind OAuth; `/set`/`/get` no longer public), `TC-KE-14` (split chunks + cache-bust). Added `TC-KE-15..23` (share round-trip + button, kinds/samples/highlighting, editing surface, ownership, sign-in/out, library, workspaces, PNG/source export). Strategy now states honestly that `packages/editor` has **no automated suite** (manual procedures + engine/deploy gates) and names the automation candidates. Traceability extended to `FR-KE-13..29`, `NFR-KE-06..07`. |
+| 0.3     | 2026-06-12 | Vũ Anh | **Kroki-integration reconciliation.** Added **`TC-KE-24`** — kroki SVG sanitization (malicious `?s=` source → scripts/handlers/`javascript:` stripped, nothing executes; Mermaid `htmlLabels` foreignObject content survives) — covering the previously untested `FR-RD-09` (`FEAT-KRENDER-001` v0.2) and extending the NFR-KE-06 surface client-side. Revised **`TC-KE-16`** to the shipped share popover (auto-copy on open, Markdown link/image variants incl. the kroki.io GET URL, > 2 000-char warning — `FR-SH-03`, `FEAT-KSHARE-001` v0.2). Traceability rows added for both. |
