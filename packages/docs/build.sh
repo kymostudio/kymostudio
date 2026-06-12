@@ -25,7 +25,7 @@ cp -R content/. site/
 # Rendered sample images referenced by content/ pages (served from /samples/).
 mkdir -p site/public/samples
 cp ../../samples/approval.svg ../../samples/flow-*.svg ../../samples/seq-*.svg \
-   site/public/samples/
+   ../../samples/class-*.svg site/public/samples/
 # No landing page — the root redirects straight to Getting Started (Cloudflare
 # Pages reads _redirects from the deploy root). /guide/ kept for old links.
 printf '/ /guide/getting-started 302\n/guide/ /guide/getting-started 302\n' > site/public/_redirects

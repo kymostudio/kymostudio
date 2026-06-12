@@ -137,6 +137,103 @@ export const SETS: Record<string, DiagramExample[]> = {
     John-->>Alice: Hi
 `, [[2, 2]]),
   ],
+  class: [
+    sq("cl-intro", "animal.mmd", "/samples/class-animal.svg",
+`classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal <|-- Zebra
+    Animal : +int age
+    Animal : +String gender
+    Animal : +isMammal()
+    Animal : +mate()
+    class Duck{
+        +String beakColor
+        +swim()
+        +quack()
+    }
+    class Fish{
+        -int sizeInFeet
+        -canEat()
+    }
+    class Zebra{
+        +bool is_wild
+        +run()
+    }
+`),
+    sq("cl-members", "members.mmd", "/samples/class-members.svg",
+`classDiagram
+    class BankAccount{
+        +String owner
+        +BigDecimal balance
+        +deposit(amount) bool
+        +withdrawal(amount) int
+    }
+    class Square~Shape~{
+        int id
+        List~int~ position
+        setPoints(List~int~ points)
+        getPoints() List~int~
+    }
+`, [[2, 7]]),
+    sq("cl-visibility", "visibility.mmd", "/samples/class-visibility.svg",
+`classDiagram
+    class Account{
+        +String publicField
+        -String privateField
+        #String protectedField
+        ~String packageField
+        +staticMethod()$
+        +abstractMethod()*
+    }
+`),
+    sq("cl-relationships", "relations.mmd", "/samples/class-relations.svg",
+`classDiagram
+    classA <|-- classB : inheritance
+    classC *-- classD : composition
+    classE o-- classF : aggregation
+    classG <-- classH : association
+    classI -- classJ : link
+    classK <.. classL : dependency
+    classM <|.. classN : realization
+    classO .. classP : dashed link
+`),
+    sq("cl-cardinality", "cardinality.mmd", "/samples/class-cardinality.svg",
+`classDiagram
+    Customer "1" --> "*" Ticket
+    Student "1" --> "1..*" Course
+    Galaxy --> "many" Star : contains
+`),
+    sq("cl-annotations", "annotations.mmd", "/samples/class-annotations.svg",
+`classDiagram
+    class Shape{
+        <<interface>>
+        noOfVertices
+        draw()
+    }
+    class Color{
+        <<enumeration>>
+        RED
+        BLUE
+        GREEN
+    }
+`, [[3, 3], [8, 8]]),
+    sq("cl-notes", "notes.mmd", "/samples/class-notes.svg",
+`classDiagram
+    note "This is a general note"
+    note for Duck "can fly<br/>can swim<br/>can help in debugging"
+    class Duck{
+        +quack()
+    }
+`, [[2, 3]]),
+    sq("cl-direction", "direction.mmd", "/samples/class-direction.svg",
+`classDiagram
+    direction LR
+    class Order
+    class Customer
+    Customer "1" --> "*" Order : places
+`, [[2, 2]]),
+  ],
 };
 
 export const ALL: Record<string, DiagramExample> = Object.fromEntries(

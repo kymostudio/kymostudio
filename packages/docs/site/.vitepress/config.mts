@@ -32,6 +32,7 @@ export default defineConfig({
         items: [
           { text: "Flowchart", link: "/diagrams/flowchart" },
           { text: "Sequence Diagram", link: "/diagrams/sequence" },
+          { text: "Class Diagram", link: "/diagrams/class" },
         ],
       },
       {
