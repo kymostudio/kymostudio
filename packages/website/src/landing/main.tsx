@@ -120,10 +120,23 @@ function App() {
       </nav>
 
       <header className="hero hero-split">
+        {/* the product's signature: an orthogonal edge with flowing-dash animation */}
+        <svg className="hero-edge" viewBox="0 0 1240 480" fill="none" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+          <path className="edge-path" d="M 96 462 H 596 Q 612 462 612 446 V 156 Q 612 140 628 140 H 1056" />
+          <g className="edge-node">
+            <circle cx="96" cy="462" r="7" />
+            <circle className="core" cx="96" cy="462" r="2.8" />
+          </g>
+          <g className="edge-node">
+            <circle cx="1056" cy="140" r="7" />
+            <circle className="core" cx="1056" cy="140" r="2.8" />
+          </g>
+        </svg>
         <div className="hero-text">
+          <p className="eyebrow"><span className="eyebrow-dot" />diagram-as-code · animated SVG</p>
           <h1>
             <span className="name">KymoStudio</span><br />
-            <span className="strap">Diagram superpowers</span>
+            <span className="strap">Diagram <em>superpowers</em></span>
           </h1>
           <p className="lead">Type it. See it appear. Watch it animate.</p>
           <div className="ctas">
