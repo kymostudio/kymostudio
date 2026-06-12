@@ -1,0 +1,37 @@
+{
+  "base_url": "https://editor.kymo.studio",
+  "scenarios": [
+    {
+      "key": "mermaid-share",
+      "title": "kroki share link (mermaid, 19-node Vietnamese flowchart)",
+      "ok": true,
+      "checks": {
+        "rendered": true,
+        "labels": true,
+        "engine_chunk": true,
+        "early_adopted": true
+      },
+      "missing_labels": [],
+      "engine_fetched": false,
+      "status": "OK · 125761 bytes · 1911ms",
+      "share_error": null,
+      "infra_error": false
+    },
+    {
+      "key": "kymo-default",
+      "title": "signed-out editor root (kymo sample, wasm engine)",
+      "ok": true,
+      "checks": {
+        "rendered": true,
+        "labels": true,
+        "engine_chunk": true
+      },
+      "missing_labels": [],
+      "engine_fetched": true,
+      "status": "OK · 3277 bytes · 1013ms",
+      "share_error": null,
+      "infra_error": false
+    }
+  ],
+  "ok": true
+}

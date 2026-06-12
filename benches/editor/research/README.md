@@ -19,4 +19,6 @@ After an editor deploy that touches the loading path, re-run the bench
 (`cd benches && uv run python editor/run.py`) and write a new
 `YYYY-MM-DD-<slug>.md` here analysing *that* run — what changed vs the previous
 article (deploy, bundle layout, kroki behaviour, any new divergences), not just
-the table. Then add a row above.
+the table. Then add a row above, and rename the run's auto-archived snapshot in
+[`../reports/`](../reports/README.md) to its `rN-<slug>` form so the article's
+numbers stay machine-readable forever.

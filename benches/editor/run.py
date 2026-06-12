@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from pathlib import Path
 
 import perf
@@ -30,6 +31,7 @@ import scenarios
 
 HERE = Path(__file__).resolve().parent
 RESULTS = HERE / "results"
+REPORTS = HERE / "reports"
 
 
 def _fmt(v) -> str:
@@ -138,6 +140,17 @@ def main() -> None:
     (RESULTS / "perf.json").write_text(json.dumps(p, indent=2) + "\n")
     report = _report(q, p)
     (RESULTS / "REPORT.md").write_text(report)
+
+    # results/ is overwritten every run — archive each run under reports/ so
+    # rounds stay comparable. Named by the run's UTC timestamp; rename to an
+    # rN-<slug> folder (and index it in reports/README.md) when the run earns
+    # a research article.
+    stamp = p["meta"]["timestamp"].replace(":", "").replace("+0000", "Z")
+    archive = REPORTS / stamp
+    archive.mkdir(parents=True, exist_ok=True)
+    for f in ("REPORT.md", "perf.json", "quality.json"):
+        shutil.copy2(RESULTS / f, archive / f)
+    print(f"\narchived -> reports/{stamp}/")
     print(report)
 
 

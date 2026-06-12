@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "timestamp": "2026-06-12T08:52:21+00:00",
+    "base_url": "https://editor.kymo.studio",
+    "host": "anhvu2-01.local",
+    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.3",
+    "browser_channel": "chrome",
+    "throttle": {
+      "offline": false,
+      "downloadThroughput": 1061683,
+      "uploadThroughput": 354240,
+      "latency": 165
+    }
+  },
+  "scenarios": [
+    {
+      "key": "mermaid-share",
+      "title": "kroki share link (mermaid, 19-node Vietnamese flowchart)",
+      "reps": 5,
+      "failed_reps": 0,
+      "median": {
+        "TTFB_MS": 267,
+        "FCP_MS": 832,
+        "KROKI_SENT_MS": 564,
+        "KROKI_DONE_MS": 1041,
+        "DIAGRAM_VISIBLE_MS": 1049,
+        "WIRE_TOTAL_KB": 209,
+        "WIRE_ENGINE_KB": 0
+      },
+      "grade": {
+        "TTFB_MS": "good",
+        "FCP_MS": "good",
+        "KROKI_SENT_MS": "good",
+        "DIAGRAM_VISIBLE_MS": "good",
+        "WIRE_TOTAL_KB": "good"
+      },
+      "engine_fetched": false,
+      "runs": [
+        {
+          "TTFB_MS": 267,
+          "FCP_MS": 868,
+          "KROKI_SENT_MS": 664,
+          "KROKI_DONE_MS": 1095,
+          "DIAGRAM_VISIBLE_MS": 1104,
+          "WIRE_TOTAL_KB": 209,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 267,
+          "FCP_MS": 836,
+          "KROKI_SENT_MS": 564,
+          "KROKI_DONE_MS": 3335,
+          "DIAGRAM_VISIBLE_MS": 3345,
+          "WIRE_TOTAL_KB": 211,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 175,
+          "FCP_MS": 784,
+          "KROKI_SENT_MS": 602,
+          "KROKI_DONE_MS": 1003,
+          "DIAGRAM_VISIBLE_MS": 1012,
+          "WIRE_TOTAL_KB": 209,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 187,
+          "FCP_MS": 744,
+          "KROKI_SENT_MS": 554,
+          "KROKI_DONE_MS": 972,
+          "DIAGRAM_VISIBLE_MS": 982,
+          "WIRE_TOTAL_KB": 209,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 270,
+          "FCP_MS": 832,
+          "KROKI_SENT_MS": 556,
+          "KROKI_DONE_MS": 1041,
+          "DIAGRAM_VISIBLE_MS": 1049,
+          "WIRE_TOTAL_KB": 209,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "kymo-default",
+      "title": "signed-out editor root (kymo sample, wasm engine)",
+      "reps": 5,
+      "failed_reps": 0,
+      "median": {
+        "TTFB_MS": 203,
+        "FCP_MS": 792,
+        "KROKI_SENT_MS": null,
+        "KROKI_DONE_MS": null,
+        "DIAGRAM_VISIBLE_MS": 1615,
+        "WIRE_TOTAL_KB": 502,
+        "WIRE_ENGINE_KB": 290
+      },
+      "grade": {
+        "TTFB_MS": "good",
+        "FCP_MS": "good",
+        "DIAGRAM_VISIBLE_MS": "good",
+        "WIRE_TOTAL_KB": "good"
+      },
+      "engine_fetched": true,
+      "runs": [
+        {
+          "TTFB_MS": 227,
+          "FCP_MS": 1156,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 1765,
+          "WIRE_TOTAL_KB": 502,
+          "WIRE_ENGINE_KB": 290,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 194,
+          "FCP_MS": 992,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 1963,
+          "WIRE_TOTAL_KB": 502,
+          "WIRE_ENGINE_KB": 290,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 203,
+          "FCP_MS": 792,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 1615,
+          "WIRE_TOTAL_KB": 502,
+          "WIRE_ENGINE_KB": 290,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 204,
+          "FCP_MS": 704,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 1350,
+          "WIRE_TOTAL_KB": 502,
+          "WIRE_ENGINE_KB": 290,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 117,
+          "FCP_MS": 712,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 1375,
+          "WIRE_TOTAL_KB": 502,
+          "WIRE_ENGINE_KB": 291,
+          "ok": true
+        }
+      ]
+    }
+  ]
+}
