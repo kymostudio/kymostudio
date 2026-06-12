@@ -64,10 +64,18 @@ async function openEditor() {
 
 /** Fill the pane width, but never blow a small diagram up past 2× its
  *  natural size — vector previews stay bold without turning cartoonish. */
-function capUpscale(e: Event) {
-  const img = e.target as HTMLImageElement;
+const previewImg = ref<HTMLImageElement>();
+function applyCap(img: HTMLImageElement) {
   if (img.naturalWidth > 0) img.style.maxWidth = `${img.naturalWidth * 2}px`;
 }
+function capUpscale(e: Event) {
+  applyCap(e.target as HTMLImageElement);
+}
+// A cached image finishes loading before hydration attaches the @load
+// listener — cap it explicitly on mount.
+onMounted(() => {
+  if (previewImg.value?.complete) applyCap(previewImg.value);
+});
 </script>
 
 <template>
@@ -84,6 +92,7 @@ function capUpscale(e: Event) {
         <div v-show="previewOpen" class="dq-preview">
           <div class="dq-preview-inner">
             <img
+              ref="previewImg"
               :src="active.image"
               :alt="`Rendered ${active.label}`"
               @load="capUpscale"

@@ -24,8 +24,11 @@ cp ../../docs/brand/logo.svg ../../docs/brand/favicon.svg site/public/
 cp -R content/. site/
 # Rendered sample images referenced by content/ pages (served from /samples/).
 mkdir -p site/public/samples
-cp ../../samples/approval.svg ../../samples/flow-*.svg ../../samples/seq-*.svg \
-   ../../samples/class-*.svg site/public/samples/
+cp ../../samples/approval.svg site/public/samples/
+for prefix in flow seq class state er journey gantt pie quadrant req git c4 \
+              mindmap timeline sankey xy block packet kanban arch radar treemap; do
+  cp ../../samples/"$prefix"-*.svg site/public/samples/
+done
 # No landing page — the root redirects straight to Getting Started (Cloudflare
 # Pages reads _redirects from the deploy root). /guide/ kept for old links.
 printf '/ /guide/getting-started 302\n/guide/ /guide/getting-started 302\n' > site/public/_redirects

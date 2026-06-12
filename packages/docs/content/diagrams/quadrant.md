@@ -1,0 +1,49 @@
+---
+layout: page
+title: Quadrant Chart
+---
+
+<DiagramQuickstart set="quadrant">
+
+# Quadrant Chart
+
+A quadrant chart plots items on a 2×2 grid — the classic
+urgent/important or reach/engagement matrix. kymo's editor reads the
+[Mermaid](https://mermaid.js.org/syntax/quadrantChart.html) `quadrantChart`
+syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="quadrant-intro">
+
+The example on the right is Mermaid's campaign matrix: axis labels, a caption
+for each of the four quadrants (`quadrant-1` is top-right, numbered
+counter-clockwise), and one point per line.
+
+</DqSection>
+
+<DqSection id="quadrant-points">
+
+## Axes and points
+
+`x-axis left --> right` and `y-axis bottom --> top` label the axis ends — the
+right/top half of each label is optional. A point is `Name: [x, y]` with both
+coordinates in the 0–1 range. Quadrant captions are optional, as this
+example shows.
+
+</DqSection>
+
+> **Status.** Quadrant chart previews on this page and in the editor use the
+> Mermaid renderer; importing quadrant charts into kymo's own pipeline
+> (native SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [XY Chart](./xychart) — for series data on numeric axes.
+- [Radar](./radar) — for comparing entities across many axes at once.
+
+</DiagramQuickstart>

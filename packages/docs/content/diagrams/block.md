@@ -1,0 +1,63 @@
+---
+layout: page
+title: Block Diagram
+---
+
+<DiagramQuickstart set="block">
+
+# Block Diagram
+
+A block diagram gives you **manual layout** on a grid — you decide the
+columns, widths, and placement, where a flowchart would decide for you.
+kymo's editor reads the [Mermaid](https://mermaid.js.org/syntax/block.html)
+`block-beta` syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="block-intro">
+
+`columns N` fixes the grid width; blocks then fill the grid left-to-right.
+A `:N` suffix makes a block span N columns, and `block:name … end` nests a
+sub-grid inside one cell span. `space` (or `space:N`) leaves cells empty.
+
+The `-beta` suffix on the header is required — the syntax is still
+stabilising upstream.
+
+</DqSection>
+
+<DqSection id="block-shapes">
+
+## Block shapes
+
+Blocks reuse the flowchart shape vocabulary: `["square"]`, `("rounded")`,
+`(("circle"))`, `(["stadium"])`, `[("cylinder")]`, `>"flag"]`,
+`{"diamond"}`, `{{"hexagon"}}`.
+
+</DqSection>
+
+<DqSection id="block-arrows">
+
+## Connecting blocks
+
+`a --> b` draws an edge between placed blocks — layout comes from the grid,
+the arrows only connect. Combine with `space` cells to leave room for the
+arrows to route through.
+
+</DqSection>
+
+> **Status.** Block diagram previews on this page and in the editor use the
+> Mermaid renderer; importing block diagrams into kymo's own pipeline
+> (native SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [Flowchart](./flowchart) — automatic layout for the same boxes and
+  arrows, rendered natively by kymo.
+- [Architecture](./architecture) — purpose-built for cloud service
+  topologies.
+
+</DiagramQuickstart>

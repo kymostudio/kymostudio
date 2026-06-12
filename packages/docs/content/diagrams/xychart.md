@@ -1,0 +1,42 @@
+---
+layout: page
+title: XY Chart
+---
+
+<DiagramQuickstart set="xychart">
+
+# XY Chart
+
+An XY chart plots numeric series — bars, lines, or both on the same axes.
+kymo's editor reads the [Mermaid](https://mermaid.js.org/syntax/xyChart.html)
+`xychart-beta` syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="xy-intro">
+
+`x-axis` takes either a category list (`[jan, feb, …]`) or a numeric range
+(`0 --> 100`); `y-axis` takes an optional quoted title and a range. Each
+`bar […]` or `line […]` line adds a series of values in x order — the
+example overlays both on the same data. Add `horizontal` after the header to
+rotate the whole chart.
+
+The `-beta` suffix on the header is required — the syntax is still
+stabilising upstream.
+
+</DqSection>
+
+> **Status.** XY chart previews on this page and in the editor use the
+> Mermaid renderer; importing XY charts into kymo's own pipeline (native
+> SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [Pie Chart](./pie) — for parts of a whole.
+- [Radar](./radar) — for comparing entities across many axes.
+
+</DiagramQuickstart>

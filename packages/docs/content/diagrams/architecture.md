@@ -1,0 +1,56 @@
+---
+layout: page
+title: Architecture
+---
+
+<DiagramQuickstart set="architecture">
+
+# Architecture Diagram
+
+An architecture diagram shows cloud or CI/CD topology: services with icons,
+grouped into boundaries, connected by edges. kymo's editor reads the
+[Mermaid](https://mermaid.js.org/syntax/architecture.html)
+`architecture-beta` syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="arch-intro">
+
+The three statements: `group alias(icon)[label]` declares a boundary,
+`service alias(icon)[label] in group` places a node, and
+`db:L -- R:server` connects two services — the letter on each side picks the
+edge's port (`L`/`R`/`T`/`B`). Arrowheads are optional: `db:L --> R:server`.
+
+Built-in icons: `cloud`, `database`, `disk`, `internet`, `server` (others
+need an icon pack registered with the renderer).
+
+The `-beta` suffix on the header is required — the syntax is still
+stabilising upstream.
+
+</DqSection>
+
+<DqSection id="arch-junctions">
+
+## Junctions
+
+`junction alias` declares an invisible 4-way connector, letting several
+edges meet at a point — the way trunk lines split in real network diagrams.
+
+</DqSection>
+
+> **Status.** Architecture previews on this page and in the editor use the
+> Mermaid renderer; importing architecture diagrams into kymo's own pipeline
+> (native SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [C4 Diagram](./c4) — for the formal context/container/component zoom
+  levels.
+- [Flowchart](./flowchart) — free-form architecture sketches kymo renders
+  natively.
+
+</DiagramQuickstart>

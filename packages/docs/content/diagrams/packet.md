@@ -1,0 +1,40 @@
+---
+layout: page
+title: Packet
+---
+
+<DiagramQuickstart set="packet">
+
+# Packet Diagram
+
+A packet diagram draws the bit layout of a network packet or any binary
+structure — the classic RFC-style field grid. kymo's editor reads the
+[Mermaid](https://mermaid.js.org/syntax/packet.html) `packet-beta` syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="packet-intro">
+
+Each line assigns a bit range to a field: `0-15: "Source Port"`, or a single
+bit (`106: "URG"`). Ranges must cover the bits in order without gaps; rows
+wrap automatically every 32 bits. The example is the TCP header.
+
+The `-beta` suffix on the header is required — the syntax is still
+stabilising upstream.
+
+</DqSection>
+
+> **Status.** Packet previews on this page and in the editor use the Mermaid
+> renderer; importing packet diagrams into kymo's own pipeline (native
+> SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [Block Diagram](./block) — manual grid layout for general structures.
+- [Class Diagram](./class) — for logical rather than binary structure.
+
+</DiagramQuickstart>

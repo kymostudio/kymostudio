@@ -1,0 +1,47 @@
+---
+layout: page
+title: Timeline
+---
+
+<DiagramQuickstart set="timeline">
+
+# Timeline
+
+A timeline lays events out in chronological order — periods on the spine,
+events hanging off each period. kymo's editor reads the
+[Mermaid](https://mermaid.js.org/syntax/timeline.html) `timeline` syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="timeline-intro">
+
+Each line is `period : event`. A period takes any text (years, quarters,
+phases); stack more events under the same period with continuation lines
+that start with `:`, or inline as `period : event1 : event2`.
+
+</DqSection>
+
+<DqSection id="timeline-sections">
+
+## Sections
+
+`section` groups consecutive periods under a coloured band — eras, releases,
+project phases. Events in the same section share a colour family.
+
+</DqSection>
+
+> **Status.** Timeline previews on this page and in the editor use the
+> Mermaid renderer; importing timelines into kymo's own pipeline (native
+> SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [Gantt](./gantt) — when events have durations and dependencies.
+- [User Journey](./journey) — for steps scored by experience rather than
+  dated.
+
+</DiagramQuickstart>
