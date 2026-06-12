@@ -59,6 +59,7 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .save-ind::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #34a853; }
 .save-ind.off { color: #8a6116; background: #fdf6e7; border-color: #f0dfb6; }
 .save-ind.off::before { background: #e6a23c; }
+.save-ind.url::before { background: #2a9d8f; } /* no-room mode: the URL is the storage */
 .diagram-input { font: inherit; font-size: 14px; font-weight: 600; background: var(--bg); border: 1px solid var(--accent); border-radius: 7px; color: var(--ink); padding: 3px 8px; outline: none; min-width: 160px; }
 
 .account { position: relative; }
@@ -181,6 +182,8 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .pane-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg); }
 .kind-select { border: 1px solid var(--border-strong); border-radius: 8px; padding: 5px 9px; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--bg); cursor: pointer; }
 .kind-select:hover { border-color: var(--dim); }
+/* honest data-flow note: non-Kymo kinds POST the source to kroki.io */
+.kroki-note { margin-left: auto; font-size: 11.5px; color: var(--dim); cursor: help; }
 
 /* ---- hover polish ----
    Solid buttons lift 1px with a soft shadow; the primary button gets an accent
@@ -243,7 +246,7 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
 @media (max-width: 720px) {
   header { flex-wrap: wrap; row-gap: 8px; padding: 10px 12px; }
   /* designed rows: 1 = identity (brand · title · avatar), 2 = the action cluster */
-  .nav-group { order: 10; flex-basis: 100%; justify-content: flex-end; }
+  .nav-group { order: 10; flex-basis: 100%; justify-content: flex-end; flex-wrap: wrap; }
   .save-ind { font-size: 0; gap: 0; padding: 5px; } /* dot only — row 1 is tight */
   main { flex-direction: column; }
   /* the source pane carries an inline flex-basis from the drag-splitter — override it */

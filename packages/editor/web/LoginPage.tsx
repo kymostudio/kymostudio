@@ -13,6 +13,11 @@ export default function LoginPage() {
 
   useEffect(() => { document.title = "Sign in · Kymostudio"; return () => { document.title = "Kymostudio"; }; }, []);
   useEffect(() => { if (claims) navigate(next, { replace: true }); }, [claims, next, navigate]);
+  // One Tap is contextual: this page is where the user intends to sign in.
+  useEffect(() => {
+    const t = setTimeout(() => (window as any).google?.accounts?.id?.prompt(), 400);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <main className="scroll" style={{ height: "100%" }}>

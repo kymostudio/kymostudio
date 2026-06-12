@@ -46,7 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const g = (window as any).google?.accounts?.id;
       if (!g) { setTimeout(init, 150); return; }
       ensureGsiInit(g);
-      if (!tokenValid(localStorage.getItem("kymo_idtoken"))) g.prompt();
+      // No One Tap auto-prompt here: a guest opening a share link hasn't asked
+      // to sign in. Prompts fire contextually (login page, session renewal).
     }
     init();
     return () => { stop = true; };
@@ -54,8 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(() => {
     try { localStorage.removeItem("kymo_idtoken"); } catch {}
     (window as any).google?.accounts?.id?.disableAutoSelect();
-    setIdToken(null);
-    setTimeout(() => (window as any).google?.accounts?.id?.prompt(), 60);
+    setIdToken(null); // signing out means OUT — don't immediately re-prompt
   }, []);
   // Session lapsed (token expired, or the server 401'd it): drop the stale
   // claims — unlike signOut, keep auto_select so GIS can renew silently.
@@ -90,7 +90,7 @@ export function GoogleButton() {
       if (!g || !ref.current) { setTimeout(r, 150); return; }
       ensureGsiInit(g);
       ref.current.innerHTML = "";
-      g.renderButton(ref.current, { type: "standard", theme: "outline", size: "medium", text: "signin_with" });
+      g.renderButton(ref.current, { type: "standard", theme: "outline", size: "medium", text: "signin_with", locale: "en" }); // UI is English — don't let browser locale leak in
     }
     r();
     return () => { stop = true; };
