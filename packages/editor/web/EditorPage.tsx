@@ -4,6 +4,7 @@ import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
 import { WorkspaceSwitcher, useWorkspace, assignDiagram } from "./workspace";
 import { KINDS, renderKroki, sanitizeSvg } from "./kroki";
+import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
@@ -108,6 +109,11 @@ export default function EditorPage() {
         if (!renderRef.current) await loadEngine();
         if (seq !== renderSeq.current) return;
         out = await renderRef.current!(src);
+      } else if (k === "mermaid") {
+        // Mermaid renders in-browser (lazy mermaid.js chunk); a share link's
+        // early kroki warm-up is only raced for the first paint. Same sanitize
+        // pass as kroki output — the source is untrusted either way.
+        out = sanitizeSvg(await renderMermaid(src));
       } else {
         // Kroki SVG is third-party markup — and with ?s= links the source can be
         // anyone's. Strip scripts/handlers before it touches the DOM.
@@ -472,8 +478,10 @@ export default function EditorPage() {
                   {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
                 </select>
                 {kind !== "kymo" && (
-                  <span className="kroki-note" title="Non-Kymo diagram types are rendered by the public kroki.io service — your source is sent to it. Kymo diagrams render locally in your browser.">
-                    renders via kroki.io
+                  <span className="kroki-note" title={kind === "mermaid"
+                    ? "Mermaid renders locally in your browser (mermaid.js). Opening a share link may use the kymo render cache for the first paint."
+                    : "Non-Kymo diagram types are rendered by the public kroki.io service — your source is sent to it. Kymo diagrams render locally in your browser."}>
+                    {kind === "mermaid" ? "renders in-browser" : "renders via kroki.io"}
                   </span>
                 )}
               </div>
