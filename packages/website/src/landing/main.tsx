@@ -155,16 +155,16 @@ function App() {
           </g>
         </svg>
         <div className="hero-text">
-          <p className="eyebrow"><span className="eyebrow-dot" />diagram-as-code · animated SVG</p>
+          <p className="eyebrow"><span className="eyebrow-dot" />MCP server · diagram-as-code · animated SVG</p>
           <h1>
             <span className="name">KymoStudio</span><br />
             <span className="strap">Diagram <em>superpowers</em></span>
           </h1>
-          <p className="lead">Type it. See it appear. Watch it animate.</p>
+          <p className="lead">Prompt it. See it appear. Watch it animate.</p>
           <div className="ctas">
             <a className="btn btn-primary btn-pill" href="https://docs.kymo.studio/guide/getting-started">Getting Started</a>
-            <a className="btn btn-alt btn-pill" href="https://docs.kymo.studio/guide/dsl-guide">The .kymo Language</a>
-            <a className="btn btn-alt btn-pill" href="https://editor.kymo.studio">Open the editor ↗</a>
+            <a className="btn btn-alt btn-pill" href="#mcp">Connect Your AI</a>
+            <a className="btn btn-alt btn-pill" href="https://editor.kymo.studio">Open the live Editor ↗</a>
           </div>
         </div>
         <div className="hero-art">
@@ -180,6 +180,45 @@ function App() {
               <p>{f.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mcp" id="mcp">
+        <div className="mcp-inner">
+          <div className="mcp-copy">
+            <h2>Connect any AI, over MCP</h2>
+            <p>
+              kymo runs a hosted <strong>MCP server</strong> at <code>mcp.kymo.studio</code>. Claude,
+              ChatGPT, Cursor — any MCP client — can create and edit your diagrams, rendering live in
+              the editor while the agent types.
+            </p>
+            <ol className="mcp-steps">
+              <li>Add the server to your AI — one line of config.</li>
+              <li>Ask for a diagram — the agent writes .kymo source and calls the tools.</li>
+              <li>Watch it draw at editor.kymo.studio — animated SVG, ready to export.</li>
+            </ol>
+            <ul className="mcp-tools" aria-label="MCP tools">
+              <li><code>new_diagram</code></li>
+              <li><code>edit_diagram</code></li>
+              <li><code>get_diagram</code></li>
+              <li><code>list_diagrams</code></li>
+              <li><code>delete_diagram</code></li>
+            </ul>
+          </div>
+          <div className="mcp-snippets">
+            <div className="mcp-snippet">
+              <div className="mcp-snippet-label">Claude Code</div>
+              <pre><code>{`claude mcp add --transport sse kymo \\
+  https://mcp.kymo.studio/sse`}</code></pre>
+            </div>
+            <div className="mcp-snippet">
+              <div className="mcp-snippet-label">Any MCP client</div>
+              <pre><code>{`{ "mcpServers": {
+    "kymo": { "url": "https://mcp.kymo.studio/mcp" }
+} }`}</code></pre>
+            </div>
+            <p className="mcp-note">Sign in with Google on first connect — diagrams open live in the editor.</p>
+          </div>
         </div>
       </section>
 
