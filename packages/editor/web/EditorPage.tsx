@@ -259,10 +259,12 @@ export default function EditorPage() {
     if (shareOpen) { setShareOpen(false); return; }
     if (!source.trim()) return;
     setSharePayload(""); setCopiedKey(null); setShareOpen(true);
-    setSharePayload(await encodeShare(source));
+    const payload = await encodeShare(source);
+    setSharePayload(payload);
+    copyText("link", shareUrl(kind, payload), true); // default action: opening Share already puts the link in the clipboard
   }
-  async function copyText(key: string, text: string) {
-    try { await navigator.clipboard.writeText(text); } catch { window.prompt("Copy:", text); return; }
+  async function copyText(key: string, text: string, silent = false) {
+    try { await navigator.clipboard.writeText(text); } catch { if (!silent) window.prompt("Copy:", text); return; }
     setCopiedKey(key);
     setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1600);
   }
