@@ -14,8 +14,12 @@ printf '/* /index.html 200\n' > dist/_redirects
 # Chunk names embed a content hash — let browsers cache them forever; the HTML
 # entry points keep the default 4h and roll the references on deploy.
 printf '/chunks/*\n  Cache-Control: public, max-age=31536000, immutable\n' > dist/_headers
+# .wasm uses the FILE loader, not binary: the engine wasm becomes a separate
+# hashed asset under chunks/ (immutable-cached, fetched in parallel, compiled
+# while downloading via instantiateStreaming) instead of ~1 MB of extra wire
+# inside the engine JS chunk.
 npx esbuild web/main.tsx --bundle --format=esm --splitting --outdir=dist \
-  --loader:.wasm=binary --jsx=automatic --jsx-import-source=react \
+  --loader:.wasm=file --asset-names="chunks/[name]-[hash]" --public-path=/ --jsx=automatic --jsx-import-source=react \
   --target=es2022 --minify --entry-names="[name]" --chunk-names="chunks/[name]-[hash]"
 # Preload main.js's statically-imported shared chunks: without this the browser
 # only discovers them after downloading+parsing main.js (an extra serial network

@@ -1,4 +1,5 @@
 import DOMPurify from "dompurify";
+import { RENDER_API } from "./const";
 
 // Diagram kinds: "kymo" renders locally (wasm); everything else goes through
 // the free https://kroki.io render API (POST source, get SVG back).
@@ -77,14 +78,28 @@ async function earlyResponse(kind: string, source: string): Promise<Response | n
   }
 }
 
+function postRender(base: string, kind: string, source: string): Promise<Response> {
+  return fetch(`${base}/${encodeURIComponent(kind)}/svg`, {
+    method: "POST",
+    headers: { "content-type": "text/plain" },
+    body: source,
+  });
+}
+
 export async function renderKroki(kind: string, source: string): Promise<string> {
-  const r =
-    (await earlyResponse(kind, source)) ??
-    (await fetch(`https://kroki.io/${encodeURIComponent(kind)}/svg`, {
-      method: "POST",
-      headers: { "content-type": "text/plain" },
-      body: source,
-    }));
+  // Proxy first (edge-cached by content hash — repeat share-link loads skip
+  // kroki's server render); fall back to kroki.io directly if the proxy is
+  // unreachable or broken, so the worker is never a single point of failure.
+  let r = await earlyResponse(kind, source);
+  if (r && r.status >= 500) r = null; // dead upstream on the warm-up — retry through the fallback chain
+  if (!r) {
+    try {
+      r = await postRender(RENDER_API, kind, source);
+      if (r.status >= 500) throw new Error(`proxy ${r.status}`);
+    } catch {
+      r = await postRender("https://kroki.io", kind, source);
+    }
+  }
   const text = await r.text();
   if (!r.ok) throw new Error(text.trim() || `kroki ${r.status}`);
   return text;
