@@ -496,6 +496,73 @@ export default {
       const workspaces = await listWorkspaces(env, email);
       return Response.json({ email, diagrams, workspaces }, { headers: cors });
     }
+    // Public caching proxy for kroki.io renders: POST /api/render/<kind>/svg with
+    // the diagram source as the body (mirrors kroki's own API). kroki renders
+    // mermaid server-side with puppeteer (~2.5s, and it has bad days) — caching
+    // the SVG by content hash means every visitor after the first gets the
+    // diagram in one edge round-trip. Share links are immutable-by-construction
+    // (?s= encodes the source), so a 1-year TTL is safe: new content = new key.
+    {
+      const m = url.pathname.match(/^\/api\/render\/([a-z0-9]+)\/svg$/);
+      if (m) {
+        const cors: Record<string, string> = {
+          "access-control-allow-origin": "*",
+          "access-control-allow-methods": "POST, OPTIONS",
+          "access-control-allow-headers": "content-type",
+          "access-control-expose-headers": "x-render-cache",
+        };
+        if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+        if (request.method !== "POST") return Response.json({ error: "POST only" }, { status: 405, headers: cors });
+        const kind = m[1];
+        const source = await request.text();
+        if (!source.trim()) return Response.json({ error: "empty source" }, { status: 400, headers: cors });
+        if (source.length > 512 * 1024) return Response.json({ error: "source too large" }, { status: 413, headers: cors });
+
+        const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(kind + "\0" + source));
+        const hash = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+        // Cache API only matches GET requests — synthesize a GET key from the content hash.
+        const cacheKey = new Request(`${url.origin}/api/render/${kind}/svg?h=${hash}`, { method: "GET" });
+        const cache = caches.default;
+
+        const hit = await cache.match(cacheKey);
+        if (hit) {
+          const res = new Response(hit.body, hit);
+          res.headers.set("x-render-cache", "hit");
+          Object.entries(cors).forEach(([k, v]) => res.headers.set(k, v));
+          return res;
+        }
+
+        let upstream: Response;
+        try {
+          upstream = await fetch(`https://kroki.io/${kind}/svg`, {
+            method: "POST",
+            headers: { "content-type": "text/plain" },
+            body: source,
+          });
+        } catch (e: any) {
+          return Response.json({ error: `kroki unreachable: ${e?.message ?? e}` }, { status: 502, headers: cors });
+        }
+        if (!upstream.ok) {
+          // kroki errors (bad source, ENOSPC days, …) are relayed but never cached.
+          return new Response(await upstream.text(), {
+            status: upstream.status,
+            headers: { "content-type": "text/plain", "x-render-cache": "miss", ...cors },
+          });
+        }
+        const svg = await upstream.text();
+        const res = new Response(svg, {
+          status: 200,
+          headers: {
+            "content-type": "image/svg+xml",
+            "cache-control": "public, max-age=31536000, immutable",
+            "x-render-cache": "miss",
+            ...cors,
+          },
+        });
+        ctx.waitUntil(cache.put(cacheKey, res.clone()));
+        return res;
+      }
+    }
     return oauthProvider.fetch(request, env, ctx);
   },
 };
