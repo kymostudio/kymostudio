@@ -372,3 +372,9 @@ section.features { padding: 24px var(--pad) 36px; }
 .feature:hover { transform: none; box-shadow: none; }
 .feature h3::before { content: none; }
 .feature h3 { font-size: 16px; }
+
+/* ── Full-bleed hero region + borderless nav ─────────────────── */
+nav { border-bottom: none; }
+.nav-inner { max-width: none; padding-left: clamp(24px, 4vw, 72px); padding-right: clamp(24px, 4vw, 72px); }
+.hero-split { max-width: none; padding: 72px clamp(24px, 5vw, 96px) 56px; }
+section.features { max-width: none; padding: 24px clamp(24px, 5vw, 96px) 36px; }
