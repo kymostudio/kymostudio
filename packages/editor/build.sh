@@ -14,6 +14,14 @@ printf '/* /index.html 200\n' > dist/_redirects
 # Chunk names embed a content hash — let browsers cache them forever; the HTML
 # entry points keep the default 4h and roll the references on deploy.
 printf '/chunks/*\n  Cache-Control: public, max-age=31536000, immutable\n' > dist/_headers
+# Pre-bundle mermaid into ONE self-contained ESM file (no --splitting, so its
+# internal per-grammar dynamic imports are inlined). Bundled by the main build
+# below as a single lazy chunk — one request instead of the ~25-chunk waterfall
+# the package's own lazy-loading produces (5-14 s medians on Fast 4G).
+mkdir -p web/vendor
+npx esbuild node_modules/mermaid/dist/mermaid.esm.min.mjs --bundle --format=esm \
+  --minify --legal-comments=none --outfile=web/vendor/mermaid.bundle.mjs
+
 # .wasm uses the FILE loader, not binary: the engine wasm becomes a separate
 # hashed asset under chunks/ (immutable-cached, fetched in parallel, compiled
 # while downloading via instantiateStreaming) instead of ~1 MB of extra wire
