@@ -8,7 +8,8 @@ import { CodeEditor } from "./codeeditor";
 import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
-import { ChevronDown, Download, FileCode2, FileImage, Code2 } from "lucide-react";
+import { encodeShare, decodeShare, shareUrl } from "./share";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -17,10 +18,14 @@ export default function EditorPage() {
   const navigate = useNavigate();
   const d = params.get("d");
   const roomId = d;
+  // ?s= carries the whole diagram in the URL (kroki-style share link, no room/account).
+  const sharedSrc = params.get("s");
+  const sharedKind = params.get("k");
+  const shared = !!sharedSrc && !d;
 
   // No ?d: once signed in, jump to the most-recent diagram (or a fresh one).
   useEffect(() => {
-    if (d || !idToken) return;
+    if (d || shared || !idToken) return;
     let stop = false;
     (async () => {
       let id: string | null = null;
@@ -37,7 +42,7 @@ export default function EditorPage() {
       navigate("/?d=" + id, { replace: true });
     })();
     return () => { stop = true; };
-  }, [d, idToken, navigate]);
+  }, [d, shared, idToken, navigate]);
 
   const [source, setSource] = useState(SAMPLE);
   const [kind, setKind] = useState("kymo");
@@ -49,6 +54,7 @@ export default function EditorPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [editingName, setEditingName] = useState(false);
   // split = width of the source pane in % (dbdiagram-style draggable divider)
   const [split, setSplit] = useState(() => {
@@ -116,6 +122,21 @@ export default function EditorPage() {
     synced.current = false; fresh.current = false; userEdited.current = false;
   }, [d]);
 
+  // Shared link: inflate the ?s= payload into the editor.
+  useEffect(() => {
+    if (!shared || !sharedSrc) return;
+    let stop = false;
+    decodeShare(sharedSrc)
+      .then((src) => {
+        if (stop) return;
+        if (sharedKind && KINDS.some((k) => k.value === sharedKind)) setKind(sharedKind);
+        userEdited.current = true; // shared content is real content — keep the URL live as it's edited
+        setSource(src);
+      })
+      .catch(() => { setStatus("Link share không hợp lệ"); setStatusErr(true); });
+    return () => { stop = true; };
+  }, []); // eslint-disable-line
+
   const room = useRoom(roomId, idToken, {
     onLive: setLive, // not cleared here: the OLD socket closing on room switch would kill the boot state
     onMeta: (t) => setTitle(t && t !== "Untitled" ? t : ""),
@@ -148,6 +169,16 @@ export default function EditorPage() {
     return () => clearTimeout(id);
   }, [source, kind]); // eslint-disable-line
 
+  // Editing without a room (signed out / shared link): keep the kroki-style ?s=
+  // URL in sync so the address bar is always a working share link.
+  useEffect(() => {
+    if (d || (!userEdited.current && !shared)) return;
+    const t = setTimeout(async () => {
+      window.history.replaceState(null, "", shareUrl(kind, await encodeShare(source)));
+    }, 300);
+    return () => clearTimeout(t);
+  }, [source, kind, d]); // eslint-disable-line
+
   useEffect(() => {
     const h = () => { setMenuOpen(false); setExportOpen(false); };
     document.addEventListener("click", h);
@@ -155,7 +186,7 @@ export default function EditorPage() {
   }, []);
 
   const diagramLabel = title || "Untitled";
-  const booting = (!d && !!idToken) || syncing; // redirecting to the latest diagram, or waiting for the first doc
+  const booting = (!d && !!idToken && !shared) || syncing; // redirecting to the latest diagram, or waiting for the first doc
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
 
   function saveBlob(blob: Blob, name: string) {
@@ -185,6 +216,13 @@ export default function EditorPage() {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       canvas.toBlob((b) => { if (b) saveBlob(b, (diagramLabel || "flowchart") + ".png"); }, "image/png");
     } finally { URL.revokeObjectURL(url); }
+  }
+  async function copyShareLink() {
+    if (!source.trim()) return;
+    const url = shareUrl(kind, await encodeShare(source));
+    try { await navigator.clipboard.writeText(url); } catch { window.prompt("Copy link:", url); return; }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   }
   function exportSource() {
     if (!source.trim()) return;
@@ -257,6 +295,10 @@ export default function EditorPage() {
         )}
         <Link className="btn" to="/diagrams">Diagrams</Link>
         <button className="btn-primary" onClick={newDiagram} title="New diagram">+ New</button>
+        <button onClick={copyShareLink} title="Copy link chia sẻ — toàn bộ diagram nằm trong URL, không cần đăng nhập để mở">
+          {copied ? <Check size={16} strokeWidth={2.2} /> : <Link2 size={16} strokeWidth={2} />}
+          {copied ? "Copied!" : "Share"}
+        </button>
         <div className="account" onClick={(e) => e.stopPropagation()} onMouseEnter={() => setExportOpen(true)} onMouseLeave={() => setExportOpen(false)}>
           <button onClick={() => setExportOpen((o) => !o)}><Download size={16} strokeWidth={2} />Export <ChevronDown size={16} strokeWidth={2.2} className="chev-icon" /></button>
           {exportOpen && (
