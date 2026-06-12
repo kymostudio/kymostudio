@@ -26,7 +26,9 @@ cp ../../docs/brand/logo.svg ../../docs/brand/favicon.svg site/public/
 cp -R content/. site/
 # Rendered sample images referenced by content/ pages (served from /samples/).
 mkdir -p site/public/samples
-cp ../../samples/approval.svg ../../samples/flow-shapes.svg site/public/samples/
+cp ../../samples/approval.svg ../../samples/flow-shapes.svg \
+   ../../samples/flow-links.svg ../../samples/flow-subgraph.svg \
+   ../../samples/seq-basic.svg ../../samples/seq-fragments.svg site/public/samples/
 # No landing page — the root redirects straight to the guide (Cloudflare Pages
 # reads _redirects from the deploy root).
 printf '/ /guide/ 302\n' > site/public/_redirects

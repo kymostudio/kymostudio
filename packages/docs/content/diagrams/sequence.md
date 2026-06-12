@@ -2,8 +2,12 @@
 
 A sequence diagram shows how participants exchange messages over time. kymo
 reads the [Mermaid](https://mermaid.js.org/syntax/sequenceDiagram.html)
-`sequenceDiagram` syntax and converts it into a proper **UML interaction
-model** — ready to open in StarUML, Gaphor, or any XMI-consuming UML tool.
+`sequenceDiagram` syntax.
+
+The fastest way to try everything on this page is the
+**[editor](https://editor.kymo.studio)**: pick **mermaid** in the diagram-type
+dropdown, type on the left, and the preview updates live. Every example below
+has a *Try it in the editor* link that opens it pre-loaded.
 
 ```mermaid
 sequenceDiagram
@@ -14,9 +18,13 @@ sequenceDiagram
     A-)J: See you later
 ```
 
-> **Status.** Sequence diagrams currently export to UML tool formats (XMI,
-> StarUML, Gaphor) via the Rust CLI — direct SVG rendering is on the roadmap.
-> See [Exporting](#exporting).
+[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxli0EKgzAURPeeYroU9AIulEDBkm1P8AlDDaSJ_UbE25uG7jrLee9t_OyMjncvL5V3g7JVNHvnV4kZBrLBBO_4h-wX2bTESkw_jnbAgyGk-nZY0gFR4kz7VB3bF8kMmJWSb7-sLdWT1UKQTG0uhL4sJA)
+
+![Basic sequence diagram, as previewed in the editor](/samples/seq-basic.svg)
+
+Beyond the live preview, kymo converts sequence sources into a proper **UML
+interaction model** — ready to open in StarUML, Gaphor, or any XMI-consuming
+UML tool. See [Exporting to UML tools](#exporting-to-uml-tools).
 
 ## Participants
 
@@ -61,6 +69,8 @@ sequenceDiagram
     John-->>-Alice: Great!
 ```
 
+[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJwrTi0sTc1LTnXJTEwvSszlUgACx5zM5FRdOzttr_yMPCsFj9ScnHwFEBssC2LoAmV1wcqsFNyLUhNLFLkAYOwWSQ)
+
 ```mermaid
 sequenceDiagram
     Alice->>John: Hello John
@@ -85,6 +95,8 @@ sequenceDiagram
     B-->>A: SYN-ACK
     Note left of A: connection established
 ```
+
+[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxljDESwjAMBPu8Qg8gH6DIjA0dM2moKBVHsTUEKdgKfB-PmxRceXt7hd47SaArY8z46qBmw2wceEMxcH-Nb82oRqAfyuBO_gwJZS4JnwQTRZbSNq4fhsruj_FQMsdkoAtU4IELiH5h5WIkLLHtfF8917zeXW6Hu9LS1MqCilAwVgEqhlN9SDR3P54TPvA)
 
 `Note left of X`, `Note right of X`, and `Note over X` (or `Note over X,Y`)
 are all supported.
@@ -116,6 +128,10 @@ sequenceDiagram
     end
 ```
 
+[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxtkD0OwjAMhXdO8S6AKD8TAxIUxMDAUDiA1RqISJOQuEhwekqqRgjw8iR_9tOzA98aNiWvFZ091QO05ciLKpUjI8hBAblWbOSHFW9WsL-zj4y0QAVQIxfr1ZOr2H1XPlwsijm2mwNGFQklUAxbks8xyTLsd7HNOjAa88elH55lYxy_B9h0ap3As_gHrMFJ05XTvrbWoXEQiylE1RwS-ggZlxPobXtt74exok6Pj1gxFd_bH2HZfcJU__Eqmb0AUwVlCg)
+
+![Fragments example, as previewed in the editor](/samples/seq-fragments.svg)
+
 | Operator | Meaning |
 |----------|---------|
 | `loop label … end` | repetition |
@@ -137,10 +153,11 @@ sequenceDiagram
     John-->>Alice: Hi
 ```
 
-## Exporting
+## Exporting to UML tools
 
-Save the source as a `.mmd` (or `.mermaid`) file; with the Rust CLI
-(`cargo install kymostudio`) the output extension picks the UML target:
+kymo's own pipeline turns the same source into a UML interaction model. With
+the Rust CLI (`cargo install kymostudio`) the output extension picks the
+target:
 
 ```bash
 kymo seq.mmd seq.xmi          # OMG XMI 2.5.1 — portable UML interchange
@@ -154,14 +171,16 @@ kymo seq.mmd seq.gaphor       # Gaphor project, model + laid-out diagram
   [StarUML](https://staruml.io) or [Gaphor](https://gaphor.org) and the diagram
   is already drawn.
 
+> **Status.** The editor previews sequence diagrams with the Mermaid renderer;
+> rendering them with kymo's own engine (SVG/PNG/PDF, like flowcharts) is on
+> the roadmap.
+
 ## Differences from Mermaid
 
 - **Accepted and ignored** (no error, no effect): `box`/`end` participant
   boxes, `rect` background highlights, `title`, `links`/`link`,
   `create`/`destroy` participant lifecycle, and `autonumber` format arguments.
 - **Not supported**: the `critical` and `break` fragments.
-- **No SVG output yet** — rendering sequence diagrams with kymo's own renderer
-  is planned; today the pipeline targets UML tools.
 
 ## See also
 

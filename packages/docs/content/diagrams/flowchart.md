@@ -2,8 +2,12 @@
 
 A flowchart shows a process as steps connected by arrows. kymo reads the
 [Mermaid](https://mermaid.js.org/syntax/flowchart.html) `flowchart` / `graph`
-syntax — so a diagram you already have in Mermaid renders in kymo unchanged —
-and draws it with its own pure-Rust renderer. No browser, no system libraries.
+syntax — a diagram you already have in Mermaid works unchanged.
+
+The fastest way to try everything on this page is the
+**[editor](https://editor.kymo.studio)**: pick **mermaid** in the diagram-type
+dropdown, type on the left, and the preview updates live. Every example below
+has a *Try it in the editor* link that opens it pre-loaded.
 
 ```mermaid
 flowchart TD
@@ -15,23 +19,9 @@ flowchart TD
     Reject --> Done
 ```
 
+[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxLy8kvT85ILCpRCHHhUgCC4BIgR0MDTGlqKujq2ikElyblZpZEQyiFotTC0tTikliIaogYSFVQallmanm1Y0FBUX5Zaop9LVgBRBSkoKYytbhGIQAomVmcmZ8XDWfFoivMy68BcrNSk0uiIRREBVwD2DqX_LxUDQ0QqakJNQCkFC7HBQCDlkXW)
+
 ![Approval flowchart rendered by kymo](/samples/approval.svg)
-
-## Rendering
-
-Save the source as a `.mmd` (or `.mermaid`) file and pass it to the `kymo` CLI —
-the same command in all three distributions
-([PyPI](https://pypi.org/project/kymostudio/), [npm](https://www.npmjs.com/package/kymostudio),
-[crates.io](https://crates.io/crates/kymostudio)):
-
-```bash
-kymo flow.mmd flow.svg        # static SVG
-kymo flow.mmd flow.png        # PNG (add -s 2 for 2× resolution)
-kymo flow.mmd flow.pdf        # vector PDF
-```
-
-Flowcharts also convert to other diagram-as-code formats — see
-[Exporting](#exporting) below.
 
 ## Direction
 
@@ -79,6 +69,8 @@ flowchart LR
     G --> H[[Subroutine]]
 ```
 
+[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJwljL0OgyAUhXef4o440DfQpIo_QycdCQPCbUuqkiCkTbTvXopn_L5zzn22b_WUzsNtyCDmygdUXgClJVRksGHVqPOkKiiKEmrCRy-1CYs4cQ30EsuMEya9nOSGuUiCxRMKDSG1cWrG_Kw36brdGSqzGbt-E23_9LCvA7p97_EjH9GcqkuDnvMxTM4Gb1YUIvsBE9Yy6Q)
+
 ![Shape gallery rendered by kymo](/samples/flow-shapes.svg)
 
 Labels may be double-quoted to include characters that would otherwise close
@@ -106,9 +98,16 @@ form — both are supported:
 
 ```mermaid
 flowchart TD
-    B{Approved?} -->|yes| C[Provision]
+    A[Submit] --> B{Approved?}
+    B -->|yes| C[Provision]
     B -- no --> D[Reject]
+    C -.-> E[Audit log]
+    D --- E
 ```
+
+[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxLy8kvT85ILCpRCHHhUgACx-jg0qTczJJYBV1dOwWnaseCgqL8stQU-1qwtBNIuKYytbhGwTk6ACiTWZyZnxcLl1PIywdrdIkOSs1KTS6ByDgr6OoBBV2jHUtTMksUcvLTIeIuQLW6Cq5cAIRXJT4)
+
+![Edge styles rendered by kymo](/samples/flow-links.svg)
 
 Links chain on a single line; each operator connects the two nodes around it:
 
@@ -136,6 +135,10 @@ flowchart TB
     C --> End[Done]
 ```
 
+[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxLy8kvT85ILCpRCHHiUgCC4BIQR1fXTsERzC8uTUovSizIUHBXiA7PL8pOLVIIyM_PiQVLgoBjtFtqSXJGLFiPU3RIUWJecVp-US5ChRNYyjk6vCizJBUinJqXAqadwVKueSnRLvl5QDkAYsQm9Q)
+
+![Subgraph rendered by kymo](/samples/flow-subgraph.svg)
+
 A `direction` statement inside a subgraph is accepted but ignored — the whole
 diagram flows in the header direction.
 
@@ -149,23 +152,26 @@ flowchart LR
     A --> B
 ```
 
-## Other text formats: D2 and Graphviz DOT
+## Rendering from the command line
 
-The flowchart pipeline is format-neutral — kymo also imports
-[D2](https://d2lang.com) and [Graphviz DOT](https://graphviz.org) sources and
-renders them with the same layout engine:
+The same sources render locally with the `kymo` CLI — identical syntax, no
+browser. Save as a `.mmd` (or `.mermaid`) file; the CLI ships in all three
+distributions ([PyPI](https://pypi.org/project/kymostudio/),
+[npm](https://www.npmjs.com/package/kymostudio),
+[crates.io](https://crates.io/crates/kymostudio)):
 
 ```bash
-kymo flow.d2  flow.svg        # D2  -> SVG
-kymo flow.dot flow.svg        # DOT -> SVG
+kymo flow.mmd flow.svg        # static SVG
+kymo flow.mmd flow.png        # PNG (add -s 2 for 2× resolution)
+kymo flow.mmd flow.pdf        # vector PDF
 ```
 
-## Exporting
-
-From a Mermaid flowchart, the output extension picks the target:
+The flowchart pipeline is format-neutral — kymo also imports
+[D2](https://d2lang.com) and [Graphviz DOT](https://graphviz.org) sources
+(`kymo flow.d2 flow.svg`, `kymo flow.dot flow.svg`), and exports to other
+diagram-as-code formats:
 
 ```bash
-kymo flow.mmd flow.svg        # SVG (also .png, .pdf)
 kymo flow.mmd flow.d2         # D2
 kymo flow.mmd flow.dot        # Graphviz DOT
 kymo flow.mmd flow.drawio     # draw.io (mxGraph XML), opens in diagrams.net

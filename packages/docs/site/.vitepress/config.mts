@@ -37,6 +37,11 @@ export default defineConfig({
         items: [
           { text: "Flowchart", link: "/diagrams/flowchart" },
           { text: "Sequence Diagram", link: "/diagrams/sequence" },
+        ],
+      },
+      {
+        text: "References",
+        items: [
           { text: "BPMN", link: "/diagrams/bpmn" },
           { text: "Best Practices", link: "/diagrams/best-practices" },
           { text: "Flowchart Notation (ISO 5807)", link: "/diagrams/flowchart-notation" },

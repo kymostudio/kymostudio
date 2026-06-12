@@ -1,0 +1,7 @@
+flowchart TB
+    Start --> A
+    subgraph G [Worker Pool]
+        A[Fetch] --> B[Transform]
+        B --> C[Write]
+    end
+    C --> End[Done]
