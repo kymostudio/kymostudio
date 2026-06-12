@@ -1,6 +1,6 @@
 # kymo-render-api
 
-Kroki-compatible diagram render API on a Cloudflare Worker — `kroki.kymo.studio`.
+Kroki-compatible diagram render API on a Cloudflare Worker — `render.kymo.studio`.
 
 ```
 GET  /{kind}/{format}/{encoded}   # kroki URL encoding (deflate + base64url)

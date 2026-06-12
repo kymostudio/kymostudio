@@ -1,4 +1,4 @@
-// kroki.kymo.studio — Kroki-compatible diagram render API.
+// render.kymo.studio — Kroki-compatible diagram render API.
 //
 //   GET  /{kind}/{format}/{encoded}   kroki URL encoding (deflate+base64url)
 //   POST /{kind}/{format}             diagram source as text/plain body
