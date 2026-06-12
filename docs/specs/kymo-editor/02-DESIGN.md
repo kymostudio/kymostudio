@@ -1,7 +1,7 @@
 ---
 title: Kymo Editor (editor.kymo.studio) — Design
 document_id: DESIGN-KEDITOR-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-12
 status: Implemented
 classification: Internal
@@ -46,7 +46,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | `DESIGN-KEDITOR-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (requirements), `TEST-KEDITOR-001` (V&V), `PLAN-KEDITOR-001` (plan/why), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine reused unchanged), `REF-KROKI-001` (the external render gateway) |
@@ -86,7 +86,7 @@ The engine (`packages/js`, `packages/rust/kymostudio-core`) is reused **unchange
 | `DiagramsPage.tsx` | The library route: owner's list (sorted by `updatedAt` desc), search filter, workspace pill tabs, move/delete per row, refresh on focus/visibility, relative timestamps, kind badges. |
 | `codeeditor.tsx` | CodeMirror 6 wrapper — FR-KE-15: extension set (line numbers, active line, history, bracket matching, `indentWithTab`, line wrapping), a brand-palette theme, per-kind language via a `Compartment` (generic keyword-parameterised `StreamLanguage` for DSL-ish kinds; `json`/`xml`/legacy `yaml`/`clojure`/`stex`/`verilog` for the rest), `applyingExternal` flag so external `value` swaps don't echo as user edits. |
 | `engine.ts` | The lazy kymo render path — FR-KE-01: `initSync(wasmBytes)` once, `setManifest`, `setIconBaseURL(jsDelivr)`, exports `renderDiagram = renderSVG ∘ parseDiagram`. Reached only via `import("./engine")`. |
-| `kroki.ts` | `KINDS` (kymo + 28 kroki kinds), `kindLabel`, `renderKroki(kind, source)` = `POST https://kroki.io/<kind>/svg`, error text propagated — FR-KE-13. |
+| `kroki.ts` | `KINDS` (kymo + 28 kroki kinds), `kindLabel`, `renderKroki(kind, source)` = `POST https://kroki.io/<kind>/svg`, error text propagated — FR-KE-13. Also `sanitizeSvg` (DOMPurify) — the third-party-SVG hygiene of `FR-RD-09` (see §3 and ADR-9). |
 | `samples.ts` | Per-kind starter sources (kroki.io-verified) — FR-KE-14. |
 | `share.ts` | The share codec + `shareUrl` — FR-KE-25 (see §5). |
 | `room.ts` | `useRoom(roomId, idToken, handlers)` — the WebSocket hook (see §6). |
@@ -100,7 +100,7 @@ The engine (`packages/js`, `packages/rust/kymostudio-core`) is reused **unchange
 
 ## 3. Render orchestration (`EditorPage.doRender`) — FR-KE-01/02/05
 
-One debounced effect re-renders and (in room mode) pushes the source: **120 ms** for kymo, **450 ms** for kroki kinds. `doRender` routes by kind — `renderRef.current` (the lazily imported engine) for kymo, `renderKroki` otherwise — and guards async completion with a **sequence counter** (`renderSeq`): a response older than the latest request is dropped, so a slow kroki render can never paint over a newer one. Success writes `OK · <bytes> · <ms>ms`; failure writes the message in error state. The status bar prefixes `⚡` while the room socket is live.
+One debounced effect re-renders and (in room mode) pushes the source: **120 ms** for kymo, **450 ms** for kroki kinds. `doRender` routes by kind — `renderRef.current` (the lazily imported engine) for kymo, `renderKroki` otherwise — and guards async completion with a **sequence counter** (`renderSeq`): a response older than the latest request is dropped, so a slow kroki render can never paint over a newer one. The kroki path passes the response through **`sanitizeSvg` (DOMPurify) before it reaches `dangerouslySetInnerHTML`** — the SVG is third-party markup rendered from possibly-untrusted `?s=` source (`FR-RD-09`, ADR-9); kymo output (trusted local engine) is injected as-is. Success writes `OK · <bytes> · <ms>ms`; failure writes the message in error state. The status bar prefixes `⚡` while the room socket is live.
 
 ## 4. Pane splitter — FR-KE-16
 
@@ -112,7 +112,7 @@ Pointer-captured drag on the divider sets the source-pane flex basis in % (clamp
 - **Decode:** the inverse via `DecompressionStream`; failures surface as a status error ("Link share không hợp lệ").
 - **URL shape:** `shareUrl()` = `/?s=<payload>` for kymo, `/?k=<kind>&s=<payload>` otherwise. Payloads are **interchangeable with kroki.io GET URLs** in both directions (NFR-KE-07).
 - **Address-bar sync** (FR-KE-26): when no room is active and the user has actually edited (or arrived via `?s=`), a 300 ms-debounced `history.replaceState` rewrites the URL — the address bar is always a working share link. Loading a `?s=` link sets `userEdited` so subsequent edits keep syncing; `?d` suppresses the whole path.
-- **Share button** (FR-KE-27): `navigator.clipboard.writeText` with a `window.prompt` fallback; 1.5 s "Copied!" state.
+- **Share popover** (FR-KE-27, re-baselined as `FR-SH-03` in `FEAT-KSHARE-001` v0.2): opening Share encodes the payload and **auto-copies the link** (`navigator.clipboard.writeText`, `window.prompt` fallback); the popover offers the URL in a select-on-focus field + Copy, a truncation warning when the link exceeds 2 000 chars, **Copy Markdown link**, and — non-kymo kinds — **Copy Markdown image**: a kroki.io **GET** URL (`https://kroki.io/<kind>/svg/<payload>`) reusing the same `?s=` payload (NFR-KE-07 interchange). Per-variant 1.6 s "Copied" state.
 
 ## 6. Live sync — client hook + room protocol — FR-KE-06..09
 
@@ -200,6 +200,7 @@ The Worker deploys separately: `wrangler deploy` in `packages/mcp` (`wrangler.js
 - **ADR-6 — Non-kymo kinds delegate to kroki.io.** *(New in v0.2, commit `7f76fd0`.)* 28 languages for the cost of one `fetch`; no engines to host or update (see `REF-KROKI-001`). Trade-offs accepted: availability coupling and source-privacy (the text is POSTed to a third party) — risks R6 in `PLAN-KEDITOR-001`. Self-hosting kroki is the documented escape hatch.
 - **ADR-7 — The Google ID token is the only client credential.** *(New in v0.2.)* No session cookies or backend session store: the GIS JWT rides every WS/REST call and is JWKS-verified server-side; MCP wraps the same identity in OAuth. Cheap and stateless; the trade-off (token in query strings → logs) is risk R9.
 - **ADR-8 — Lazy room creation.** *(New in v0.2, commit `335e7b3`.)* + New navigates to a fresh id without creating server state; the row/room materialise on first write (and `assignWorkspace` can pre-create the row for workspace placement). Abandoned "new" clicks cost nothing.
+- **ADR-9 — Third-party SVG is sanitized with DOMPurify.** *(New in v0.3, commits `51d08ec`/`a5ff7b5` — documents `FR-RD-09`.)* A `?s=` share link carries arbitrary source, so the SVG kroki.io renders from it is **attacker-controllable markup** headed for `dangerouslySetInnerHTML`. `sanitizeSvg` strips scripts, event handlers, and `javascript:` URLs (`USE_PROFILES: svg+svgFilters+html`) while **keeping `foreignObject`**: Mermaid's `htmlLabels` put every node/edge label in HTML inside one, so dropping it (DOMPurify's default — `foreignObject` is not an HTML integration point) would blank Mermaid diagrams; instead `HTML_INTEGRATION_POINTS` is extended so its content is sanitized with the html profile. Trade-offs accepted: `dompurify` becomes a runtime dependency of `packages/editor` (the engine in `packages/js` stays dependency-free), and trusted kymo output skips the pass (engine-escaped, no third party involved).
 
 ## Annex B — Revision History
 
@@ -207,3 +208,4 @@ The Worker deploys separately: `wrangler deploy` in `packages/mcp` (`wrangler.js
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-10 | Vũ Anh | Initial design. Documents the client render path, esbuild static build, Cloudflare Pages deploy workflow, the WebSocket live-sync protocol + `EditorRoom` DO, and the `KymoMCP` MCP server/routing — all grounded in the shipped tree. ADRs record the server→client migration and the single-room/DO-storage choices. |
 | 0.2     | 2026-06-12 | Vũ Anh | **Re-baseline for the React-SPA product** (P4–P9): module map for `web/` (replaces the `app.js` walkthrough), render orchestration (per-kind debounce + stale-response guard), CodeMirror integration, splitter, the kroki-compatible share codec + address-bar sync, the per-diagram room protocol (`doc`/`meta`/`set`/`rename`, owner binding, no timed reconnect), D1 schema + upsert cadence + KV→D1 migration, GIS/JWKS auth + OAuth-gated MCP, REST APIs, the five per-user MCP tools, code-split build with cache-busting, and the two-target deploy. ADR-2/3 superseded (per-diagram rooms; D1 of record); ADR-5 revised (split chunk); ADR-6/7/8 added (kroki delegation, ID-token-only auth, lazy room creation). |
+| 0.3     | 2026-06-12 | Vũ Anh | **Kroki-integration reconciliation (docs-only).** §3 now documents the **`sanitizeSvg` (DOMPurify) pass** on the kroki render path before `dangerouslySetInnerHTML` (with the §2 `kroki.ts` row updated) and **ADR-9** records the decision (strip scripts/handlers/`javascript:`; keep `foreignObject` for Mermaid `htmlLabels` via `HTML_INTEGRATION_POINTS`; `dompurify` accepted as an editor runtime dep) — shipped in `51d08ec`/`a5ff7b5`, previously undocumented; the requirement is `FR-RD-09` (`FEAT-KRENDER-001` v0.2). §5 Share bullet re-baselined to the shipped popover (auto-copy on open, copy variants incl. the kroki.io GET image URL, > 2 000-char warning — `FR-SH-03`, `FEAT-KSHARE-001` v0.2). |
