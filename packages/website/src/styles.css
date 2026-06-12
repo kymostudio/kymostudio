@@ -329,6 +329,20 @@ section.mcp {
 }
 .mcp-h2-edge { display: block; margin: 0 0 18px; }
 .mcp-snippets { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+/* agent picker — one pill per famous client */
+.mcp-agents { display: flex; flex-wrap: wrap; gap: 7px; }
+.mcp-agent {
+  appearance: none; cursor: pointer;
+  background: var(--bg);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
+  color: var(--dim);
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.mcp-agent:hover { color: var(--ink); border-color: var(--dim); }
+.mcp-agent.active { background: var(--ink); border-color: var(--ink); color: #fff; }
 /* the connect snippet, dressed as a tiny terminal */
 .mcp-term {
   background: var(--ink);
@@ -347,17 +361,13 @@ section.mcp {
 .mcp-term-dots i:nth-child(1) { background: #ff5f57; }
 .mcp-term-dots i:nth-child(2) { background: #febc2e; }
 .mcp-term-dots i:nth-child(3) { background: #28c840; }
-.mcp-tabs { display: flex; gap: 4px; flex: 1; }
-.mcp-tab {
-  appearance: none; border: 0; background: transparent;
-  font-family: var(--font); font-size: 12.5px; font-weight: 600;
-  color: rgba(255, 255, 255, 0.55);
-  padding: 5px 11px; border-radius: 8px;
-  cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease;
+.mcp-term-label {
+  flex: 1;
+  font-family: var(--mono); font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.mcp-tab:hover { color: #fff; }
-.mcp-tab.active { background: rgba(255, 255, 255, 0.14); color: #fff; }
 .mcp-copy-btn {
   appearance: none; background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 8px;
@@ -377,6 +387,7 @@ section.mcp {
   color: #f3f1f8;
 }
 .mcp-note { margin: 0; font-size: 13px; color: var(--dim); }
+.mcp-deeplink { font-weight: 600; white-space: nowrap; }
 
 /* ── Feature nodes ───────────────────────────────────────────── */
 section.features {
@@ -595,8 +606,6 @@ footer a:hover { color: var(--accent); }
   .hero-art img { width: 150px; }
   .hero-edge { display: none; }
   .mcp-inner { grid-template-columns: 1fr; gap: 28px; padding: 30px 26px; }
-  .mcp-term-bar { flex-wrap: wrap; row-gap: 8px; }
-  .mcp-tabs { order: 3; flex-basis: 100%; }
   .mcp-copy-btn { margin-left: auto; }
   .modal-content { width: 96vw; height: 94vh; }
   .modal-body { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
