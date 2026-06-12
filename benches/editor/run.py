@@ -36,6 +36,13 @@ def _fmt(v) -> str:
     return "—" if v is None else f"{v:,}"
 
 
+_MARK = {"good": " 🟢", "needs-improvement": " 🟡", "poor": " 🔴"}
+
+
+def _graded(metric: str, value) -> str:
+    return _fmt(value) + _MARK.get(scenarios.grade(metric, value) or "", "")
+
+
 def _report(q: dict, p: dict) -> str:
     m = p["meta"]
     lines = [
@@ -78,15 +85,40 @@ def _report(q: dict, p: dict) -> str:
     for r in p["scenarios"]:
         md = r["median"]
         lines.append(
-            f"| {r['key']} | {r['reps']} ({r['failed_reps']}) | {_fmt(md['TTFB_MS'])} ms | {_fmt(md['FCP_MS'])} ms "
-            f"| {_fmt(md['KROKI_SENT_MS'])} ms | {_fmt(md['KROKI_DONE_MS'])} ms | **{_fmt(md['DIAGRAM_VISIBLE_MS'])} ms** "
-            f"| {_fmt(md['WIRE_TOTAL_KB'])} ({_fmt(md['WIRE_ENGINE_KB'])}) |"
+            f"| {r['key']} | {r['reps']} ({r['failed_reps']}) | {_graded('TTFB_MS', md['TTFB_MS'])} ms | {_graded('FCP_MS', md['FCP_MS'])} ms "
+            f"| {_graded('KROKI_SENT_MS', md['KROKI_SENT_MS'])} ms | {_fmt(md['KROKI_DONE_MS'])} ms | **{_graded('DIAGRAM_VISIBLE_MS', md['DIAGRAM_VISIBLE_MS'])} ms** "
+            f"| {_graded('WIRE_TOTAL_KB', md['WIRE_TOTAL_KB'])} ({_fmt(md['WIRE_ENGINE_KB'])}) |"
         )
     lines += [
         "",
         "Metric of record is **DIAGRAM_VISIBLE_MS** — first SVG in the preview pane.",
         "`KROKI_DONE_MS − KROKI_SENT_MS` is kroki.io's own server-side render; the",
         "editor controls everything to the left of it (see `research/` for the analyses).",
+        "",
+        "## Baselines",
+        "",
+        "Medians are graded 🟢 good / 🟡 needs improvement / 🔴 poor against:",
+        "",
+        "| Metric | 🟢 ≤ | 🔴 > | Source |",
+        "|---|---|---|---|",
+    ]
+    for m, (good_max, poor_min) in scenarios.BASELINES.items():
+        unit = "KB" if m.endswith("_KB") else "ms"
+        src = {
+            "TTFB_MS": "[web.dev/ttfb](https://web.dev/articles/ttfb)",
+            "FCP_MS": "[web.dev/fcp](https://web.dev/articles/fcp)",
+            "DIAGRAM_VISIBLE_MS": "LCP budget, [web.dev/lcp](https://web.dev/articles/lcp) — the diagram is the page's largest contentful element",
+            "KROKI_SENT_MS": "house: under 1 s = the inline kick-off beat the bundle (no public standard)",
+            "WIRE_TOTAL_KB": "house, anchored to the ~2.4 MB median page — [HTTP Archive Web Almanac 2025](https://almanac.httparchive.org/en/2025/page-weight)",
+        }[m]
+        lines.append(f"| {m} | {good_max:,} {unit} | {poor_min:,} {unit} | {src} |")
+    lines += [
+        "",
+        "KROKI_DONE_MS is ungraded (kroki.io's server-side render — a third party's",
+        "number); WIRE_ENGINE_KB is pass/fail per scenario in the quality pass. Google",
+        "defines its buckets on the 75th percentile of *field* data; this bench grades",
+        "the median of N *throttled lab* loads — a stricter network than typical field",
+        "traffic, so a 🟡 here is not a CrUX 🟡.",
         "",
     ]
     return "\n".join(lines)

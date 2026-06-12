@@ -50,12 +50,14 @@ def measure(base_url: str, channel: str | None, reps: int) -> dict:
             for scn in scenarios.SCENARIOS:
                 runs = [scenarios.load_once(browser, base_url, scn, throttle=True) for _ in range(reps)]
                 good = [r for r in runs if r["ok"]]
+                med = {m: _median(good, m) for m in METRICS}
                 out.append({
                     "key": scn["key"],
                     "title": scn["title"],
                     "reps": reps,
                     "failed_reps": reps - len(good),
-                    "median": {m: _median(good, m) for m in METRICS},
+                    "median": med,
+                    "grade": {m: g for m in METRICS if (g := scenarios.grade(m, med[m]))},
                     "engine_fetched": any(r["engine_fetched"] for r in runs),
                     "runs": [{m: r.get(m) for m in METRICS + ["ok"]} for r in runs],
                 })

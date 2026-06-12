@@ -82,6 +82,49 @@ METRICS = [
     "WIRE_ENGINE_KB",      # of which the wasm engine chunk (must be 0 on kroki kinds)
 ]
 
+# Grading thresholds per metric: (good_max, poor_min) in the metric's own unit;
+# between the two = "needs improvement" — Google's three-bucket scheme. Sources:
+#
+#   TTFB_MS              ≤800 / >1800 ms   — https://web.dev/articles/ttfb
+#   FCP_MS               ≤1800 / >3000 ms  — https://web.dev/articles/fcp
+#   DIAGRAM_VISIBLE_MS   ≤2500 / >4000 ms  — the LCP budget
+#                          (https://web.dev/articles/lcp): the diagram IS this
+#                          page's largest contentful element, so the LCP
+#                          thresholds are the honest stand-in even though we
+#                          stamp it with a MutationObserver, not the LCP API.
+#   KROKI_SENT_MS        ≤1000 / >2000 ms  — house budget, no public standard:
+#                          under 1 s means the inline kick-off beat the bundle
+#                          (a bundle-initiated POST can't leave before FCP).
+#   WIRE_TOTAL_KB        ≤600 / >2400 KB   — house budget anchored to the HTTP
+#                          Archive Web Almanac 2025 median home page (~2.4 MB
+#                          desktop): a diagram share page outweighing the median
+#                          web page is poor; good is a quarter of that.
+#
+# Ungraded: KROKI_DONE_MS (kroki.io's server-side render — a third party's
+# number, tracked but not ours to budget) and WIRE_ENGINE_KB (pass/fail per
+# scenario in quality.py, not a gradient).
+#
+# Caveat: Google defines its buckets on the 75th percentile of *field* data;
+# this bench grades the MEDIAN of N *throttled lab* loads — a stricter network
+# than typical field traffic, so a 🟡 here is not a CrUX 🟡.
+BASELINES: dict[str, tuple[int, int]] = {
+    "TTFB_MS": (800, 1800),
+    "FCP_MS": (1800, 3000),
+    "DIAGRAM_VISIBLE_MS": (2500, 4000),
+    "KROKI_SENT_MS": (1000, 2000),
+    "WIRE_TOTAL_KB": (600, 2400),
+}
+
+
+def grade(metric: str, value) -> str | None:
+    """'good' | 'needs-improvement' | 'poor' for a baselined metric, else None."""
+    b = BASELINES.get(metric)
+    if b is None or value is None:
+        return None
+    good_max, poor_min = b
+    return "good" if value <= good_max else ("poor" if value > poor_min else "needs-improvement")
+
+
 # Installed before any document script: stamps the moment the first diagram SVG
 # lands in the preview pane — the metric a share-link visitor actually feels.
 _INIT_JS = """

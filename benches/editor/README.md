@@ -18,6 +18,14 @@ for the diagram. Two axes, same harness (Playwright driving headless Chrome):
 - **Performance** — how fast, on the Chrome DevTools **Fast 4G** throttle
   (165 ms RTT, ~8.3 Mbit/s down), median over N cold loads: TTFB, FCP, the
   kroki request window, **time to first diagram**, and bytes on the wire.
+  Medians are graded 🟢/🟡/🔴 against published baselines —
+  [web.dev](https://web.dev/articles/ttfb) thresholds for `TTFB_MS`/`FCP_MS`,
+  the [LCP budget](https://web.dev/articles/lcp) for `DIAGRAM_VISIBLE_MS` (the
+  diagram is the page's largest contentful element), and house budgets for
+  `KROKI_SENT_MS` (the kick-off must beat the bundle) and `WIRE_TOTAL_KB`
+  (anchored to the [HTTP Archive 2025](https://almanac.httparchive.org/en/2025/page-weight)
+  ~2.4 MB median page). Thresholds + sources live in `scenarios.BASELINES`;
+  the REPORT prints the full table.
 
 ## Unlike the other benches, this one is ONLINE
 
