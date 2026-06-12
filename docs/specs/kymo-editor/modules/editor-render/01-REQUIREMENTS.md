@@ -1,7 +1,7 @@
 ---
 title: Editor Render — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KRENDER-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-12
 status: Implemented
 classification: Internal
@@ -47,7 +47,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KRENDER-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KSHARE-001` (sibling — sharing & export), `FEAT-KLIVE-001` (sibling — accounts & live documents), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KEMCP-001` (sibling — MCP channel), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine reused unchanged), `REF-KROKI-001` (the external render gateway) |
@@ -143,8 +143,8 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-RD-01** | The editor SHALL render the kymo `flowchart { }` / `bpmn { }` DSL to SVG **entirely in the browser**, via `parseDiagram(source)` → `renderSVG(...)` from the `kymostudio` package with the `kymostudio-core` wasm initialised once on first use. The engine module SHALL be **lazy-loaded** (dynamic import) so the wasm chunk is fetched only on the editor route. There SHALL be no server roundtrip for kymo rendering. | SN-RD-01, SN-RD-02 |
-| **FR-RD-02** | The editor SHALL re-render on input with a debounce of **120 ms for kymo** and **450 ms for kroki kinds**, SHALL discard stale async render responses (a sequence guard), and SHALL show a status line `OK · <n> bytes · <ms>ms` on success. | SN-RD-01 |
+| **FR-RD-01** | The editor SHALL render the kymo `flowchart { }` / `bpmn { }` DSL to SVG **entirely in the browser**, via `parseDiagram(source)` → `renderSVG(...)` from the `kymostudio` package with the `kymostudio-core` wasm initialised once on first use. The engine module SHALL be **lazy-loaded** (dynamic import) on the **first kymo render** — a kroki-kind session (e.g. a Mermaid `?s=` share link) SHALL NOT fetch the wasm chunk at all, and a share link's `?k`/`?s` seed the initial kind/source so the mount cycle never renders the kymo sample. There SHALL be no server roundtrip for kymo rendering. *(v0.3: load moved from editor mount to first kymo render — commit `ef02c04`.)* | SN-RD-01, SN-RD-02 |
+| **FR-RD-02** | The editor SHALL re-render on input with a debounce of **120 ms for kymo** and **450 ms for kroki kinds**, SHALL discard stale async render responses (a sequence guard), and SHALL show a status line `OK · <n> bytes · <ms>ms` on success. The **first render of a session** SHALL fire immediately, without waiting out the typing debounce. *(v0.3: immediate first render — commit `ef02c04`.)* | SN-RD-01 |
 | **FR-RD-03** | The editor SHALL resolve icon art from a CDN base URL (`setIconBaseURL` → jsDelivr `gh/kymostudio/kymostudio@main/packages/icons`), so no icon assets are bundled or served locally. | SN-RD-02 |
 | **FR-RD-04** | On a parse/render error (engine exception or a kroki error response), the editor SHALL surface the message in the status line (error state) and SHALL NOT crash the page. | SN-RD-01 |
 | **FR-RD-09** | SVG returned by kroki.io is **third-party markup rendered from source the editor does not control** (a `?s=` share link can carry anyone's source — see `FEAT-KSHARE-001`). Before injection into the page, the editor SHALL **sanitize** it with DOMPurify (`USE_PROFILES: svg + svgFilters + html`), stripping scripts, event handlers, and `javascript:` URLs. `foreignObject` SHALL be **preserved** (Mermaid `htmlLabels` puts every node/edge label in HTML inside one) with its HTML content sanitized via the html profile (`HTML_INTEGRATION_POINTS` extended to `foreignobject`, which DOMPurify excludes by default). Kymo output (the local, trusted engine) does not pass through sanitization. *(As-built: commits `51d08ec`, `a5ff7b5` — module-native requirement, no former `FR-KE` id.)* | SN-RD-03 |
@@ -153,7 +153,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-RD-05** | The editor SHALL offer a **kind selector** with `kymo` plus the 28 kroki kinds enumerated in `web/kroki.ts` (ActDiag … WireViz). Non-kymo kinds SHALL render by `POST https://kroki.io/<kind>/svg` with the raw source as the body; a non-OK response SHALL surface as a render error (FR-RD-04). | SN-RD-03 |
+| **FR-RD-05** | The editor SHALL offer a **kind selector** with `kymo` plus the 28 kroki kinds enumerated in `web/kroki.ts` (ActDiag … WireViz). Non-kymo kinds SHALL render by `POST https://kroki.io/<kind>/svg` with the raw source as the body; a non-OK response SHALL surface as a render error (FR-RD-04). The first render of a `?s=` share link MAY be served by the **early kick-off**: the HTML shell fires the identical POST before the app bundle has downloaded, and `renderKroki` adopts the in-flight response when kind+source match exactly (single use; on mismatch or failure it falls back to a fresh request — `DESIGN-KEDITOR-001` §3). The adopted response passes through the same sanitization (FR-RD-09). *(v0.3: early kick-off — commit `ef02c04`.)* | SN-RD-03 |
 | **FR-RD-06** | Switching kind SHALL load that kind's **starter sample** (`web/samples.ts`; each verified to render on kroki.io) into the editor and render it — mirroring kroki.io's own selector behaviour. The current kind SHALL be persisted with the diagram (`FR-LV-07`) and shown as a badge in the library list (`FEAT-KLIBRARY-001`). | SN-RD-03 |
 
 ### C.3 Functional requirements — Editing surface (`FR-RD-07..08`)
@@ -177,6 +177,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 3. Line numbers, undo/redo, bracket match, and Tab-indent work; the splitter drags (clamped 15–85 %), persists across reload, and resets on double-click.
 4. Malformed source (kymo or kroki) surfaces in the status line without crashing the page.
 5. A kroki SVG carrying `<script>`, event-handler attributes, or `javascript:` URLs renders with all of them stripped — nothing executes in the preview; ordinary Mermaid `htmlLabels` (foreignObject) still display.
+6. Opening a kroki-kind share link on a cold profile **never fetches the wasm engine chunk** (network panel: no `chunks/engine-*.js`), and its kroki POST is in flight before `main.js` finishes downloading (the early kick-off).
 
 ---
 
@@ -186,3 +187,4 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-12 | Vũ Anh | Initial **as-built carve-out** from `FEAT-KEDITOR-001` v0.2 under the kymo-editor umbrella decomposition. Re-homes `SN-KE-01/06/09/12 → SN-RD-01..04`, `FR-KE-01/02/04/05/13/14/15/16 → FR-RD-01..08`, `NFR-KE-01/05 → NFR-RD-01..02`. Stub doc-set (01 only); design/V&V remain in `DESIGN-KEDITOR-001` / `TEST-KEDITOR-001`. |
 | 0.2     | 2026-06-12 | Vũ Anh | **As-built reconciliation: third-party SVG sanitization.** Added **`FR-RD-09`** — kroki SVG is sanitized with DOMPurify before DOM injection (scripts/handlers/`javascript:` stripped; `foreignObject` preserved with html-profile-sanitized content for Mermaid `htmlLabels`); kymo output stays unsanitized (trusted local engine). Module-native id (no former `FR-KE`); shipped in commits `51d08ec`/`a5ff7b5` but previously undocumented. Added acceptance #5; traceability extended to TC-KE-24 (`TEST-KEDITOR-001` v0.3); see ADR-9 in `DESIGN-KEDITOR-001` v0.3. |
+| 0.3     | 2026-06-12 | Vũ Anh | **Share-link first-load perf re-baseline** (commit `ef02c04`, P11 in `PLAN-KEDITOR-001` v0.4). `FR-RD-01`: engine chunk loads on **first kymo render** (was: editor mount) — kroki-kind sessions never fetch the wasm; share `?k`/`?s` seed initial state. `FR-RD-02`: first render of a session fires without the debounce. `FR-RD-05`: documented the **early kroki kick-off** (HTML shell fires the POST pre-bundle; `renderKroki` adopts on exact kind+source match; sanitization unchanged). Acceptance #6 added; see ADR-10 in `DESIGN-KEDITOR-001` v0.4 and the `benches/editor` snapshot (Annex B of `TEST-KEDITOR-001` v0.4). |

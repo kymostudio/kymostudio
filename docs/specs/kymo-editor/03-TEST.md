@@ -1,7 +1,7 @@
 ---
 title: Kymo Editor (editor.kymo.studio) — Verification & Validation
 document_id: TEST-KEDITOR-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-06-12
 status: Implemented
 classification: Internal
@@ -36,7 +36,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | `TEST-KEDITOR-001` |
-| Version           | 0.3 |
+| Version           | 0.4 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (requirements), `DESIGN-KEDITOR-001` (design), `PLAN-KEDITOR-001` (plan) |
@@ -51,6 +51,7 @@ keywords:
 - **Worker integration (manual)** — drive a room over `/ws` and the REST APIs, and the MCP endpoint over `/mcp` from a real host (Claude), asserting ownership, persistence, fan-out, and echo behaviour.
 - **Regression gate (automated, indirect)** — the engine producing the kymo SVG is reused unchanged; the golden/`node --test` suites in `packages/js` and `packages/python` MUST stay green (no editor change may touch them).
 - **Deploy gate (automated)** — `deploy-editor.yml` must build wasm → js → bundle on every relevant push; a red deploy blocks the site from updating.
+- **Share-link first-load bench (automated, online, snapshot)** — `benches/editor` drives the **deployed** editor + live kroki.io with Playwright on a cold profile (Fast-4G throttle): quality probes + perf medians (Annex B). A dated snapshot, **never a gate** — numbers move with the network and kroki's queue.
 - **Two accounts needed** for the ownership cases (TC-KE-19): one owner, one intruder.
 
 ## 2. Feature test cases (`TC-KE`)
@@ -94,9 +95,9 @@ If an engine gate moves because of an editor change, the change is **out of scop
 
 ## 4. Non-functional verification
 
-- **NFR-KE-01 (performance):** the `<ms>ms` for kymo renders is in the tens on a typical laptop; TC-KE-03 confirms no network dependency for kymo; TC-KE-02 confirms kroki latency never blocks or misorders the UI.
+- **NFR-KE-01 (performance):** the `<ms>ms` for kymo renders is in the tens on a typical laptop; TC-KE-03 confirms no network dependency for kymo; TC-KE-02 confirms kroki latency never blocks or misorders the UI. Cold share-link first load is tracked by the Annex B bench (2026-06-12 snapshot: Mermaid share link **diagram visible ~3.4 s** on Fast 4G, 211 KB wire, engine chunk not fetched).
 - **NFR-KE-02 (operability):** TC-KE-14 confirms static-Pages + serverless-Worker deploy with no server.
-- **NFR-KE-03 (portability):** inspect `dist/` — SPA shell + split chunks, engine (wasm-inlined) in its own chunk, `?v=` cache-busted URLs; load `/diagrams` cold and confirm the engine chunk is not fetched.
+- **NFR-KE-03 (portability):** inspect `dist/` — SPA shell + split chunks, engine (wasm-inlined) in its own chunk, content-hash `?v=` URLs + immutable `chunks/*` `_headers` + modulepreload links (v0.4); load `/diagrams` cold and confirm the engine chunk is not fetched — the Annex B bench asserts the same for a kroki share link (and that it **is** fetched for kymo).
 - **NFR-KE-04 (reliability):** TC-KE-09 — DO hibernation/restore plus the D1 flush on disconnect.
 - **NFR-KE-05 (compatibility):** §3 regression gates — kymo output is the unchanged `kymostudio` engine.
 - **NFR-KE-06 (security):** TC-KE-19; additionally confirm a forged/expired ID token is rejected (401) on `/ws` and `/api/*`. Client-side, TC-KE-24 covers the third-party-SVG surface (kroki output sanitized before DOM injection — FR-RD-09).
@@ -153,3 +154,12 @@ If an engine gate moves because of an editor change, the change is **out of scop
 | 0.1     | 2026-06-10 | Vũ Anh | Initial V&V. `TC-KE-01..14` covering client render/debounce/offline/download/error, two-tab live sync, empty-room seed, persist/replay, reconnect, `set_diagram`/`get_diagram`, transports, and deploy shape. Regression gates pin the unchanged engine output. Full FR/NFR → TC traceability. |
 | 0.2     | 2026-06-12 | Vũ Anh | **Re-baseline alongside `FEAT-KEDITOR-001` v0.2.** Revised `TC-KE-02` (per-kind debounce + stale guard), `TC-KE-04` (title-named SVG), `TC-KE-07..09` (per-diagram rooms, lazy-seed + auto-title, DO + D1 persistence), `TC-KE-10` (socket-loss expectation — **no timed reconnect**, replacing the v0.1 reconnect case), `TC-KE-11..13` (per-user MCP tool set behind OAuth; `/set`/`/get` no longer public), `TC-KE-14` (split chunks + cache-bust). Added `TC-KE-15..23` (share round-trip + button, kinds/samples/highlighting, editing surface, ownership, sign-in/out, library, workspaces, PNG/source export). Strategy now states honestly that `packages/editor` has **no automated suite** (manual procedures + engine/deploy gates) and names the automation candidates. Traceability extended to `FR-KE-13..29`, `NFR-KE-06..07`. |
 | 0.3     | 2026-06-12 | Vũ Anh | **Kroki-integration reconciliation.** Added **`TC-KE-24`** — kroki SVG sanitization (malicious `?s=` source → scripts/handlers/`javascript:` stripped, nothing executes; Mermaid `htmlLabels` foreignObject content survives) — covering the previously untested `FR-RD-09` (`FEAT-KRENDER-001` v0.2) and extending the NFR-KE-06 surface client-side. Revised **`TC-KE-16`** to the shipped share popover (auto-copy on open, Markdown link/image variants incl. the kroki.io GET URL, > 2 000-char warning — `FR-SH-03`, `FEAT-KSHARE-001` v0.2). Traceability rows added for both. |
+| 0.4     | 2026-06-12 | Vũ Anh | **Folded in the share-link first-load bench** (commit `3785a53`) as **Annex B**: online Playwright harness over the deployed editor + live kroki.io — quality probes (label survival = the FR-RD-09 sanitizer regression probe; engine chunk fetched for kymo only; early kick-off adopted) + Fast-4G perf medians; snapshot, never a gate. §1 strategy row added; §4 NFR-KE-01/03 now cite the bench (2026-06-12 snapshot: Mermaid share link visible ~3.4 s, engine chunk not fetched; content-hash `?v=` + immutable chunk headers per `DESIGN-KEDITOR-001` v0.4 §11). |
+
+## Annex B — Share-link first-load bench (`benches/editor`)
+
+Per the repo's doc norm, the editor's benchmark folds in here. `benches/editor` (Python + Playwright, `uv run python editor/run.py`) cold-loads the **deployed** editor on a fresh profile under a Fast-4G throttle (165 ms RTT), two scenarios — a Mermaid `?k=&s=` share link and the default kymo editor — and writes dated results to `benches/editor/results/`.
+
+- **Quality probes** (per load): the diagram SVG appears; **every expected label survives** — the standing regression probe for the FR-RD-09 sanitizer (DOMPurify once silently dropped `foreignObject`, deleting all Mermaid labels while the page looked rendered); the **engine chunk is fetched for kymo and only for kymo** (NFR-KE-03); the early kroki kick-off fired and was adopted (`FR-RD-05` v0.3).
+- **Perf medians** (per scenario): TTFB, FCP, kroki request window, **time to first diagram** (the metric of record), bytes on the wire.
+- **Caveat:** the bench is **online** — it exercises Cloudflare Pages and the live kroki.io render, so results are dated snapshots (failed reps dropped and reported), never a CI gate. The engine/golden suites in §3 remain the only hard gates.
