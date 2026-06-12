@@ -9,7 +9,7 @@ import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -54,7 +54,9 @@ export default function EditorPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [sharePayload, setSharePayload] = useState(""); // deflate+base64url of the current source
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
   const [editingName, setEditingName] = useState(false);
   // split = width of the source pane in % (dbdiagram-style draggable divider)
@@ -147,7 +149,7 @@ export default function EditorPage() {
       .catch(() => {
         if (stop) return;
         setSource(""); // don't show the sample as if it were the shared diagram
-        setShareError("Link chia sẻ không hợp lệ — không đọc được diagram từ URL. Link có thể đã bị cắt ngắn khi gửi.");
+        setShareError("Invalid share link — couldn't read a diagram from the URL. The link may have been truncated in transit.");
       });
     return () => { stop = true; };
   }, [d, sharedSrc, sharedKind]); // eslint-disable-line
@@ -207,9 +209,11 @@ export default function EditorPage() {
   }, [source, kind, d]); // eslint-disable-line
 
   useEffect(() => {
-    const h = () => { setMenuOpen(false); setExportOpen(false); };
+    const h = () => { setMenuOpen(false); setExportOpen(false); setShareOpen(false); };
+    const k = (e: KeyboardEvent) => { if (e.key === "Escape") h(); };
     document.addEventListener("click", h);
-    return () => document.removeEventListener("click", h);
+    document.addEventListener("keydown", k);
+    return () => { document.removeEventListener("click", h); document.removeEventListener("keydown", k); };
   }, []);
 
   // Without a room there's no stored title — derive one from the source so share
@@ -251,19 +255,16 @@ export default function EditorPage() {
       canvas.toBlob((b) => { if (b) saveBlob(b, (diagramLabel || "flowchart") + ".png"); }, "image/png");
     } finally { URL.revokeObjectURL(url); }
   }
-  async function copyShareLink() {
+  async function openShare() {
+    if (shareOpen) { setShareOpen(false); return; }
     if (!source.trim()) return;
-    const url = shareUrl(kind, await encodeShare(source));
-    try { await navigator.clipboard.writeText(url); } catch { window.prompt("Copy link:", url); return; }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-    if (url.length > 2000) {
-      setStatus(`Đã copy link · ${url.length} ký tự — link dài, một số app chat có thể cắt; cân nhắc Export SVG/PNG`);
-      setStatusErr(true);
-    } else {
-      setStatus("Đã copy link chia sẻ — ai mở cũng xem được, không cần đăng nhập");
-      setStatusErr(false);
-    }
+    setSharePayload(""); setCopiedKey(null); setShareOpen(true);
+    setSharePayload(await encodeShare(source));
+  }
+  async function copyText(key: string, text: string) {
+    try { await navigator.clipboard.writeText(text); } catch { window.prompt("Copy:", text); return; }
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1600);
   }
   function exportSource() {
     if (!source.trim()) return;
@@ -331,14 +332,14 @@ export default function EditorPage() {
               onKeyDown={(e) => { if (e.key === "Enter") commitRename((e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditingName(false); }}
               onBlur={(e) => commitRename(e.target.value)} />
           ) : (
-            <span className={"diagram-name editable" + (title ? "" : " untitled")} title="Đổi tên" onClick={() => setEditingName(true)}>
+            <span className={"diagram-name editable" + (title ? "" : " untitled")} title="Rename" onClick={() => setEditingName(true)}>
               {diagramLabel}
               <Pencil size={12.5} strokeWidth={2.1} className="pencil" />
             </span>
           )
         ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")}>{diagramLabel}</span>}
         {claims && d && !booting && (
-          <span className={"save-ind" + (live ? "" : " off")} title={live ? "Mọi thay đổi được lưu real-time" : "Mất kết nối — thay đổi chưa được lưu"}>
+          <span className={"save-ind" + (live ? "" : " off")} title={live ? "All changes are saved in real time" : "Disconnected — changes are not being saved"}>
             {live ? "Saved" : "Offline"}
           </span>
         )}
@@ -354,7 +355,7 @@ export default function EditorPage() {
           )}
           <button onClick={newDiagram} title="New diagram"><Plus size={16} strokeWidth={2.2} />New</button>
           {shared && claims && (
-            <button onClick={saveCopy} title="Lưu một bản copy vào Diagrams của bạn">
+            <button onClick={saveCopy} title="Save a copy to your Diagrams">
               <Save size={16} strokeWidth={2} />
               Save a copy
             </button>
@@ -379,10 +380,44 @@ export default function EditorPage() {
               </div>
             )}
           </div>
-          <button className="btn-primary" onClick={copyShareLink} title="Copy link chia sẻ — toàn bộ diagram nằm trong URL, không cần đăng nhập để mở">
-            {copied ? <Check size={16} strokeWidth={2.2} /> : <Link2 size={16} strokeWidth={2} />}
-            {copied ? "Copied!" : "Share"}
-          </button>
+          <div className="account" onClick={(e) => e.stopPropagation()}>
+            <button className="btn-primary" onClick={openShare} title="Share this diagram — the entire content lives in the link">
+              <Link2 size={16} strokeWidth={2} />
+              Share
+            </button>
+            {shareOpen && (() => {
+              const link = sharePayload ? shareUrl(kind, sharePayload) : "";
+              const tooLong = link.length > 2000;
+              return (
+                <div className="acct-menu share-menu">
+                  <div className="share-head">Share diagram</div>
+                  <p className="share-desc">The entire diagram lives in the link — anyone with it can open and edit their own copy, no sign-in needed.</p>
+                  <div className="share-row">
+                    <input className="share-url" readOnly spellCheck={false} value={link || "Generating link…"}
+                      onFocus={(e) => e.currentTarget.select()} onClick={(e) => (e.currentTarget as HTMLInputElement).select()} />
+                    <button className="btn-primary share-copy" disabled={!link} onClick={() => copyText("link", link)}>
+                      {copiedKey === "link" ? <Check size={15} strokeWidth={2.2} /> : <Copy size={15} strokeWidth={2} />}
+                      {copiedKey === "link" ? "Copied" : "Copy"}
+                    </button>
+                  </div>
+                  {tooLong && <div className="share-warn">This link is {link.length.toLocaleString()} characters — some chat apps may truncate it. Consider exporting SVG/PNG instead.</div>}
+                  <div className="menu-sep" />
+                  <button className="acct-item exp-item" disabled={!link} onClick={() => copyText("md", `[${diagramLabel}](${link})`)}>
+                    {copiedKey === "md" ? <Check size={17} strokeWidth={2.2} /> : <Code2 size={17} strokeWidth={1.9} />}
+                    {copiedKey === "md" ? "Copied!" : "Copy Markdown link"}
+                  </button>
+                  {kind !== "kymo" && (
+                    <button className="acct-item exp-item" disabled={!link}
+                      title="SVG image rendered by kroki.io — paste straight into a GitHub README"
+                      onClick={() => copyText("img", `![${diagramLabel}](https://kroki.io/${encodeURIComponent(kind)}/svg/${sharePayload})`)}>
+                      {copiedKey === "img" ? <Check size={17} strokeWidth={2.2} /> : <FileImage size={17} strokeWidth={1.9} />}
+                      {copiedKey === "img" ? "Copied!" : "Copy Markdown image"}
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
         </nav>
         {claims && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
@@ -443,7 +478,7 @@ export default function EditorPage() {
               </div>
               <CodeEditor value={source} kind={kind} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
-            <div className="splitter" title="Kéo để chỉnh kích thước · double-click về 50/50"
+            <div className="splitter" title="Drag to resize · double-click for 50/50"
               onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />
             <section className="pane">
               {shareError && <div className="share-error">{shareError}</div>}

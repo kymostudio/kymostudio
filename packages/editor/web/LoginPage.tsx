@@ -20,7 +20,7 @@ export default function LoginPage() {
         <div className="signin login-card">
           <a className="brand" href="/"><img src="/favicon.svg" alt="Kymostudio" /></a>
           <h1>Sign in</h1>
-          <p className="muted">Phiên đăng nhập đã hết hạn hoặc bạn chưa đăng nhập.<br />Sign in with Google to continue.</p>
+          <p className="muted">Your session has expired or you're not signed in.<br />Sign in with Google to continue.</p>
           <GoogleButton />
         </div>
       </div>
