@@ -55,5 +55,6 @@ before it ships (the kroki calls still go to the live service).
 | `scenarios.py` | the canonical share URL + expectations, throttle constants, the cold-load harness |
 | `quality.py`   | correctness grading (1 unthrottled load per scenario, kroki-infra retries) |
 | `perf.py`      | N throttled cold loads per scenario → medians |
-| `run.py`       | both → `results/quality.json`, `results/perf.json`, `results/REPORT.md` |
+| `run.py`       | both → `results/quality.json`, `results/perf.json`, `results/REPORT.md` (+ a timestamped copy under `reports/`) |
+| `reports/`     | archive of every run's snapshot — `results/` only ever holds the latest |
 | `research/`    | hand-written analysis per benchmarking round |
