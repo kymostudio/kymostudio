@@ -11,7 +11,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://kroki.io" crossorigin />
+    <link rel="preconnect" href="https://mcp.kymo.studio" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <script src="https://accounts.google.com/gsi/client?hl=en" async></script> <!-- pin GIS UI to English: the renderButton locale field alone doesn't override browser locale -->
     <link rel="stylesheet" href="/styles.css" />
@@ -30,7 +30,10 @@
             var bin = atob(s.replace(/-/g, "+").replace(/_/g, "/"));
             var bytes = Uint8Array.from(bin, function (c) { return c.charCodeAt(0); });
             var src = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"))).text();
-            var res = fetch("https://kroki.io/" + encodeURIComponent(k) + "/svg", { method: "POST", headers: { "content-type": "text/plain" }, body: src });
+            // The cached render proxy (web/const.ts RENDER_API) — edge cache hit
+            // skips kroki's server render entirely. If this fails, renderKroki()
+            // falls back to a fresh request (proxy, then kroki.io direct).
+            var res = fetch("https://mcp.kymo.studio/api/render/" + encodeURIComponent(k) + "/svg", { method: "POST", headers: { "content-type": "text/plain" }, body: src });
             res.catch(function () {});
             return { kind: k, src: src, res: res };
           })();

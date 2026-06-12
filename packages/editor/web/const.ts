@@ -2,6 +2,9 @@ export const GOOGLE_CLIENT_ID = "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.a
 export const MCP_WS = "wss://mcp.kymo.studio/ws";
 export const DIAGRAMS_API = "https://mcp.kymo.studio/api/diagrams";
 export const WORKSPACES_API = "https://mcp.kymo.studio/api/workspaces";
+// Caching kroki proxy on the mcp worker (SVG cached by content hash at the
+// edge): repeat loads of a share link skip kroki's ~2.5s server-side render.
+export const RENDER_API = "https://mcp.kymo.studio/api/render";
 export const SAMPLE = `flowchart TD {
   A[Receive order] --> B{In stock?}
   B -->|Yes| C[Take payment]
