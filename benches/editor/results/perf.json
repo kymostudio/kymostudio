@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2026-06-12T08:52:21+00:00",
+    "timestamp": "2026-06-12T09:25:03+00:00",
     "base_url": "https://editor.kymo.studio",
     "host": "anhvu2-01.local",
     "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
@@ -20,11 +20,11 @@
       "reps": 5,
       "failed_reps": 0,
       "median": {
-        "TTFB_MS": 267,
-        "FCP_MS": 832,
-        "KROKI_SENT_MS": 564,
-        "KROKI_DONE_MS": 1041,
-        "DIAGRAM_VISIBLE_MS": 1049,
+        "TTFB_MS": 307,
+        "FCP_MS": 1368,
+        "KROKI_SENT_MS": 796,
+        "KROKI_DONE_MS": 1445,
+        "DIAGRAM_VISIBLE_MS": 1492,
         "WIRE_TOTAL_KB": 209,
         "WIRE_ENGINE_KB": 0
       },
@@ -38,52 +38,127 @@
       "engine_fetched": false,
       "runs": [
         {
-          "TTFB_MS": 267,
-          "FCP_MS": 868,
-          "KROKI_SENT_MS": 664,
-          "KROKI_DONE_MS": 1095,
-          "DIAGRAM_VISIBLE_MS": 1104,
+          "TTFB_MS": 283,
+          "FCP_MS": 984,
+          "KROKI_SENT_MS": 599,
+          "KROKI_DONE_MS": 1325,
+          "DIAGRAM_VISIBLE_MS": 1334,
           "WIRE_TOTAL_KB": 209,
           "WIRE_ENGINE_KB": 0,
           "ok": true
         },
         {
-          "TTFB_MS": 267,
+          "TTFB_MS": 307,
+          "FCP_MS": 1512,
+          "KROKI_SENT_MS": 796,
+          "KROKI_DONE_MS": 1218,
+          "DIAGRAM_VISIBLE_MS": 1492,
+          "WIRE_TOTAL_KB": 209,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 679,
+          "FCP_MS": 1416,
+          "KROKI_SENT_MS": 1241,
+          "KROKI_DONE_MS": 1621,
+          "DIAGRAM_VISIBLE_MS": 1632,
+          "WIRE_TOTAL_KB": 210,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 352,
+          "FCP_MS": 1368,
+          "KROKI_SENT_MS": 828,
+          "KROKI_DONE_MS": 1445,
+          "DIAGRAM_VISIBLE_MS": 1453,
+          "WIRE_TOTAL_KB": 210,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 162,
           "FCP_MS": 836,
-          "KROKI_SENT_MS": 564,
-          "KROKI_DONE_MS": 3335,
-          "DIAGRAM_VISIBLE_MS": 3345,
-          "WIRE_TOTAL_KB": 211,
+          "KROKI_SENT_MS": 762,
+          "KROKI_DONE_MS": 1595,
+          "DIAGRAM_VISIBLE_MS": 1603,
+          "WIRE_TOTAL_KB": 209,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "mermaid-fresh",
+      "title": "never-cached mermaid share link (local mermaid.js render)",
+      "reps": 5,
+      "failed_reps": 0,
+      "median": {
+        "TTFB_MS": 368,
+        "FCP_MS": 1052,
+        "KROKI_SENT_MS": 816,
+        "KROKI_DONE_MS": 3032,
+        "DIAGRAM_VISIBLE_MS": 3239,
+        "WIRE_TOTAL_KB": 1042,
+        "WIRE_ENGINE_KB": 0
+      },
+      "grade": {
+        "TTFB_MS": "good",
+        "FCP_MS": "good",
+        "KROKI_SENT_MS": "good",
+        "DIAGRAM_VISIBLE_MS": "needs-improvement",
+        "WIRE_TOTAL_KB": "needs-improvement"
+      },
+      "engine_fetched": false,
+      "runs": [
+        {
+          "TTFB_MS": 252,
+          "FCP_MS": 828,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 2752,
+          "WIRE_TOTAL_KB": 1042,
           "WIRE_ENGINE_KB": 0,
           "ok": true
         },
         {
-          "TTFB_MS": 175,
-          "FCP_MS": 784,
-          "KROKI_SENT_MS": 602,
-          "KROKI_DONE_MS": 1003,
-          "DIAGRAM_VISIBLE_MS": 1012,
-          "WIRE_TOTAL_KB": 209,
+          "TTFB_MS": 707,
+          "FCP_MS": 1172,
+          "KROKI_SENT_MS": 1086,
+          "KROKI_DONE_MS": 3406,
+          "DIAGRAM_VISIBLE_MS": 3931,
+          "WIRE_TOTAL_KB": 1042,
           "WIRE_ENGINE_KB": 0,
           "ok": true
         },
         {
-          "TTFB_MS": 187,
-          "FCP_MS": 744,
-          "KROKI_SENT_MS": 554,
-          "KROKI_DONE_MS": 972,
-          "DIAGRAM_VISIBLE_MS": 982,
-          "WIRE_TOTAL_KB": 209,
+          "TTFB_MS": 368,
+          "FCP_MS": 1304,
+          "KROKI_SENT_MS": 816,
+          "KROKI_DONE_MS": 3032,
+          "DIAGRAM_VISIBLE_MS": 3239,
+          "WIRE_TOTAL_KB": 1042,
           "WIRE_ENGINE_KB": 0,
           "ok": true
         },
         {
-          "TTFB_MS": 270,
-          "FCP_MS": 832,
-          "KROKI_SENT_MS": 556,
-          "KROKI_DONE_MS": 1041,
-          "DIAGRAM_VISIBLE_MS": 1049,
-          "WIRE_TOTAL_KB": 209,
+          "TTFB_MS": 434,
+          "FCP_MS": 1052,
+          "KROKI_SENT_MS": 786,
+          "KROKI_DONE_MS": 2973,
+          "DIAGRAM_VISIBLE_MS": 3851,
+          "WIRE_TOTAL_KB": 1042,
+          "WIRE_ENGINE_KB": 0,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 172,
+          "FCP_MS": 796,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 2711,
+          "WIRE_TOTAL_KB": 1042,
           "WIRE_ENGINE_KB": 0,
           "ok": true
         }
@@ -95,70 +170,70 @@
       "reps": 5,
       "failed_reps": 0,
       "median": {
-        "TTFB_MS": 203,
-        "FCP_MS": 792,
+        "TTFB_MS": 291,
+        "FCP_MS": 1020,
         "KROKI_SENT_MS": null,
         "KROKI_DONE_MS": null,
-        "DIAGRAM_VISIBLE_MS": 1615,
+        "DIAGRAM_VISIBLE_MS": 3438,
         "WIRE_TOTAL_KB": 502,
         "WIRE_ENGINE_KB": 290
       },
       "grade": {
         "TTFB_MS": "good",
         "FCP_MS": "good",
-        "DIAGRAM_VISIBLE_MS": "good",
+        "DIAGRAM_VISIBLE_MS": "needs-improvement",
         "WIRE_TOTAL_KB": "good"
       },
       "engine_fetched": true,
       "runs": [
         {
+          "TTFB_MS": 348,
+          "FCP_MS": 808,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 1458,
+          "WIRE_TOTAL_KB": 502,
+          "WIRE_ENGINE_KB": 290,
+          "ok": true
+        },
+        {
+          "TTFB_MS": 291,
+          "FCP_MS": 6008,
+          "KROKI_SENT_MS": null,
+          "KROKI_DONE_MS": null,
+          "DIAGRAM_VISIBLE_MS": 6595,
+          "WIRE_TOTAL_KB": 502,
+          "WIRE_ENGINE_KB": 290,
+          "ok": true
+        },
+        {
           "TTFB_MS": 227,
-          "FCP_MS": 1156,
+          "FCP_MS": 1020,
           "KROKI_SENT_MS": null,
           "KROKI_DONE_MS": null,
-          "DIAGRAM_VISIBLE_MS": 1765,
+          "DIAGRAM_VISIBLE_MS": 3438,
           "WIRE_TOTAL_KB": 502,
           "WIRE_ENGINE_KB": 290,
           "ok": true
         },
         {
-          "TTFB_MS": 194,
-          "FCP_MS": 992,
+          "TTFB_MS": 319,
+          "FCP_MS": 784,
           "KROKI_SENT_MS": null,
           "KROKI_DONE_MS": null,
-          "DIAGRAM_VISIBLE_MS": 1963,
+          "DIAGRAM_VISIBLE_MS": 22591,
           "WIRE_TOTAL_KB": 502,
           "WIRE_ENGINE_KB": 290,
           "ok": true
         },
         {
-          "TTFB_MS": 203,
-          "FCP_MS": 792,
+          "TTFB_MS": 166,
+          "FCP_MS": 1212,
           "KROKI_SENT_MS": null,
           "KROKI_DONE_MS": null,
-          "DIAGRAM_VISIBLE_MS": 1615,
-          "WIRE_TOTAL_KB": 502,
+          "DIAGRAM_VISIBLE_MS": 1998,
+          "WIRE_TOTAL_KB": 500,
           "WIRE_ENGINE_KB": 290,
-          "ok": true
-        },
-        {
-          "TTFB_MS": 204,
-          "FCP_MS": 704,
-          "KROKI_SENT_MS": null,
-          "KROKI_DONE_MS": null,
-          "DIAGRAM_VISIBLE_MS": 1350,
-          "WIRE_TOTAL_KB": 502,
-          "WIRE_ENGINE_KB": 290,
-          "ok": true
-        },
-        {
-          "TTFB_MS": 117,
-          "FCP_MS": 712,
-          "KROKI_SENT_MS": null,
-          "KROKI_DONE_MS": null,
-          "DIAGRAM_VISIBLE_MS": 1375,
-          "WIRE_TOTAL_KB": 502,
-          "WIRE_ENGINE_KB": 291,
           "ok": true
         }
       ]

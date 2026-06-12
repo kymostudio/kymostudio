@@ -1,6 +1,6 @@
 # editor bench — share-link first load
 
-*2026-06-12T08:52:21+00:00 · https://editor.kymo.studio · anhvu2-01.local (macOS-26.4.1-arm64-arm-64bit-Mach-O) · chrome · Fast 4G throttle (165 ms RTT, 8,493 kbit/s down)*
+*2026-06-12T09:25:03+00:00 · https://editor.kymo.studio · anhvu2-01.local (macOS-26.4.1-arm64-arm-64bit-Mach-O) · chrome · Fast 4G throttle (165 ms RTT, 8,493 kbit/s down)*
 
 Snapshot, not a gate: the editor is deployed software and kroki.io is a live
 third-party renderer — timing varies with the network and with kroki's queue.
@@ -10,14 +10,16 @@ third-party renderer — timing varies with the network and with kroki's queue.
 | Scenario | OK | Diagram | Labels | Engine chunk | Notes |
 |---|---|---|---|---|---|
 | mermaid-share | ✅ | ✅ | ✅ | not fetched ✅ | early kick-off adopted |
+| mermaid-fresh | ✅ | ✅ | ✅ | not fetched ✅ | — |
 | kymo-default | ✅ | ✅ | ✅ | fetched ✅ | — |
 
 ## Performance — cold load on Fast 4G (medians)
 
 | Scenario | reps (failed) | TTFB_MS | FCP_MS | KROKI_SENT_MS | KROKI_DONE_MS | **DIAGRAM_VISIBLE_MS** | WIRE_TOTAL_KB (WIRE_ENGINE_KB) |
 |---|---|---|---|---|---|---|---|
-| mermaid-share | 5 (0) | 267 🟢 ms | 832 🟢 ms | 564 🟢 ms | 1,041 ms | **1,049 🟢 ms** | 209 🟢 (0) |
-| kymo-default | 5 (0) | 203 🟢 ms | 792 🟢 ms | — ms | — ms | **1,615 🟢 ms** | 502 🟢 (290) |
+| mermaid-share | 5 (0) | 307 🟢 ms | 1,368 🟢 ms | 796 🟢 ms | 1,445 ms | **1,492 🟢 ms** | 209 🟢 (0) |
+| mermaid-fresh | 5 (0) | 368 🟢 ms | 1,052 🟢 ms | 816 🟢 ms | 3,032 ms | **3,239 🟡 ms** | 1,042 🟡 (0) |
+| kymo-default | 5 (0) | 291 🟢 ms | 1,020 🟢 ms | — ms | — ms | **3,438 🟡 ms** | 502 🟢 (290) |
 
 Metric of record is **DIAGRAM_VISIBLE_MS** — first SVG in the preview pane.
 `KROKI_DONE_MS − KROKI_SENT_MS` is kroki.io's own server-side render; the

@@ -13,7 +13,22 @@
       },
       "missing_labels": [],
       "engine_fetched": false,
-      "status": "OK · 125753 bytes · 14ms",
+      "status": "OK · 125753 bytes · 13ms",
+      "share_error": null,
+      "infra_error": false
+    },
+    {
+      "key": "mermaid-fresh",
+      "title": "never-cached mermaid share link (local mermaid.js render)",
+      "ok": true,
+      "checks": {
+        "rendered": true,
+        "labels": true,
+        "engine_chunk": true
+      },
+      "missing_labels": [],
+      "engine_fetched": false,
+      "status": "OK · 56981 bytes · 5828ms",
       "share_error": null,
       "infra_error": false
     },
@@ -28,7 +43,7 @@
       },
       "missing_labels": [],
       "engine_fetched": true,
-      "status": "OK · 3276 bytes · 1272ms",
+      "status": "OK · 3276 bytes · 320ms",
       "share_error": null,
       "infra_error": false
     }
