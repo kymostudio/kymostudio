@@ -204,6 +204,84 @@ nav {
   animation: bob 7s ease-in-out infinite;
 }
 
+/* ── MCP (connect any AI) ────────────────────────────────────── */
+section.mcp {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 10px var(--pad) 34px;
+}
+/* same node language as the feature cards: crisp border + port dot */
+.mcp-inner {
+  position: relative;
+  display: grid; grid-template-columns: 1.1fr 1fr; gap: 44px;
+  align-items: center;
+  background: var(--bg);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 22px;
+  padding: 42px 46px;
+  box-shadow: 0 1px 2px rgba(36, 33, 49, 0.04);
+}
+.mcp-inner::before {
+  content: "";
+  position: absolute; top: -7px; left: 38px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--accent);
+}
+.mcp-inner::after {
+  content: "";
+  position: absolute; top: -2.5px; left: 42.5px;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--accent);
+}
+.mcp-copy h2 {
+  margin: 0 0 14px;
+  font-size: clamp(24px, 2.6vw, 32px); font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+.mcp-copy > p { margin: 0 0 16px; font-size: 15.5px; color: var(--dim); }
+.mcp-copy > p code { font-size: 14px; color: var(--ink); }
+.mcp-steps {
+  margin: 0 0 18px; padding-left: 22px;
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 14.5px; color: var(--dim);
+}
+.mcp-steps li::marker { color: var(--accent); font-weight: 700; }
+.mcp-tools {
+  list-style: none;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin: 0; padding: 0;
+}
+.mcp-tools code {
+  display: inline-block;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+.mcp-snippets { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.mcp-snippet {
+  background: var(--ink);
+  border-radius: 14px;
+  padding: 14px 18px 16px;
+}
+.mcp-snippet-label {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 8px;
+}
+.mcp-snippet pre {
+  margin: 0;
+  overflow-x: auto;
+  font-size: 13px; line-height: 1.6;
+  color: #f3f1f8;
+}
+.mcp-note { margin: 0; font-size: 13px; color: var(--dim); }
+
 /* ── Feature nodes ───────────────────────────────────────────── */
 section.features {
   max-width: var(--max);
@@ -412,6 +490,7 @@ footer a:hover { color: var(--accent); }
   .hero-art { order: -1; }
   .hero-art img { width: 150px; }
   .hero-edge { display: none; }
+  .mcp-inner { grid-template-columns: 1fr; gap: 28px; padding: 30px 26px; }
   .modal-content { width: 96vw; height: 94vh; }
   .modal-body { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
   .modal-pane-source { border-right: none; border-bottom: 1px solid var(--border); }
