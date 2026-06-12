@@ -6,13 +6,9 @@ const GH = "https://github.com/kymostudio/kymostudio";
 
 type Feature = { title: string; desc: string };
 const FEATURES: Feature[] = [
-  { title: "Draws what you actually need", desc: "Software architecture, process flows and standard BPMN, all rendered faithfully." },
-  { title: "Starts from any source", desc: "Author in the .kymo DSL, or feed it BPMN, JSON or Python." },
-  { title: "Write once, export anywhere", desc: "One source compiles to SVG, PNG, WebP, Figma and Excalidraw." },
   { title: "Diagrams as code", desc: "Describe your diagram in a clean, line-oriented .kymo syntax — no dragging boxes around." },
   { title: "Animated by default", desc: "Edges come alive with built-in flowing animation, straight to a self-contained SVG." },
-  { title: "Smart auto-layout", desc: "Frames, anchoring, edge routing and canvas sizing are figured out for you." },
-  { title: "A rich icon library", desc: "2,460 icons spanning AWS, Azure, GCP, Kubernetes, on-prem and more." },
+  { title: "Write once, export anywhere", desc: "One source compiles to SVG, PNG, WebP, Figma and Excalidraw — and imports BPMN 2.0." },
 ];
 
 type Sample = { title: string; desc: string; file: string; preview: string; size: string };
@@ -104,34 +100,6 @@ function Modal({ sample, onClose }: { sample: Sample; onClose: () => void }) {
   );
 }
 
-function InstallTabs() {
-  const CMDS: Record<string, string> = {
-    pip: "pip install kymostudio",
-    npm: "npm install kymostudio",
-    cargo: "cargo install kymostudio",
-  };
-  const [tab, setTab] = useState("pip");
-  const [copied, setCopied] = useState(false);
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(CMDS[tab]);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1200);
-    } catch {}
-  }
-  return (
-    <div className="install-tabs">
-      <div className="tabs">
-        {Object.keys(CMDS).map((k) => (
-          <button key={k} className={k === tab ? "active" : ""} onClick={() => setTab(k)}>{k}</button>
-        ))}
-      </div>
-      <code className="cmd"><span className="prompt">$ </span>{CMDS[tab]}</code>
-      <button className="copy" onClick={copy} title="Copy">{copied ? "✓ Copied" : "Copy"}</button>
-    </div>
-  );
-}
-
 function App() {
   const [selected, setSelected] = useState<Sample | null>(null);
   return (
@@ -159,27 +127,17 @@ function App() {
           </h1>
           <p className="lead">Type it. See it appear. Watch it animate.</p>
           <div className="ctas">
-            <a className="btn btn-primary btn-pill" href="https://editor.kymo.studio">Start Free →</a>
-            <a className="btn btn-ghost btn-pill" href={GH}>View on GitHub</a>
+            <a className="btn btn-primary btn-pill" href="https://docs.kymo.studio/guide/getting-started">Getting Started</a>
+            <a className="btn btn-alt btn-pill" href="https://docs.kymo.studio/guide/dsl-guide">The .kymo Language</a>
+            <a className="btn btn-alt btn-pill" href="https://editor.kymo.studio">Open the editor ↗</a>
           </div>
-          <InstallTabs />
-          <p className="hero-note">Free &amp; open source · Apache 2.0</p>
         </div>
         <div className="hero-art">
           <img src="./logo.svg" alt="KymoStudio" />
         </div>
       </header>
 
-      <div className="preview">
-        <div className="preview-frame">
-          <img src={`${RAW}/nvidia-aiq-animated.webp`} alt="kymo demo — NVIDIA AIQ replica, animated WebP" />
-        </div>
-      </div>
-
       <section className="features" id="features">
-        <div className="section-header">
-          <h2>Features</h2>
-        </div>
         <div className="feature-grid">
           {FEATURES.map((f) => (
             <div className="feature" key={f.title}>
@@ -189,6 +147,12 @@ function App() {
           ))}
         </div>
       </section>
+
+      <div className="preview">
+        <div className="preview-frame">
+          <img src={`${RAW}/nvidia-aiq-animated.webp`} alt="kymo demo — NVIDIA AIQ replica, animated WebP" />
+        </div>
+      </div>
 
       <section className="samples" id="samples">
         <div className="section-header">
