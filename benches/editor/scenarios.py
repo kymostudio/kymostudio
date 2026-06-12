@@ -13,6 +13,9 @@ server-side queue — the committed results are a snapshot, not a gate.
 """
 from __future__ import annotations
 
+import base64
+import uuid
+import zlib
 from typing import Any
 
 # ── canonical share payload ──────────────────────────────────────────────────
@@ -49,6 +52,23 @@ SCENARIOS: list[dict[str, Any]] = [
         # index.html's inline kick-off must have fired and been adopted
         # (renderKroki consumes window.__earlyKroki on a source match).
         "expect_early_adopted": True,
+    },
+    {
+        # A NEVER-CACHED diagram — load_once swaps {nonce} per load, so every
+        # rep is a guaranteed edge-cache miss. This measures the round-4 local
+        # mermaid.js path: the first visitor of a diagram nobody shared before
+        # (the early kroki warm-up fires but loses the 900 ms race).
+        "key": "mermaid-fresh",
+        "title": "never-cached mermaid share link (local mermaid.js render)",
+        "source_template": "flowchart TD\n    %% bench nonce {nonce}\n"
+            "    A[Bắt đầu] --> B{cache miss?}\n"
+            "    B -->|Có| C[mermaid.js render local<br/>không chờ kroki]\n"
+            "    C --> D([Hoàn tất])\n",
+        "kind": "mermaid",
+        "path": None,  # built per load from source_template
+        "expect_labels": ["Bắt đầu", "cache miss?", "không chờ kroki", "Hoàn tất"],
+        "expect_engine_chunk": False,
+        "expect_early_adopted": None,  # the warm-up fires but loses the race — not asserted
     },
     {
         "key": "kymo-default",
@@ -177,6 +197,18 @@ _COLLECT_JS = """
 """
 
 
+def share_payload(source: str) -> str:
+    """kroki-style deflate+base64url — the ?s= encoding share.ts uses."""
+    return base64.urlsafe_b64encode(zlib.compress(source.encode())).decode().rstrip("=")
+
+
+def scenario_path(scenario: dict) -> str:
+    if scenario.get("source_template"):
+        src = scenario["source_template"].replace("{nonce}", uuid.uuid4().hex[:10])
+        return f"/?k={scenario['kind']}&s={share_payload(src)}"
+    return scenario["path"]
+
+
 def launch_browser(pw, channel: str | None):
     """One browser process per bench run; cold-ness comes from fresh contexts."""
     return pw.chromium.launch(channel=channel or None, headless=True)
@@ -192,7 +224,7 @@ def load_once(browser, base_url: str, scenario: dict, *, throttle: bool = True, 
             cdp = context.new_cdp_session(page)
             cdp.send("Network.enable")
             cdp.send("Network.emulateNetworkConditions", THROTTLE)
-        page.goto(base_url + scenario["path"], timeout=timeout_s * 1000)
+        page.goto(base_url + scenario_path(scenario), timeout=timeout_s * 1000)
         try:
             page.wait_for_function(_SETTLED_JS, timeout=timeout_s * 1000)
         except Exception:
