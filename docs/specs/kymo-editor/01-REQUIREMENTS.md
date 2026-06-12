@@ -1,7 +1,7 @@
 ---
 title: Kymo Editor (editor.kymo.studio) — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KEDITOR-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-12
 status: Implemented
 classification: Internal
@@ -13,6 +13,11 @@ related_documents:
   - DESIGN-KEDITOR-001
   - TEST-KEDITOR-001
   - PLAN-KEDITOR-001
+  - FEAT-KRENDER-001
+  - FEAT-KSHARE-001
+  - FEAT-KLIVE-001
+  - FEAT-KLIBRARY-001
+  - FEAT-KEMCP-001
   - FEAT-FLOWCHART-001
   - FEAT-KYMOJSON-001
   - FEAT-KMCP-001
@@ -25,6 +30,7 @@ authors:
 language: en
 keywords:
   - product-description
+  - umbrella
   - conops
   - stakeholder-requirements
   - requirements
@@ -53,12 +59,12 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | `FEAT-KEDITOR-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
-| Related Documents | `DESIGN-KEDITOR-001` (how), `TEST-KEDITOR-001` (V&V), `PLAN-KEDITOR-001` (plan), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine intermediate), `FEAT-KMCP-001` (the sibling *local* npx MCP server), `FEAT-CANVAS-001` / `FEAT-STUDIO-001` (sibling canvas editors), `REF-KROKI-001` (the external render gateway), `RES-MCP-001` (MCP landscape) |
+| Related Documents | `DESIGN-KEDITOR-001` (how), `TEST-KEDITOR-001` (V&V), `PLAN-KEDITOR-001` (plan), `FEAT-KRENDER-001` / `FEAT-KSHARE-001` / `FEAT-KLIVE-001` / `FEAT-KLIBRARY-001` / `FEAT-KEMCP-001` (the five modules — see §B.7), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine intermediate), `FEAT-KMCP-001` (the sibling *local* npx MCP server), `FEAT-CANVAS-001` / `FEAT-STUDIO-001` (sibling canvas editors), `REF-KROKI-001` (the external render gateway), `RES-MCP-001` (MCP landscape) |
 
-> This document consolidates the product description (ConOps & StRS), specification overview, and feature requirements (SRS) for **kymo-editor** — the diagram editor at **editor.kymo.studio** and its serverless backend (the `kymo-mcp` Cloudflare Worker at mcp.kymo.studio). It owns the `SN-KE-NN` stakeholder needs and the `FR-KE`/`NFR-KE` requirement IDs, and is the **normative reference** for the shipped system. Version 0.2 **re-baselines** the spec for the product as shipped on 2026-06-12: a React SPA with Google accounts, a per-user multi-diagram library organised into workspaces, CodeMirror editing, 28 kroki.io diagram kinds beside the native kymo DSL, account-free URL sharing, and a per-diagram live-sync + MCP channel (v0.1 described the predecessor: a single textarea, no accounts, one shared room).
+> This document consolidates the product description (ConOps & StRS), specification overview, and feature requirements (SRS) for **kymo-editor** — the diagram editor at **editor.kymo.studio** and its serverless backend (the `kymo-mcp` Cloudflare Worker at mcp.kymo.studio). It owns the `SN-KE-NN` stakeholder needs and the `FR-KE`/`NFR-KE` requirement IDs, and is the **normative reference** for the shipped system. Version 0.2 **re-baselines** the spec for the product as shipped on 2026-06-12: a React SPA with Google accounts, a per-user multi-diagram library organised into workspaces, CodeMirror editing, 28 kroki.io diagram kinds beside the native kymo DSL, account-free URL sharing, and a per-diagram live-sync + MCP channel (v0.1 described the predecessor: a single textarea, no accounts, one shared room). Since v0.3, kymo-editor is an **umbrella**: the SRS surface is decomposed into five as-built modules under `modules/` (§B.7); this document remains the baseline of record until a module re-baselines its own carve-out.
 
 ---
 
@@ -134,6 +140,7 @@ This part frames the spec: what kymo-editor is, how the four KEDITOR documents f
 - `DESIGN-KEDITOR-001` — the *how*: the SPA module map, render paths, share codec, room protocol, D1/REST/MCP backend, build/deploy.
 - `TEST-KEDITOR-001` — the *V&V*: test cases and traceability.
 - `PLAN-KEDITOR-001` — the *delivery*: the (retrospective) phased history and risk register.
+- `modules/` — the five as-built sub-module doc-sets (§B.7): `editor-render`, `editor-share`, `editor-live`, `editor-library`, `editor-mcp`.
 
 ### B.3 Relationship to the engine and sibling products
 
@@ -159,12 +166,40 @@ Implemented and shipped (see `PLAN-KEDITOR-001` §4). Owned by the `diagrams/` p
 - **kymo-mcp** — the Cloudflare **Worker** (`packages/mcp`) hosting the rooms, the REST API, and the OAuth-gated MCP agent, at mcp.kymo.studio.
 - **D1 index** — the Worker's database of record: `diagrams` and `workspaces` tables (metadata + latest source snapshot).
 - **origin id** — a per-tab random token used to suppress WebSocket echo.
+- **umbrella / module** — `kymo-editor` is the umbrella (system); `editor-render`/`editor-share`/`editor-live`/`editor-library`/`editor-mcp` are its modules (system elements) under `modules/`.
+
+### B.7 Module decomposition (umbrella)
+
+Since v0.3, the shipped feature is decomposed into **five as-built modules** — the same containment move as the `canvas-studio` umbrella (`FEAT-STUDIO-001` → toolbar/export/items). Each module is a stub doc-set (`01-REQUIREMENTS` only) that **re-homes** its SN/FR/NFR IDs from this document; the *how* stays in `DESIGN-KEDITOR-001` and the V&V in `TEST-KEDITOR-001` until a module grows its own 02/03/04. This document remains the v0.2 baseline of record; new work on a module's surface is specified and re-baselined **in that module**.
+
+```
+kymo-editor (FEAT-KEDITOR-001) → UMBRELLA — the shipped editor.kymo.studio product
+        ├── editor-render   (FEAT-KRENDER-001)  → authoring & rendering surface   [as-built]
+        ├── editor-share    (FEAT-KSHARE-001)   → URL sharing & export            [as-built]
+        ├── editor-live     (FEAT-KLIVE-001)    → accounts, rooms & persistence   [as-built]
+        ├── editor-library  (FEAT-KLIBRARY-001) → library & workspaces            [as-built]
+        └── editor-mcp      (FEAT-KEMCP-001)    → remote MCP channel              [as-built]
+```
+
+Dependency direction: `editor-library` and `editor-mcp` build on the `editor-live` spine; `editor-render` and `editor-share` work signed-out, independent of it.
+
+**Re-homing map** (former → new; requirement text is carried verbatim in each module's Part C):
+
+| Module | Stakeholder needs | Functional | Non-functional |
+|--------|-------------------|------------|----------------|
+| `editor-render` | `SN-KE-01/06/09/12 → SN-RD-01..04` | `FR-KE-01/02/04/05/13/14/15/16 → FR-RD-01..08` | `NFR-KE-01/05 → NFR-RD-01..02` |
+| `editor-share` | `SN-KE-02/10/11 → SN-SH-01..03` | `FR-KE-25/26/27/03/28/29 → FR-SH-01..06` | `NFR-KE-07 → NFR-SH-01` |
+| `editor-live` | `SN-KE-04/07(partial) → SN-LV-01..02` | `FR-KE-17/18/19/06/07/08/09 → FR-LV-01..07` | `NFR-KE-04/06 → NFR-LV-01..02` |
+| `editor-library` | `SN-KE-07(partial)/08 → SN-LB-01..02` | `FR-KE-20..24 → FR-LB-01..05` | — (inherits) |
+| `editor-mcp` | `SN-KE-03 → SN-MC-01` | `FR-KE-10..12 → FR-MC-01..03` | — (inherits) |
+
+**Retained by the umbrella (not re-homed):** `SN-KE-05` (zero-ops hosting) and `NFR-KE-02/03` (operability, portability/build) — the platform/deploy contract spans every module, as do `DESIGN-KEDITOR-001` §11–12 and the deploy gate in `TEST-KEDITOR-001`.
 
 ---
 
 ## Part C — Requirements (SRS)
 
-Requirements use RFC-2119 keywords. Each maps to the stakeholder need(s) it satisfies. IDs `FR-KE-01..12` are carried over from v0.1 (semantics revised where the product moved — revisions are noted inline); `FR-KE-13+` are new in v0.2.
+Requirements use RFC-2119 keywords. Each maps to the stakeholder need(s) it satisfies. IDs `FR-KE-01..12` are carried over from v0.1 (semantics revised where the product moved — revisions are noted inline); `FR-KE-13+` are new in v0.2. **Since v0.3** every `FR-KE`/most `NFR-KE` are additionally **re-homed** into a module ID (§B.7); this Part C stays the v0.2 baseline of record, but changes to a module's surface are specified against the module's IDs.
 
 ### C.1 Functional requirements — Render (`FR-KE-01..05`)
 
@@ -274,3 +309,4 @@ Collaborative cursors / comments / presence; durable version history; cross-user
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-10 | Vũ Anh | Initial requirements for the shipped kymo-editor. Owns `SN-KE-01..06`, `FR-KE-01..12` (browser render, live sync, MCP channel), `NFR-KE-01..05`. Documents the client-side-render + Cloudflare-Pages + `kymo-mcp`-Worker architecture as the normative reference and records that it **supersedes** the Python/server stack described in `packages/editor/README.md`. Retrospective spec for the P-set delivered across commits `466db60` → `47ecb4c` → `0860ace` → `7543db7` (see `PLAN-KEDITOR-001` §4). |
 | 0.2     | 2026-06-12 | Vũ Anh | **Re-baseline for the 2026-06-12 product** (commits `58cca51..a3dae51`, P4–P9 in `PLAN-KEDITOR-001`): React SPA + `/diagrams` library, Google accounts, per-diagram owner-scoped rooms, D1 store, workspaces, CodeMirror, 28 kroki kinds + samples, export menu, kroki-style `?s=` URL sharing. Added `SN-KE-07..12`; revised `FR-KE-01..02, 06, 08..12` (per-kind debounce, per-diagram rooms, lazy-seed + auto-title, D1 persistence, per-user MCP tool set, OAuth gating, `/set`/`/get` no longer public); added `FR-KE-13..29` (kinds/samples, CodeMirror/splitter, accounts/ownership, library/workspaces, sharing, export); revised `NFR-KE-01/03` and added `NFR-KE-06/07` (security, share-encoding compatibility). v0.1 non-goals *auth, accounts, named documents, persistence* are now in scope; new non-goals recorded in §A.3. |
+| 0.3     | 2026-06-12 | Vũ Anh | **Umbrella decomposition.** kymo-editor becomes an **umbrella** with five as-built modules under `modules/` — `editor-render` (`FEAT-KRENDER-001`), `editor-share` (`FEAT-KSHARE-001`), `editor-live` (`FEAT-KLIVE-001`), `editor-library` (`FEAT-KLIBRARY-001`), `editor-mcp` (`FEAT-KEMCP-001`) — mirroring the `canvas-studio` decomposition. Added §B.7 (module tree + re-homing map), the `modules/` row in §B.2, and the umbrella/module glossary entry; Part C marked as the v0.2 baseline of record with module IDs as the forward change surface. `SN-KE-05` + `NFR-KE-02/03` (platform/deploy) stay umbrella-owned. No requirement content changed. |
