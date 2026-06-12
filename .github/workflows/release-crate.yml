@@ -216,7 +216,7 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
       - name: Build wasm package
-        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm,pdf
       - name: Publish to npm (idempotent — already-published is treated as success)
         working-directory: packages/rust/kymostudio-core/pkg
         run: |

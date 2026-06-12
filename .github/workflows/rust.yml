@@ -53,7 +53,7 @@ jobs:
       - name: check (bare core, no features)
         run: cargo check --no-default-features
       - name: clippy (wasm feature)
-        run: cargo clippy --lib --no-default-features --features wasm --target wasm32-unknown-unknown -- -D warnings
+        run: cargo clippy --lib --no-default-features --features wasm,pdf --target wasm32-unknown-unknown -- -D warnings
       - name: rustfmt + clippy (kymo CLI crate)
         working-directory: packages/rust/kymostudio
         run: |
@@ -108,12 +108,12 @@ jobs:
         with:
           workspaces: packages/rust/kymostudio-core
       - name: Cargo build (wasm32)
-        run: cargo build --lib --release --no-default-features --features wasm --target wasm32-unknown-unknown
+        run: cargo build --lib --release --no-default-features --features wasm,pdf --target wasm32-unknown-unknown
       - uses: taiki-e/install-action@v2
         with:
           tool: wasm-pack
       - name: wasm-pack build (browser + Node)
-        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm,pdf
       - name: Check generated JS/TS glue exists
         run: |
           test -f pkg/kymostudio_core.js
