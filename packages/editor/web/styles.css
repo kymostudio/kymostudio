@@ -77,6 +77,18 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .exp-item svg { flex: none; color: var(--dim); }
 .exp-item:hover svg { color: var(--accent); }
 .menu-sep { height: 1px; background: var(--border); margin: 4px 6px; }
+
+/* share popover (Figma-style panel under the Share CTA) */
+.share-menu { width: min(380px, calc(100vw - 20px)); padding: 12px; cursor: default; }
+.share-head { font-size: 13.5px; font-weight: 700; padding: 2px 4px 0; }
+.share-desc { margin: 4px 4px 10px; font-size: 12.5px; color: var(--dim); line-height: 1.55; }
+.share-row { display: flex; gap: 6px; }
+.share-url { flex: 1; min-width: 0; font: 12px/1.4 var(--mono); color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; outline: none; text-overflow: ellipsis; }
+.share-url:focus { border-color: rgba(224, 9, 95, 0.45); background: var(--bg); }
+.share-copy { flex: none; padding: 7px 12px; font-size: 13px; min-width: 86px; }
+.share-warn { margin: 8px 2px 0; font-size: 12px; color: #8a6116; background: #fdf6e7; border: 1px solid #f0dfb6; border-radius: 8px; padding: 7px 10px; line-height: 1.5; }
+.share-menu .menu-sep { margin: 10px 2px 4px; }
+.share-menu .acct-item[disabled] { opacity: 0.5; cursor: default; }
 .chev-icon { color: var(--dim); margin-right: -3px; }
 
 /* ---- editor panes ---- */
