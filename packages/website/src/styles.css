@@ -330,18 +330,20 @@ section.mcp {
 }
 .mcp-h2-edge { display: block; margin: 0 0 18px; }
 .mcp-snippets { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-/* agent picker — one pill per famous client */
+/* agent picker — one pill per famous client, with its brand mark */
 .mcp-agents { display: flex; flex-wrap: wrap; gap: 7px; }
 .mcp-agent {
   appearance: none; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px;
   background: var(--bg);
   border: 1.5px solid var(--border-strong);
   border-radius: 999px;
-  padding: 6px 13px;
+  padding: 6px 13px 6px 11px;
   font-family: var(--font); font-size: 12.5px; font-weight: 600;
   color: var(--dim);
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
+.mcp-agent svg { width: 14px; height: 14px; flex: none; }
 .mcp-agent:hover { color: var(--ink); border-color: var(--dim); }
 .mcp-agent.active { background: var(--ink); border-color: var(--ink); color: #fff; }
 /* the connect snippet, dressed as a tiny terminal */
@@ -388,7 +390,15 @@ section.mcp {
   color: #f3f1f8;
 }
 .mcp-note { margin: 0; font-size: 13px; color: var(--dim); }
-.mcp-deeplink { font-weight: 600; white-space: nowrap; }
+/* one-click install link, lives in the terminal bar next to Copy */
+.mcp-bar-link {
+  border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  color: #fff;
+  padding: 4px 11px;
+  white-space: nowrap;
+}
+.mcp-bar-link:hover { text-decoration: none; border-color: #fff; background: rgba(255, 255, 255, 0.1); }
 
 /* ── Feature nodes ───────────────────────────────────────────── */
 section.features {
