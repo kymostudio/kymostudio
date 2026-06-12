@@ -2,8 +2,8 @@
   "format": "kymo.json",
   "version": 1,
   "diagram": {
-    "width": 201,
-    "height": 630,
+    "width": 168,
+    "height": 470,
     "title": "",
     "subtitle": "",
     "components": [
@@ -15,11 +15,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          88,
-          63
+          76,
+          47
         ],
         "size": [
-          66,
+          72,
           46
         ],
         "parent": null,
@@ -39,11 +39,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          88,
-          189
+          76,
+          141
         ],
         "size": [
-          66,
+          72,
           46
         ],
         "parent": null,
@@ -63,11 +63,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          88,
-          315
+          76,
+          235
         ],
         "size": [
-          97,
+          104,
           46
         ],
         "parent": null,
@@ -87,11 +87,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          88,
-          441
+          76,
+          329
         ],
         "size": [
-          66,
+          72,
           46
         ],
         "parent": null,
@@ -111,11 +111,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          88,
-          567
+          76,
+          423
         ],
         "size": [
-          60,
+          64,
           46
         ],
         "parent": null,
@@ -133,10 +133,10 @@
         "id": "G",
         "label": "Worker Pool",
         "bounds": [
-          16,
-          120,
-          145,
-          368
+          8,
+          82,
+          136,
+          286
         ],
         "contains": [
           "A",
