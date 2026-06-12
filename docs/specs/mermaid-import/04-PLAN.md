@@ -1,7 +1,7 @@
 ---
-title: Mermaid Support — Plan (umbrella)
+title: Mermaid Import — Plan (umbrella)
 document_id: PLAN-MERMAID-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -25,7 +25,7 @@ keywords:
   - roadmap
 ---
 
-# Mermaid Support — Plan (umbrella)
+# Mermaid Import — Plan (umbrella)
 
 ## Phase 1 — Flowchart import in the Rust core (this delivery)
 
@@ -103,3 +103,11 @@ producing the same resolved `Diagram`.
   if real diagrams look loose.
 - **Conformance suite.** Phase 1 keeps goldens inside the crate; folding Rust into
   the repo-level `conformance/` happens once Python/JS consume the Rust output.
+
+## Doc history
+
+- 2026-06-07 — set authored as `docs/specs/mermaid/` (v0.1).
+- 2026-06-12 — folder renamed `mermaid/` → `mermaid-import/` and titles "Mermaid
+  Support" → "Mermaid Import" (v0.2): the family is the *import* direction; emitting
+  Mermaid text belongs to the flowchart hub (`FEAT-FLOWCHART-001`). All
+  `*-MERMAID-*-001` document_ids unchanged.

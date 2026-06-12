@@ -1,7 +1,7 @@
 ---
-title: Mermaid Support — Design (umbrella)
+title: Mermaid Import — Design (umbrella)
 document_id: DESIGN-MERMAID-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -26,7 +26,7 @@ keywords:
   - engine
 ---
 
-# Mermaid Support — Design (umbrella)
+# Mermaid Import — Design (umbrella)
 
 ## 1. Architecture: the engine moves into Rust
 

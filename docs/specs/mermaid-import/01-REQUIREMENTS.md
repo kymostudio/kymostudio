@@ -1,7 +1,7 @@
 ---
-title: Mermaid Support — Requirements (umbrella)
+title: Mermaid Import — Requirements (umbrella)
 document_id: FEAT-MERMAID-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -31,7 +31,7 @@ keywords:
   - flowchart
 ---
 
-# Mermaid Support — Requirements (umbrella)
+# Mermaid Import — Requirements (umbrella)
 
 ## Part A — ConOps / StRS (concept & stakeholder needs)
 
