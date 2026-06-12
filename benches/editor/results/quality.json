@@ -13,7 +13,7 @@
       },
       "missing_labels": [],
       "engine_fetched": false,
-      "status": "OK · 125753 bytes · 4400ms",
+      "status": "OK · 125753 bytes · 14ms",
       "share_error": null,
       "infra_error": false
     },
@@ -28,7 +28,7 @@
       },
       "missing_labels": [],
       "engine_fetched": true,
-      "status": "OK · 3277 bytes · 1998ms",
+      "status": "OK · 3276 bytes · 1272ms",
       "share_error": null,
       "infra_error": false
     }
