@@ -95,6 +95,7 @@ nav {
 /* ── Buttons ─────────────────────────────────────────────────── */
 .btn {
   display: inline-flex; align-items: center; gap: 8px;
+  white-space: nowrap;
   padding: 12px 22px;
   border-radius: 999px;
   font-size: 14.5px; font-weight: 600;
@@ -209,6 +210,7 @@ section.mcp {
   max-width: var(--max);
   margin: 0 auto;
   padding: 10px var(--pad) 34px;
+  scroll-margin-top: 96px; /* clear the sticky nav when arriving via #mcp */
 }
 /* same node language as the feature cards: crisp border + port dot */
 .mcp-inner {
@@ -261,21 +263,57 @@ section.mcp {
   padding: 4px 10px;
   font-size: 12.5px;
   color: var(--ink);
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
-.mcp-snippets { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.mcp-snippet {
+.mcp-tools li:hover code {
+  border-color: var(--accent); color: var(--accent);
+  transform: translateY(-1px);
+}
+.mcp-h2-edge { display: block; margin: 0 0 18px; }
+.mcp-snippets { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+/* the connect snippet, dressed as a tiny terminal */
+.mcp-term {
   background: var(--ink);
   border-radius: 14px;
-  padding: 14px 18px 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(36, 33, 49, 0.18);
 }
-.mcp-snippet-label {
-  font-size: 11px; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase;
+.mcp-term-bar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 12px 10px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.mcp-term-dots { display: inline-flex; gap: 6px; }
+.mcp-term-dots i { width: 10px; height: 10px; border-radius: 50%; }
+.mcp-term-dots i:nth-child(1) { background: #ff5f57; }
+.mcp-term-dots i:nth-child(2) { background: #febc2e; }
+.mcp-term-dots i:nth-child(3) { background: #28c840; }
+.mcp-tabs { display: flex; gap: 4px; flex: 1; }
+.mcp-tab {
+  appearance: none; border: 0; background: transparent;
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
   color: rgba(255, 255, 255, 0.55);
-  margin-bottom: 8px;
+  padding: 5px 11px; border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
 }
-.mcp-snippet pre {
+.mcp-tab:hover { color: #fff; }
+.mcp-tab.active { background: rgba(255, 255, 255, 0.14); color: #fff; }
+.mcp-copy-btn {
+  appearance: none; background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 8px;
+  font-family: var(--font); font-size: 12px; font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.mcp-copy-btn:hover { border-color: #fff; color: #fff; }
+.mcp-term pre {
   margin: 0;
+  padding: 16px 18px 18px;
+  min-height: 96px;
   overflow-x: auto;
   font-size: 13px; line-height: 1.6;
   color: #f3f1f8;
@@ -485,12 +523,23 @@ footer a:hover { color: var(--accent); }
 
 /* ── Responsive + reduced motion ─────────────────────────────── */
 @media (max-width: 880px) {
+  .nav-inner { padding: 12px; }
+  .brand { font-size: 18px; gap: 7px; }
+  .brand img { width: 30px; height: 30px; }
+  .nav-right { gap: 6px; }
+  .nav-gh { padding: 7px 9px 7px 11px; font-size: 13px; gap: 6px; white-space: nowrap; }
+  .nav-gh svg { width: 16px; height: 16px; }
+  .nav-gh-count { font-size: 11.5px; padding: 1px 7px; }
+  nav .btn-sm { padding: 8px 12px; font-size: 13px; }
   .hero-split { grid-template-columns: 1fr; text-align: center; padding-top: 56px; gap: 12px; }
   .hero-split .ctas { justify-content: center; }
   .hero-art { order: -1; }
   .hero-art img { width: 150px; }
   .hero-edge { display: none; }
   .mcp-inner { grid-template-columns: 1fr; gap: 28px; padding: 30px 26px; }
+  .mcp-term-bar { flex-wrap: wrap; row-gap: 8px; }
+  .mcp-tabs { order: 3; flex-basis: 100%; }
+  .mcp-copy-btn { margin-left: auto; }
   .modal-content { width: 96vw; height: 94vh; }
   .modal-body { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
   .modal-pane-source { border-right: none; border-bottom: 1px solid var(--border); }
