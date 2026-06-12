@@ -1,7 +1,7 @@
 ---
 title: kymo.json Interchange Format — Requirements
 document_id: FEAT-KYMOJSON-001
-version: "1.2"
+version: "1.3"
 issue_date: 2026-06-06
 status: Released
 classification: Internal
@@ -14,6 +14,7 @@ related_documents:
   - TEST-KYMOJSON-001           # Test documentation
   - PLAN-KYMOJSON-001           # Plan
   - KYMOJSON-MAP-001            # The normative schema
+  - FEAT-KYMO-SYNTAX-001        # Parent umbrella (this folder is its json module)
 authors:
   - Vũ Anh
 language: en
@@ -41,7 +42,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-KYMOJSON-001                                  |
-| Version      | 1.2                                                |
+| Version      | 1.3                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-06-06                                         |
 | Owner        | `diagrams/` project                                |
@@ -172,13 +173,13 @@ This feature's docs use a two-layer model in this folder — a **baselined spec*
 | 01 | `01-REQUIREMENTS.md` | `FEAT-KYMOJSON-001` | *what product problem, whose needs, and what must it do? (ConOps + StRS + SRS, `SN-KYMOJSON`, `FR`/`NFR`)* |
 | 02 | `02-DESIGN.md` | `DESIGN-KYMOJSON-001` | *how is it built?* |
 | 03 | `03-TEST.md` | `TEST-KYMOJSON-001` | *how do we know it's right?* |
-| — | `docs/specs/kymo-json/04-PLAN.md` | `PLAN-KYMOJSON-001` | *why, in what order, at what risk, what's done? (+ `CR/`)* |
+| — | `docs/specs/kymo-syntax/modules/json/04-PLAN.md` | `PLAN-KYMOJSON-001` | *why, in what order, at what risk, what's done? (+ `CR/`)* |
 
 Cross-document references use **`document_id`** (never file paths); the numeric `NN-` prefixes are a
 reading-order aid only. The normative schema is **KYMOJSON-MAP-001**.
 
 **Change management:** a change to this baselined spec is raised as a change-request in
-`docs/specs/kymo-json/CR/` and re-baselined (bump version + record in Annex A).
+`docs/specs/kymo-syntax/modules/json/CR/` and re-baselined (bump version + record in Annex A).
 
 ---
 
@@ -259,11 +260,12 @@ scope/out-of-scope boundary is in §C.4.
 | 1.1     | 2026-05-25 | Vũ Anh | FEAT-KYMOJSON-001 §6 reworked to document map; §1 reading map updated to include product description. |
 | 1.1     | 2026-05-25 | Vũ Anh | FEAT-KYMOJSON-001 §1 stakeholder needs moved to FEAT-KYMOJSON-001; §1 now points there. `FEAT-KYMOJSON-001` added to related documents. No requirement content changed. |
 | 1.2     | 2026-06-06 | Vũ Anh | **Consolidation.** FEAT-KYMOJSON-001 (00-PRODUCT), FEAT-KYMOJSON-001 (01-INTRO), and FEAT-KYMOJSON-001 (02-FEATURE) merged losslessly into this single `01-REQUIREMENTS.md` under Parts A/B/C. Folder normalised to 4-file structure. |
+| 1.3     | 2026-06-12 | Vũ Anh | **Folder merge into the kymo-syntax umbrella.** Relocated `docs/specs/kymo-json/` → `docs/specs/kymo-syntax/modules/json/` as the `json` module beside `dsl/` and `nref/`, under the new `FEAT-KYMO-SYNTAX-001` parent set. Added `FEAT-KYMO-SYNTAX-001` to related documents; self-paths updated (incl. fixing the stale `03-DESIGN`/`04-TEST`/`PLAN.md` filenames in Annex B.1 of the siblings). No requirement content changed; all `*-KYMOJSON-001` document_ids unchanged. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled in the project repository at `docs/specs/kymo-json/01-REQUIREMENTS.md`;
+Version-controlled in the project repository at `docs/specs/kymo-syntax/modules/json/01-REQUIREMENTS.md`;
 the authoritative source is the main-branch working tree, with history via `git log`.
 
 ### B.2 Distribution

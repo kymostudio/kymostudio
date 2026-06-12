@@ -1,7 +1,7 @@
 ---
 title: kymo.json Interchange Format — Design
 document_id: DESIGN-KYMOJSON-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -34,7 +34,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | DESIGN-KYMOJSON-001                                |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
@@ -117,11 +117,12 @@ back-end stays on its hybrid path (it dispatches on non-empty `layout_trees`).
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — design of the `.kymo.json` serializer/loader, the layout-tree canonical form, CLI wiring, and the single-source-of-truth conformance reuse. |
+| 1.1     | 2026-06-12 | Vũ Anh | **Relocated** into `docs/specs/kymo-syntax/modules/json/` (the kymo-syntax umbrella's json module). Annex B.1 path updated. No design content changed. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/kymo-json/03-DESIGN.md`; authoritative source is the
+Version-controlled at `docs/specs/kymo-syntax/modules/json/02-DESIGN.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

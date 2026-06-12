@@ -1,7 +1,7 @@
 ---
 title: Kymo DSL Normative-Reference Set — Design
 document_id: DESIGN-KYMO-NREF-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-25
 status: Released
 classification: Internal
@@ -35,7 +35,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | DESIGN-KYMO-NREF-001                              |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
@@ -184,11 +184,12 @@ Per `CLAUDE.md`, any future grammar change is still reconciled into the clause f
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-25 | Vũ Anh | Initial issue — design of the kymo DSL normative-reference restructure. |
+| 1.1     | 2026-06-12 | Vũ Anh | **Relocated** into `docs/specs/kymo-syntax/modules/nref/` (module of the kymo-syntax umbrella); Annex B.1 path updated. No design content changed. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/kymo-dsl-nref/02-DESIGN.md`; authoritative source
+Version-controlled at `docs/specs/kymo-syntax/modules/nref/02-DESIGN.md`; authoritative source
 is the main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

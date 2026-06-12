@@ -1,7 +1,7 @@
 ---
 title: Kymo DSL Normative-Reference Set — Plan
 document_id: PLAN-KYMO-NREF-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-25
 status: Released
 classification: Internal
@@ -33,7 +33,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | PLAN-KYMO-NREF-001                                |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
@@ -122,13 +122,14 @@ Fibonacci SP; calibration: **3 ≈ the descriptive 5-doc `kymo-dsl` set**
 | **RK-KND-02** | **Missed link** — a `../KYMO_DSL.md` reference left behind dangles after the delete | Med | Med | Repo-wide grep gate over `](.*KYMO_DSL` / `/KYMO_DSL.md` and the `.yml` issue template; `TC-5`. | Closed |
 | **RK-KND-03** | **Duplicate id** — `KYMO-DSL-001` ends up defined in two files → ambiguous citation target | Low | High | Uniqueness grep `^document_id: KYMO-DSL-001$` → exactly one; `TC-2`. | Closed |
 | **RK-KND-04** | **Accidental content change** during the verbatim lift (a dropped line, a reflowed EBNF block) | Low | High | Diff each clause body against `git show HEAD~:docs/KYMO_DSL.md`; `TC-3`. | Open |
-| **RK-KND-05** | The **old filename string reappears** — these relocation docs naturally name `docs/KYMO_DSL.md` as the source being moved | Low | Low | Keep such mentions as **non-link prose** in the `kymo-dsl-nref` set; the link-integrity gate (`TC-5`) checks link/path forms only, not prose. | Accepted |
+| **RK-KND-05** | The **old filename string reappears** — these relocation docs naturally name `docs/KYMO_DSL.md` as the source being moved | Low | Low | Keep such mentions as **non-link prose** in this nref module's docs; the link-integrity gate (`TC-5`) checks link/path forms only, not prose. | Accepted |
 
 ## 7. Files to create / modify
 
 - **Create** — `docs/formats/kymo-dsl/README.md` + `01-scope.md` … `10-examples.md`
-  (11); `docs/specs/kymo-dsl-nref/{01-REQUIREMENTS,02-DESIGN,03-TEST,04-PLAN}.md`
-  (this is `04-PLAN.md`).
+  (11); the `*-KYMO-NREF-001` spec quartet `{01-REQUIREMENTS,02-DESIGN,03-TEST,04-PLAN}.md`
+  (this is `04-PLAN.md`; authored at `docs/specs/kymo-dsl-nref/`, since 2026-06-12 living at
+  `docs/specs/kymo-syntax/modules/nref/`).
 - **Modify** — `docs/tools/*.md` (~26); `docs/guide/{dsl-guide,faq,README}.md`;
   `docs/diagrams/bpmn/README.md`; `docs/BEST_PRACTICE_DIAGRAMS.md`;
   `CONTRIBUTING.md`; `.github/PULL_REQUEST_TEMPLATE.md`; `CHANGELOG.md`;
@@ -151,6 +152,7 @@ Per TEST-KYMO-NREF-001 (TC-1…7) and the matrix in its §5. In brief: structure
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-25 | Vũ Anh | Initial issue — plan (phases P1–P4, ≈15 SP, risk register) for the kymo DSL normative-reference restructure. |
+| 1.1     | 2026-06-12 | Vũ Anh | **Relocated** into `docs/specs/kymo-syntax/modules/nref/` (module of the kymo-syntax umbrella); §7 and `RK-KND-05` location wording updated; worklog row added. No plan content changed. |
 
 ## Annex B — Open questions / pending decisions
 
@@ -170,3 +172,4 @@ Annex A, which records edits to *this document*. Newest at the bottom; dates ISO
 | 2026-05-25 | P2 — Repoint + delete | Repointed all `../KYMO_DSL.md` path/anchor links: ~26 `docs/tools/*`, `docs/guide/*` deep anchors → `06-grammar.md`/`07-semantics.md`, `docs/diagrams/bpmn/README.md` (depth-two), `BEST_PRACTICE_DIAGRAMS.md`, `CONTRIBUTING.md`, PR template, `CHANGELOG.md`, `.github/ISSUE_TEMPLATE/config.yml`. Deleted `docs/KYMO_DSL.md`. Verified zero `KYMO_DSL` tokens repo-wide; `KYMO-DSL-001` defined once. | ✅ | `TC-2`,`TC-5` |
 | 2026-05-25 | P3 — Spec set | Authored this engineering set (`INTRO`/`FEATURE`/`DESIGN`/`TEST`/`PLAN-KYMO-NREF-001`) at the detailed `canvas-studio` format — stakeholder needs, FR/NFR tables, anchor/link-rewrite design, TC + traceability, phased plan + sizing + risk register. | ✅ | `FEAT-KYMO-NREF-001` |
 | 2026-05-25 | P4 — Verify | Integrity greps + `pytest -q` + `npm test`. | ⏳ | `TC-6` |
+| 2026-06-12 | Folder merge | Folded `docs/specs/kymo-dsl-nref/` into the kymo-syntax umbrella as `docs/specs/kymo-syntax/modules/nref/` (`git mv`, self-paths + parent cross-links updated; all `*-KYMO-NREF-001` ids unchanged). | ✅ | `FEAT-KYMO-SYNTAX-001` |

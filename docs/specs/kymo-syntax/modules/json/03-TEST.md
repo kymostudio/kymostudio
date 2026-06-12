@@ -1,7 +1,7 @@
 ---
 title: kymo.json Interchange Format — Test Documentation
 document_id: TEST-KYMOJSON-001
-version: "1.0"
+version: "1.1"
 issue_date: 2026-05-24
 status: Released
 classification: Internal
@@ -34,7 +34,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | TEST-KYMOJSON-001                                  |
-| Version      | 1.0                                                |
+| Version      | 1.1                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-24                                         |
 | Owner        | `diagrams/` project                                |
@@ -108,11 +108,12 @@ a **failure** to reconcile toward Python, not a re-baseline.
 | Version | Date       | Author | Changes        |
 |---------|------------|--------|----------------|
 | 1.0     | 2026-05-24 | Vũ Anh | Initial issue — test documentation for the `.kymo.json` round-trip + cross-language parity. |
+| 1.1     | 2026-06-12 | Vũ Anh | **Relocated** into `docs/specs/kymo-syntax/modules/json/` (the kymo-syntax umbrella's json module). Annex B.1 path updated. No test content changed. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/kymo-json/04-TEST.md`; authoritative source is the
+Version-controlled at `docs/specs/kymo-syntax/modules/json/03-TEST.md`; authoritative source is the
 main-branch working tree (history via `git log`).
 
 ### B.2 Distribution

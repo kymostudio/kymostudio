@@ -42,7 +42,7 @@ clause 6.
 | `KYMOJSON-MAP-001` (`docs/formats/kymo.json.md`) | `.kymo.json` — serialization of the resolved `model.Diagram` this DSL produces. |
 | `BPD-DGM-001` (`docs/BEST_PRACTICE_DIAGRAMS.md`) | Architecture-diagram best practices — design rationale and worked examples. |
 | `INTRO`/`FEAT`/`DESIGN`/`TEST`/`PLAN-KYMO-DSL-001` | The DSL front-end engineering set (the parse → layout → alignment pipeline this grammar specifies). |
-| `INTRO`/`FEAT`/`DESIGN`/`TEST`/`PLAN-KYMO-NREF-001` (`docs/specs/kymo-dsl-nref/`) | The engineering set for **this** normative-reference restructure. |
+| `INTRO`/`FEAT`/`DESIGN`/`TEST`/`PLAN-KYMO-NREF-001` (`docs/specs/kymo-syntax/modules/nref/`) | The engineering set for **this** normative-reference restructure. |
 
 ## Annex A — Revision History
 

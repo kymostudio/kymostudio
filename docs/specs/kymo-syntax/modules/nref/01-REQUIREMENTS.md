@@ -1,7 +1,7 @@
 ---
 title: Kymo DSL Normative-Reference Set — Requirements
 document_id: FEAT-KYMO-NREF-001
-version: "1.1"
+version: "1.2"
 issue_date: 2026-05-25
 status: Released
 classification: Internal
@@ -13,6 +13,8 @@ related_documents:
   - DESIGN-KYMO-NREF-001     # Design
   - TEST-KYMO-NREF-001       # Test documentation
   - PLAN-KYMO-NREF-001       # Plan
+  - FEAT-KYMO-SYNTAX-001     # Parent umbrella (this folder is its nref module)
+  - FEAT-KYMO-DSL-001        # Sibling dsl module — the front-end whose reference was restructured
   - KYMO-FMT-001             # .kymo source format — catalog reference
 authors:
   - Vũ Anh
@@ -38,7 +40,7 @@ iso_compliance:
 | Field        | Value                                              |
 |--------------|----------------------------------------------------|
 | Document ID  | FEAT-KYMO-NREF-001                                |
-| Version      | 1.1                                                |
+| Version      | 1.2                                                |
 | Status       | Released                                           |
 | Issue Date   | 2026-05-25                                         |
 | Owner        | `diagrams/` project                                |
@@ -84,8 +86,8 @@ items) and ISO/IEC/IEEE 12207 (life-cycle processes):
 
 | Layer | Folder | 15289 class | 12207 processes | Answers |
 |-------|--------|-------------|-----------------|---------|
-| **Specification** (this folder) | `docs/specs/kymo-dsl-nref/` | Specification / Description | §6.4 Technical Processes | *what must it be / how is it built / how is it verified?* |
-| **Implementation plan** | `docs/specs/kymo-dsl-nref/04-PLAN.md` | Plan + Records — **living** | §6.3 Technical Management | *why, in what order, at what risk, what's done?* |
+| **Specification** (this folder) | `docs/specs/kymo-syntax/modules/nref/` | Specification / Description | §6.4 Technical Processes | *what must it be / how is it built / how is it verified?* |
+| **Implementation plan** | `docs/specs/kymo-syntax/modules/nref/04-PLAN.md` | Plan + Records — **living** | §6.3 Technical Management | *why, in what order, at what risk, what's done?* |
 
 #### 2.1 Specification layer — document map
 
@@ -97,7 +99,7 @@ Read in order:
 | 02 | `02-DESIGN.md` | `DESIGN-KYMO-NREF-001` | 6.4.4 Architecture (42010) + 6.4.5 Design Definition | *how is it built?* |
 | 03 | `03-TEST.md` | `TEST-KYMO-NREF-001` | 6.4.9 Verification + 6.4.11 Validation + 6.3.6 Traceability | *how do we know it's right?* |
 
-The implementation plan (`PLAN-KYMO-NREF-001`, `docs/specs/kymo-dsl-nref/04-PLAN.md`)
+The implementation plan (`PLAN-KYMO-NREF-001`, `docs/specs/kymo-syntax/modules/nref/04-PLAN.md`)
 carries the phasing, sizing, risk register, and worklog. The **restructured
 specification itself** is `KYMO-DSL-001` (the set at `docs/formats/kymo-dsl/`); this
 engineering set documents the restructure, it does not restate the grammar.
@@ -211,11 +213,12 @@ normative language definition and **without** breaking any existing cross-refere
 | 1.0     | 2026-05-25 | Vũ Anh | Initial issue — introduction for the kymo DSL normative-reference restructure (FEAT-KYMO-NREF-001). |
 | 1.0     | 2026-05-25 | Vũ Anh | Initial issue — requirements (SN-1…5, FR-1…5, NFR-1…4) for the kymo DSL normative-reference restructure (FEAT-KYMO-NREF-001). |
 | 1.1     | 2026-06-06 | Vũ Anh | Consolidated FEAT-KYMO-NREF-001 (01-INTRO.md) and FEAT-KYMO-NREF-001 (02-FEATURE.md) into single 01-REQUIREMENTS.md under document_id FEAT-KYMO-NREF-001; no content changes. |
+| 1.2     | 2026-06-12 | Vũ Anh | **Relocated** `docs/specs/kymo-dsl-nref/` → `docs/specs/kymo-syntax/modules/nref/` — the one-off restructure set folded into the kymo-syntax umbrella (`FEAT-KYMO-SYNTAX-001`) as its `nref` module, beside `dsl/` and `json/`. Self-referential paths (§2, Annex B.1) updated; added `FEAT-KYMO-SYNTAX-001` (parent) and `FEAT-KYMO-DSL-001` (sibling) to related documents. No requirement content changed; all `*-KYMO-NREF-001` document_ids unchanged. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/kymo-dsl-nref/01-REQUIREMENTS.md`; the authoritative
+Version-controlled at `docs/specs/kymo-syntax/modules/nref/01-REQUIREMENTS.md`; the authoritative
 source is the main-branch working tree, with history via `git log`.
 
 ### B.2 Distribution
