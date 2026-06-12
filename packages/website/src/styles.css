@@ -362,3 +362,13 @@ footer .reg-badges { margin: 0 0 16px; }
   .hero-art { order: -1; }
   .hero-art img { width: 160px; }
 }
+
+/* ── Hero v4: exact docs-home replica ────────────────────────── */
+.btn-alt { background: var(--bg-raise); color: var(--ink); border: none; }
+.btn-alt:hover { background: var(--border); box-shadow: none; }
+.btn-pill { padding: 12px 20px; font-size: 14px; }
+section.features { padding: 24px var(--pad) 36px; }
+.feature { border: none; background: #f6f6f7; border-radius: 12px; padding: 24px 26px; }
+.feature:hover { transform: none; box-shadow: none; }
+.feature h3::before { content: none; }
+.feature h3 { font-size: 16px; }
