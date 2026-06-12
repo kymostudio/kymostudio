@@ -8,7 +8,8 @@ export function tokenValid(t: string | null): boolean {
   const e = t && jwtField(t, "exp");
   return !!(e && e * 1000 > Date.now() + 30000);
 }
-const AVATAR_COLORS = ["#f5b8d0", "#ddecee", "#c7e3f5", "#fde2b8", "#d9d4f7", "#c9efc9", "#f7d4c4", "#e3e1ea"];
+// no pinks: the avatar sits next to the brand-pink Share CTA and must not compete with it
+const AVATAR_COLORS = ["#d8dce6", "#ddecee", "#c7e3f5", "#fde2b8", "#d9d4f7", "#c9efc9", "#f7d4c4", "#e3e1ea"];
 export function colorFor(str: string): string {
   let h = 0; for (const ch of str) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return AVATAR_COLORS[h % AVATAR_COLORS.length];
