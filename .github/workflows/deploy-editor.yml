@@ -40,8 +40,12 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: wasm-pack
-      - name: Build kymostudio-core wasm
+      - name: Build kymostudio-core wasm (lean — no pdf/png exports)
         working-directory: packages/rust/kymostudio-core
+        # Plain `wasm` (no `pdf`): the editor never calls svgToPng/svgToPdf (its
+        # PNG export rasterizes via canvas), and those two exports carry resvg +
+        # svg2pdf — 1.4 MB brotli vs 0.2 MB without. npm/vscode artifacts build
+        # `wasm,pdf` and keep the full surface.
         run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
       - name: Build packages/js with the fresh core
         working-directory: packages/js

@@ -43,9 +43,11 @@ cargo build --release --manifest-path ../kymostudio/Cargo.toml   # -> ../kymostu
 maturin build --release --out dist        # -> dist/kymostudio_core-*-abi3-*.whl
 #   import _kymostudio_core; _kymostudio_core.svg_to_png(svg_bytes, scale)
 
-# wasm (browser + Node) — system-fonts OFF (no fs/mmap on wasm)
+# wasm (browser + Node) — system-fonts OFF (no fs/mmap on wasm).
+# Plain `wasm` is the LEAN module (no svgToPng/svgToPdf — 0.9 MB vs 6.1 MB raw);
+# add `pdf` for the full surface the npm/vscode artifacts ship.
 wasm-pack build --target web --out-dir pkg --out-name kymostudio_core \
-  -- --no-default-features --features wasm
+  -- --no-default-features --features wasm,pdf
 #   import { svgToPng } from './pkg/kymostudio_core.js'
 ```
 

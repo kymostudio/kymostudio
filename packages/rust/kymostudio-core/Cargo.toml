@@ -63,13 +63,16 @@ pdf = ["dep:svg2pdf"]
 # bpmn_import/bpmn_layout/bpmn_to_svg.
 python = ["dep:pyo3", "system-fonts", "pdf", "bpmn"]
 
-# wasm (browser + Node) — NO system-fonts (no fs/mmap on wasm). Includes pdf so
-# the JS CLI has SVG→PDF parity with Python/Rust; this pulls a second SVG engine
-# (svg2pdf's usvg 0.45) into the bundle — text still needs fonts embedded in the
-# SVG since system fonts aren't available on wasm. Includes bpmn so the JS library
-# delegates BPMN import/export/layout/render to this one source of truth (adds
-# roxmltree + serde_json, ~+100KB).
-wasm = ["dep:wasm-bindgen", "pdf", "bpmn"]
+# wasm (browser + Node) — NO system-fonts (no fs/mmap on wasm), and NO pdf by
+# default: svgToPng/svgToPdf live behind the `pdf` feature, which drags resvg's
+# rasterizer plus a second SVG engine (svg2pdf's usvg 0.45) into the module —
+# measured 2026-06-12: 6.1 MB raw / 1.4 MB brotli with them, 0.9 MB / 0.2 MB
+# without. The published npm/vscode artifacts build `--features wasm,pdf` so the
+# JS CLI keeps SVG→PDF/PNG parity with Python/Rust; the editor builds plain
+# `wasm` and ships the lean module (its PNG export rasterizes via canvas).
+# Includes bpmn so the JS library delegates BPMN import/export/layout/render to
+# this one source of truth (adds roxmltree + serde_json, ~+100KB).
+wasm = ["dep:wasm-bindgen", "bpmn"]
 
 # BPMN import/export/layout/shapes — the single-source-of-truth stack. On for
 # native builds + the Python wheel; validated by tests/bpmn_conformance.rs against
