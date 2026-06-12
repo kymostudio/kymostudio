@@ -271,7 +271,6 @@ function McpTerminal() {
         </div>
         <pre><code>{agent.code}</code></pre>
       </div>
-      <p className="mcp-note">Sign in with Google on first connect — diagrams open live in the editor.</p>
     </div>
   );
 }
