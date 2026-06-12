@@ -127,6 +127,76 @@ function GitHubStars() {
   );
 }
 
+// Diagram kinds band — a clean, clickable row in a bordered full-bleed strip.
+// Each kind carries a small line glyph (uniform 1.8 stroke, 24 grid).
+const DOCS = "https://docs.kymo.studio";
+const EDITOR = "https://editor.kymo.studio";
+const G = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+const KINDS: { name: string; href: string; glyph: React.ReactNode }[] = [
+  { name: "Flowchart", href: `${DOCS}/diagrams/flowchart`, glyph: <svg viewBox="0 0 24 24" {...G}><rect x="6.5" y="3" width="11" height="5.5" rx="1.3" /><path d="M12 8.5v3" /><path d="M12 11.5l4.5 4.5-4.5 4.5-4.5-4.5z" /></svg> },
+  { name: "Architecture", href: "#samples", glyph: <svg viewBox="0 0 24 24" {...G}><rect x="3" y="3.5" width="18" height="17" rx="2" /><rect x="6.5" y="7" width="5.5" height="5" rx="1" /><path d="M12 12l3 3" /><rect x="15" y="13" width="4" height="4" rx="1" /></svg> },
+  { name: "BPMN", href: `${DOCS}/diagrams/bpmn`, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="4.6" cy="12" r="2.1" /><path d="M6.7 12H9" /><rect x="9" y="8.8" width="6.4" height="6.4" rx="1.4" /><path d="M15.4 12h2.2" /><circle cx="19.7" cy="12" r="2.1" /><circle cx="19.7" cy="12" r="0.9" fill="currentColor" stroke="none" /></svg> },
+  { name: "Sequence", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><path d="M6.5 4v16M17.5 4v16" /><path d="M6.5 9h11" /><path d="M15.2 6.8L17.5 9l-2.3 2.2" /><path d="M17.5 15.5h-11" /></svg> },
+  { name: "Class", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><rect x="4.5" y="3.5" width="15" height="17" rx="1.6" /><path d="M4.5 9h15M4.5 14.5h15" /></svg> },
+  { name: "ER", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><rect x="2.8" y="8.3" width="7.2" height="7.4" rx="1.2" /><rect x="15" y="8.3" width="6.2" height="7.4" rx="3.1" /><path d="M10 12h5M15 12l-2.6-2.3M15 12l-2.6 2.3" /></svg> },
+  { name: "State", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="5" cy="12" r="1.7" fill="currentColor" stroke="none" /><path d="M6.7 12h3.3" /><rect x="10" y="8.3" width="10.5" height="7.4" rx="3.7" /></svg> },
+  { name: "C4", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="7" cy="5.8" r="2.1" /><path d="M3.5 12.5c0-2 1.6-3.3 3.5-3.3s3.5 1.3 3.5 3.3" /><rect x="13.5" y="7.5" width="7.5" height="6" rx="1.2" /><path d="M7 12.5v4.5h6.5" /></svg> },
+  { name: "Use case", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="5.5" cy="5.5" r="1.9" /><path d="M5.5 7.4v4.6M3 9.5h5M5.5 12l-2 4M5.5 12l2 4" /><ellipse cx="16.5" cy="12" rx="5" ry="3.4" /></svg> },
+  { name: "Activity", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="4.3" cy="12" r="1.6" fill="currentColor" stroke="none" /><path d="M5.9 12h2.6" /><rect x="8.5" y="8.8" width="7" height="6.4" rx="2.6" /><path d="M15.5 12H17" /><path d="M17 12l2.3-2.3L21.6 12l-2.3 2.3z" /></svg> },
+  { name: "Component", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><rect x="7.5" y="4" width="13" height="16" rx="1.5" /><rect x="3" y="7.5" width="7" height="3.4" rx="0.9" /><rect x="3" y="13.1" width="7" height="3.4" rx="0.9" /></svg> },
+  { name: "Deployment", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><path d="M4.5 8.5L9 4h10.5v11.5L15 20H4.5z" /><path d="M4.5 8.5H15V20M15 8.5L19.5 4" /></svg> },
+  { name: "Database", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><ellipse cx="12" cy="5.6" rx="7" ry="2.6" /><path d="M5 5.6v12.8c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V5.6" /><path d="M5 12c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6" /></svg> },
+  { name: "Gantt", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><path d="M4 4v16" /><path d="M7 7.5h7M7 12h10M7 16.5h5" strokeWidth="2.6" /></svg> },
+  { name: "Timeline", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><path d="M3 12h18" /><path d="M7 12V7.5M13 12v4.5M19 12V7.5" /><circle cx="7" cy="12" r="1.7" fill="currentColor" stroke="none" /><circle cx="13" cy="12" r="1.7" fill="currentColor" stroke="none" /><circle cx="19" cy="12" r="1.7" fill="currentColor" stroke="none" /></svg> },
+  { name: "Git graph", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="6.5" cy="5.5" r="1.9" /><circle cx="6.5" cy="18.5" r="1.9" /><circle cx="17.5" cy="12" r="1.9" /><path d="M6.5 7.4v9.2" /><path d="M8 6.7c4.5 1 7.6 2.6 8.4 3.6" /></svg> },
+  { name: "Network", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="12" cy="12" r="2.5" /><circle cx="5" cy="5.5" r="1.8" /><circle cx="19" cy="5.5" r="1.8" /><circle cx="5" cy="18.5" r="1.8" /><circle cx="19" cy="18.5" r="1.8" /><path d="M10.2 10.4L6.3 6.8M13.8 10.4l3.9-3.6M10.2 13.6l-3.9 3.6M13.8 13.6l3.9 3.6" /></svg> },
+  { name: "Mindmap", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="12" cy="12" r="2.7" /><path d="M14.3 10.5l4-3.2M14.5 13l4.2 1.6M9.7 13.6L5.3 16.8" /><circle cx="19.8" cy="6.3" r="1.6" /><circle cx="20.2" cy="15.3" r="1.6" /><circle cx="4" cy="17.8" r="1.6" /></svg> },
+  { name: "Kanban", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><rect x="3.5" y="4" width="5" height="13" rx="1" /><rect x="9.5" y="4" width="5" height="9" rx="1" /><rect x="15.5" y="4" width="5" height="16" rx="1" /></svg> },
+  { name: "Timing", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><path d="M3 16h3V8h4.5v8H15V8h4v8h2" /></svg> },
+  { name: "Pie", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><circle cx="12" cy="12" r="8" /><path d="M12 12V4M12 12l6.8 4.2" /></svg> },
+  { name: "XY chart", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><path d="M4.5 4v15.5H20" /><path d="M7 14.5l3.8-4.7 3.4 2.9 4.8-6.7" /></svg> },
+];
+
+function KindsRow({ items, reverse }: { items: typeof KINDS; reverse?: boolean }) {
+  return (
+    <div className={reverse ? "kinds-marquee reverse" : "kinds-marquee"}>
+      <div className="kinds-track">
+        {[...items, ...items].map((k, i) => (
+          <a
+            className="kind"
+            key={`${k.name}-${i}`}
+            href={k.href}
+            aria-hidden={i >= items.length || undefined}
+            tabIndex={i >= items.length ? -1 : undefined}
+          >
+            {k.glyph}
+            {k.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function KindsStrip() {
+  // three rows, each blending two thirds of the catalogue: A+B / B+C / C+A —
+  // long enough that the marquee's duplicate copy stays off-screen
+  const third = Math.ceil(KINDS.length / 3);
+  const A = KINDS.slice(0, third);
+  const B = KINDS.slice(third, third * 2);
+  const C = KINDS.slice(third * 2);
+  return (
+    <section className="kinds" aria-label="Supported diagram types">
+      <p className="kinds-head">
+        <strong>Every diagram, one studio</strong> — from architecture to BPMN, your agent picks the right kind.
+      </p>
+      <KindsRow items={[...A, ...B]} />
+      <KindsRow items={[...B, ...C]} reverse />
+      <KindsRow items={[...C, ...A]} />
+    </section>
+  );
+}
+
 const MCP_SNIPPETS = [
   { key: "claude", label: "Claude Code", code: `claude mcp add --transport sse kymo \\\n  https://mcp.kymo.studio/sse` },
   { key: "any", label: "Any MCP client", code: `{ "mcpServers": {\n    "kymo": { "url": "https://mcp.kymo.studio/mcp" }\n} }` },
@@ -227,6 +297,8 @@ function App() {
           ))}
         </div>
       </section>
+
+      <KindsStrip />
 
       <section className="mcp" id="mcp">
         <div className="mcp-inner">
