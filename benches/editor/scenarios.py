@@ -70,6 +70,18 @@ THROTTLE = {
     "latency": 165,                   # 60 ms × 2.75
 }
 
+# The measured metrics, by canonical name. DIAGRAM_VISIBLE_MS is the metric of
+# record; everything else exists to explain it (what's ours vs what's kroki's).
+METRICS = [
+    "TTFB_MS",             # navigation responseStart
+    "FCP_MS",              # first contentful paint (editor chrome, not the diagram)
+    "KROKI_SENT_MS",       # render POST left the browser (early kick-off pulls this down)
+    "KROKI_DONE_MS",       # kroki's SVG fully arrived (gap to SENT = kroki's server render)
+    "DIAGRAM_VISIBLE_MS",  # first SVG in the preview pane — the metric of record
+    "WIRE_TOTAL_KB",       # total transfer over the load
+    "WIRE_ENGINE_KB",      # of which the wasm engine chunk (must be 0 on kroki kinds)
+]
+
 # Installed before any document script: stamps the moment the first diagram SVG
 # lands in the preview pane — the metric a share-link visitor actually feels.
 _INIT_JS = """
@@ -99,14 +111,14 @@ _COLLECT_JS = """
   const engine = res.find((r) => r.name.includes("/chunks/engine-"));
   const fcp = performance.getEntriesByType("paint").find((p) => p.name === "first-contentful-paint");
   return {
-    ttfb_ms: Math.round(nav.responseStart),
-    fcp_ms: fcp ? Math.round(fcp.startTime) : null,
-    diagram_ms: window.__diagramAt === null ? null : Math.round(window.__diagramAt),
-    kroki_start_ms: kroki ? Math.round(kroki.startTime) : null,
-    kroki_end_ms: kroki ? Math.round(kroki.responseEnd) : null,
+    TTFB_MS: Math.round(nav.responseStart),
+    FCP_MS: fcp ? Math.round(fcp.startTime) : null,
+    DIAGRAM_VISIBLE_MS: window.__diagramAt === null ? null : Math.round(window.__diagramAt),
+    KROKI_SENT_MS: kroki ? Math.round(kroki.startTime) : null,
+    KROKI_DONE_MS: kroki ? Math.round(kroki.responseEnd) : null,
+    WIRE_ENGINE_KB: engine ? Math.round(engine.transferSize / 1024) : 0,
+    WIRE_TOTAL_KB: Math.round(res.reduce((s, r) => s + r.transferSize, 0) / 1024),
     engine_fetched: !!engine,
-    engine_transfer_kb: engine ? Math.round(engine.transferSize / 1024) : 0,
-    transfer_kb_total: Math.round(res.reduce((s, r) => s + r.transferSize, 0) / 1024),
     early_kroki: typeof window.__earlyKroki,
     status: (document.querySelector(".status")?.textContent || "").slice(0, 200),
     status_error: !!document.querySelector(".status.error"),
@@ -138,7 +150,7 @@ def load_once(browser, base_url: str, scenario: dict, *, throttle: bool = True, 
         except Exception:
             pass  # timed out — collect what we can; ok will be False
         obs = page.evaluate(_COLLECT_JS)
-        obs["ok"] = obs["diagram_ms"] is not None and not obs["status_error"] and not obs["share_error"]
+        obs["ok"] = obs["DIAGRAM_VISIBLE_MS"] is not None and not obs["status_error"] and not obs["share_error"]
         return obs
     finally:
         context.close()

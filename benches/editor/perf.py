@@ -3,17 +3,11 @@
 
 Per scenario, N cold loads (fresh browser context each — no HTTP cache, no
 storage) under the Chrome DevTools "Fast 4G" network conditions, then medians
-over the loads that settled successfully:
-
-  • ttfb_ms          — navigation responseStart
-  • fcp_ms           — first contentful paint (the editor chrome, not the diagram)
-  • kroki_start_ms   — when the render POST left the browser; the early-kick-off
-                       work (PR #282) exists to pull this number down
-  • kroki_end_ms     — when kroki's SVG finished arriving (includes kroki's own
-                       server-side render — out of our control)
-  • diagram_ms       — first SVG visible in the preview pane: the number a
-                       share-link visitor actually feels
-  • transfer_kb      — total bytes on the wire (engine chunk counted separately)
+over the loads that settled successfully, for each metric in
+``scenarios.METRICS`` — DIAGRAM_VISIBLE_MS (the metric of record: first SVG in
+the preview pane), TTFB_MS, FCP_MS, KROKI_SENT_MS, KROKI_DONE_MS (the gap to
+SENT is kroki's own server-side render — out of our control), WIRE_TOTAL_KB
+and WIRE_ENGINE_KB.
 
 These numbers are MACHINE- and NETWORK-DEPENDENT, and kroki.io's queue adds
 real variance — the committed ``results/perf.json`` is a snapshot stamped with
@@ -40,7 +34,7 @@ HERE = Path(__file__).resolve().parent
 RESULTS = HERE / "results"
 
 DEFAULT_REPS = 5
-METRICS = ["ttfb_ms", "fcp_ms", "kroki_start_ms", "kroki_end_ms", "diagram_ms", "transfer_kb_total", "engine_transfer_kb"]
+METRICS = scenarios.METRICS
 
 
 def _median(rows: list[dict], key: str) -> int | None:
