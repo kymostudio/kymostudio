@@ -1,6 +1,6 @@
 flowchart TD
     A[Submit] --> B{Approved?}
     B -->|yes| C[Provision]
-    B -- no --> D[Reject]
+    B -->|no| D[Reject]
     C -.-> E[Audit log]
     D --- E

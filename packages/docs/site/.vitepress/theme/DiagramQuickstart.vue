@@ -19,6 +19,16 @@ const markers = new Map<string, HTMLElement>();
 provide("dq-register", (id: string, el: HTMLElement) => markers.set(id, el));
 provide("dq-unregister", (id: string) => markers.delete(id));
 provide("dq-active", activeId);
+provide("dq-activate", (id: string) => {
+  if (examples.some((e) => e.id === id)) activeId.value = id;
+});
+
+const lines = computed(() => active.value.code.replace(/\n$/, "").split("\n"));
+const hasHl = computed(() => (active.value.hl?.length ?? 0) > 0);
+function lineClass(n: number) {
+  if (!hasHl.value) return "";
+  return active.value.hl!.some(([a, b]) => n >= a && n <= b) ? "hl" : "dim";
+}
 
 let onScroll: (() => void) | undefined;
 onMounted(() => {
@@ -75,7 +85,12 @@ async function openEditor() {
               <button @click="openEditor">▶ Open in editor</button>
             </span>
           </div>
-          <pre class="dq-source"><code>{{ active.code }}</code></pre>
+          <pre class="dq-source"><code><span
+            v-for="(line, i) in lines"
+            :key="`${active.id}-${i}`"
+            class="dq-line"
+            :class="lineClass(i + 1)"
+          >{{ line + "\n" }}</span></code></pre>
         </div>
       </div>
     </aside>
@@ -191,7 +206,7 @@ async function openEditor() {
 .dq-source {
   flex: 1 1 0;
   margin: 0;
-  padding: 16px;
+  padding: 16px 0;
   overflow: auto;
   font-family: var(--vp-font-family-mono);
   font-size: 13px;
@@ -200,6 +215,18 @@ async function openEditor() {
 }
 .dq-source code {
   white-space: pre;
+}
+.dq-line {
+  display: block;
+  padding: 0 16px;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+.dq-line.hl {
+  background: rgba(224, 9, 95, 0.18);
+  box-shadow: inset 3px 0 0 var(--vp-c-brand-1, #e0095f);
+}
+.dq-line.dim {
+  opacity: 0.4;
 }
 
 @media (max-width: 1099px) {
