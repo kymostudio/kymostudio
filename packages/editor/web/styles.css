@@ -46,7 +46,10 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
 .btn-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
 
-.diagram-name { display: inline-flex; align-items: center; gap: 6px; font-size: 14.5px; font-weight: 650; color: var(--ink); padding: 3px 8px; border-radius: 7px; }
+/* padding is asymmetric on purpose: mixed-case labels are optically centered on
+   their x-height band, which sits ~1px below the box center — next to the solid
+   24px brand tile that 1px reads as "text too low", so the ink is raised. */
+.diagram-name { display: inline-flex; align-items: center; gap: 6px; font-size: 14.5px; font-weight: 650; color: var(--ink); padding: 2px 8px 4px; border-radius: 7px; }
 .diagram-name.editable { cursor: text; }
 .diagram-name.untitled { color: var(--dim); font-weight: 500; }
 .diagram-name.editable:hover { background: var(--bg-raise); }
