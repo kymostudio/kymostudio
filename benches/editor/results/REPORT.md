@@ -1,6 +1,6 @@
 # editor bench — share-link first load
 
-*2026-06-12T07:00:46+00:00 · https://editor.kymo.studio · anhvu2-01.local (macOS-26.4.1-arm64-arm-64bit-Mach-O) · chrome · Fast 4G throttle (165 ms RTT, 8,493 kbit/s down)*
+*2026-06-12T08:23:21+00:00 · https://editor.kymo.studio · anhvu2-01.local (macOS-26.4.1-arm64-arm-64bit-Mach-O) · chrome · Fast 4G throttle (165 ms RTT, 8,493 kbit/s down)*
 
 Snapshot, not a gate: the editor is deployed software and kroki.io is a live
 third-party renderer — timing varies with the network and with kroki's queue.
@@ -16,8 +16,8 @@ third-party renderer — timing varies with the network and with kroki's queue.
 
 | Scenario | reps (failed) | TTFB_MS | FCP_MS | KROKI_SENT_MS | KROKI_DONE_MS | **DIAGRAM_VISIBLE_MS** | WIRE_TOTAL_KB (WIRE_ENGINE_KB) |
 |---|---|---|---|---|---|---|---|
-| mermaid-share | 5 (3) | 278 🟢 ms | 924 🟢 ms | 747 🟢 ms | 3,399 ms | **3,408 🟡 ms** | 211 🟢 (0) |
-| kymo-default | 5 (0) | 274 🟢 ms | 1,616 🟢 ms | — ms | — ms | **4,465 🔴 ms** | 2,677 🔴 (2,465) |
+| mermaid-share | 5 (0) | 206 🟢 ms | 824 🟢 ms | 698 🟢 ms | 1,224 ms | **1,232 🟢 ms** | 209 🟢 (0) |
+| kymo-default | 5 (0) | 258 🟢 ms | 880 🟢 ms | — ms | — ms | **3,517 🟡 ms** | 1,823 🟡 (1,612) |
 
 Metric of record is **DIAGRAM_VISIBLE_MS** — first SVG in the preview pane.
 `KROKI_DONE_MS − KROKI_SENT_MS` is kroki.io's own server-side render; the
