@@ -389,7 +389,6 @@ section.mcp {
   font-size: 13px; line-height: 1.6;
   color: #f3f1f8;
 }
-.mcp-note { margin: 0; font-size: 13px; color: var(--dim); }
 /* one-click install link, lives in the terminal bar next to Copy */
 .mcp-bar-link {
   border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 8px;
