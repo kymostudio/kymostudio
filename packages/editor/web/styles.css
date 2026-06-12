@@ -33,6 +33,12 @@ header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; bord
 .brand img { width: 24px; height: 24px; display: block; }
 .sep { color: var(--border-strong); user-select: none; }
 .spacer { flex: 1; }
+
+/* right-side action cluster: nav · create · output (Share = CTA); account sits outside, last */
+.nav-group { display: flex; align-items: center; gap: 8px; }
+.navlink { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: var(--radius-btn); font-size: 13.5px; font-weight: 600; color: var(--dim); text-decoration: none; transition: background-color 0.16s ease, color 0.16s ease; }
+.navlink:hover { background: var(--bg-soft); color: var(--ink); }
+.vsep { width: 1px; height: 22px; background: var(--border); flex: none; }
 .muted { font-size: 12.5px; color: var(--dim); }
 
 button, .btn { background: var(--bg); color: var(--ink); border: 1px solid var(--border-strong); border-radius: var(--radius-btn); padding: 7px 14px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
@@ -40,10 +46,19 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
 .btn-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
 
-.diagram-name { font-size: 14px; font-weight: 600; color: var(--ink); padding: 3px 8px; border-radius: 7px; }
+.diagram-name { display: inline-flex; align-items: center; gap: 6px; font-size: 14.5px; font-weight: 650; color: var(--ink); padding: 3px 8px; border-radius: 7px; }
 .diagram-name.editable { cursor: text; }
 .diagram-name.untitled { color: var(--dim); font-weight: 500; }
 .diagram-name.editable:hover { background: var(--bg-raise); }
+/* rename affordance: the pencil only materialises on hover, but it exists */
+.diagram-name .pencil { color: var(--dim); opacity: 0; flex: none; transition: opacity 0.15s ease; }
+.diagram-name.editable:hover .pencil { opacity: 1; }
+
+/* sync state next to the title (room mode): green = every change persisted */
+.save-ind { display: inline-flex; align-items: center; gap: 6px; flex: none; font-size: 11.5px; font-weight: 600; color: var(--dim); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 999px; padding: 2.5px 10px; }
+.save-ind::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #34a853; }
+.save-ind.off { color: #8a6116; background: #fdf6e7; border-color: #f0dfb6; }
+.save-ind.off::before { background: #e6a23c; }
 .diagram-input { font: inherit; font-size: 14px; font-weight: 600; background: var(--bg); border: 1px solid var(--accent); border-radius: 7px; color: var(--ink); padding: 3px 8px; outline: none; min-width: 160px; }
 
 .account { position: relative; }
@@ -215,6 +230,9 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
 /* ---- mobile: share links are mostly opened from chat on phones ---- */
 @media (max-width: 720px) {
   header { flex-wrap: wrap; row-gap: 8px; padding: 10px 12px; }
+  /* designed rows: 1 = identity (brand · title · avatar), 2 = the action cluster */
+  .nav-group { order: 10; flex-basis: 100%; justify-content: flex-end; }
+  .save-ind { font-size: 0; gap: 0; padding: 5px; } /* dot only — row 1 is tight */
   main { flex-direction: column; }
   /* the source pane carries an inline flex-basis from the drag-splitter — override it */
   .pane { flex: 1 1 50% !important; min-width: 0; min-height: 0; }

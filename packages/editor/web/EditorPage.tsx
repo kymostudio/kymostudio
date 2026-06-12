@@ -9,7 +9,7 @@ import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -321,7 +321,8 @@ export default function EditorPage() {
   return (
     <div className="layout">
       <header>
-        <a className="brand" href="/"><img src="/favicon.svg" alt="" /></a>
+        {/* identity & document: logo → app home, workspace, editable title, sync state */}
+        <Link className="brand" to={claims ? "/diagrams" : "/"}><img src="/favicon.svg" alt="" /></Link>
         {claims && <WorkspaceSwitcher />}
         <span className="sep">/</span>
         {booting ? <span className="skeleton name-skel" /> : claims ? (
@@ -330,11 +331,59 @@ export default function EditorPage() {
               onKeyDown={(e) => { if (e.key === "Enter") commitRename((e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditingName(false); }}
               onBlur={(e) => commitRename(e.target.value)} />
           ) : (
-            <span className={"diagram-name editable" + (title ? "" : " untitled")} title="Đổi tên" onClick={() => setEditingName(true)}>{diagramLabel}</span>
+            <span className={"diagram-name editable" + (title ? "" : " untitled")} title="Đổi tên" onClick={() => setEditingName(true)}>
+              {diagramLabel}
+              <Pencil size={12.5} strokeWidth={2.1} className="pencil" />
+            </span>
           )
         ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")}>{diagramLabel}</span>}
+        {claims && d && !booting && (
+          <span className={"save-ind" + (live ? "" : " off")} title={live ? "Mọi thay đổi được lưu real-time" : "Mất kết nối — thay đổi chưa được lưu"}>
+            {live ? "Saved" : "Offline"}
+          </span>
+        )}
         <div className="spacer" />
         {!claims && <GoogleButton />}
+        {/* actions: nav · create · output (Share is the CTA) · account last */}
+        <nav className="nav-group">
+          {claims && (
+            <>
+              <Link className="navlink" to="/diagrams"><LayoutGrid size={15} strokeWidth={2} />Diagrams</Link>
+              <span className="vsep" />
+            </>
+          )}
+          <button onClick={newDiagram} title="New diagram"><Plus size={16} strokeWidth={2.2} />New</button>
+          {shared && claims && (
+            <button onClick={saveCopy} title="Lưu một bản copy vào Diagrams của bạn">
+              <Save size={16} strokeWidth={2} />
+              Save a copy
+            </button>
+          )}
+          <div className="account" onClick={(e) => e.stopPropagation()} onMouseEnter={() => setExportOpen(true)} onMouseLeave={() => setExportOpen(false)}>
+            <button onClick={() => setExportOpen((o) => !o)}><Download size={16} strokeWidth={2} />Export <ChevronDown size={16} strokeWidth={2.2} className="chev-icon" /></button>
+            {exportOpen && (
+              <div className="acct-menu exp-menu">
+                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}>
+                  <FileCode2 size={17} strokeWidth={1.9} />
+                  To SVG
+                </button>
+                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportPNG(); }}>
+                  <FileImage size={17} strokeWidth={1.9} />
+                  To PNG
+                </button>
+                <div className="menu-sep" />
+                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}>
+                  <Code2 size={17} strokeWidth={1.9} />
+                  Source (.kymo)
+                </button>
+              </div>
+            )}
+          </div>
+          <button className="btn-primary" onClick={copyShareLink} title="Copy link chia sẻ — toàn bộ diagram nằm trong URL, không cần đăng nhập để mở">
+            {copied ? <Check size={16} strokeWidth={2.2} /> : <Link2 size={16} strokeWidth={2} />}
+            {copied ? "Copied!" : "Share"}
+          </button>
+        </nav>
         {claims && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
             <button className="acct-btn" onClick={() => setMenuOpen((o) => !o)} title="Account">
@@ -349,38 +398,6 @@ export default function EditorPage() {
             )}
           </div>
         )}
-        {claims && <Link className="btn" to="/diagrams">Diagrams</Link>}
-        <button className="btn-primary" onClick={newDiagram} title="New diagram">+ New</button>
-        {shared && claims && (
-          <button onClick={saveCopy} title="Lưu một bản copy vào Diagrams của bạn">
-            <Save size={16} strokeWidth={2} />
-            Save a copy
-          </button>
-        )}
-        <button onClick={copyShareLink} title="Copy link chia sẻ — toàn bộ diagram nằm trong URL, không cần đăng nhập để mở">
-          {copied ? <Check size={16} strokeWidth={2.2} /> : <Link2 size={16} strokeWidth={2} />}
-          {copied ? "Copied!" : "Share"}
-        </button>
-        <div className="account" onClick={(e) => e.stopPropagation()} onMouseEnter={() => setExportOpen(true)} onMouseLeave={() => setExportOpen(false)}>
-          <button onClick={() => setExportOpen((o) => !o)}><Download size={16} strokeWidth={2} />Export <ChevronDown size={16} strokeWidth={2.2} className="chev-icon" /></button>
-          {exportOpen && (
-            <div className="acct-menu exp-menu">
-              <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}>
-                <FileCode2 size={17} strokeWidth={1.9} />
-                To SVG
-              </button>
-              <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportPNG(); }}>
-                <FileImage size={17} strokeWidth={1.9} />
-                To PNG
-              </button>
-              <div className="menu-sep" />
-              <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}>
-                <Code2 size={17} strokeWidth={1.9} />
-                Source (.kymo)
-              </button>
-            </div>
-          )}
-        </div>
       </header>
       <main ref={mainRef}>
         {booting ? (
@@ -435,7 +452,7 @@ export default function EditorPage() {
           </>
         )}
       </main>
-      <div className={"status" + (statusErr ? " error" : "")}>{(live ? "⚡ " : "") + status}</div>
+      <div className={"status" + (statusErr ? " error" : "")}>{status}</div>
     </div>
   );
 }
