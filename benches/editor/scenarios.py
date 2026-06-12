@@ -150,8 +150,13 @@ _COLLECT_JS = """
 () => {
   const nav = performance.getEntriesByType("navigation")[0];
   const res = performance.getEntriesByType("resource");
-  const kroki = res.find((r) => r.name.includes("kroki.io"));
-  const engine = res.find((r) => r.name.includes("/chunks/engine-"));
+  // Renders go through the mcp worker's caching proxy since PR #294 (kroki.io
+  // direct is only the fallback path) — match either for the request window.
+  const kroki = res.find((r) => r.name.includes("/api/render/") || r.name.includes("kroki.io"));
+  // The engine is two assets since PR #294: the JS glue chunk plus the .wasm
+  // shipped as its own streaming-compiled file. Sum them for the wire cost.
+  const engineRes = res.filter((r) => r.name.includes("/chunks/engine-") || r.name.endsWith(".wasm"));
+  const engineKB = Math.round(engineRes.reduce((s, r) => s + r.transferSize, 0) / 1024);
   const fcp = performance.getEntriesByType("paint").find((p) => p.name === "first-contentful-paint");
   return {
     TTFB_MS: Math.round(nav.responseStart),
@@ -159,9 +164,9 @@ _COLLECT_JS = """
     DIAGRAM_VISIBLE_MS: window.__diagramAt === null ? null : Math.round(window.__diagramAt),
     KROKI_SENT_MS: kroki ? Math.round(kroki.startTime) : null,
     KROKI_DONE_MS: kroki ? Math.round(kroki.responseEnd) : null,
-    WIRE_ENGINE_KB: engine ? Math.round(engine.transferSize / 1024) : 0,
+    WIRE_ENGINE_KB: engineKB,
     WIRE_TOTAL_KB: Math.round(res.reduce((s, r) => s + r.transferSize, 0) / 1024),
-    engine_fetched: !!engine,
+    engine_fetched: engineRes.length > 0,
     early_kroki: typeof window.__earlyKroki,
     status: (document.querySelector(".status")?.textContent || "").slice(0, 200),
     status_error: !!document.querySelector(".status.error"),
