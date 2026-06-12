@@ -151,17 +151,23 @@ function App() {
         </div>
       </nav>
 
-      <header className="hero">
-        <h1>Diagram <span className="accent">superpowers</span></h1>
-        <p className="lead">
-          Type it. See it appear. Watch it animate.
-        </p>
-        <div className="ctas">
-          <a className="btn btn-primary" href="https://editor.kymo.studio">Start Free →</a>
-          <a className="btn btn-ghost" href={GH}>View on GitHub</a>
+      <header className="hero hero-split">
+        <div className="hero-text">
+          <h1>
+            <span className="name">KymoStudio</span><br />
+            <span className="strap">Diagram superpowers</span>
+          </h1>
+          <p className="lead">Type it. See it appear. Watch it animate.</p>
+          <div className="ctas">
+            <a className="btn btn-primary btn-pill" href="https://editor.kymo.studio">Start Free →</a>
+            <a className="btn btn-ghost btn-pill" href={GH}>View on GitHub</a>
+          </div>
+          <InstallTabs />
+          <p className="hero-note">Free &amp; open source · Apache 2.0</p>
         </div>
-        <InstallTabs />
-        <p className="hero-note">Free &amp; open source · Apache 2.0</p>
+        <div className="hero-art">
+          <img src="./logo.svg" alt="KymoStudio" />
+        </div>
       </header>
 
       <div className="preview">
