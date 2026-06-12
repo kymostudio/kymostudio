@@ -115,12 +115,12 @@ function capUpscale(e: Event) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(380px, 46%);
   gap: 40px;
-  max-width: 1376px;
-  margin: 0 auto;
-  padding: 24px 32px 96px;
+  /* Flush to the viewport's right edge, Stripe-style — no centered gutter. */
+  padding: 24px 0 96px 48px;
 }
 .dq-main {
   min-width: 0;
+  max-width: 760px;
 }
 .dq-pane {
   min-width: 0;
@@ -162,11 +162,11 @@ function capUpscale(e: Event) {
   font-size: 12px;
   color: rgba(221, 236, 238, 0.55);
 }
-/* The preview hugs the diagram's height (capped); the code pane takes ALL
-   the remaining space — no dead canvas around short diagrams. */
+/* Fixed split: preview 60% / code 40% of the pane (below the toggle header) —
+   a stable boundary while scrolling through sections. */
 .dq-preview {
-  flex: 0 1 auto;
-  max-height: 58%;
+  flex: 6 1 0;
+  min-height: 0;
   overflow-y: auto;
   background:
     radial-gradient(circle, rgba(36, 33, 49, 0.06) 1px, transparent 1px) 0 0 / 22px 22px,
@@ -174,7 +174,9 @@ function capUpscale(e: Event) {
 }
 .dq-preview-inner {
   display: flex;
+  align-items: center;
   justify-content: center;
+  min-height: 100%;
   padding: 14px;
 }
 .dq-preview img {
@@ -185,8 +187,8 @@ function capUpscale(e: Event) {
 .dq-code {
   display: flex;
   flex-direction: column;
-  flex: 1 1 0;
-  min-height: 150px;
+  flex: 4 1 0;
+  min-height: 0;
 }
 .preview-closed .dq-code {
   flex: 1 1 auto;

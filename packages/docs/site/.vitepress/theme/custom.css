@@ -15,3 +15,10 @@
   --vp-c-brand-2: #e0095f;
   --vp-c-brand-soft: rgba(224, 9, 95, 0.22);
 }
+
+/* Diagram quickstart pages: pull the sticky pane out to the viewport's right
+   edge (VPContent reserves a 120px centered gutter on `page` layouts), keeping
+   a sliver of room so it doesn't sit under the vertical scrollbar. */
+.VPContent.has-sidebar:has(.dq) {
+  padding-right: 16px !important;
+}
