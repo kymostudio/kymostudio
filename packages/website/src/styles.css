@@ -230,6 +230,7 @@ section.kinds {
 .kinds-track {
   display: flex;
   width: max-content;
+  padding: 3px 0; /* room for the 1px hover lift — the marquee clips overflow */
   animation: kinds-scroll 56s linear infinite;
 }
 .kinds-marquee.reverse .kinds-track { animation-direction: reverse; animation-duration: 64s; }
@@ -258,7 +259,7 @@ section.kinds {
   text-decoration: none;
   border-color: var(--accent); color: var(--accent);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(36, 33, 49, 0.08);
+  /* no box-shadow here: the marquee's overflow:hidden would clip it */
 }
 .kind svg { width: 19px; height: 19px; color: var(--dim); flex: none; transition: color 0.15s ease; }
 .kind:hover svg { color: var(--accent); }
