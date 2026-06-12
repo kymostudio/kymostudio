@@ -346,8 +346,8 @@ export default function EditorPage() {
       <header>
         {/* identity & document: logo → app home (guests: the product landing), workspace, editable title, sync state */}
         {claims
-          ? <Link className="brand" to="/diagrams"><img src="/favicon.svg" alt="" /></Link>
-          : <a className="brand" href="https://kymo.studio" title="Kymo Studio"><img src="/favicon.svg" alt="" /></a>}
+          ? <Link className="brand" to="/diagrams"><img src="/logo.svg" alt="" /></Link>
+          : <a className="brand" href="https://kymo.studio" title="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
         {claims && <WorkspaceSwitcher />}
         {claims && <span className="sep">/</span>}
         {booting ? <span className="skeleton name-skel" /> : claims ? (

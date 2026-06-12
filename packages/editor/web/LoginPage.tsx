@@ -23,7 +23,7 @@ export default function LoginPage() {
     <main className="scroll" style={{ height: "100%" }}>
       <div className="page">
         <div className="signin login-card">
-          <a className="brand" href="/"><img src="/favicon.svg" alt="Kymostudio" /></a>
+          <a className="brand" href="/"><img src="/logo.svg" alt="Kymostudio" /></a>
           <h1>Sign in</h1>
           <p className="muted">Your session has expired or you're not signed in.<br />Sign in with Google to continue.</p>
           <GoogleButton />
