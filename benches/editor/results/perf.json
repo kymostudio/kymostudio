@@ -28,6 +28,13 @@
         "WIRE_TOTAL_KB": 211,
         "WIRE_ENGINE_KB": 0
       },
+      "grade": {
+        "TTFB_MS": "good",
+        "FCP_MS": "good",
+        "KROKI_SENT_MS": "good",
+        "DIAGRAM_VISIBLE_MS": "needs-improvement",
+        "WIRE_TOTAL_KB": "good"
+      },
       "engine_fetched": false,
       "runs": [
         {
@@ -95,6 +102,12 @@
         "DIAGRAM_VISIBLE_MS": 4465,
         "WIRE_TOTAL_KB": 2677,
         "WIRE_ENGINE_KB": 2465
+      },
+      "grade": {
+        "TTFB_MS": "good",
+        "FCP_MS": "good",
+        "DIAGRAM_VISIBLE_MS": "poor",
+        "WIRE_TOTAL_KB": "poor"
       },
       "engine_fetched": true,
       "runs": [
