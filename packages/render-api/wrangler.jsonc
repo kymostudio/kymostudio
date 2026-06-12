@@ -10,6 +10,6 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-06-01",
   "rules": [{ "type": "Data", "globs": ["**/*.ttf"], "fallthrough": true }],
-  "routes": [{ "pattern": "kroki.kymo.studio", "custom_domain": true }],
+  "routes": [{ "pattern": "render.kymo.studio", "custom_domain": true }],
   "observability": { "enabled": true }
 }

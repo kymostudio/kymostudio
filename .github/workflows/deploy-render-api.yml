@@ -1,7 +1,7 @@
 name: Deploy render API to Cloudflare Workers
 
 # packages/render-api is the kroki-compatible render endpoint
-# (kroki.kymo.studio): kymo/mermaid/d2/graphviz/bpmn render in the worker via
+# (render.kymo.studio): kymo/mermaid/d2/graphviz/bpmn render in the worker via
 # the kymostudio JS engine + kymostudio-core wasm, everything else proxies to
 # kroki.io. The wasm is built from source (full `wasm,pdf` surface — svgToPng/
 # svgToPdf/registerFont) so the worker tracks the repo, not npm releases.
