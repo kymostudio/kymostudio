@@ -9,7 +9,7 @@ name = "kymostudio-core"
 # by /kymo-bump. A static version here previously pinned the wheel to 0.3.3 while
 # Cargo moved on, so PyPI stayed stuck at 0.3.3.
 dynamic = ["version"]
-description = "Type it. See it appear. Watch it animate. (Core)"
+description = "Prompt it. See it appear. Watch it animate. (Core)"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
