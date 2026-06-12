@@ -67,7 +67,7 @@ async function openEditor() {
   <div class="dq">
     <div class="dq-main vp-doc"><slot /></div>
     <aside class="dq-pane" aria-label="Live example">
-      <div class="dq-sticky">
+      <div class="dq-sticky" :class="{ 'preview-closed': !previewOpen }">
         <button class="dq-preview-toggle" @click="previewOpen = !previewOpen">
           <span class="dq-chevron" :class="{ open: previewOpen }">▸</span> Preview
           <span class="dq-renderer">{{
@@ -117,7 +117,7 @@ async function openEditor() {
   top: calc(var(--vp-nav-height) + 20px);
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - var(--vp-nav-height) - 40px);
+  height: calc(100vh - var(--vp-nav-height) - 40px);
   border-radius: 12px;
   overflow: hidden;
   background: #242131; /* brand navy */
@@ -150,26 +150,32 @@ async function openEditor() {
   color: rgba(221, 236, 238, 0.55);
 }
 .dq-preview {
-  flex: 0 1 auto;
-  min-height: 120px;
-  max-height: 46%;
-  overflow: auto;
-  padding: 20px;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 160px;
+  overflow: hidden;
+  padding: 16px;
   background:
     radial-gradient(circle, rgba(36, 33, 49, 0.06) 1px, transparent 1px) 0 0 / 22px 22px,
     #fafafa;
 }
 .dq-preview img {
-  display: block;
-  margin: 0 auto;
-  max-width: 100%;
-  height: auto;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
 }
 .dq-code {
   display: flex;
   flex-direction: column;
-  flex: 1 1 0;
-  min-height: 160px;
+  flex: 0 1 auto;
+  max-height: 46%;
+  min-height: 150px;
+}
+.preview-closed .dq-code {
+  flex: 1 1 auto;
+  max-height: none;
 }
 .dq-code-head {
   display: flex;
