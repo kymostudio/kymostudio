@@ -29,7 +29,8 @@ body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); -w
 
 /* ---- header ---- */
 header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg); }
-.brand { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+/* padding+negative margin = an invisible ~44px touch target around the 24px mark */
+.brand { display: inline-flex; align-items: center; gap: 8px; padding: 10px; margin: -10px; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
 .brand img { width: 24px; height: 24px; display: block; }
 .sep { color: var(--border-strong); user-select: none; }
 .spacer { flex: 1; }
@@ -49,7 +50,9 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 /* padding is asymmetric on purpose: mixed-case labels are optically centered on
    their x-height band, which sits ~1px below the box center — next to the solid
    24px brand tile that 1px reads as "text too low", so the ink is raised. */
-.diagram-name { display: inline-flex; align-items: center; gap: 6px; font-size: 14.5px; font-weight: 650; color: var(--ink); padding: 2px 8px 4px; border-radius: 7px; }
+.diagram-name { display: inline-flex; align-items: center; gap: 6px; min-width: 0; font-size: 14.5px; font-weight: 650; color: var(--ink); padding: 2px 8px 4px; border-radius: 7px; }
+/* long titles ellipsize instead of wrapping the header (rename input still shows the full name) */
+.dn-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .diagram-name.editable { cursor: text; }
 .diagram-name.untitled { color: var(--dim); font-weight: 500; }
 .diagram-name.editable:hover { background: var(--bg-raise); }
@@ -66,6 +69,7 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .diagram-input { font: inherit; font-size: 14px; font-weight: 600; background: var(--bg); border: 1px solid var(--accent); border-radius: 7px; color: var(--ink); padding: 3px 8px; outline: none; min-width: 160px; }
 
 .account { position: relative; }
+.mob-more { display: none; } /* phones only — see the 720px media block */
 .acct-btn { display: inline-flex; align-items: center; gap: 2px; padding: 3px 5px 3px 3px; border-radius: 999px; background: var(--bg-raise); border-color: transparent; }
 .acct-btn:hover { background: var(--border); border-color: transparent; }
 .avatar { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; color: var(--ink); }
@@ -78,6 +82,7 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .exp-menu { min-width: 190px; }
 .exp-menu::before { content: ""; position: absolute; top: -8px; left: 0; right: 0; height: 8px; } /* hover bridge over the gap */
 .exp-item { display: flex; align-items: center; justify-content: flex-start; gap: 9px; font-size: 13.5px; }
+a.exp-item { text-decoration: none; } /* Docs/Diagrams links inside the ⋯ menu */
 .exp-item svg { flex: none; color: var(--dim); }
 .exp-item:hover svg { color: var(--accent); }
 .menu-sep { height: 1px; background: var(--border); margin: 4px 6px; }
@@ -245,12 +250,34 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
 /* diagram kind badge on list rows */
 .rkind { flex: none; font-size: 11.5px; font-weight: 600; color: var(--dim); background: var(--bg-raise); border-radius: 999px; padding: 2px 9px; letter-spacing: 0.01em; }
 
-/* ---- mobile: share links are mostly opened from chat on phones ---- */
-@media (max-width: 720px) {
+/* ---- responsive header ----
+   ≤1000px (tablet / narrow window): the single row can't fit the full logged-in
+   header (its min-width is ~910px — Share used to get clipped on iPad portrait),
+   so the action cluster drops to a second row. All buttons stay visible.
+   ≤720px (phones): the second row would wrap into a ragged third, so the
+   low-traffic actions collapse into the ⋯ menu instead — see .mob-more. */
+@media (max-width: 1000px) {
   header { flex-wrap: wrap; row-gap: 8px; padding: 10px 12px; }
   /* designed rows: 1 = identity (brand · title · avatar), 2 = the action cluster */
-  .nav-group { order: 10; flex-basis: 100%; justify-content: flex-end; flex-wrap: wrap; }
-  .save-ind { font-size: 0; gap: 0; padding: 5px; } /* dot only — row 1 is tight */
+  .nav-group { order: 10; flex-basis: 100%; justify-content: flex-end; }
+  /* a wrapping flex line packs items at their CONTENT width before any shrink,
+     so a long title must be capped up front or it evicts row-1 neighbours */
+  .diagram-name { max-width: clamp(120px, 40vw, 420px); }
+}
+
+/* ---- mobile: share links are mostly opened from chat on phones ---- */
+@media (max-width: 720px) {
+  .mob-hide { display: none !important; } /* collapsed into the ⋯ menu */
+  .mob-more { display: inline-flex; }
+  /* status text stays readable when it carries a warning ("Offline") or a
+     storage nuance ("Saved to URL" — the link IS the document); only the
+     steady-state "Saved" shrinks to its dot. Tooltips don't exist on touch. */
+  .save-ind:not(.off):not(.url) { font-size: 0; gap: 0; padding: 5px; }
+  .save-ind.off, .save-ind.url { font-size: 11px; padding: 2.5px 9px; }
+  /* comfortable touch targets (44px) for the two-control action row */
+  .nav-group button { padding: 12px 16px; }
+  /* row 1 must hold brand · (workspace) · title · status · auth control */
+  .diagram-name { max-width: clamp(72px, 24vw, 200px); }
   main { flex-direction: column; }
   /* the source pane carries an inline flex-basis from the drag-splitter — override it */
   .pane { flex: 1 1 50% !important; min-width: 0; min-height: 0; }
@@ -259,4 +286,9 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
   .pane:last-child { order: -1; border-bottom: 1px solid var(--border); }
   .splitter { display: none; }
   #preview { padding: 14px; }
+}
+
+/* touch devices: hover-revealed affordances must be visible up front */
+@media (hover: none) {
+  .diagram-name .pencil { opacity: 1; }
 }

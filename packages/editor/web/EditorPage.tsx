@@ -10,7 +10,7 @@ import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy, BookOpen } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy, BookOpen, MoreHorizontal } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -60,6 +60,7 @@ export default function EditorPage() {
   const [syncing, setSyncing] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [sharePayload, setSharePayload] = useState(""); // deflate+base64url of the current source
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
@@ -226,7 +227,7 @@ export default function EditorPage() {
   }, [source, kind, d]); // eslint-disable-line
 
   useEffect(() => {
-    const h = () => { setMenuOpen(false); setExportOpen(false); setShareOpen(false); };
+    const h = () => { setMenuOpen(false); setExportOpen(false); setShareOpen(false); setMoreOpen(false); };
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") h(); };
     document.addEventListener("click", h);
     document.addEventListener("keydown", k);
@@ -345,7 +346,7 @@ export default function EditorPage() {
     <div className="layout">
       <header>
         {/* identity & document: logo → product home in a new tab (Diagrams stays reachable via the navlink), workspace, editable title, sync state */}
-        <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio"><img src="/logo.svg" alt="" /></a>
+        <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>
         {claims && <WorkspaceSwitcher />}
         {claims && <span className="sep">/</span>}
         {booting ? <span className="skeleton name-skel" /> : claims ? (
@@ -354,12 +355,14 @@ export default function EditorPage() {
               onKeyDown={(e) => { if (e.key === "Enter") commitRename((e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditingName(false); }}
               onBlur={(e) => commitRename(e.target.value)} />
           ) : (
-            <span className={"diagram-name editable" + (title ? "" : " untitled")} title="Rename" onClick={() => setEditingName(true)}>
-              {diagramLabel}
+            <span className={"diagram-name editable" + (title ? "" : " untitled")} title={`${diagramLabel} — Rename`}
+              role="button" tabIndex={0} aria-label="Rename diagram" onClick={() => setEditingName(true)}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setEditingName(true); } }}>
+              <span className="dn-text">{diagramLabel}</span>
               <Pencil size={12.5} strokeWidth={2.1} className="pencil" />
             </span>
           )
-        ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")}>{diagramLabel}</span>}
+        ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")} title={diagramLabel}><span className="dn-text">{diagramLabel}</span></span>}
         {claims && d && !booting && (
           <span className={"save-ind" + (live ? "" : " off")} title={live ? "All changes are saved in real time" : "Disconnected — changes are not being saved"}>
             {live ? "Saved" : "Offline"}
@@ -373,18 +376,18 @@ export default function EditorPage() {
         <div className="spacer" />
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
-          <a className="navlink" href="https://docs.kymo.studio" target="_blank" rel="noopener" title="Kymo documentation"><BookOpen size={15} strokeWidth={2} />Docs</a>
-          {claims && <Link className="navlink" to="/diagrams"><LayoutGrid size={15} strokeWidth={2} />Diagrams</Link>}
-          <span className="vsep" />
-          <button onClick={newDiagram} title="New diagram"><Plus size={16} strokeWidth={2.2} />New</button>
+          <a className="navlink mob-hide" href="https://docs.kymo.studio" target="_blank" rel="noopener" title="Kymo documentation"><BookOpen size={15} strokeWidth={2} />Docs</a>
+          {claims && <Link className="navlink mob-hide" to="/diagrams"><LayoutGrid size={15} strokeWidth={2} />Diagrams</Link>}
+          <span className="vsep mob-hide" />
+          <button className="mob-hide" onClick={newDiagram} title="New diagram"><Plus size={16} strokeWidth={2.2} />New</button>
           {shared && claims && (
-            <button onClick={saveCopy} title="Save a copy to your Diagrams">
+            <button className="mob-hide" onClick={saveCopy} title="Save a copy to your Diagrams">
               <Save size={16} strokeWidth={2} />
               Save a copy
             </button>
           )}
-          <div className="account" onClick={(e) => e.stopPropagation()} onMouseEnter={() => setExportOpen(true)} onMouseLeave={() => setExportOpen(false)}>
-            <button onClick={() => setExportOpen((o) => !o)}><Download size={16} strokeWidth={2} />Export <ChevronDown size={16} strokeWidth={2.2} className="chev-icon" /></button>
+          <div className="account mob-hide" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setExportOpen((o) => !o)} aria-haspopup="menu" aria-expanded={exportOpen}><Download size={16} strokeWidth={2} />Export <ChevronDown size={16} strokeWidth={2.2} className="chev-icon" /></button>
             {exportOpen && (
               <div className="acct-menu exp-menu">
                 <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}>
@@ -397,6 +400,49 @@ export default function EditorPage() {
                 </button>
                 <div className="menu-sep" />
                 <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}>
+                  <Code2 size={17} strokeWidth={1.9} />
+                  Source (.kymo)
+                </button>
+              </div>
+            )}
+          </div>
+          {/* phones: the low-traffic actions collapse into one ⋯ menu (Share stays a visible CTA) */}
+          <div className="account mob-more" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setMoreOpen((o) => !o)} title="More actions" aria-label="More actions" aria-haspopup="menu" aria-expanded={moreOpen}>
+              <MoreHorizontal size={18} strokeWidth={2.2} />
+            </button>
+            {moreOpen && (
+              <div className="acct-menu">
+                <a className="acct-item exp-item" href="https://docs.kymo.studio" target="_blank" rel="noopener" onClick={() => setMoreOpen(false)}>
+                  <BookOpen size={17} strokeWidth={1.9} />
+                  Docs
+                </a>
+                {claims && (
+                  <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMoreOpen(false)}>
+                    <LayoutGrid size={17} strokeWidth={1.9} />
+                    Diagrams
+                  </Link>
+                )}
+                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); newDiagram(); }}>
+                  <Plus size={17} strokeWidth={2} />
+                  New diagram
+                </button>
+                {shared && claims && (
+                  <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); saveCopy(); }}>
+                    <Save size={17} strokeWidth={1.9} />
+                    Save a copy
+                  </button>
+                )}
+                <div className="menu-sep" />
+                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); download(); }}>
+                  <FileCode2 size={17} strokeWidth={1.9} />
+                  Export SVG
+                </button>
+                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); exportPNG(); }}>
+                  <FileImage size={17} strokeWidth={1.9} />
+                  Export PNG
+                </button>
+                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); exportSource(); }}>
                   <Code2 size={17} strokeWidth={1.9} />
                   Source (.kymo)
                 </button>
@@ -445,7 +491,7 @@ export default function EditorPage() {
         {!claims && <GoogleButton />}
         {claims && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
-            <button className="acct-btn" onClick={() => setMenuOpen((o) => !o)} title="Account">
+            <button className="acct-btn" onClick={() => setMenuOpen((o) => !o)} title="Account" aria-label="Account" aria-haspopup="menu" aria-expanded={menuOpen}>
               <span className="avatar" style={{ background: colorFor((claims.email || "x").toLowerCase()) }}>{initial}</span>
               <ChevronDown size={14} strokeWidth={2.2} className="chev" />
             </button>
