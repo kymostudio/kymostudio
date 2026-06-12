@@ -74,6 +74,9 @@ nav {
 .nav-links { display: flex; gap: 30px; font-size: 16px; }
 .nav-links a { color: var(--dim); font-weight: 500; }
 .nav-links a:hover { color: var(--accent); text-decoration: none; }
+.nav-gh { display: flex; align-items: center; color: var(--dim); }
+.nav-gh:hover { color: var(--accent); }
+.nav-gh svg { display: block; }
 
 /* ── Buttons ─────────────────────────────────────────────────── */
 .btn {
