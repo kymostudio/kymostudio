@@ -9,6 +9,7 @@ colour palette.
 | Line | Text | Where it's used |
 | --- | --- | --- |
 | **Wordmark** | `KymoStudio` (two-tone: `Kymo` primary + `Studio` accent); the product/CLI is **kymo** | banner + hero lockups, site navbars |
+| **Page titles** | `KymoStudio` — the bare wordmark, no tagline suffix | `<title>` + `og:title` on kymo.studio; VitePress `title` on docs.kymo.studio |
 | **Tagline** | `Diagram superpowers` | banner/hero assets (this folder), landing-hero strap, GitHub repo description, docs site description, User Guide intro |
 | **Slogan** | `Prompt it. See it appear. Watch it animate.` | landing hero lead, root README, package registry descriptions (PyPI / npm / crates.io / VS Code Marketplace) |
 | **Positioning** | the diagram renderer for **coding agents** — connect them over MCP; output is a self-contained, animated SVG *file*, not a canvas locked in a platform | strategy direction (`RES-STRATEGY-001`); landing eyebrow + `#mcp` section; README intro + Features |
