@@ -98,8 +98,8 @@ main.scroll { display: block; overflow: auto; }
 .pane { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .pane + .pane { border-left: 1px solid var(--border); }
 textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !important; padding: 16px; background: var(--bg); color: var(--ink); caret-color: var(--accent); font: 13.5px/1.7 var(--mono); tab-size: 2; }
-#preview { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 28px; background: var(--bg-soft) radial-gradient(circle, var(--border) 1px, transparent 1px); background-size: 24px 24px; }
-#preview svg { max-width: 100%; height: auto; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: 0 12px 36px rgba(36, 33, 49, 0.1); }
+#preview { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 28px; background: #fff; }
+#preview svg { max-width: 100%; height: auto; background: #fff; }
 .status { font: 12px/1.5 var(--mono); padding: 7px 14px; border-top: 1px solid var(--border); color: var(--dim); min-height: 28px; white-space: pre-wrap; background: var(--bg); }
 .status.error { color: var(--error); background: rgba(180, 35, 24, 0.06); border-top-color: rgba(180, 35, 24, 0.25); font-weight: 600; }
 /* invalid share link: a banner the user can't miss (the status line races with renders) */
