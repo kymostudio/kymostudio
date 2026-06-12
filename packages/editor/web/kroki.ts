@@ -53,12 +53,38 @@ export function sanitizeSvg(svg: string): string {
   });
 }
 
+declare global {
+  interface Window {
+    __earlyKroki?: Promise<{ kind: string; src: string; res: Promise<Response> }>;
+  }
+}
+
+// index.html fires the first share-link render at kroki before this bundle has
+// even downloaded (inline script there). Adopt that in-flight response when the
+// first real render asks for exactly the same diagram; on any mismatch leave it
+// in place — a later render with the matching source may still claim it.
+async function earlyResponse(kind: string, source: string): Promise<Response | null> {
+  const early = window.__earlyKroki;
+  if (!early) return null;
+  try {
+    const e = await early;
+    if (e.kind !== kind || e.src !== source) return null;
+    window.__earlyKroki = undefined; // single use: a re-render must hit kroki again
+    return await e.res;
+  } catch {
+    window.__earlyKroki = undefined; // dead warm-up — fall back to a fresh request
+    return null;
+  }
+}
+
 export async function renderKroki(kind: string, source: string): Promise<string> {
-  const r = await fetch(`https://kroki.io/${encodeURIComponent(kind)}/svg`, {
-    method: "POST",
-    headers: { "content-type": "text/plain" },
-    body: source,
-  });
+  const r =
+    (await earlyResponse(kind, source)) ??
+    (await fetch(`https://kroki.io/${encodeURIComponent(kind)}/svg`, {
+      method: "POST",
+      headers: { "content-type": "text/plain" },
+      body: source,
+    }));
   const text = await r.text();
   if (!r.ok) throw new Error(text.trim() || `kroki ${r.status}`);
   return text;

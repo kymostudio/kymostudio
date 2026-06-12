@@ -44,10 +44,14 @@ export default function EditorPage() {
     return () => { stop = true; };
   }, [d, shared, idToken, navigate]);
 
-  const [source, setSource] = useState(SAMPLE);
-  const [kind, setKind] = useState("kymo");
+  // Shared links carry their kind in the URL — seed state from it so the first
+  // render cycle never runs against the kymo sample (which would pull the 2.5 MB
+  // wasm engine chunk that a kroki-rendered share link never uses).
+  const initialKind = shared && sharedKind && KINDS.some((x) => x.value === sharedKind) ? sharedKind : "kymo";
+  const [source, setSource] = useState(shared ? "" : SAMPLE);
+  const [kind, setKind] = useState(initialKind);
   const [svg, setSvg] = useState("");
-  const [status, setStatus] = useState("Loading engine…");
+  const [status, setStatus] = useState(initialKind === "kymo" ? "Loading engine…" : "Rendering…");
   const [statusErr, setStatusErr] = useState(false);
   const [live, setLive] = useState(false);
   const [title, setTitle] = useState("");
@@ -86,6 +90,14 @@ export default function EditorPage() {
   sourceRef.current = source;
   const renderSeq = useRef(0); // kroki renders are async fetches — drop stale responses
 
+  // The wasm engine chunk is ~2.5 MB on the wire: load it on first kymo render,
+  // never for kroki kinds (a mermaid share link must not pay for it).
+  const enginePromise = useRef<Promise<void> | null>(null);
+  const loadEngine = useCallback(() => {
+    enginePromise.current ??= import("./engine").then((m) => { renderRef.current = m.renderDiagram; setRenderReady(true); });
+    return enginePromise.current;
+  }, []);
+
   const doRender = useCallback(async (src: string, k: string) => {
     const seq = ++renderSeq.current;
     if (!src.trim()) { setSvg(""); setStatus("Enter diagram source…"); setStatusErr(false); return; }
@@ -93,8 +105,9 @@ export default function EditorPage() {
     try {
       let out: string;
       if (k === "kymo") {
-        if (!renderRef.current) return;
-        out = await renderRef.current(src);
+        if (!renderRef.current) await loadEngine();
+        if (seq !== renderSeq.current) return;
+        out = await renderRef.current!(src);
       } else {
         // Kroki SVG is third-party markup — and with ?s= links the source can be
         // anyone's. Strip scripts/handlers before it touches the DOM.
@@ -107,14 +120,7 @@ export default function EditorPage() {
       if (seq !== renderSeq.current) return;
       setStatus(String(e?.message ?? e)); setStatusErr(true);
     }
-  }, []);
-
-  useEffect(() => {
-    let stop = false;
-    // refs, not state: by the time the wasm lands, a share link may have replaced the sample
-    import("./engine").then((m) => { if (stop) return; renderRef.current = m.renderDiagram; setRenderReady(true); if (kindRef.current === "kymo") doRender(sourceRef.current, "kymo"); });
-    return () => { stop = true; };
-  }, []); // eslint-disable-line
+  }, [loadEngine]);
 
   // Hold a loading state from "room requested" to "first doc received" so the
   // header/title and source don't render a placeholder and then flip (5s failsafe).
@@ -129,6 +135,7 @@ export default function EditorPage() {
 
   // Rooms are switched client-side (+ New uses navigate()), so reset per-room state on ?d change.
   useEffect(() => {
+    if (shared) return; // ?s= state is seeded at mount and owned by the decode effect below
     const imp = pendingImport.current; pendingImport.current = null;
     setSource(imp ? imp.source : SAMPLE); setKind(imp ? imp.kind : "kymo");
     setTitle(""); setEditingName(false); setShareError(null); setLocalSaved(false);
@@ -196,7 +203,7 @@ export default function EditorPage() {
         const t = kind === "kymo" ? titleFrom(source) : "Untitled";
         if (!titleRef.current && t !== "Untitled") { setTitle(t); room.sendRename(t); }
       }
-    }, kind === "kymo" ? 120 : 450); // remote (kroki) renders get a longer debounce
+    }, lastSvg.current ? (kind === "kymo" ? 120 : 450) : 0); // debounce typing, but never the very first render
     return () => clearTimeout(id);
   }, [source, kind]); // eslint-disable-line
 
