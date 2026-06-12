@@ -16,8 +16,6 @@ export default defineConfig({
     logoLink: "/guide/getting-started",
     siteTitle: "KymoStudio",
     nav: [
-      { text: "Guide", link: "/guide/getting-started" },
-      { text: "Diagrams", link: "/diagrams/flowchart" },
       { text: "Editor", link: "https://editor.kymo.studio" },
       { text: "Website", link: "https://kymo.studio" },
     ],
