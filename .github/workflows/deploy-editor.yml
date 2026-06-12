@@ -16,6 +16,7 @@ on:
       - "packages/editor/package.json"
       - "packages/js/**"
       - "packages/rust/kymostudio-core/**"
+      - "packages/rust/kymo-mermaid/**"
       - ".github/workflows/deploy-editor.yml"
   workflow_dispatch:
 
@@ -47,6 +48,11 @@ jobs:
         # svg2pdf — 1.4 MB brotli vs 0.2 MB without. npm/vscode artifacts build
         # `wasm,pdf` and keep the full surface.
         run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm
+      - name: Build kymo-mermaid wasm (flowchart slice of merman)
+        working-directory: packages/rust/kymo-mermaid
+        # Flowchart-only slice (~470 KB brotli): merman pinned by rev, the other
+        # 22 grammars stripped by LTO because nothing references their dispatch.
+        run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm
       - name: Build packages/js with the fresh core
         working-directory: packages/js
         run: |

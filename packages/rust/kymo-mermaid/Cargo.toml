@@ -1,0 +1,38 @@
+[package]
+name = "kymo-mermaid"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Mermaid flowchart -> SVG for the kymo editor: a flowchart-only slice of merman (MIT OR Apache-2.0), linker-trimmed to ~1.5 MB raw / ~473 KB brotli."
+
+# cdylib -> wasm (the editor loads this lazily for kind=mermaid flowcharts);
+# rlib -> native smoke tests.
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+# merman is pinned by rev, NOT vendored: every flowchart module it exposes is
+# pub, so calling the flowchart pipeline directly (no Engine/registry dispatch)
+# lets LTO strip the other 22 grammars at link time. default-features = false
+# drops full-config (YAML/json5 front-matter) and full-sanitization (lol_html):
+# the editor sanitizes all SVG client-side with DOMPurify anyway.
+# Measured 2026-06-12: 1.49 MB raw / 473 KB brotli vs mermaid.js 760 KB brotli.
+[dependencies]
+merman-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false }
+merman-render = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false }
+serde_json = "1"
+wasm-bindgen = { version = "0.2", optional = true }
+
+[features]
+default = []
+wasm = ["dep:wasm-bindgen"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+codegen-units = 1
+
+# Same call as kymostudio-core: wasm-opt -Oz shrinks raw size but makes the
+# brotli wire size WORSE (measured 2026-06-12) — keep builds deterministic.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false

@@ -18,3 +18,4 @@ test-results/
 playwright-report/
 .last-run.json
 dist-core/
+packages/rust/kymo-mermaid/target/

@@ -12,6 +12,7 @@
     "@lezer/highlight": "^1.2.3",
     "codemirror": "^6.0.2",
     "dompurify": "^3.4.9",
+    "kymo-mermaid": "file:../rust/kymo-mermaid/pkg",
     "kymostudio": "file:../js",
     "kymostudio-core": "file:../rust/kymostudio-core/pkg",
     "lucide-react": "^1.17.0",
