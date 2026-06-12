@@ -61,6 +61,13 @@ async function copy() {
 async function openEditor() {
   window.open(await editorUrl(active.value.code), "_blank", "noopener");
 }
+
+/** Fill the pane width, but never blow a small diagram up past 2× its
+ *  natural size — vector previews stay bold without turning cartoonish. */
+function capUpscale(e: Event) {
+  const img = e.target as HTMLImageElement;
+  if (img.naturalWidth > 0) img.style.maxWidth = `${img.naturalWidth * 2}px`;
+}
 </script>
 
 <template>
@@ -75,7 +82,13 @@ async function openEditor() {
           }}</span>
         </button>
         <div v-show="previewOpen" class="dq-preview">
-          <img :src="active.image" :alt="`Rendered ${active.label}`" />
+          <div class="dq-preview-inner">
+            <img
+              :src="active.image"
+              :alt="`Rendered ${active.label}`"
+              @load="capUpscale"
+            />
+          </div>
         </div>
         <div class="dq-code">
           <div class="dq-code-head">
@@ -149,28 +162,30 @@ async function openEditor() {
   font-size: 12px;
   color: rgba(221, 236, 238, 0.55);
 }
+/* The preview hugs the diagram's height (capped); the code pane takes ALL
+   the remaining space — no dead canvas around short diagrams. */
 .dq-preview {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 160px;
-  overflow: hidden;
-  padding: 16px;
+  flex: 0 1 auto;
+  max-height: 58%;
+  overflow-y: auto;
   background:
     radial-gradient(circle, rgba(36, 33, 49, 0.06) 1px, transparent 1px) 0 0 / 22px 22px,
     #fafafa;
 }
+.dq-preview-inner {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+}
 .dq-preview img {
-  flex: 1 1 auto;
+  display: block;
   width: 100%;
-  height: 100%;
-  min-height: 0;
-  object-fit: contain;
+  height: auto;
 }
 .dq-code {
   display: flex;
   flex-direction: column;
-  flex: 0 1 auto;
-  max-height: 46%;
+  flex: 1 1 0;
   min-height: 150px;
 }
 .preview-closed .dq-code {
