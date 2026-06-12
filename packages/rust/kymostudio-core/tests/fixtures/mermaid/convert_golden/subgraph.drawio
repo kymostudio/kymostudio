@@ -1,26 +1,26 @@
 <mxfile host="kymostudio">
   <diagram id="kymo" name="Flowchart">
-    <mxGraphModel dx="201" dy="630" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="168" dy="470" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
         <mxCell id="c_G" value="Worker Pool" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f9ff;strokeColor=#b8d0ee;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#475569;" vertex="1" parent="1">
-          <mxGeometry x="16" y="120" width="145" height="368" as="geometry"/>
+          <mxGeometry x="8" y="82" width="136" height="286" as="geometry"/>
         </mxCell>
         <mxCell id="Start" value="Start" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="55" y="40" width="66" height="46" as="geometry"/>
+          <mxGeometry x="40" y="24" width="72" height="46" as="geometry"/>
         </mxCell>
         <mxCell id="A" value="Fetch" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="55" y="166" width="66" height="46" as="geometry"/>
+          <mxGeometry x="40" y="118" width="72" height="46" as="geometry"/>
         </mxCell>
         <mxCell id="B" value="Transform" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="292" width="97" height="46" as="geometry"/>
+          <mxGeometry x="24" y="212" width="104" height="46" as="geometry"/>
         </mxCell>
         <mxCell id="C" value="Write" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="55" y="418" width="66" height="46" as="geometry"/>
+          <mxGeometry x="40" y="306" width="72" height="46" as="geometry"/>
         </mxCell>
         <mxCell id="End" value="Done" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="58" y="544" width="60" height="46" as="geometry"/>
+          <mxGeometry x="44" y="400" width="64" height="46" as="geometry"/>
         </mxCell>
         <mxCell id="e0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="Start" target="A">
           <mxGeometry relative="1" as="geometry"/>

@@ -18,9 +18,9 @@ use std::collections::{HashMap, HashSet};
 use crate::flowchart::{Direction, FlowEdge, Flowchart};
 use crate::model::{py_round, Component, Diagram, Edge, Region, Shape};
 
-const H_GAP: f64 = 80.0; // gap between layer columns (main axis)
-const V_GAP: f64 = 50.0; // gap between boxes within a layer (cross axis)
-const MARGIN: f64 = 40.0;
+const H_GAP: f64 = 48.0; // gap between layer columns (main axis)
+const V_GAP: f64 = 40.0; // gap between boxes within a layer (cross axis)
+const MARGIN: f64 = 24.0;
 const ORDER_SWEEPS: usize = 6; // fixed, even → deterministic
 const ALIGN_SWEEPS: usize = 8;
 
@@ -28,7 +28,7 @@ const PRIO_TRUNK: i64 = 2_000_000;
 const PRIO_DUMMY: i64 = 1_000_000;
 const PRIO_CHAIN: i64 = 10_000;
 
-const CHAR_W: f64 = 7.6; // matches kymo layout._CHAR_W_NAME (14px label)
+const CHAR_W: f64 = 8.0; // ~13px semibold label, with breathing room
 
 /// Real (width, height) of a flowchart node's glyph box, sized to its label.
 /// Boxes stay upright regardless of flow direction.
@@ -36,14 +36,14 @@ fn node_size(label: &str, shape: Shape) -> (i32, i32) {
     let text_w = (label.chars().count() as f64 * CHAR_W).ceil() as i32;
     let (w, h) = match shape {
         Shape::Circle => {
-            let d = (text_w + 24).max(56);
+            let d = (text_w + 28).max(56);
             (d, d)
         }
-        Shape::Diamond => ((text_w + 48).max(70), 64),
-        Shape::Cylinder => ((text_w + 28).max(64), 56),
-        Shape::Hex => ((text_w + 36).max(72), 52),
-        Shape::Badge => ((text_w + 36).max(64), 46),
-        _ => ((text_w + 28).max(60), 46), // box & rounded
+        Shape::Diamond => ((text_w + 52).max(70), 64),
+        Shape::Cylinder => ((text_w + 32).max(64), 56),
+        Shape::Hex => ((text_w + 40).max(72), 52),
+        Shape::Badge => ((text_w + 40).max(64), 46),
+        _ => ((text_w + 32).max(60), 46), // box & rounded
     };
     (w, h)
 }
@@ -394,8 +394,8 @@ pub fn layout_flowchart(fc: &Flowchart) -> Diagram {
         if members.is_empty() {
             continue;
         }
-        let pad = 24.0;
-        let label_pad = if sg.title.is_empty() { 0.0 } else { 22.0 };
+        let pad = 16.0;
+        let label_pad = if sg.title.is_empty() { 0.0 } else { 20.0 };
         let mut x0 = f64::INFINITY;
         let mut y0 = f64::INFINITY;
         let mut x1 = f64::NEG_INFINITY;

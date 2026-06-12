@@ -2,8 +2,8 @@
   "format": "kymo.json",
   "version": 1,
   "diagram": {
-    "width": 1187,
-    "height": 150,
+    "width": 1008,
+    "height": 124,
     "title": "",
     "subtitle": "",
     "components": [
@@ -15,11 +15,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          88,
-          75
+          76,
+          62
         ],
         "size": [
-          97,
+          104,
           46
         ],
         "parent": null,
@@ -39,11 +39,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          258,
-          75
+          220,
+          62
         ],
         "size": [
-          82,
+          88,
           46
         ],
         "parent": null,
@@ -63,11 +63,11 @@
         "shape": "badge",
         "accent": "blue",
         "pos": [
-          424,
-          75
+          360,
+          62
         ],
         "size": [
-          90,
+          96,
           46
         ],
         "parent": null,
@@ -87,11 +87,11 @@
         "shape": "cylinder",
         "accent": "blue",
         "pos": [
-          594,
-          75
+          504,
+          62
         ],
         "size": [
-          89,
+          96,
           56
         ],
         "parent": null,
@@ -111,12 +111,12 @@
         "shape": "circle",
         "accent": "blue",
         "pos": [
-          753,
-          75
+          638,
+          62
         ],
         "size": [
-          70,
-          70
+          76,
+          76
         ],
         "parent": null,
         "align": null,
@@ -135,11 +135,11 @@
         "shape": "diamond",
         "accent": "blue",
         "pos": [
-          922,
-          75
+          782,
+          62
         ],
         "size": [
-          109,
+          116,
           64
         ],
         "parent": null,
@@ -159,11 +159,11 @@
         "shape": "hex",
         "accent": "blue",
         "pos": [
-          1102,
-          75
+          936,
+          62
         ],
         "size": [
-          90,
+          96,
           52
         ],
         "parent": null,

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1334 150" width="1334" height="150" style="max-width:100%;height:auto" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1128 124" width="1128" height="124" style="max-width:100%;height:auto" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
 <style>text{fill:#1f2937}.bg-grid{fill:url(#dot-grid)}.fc-shape{fill:#eff6ff;stroke:#3b82f6;stroke-width:1.6}.fc-shape-line{fill:none;stroke:#3b82f6;stroke-width:1.6;stroke-linecap:round}.fc-label{font-size:13px;font-weight:600;fill:#1e3a8a;text-anchor:middle;dominant-baseline:central}.edge-path{fill:none;stroke:#64748b;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}.edge-label{font-size:11.5px;font-weight:500;fill:#334155;text-anchor:middle;paint-order:stroke;stroke:#fafafa;stroke-width:4;stroke-linejoin:round}.region-rect{fill:#eaf3ff;stroke:#b8d0ee;stroke-width:1.2}.region-label{font-size:11px;font-weight:500;fill:#475569;paint-order:stroke;stroke:#eaf3ff;stroke-width:3}</style>
 <defs><marker id="arrow" viewBox="0 0 12 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse"><path d="M2,1 L11,5 L2,9" fill="none" stroke="#64748b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><pattern id="dot-grid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="#0f172a" fill-opacity="0.05"/></pattern></defs>
-<rect width="1334" height="150" fill="#fafafa"/>
-<rect width="1334" height="150" class="bg-grid"/>
-<path class="edge-path" d="M100,75 L140,75 L140,75 L180,75" marker-end="url(#arrow)"/>
-<path class="edge-path" d="M262,75 L302,75 L302,75 L342,75" marker-end="url(#arrow)"/>
-<path class="edge-path" style="stroke-dasharray:6 4" d="M432,75 L472,75 L472,75 L512,75" marker-end="url(#arrow)"/>
-<path class="edge-path" d="M600,75 L640,75 L640,75 L681,75"/>
-<path class="edge-path" d="M751,75 L791,75 L791,75 L832,75" marker-end="url(#arrow)"/>
-<path class="edge-path" d="M940,75 L980,75 L980,75 L1020,75" marker-end="url(#arrow)"/>
-<text class="edge-label" x="980" y="75">ok</text>
-<path class="edge-path" d="M1110,75 L1150,75 L1150,75 L1190,75" marker-end="url(#arrow)"/>
-<rect class="fc-shape" x="40" y="52" width="60" height="46" rx="6"/><text class="fc-label" x="70" y="75">Rect</text>
-<rect class="fc-shape" x="180" y="52" width="82" height="46" rx="6"/><text class="fc-label" x="221" y="75">Rounded</text>
-<rect class="fc-shape" x="342" y="52" width="90" height="46" rx="23"/><text class="fc-label" x="387" y="75">Stadium</text>
-<path class="fc-shape" d="M512,53 V97 A44,6 0 0 0 600,97 V53 A44,6 0 0 1 512,53 Z"/><path class="fc-shape-line" d="M512,53 A44,6 0 0 0 600,53"/><text class="fc-label" x="556" y="75">Database</text>
-<ellipse class="fc-shape" cx="716" cy="75" rx="35" ry="35"/><text class="fc-label" x="716" y="75">Circle</text>
-<polygon class="fc-shape" points="886,43 940,75 886,107 832,75"/><text class="fc-label" x="886" y="75">Decision</text>
-<polygon class="fc-shape" points="1020,75 1042,49 1088,49 1110,75 1088,101 1042,101"/><text class="fc-label" x="1065" y="75">Hexagon</text>
-<rect class="fc-shape" x="1190" y="52" width="104" height="46" rx="6"/><text class="fc-label" x="1242" y="75">Subroutine</text>
+<rect width="1128" height="124" fill="#fafafa"/>
+<rect width="1128" height="124" class="bg-grid"/>
+<path class="edge-path" d="M88,62 L112,62 L112,62 L136,62" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M224,62 L248,62 L248,62 L272,62" marker-end="url(#arrow)"/>
+<path class="edge-path" style="stroke-dasharray:6 4" d="M368,62 L392,62 L392,62 L416,62" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M512,62 L536,62 L536,62 L560,62"/>
+<path class="edge-path" d="M636,62 L660,62 L660,62 L684,62" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M800,62 L824,62 L824,62 L848,62" marker-end="url(#arrow)"/>
+<text class="edge-label" x="824" y="62">ok</text>
+<path class="edge-path" d="M944,62 L968,62 L968,62 L992,62" marker-end="url(#arrow)"/>
+<rect class="fc-shape" x="24" y="39" width="64" height="46" rx="6"/><text class="fc-label" x="56" y="62">Rect</text>
+<rect class="fc-shape" x="136" y="39" width="88" height="46" rx="6"/><text class="fc-label" x="180" y="62">Rounded</text>
+<rect class="fc-shape" x="272" y="39" width="96" height="46" rx="23"/><text class="fc-label" x="320" y="62">Stadium</text>
+<path class="fc-shape" d="M416,40 V84 A48,6 0 0 0 512,84 V40 A48,6 0 0 1 416,40 Z"/><path class="fc-shape-line" d="M416,40 A48,6 0 0 0 512,40"/><text class="fc-label" x="464" y="62">Database</text>
+<ellipse class="fc-shape" cx="598" cy="62" rx="38" ry="38"/><text class="fc-label" x="598" y="62">Circle</text>
+<polygon class="fc-shape" points="742,30 800,62 742,94 684,62"/><text class="fc-label" x="742" y="62">Decision</text>
+<polygon class="fc-shape" points="848,62 872,36 920,36 944,62 920,88 872,88"/><text class="fc-label" x="896" y="62">Hexagon</text>
+<rect class="fc-shape" x="992" y="39" width="112" height="46" rx="6"/><text class="fc-label" x="1048" y="62">Subroutine</text>
 </svg>

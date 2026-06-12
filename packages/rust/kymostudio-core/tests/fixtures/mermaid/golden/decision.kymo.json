@@ -2,8 +2,8 @@
   "format": "kymo.json",
   "version": 1,
   "diagram": {
-    "width": 315,
-    "height": 532,
+    "width": 286,
+    "height": 408,
     "title": "",
     "subtitle": "",
     "components": [
@@ -15,11 +15,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          205,
-          63
+          188,
+          47
         ],
         "size": [
-          66,
+          72,
           46
         ],
         "parent": null,
@@ -39,11 +39,11 @@
         "shape": "diamond",
         "accent": "blue",
         "pos": [
-          205,
-          198
+          188,
+          150
         ],
         "size": [
-          140,
+          148,
           64
         ],
         "parent": null,
@@ -63,11 +63,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          205,
-          333
+          188,
+          253
         ],
         "size": [
-          82,
+          88,
           46
         ],
         "parent": null,
@@ -87,11 +87,11 @@
         "shape": "box",
         "accent": "blue",
         "pos": [
-          77,
-          333
+          64,
+          253
         ],
         "size": [
-          74,
+          80,
           46
         ],
         "parent": null,
@@ -111,12 +111,12 @@
         "shape": "circle",
         "accent": "blue",
         "pos": [
-          205,
-          464
+          188,
+          354
         ],
         "size": [
-          56,
-          56
+          60,
+          60
         ],
         "parent": null,
         "align": null,

@@ -1,29 +1,29 @@
 <mxfile host="kymostudio">
   <diagram id="kymo" name="Flowchart">
-    <mxGraphModel dx="1187" dy="150" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1008" dy="124" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
         <mxCell id="A" value="Rectangle" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="40" y="52" width="97" height="46" as="geometry"/>
+          <mxGeometry x="24" y="39" width="104" height="46" as="geometry"/>
         </mxCell>
         <mxCell id="B" value="Rounded" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="217" y="52" width="82" height="46" as="geometry"/>
+          <mxGeometry x="176" y="39" width="88" height="46" as="geometry"/>
         </mxCell>
         <mxCell id="C" value="Stadium" style="rounded=1;whiteSpace=wrap;html=1;arcSize=40;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="379" y="52" width="90" height="46" as="geometry"/>
+          <mxGeometry x="312" y="39" width="96" height="46" as="geometry"/>
         </mxCell>
         <mxCell id="D" value="Database" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="550" y="47" width="89" height="56" as="geometry"/>
+          <mxGeometry x="456" y="34" width="96" height="56" as="geometry"/>
         </mxCell>
         <mxCell id="E" value="Circle" style="ellipse;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="718" y="40" width="70" height="70" as="geometry"/>
+          <mxGeometry x="600" y="24" width="76" height="76" as="geometry"/>
         </mxCell>
         <mxCell id="F" value="Decision" style="rhombus;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="868" y="43" width="109" height="64" as="geometry"/>
+          <mxGeometry x="724" y="30" width="116" height="64" as="geometry"/>
         </mxCell>
         <mxCell id="G" value="Hexagon" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;" vertex="1" parent="1">
-          <mxGeometry x="1057" y="49" width="90" height="52" as="geometry"/>
+          <mxGeometry x="888" y="36" width="96" height="52" as="geometry"/>
         </mxCell>
         <mxCell id="e0" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="A" target="B">
           <mxGeometry relative="1" as="geometry"/>

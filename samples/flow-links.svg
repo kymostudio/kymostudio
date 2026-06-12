@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 311 522" width="311" height="522" style="max-width:100%;height:auto" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 282 394" width="282" height="394" style="max-width:100%;height:auto" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
 <style>text{fill:#1f2937}.bg-grid{fill:url(#dot-grid)}.fc-shape{fill:#eff6ff;stroke:#3b82f6;stroke-width:1.6}.fc-shape-line{fill:none;stroke:#3b82f6;stroke-width:1.6;stroke-linecap:round}.fc-label{font-size:13px;font-weight:600;fill:#1e3a8a;text-anchor:middle;dominant-baseline:central}.edge-path{fill:none;stroke:#64748b;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}.edge-label{font-size:11.5px;font-weight:500;fill:#334155;text-anchor:middle;paint-order:stroke;stroke:#fafafa;stroke-width:4;stroke-linejoin:round}.region-rect{fill:#eaf3ff;stroke:#b8d0ee;stroke-width:1.2}.region-label{font-size:11px;font-weight:500;fill:#475569;paint-order:stroke;stroke:#eaf3ff;stroke-width:3}</style>
 <defs><marker id="arrow" viewBox="0 0 12 10" refX="11" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse"><path d="M2,1 L11,5 L2,9" fill="none" stroke="#64748b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><pattern id="dot-grid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="#0f172a" fill-opacity="0.05"/></pattern></defs>
-<rect width="311" height="522" fill="#fafafa"/>
-<rect width="311" height="522" class="bg-grid"/>
-<path class="edge-path" d="M212,86 L212,126 L212,126 L212,166" marker-end="url(#arrow)"/>
-<path class="edge-path" d="M212,230 L212,270 L212,270 L212,310" marker-end="url(#arrow)"/>
-<text class="edge-label" x="212" y="270">yes</text>
-<path class="edge-path" d="M154,198 L134,198 L134,333 L114,333" marker-end="url(#arrow)"/>
-<text class="edge-label" x="134" y="265">no</text>
-<path class="edge-path" style="stroke-dasharray:6 4" d="M212,356 L212,396 L212,396 L212,436" marker-end="url(#arrow)"/>
-<path class="edge-path" d="M114,333 L139,333 L139,459 L164,459"/>
-<rect class="fc-shape" x="175" y="40" width="74" height="46" rx="6"/><text class="fc-label" x="212" y="63">Submit</text>
-<polygon class="fc-shape" points="212,166 270,198 212,230 154,198"/><text class="fc-label" x="212" y="198">Approved?</text>
-<rect class="fc-shape" x="164" y="310" width="96" height="46" rx="6"/><text class="fc-label" x="212" y="333">Provision</text>
-<rect class="fc-shape" x="40" y="310" width="74" height="46" rx="6"/><text class="fc-label" x="77" y="333">Reject</text>
-<rect class="fc-shape" x="164" y="436" width="96" height="46" rx="6"/><text class="fc-label" x="212" y="459">Audit log</text>
+<rect width="282" height="394" fill="#fafafa"/>
+<rect width="282" height="394" class="bg-grid"/>
+<path class="edge-path" d="M196,70 L196,94 L196,94 L196,118" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M196,182 L196,206 L196,206 L196,230" marker-end="url(#arrow)"/>
+<text class="edge-label" x="196" y="206">yes</text>
+<path class="edge-path" d="M134,150 L119,150 L119,253 L104,253" marker-end="url(#arrow)"/>
+<text class="edge-label" x="119" y="201">no</text>
+<path class="edge-path" style="stroke-dasharray:6 4" d="M196,276 L196,300 L196,300 L196,324" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M104,253 L124,253 L124,347 L144,347"/>
+<rect class="fc-shape" x="156" y="24" width="80" height="46" rx="6"/><text class="fc-label" x="196" y="47">Submit</text>
+<polygon class="fc-shape" points="196,118 258,150 196,182 134,150"/><text class="fc-label" x="196" y="150">Approved?</text>
+<rect class="fc-shape" x="144" y="230" width="104" height="46" rx="6"/><text class="fc-label" x="196" y="253">Provision</text>
+<rect class="fc-shape" x="24" y="230" width="80" height="46" rx="6"/><text class="fc-label" x="64" y="253">Reject</text>
+<rect class="fc-shape" x="144" y="324" width="104" height="46" rx="6"/><text class="fc-label" x="196" y="347">Audit log</text>
 </svg>
