@@ -1,15 +1,20 @@
 # FAQ & Troubleshooting
 
 Fixes for the things you're most likely to hit early on. If something here doesn't match what
-you see, the DSL Language Specification is the authoritative source.
+you see, the
+[DSL Language Specification](https://github.com/kymostudio/kymostudio/tree/main/docs/formats/kymo-dsl)
+is the authoritative source.
 
 ## Getting set up
 
 ### Which Python / Node versions do I need?
 
-The Python package requires **Python ≥ 3.13** (it's developed with [uv](https://docs.astral.sh/uv/)).
-The JavaScript package is a dependency-free ESM module and runs on any current Node.js. The two
-packages are independent but feature-equivalent — pick whichever suits your stack.
+The Python package requires **Python ≥ 3.10** (it's developed with [uv](https://docs.astral.sh/uv/)).
+The JavaScript package is an ESM module and runs on any current Node.js. Both are independent,
+feature-equivalent implementations that ship the same Rust engine (`kymostudio-core`) as their
+single dependency — pick whichever suits your stack. There is also a Rust CLI
+(`cargo install kymostudio`, no runtime at all) focused on conversions and rasterization —
+Mermaid/D2/DOT import and SVG → PNG/PDF; it does not render `.kymo` itself.
 
 ### `kymo: command not found`
 
@@ -36,17 +41,18 @@ If you set `canvas: W x H` by hand and your content runs past it, the overflow i
 Easiest fix: **delete the `canvas:` line** and let kymo auto-size to your content (it adds a
 30-px margin). Add an explicit `canvas:` back only when you need a fixed frame.
 
-→ See [§7.4 Auto-Canvas](../formats/kymo-dsl/07-semantics.md#74-auto-canvas).
+→ See [§7.4 Auto-Canvas](https://github.com/kymostudio/kymostudio/blob/main/docs/formats/kymo-dsl/07-semantics.md#74-auto-canvas).
 
 ### The render fails with `unknown icon: '…'`
 
 The `icon` slot takes a **key**, not a path, and an unknown key **stops the render with an
 error** (it doesn't silently blank). kymo looks up built-in glyphs first, then file-backed
-icons under the top-level [`icons/`](../../icons) directory. For file-backed icons the key is
-**`<provider>-<name>`** — the provider folder plus the filename, with the middle category folder
-dropped. So `icons/aws/compute/lambda.svg` is the key `aws-lambda` (not `aws/lambda` or
-`lambda.svg`), and `icons/k8s/compute/pod.svg` is `k8s-pod`. Check the key against the
-`icons/` tree and fix the spelling.
+icons from the
+[`packages/icons/icons/`](https://github.com/kymostudio/kymostudio/tree/main/packages/icons/icons)
+catalogue. For file-backed icons the key is **`<provider>-<name>`** — the provider folder plus
+the filename, with the middle category folder dropped. So `icons/aws/compute/lambda.svg` is the
+key `aws-lambda` (not `aws/lambda` or `lambda.svg`), and `icons/k8s/compute/pod.svg` is
+`k8s-pod`. Check the key against the catalogue and fix the spelling.
 
 ### My edges overlap or leave from the wrong side
 
@@ -57,7 +63,7 @@ The default router is orthogonal and usually fine, but you can steer it:
 - Force the path through waypoints: `via=(120,300);(220,300)`.
 - Change the routing style: add `curve`, `straight`, or `elbow` (the default).
 
-→ See [§6.7 Edges](../formats/kymo-dsl/06-grammar.md#67-edges).
+→ See [§6.7 Edges](https://github.com/kymostudio/kymostudio/blob/main/docs/formats/kymo-dsl/06-grammar.md#67-edges).
 
 ### `--animate` output looks static
 
@@ -72,7 +78,8 @@ Also check you're opening the `-animated.svg` file, not the plain `.svg`.
 It shouldn't — on import, kymo uses the geometry stored in the file's Diagram-Interchange (DI)
 section and renders it as laid out, skipping its own layout pass. If positions look off, the
 file's DI data is likely the cause. For the element-to-shape mapping, see the
-[BPMN element mapping](../formats/bpmn/kymo-mapping.md) (`BPMN-MAP-001`).
+[BPMN element mapping](https://github.com/kymostudio/kymostudio/blob/main/docs/formats/bpmn/kymo-mapping.md)
+(`BPMN-MAP-001`).
 
 ### Should I author BPMN in the DSL or import a `.bpmn`?
 
@@ -81,6 +88,19 @@ the flow and let kymo lay it out automatically; import a `.bpmn` file when you'v
 modelled it elsewhere and want to keep that layout.
 
 ## Using kymo in your own tools
+
+### Does kymo render Mermaid?
+
+Yes — pass a `.mmd` / `.mermaid` file to the same CLI (`kymo flow.mmd flow.svg`). Flowcharts
+render with kymo's own engine; sequence diagrams export to UML tools. The supported syntax is
+documented at [Flowchart](https://docs.kymo.studio/diagrams/flowchart) and
+[Sequence Diagram](https://docs.kymo.studio/diagrams/sequence).
+
+### Can my coding agent draw diagrams?
+
+Yes — kymo runs a hosted **MCP server** at `mcp.kymo.studio`. Add it to Claude Code, Cursor,
+VS Code, Codex and friends with one line of config, and the agent creates and edits your
+diagrams live in the editor. See the [MCP Server guide](https://docs.kymo.studio/guide/mcp).
 
 ### Can I render diagrams from my own app instead of the CLI?
 
@@ -100,13 +120,19 @@ It's dependency-free and ships TypeScript types. The Python package offers an eq
 
 ### Is there a live preview while I edit?
 
-Install the **kymo VS Code extension** for side-by-side preview of `.kymo` and `.bpmn` files
-that re-renders as you type:
-[Marketplace listing](https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode).
-Or use the [browser playground](https://kymo.studio/app/) — no install needed.
+Three options, no install needed for the first two:
+
+- **[editor.kymo.studio](https://editor.kymo.studio)** — the hosted editor: type on the left,
+  watch the render on the right, share with a link.
+- The [browser playground](https://kymo.studio/app/) on the landing page.
+- The **kymo VS Code extension** for side-by-side preview of `.kymo` and `.bpmn` files as you
+  type: [Marketplace listing](https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode).
 
 ## Still stuck?
 
-- Compare against a working file in [`samples/`](../../samples).
+- Compare against a working file in
+  [`samples/`](https://github.com/kymostudio/kymostudio/tree/main/samples).
 - Re-read the relevant section of [The `.kymo` Language](./dsl-guide.md).
-- Consult the normative DSL Language Specification for exact grammar and edge cases.
+- Consult the normative
+  [DSL Language Specification](https://github.com/kymostudio/kymostudio/tree/main/docs/formats/kymo-dsl)
+  for exact grammar and edge cases.

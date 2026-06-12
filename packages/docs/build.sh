@@ -11,10 +11,8 @@ cd "$(dirname "$0")"
 echo "→ syncing content (docs/ → site/)"
 rm -rf site/guide site/diagrams
 mkdir -p site/guide site/diagrams site/public
-cp ../../docs/guide/README.md            site/guide/index.md
 cp ../../docs/guide/getting-started.md   site/guide/
 cp ../../docs/guide/dsl-guide.md         site/guide/
-cp ../../docs/guide/cookbook.md          site/guide/
 cp ../../docs/guide/faq.md               site/guide/
 cp ../../docs/diagrams/flowchart/README.md   site/diagrams/flowchart-notation.md
 cp ../../docs/diagrams/bpmn/README.md        site/diagrams/bpmn.md
@@ -28,16 +26,18 @@ cp -R content/. site/
 mkdir -p site/public/samples
 cp ../../samples/approval.svg ../../samples/flow-*.svg ../../samples/seq-*.svg \
    site/public/samples/
-# No landing page — the root redirects straight to the guide (Cloudflare Pages
-# reads _redirects from the deploy root).
-printf '/ /guide/ 302\n' > site/public/_redirects
+# No landing page — the root redirects straight to Getting Started (Cloudflare
+# Pages reads _redirects from the deploy root). /guide/ kept for old links.
+printf '/ /guide/getting-started 302\n/guide/ /guide/getting-started 302\n' > site/public/_redirects
 
 # Sample images live outside the published subset — point them at the repo raw URLs
 # (VitePress resolves local image assets strictly, unlike dead links).
 # perl -pi (not sed -i) so the script runs on both GNU (CI) and BSD/macOS.
 RAW="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples"
+# The cookbook is not published on the site — point its links at GitHub.
+COOKBOOK="https://github.com/kymostudio/kymostudio/blob/main/docs/guide/cookbook.md"
 find site/guide site/diagrams -name '*.md' -exec \
-  perl -pi -e "s|\]\(\.\./\.\./samples/|](${RAW}/|g; s|\]\(\./\.\./\.\./samples/|](${RAW}/|g" {} +
+  perl -pi -e "s|\]\(\.\./\.\./samples/|](${RAW}/|g; s|\]\(\./\.\./\.\./samples/|](${RAW}/|g; s|\]\((?:\./)?cookbook\.md\)|](${COOKBOOK})|g" {} +
 
 echo "→ vitepress build"
 rm -rf dist
