@@ -1,12 +1,12 @@
 ---
 title: Kymo Editor (editor.kymo.studio) — Implementation Plan
 document_id: PLAN-KEDITOR-001
-version: "0.1"
-issue_date: 2026-06-10
+version: "0.2"
+issue_date: 2026-06-12
 status: Implemented
 classification: Internal
 owner: diagrams/ project
-audience: Engineers maintaining the live flowchart editor (`packages/editor/`) and the kymo-mcp Worker (`packages/mcp/`)
+audience: Engineers maintaining the live diagram editor (`packages/editor/`) and the kymo-mcp Worker (`packages/mcp/`)
 review_cycle: On scope change, or when a phase completes
 supersedes: null
 related_documents:
@@ -23,6 +23,8 @@ keywords:
   - kymo-editor
   - cloudflare-pages
   - cloudflare-workers
+  - d1
+  - kroki
   - worklog
   - story-points
 ---
@@ -32,50 +34,62 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | `PLAN-KEDITOR-001` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (requirements), `DESIGN-KEDITOR-001` (design), `TEST-KEDITOR-001` (V&V) |
 
-> **Implementation plan (ISO/IEC/IEEE 12207 §6.3), authored retrospectively.** kymo-editor is **shipped**; this plan traces the delivered phases against git history and records the residual risks. It implements the spec in `docs/specs/kymo-editor/`. **No backend, no new runtime deps** — a static Pages site + one serverless Worker.
+> **Implementation plan (ISO/IEC/IEEE 12207 §6.3), authored retrospectively.** kymo-editor is **shipped**; this plan traces the delivered phases against git history and records the residual risks. **No VM, no render server** — a static Pages site + one serverless Worker (+ managed D1/KV/DO state).
 
 ---
 
 ## 1. Context
 
-The kymo flowchart editor needed a home that was shareable, instant, and cheap to run, and a way for an LLM to author into it live. Entry gates were already met: the `kymostudio` JS engine and the `kymostudio-core` wasm render `flowchart{}`/`bpmn{}` at parity, so the editor could be a thin shell with **no second renderer**. The legacy server stack (`packages/editor/README.md`: Python `render_kymo.py` behind `/api/render`, stdio `render_flowchart`) is **superseded** by the shipped client-side architecture (`DESIGN-KEDITOR-001` Annex A, ADR-1).
+The kymo flowchart editor needed a home that was shareable, instant, and cheap to run, and a way for an LLM to author into it live — that was v0.1 (P0–P3): client-side wasm render on Cloudflare Pages plus one shared live room on a Worker. Using it immediately exposed the next gaps (`FEAT-KEDITOR-001` §A.1): one shared canvas can't serve two people, nothing is named or findable, real authors also write Mermaid/PlantUML/D2, and sharing must not require sign-in. P4–P9 grew the product around the same spine without adding any operated infrastructure.
 
 ## 2. Decision
 
-Render **client-side** (wasm in the browser, no roundtrip), host **static** on Cloudflare Pages, and run live sync + MCP on a **single Cloudflare Worker** with one `EditorRoom` Durable Object. Echo-suppress on both ends; persist the room's last source to DO storage. Defer all backend-implying features (auth, named rooms, history, presence).
+Keep the v0.1 spine — client-side kymo render, static Pages hosting, one Worker. Add: Google identity (GIS in the browser, JWKS verification + OAuth-for-MCP on the Worker), **one Durable Object per diagram** with the random id as capability, **D1 as database of record** (DO storage for live state), workspaces, CodeMirror, kroki.io delegation for non-kymo kinds, and kroki-style `?s=` URL sharing for the account-free path. Defer: presence/comments, version history, cross-user server-side sharing, self-hosted kroki (`FEAT-KEDITOR-001` §C.11).
 
 ## 3. Architecture (overview)
 
 Two deployables (see `DESIGN-KEDITOR-001` §1):
 
-- **Pages static** — `packages/editor` esbuild bundle (`dist/index.html` + `dist/app.js` with wasm inlined), deployed by `deploy-editor.yml` to project `kymo-editor` → editor.kymo.studio.
-- **Worker** — `packages/mcp` (`EditorRoom` + `KymoMCP`), deployed by `wrangler deploy` → `kymo-mcp.anhv-ict91.workers.dev`, channels `/ws`,`/set`,`/get`,`/mcp`,`/sse`.
+- **Pages static** — `packages/editor` esbuild SPA (code-split, wasm chunk lazy), deployed by `deploy-editor.yml` to project `kymo-editor` → editor.kymo.studio.
+- **Worker** — `packages/mcp` (`EditorRoom` DOs + REST APIs + `KymoMCP` behind OAuth), deployed by `wrangler deploy` → **mcp.kymo.studio**; state in D1 (`kymo-editor`) + KV (`OAUTH_KV`) + DO storage.
 
 ## 4. Phased plan (retrospective — ✓ Shipped)
 
-| Phase | Commit | Scope | SP | Status |
-|-------|--------|-------|----|--------|
+| Phase | Commits | Scope | SP | Status |
+|-------|---------|-------|----|--------|
 | P0 | `466db60` | First hosted editor — Cloudflare Pages + a `/api/render` Function. | 5 | ✓ Shipped (superseded) |
 | P1 | `47ecb4c` | Server render on Hetzner (Python `render_kymo.py`) + SSH auto-deploy. | 8 | ✓ Shipped (superseded) |
-| P2 | `0860ace` | **Client-side render** — drop the server; bundle the JS engine + `kymostudio-core` wasm, render in-browser; deploy `dist/` to Pages. Realises FR-KE-01..05, NFR-KE-01..03. | 10 | ✓ Shipped |
-| P3 | `7543db7` | **kymo-mcp Worker + live sync** — `EditorRoom` DO, WebSocket fan-out, `set_diagram`/`get_diagram` over `/mcp`+`/sse`; editor opens a reconnecting socket. Realises FR-KE-06..12, NFR-KE-04. | 10 | ✓ Shipped |
+| P2 | `0860ace` | **Client-side render** — drop the server; bundle the JS engine + wasm; deploy `dist/` to Pages. | 10 | ✓ Shipped |
+| P3 | `7543db7` | **kymo-mcp Worker + live sync** — `EditorRoom` DO, WebSocket fan-out, single-room `set_diagram`/`get_diagram`. | 10 | ✓ Shipped |
+| P4 | `58cca51`, `22c3b4d`, `af06100`, `334a8fb` | **Identity & multi-diagram** — Google OAuth for MCP + GIS sign-in in the editor; custom domain mcp.kymo.studio; one room per diagram, per-user index, persisted sign-in. Realises FR-KE-11/17/19 and the per-diagram revision of FR-KE-06..09. | 8 | ✓ Shipped |
+| P5 | `6c94e17`, `ea9078d`, `6db561d`, `7464c8e`, `f0e6fc8`, `5e8dd0d`, `335e7b3`, `dcac702` | **React SPA + library** — SPA rewrite; `/diagrams` page (list/delete, focus-refresh); header rename; `edit_diagram` + richer `list_diagrams`; drop the default room; strong 16-char ids + lazy room creation + auto-title. Realises FR-KE-20..22 and the v0.2 FR-KE-08/10. | 13 | ✓ Shipped |
+| P6 | `c8bd0e0`, `25c0e8f`, `94deff3`, `f209cc4`, `7c9b595`, `2ab494a`, `ec86ba1`, `5df7b4f`, `830536b`, `c93aa93` | **Brand & chrome** — kymo.studio light theme, brand loader/boot states, Export dropdown (SVG/PNG/source), lucide icons. Realises FR-KE-28/29 (with FR-KE-03). | 5 | ✓ Shipped |
+| P7 | `7f76fd0`, `454b0f6`, `968428e`, `edd9a89` | **Workspaces, kroki kinds, CodeMirror** — workspace CRUD + move + switcher; 28 kroki kinds + per-kind samples; CodeMirror 6 with per-kind highlighting; draggable splitter. Realises FR-KE-13..16, FR-KE-23/24. | 10 | ✓ Shipped |
+| P8 | `583520d`, `db5f996`, `2071161`, `de2269d`, `6520841` | **D1 database of record** — `diagrams`/`workspaces` tables, throttled snapshot upserts + disconnect flush, one-time KV→D1 migration, kind in the index/badges/broadcast; MCP server renamed `kymostudio` (0.4.x). Realises the v0.2 FR-KE-09, NFR-KE-04. | 8 | ✓ Shipped |
+| P9 | `a3dae51` | **Kroki-style URL sharing** — deflate+base64url `?s=`/`?k=` codec, address-bar autosync, Share button. Realises FR-KE-25..27, NFR-KE-07. | 5 | ✓ Shipped |
 
-P0/P1 are retained as history; the **shipped product is P2 + P3**.
+P0/P1 are retained as history; the **shipped product is P2–P9**.
 
 ## 5. Risk register
 
-| ID | Risk | Likelihood | Impact | Mitigation |
-|----|------|-----------|--------|------------|
-| R1 | **Single shared room** — all visitors edit one canvas; concurrent unrelated users collide. | Med | Med | Acceptable for a demo/personal editor; named rooms deferred (`FEAT-KEDITOR-001` §C.5). Document the behaviour. |
-| R2 | **Hard-coded Worker host** in `app.js` (`wss://kymo-mcp.anhv-ict91.workers.dev/ws`). | Low | Med | A custom domain / env-substitution at build time would decouple it; tracked as a follow-up. |
-| R3 | **CDN icon dependency** — icons resolve from `jsDelivr @main`; a moved/renamed icon path breaks art. | Low | Low | Pin a tag instead of `@main` if churn becomes an issue. |
-| R4 | **README drift** — `packages/editor/README.md` still describes the retired Python/server stack. | High | Low | This spec is the normative reference; sync or trim the README in a follow-up (out of scope here). |
-| R5 | **Engine drift** — a future `kymostudio` change alters rendered bytes. | Med | Low | Covered by the engine's own golden suites (`TEST-KEDITOR-001` §3); editor inherits, owns no goldens. |
+| ID | Risk | Likelihood | Impact | Mitigation | Status |
+|----|------|-----------|--------|------------|--------|
+| R1 | **Single shared room** — visitors collide on one canvas. | — | — | Superseded by per-diagram owner-scoped rooms (P4/P5). | Closed |
+| R2 | **Hard-coded Worker host** in the client. | — | — | Custom domain mcp.kymo.studio (`af06100`); endpoints in `const.ts` are still literals, but the domain is stable. | Closed |
+| R3 | **CDN icon dependency** — icons resolve from jsDelivr `@main`; a moved/renamed icon path breaks art. | Low | Low | Pin a tag instead of `@main` if churn becomes an issue. | Open |
+| R4 | **README drift** — `packages/editor/README.md` still describes the retired Python/server stack (and now also predates the SPA). | High | Low | This spec is normative; sync or trim the README in a follow-up. | Open |
+| R5 | **Engine drift** — a future `kymostudio` change alters rendered bytes. | Med | Low | Engine golden suites (`TEST-KEDITOR-001` §3); editor owns no goldens. | Open |
+| R6 | **kroki.io dependency** — non-kymo kinds need a third-party service: outage breaks 28 kinds, and the **source text is POSTed off-device** (privacy). | Med | Med | Kymo kinds unaffected (local). Documented in ADR-6; self-hosting kroki is the escape hatch if availability/privacy requirements harden. | Open |
+| R7 | **Google coupling** — sign-in, library, live sync, and MCP all hinge on GIS + one OAuth client id. | Low | Med | Signed-out authoring + `?s=` sharing keep the core usable through a Google outage; client id is config (`wrangler.jsonc` var + `const.ts`). | Open |
+| R8 | **D1 schema out-of-band** — tables were provisioned manually; no migration file or backup policy in-tree. | Med | Med | Add a checked-in schema/migration file and enable D1 time-travel/backups; until then the schema is documented in `DESIGN-KEDITOR-001` §7. | Open |
+| R9 | **ID token in query strings** (`/ws?id_token=…`, `/api/*?id_token=…`) — tokens can land in logs/proxies. | Low | Med | Tokens are short-lived (~1 h) and JWKS-verified; REST already accepts `Authorization: Bearer` — moving the WS handshake to a header/subprotocol is the follow-up. | Open |
+| R10 | **No WebSocket auto-reconnect** — the SPA rewrite dropped v0.1's 2 s retry; after a drop, edits stay local-only (`⚡` gone) until the route/token changes. | Med | Med | The indicator makes the state visible; D1 flush-on-close bounds loss. Reinstating backoff-reconnect in `room.ts` is the standing follow-up. | Open |
+| R11 | **Pages 4 h asset cache** could serve a stale bundle after deploy. | — | — | `build.sh` cache-busts JS/CSS URLs with a per-build timestamp. | Closed |
 
 ## 6. Worklog / timeline
 
@@ -85,7 +99,14 @@ P0/P1 are retained as history; the **shipped product is P2 + P3**.
 | `47ecb4c` | Hetzner Python render + SSH auto-deploy (P1). |
 | `0860ace` | Client-side wasm render, no server (P2). |
 | `7543db7` | kymo-mcp Worker + live editor sync (P3). |
-| 2026-06-10 | Authored this spec set (`FEAT/DESIGN/TEST/PLAN-KEDITOR-001`) for the shipped system. |
+| 2026-06-10 | Authored spec set v0.1 (`FEAT/DESIGN/TEST/PLAN-KEDITOR-001`) for P2+P3. |
+| `58cca51`…`334a8fb` | Google OAuth + sign-in, custom domain, multi-diagram per user (P4). |
+| `6c94e17`…`dcac702` | React SPA, `/diagrams` library, rename, lazy create + auto-title, `edit_diagram` (P5). |
+| `c8bd0e0`…`c93aa93` | Brand theme, loaders, Export menu (P6). |
+| `7f76fd0`…`edd9a89` | Workspaces, kroki kinds + samples, CodeMirror + splitter (P7). |
+| `583520d`…`6520841` | D1 store + KV→D1 migration, kind badges/broadcast, MCP rename (P8). |
+| `a3dae51` | Kroki-style `?s=` URL sharing (P9). |
+| 2026-06-12 | Re-baselined the spec set to v0.2 for P4–P9. |
 
 ---
 
@@ -94,3 +115,4 @@ P0/P1 are retained as history; the **shipped product is P2 + P3**.
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-10 | Vũ Anh | Initial, retrospective plan. Traces P0→P3 against commits `466db60`/`47ecb4c`/`0860ace`/`7543db7`, marks the shipped product as P2+P3, and records risks R1–R5 (single room, hard-coded host, CDN icons, README drift, engine drift). |
+| 0.2     | 2026-06-12 | Vũ Anh | **Extended the retrospective with P4–P9** (identity & multi-diagram, React SPA + library, brand & chrome, workspaces/kroki/CodeMirror, D1 store, URL sharing) with commit traces and SP. Risk register: **closed R1/R2/R11** (per-diagram rooms, custom domain, cache-busting), kept R3–R5, **added R6–R10** (kroki.io availability/privacy, Google coupling, out-of-band D1 schema, token-in-URL, no WS auto-reconnect). |
