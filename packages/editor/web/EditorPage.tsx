@@ -9,7 +9,7 @@ import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy, BookOpen } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -58,6 +58,8 @@ export default function EditorPage() {
   const [sharePayload, setSharePayload] = useState(""); // deflate+base64url of the current source
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
+  const [renderReady, setRenderReady] = useState(false); // wasm engine loaded
+  const [localSaved, setLocalSaved] = useState(false);   // no-room content is persisted in the URL
   const [editingName, setEditingName] = useState(false);
   // split = width of the source pane in % (dbdiagram-style draggable divider)
   const [split, setSplit] = useState(() => {
@@ -110,7 +112,7 @@ export default function EditorPage() {
   useEffect(() => {
     let stop = false;
     // refs, not state: by the time the wasm lands, a share link may have replaced the sample
-    import("./engine").then((m) => { if (stop) return; renderRef.current = m.renderDiagram; if (kindRef.current === "kymo") doRender(sourceRef.current, "kymo"); });
+    import("./engine").then((m) => { if (stop) return; renderRef.current = m.renderDiagram; setRenderReady(true); if (kindRef.current === "kymo") doRender(sourceRef.current, "kymo"); });
     return () => { stop = true; };
   }, []); // eslint-disable-line
 
@@ -129,7 +131,7 @@ export default function EditorPage() {
   useEffect(() => {
     const imp = pendingImport.current; pendingImport.current = null;
     setSource(imp ? imp.source : SAMPLE); setKind(imp ? imp.kind : "kymo");
-    setTitle(""); setEditingName(false); setShareError(null);
+    setTitle(""); setEditingName(false); setShareError(null); setLocalSaved(false);
     synced.current = false; fresh.current = false; userEdited.current = !!imp;
   }, [d]);
 
@@ -144,6 +146,7 @@ export default function EditorPage() {
         if (sharedKind && KINDS.some((k) => k.value === sharedKind)) setKind(sharedKind);
         userEdited.current = false; // pristine shared content — leave the URL alone until they type
         setShareError(null);
+        setLocalSaved(true); // the content already lives in the URL
         setSource(src);
       })
       .catch(() => {
@@ -204,6 +207,7 @@ export default function EditorPage() {
     if (d || !userEdited.current || !source.trim()) return;
     const t = setTimeout(async () => {
       window.history.replaceState(null, "", shareUrl(kind, await encodeShare(source)));
+      setLocalSaved(true);
     }, 300);
     return () => clearTimeout(t);
   }, [source, kind, d]); // eslint-disable-line
@@ -274,10 +278,13 @@ export default function EditorPage() {
     saveBlob(new Blob([source], { type: "text/plain;charset=utf-8" }), (diagramLabel || "flowchart") + ext);
   }
   function newDiagram() {
+    // No room = the only copy of edited content is this tab/URL. Ask first.
+    if (!d && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
     if (!idToken) {
       // Guests have no rooms — a ?d= URL would be a dead room that silently loses
       // everything typed into it. Reset to a fresh local sample instead.
       setSource(SAMPLE); setKind("kymo"); setTitle(""); setShareError(null);
+      setLocalSaved(false); // pristine sample isn't in the URL — don't claim it is
       userEdited.current = false;
       navigate("/");
       return;
@@ -324,10 +331,12 @@ export default function EditorPage() {
   return (
     <div className="layout">
       <header>
-        {/* identity & document: logo → app home, workspace, editable title, sync state */}
-        <Link className="brand" to={claims ? "/diagrams" : "/"}><img src="/favicon.svg" alt="" /></Link>
+        {/* identity & document: logo → app home (guests: the product landing), workspace, editable title, sync state */}
+        {claims
+          ? <Link className="brand" to="/diagrams"><img src="/favicon.svg" alt="" /></Link>
+          : <a className="brand" href="https://kymo.studio" title="Kymo Studio"><img src="/favicon.svg" alt="" /></a>}
         {claims && <WorkspaceSwitcher />}
-        <span className="sep">/</span>
+        {claims && <span className="sep">/</span>}
         {booting ? <span className="skeleton name-skel" /> : claims ? (
           editingName ? (
             <input className="diagram-input" autoFocus maxLength={60} defaultValue={title} placeholder="Untitled"
@@ -345,16 +354,17 @@ export default function EditorPage() {
             {live ? "Saved" : "Offline"}
           </span>
         )}
+        {!d && localSaved && !booting && (
+          <span className="save-ind url" title="Your diagram lives entirely in this page's URL — bookmark or Share it to keep it. Nothing is stored on a server.">
+            Saved to URL
+          </span>
+        )}
         <div className="spacer" />
-        {!claims && <GoogleButton />}
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
-          {claims && (
-            <>
-              <Link className="navlink" to="/diagrams"><LayoutGrid size={15} strokeWidth={2} />Diagrams</Link>
-              <span className="vsep" />
-            </>
-          )}
+          <a className="navlink" href="https://docs.kymo.studio" target="_blank" rel="noopener" title="Kymo documentation"><BookOpen size={15} strokeWidth={2} />Docs</a>
+          {claims && <Link className="navlink" to="/diagrams"><LayoutGrid size={15} strokeWidth={2} />Diagrams</Link>}
+          <span className="vsep" />
           <button onClick={newDiagram} title="New diagram"><Plus size={16} strokeWidth={2.2} />New</button>
           {shared && claims && (
             <button onClick={saveCopy} title="Save a copy to your Diagrams">
@@ -421,6 +431,7 @@ export default function EditorPage() {
             })()}
           </div>
         </nav>
+        {!claims && <GoogleButton />}
         {claims && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
             <button className="acct-btn" onClick={() => setMenuOpen((o) => !o)} title="Account">
@@ -438,31 +449,7 @@ export default function EditorPage() {
       </header>
       <main ref={mainRef}>
         {booting ? (
-          <div className="boot">
-            <div className="kloader" role="img" aria-label="Loading">
-              <div className="k1">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                  <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
-                  <circle cx="33" cy="26.5" r="5.8" fill="#fff" /><circle cx="33" cy="26.5" r="2.44" fill="#e0095f" />
-                  <circle cx="33" cy="73.5" r="5.8" fill="#fff" /><circle cx="33" cy="73.5" r="2.44" fill="#e0095f" />
-                </svg>
-              </div>
-              <div className="k2">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                  <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
-                  <circle cx="65.5" cy="27" r="5.8" fill="#fff" /><circle cx="65.5" cy="27" r="2.44" fill="#e0095f" />
-                  <circle cx="34" cy="58.5" r="5.8" fill="#fff" /><circle cx="34" cy="58.5" r="2.44" fill="#e0095f" />
-                </svg>
-              </div>
-              <div className="k3">
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                  <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
-                  <circle cx="48" cy="49.5" r="5.8" fill="#fff" /><circle cx="48" cy="49.5" r="2.44" fill="#e0095f" />
-                  <circle cx="67" cy="73" r="5.8" fill="#fff" /><circle cx="67" cy="73" r="2.44" fill="#e0095f" />
-                </svg>
-              </div>
-            </div>
-          </div>
+          <div className="boot"><KLoader /></div>
         ) : (
           <>
             <section className="pane" style={{ flex: `0 0 ${split}%` }}>
@@ -477,6 +464,11 @@ export default function EditorPage() {
                   }}>
                   {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
                 </select>
+                {kind !== "kymo" && (
+                  <span className="kroki-note" title="Non-Kymo diagram types are rendered by the public kroki.io service — your source is sent to it. Kymo diagrams render locally in your browser.">
+                    renders via kroki.io
+                  </span>
+                )}
               </div>
               <CodeEditor value={source} kind={kind} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
@@ -484,12 +476,43 @@ export default function EditorPage() {
               onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />
             <section className="pane">
               {shareError && <div className="share-error">{shareError}</div>}
-              <div id="preview" dangerouslySetInnerHTML={{ __html: svg }} />
+              {kind === "kymo" && !renderReady && !shareError
+                ? <div className="boot"><KLoader /></div>
+                : <div id="preview" dangerouslySetInnerHTML={{ __html: svg }} />}
             </section>
           </>
         )}
       </main>
       <div className={"status" + (statusErr ? " error" : "")}>{status}</div>
+    </div>
+  );
+}
+
+// Miro-style brand loader (full-page boot + wasm engine load in the preview pane).
+function KLoader() {
+  return (
+    <div className="kloader" role="img" aria-label="Loading">
+      <div className="k1">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
+          <circle cx="33" cy="26.5" r="5.8" fill="#fff" /><circle cx="33" cy="26.5" r="2.44" fill="#e0095f" />
+          <circle cx="33" cy="73.5" r="5.8" fill="#fff" /><circle cx="33" cy="73.5" r="2.44" fill="#e0095f" />
+        </svg>
+      </div>
+      <div className="k2">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
+          <circle cx="65.5" cy="27" r="5.8" fill="#fff" /><circle cx="65.5" cy="27" r="2.44" fill="#e0095f" />
+          <circle cx="34" cy="58.5" r="5.8" fill="#fff" /><circle cx="34" cy="58.5" r="2.44" fill="#e0095f" />
+        </svg>
+      </div>
+      <div className="k3">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
+          <circle cx="48" cy="49.5" r="5.8" fill="#fff" /><circle cx="48" cy="49.5" r="2.44" fill="#e0095f" />
+          <circle cx="67" cy="73" r="5.8" fill="#fff" /><circle cx="67" cy="73" r="2.44" fill="#e0095f" />
+        </svg>
+      </div>
     </div>
   );
 }

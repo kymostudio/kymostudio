@@ -3,10 +3,10 @@ export const MCP_WS = "wss://mcp.kymo.studio/ws";
 export const DIAGRAMS_API = "https://mcp.kymo.studio/api/diagrams";
 export const WORKSPACES_API = "https://mcp.kymo.studio/api/workspaces";
 export const SAMPLE = `flowchart TD {
-  A[Nhận đơn hàng] --> B{Còn hàng?}
-  B -->|Có| C[Thanh toán]
-  B -->|Không| D[Thông báo khách]
-  C --> E[Đóng gói]
-  E --> F((Giao hàng))
-  D --> G[Hủy đơn]
+  A[Receive order] --> B{In stock?}
+  B -->|Yes| C[Take payment]
+  B -->|No| D[Notify customer]
+  C --> E[Pack items]
+  E --> F((Ship order))
+  D --> G[Cancel order]
 }`;
