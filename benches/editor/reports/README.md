@@ -6,6 +6,9 @@ Every benchmarking round's full snapshot (`REPORT.md` + `perf.json` +
 history: the numbers each research article was written against, kept
 machine-readable instead of living only in git archaeology.
 
+**Day rollup: [2026-06-12-SUMMARY.md](2026-06-12-SUMMARY.md)** — the four
+rounds, what each shipped, the negative results, and the architecture after.
+
 `run.py` also archives every fresh run here automatically, named by the run's
 UTC timestamp. Rename a run's folder to a `rN-<slug>` form (and add it below)
 when it becomes a *round* — i.e. when it gets a research article.

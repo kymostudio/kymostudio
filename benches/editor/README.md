@@ -56,5 +56,5 @@ before it ships (the kroki calls still go to the live service).
 | `quality.py`   | correctness grading (1 unthrottled load per scenario, kroki-infra retries) |
 | `perf.py`      | N throttled cold loads per scenario → medians |
 | `run.py`       | both → `results/quality.json`, `results/perf.json`, `results/REPORT.md` (+ a timestamped copy under `reports/`) |
-| `reports/`     | archive of every run's snapshot — `results/` only ever holds the latest |
+| `reports/`     | archive of every run's snapshot (+ the [2026-06-12 day summary](reports/2026-06-12-SUMMARY.md)) — `results/` only ever holds the latest |
 | `research/`    | hand-written analysis per benchmarking round |
