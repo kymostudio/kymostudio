@@ -127,6 +127,51 @@ function GitHubStars() {
   );
 }
 
+const MCP_SNIPPETS = [
+  { key: "claude", label: "Claude Code", code: `claude mcp add --transport sse kymo \\\n  https://mcp.kymo.studio/sse` },
+  { key: "any", label: "Any MCP client", code: `{ "mcpServers": {\n    "kymo": { "url": "https://mcp.kymo.studio/mcp" }\n} }` },
+];
+
+function McpTerminal() {
+  const [tab, setTab] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    const text = MCP_SNIPPETS[tab].code;
+    const done = () => { setCopied(true); setTimeout(() => setCopied(false), 1600); };
+    const fallback = () => {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); } catch { /* leave label as-is */ }
+      ta.remove();
+    };
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done).catch(fallback);
+    else fallback();
+  };
+  return (
+    <div className="mcp-snippets">
+      <div className="mcp-term">
+        <div className="mcp-term-bar">
+          <span className="mcp-term-dots" aria-hidden="true"><i /><i /><i /></span>
+          <div className="mcp-tabs" role="tablist" aria-label="Connect snippet">
+            {MCP_SNIPPETS.map((s, i) => (
+              <button key={s.key} role="tab" aria-selected={i === tab} className={i === tab ? "mcp-tab active" : "mcp-tab"} onClick={() => { setTab(i); setCopied(false); }}>
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <button className="mcp-copy-btn" onClick={copy} aria-live="polite">{copied ? "Copied ✓" : "Copy"}</button>
+        </div>
+        <pre><code>{MCP_SNIPPETS[tab].code}</code></pre>
+      </div>
+      <p className="mcp-note">Sign in with Google on first connect — diagrams open live in the editor.</p>
+    </div>
+  );
+}
+
 function App() {
   const [selected, setSelected] = useState<Sample | null>(null);
   return (
@@ -187,6 +232,18 @@ function App() {
         <div className="mcp-inner">
           <div className="mcp-copy">
             <h2>Connect your coding agent, over MCP</h2>
+            {/* the brand motif: a flowing-dash edge between two ports */}
+            <svg className="mcp-h2-edge" viewBox="0 0 260 16" width="260" height="16" aria-hidden="true">
+              <path className="edge-path" d="M 8 8 H 252" />
+              <g className="edge-node">
+                <circle cx="8" cy="8" r="5.5" />
+                <circle className="core" cx="8" cy="8" r="2.2" />
+              </g>
+              <g className="edge-node">
+                <circle cx="252" cy="8" r="5.5" />
+                <circle className="core" cx="252" cy="8" r="2.2" />
+              </g>
+            </svg>
             <p>
               kymo runs a hosted <strong>MCP server</strong> at <code>mcp.kymo.studio</code>. Claude
               Code, Cursor, Copilot — any MCP client — can create and edit your diagrams, rendering
@@ -205,20 +262,7 @@ function App() {
               <li><code>delete_diagram</code></li>
             </ul>
           </div>
-          <div className="mcp-snippets">
-            <div className="mcp-snippet">
-              <div className="mcp-snippet-label">Claude Code</div>
-              <pre><code>{`claude mcp add --transport sse kymo \\
-  https://mcp.kymo.studio/sse`}</code></pre>
-            </div>
-            <div className="mcp-snippet">
-              <div className="mcp-snippet-label">Any MCP client</div>
-              <pre><code>{`{ "mcpServers": {
-    "kymo": { "url": "https://mcp.kymo.studio/mcp" }
-} }`}</code></pre>
-            </div>
-            <p className="mcp-note">Sign in with Google on first connect — diagrams open live in the editor.</p>
-          </div>
+          <McpTerminal />
         </div>
       </section>
 
