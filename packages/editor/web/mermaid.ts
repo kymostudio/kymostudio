@@ -1,12 +1,22 @@
-// Mermaid renders IN-BROWSER (mermaid.js, a lazy chunk) — kroki is only the
-// share-link warm-up path. Rules of the race:
+// Mermaid renders IN-BROWSER — kroki is only the share-link warm-up path.
+// Two local engines, picked per source:
+//
+//   - FLOWCHART (the dominant grammar, LLM output especially) renders through
+//     kymo-mermaid: a flowchart-only slice of merman (the Rust port of
+//     mermaid.js, pinned by rev) — ~470 KB brotli wasm with mermaid-11 parity.
+//   - every other grammar renders through mermaid.js (~760 KB brotli), which
+//     IS the reference implementation. Any kymo-mermaid error falls back here
+//     too, so an unsupported syntax degrades to the slower chunk, never to a
+//     broken diagram.
+//
+// Rules of the warm-up race (unchanged):
 //   - a pristine share link has an early proxy warm-up in flight (index.html);
 //     give it EARLY_WINDOW_MS to answer — an edge cache hit returns in ~300 ms
-//     and costs zero extra bytes (the mermaid chunk is never downloaded);
+//     and costs zero extra bytes (no local engine is downloaded);
 //   - a cache miss, a kroki outage, or any later render (typing) goes local:
-//     no kroki round-trip per keystroke, immune to kroki's bad days, works
-//     offline once the chunk is cached.
+//     no render request per keystroke, immune to kroki, works offline.
 import { earlyResponse } from "./kroki";
+import wasmUrl from "kymo-mermaid/kymo_mermaid_bg.wasm";
 
 let mod: Promise<any> | null = null;
 function loadMermaid(): Promise<any> {
@@ -28,8 +38,30 @@ async function renderLocal(source: string): Promise<string> {
   return svg;
 }
 
+let fc: Promise<any> | null = null;
+function loadFlowchartWasm(): Promise<any> {
+  return (fc ??= import("kymo-mermaid").then(async (m: any) => {
+    await m.default(wasmUrl as unknown as string); // streaming-compiled, parallel fetch
+    return m;
+  }));
+}
+
+// Conservative sniff: only route sources we KNOW the slice speaks. Front-matter
+// (---) and %%{init}%% directives carry config the slice ignores — let
+// mermaid.js honor those.
+export function isPlainFlowchart(source: string): boolean {
+  for (const raw of source.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (line.startsWith("%%{")) return false;
+    if (line.startsWith("%%")) continue;
+    return /^(flowchart|graph)\b/.test(line);
+  }
+  return false;
+}
+
 // An edge cache hit answers well under this; a kroki cache-miss render takes
-// seconds — past the window, downloading mermaid.js locally is the faster path.
+// seconds — past the window, rendering locally is the faster path.
 const EARLY_WINDOW_MS = 900;
 
 export async function renderMermaid(source: string): Promise<string> {
@@ -38,5 +70,13 @@ export async function renderMermaid(source: string): Promise<string> {
     new Promise<null>((resolve) => setTimeout(() => resolve(null), EARLY_WINDOW_MS)),
   ]);
   if (early && early.ok) return await early.text();
+  if (isPlainFlowchart(source)) {
+    try {
+      const m = await loadFlowchartWasm();
+      return m.mermaidFlowchartToSvg(source);
+    } catch {
+      // not this slice's grammar (or wasm failed to load) — mermaid.js takes it
+    }
+  }
   return renderLocal(source);
 }
