@@ -1,26 +1,23 @@
+---
+layout: page
+title: Sequence Diagram
+---
+
+<DiagramQuickstart set="sequence">
+
 # Sequence Diagram
 
 A sequence diagram shows how participants exchange messages over time. kymo
 reads the [Mermaid](https://mermaid.js.org/syntax/sequenceDiagram.html)
 `sequenceDiagram` syntax.
 
-The fastest way to try everything on this page is the
-**[editor](https://editor.kymo.studio)**: pick **mermaid** in the diagram-type
-dropdown, type on the left, and the preview updates live. Every example below
-has a *Try it in the editor* link that opens it pre-loaded.
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
 
-```mermaid
-sequenceDiagram
-    participant A as Alice
-    participant J as John
-    A->>J: Hello John, how are you?
-    J-->>A: Great!
-    A-)J: See you later
-```
-
-[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxli0EKgzAURPeeYroU9AIulEDBkm1P8AlDDaSJ_UbE25uG7jrLee9t_OyMjncvL5V3g7JVNHvnV4kZBrLBBO_4h-wX2bTESkw_jnbAgyGk-nZY0gFR4kz7VB3bF8kMmJWSb7-sLdWT1UKQTG0uhL4sJA)
-
-![Basic sequence diagram, as previewed in the editor](/samples/seq-basic.svg)
+<ExampleMarker id="sq-intro" />
 
 Beyond the live preview, kymo converts sequence sources into a proper **UML
 interaction model** — ready to open in StarUML, Gaphor, or any XMI-consuming
@@ -28,19 +25,16 @@ UML tool. See [Exporting to UML tools](#exporting-to-uml-tools).
 
 ## Participants
 
+<ExampleMarker id="sq-participants" />
+
 Declare participants with `participant`, or `actor` for a stick-figure actor.
 The optional `as` alias sets the display label; the id is what you use in
 messages. Participants you don't declare are created automatically the first
 time a message references them, in order of appearance.
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    actor U as User
-    U->>C: click
-```
-
 ## Messages
+
+<ExampleMarker id="sq-messages" />
 
 A message is `Sender<arrow>Receiver: text`. Each arrow maps to a UML message
 sort, so the distinction survives into the exported model:
@@ -60,77 +54,33 @@ Self-messages (`A->>A: think`) are supported.
 
 ## Activations
 
-Mark when a participant is actively processing with explicit statements or the
-`+` / `-` shorthand on the arrow:
+<ExampleMarker id="sq-activations" />
 
-```mermaid
-sequenceDiagram
-    Alice->>+John: Hello John
-    John-->>-Alice: Great!
-```
+Mark when a participant is actively processing with the `+` / `-` shorthand on
+the arrow, or with explicit statements:
 
-[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJwrTi0sTc1LTnXJTEwvSszlUgACx5zM5FRdOzttr_yMPCsFj9ScnHwFEBssC2LoAmV1wcqsFNyLUhNLFLkAYOwWSQ)
-
-```mermaid
-sequenceDiagram
-    Alice->>John: Hello John
-    activate John
-    John-->>Alice: Great!
-    deactivate John
+```text
+Alice->>John: Hello John
+activate John
+John-->>Alice: Great!
+deactivate John
 ```
 
 `+` activates the **target** after the message; `-` deactivates the **source**.
 
 ## Notes
 
-Attach commentary to one participant or span several:
+<ExampleMarker id="sq-notes" />
 
-```mermaid
-sequenceDiagram
-    participant A
-    participant B
-    Note over A,B: handshake begins
-    A->>B: SYN
-    Note right of B: B is now listening
-    B-->>A: SYN-ACK
-    Note left of A: connection established
-```
-
-[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxljDESwjAMBPu8Qg8gH6DIjA0dM2moKBVHsTUEKdgKfB-PmxRceXt7hd47SaArY8z46qBmw2wceEMxcH-Nb82oRqAfyuBO_gwJZS4JnwQTRZbSNq4fhsruj_FQMsdkoAtU4IELiH5h5WIkLLHtfF8917zeXW6Hu9LS1MqCilAwVgEqhlN9SDR3P54TPvA)
-
-`Note left of X`, `Note right of X`, and `Note over X` (or `Note over X,Y`)
-are all supported.
+Attach commentary to one participant or span several. `Note left of X`,
+`Note right of X`, and `Note over X` (or `Note over X,Y`) are all supported.
 
 ## Fragments: loop, alt, opt, par
 
+<ExampleMarker id="sq-fragments" />
+
 Combined fragments group messages under an operator, close with `end`, and
 nest arbitrarily:
-
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant S as Server
-    alt is authorized
-        C->>S: GET /data
-        S-->>C: 200 OK
-    else unauthorized
-        S-->>C: 401 Unauthorized
-    end
-    opt retry on flake
-        loop up to 3 times
-            C->>S: retry
-        end
-    end
-    par notify
-        S->>C: event A
-    and
-        S->>C: event B
-    end
-```
-
-[▶ Try it in the editor](https://editor.kymo.studio/?k=mermaid&s=eJxtkD0OwjAMhXdO8S6AKD8TAxIUxMDAUDiA1RqISJOQuEhwekqqRgjw8iR_9tOzA98aNiWvFZ091QO05ciLKpUjI8hBAblWbOSHFW9WsL-zj4y0QAVQIxfr1ZOr2H1XPlwsijm2mwNGFQklUAxbks8xyTLsd7HNOjAa88elH55lYxy_B9h0ap3As_gHrMFJ05XTvrbWoXEQiylE1RwS-ggZlxPobXtt74exok6Pj1gxFd_bH2HZfcJU__Eqmb0AUwVlCg)
-
-![Fragments example, as previewed in the editor](/samples/seq-fragments.svg)
 
 | Operator | Meaning |
 |----------|---------|
@@ -144,14 +94,9 @@ labels carried as guards.
 
 ## Numbering
 
-`autonumber` switches on sequential message numbering:
+<ExampleMarker id="sq-autonumber" />
 
-```mermaid
-sequenceDiagram
-    autonumber
-    Alice->>John: Hello
-    John-->>Alice: Hi
-```
+`autonumber` switches on sequential message numbering.
 
 ## Exporting to UML tools
 
@@ -171,9 +116,9 @@ kymo seq.mmd seq.gaphor       # Gaphor project, model + laid-out diagram
   [StarUML](https://staruml.io) or [Gaphor](https://gaphor.org) and the diagram
   is already drawn.
 
-> **Status.** The editor previews sequence diagrams with the Mermaid renderer;
-> rendering them with kymo's own engine (SVG/PNG/PDF, like flowcharts) is on
-> the roadmap.
+> **Status.** Sequence previews on this page and in the editor use the Mermaid
+> renderer; rendering sequence diagrams with kymo's own engine (SVG/PNG/PDF,
+> like flowcharts) is on the roadmap.
 
 ## Differences from Mermaid
 
@@ -187,3 +132,5 @@ kymo seq.mmd seq.gaphor       # Gaphor project, model + laid-out diagram
 - [Flowchart](./flowchart) — the other Mermaid diagram type kymo imports.
 - [BPMN](./bpmn) — for multi-participant business processes with execution
   semantics.
+
+</DiagramQuickstart>
