@@ -173,9 +173,11 @@ _COLLECT_JS = """
   // Renders go through the mcp worker's caching proxy since PR #294 (kroki.io
   // direct is only the fallback path) — match either for the request window.
   const kroki = res.find((r) => r.name.includes("/api/render/") || r.name.includes("kroki.io"));
-  // The engine is two assets since PR #294: the JS glue chunk plus the .wasm
-  // shipped as its own streaming-compiled file. Sum them for the wire cost.
-  const engineRes = res.filter((r) => r.name.includes("/chunks/engine-") || r.name.endsWith(".wasm"));
+  // The kymo engine is two assets since PR #294: the JS glue chunk plus its
+  // .wasm shipped as a streaming-compiled file. Match the kymo engine
+  // SPECIFICALLY — since PR #315 the mermaid flowchart slice is also a .wasm
+  // (kymo_mermaid_bg-*.wasm) and must not count as "the engine".
+  const engineRes = res.filter((r) => r.name.includes("/chunks/engine-") || r.name.includes("kymostudio_core_bg"));
   const engineKB = Math.round(engineRes.reduce((s, r) => s + r.transferSize, 0) / 1024);
   const fcp = performance.getEntriesByType("paint").find((p) => p.name === "first-contentful-paint");
   return {
