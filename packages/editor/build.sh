@@ -7,6 +7,7 @@ cd "$(dirname "$0")"
 rm -rf dist && mkdir -p dist
 cp web/index.html dist/index.html
 cp web/index.html dist/diagrams.html
+cp web/index.html dist/login.html
 cp web/styles.css dist/styles.css
 cp ../../docs/brand/favicon.svg ../../docs/brand/favicon.ico ../../docs/brand/favicon-32.png ../../docs/brand/favicon-48.png ../../docs/brand/apple-touch-icon.png dist/
 printf '/* /index.html 200\n' > dist/_redirects
@@ -16,6 +17,6 @@ npx esbuild web/main.tsx --bundle --format=esm --splitting --outdir=dist \
 # Cache-bust: Pages serves assets with max-age=14400, so version the URLs —
 # browsers refetch immediately after every deploy instead of up to 4h later.
 V=$(date +%s)
-sed -i "s|/styles.css|/styles.css?v=$V|g; s|/main.js|/main.js?v=$V|g" dist/index.html dist/diagrams.html
+sed -i "s|/styles.css|/styles.css?v=$V|g; s|/main.js|/main.js?v=$V|g" dist/index.html dist/diagrams.html dist/login.html
 
 echo "✓ built dist/ ($(du -sh dist | cut -f1))"

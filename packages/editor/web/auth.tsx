@@ -29,8 +29,8 @@ function ensureGsiInit(g: any) {
 }
 
 type Claims = { email: string; name?: string; sub: string };
-type AuthVal = { idToken: string | null; claims: Claims | null; signOut: () => void };
-const Ctx = createContext<AuthVal>({ idToken: null, claims: null, signOut: () => {} });
+type AuthVal = { idToken: string | null; claims: Claims | null; signOut: () => void; expireSession: () => void };
+const Ctx = createContext<AuthVal>({ idToken: null, claims: null, signOut: () => {}, expireSession: () => {} });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [idToken, setIdToken] = useState<string | null>(() => {
@@ -56,9 +56,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIdToken(null);
     setTimeout(() => (window as any).google?.accounts?.id?.prompt(), 60);
   }, []);
+  // Session lapsed (token expired, or the server 401'd it): drop the stale
+  // claims — unlike signOut, keep auto_select so GIS can renew silently.
+  const expireSession = useCallback(() => {
+    try { localStorage.removeItem("kymo_idtoken"); } catch {}
+    setIdToken(null);
+    (window as any).google?.accounts?.id?.prompt();
+  }, []);
+  // Google id_tokens live ~1h; tokenValid() is only checked at mount. Without
+  // this watchdog a long-lived tab keeps showing "Signed in as …" while every
+  // API call 401s ("Session expired") — expire the moment the token does.
+  useEffect(() => {
+    if (!idToken) return;
+    const exp = jwtField(idToken, "exp");
+    if (!exp) return;
+    const t = setTimeout(expireSession, Math.max(0, exp * 1000 - Date.now() - 30000));
+    return () => clearTimeout(t);
+  }, [idToken, expireSession]);
   const claims = useMemo<Claims | null>(() =>
     idToken ? { email: jwtField(idToken, "email"), name: jwtField(idToken, "name"), sub: jwtField(idToken, "sub") } : null, [idToken]);
-  return <Ctx.Provider value={{ idToken, claims, signOut }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ idToken, claims, signOut, expireSession }}>{children}</Ctx.Provider>;
 }
 export const useAuth = () => useContext(Ctx);
 
