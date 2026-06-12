@@ -11,6 +11,7 @@ on:
       - "packages/docs/**"
       - "docs/guide/**"
       - "docs/diagrams/**"
+      - "samples/**"
       - "docs/brand/logo.svg"
       - "docs/brand/favicon.svg"
       - ".github/workflows/deploy-docs.yml"
