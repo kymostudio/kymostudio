@@ -12,6 +12,8 @@ export default defineConfig({
   head: [["link", { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }]],
   themeConfig: {
     logo: "/logo.svg",
+    // No landing page — the brand mark goes straight to the guide.
+    logoLink: "/guide/",
     siteTitle: "KymoStudio",
     nav: [
       { text: "Guide", link: "/guide/" },

@@ -20,12 +20,16 @@ cp ../../docs/diagrams/flowchart/README.md   site/diagrams/flowchart.md
 cp ../../docs/diagrams/bpmn/README.md        site/diagrams/bpmn.md
 cp ../../docs/diagrams/best-practices.md     site/diagrams/best-practices.md
 cp ../../docs/brand/logo.svg ../../docs/brand/favicon.svg site/public/
+# No landing page — the root redirects straight to the guide (Cloudflare Pages
+# reads _redirects from the deploy root).
+printf '/ /guide/ 302\n' > site/public/_redirects
 
 # Sample images live outside the published subset — point them at the repo raw URLs
 # (VitePress resolves local image assets strictly, unlike dead links).
+# perl -pi (not sed -i) so the script runs on both GNU (CI) and BSD/macOS.
 RAW="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples"
 find site/guide site/diagrams -name '*.md' -exec \
-  sed -i "s|](\.\./\.\./samples/|](${RAW}/|g; s|](\./\.\./\.\./samples/|](${RAW}/|g" {} +
+  perl -pi -e "s|\]\(\.\./\.\./samples/|](${RAW}/|g; s|\]\(\./\.\./\.\./samples/|](${RAW}/|g" {} +
 
 echo "→ vitepress build"
 rm -rf dist
