@@ -138,6 +138,15 @@ pub fn drawio_from_kymojson(json: &str) -> Result<String, JsError> {
     crate::drawio_from_kymojson(json).map_err(|e| JsError::new(&e))
 }
 
+/// Register a font (TTF/OTF bytes) for `<text>` in svgToPng/svgToPdf. The wasm
+/// build has no system fonts and resvg ignores `@font-face`, so callers that
+/// rasterize text (Node CLI, Cloudflare Workers) must register one sans face
+/// up front; it also becomes the generic-family (sans-serif &c.) fallback.
+#[wasm_bindgen(js_name = registerFont)]
+pub fn register_font(bytes: Vec<u8>) {
+    crate::register_font(bytes);
+}
+
 /// The crate version, exposed to JS as `version()`.
 #[wasm_bindgen]
 pub fn version() -> String {

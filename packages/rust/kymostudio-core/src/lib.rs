@@ -35,6 +35,56 @@ mod wasm;
 #[cfg(feature = "bpmn")]
 pub mod bpmn;
 
+/// Fonts registered at runtime for font-less builds. The wasm build has no
+/// system fonts (`system-fonts` is off — no fs/mmap) and resvg does not honor
+/// `@font-face`, so without this every `<text>` element silently disappears
+/// from PNG/PDF output. Registered fonts are loaded into the fontdb on each
+/// render; the first registered face also becomes the generic-family fallback
+/// (sans-serif &c.) so the renderers' CSS stacks resolve.
+static EXTRA_FONTS: std::sync::OnceLock<std::sync::Mutex<Vec<Vec<u8>>>> = std::sync::OnceLock::new();
+
+/// Register a font (TTF/OTF bytes) for `<text>` rendering in [`svg_to_png`] /
+/// [`svg_to_pdf`]. Cumulative; intended for wasm/Workers where no system
+/// fonts exist. On native builds system fonts still load — registered fonts
+/// take over only the generic families.
+pub fn register_font(bytes: Vec<u8>) {
+    EXTRA_FONTS
+        .get_or_init(|| std::sync::Mutex::new(Vec::new()))
+        .lock()
+        .unwrap()
+        .push(bytes);
+}
+
+// One macro, two fontdb crates: resvg 0.47's usvg and svg2pdf's usvg 0.45
+// each re-export their own `fontdb`, so this can't be a typed fn. Faces are
+// scanned past the pre-load count so the fallback family is a *registered*
+// face, not whatever system font happens to sort first on native.
+macro_rules! load_extra_fonts {
+    ($db:expr) => {
+        if let Some(fonts) = EXTRA_FONTS.get() {
+            let fonts = fonts.lock().unwrap();
+            if !fonts.is_empty() {
+                let db = $db;
+                let before = db.faces().count();
+                for data in fonts.iter() {
+                    db.load_font_data(data.clone());
+                }
+                let family = db
+                    .faces()
+                    .skip(before)
+                    .find_map(|f| f.families.first().map(|(name, _)| name.clone()));
+                if let Some(family) = family {
+                    db.set_sans_serif_family(family.clone());
+                    db.set_serif_family(family.clone());
+                    db.set_cursive_family(family.clone());
+                    db.set_fantasy_family(family.clone());
+                    db.set_monospace_family(family);
+                }
+            }
+        }
+    };
+}
+
 /// Something went wrong turning SVG bytes into PNG or PDF bytes.
 #[derive(Debug)]
 pub enum RenderError {
@@ -73,12 +123,12 @@ impl From<usvg::Error> for RenderError {
 ///
 /// On native builds (`system-fonts` feature, the default) system fonts are
 /// loaded so `<text>` elements rasterize correctly. On wasm that feature is
-/// off — supply fonts in the SVG, or the caller resolves them.
+/// off — call [`register_font`] first, or text is dropped.
 pub fn svg_to_png(svg: &[u8], scale: f32) -> Result<Vec<u8>, RenderError> {
-    #[allow(unused_mut)]
     let mut opt = usvg::Options::default();
     #[cfg(feature = "system-fonts")]
     opt.fontdb_mut().load_system_fonts();
+    load_extra_fonts!(opt.fontdb_mut());
 
     let tree = usvg::Tree::from_data(svg, &opt)?;
     let size = tree.size();
@@ -103,16 +153,16 @@ pub fn svg_to_png(svg: &[u8], scale: f32) -> Result<Vec<u8>, RenderError> {
 /// own bundled usvg (0.45), independent of the `resvg` used by [`svg_to_png`],
 /// so there is no `scale`: PDF is resolution-independent. On native builds
 /// (`system-fonts`) system fonts are loaded so `<text>` renders; the wasm build
-/// keeps this path (for the JS CLI) but, with no system fonts, needs fonts
-/// embedded in the SVG for text to appear.
+/// keeps this path (for the JS CLI / Workers) but, with no system fonts, needs
+/// [`register_font`] to be called for text to appear.
 #[cfg(feature = "pdf")]
 pub fn svg_to_pdf(svg: &[u8]) -> Result<Vec<u8>, RenderError> {
     use svg2pdf::usvg as pdf_usvg;
 
-    #[allow(unused_mut)]
     let mut opt = pdf_usvg::Options::default();
     #[cfg(feature = "system-fonts")]
     opt.fontdb_mut().load_system_fonts();
+    load_extra_fonts!(opt.fontdb_mut());
 
     let tree = pdf_usvg::Tree::from_data(svg, &opt).map_err(|e| RenderError::Pdf(e.to_string()))?;
 

@@ -1,0 +1,63 @@
+name: Deploy render API to Cloudflare Workers
+
+# packages/render-api is the kroki-compatible render endpoint
+# (kroki.kymo.studio): kymo/mermaid/d2/graphviz/bpmn render in the worker via
+# the kymostudio JS engine + kymostudio-core wasm, everything else proxies to
+# kroki.io. The wasm is built from source (full `wasm,pdf` surface — svgToPng/
+# svgToPdf/registerFont) so the worker tracks the repo, not npm releases.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/render-api/**"
+      - "packages/js/**"
+      - "packages/rust/kymostudio-core/**"
+      - ".github/workflows/deploy-render-api.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-api-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+      - name: Build kymostudio-core wasm (full — pdf/png + registerFont)
+        working-directory: packages/rust/kymostudio-core
+        run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm,pdf
+      - name: Build packages/js with the fresh core
+        working-directory: packages/js
+        run: |
+          npm ci
+          npm install --no-save ../rust/kymostudio-core/pkg
+          npm run build
+      - name: Install the worker's deps (local engine + core)
+        working-directory: packages/render-api
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          npm install --no-save --no-package-lock ../rust/kymostudio-core/pkg ../js
+      - name: Typecheck
+        working-directory: packages/render-api
+        run: npx tsc --noEmit
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/render-api
+          command: deploy
