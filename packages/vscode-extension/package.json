@@ -1,7 +1,7 @@
 {
   "name": "kymostudio-vscode",
   "displayName": "kymostudio — Diagram Preview",
-  "description": "Type it. See it appear. Watch it animate.",
+  "description": "Prompt it. See it appear. Watch it animate.",
   "version": "0.4.3",
   "license": "Apache-2.0",
   "icon": "media/icon.png",

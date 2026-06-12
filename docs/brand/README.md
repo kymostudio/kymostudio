@@ -4,6 +4,30 @@ Logo and colour reference for **kymo**. The mark is a **K** built from connected
 strokes with diagram-style node handles, on a rounded tile, using the **Mermaid**
 colour palette.
 
+## Brand language — tagline, slogan, positioning
+
+| Line | Text | Where it's used |
+| --- | --- | --- |
+| **Wordmark** | `KymoStudio` (two-tone: `Kymo` primary + `Studio` accent); the product/CLI is **kymo** | banner + hero lockups, site navbars |
+| **Tagline** | `Diagram superpowers` | banner/hero assets (this folder), landing-hero strap, GitHub repo description, docs site description, User Guide intro |
+| **Slogan** | `Prompt it. See it appear. Watch it animate.` | landing hero lead, root README, package registry descriptions (PyPI / npm / crates.io / VS Code Marketplace) |
+| **Positioning** | the diagram renderer for **AI agents** — connect any AI over MCP | strategy direction (`RES-STRATEGY-001`); landing eyebrow + `#mcp` section |
+| **Eyebrow / keywords** | `MCP server · diagram-as-code · animated SVG` | landing hero eyebrow |
+| **One-liner** (listings) | `Diagram superpowers — diagram-as-code → animated SVG, PNG, WebP, Figma & Excalidraw` | GitHub repo About |
+
+Rules of thumb:
+
+- **Tagline is fixed.** "Diagram superpowers" is the one line that appears inside
+  rendered brand assets — changing it means re-rendering `social-preview.png` and
+  both `github-hero-*.png` (see the regeneration commands below) *and* updating
+  every surface in the table.
+- **One slogan everywhere.** "Prompt it. See it appear. Watch it animate." is the
+  single action line (it replaced the earlier "Type it." variant in 2026-06). If
+  it ever changes, keep the three-beat rhythm — verb + `See it appear. Watch it
+  animate.` — and update every surface in the table in the same change.
+- Keep the tagline as the noun phrase and the slogan as the action line — don't
+  merge them into one sentence.
+
 ## Files
 
 | File | Use |

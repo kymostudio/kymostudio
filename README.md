@@ -15,7 +15,7 @@
 </p>
 
 <h3 align="center">
-  Type it. See it appear. Watch it animate.
+  Prompt it. See it appear. Watch it animate.
 </h3>
 
 <p align="center">
