@@ -60,11 +60,13 @@ declare global {
   }
 }
 
+// (Also consumed by web/mermaid.ts, which races this warm-up against a local
+// mermaid.js render.)
 // index.html fires the first share-link render at kroki before this bundle has
 // even downloaded (inline script there). Adopt that in-flight response when the
 // first real render asks for exactly the same diagram; on any mismatch leave it
 // in place — a later render with the matching source may still claim it.
-async function earlyResponse(kind: string, source: string): Promise<Response | null> {
+export async function earlyResponse(kind: string, source: string): Promise<Response | null> {
   const early = window.__earlyKroki;
   if (!early) return null;
   try {
