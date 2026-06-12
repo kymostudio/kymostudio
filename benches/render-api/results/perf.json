@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "timestamp": "2026-06-12T23:53:46+00:00",
+    "mine": "https://render.kymo.studio",
+    "kroki": "https://kroki.io",
+    "reps": 10,
+    "host": "code-server",
+    "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39"
+  },
+  "busted": [
+    {
+      "name": "mermaid/svg (self)",
+      "kind": "mermaid",
+      "format": "svg",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 45,
+        "min_ms": 40,
+        "max_ms": 74
+      },
+      "kroki": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 295,
+        "min_ms": 284,
+        "max_ms": 329
+      }
+    },
+    {
+      "name": "graphviz/svg (self)",
+      "kind": "graphviz",
+      "format": "svg",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 36,
+        "min_ms": 33,
+        "max_ms": 52
+      },
+      "kroki": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 50,
+        "min_ms": 46,
+        "max_ms": 68
+      }
+    },
+    {
+      "name": "graphviz/png (self)",
+      "kind": "graphviz",
+      "format": "png",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 106,
+        "min_ms": 59,
+        "max_ms": 160
+      },
+      "kroki": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 56,
+        "min_ms": 47,
+        "max_ms": 89
+      }
+    },
+    {
+      "name": "kymo/svg (self)",
+      "kind": "kymo",
+      "format": "svg",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 50,
+        "min_ms": 41,
+        "max_ms": 77
+      }
+    },
+    {
+      "name": "plantuml/svg (proxy)",
+      "kind": "plantuml",
+      "format": "svg",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 83,
+        "min_ms": 67,
+        "max_ms": 102
+      },
+      "kroki": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 61,
+        "min_ms": 54,
+        "max_ms": 72
+      }
+    }
+  ],
+  "hits": [
+    {
+      "name": "mermaid/svg",
+      "kind": "mermaid",
+      "format": "svg",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 10,
+        "median_ms": 45,
+        "min_ms": 37,
+        "max_ms": 48
+      }
+    },
+    {
+      "name": "plantuml/svg",
+      "kind": "plantuml",
+      "format": "svg",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 10,
+        "median_ms": 40,
+        "min_ms": 35,
+        "max_ms": 66
+      }
+    }
+  ]
+}
