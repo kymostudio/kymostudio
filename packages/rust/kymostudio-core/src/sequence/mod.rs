@@ -25,6 +25,23 @@ pub struct Sequence {
     pub items: Vec<Item>,
     /// `autonumber` was present (flag only; not modelled in XMI).
     pub autonumber: bool,
+    /// Autonumber start value (mermaid `autonumber <start> <step>`).
+    pub auto_start: i64,
+    /// Autonumber step.
+    pub auto_step: i64,
+    /// Optional `title` line.
+    pub title: String,
+    /// `box ... end` participant groupings.
+    pub boxes: Vec<BoxGroup>,
+}
+
+/// A `box <label> ... end` grouping of participants drawn as a backdrop.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BoxGroup {
+    /// The box label (may include a leading colour word, kept verbatim).
+    pub label: String,
+    /// Participant ids enclosed by the box.
+    pub members: Vec<String>,
 }
 
 /// A lifeline source — `participant` / `actor`, explicit or implicit.
@@ -136,6 +153,10 @@ pub enum FragmentOp {
     Opt,
     /// `par` … `and` …
     Par,
+    /// `critical` … `option` …
+    Critical,
+    /// `break`.
+    Break,
 }
 
 impl FragmentOp {
@@ -146,6 +167,8 @@ impl FragmentOp {
             FragmentOp::Alt => "alt",
             FragmentOp::Opt => "opt",
             FragmentOp::Par => "par",
+            FragmentOp::Critical => "critical",
+            FragmentOp::Break => "break",
         }
     }
 }

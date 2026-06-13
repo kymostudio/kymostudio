@@ -58,8 +58,13 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
         participants: Vec::new(),
         items: Vec::new(),
         autonumber: false,
+        auto_start: 1,
+        auto_step: 1,
+        title: String::new(),
+        boxes: Vec::new(),
     };
     let mut stack: Vec<FragFrame> = Vec::new();
+    let mut box_group: Option<(String, Vec<String>)> = None;
 
     for (lineno, raw) in stmts {
         let stmt = raw.trim();
@@ -70,17 +75,41 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
 
         // Participant / actor declarations.
         if let Some(rest) = strip_kw(stmt, "participant") {
+            let before = seq.participants.len();
             ensure_decl(&mut seq, rest, false);
+            capture_box(&seq, before, &mut box_group);
             continue;
         }
         if let Some(rest) = strip_kw(stmt, "actor") {
+            let before = seq.participants.len();
             ensure_decl(&mut seq, rest, true);
+            capture_box(&seq, before, &mut box_group);
+            continue;
+        }
+        // `title` line.
+        if lower == "title" || lower.starts_with("title ") || lower.starts_with("title:") {
+            seq.title = stmt[5..].trim_start_matches(':').trim().to_string();
+            continue;
+        }
+        // `box [colour] label` opens a participant grouping.
+        if let Some(rest) = strip_kw(stmt, "box") {
+            box_group = Some((rest.trim().to_string(), Vec::new()));
             continue;
         }
 
-        // `autonumber` — flag only.
+        // `autonumber [start [step]]`.
         if lower == "autonumber" || lower.starts_with("autonumber ") {
             seq.autonumber = true;
+            let nums: Vec<i64> = stmt["autonumber".len()..]
+                .split_whitespace()
+                .filter_map(|w| w.parse().ok())
+                .collect();
+            if let Some(&start) = nums.first() {
+                seq.auto_start = start;
+            }
+            if let Some(&step) = nums.get(1) {
+                seq.auto_step = step;
+            }
             continue;
         }
 
@@ -102,9 +131,19 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
             new_operand(&mut stack, *lineno, stmt["and".len()..].trim().to_string())?;
             continue;
         }
+        if lower == "option" || lower.starts_with("option ") {
+            new_operand(
+                &mut stack,
+                *lineno,
+                stmt["option".len()..].trim().to_string(),
+            )?;
+            continue;
+        }
         if lower == "end" {
             if !stack.is_empty() {
                 close_fragment(&mut seq, &mut stack);
+            } else if let Some((label, members)) = box_group.take() {
+                seq.boxes.push(crate::sequence::BoxGroup { label, members });
             }
             continue;
         }
@@ -150,13 +189,30 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
     Ok(seq)
 }
 
-/// `loop`/`alt`/`opt`/`par` opener → (operator, guard label).
+/// If a participant was just added inside an open `box`, record its id.
+fn capture_box(
+    seq: &crate::sequence::Sequence,
+    before: usize,
+    box_group: &mut Option<(String, Vec<String>)>,
+) {
+    if let Some((_, members)) = box_group.as_mut() {
+        if seq.participants.len() > before {
+            if let Some(p) = seq.participants.last() {
+                members.push(p.id.clone());
+            }
+        }
+    }
+}
+
+/// `loop`/`alt`/`opt`/`par`/`critical`/`break` opener → (operator, guard label).
 fn frag_open(lower: &str, stmt: &str) -> Option<(FragmentOp, String)> {
     for (kw, op) in [
         ("loop", FragmentOp::Loop),
         ("alt", FragmentOp::Alt),
         ("opt", FragmentOp::Opt),
         ("par", FragmentOp::Par),
+        ("critical", FragmentOp::Critical),
+        ("break", FragmentOp::Break),
     ] {
         if lower == kw || lower.starts_with(&format!("{kw} ")) {
             return Some((op, stmt[kw.len()..].trim().to_string()));
@@ -444,5 +500,20 @@ mod tests {
             panic!()
         };
         assert_eq!(n1.placement, NotePlacement::LeftOf);
+    }
+
+    #[test]
+    fn autonumber_title_box_and_note() {
+        let s = parse(
+            "sequenceDiagram\ntitle My Flow\nautonumber 10 5\nbox Aqua Group\nparticipant A\nparticipant B\nend\nA->>B: hi\nNote over A,B: shared",
+        );
+        assert_eq!(s.title, "My Flow");
+        assert!(s.autonumber && s.auto_start == 10 && s.auto_step == 5);
+        assert_eq!(s.boxes.len(), 1);
+        assert_eq!(s.boxes[0].members, vec!["A".to_string(), "B".to_string()]);
+        assert!(s
+            .items
+            .iter()
+            .any(|i| matches!(i, crate::sequence::Item::Note(n) if n.text == "shared")));
     }
 }
