@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
-import { useWorkspace } from "./workspace";
+import { useWorkspace, childFoldersOf, flattenTree, descendantFolderIds, type Folder } from "./workspace";
 import { kindLabel } from "./kroki";
 import { DIAGRAMS_API } from "./const";
 import { TemplateGallery, setPendingTemplate, type Template } from "./templates";
-import { Search, Plus, Image as ImageIcon } from "lucide-react";
+import { Search, Plus, Image as ImageIcon, ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, Pencil, Trash2 } from "lucide-react";
 
 type Item = { id: string; title: string; updatedAt: number; ws?: string; kind?: string; hasThumb?: boolean };
 
@@ -27,14 +27,18 @@ function timeAgo(ms: number): string {
 
 export default function DiagramsPage() {
   const { idToken, claims, signOut, expireSession } = useAuth();
-  const { workspaces, currentWs, currentName, setCurrentWs, createWorkspace, renameWorkspace, deleteWorkspace } = useWorkspace();
+  const { folders, createFolder, renameFolder, deleteFolder, moveFolder } = useWorkspace();
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [error, setError] = useState("");
   const [q, setQ] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const [sel, setSel] = useState<Set<string>>(new Set()); // multi-select for bulk delete/move
+  const [sel, setSel] = useState<Set<string>>(new Set());        // bulk-selected diagram ids
+  const [expanded, setExpanded] = useState<Set<string>>(() => {  // open folders (persisted)
+    try { return new Set(JSON.parse(localStorage.getItem("kymo_expanded") || "[]")); } catch { return new Set(); }
+  });
+  const [dragOver, setDragOver] = useState<string | null>(null); // folder id (or "__root__") under the cursor
 
   useEffect(() => { document.title = "Diagrams · Kymostudio"; return () => { document.title = "Kymostudio"; }; }, []);
 
@@ -47,7 +51,7 @@ export default function DiagramsPage() {
     if (!idToken) return;
     try {
       const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
-      if (r.status === 401) { expireSession(); return; } // server says expired → the auth wall redirects to /login
+      if (r.status === 401) { expireSession(); return; }
       if (!r.ok) { setError("Error " + r.status); return; }
       const j = await r.json();
       setError("");
@@ -64,37 +68,49 @@ export default function DiagramsPage() {
     return () => { document.removeEventListener("visibilitychange", vis); window.removeEventListener("focus", load); };
   }, [load]);
 
-  // "New diagram" opens the same type-first template gallery as the editor's
-  // "+ New". The pick seeds a DRAFT in the editor (via setPendingTemplate) —
-  // no room is created until the user saves or makes a first successful edit.
+  const persistExpanded = (s: Set<string>) => { try { localStorage.setItem("kymo_expanded", JSON.stringify([...s])); } catch {} };
+  const toggle = (id: string) => setExpanded((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); persistExpanded(n); return n; });
+
+  // A diagram whose `ws` points at a folder that no longer exists shows at the root.
+  const folderIds = useMemo(() => new Set(folders.map((f) => f.id)), [folders]);
+  const effFolder = useCallback((i: Item) => (i.ws && folderIds.has(i.ws) ? i.ws : ""), [folderIds]);
+  const diagramsIn = useCallback(
+    (fid: string) => items.filter((i) => effFolder(i) === fid).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)),
+    [items, effFolder]
+  );
+
   function pickTemplate(t: Template) {
     setGalleryOpen(false);
     setPendingTemplate({ source: t.source, kind: t.kind });
     navigate("/");
   }
 
-  async function onNewWorkspace() {
-    const name = (window.prompt("Workspace name") || "").trim();
+  // ---- folder ops (prompt/confirm, like the old workspace bar) ----
+  async function onNewFolder(parentId: string) {
+    const name = (window.prompt("Folder name") || "").trim();
     if (!name) return;
-    const ws = await createWorkspace(name);
-    if (ws) setCurrentWs(ws.id);
+    const f = await createFolder(name, parentId);
+    if (f && parentId) setExpanded((s) => { const n = new Set(s); n.add(parentId); persistExpanded(n); return n; });
   }
-  async function onRenameWorkspace() {
-    const name = (window.prompt("Rename workspace", currentName) || "").trim();
-    if (name && name !== currentName) await renameWorkspace(currentWs, name);
+  async function onRenameFolder(f: Folder) {
+    const name = (window.prompt("Rename folder", f.name) || "").trim();
+    if (name && name !== f.name) await renameFolder(f.id, name);
   }
-  async function onDeleteWorkspace() {
-    if (!window.confirm(`Delete workspace "${currentName}"? Its diagrams move back to Personal.`)) return;
-    await deleteWorkspace(currentWs);
+  async function onDeleteFolder(f: Folder) {
+    if (!window.confirm(`Delete folder "${f.name}"? Its diagrams and subfolders move up one level.`)) return;
+    await deleteFolder(f.id);
     load();
   }
 
-  async function move(dd: Item, ws: string) {
+  // ---- move a diagram to a folder ("" = root) ----
+  async function moveDiagram(id: string, folderId: string) {
     if (!idToken) return;
+    const it = items.find((i) => i.id === id);
+    if (it && effFolder(it) === folderId) return; // already there
     try {
       const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
         method: "PATCH", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ id: dd.id, ws }),
+        body: JSON.stringify({ id, ws: folderId }),
       });
       if (!r.ok) { setError(`Move failed (${r.status})`); return; }
       load();
@@ -111,11 +127,10 @@ export default function DiagramsPage() {
     } catch (e: any) { setError("Delete failed: " + e.message); }
   }
 
-  // ---- bulk selection (clean up the "Untitled" pile-up in one go) ----
+  // ---- bulk selection ----
   const toggleSel = (id: string) => setSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const clearSel = () => setSel(new Set());
-  // Selection is scoped to what's visible — reset it when the workspace/search changes.
-  useEffect(() => { setSel(new Set()); }, [currentWs, q]);
+  useEffect(() => { setSel(new Set()); }, [q]);
 
   async function bulkDelete() {
     if (!idToken || !sel.size) return;
@@ -125,27 +140,116 @@ export default function DiagramsPage() {
         fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" })
           .then((r) => r.ok).catch(() => false)));
       if (results.some((ok) => !ok)) setError("Some diagrams could not be deleted.");
-      clearSel();
-      load();
+      clearSel(); load();
     } catch (e: any) { setError("Delete failed: " + e.message); }
   }
-  async function bulkMove(ws: string) {
+  async function bulkMove(folderId: string) {
     if (!idToken || !sel.size) return;
     try {
       await Promise.all([...sel].map((id) =>
         fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
           method: "PATCH", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ id, ws }),
+          body: JSON.stringify({ id, ws: folderId }),
         }).catch(() => {})));
-      clearSel();
-      load();
+      clearSel(); load();
     } catch (e: any) { setError("Move failed: " + e.message); }
   }
 
-  const inWs = items.filter((i) => (i.ws || "") === currentWs);
-  const filtered = q.trim()
-    ? inWs.filter((i) => (i.title || "Untitled").toLowerCase().includes(q.trim().toLowerCase()))
-    : inWs;
+  // ---- drag & drop (HTML5) ----
+  function dragStart(e: React.DragEvent, kind: "diagram" | "folder", id: string) {
+    e.dataTransfer.setData("text/plain", kind + ":" + id);
+    e.dataTransfer.effectAllowed = "move";
+  }
+  function allowDrop(e: React.DragEvent, target: string) {
+    e.preventDefault(); e.dataTransfer.dropEffect = "move";
+    if (dragOver !== target) setDragOver(target);
+  }
+  async function dropOn(e: React.DragEvent, targetFolderId: string) {
+    e.preventDefault(); e.stopPropagation(); setDragOver(null);
+    const data = e.dataTransfer.getData("text/plain"); const [kind, id] = data.split(":");
+    if (kind === "diagram" && id) await moveDiagram(id, targetFolderId);
+    else if (kind === "folder" && id && id !== targetFolderId) {
+      const ok = await moveFolder(id, targetFolderId);
+      if (!ok) setError("Can't move a folder into itself.");
+    }
+  }
+
+  // ---- move-to-folder <select> (no-drag fallback, e.g. mobile) ----
+  const flat = useMemo(() => flattenTree(folders), [folders]);
+  function MoveSelect({ value, onPick, forbid }: { value: string; onPick: (id: string) => void; forbid?: Set<string> }) {
+    return (
+      <select className="rmove" value={value} title="Move to folder"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onChange={(e) => { e.stopPropagation(); onPick(e.target.value); }}>
+        <option value="">My Diagrams</option>
+        {flat.map(({ folder, depth }) => (
+          <option key={folder.id} value={folder.id} disabled={forbid?.has(folder.id)}>
+            {" ".repeat(depth * 2) + folder.name}
+          </option>
+        ))}
+      </select>
+    );
+  }
+
+  function DiagramRow(dd: Item, depth: number) {
+    return (
+      <a key={dd.id} className={"rrow" + (sel.has(dd.id) ? " selected" : "")} href={"/?d=" + encodeURIComponent(dd.id)}
+        style={{ paddingLeft: 10 + depth * 22 }}
+        draggable onDragStart={(e) => dragStart(e, "diagram", dd.id)}
+        onClick={(e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+          e.preventDefault(); navigate("/?d=" + encodeURIComponent(dd.id));
+        }}>
+        <input type="checkbox" className="rcheck" checked={sel.has(dd.id)} aria-label="Select diagram"
+          onClick={(e) => e.stopPropagation()} onChange={(e) => { e.stopPropagation(); toggleSel(dd.id); }} />
+        <span className="rthumb">
+          {dd.hasThumb
+            ? <img loading="lazy" alt="" src={`${DIAGRAMS_API}/thumb?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken || "")}`}
+                onError={(e) => { (e.currentTarget.parentElement as HTMLElement).classList.add("empty"); e.currentTarget.remove(); }} />
+            : <ImageIcon size={16} strokeWidth={1.8} />}
+        </span>
+        <span className="rtitle">{dd.title || "Untitled"}</span>
+        {dd.kind && <span className="rkind">{kindLabel(dd.kind)}</span>}
+        <MoveSelect value={effFolder(dd)} onPick={(fid) => moveDiagram(dd.id, fid)} />
+        <button className="rdel" title="Delete diagram" onClick={(e) => { e.preventDefault(); e.stopPropagation(); remove(dd); }}>Delete</button>
+        <span className="rtime">{timeAgo(dd.updatedAt)}</span>
+      </a>
+    );
+  }
+
+  // Recursive level render: folders (each with its subtree when open) then diagrams.
+  function renderLevel(parentId: string, depth: number): React.ReactNode[] {
+    const out: React.ReactNode[] = [];
+    for (const f of childFoldersOf(folders, parentId).sort((a, b) => a.name.localeCompare(b.name))) {
+      const open = expanded.has(f.id);
+      const count = childFoldersOf(folders, f.id).length + diagramsIn(f.id).length;
+      const forbid = descendantFolderIds(folders, f.id); // can't move this folder into its own subtree
+      out.push(
+        <div key={"f" + f.id} className={"frow" + (dragOver === f.id ? " dragover" : "")} style={{ paddingLeft: 8 + depth * 22 }}
+          draggable onDragStart={(e) => { e.stopPropagation(); dragStart(e, "folder", f.id); }}
+          onDragOver={(e) => allowDrop(e, f.id)} onDragLeave={() => setDragOver((d) => (d === f.id ? null : d))}
+          onDrop={(e) => dropOn(e, f.id)} onClick={() => toggle(f.id)}>
+          <span className="fchev">{open ? <ChevronDown size={16} strokeWidth={2.2} /> : <ChevronRight size={16} strokeWidth={2.2} />}</span>
+          <FolderIcon size={17} strokeWidth={1.9} className="ficon" />
+          <span className="fname">{f.name}</span>
+          <span className="fcount">{count || ""}</span>
+          <span className="factions" onClick={(e) => e.stopPropagation()}>
+            <button title="New subfolder" onClick={() => onNewFolder(f.id)}><FolderPlus size={15} strokeWidth={2} /></button>
+            <button title="Rename folder" onClick={() => onRenameFolder(f)}><Pencil size={15} strokeWidth={2} /></button>
+            <button title="Delete folder" onClick={() => onDeleteFolder(f)}><Trash2 size={15} strokeWidth={2} /></button>
+          </span>
+        </div>
+      );
+      if (open) out.push(...renderLevel(f.id, depth + 1));
+    }
+    for (const dd of diagramsIn(parentId)) out.push(DiagramRow(dd, depth));
+    return out;
+  }
+
+  const searching = q.trim().toLowerCase();
+  const searchResults = searching
+    ? items.filter((i) => (i.title || "Untitled").toLowerCase().includes(searching))
+    : [];
 
   return (
     <main className="scroll" style={{ height: "100%" }}>
@@ -154,47 +258,34 @@ export default function DiagramsPage() {
         <div className="page-head">
           <h1>Diagrams</h1>
           <div className="head-actions">
+            {claims && <button className="pill" onClick={() => onNewFolder("")}><FolderPlus size={15} strokeWidth={2} />New folder</button>}
             {claims && <button className="pill pill-dark" onClick={() => setGalleryOpen(true)} aria-haspopup="dialog">New diagram</button>}
           </div>
         </div>
 
-        {!claims ? null /* the auth wall above is redirecting to /login */ : (
+        {!claims ? null : (
           <>
-            <div className="ws-bar">
-              <button className={"ws-pill" + (currentWs === "" ? " active" : "")} onClick={() => setCurrentWs("")}>Personal</button>
-              {workspaces.map((w) => (
-                <button key={w.id} className={"ws-pill" + (currentWs === w.id ? " active" : "")} onClick={() => setCurrentWs(w.id)}>{w.name}</button>
-              ))}
-              <button className="ws-pill ws-add" onClick={onNewWorkspace} title="New workspace"><Plus size={14} strokeWidth={2.2} /></button>
-              {currentWs && (
-                <span className="ws-actions">
-                  <button className="linklike" onClick={onRenameWorkspace}>Rename</button>
-                  <button className="linklike" onClick={onDeleteWorkspace}>Delete</button>
-                </span>
-              )}
-            </div>
             <div className="search">
               <Search size={17} strokeWidth={2} />
               <input placeholder="Search diagrams…" value={q} onChange={(e) => setQ(e.target.value)} />
             </div>
-            {/* bulk toolbar: select-all toggle, and (when something is picked) delete / move */}
-            {!!filtered.length && (
+            {!!(searching ? searchResults.length : items.length) && (
               <div className={"bulk-bar" + (sel.size ? " active" : "")}>
                 <label className="bulk-all">
                   <input type="checkbox"
-                    checked={sel.size > 0 && sel.size === filtered.length}
-                    ref={(el) => { if (el) el.indeterminate = sel.size > 0 && sel.size < filtered.length; }}
-                    onChange={(e) => setSel(e.target.checked ? new Set(filtered.map((i) => i.id)) : new Set())} />
+                    checked={sel.size > 0 && sel.size === (searching ? searchResults.length : items.length)}
+                    ref={(el) => { if (el) el.indeterminate = sel.size > 0 && sel.size < (searching ? searchResults.length : items.length); }}
+                    onChange={(e) => setSel(e.target.checked ? new Set((searching ? searchResults : items).map((i) => i.id)) : new Set())} />
                   {sel.size ? `${sel.size} selected` : "Select"}
                 </label>
                 {!!sel.size && (
                   <span className="bulk-actions">
                     <button className="bulk-del" onClick={bulkDelete}>Delete</button>
-                    <select className="bulk-move" defaultValue="" title="Move selected to workspace"
-                      onChange={(e) => { if (e.target.value !== "__") bulkMove(e.target.value); e.target.value = "__"; }}>
+                    <select className="bulk-move" defaultValue="__" title="Move selected to folder"
+                      onChange={(e) => { if (e.target.value !== "__") bulkMove(e.target.value === "__root" ? "" : e.target.value); e.target.value = "__"; }}>
                       <option value="__">Move to…</option>
-                      <option value="">Personal</option>
-                      {workspaces.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+                      <option value="__root">My Diagrams</option>
+                      {flat.map(({ folder, depth }) => <option key={folder.id} value={folder.id}>{" ".repeat(depth * 2) + folder.name}</option>)}
                     </select>
                     <button className="linklike" onClick={clearSel}>Clear</button>
                   </span>
@@ -202,47 +293,23 @@ export default function DiagramsPage() {
               </div>
             )}
             {error && <div className="empty">{error}</div>}
-            <div className="rows">
+
+            {/* tree (root is also a drop target → move to top level) */}
+            <div className={"rows tree" + (dragOver === "__root__" ? " dragover-root" : "")}
+              onDragOver={(e) => allowDrop(e, "__root__")} onDragLeave={() => setDragOver((d) => (d === "__root__" ? null : d))}
+              onDrop={(e) => dropOn(e, "")}>
               {!loaded && !items.length && !error && [0, 1, 2].map((i) => (
                 <div key={"skel" + i} className="rrow">
                   <span className="rtitle"><span className="skeleton" style={{ width: 180 }} /></span>
                   <span className="rtime"><span className="skeleton" style={{ width: 80 }} /></span>
                 </div>
               ))}
-              {filtered.map((dd) => (
-                <a key={dd.id} className={"rrow" + (sel.has(dd.id) ? " selected" : "")} href={"/?d=" + encodeURIComponent(dd.id)}
-                  onClick={(e) => {
-                    // SPA navigation → the editor's boot loader shows instead of a blank full-page reload
-                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-                    e.preventDefault();
-                    navigate("/?d=" + encodeURIComponent(dd.id));
-                  }}>
-                  <input type="checkbox" className="rcheck" checked={sel.has(dd.id)} aria-label="Select diagram"
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => { e.stopPropagation(); toggleSel(dd.id); }} />
-                  <span className="rthumb">
-                    {dd.hasThumb
-                      ? <img loading="lazy" alt="" src={`${DIAGRAMS_API}/thumb?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken || "")}`}
-                          onError={(e) => { (e.currentTarget.parentElement as HTMLElement).classList.add("empty"); e.currentTarget.remove(); }} />
-                      : <ImageIcon size={16} strokeWidth={1.8} />}
-                  </span>
-                  <span className="rtitle">{dd.title || "Untitled"}</span>
-                  {dd.kind && <span className="rkind">{kindLabel(dd.kind)}</span>}
-                  <select className="rmove" value={dd.ws || ""} title="Move to workspace"
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                    onChange={(e) => { e.stopPropagation(); move(dd, e.target.value); }}>
-                    <option value="">Personal</option>
-                    {workspaces.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
-                  </select>
-                  <button className="rdel" title="Delete diagram"
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); remove(dd); }}>Delete</button>
-                  <span className="rtime">{timeAgo(dd.updatedAt)}</span>
-                </a>
-              ))}
-              {loaded && !filtered.length && !error && (
-                <div className="empty">{q ? "No diagrams match your search." : "No diagrams yet — create one."}</div>
+              {searching ? searchResults.map((dd) => DiagramRow(dd, 0)) : renderLevel("", 0)}
+              {loaded && (searching ? !searchResults.length : !items.length && !folders.length) && !error && (
+                <div className="empty">{searching ? "No diagrams match your search." : "No diagrams yet — create one."}</div>
               )}
             </div>
+
             <div className="foot">
               <span>Signed in as {claims.email}</span>
               <button className="linklike" onClick={signOut}>Sign out</button>
