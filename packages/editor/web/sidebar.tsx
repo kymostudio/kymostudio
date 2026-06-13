@@ -9,7 +9,7 @@ import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
   ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
-  Files, Search, Shapes, Settings, BookOpen, LayoutGrid, LogOut, Menu,
+  Files, Search, Shapes, BookOpen, LayoutGrid, LogOut, Menu,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
@@ -260,9 +260,10 @@ export function TemplatesPanel({ onPick, onClose }: { onPick: (t: Template) => v
 }
 
 // =============================== Activity bar ================================
-export function ActivityBar({ active, onSelect, onToggle }: { active: Panel | null; onSelect: (p: Panel) => void; onToggle: () => void }) {
+export function ActivityBar({ active, onSelect, onNewDiagram }: { active: Panel | null; onSelect: (p: Panel) => void; onNewDiagram: () => void }) {
   const { claims, signOut } = useAuth();
-  const [menu, setMenu] = useState<"account" | "settings" | null>(null);
+  const { createFolder } = useWorkspace();
+  const [menu, setMenu] = useState<"main" | "account" | null>(null);
   useEffect(() => {
     if (!menu) return;
     const h = () => setMenu(null);
@@ -270,6 +271,11 @@ export function ActivityBar({ active, onSelect, onToggle }: { active: Panel | nu
     return () => document.removeEventListener("click", h);
   }, [menu]);
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
+  async function newFolder() {
+    setMenu(null);
+    const name = (window.prompt("Folder name") || "").trim();
+    if (name) await createFolder(name, "");
+  }
   const Btn = ({ id, label, children }: { id: Panel; label: string; children: React.ReactNode }) => (
     <button className={"act-btn" + (active === id ? " active" : "")} title={label} aria-label={label}
       aria-pressed={active === id} onClick={() => onSelect(id)}>{children}</button>
@@ -277,7 +283,20 @@ export function ActivityBar({ active, onSelect, onToggle }: { active: Panel | nu
   return (
     <nav className="activitybar" onClick={(e) => e.stopPropagation()}>
       <div className="act-group">
-        <button className="act-btn act-menu" onClick={onToggle} title="Toggle sidebar" aria-label="Toggle sidebar"><Menu size={22} strokeWidth={2} /></button>
+        <div className="act-pop-wrap">
+          <button className="act-btn act-menu" title="Menu" aria-label="Menu" aria-haspopup="menu"
+            onClick={() => setMenu((m) => (m === "main" ? null : "main"))}><Menu size={22} strokeWidth={2} /></button>
+          {menu === "main" && (
+            <div className="acct-menu act-popover act-popover-top">
+              <button className="acct-item exp-item" onClick={() => { setMenu(null); onNewDiagram(); }}><FilePlus2 size={16} strokeWidth={1.9} />New diagram</button>
+              <button className="acct-item exp-item" onClick={newFolder}><FolderPlus size={16} strokeWidth={1.9} />New folder</button>
+              <div className="menu-sep" />
+              <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMenu(null)}><LayoutGrid size={16} strokeWidth={1.9} />All diagrams</Link>
+              <Link className="acct-item exp-item" to="/trash" onClick={() => setMenu(null)}><Trash2 size={16} strokeWidth={1.9} />Trash</Link>
+              <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
+            </div>
+          )}
+        </div>
         <Btn id="explorer" label="Explorer"><Files size={22} strokeWidth={1.7} /></Btn>
         <Btn id="search" label="Search"><Search size={22} strokeWidth={1.9} /></Btn>
         <Btn id="templates" label="Templates"><Shapes size={22} strokeWidth={1.8} /></Btn>
@@ -292,17 +311,6 @@ export function ActivityBar({ active, onSelect, onToggle }: { active: Panel | nu
             <div className="acct-menu act-popover">
               <div className="acct-head">Signed in as<b>{claims?.email}</b></div>
               <button className="acct-item" onClick={() => { setMenu(null); signOut(); }}><LogOut size={15} strokeWidth={2} />Sign out</button>
-            </div>
-          )}
-        </div>
-        <div className="act-pop-wrap">
-          <button className="act-btn" title="Settings" aria-label="Settings" aria-haspopup="menu"
-            onClick={() => setMenu((m) => (m === "settings" ? null : "settings"))}><Settings size={21} strokeWidth={1.8} /></button>
-          {menu === "settings" && (
-            <div className="acct-menu act-popover">
-              <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMenu(null)}><LayoutGrid size={16} strokeWidth={1.9} />All diagrams</Link>
-              <Link className="acct-item exp-item" to="/trash" onClick={() => setMenu(null)}><Trash2 size={16} strokeWidth={1.9} />Trash</Link>
-              <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
             </div>
           )}
         </div>
