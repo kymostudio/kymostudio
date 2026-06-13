@@ -5,6 +5,7 @@
 // Because these ARE kroki's engines, a source they reject would be rejected
 // by kroki identically — so dispatch treats them as authoritative (errors are
 // final 400s, no fallback hop).
+import { run as dbmlToDot } from "@softwaretechnik/dbml-renderer";
 import renderBytefield from "bytefield-svg";
 import JSON5 from "json5";
 import { renderSvg } from "nomnoml";
@@ -14,6 +15,7 @@ import { expressionInterpreter } from "vega-interpreter";
 import { compile as vegaLiteCompile } from "vega-lite";
 import wavedrom from "wavedrom";
 
+import { graphvizToSvg } from "./graphviz/index.js";
 import { pikchrToSvg } from "./pikchr/index.js";
 
 // workerd forbids new Function(), which vega's default expression compiler
@@ -37,6 +39,12 @@ function parseSpec(source: string): Record<string, unknown> {
 
 export const JS_RENDERERS: Record<string, (source: string) => string | Promise<string>> = {
   bytefield: (source) => renderBytefield(source),
+  // dbml-renderer emits DOT (its own svg path runs the legacy viz.js — see
+  // viz-sync-stub.ts); real graphviz lays the tables out.
+  dbml: (source) => graphvizToSvg(dbmlToDot(source, "dot")),
+  // Real graphviz replaces the core's flowchart-subset DOT importer for this
+  // kind (the subset still powers d2 and the kymo flowchart pipeline).
+  graphviz: (source) => graphvizToSvg(source),
   nomnoml: (source) => renderSvg(source),
   pikchr: (source) => pikchrToSvg(source),
   vega: (source) => vegaToSvg(parseSpec(source)),
