@@ -97,19 +97,29 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
             continue;
         }
 
-        // `autonumber [start [step]]`.
+        // `autonumber [start [step]]` / `autonumber off` — a timeline item so
+        // mid-stream changes apply only to subsequent messages.
         if lower == "autonumber" || lower.starts_with("autonumber ") {
-            seq.autonumber = true;
-            let nums: Vec<i64> = stmt["autonumber".len()..]
-                .split_whitespace()
-                .filter_map(|w| w.parse().ok())
-                .collect();
-            if let Some(&start) = nums.first() {
+            let arg = stmt["autonumber".len()..].trim();
+            let spec = if arg.eq_ignore_ascii_case("off") {
+                None
+            } else {
+                let nums: Vec<i64> = arg
+                    .split_whitespace()
+                    .filter_map(|w| w.parse().ok())
+                    .collect();
+                let start = nums.first().copied().unwrap_or(1);
+                let step = nums.get(1).copied().unwrap_or(1);
+                seq.autonumber = true;
                 seq.auto_start = start;
-            }
-            if let Some(&step) = nums.get(1) {
                 seq.auto_step = step;
-            }
+                Some((start, step))
+            };
+            push_item(
+                &mut seq,
+                &mut stack,
+                crate::sequence::Item::Autonumber(spec),
+            );
             continue;
         }
 
@@ -515,5 +525,21 @@ mod tests {
             .items
             .iter()
             .any(|i| matches!(i, crate::sequence::Item::Note(n) if n.text == "shared")));
+    }
+
+    #[test]
+    fn autonumber_timeline_midstream() {
+        use crate::sequence::Item;
+        let s =
+            parse("sequenceDiagram\nA->>B: a\nautonumber 10 5\nA->>B: b\nautonumber off\nA->>B: c");
+        let autos: Vec<_> = s
+            .items
+            .iter()
+            .filter_map(|i| match i {
+                Item::Autonumber(spec) => Some(*spec),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(autos, vec![Some((10, 5)), None]);
     }
 }
