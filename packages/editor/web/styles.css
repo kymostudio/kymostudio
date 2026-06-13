@@ -180,11 +180,13 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-folder, .sb-file { position: relative; display: flex; align-items: center; gap: 5px; padding: 2px 8px; font-size: 13px; line-height: 1.46; cursor: pointer; color: var(--ink); white-space: nowrap; user-select: none; }
 .sb-folder:hover, .sb-file:hover { background: var(--bg-raise); }
 .sb-folder { font-weight: 400; }
-/* VS Code-style indent guides: one stretched border-left per ancestor level */
-/* margin bleeds the guide into the row's 2px vertical padding so consecutive
-   segments touch — one continuous line instead of dashes */
-.sb-guide { flex: none; width: 13px; align-self: stretch; margin: -2px 0; border-left: 1px solid var(--border); }
-.sb-guide.on { border-left-color: var(--dim); } /* active subtree — neutral, not a loud accent */
+/* VS Code-style indent guides: one stretched 1px line per ancestor level.
+   The line sits at the cell's horizontal centre (left:7px) so it lands under
+   the parent folder's chevron centre, not its left edge. The ::before bleeds
+   into the row's 2px vertical padding so segments touch — one continuous line. */
+.sb-guide { position: relative; flex: none; width: 13px; align-self: stretch; }
+.sb-guide::before { content: ""; position: absolute; left: 7px; top: -2px; bottom: -2px; width: 1px; background: var(--border); }
+.sb-guide.on::before { background: var(--dim); } /* active subtree — neutral, not a loud accent */
 .sb-spacer { flex: none; width: 14px; } /* lines a file's icon up under a folder's icon */
 .sb-chev, .sb-icon { flex: none; color: var(--dim); display: inline-flex; }
 .sb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
