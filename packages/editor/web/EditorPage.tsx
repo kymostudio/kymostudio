@@ -14,7 +14,7 @@ import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
 import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } from "./sidebar";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, LayoutGrid, Trash2, LogOut } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -446,6 +446,10 @@ export default function EditorPage() {
   return (
     <div className="layout">
       <header>
+        {/* phones have no activity-bar rail → a hamburger opens the file drawer */}
+        {claims && !shared && (
+          <button className="hdr-menu mob-only" onClick={() => selectPanel("explorer")} title="Files" aria-label="Files"><Menu size={18} strokeWidth={2.2} /></button>
+        )}
         {/* identity & document: logo → your Diagrams when signed in (the natural
             "home"), else the product site; then workspace, editable title, sync state */}
         {claims
@@ -555,6 +559,12 @@ export default function EditorPage() {
                   <Code2 size={17} strokeWidth={1.9} />
                   Source (.kymo)
                 </button>
+                {claims && <>
+                  <div className="menu-sep" />
+                  <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMoreOpen(false)}><LayoutGrid size={17} strokeWidth={1.9} />All diagrams</Link>
+                  <Link className="acct-item exp-item" to="/trash" onClick={() => setMoreOpen(false)}><Trash2 size={17} strokeWidth={1.9} />Trash</Link>
+                  <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); signOut(); }}><LogOut size={17} strokeWidth={1.9} />Sign out</button>
+                </>}
               </div>
             )}
           </div>

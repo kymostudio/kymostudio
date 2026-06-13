@@ -188,8 +188,9 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 /* phones: the rail stays pinned at the left; the panel slides in as a drawer
    beside it, with a backdrop over the editor area. */
 @media (max-width: 720px) {
-  .sidebar { position: fixed; top: 0; bottom: 0; left: 52px; z-index: 40; width: min(260px, 74vw); box-shadow: 0 8px 40px rgba(36, 33, 49, 0.28); }
-  .sb-backdrop { display: block; position: fixed; top: 0; bottom: 0; right: 0; left: 52px; z-index: 39; background: rgba(36, 33, 49, 0.35); }
+  /* the activity-bar rail is hidden on phones, so the drawer fills from the edge */
+  .sidebar { position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; width: min(280px, 82vw); box-shadow: 0 8px 40px rgba(36, 33, 49, 0.28); }
+  .sb-backdrop { display: block; position: fixed; inset: 0; z-index: 39; background: rgba(36, 33, 49, 0.35); }
 }
 
 .status { font: 12px/1.5 var(--mono); padding: 7px 14px; border-top: 1px solid var(--border); color: var(--dim); min-height: 28px; white-space: pre-wrap; background: var(--bg); }
@@ -238,9 +239,10 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .rows { margin-top: 6px; }
 .rrow { display: flex; align-items: center; gap: 14px; padding: 18px 10px; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--ink); }
 .rrow:hover { background: var(--bg-soft); }
-.rthumb { flex: none; width: 60px; height: 42px; border: 1px solid var(--border); border-radius: 8px; background: #fff; display: grid; place-items: center; overflow: hidden; color: var(--border-strong); }
-.rthumb.empty { background: var(--bg-soft); }
-.rthumb img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; padding: 3px; }
+.rthumb { position: relative; flex: none; width: 60px; height: 42px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-soft); display: grid; place-items: center; overflow: hidden; color: var(--border-strong); }
+.rthumb-ph { color: var(--border-strong); }
+/* the thumbnail overlays the placeholder icon; on load error the <img> removes itself → icon shows */
+.rthumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 3px; background: #fff; }
 .rtitle { font-size: 15px; font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rtime { color: var(--dim); font-size: 13.5px; min-width: 110px; text-align: right; flex: none; }
 .rdel { opacity: 0; background: transparent; border: 0; color: var(--dim); font-size: 13px; font-weight: 500; cursor: pointer; padding: 4px 9px; border-radius: 7px; flex: none; }
@@ -451,4 +453,34 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
 /* touch devices: hover-revealed affordances must be visible up front */
 @media (hover: none) {
   .diagram-name .pencil { opacity: 1; }
+}
+
+/* ---- review batch: rename / empty folder / toast / mobile chrome ---- */
+.sb-empty-row { font-size: 12px; color: var(--dim); font-style: italic; padding: 4px 8px; }
+/* rename mini-button on the /diagrams rows (fades in on hover like delete) */
+.rmini { opacity: 0; flex: none; border: 0; background: transparent; color: var(--dim); padding: 5px; border-radius: 7px; display: inline-flex; }
+.rrow:hover .rmini, .rmini:focus-visible { opacity: 1; }
+.rmini:hover { color: var(--accent); background: var(--bg-raise); transform: none; box-shadow: none; }
+.frow-empty { padding: 10px 10px; font-size: 13px; color: var(--dim); font-style: italic; border-bottom: 1px solid var(--border); }
+
+/* header hamburger (phones only — opens the file drawer since the rail is hidden) */
+.hdr-menu { flex: none; padding: 7px; border-color: transparent; background: transparent; color: var(--ink); }
+.hdr-menu:hover { background: var(--bg-soft); border-color: transparent; transform: none; box-shadow: none; }
+.mob-only { display: none; }
+
+/* undo / status snackbar */
+.toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 70; display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 28px); padding: 11px 12px 11px 16px; background: var(--ink); color: #fff; border-radius: 11px; box-shadow: 0 10px 30px rgba(36, 33, 49, 0.3); font: 13.5px/1.4 var(--font); }
+.toast-msg { font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.toast-action { flex: none; background: transparent; border: 0; color: #fff; font-weight: 700; font-size: 13.5px; padding: 4px 8px; border-radius: 7px; text-decoration: underline; }
+.toast-action:hover { background: rgba(255, 255, 255, 0.14); transform: none; box-shadow: none; border: 0; }
+.toast-x { flex: none; background: transparent; border: 0; color: rgba(255, 255, 255, 0.7); padding: 4px; border-radius: 6px; display: inline-flex; }
+.toast-x:hover { background: rgba(255, 255, 255, 0.14); color: #fff; transform: none; box-shadow: none; border: 0; }
+
+/* phones: hide the activity-bar rail + folder switcher so the header is one row;
+   the hamburger opens the Explorer as a drawer. (Placed last so it wins.) */
+@media (max-width: 720px) {
+  .activitybar { display: none; }
+  .ws-switch, .sep { display: none; }
+  .mob-only { display: inline-flex; }
+  .nav-group { order: 0; flex-basis: auto; }
 }

@@ -563,10 +563,23 @@ export default {
         const id = url.searchParams.get("id") || "";
         if (!id) return new Response("missing id", { status: 400, headers: cors });
         await ensureThumbColumn(env);
-        const row = await env.DB.prepare("SELECT thumb FROM diagrams WHERE id = ?1 AND owner = ?2")
-          .bind(id, email).first<{ thumb: string | null }>();
-        if (!row || !row.thumb) return new Response("no thumb", { status: 404, headers: cors });
-        return new Response(row.thumb, { headers: { "content-type": "image/svg+xml", "cache-control": "private, max-age=120", ...cors } });
+        const row = await env.DB.prepare("SELECT thumb, source, kind FROM diagrams WHERE id = ?1 AND owner = ?2")
+          .bind(id, email).first<{ thumb: string | null; source: string | null; kind: string | null }>();
+        if (!row) return new Response("no thumb", { status: 404, headers: cors });
+        let thumb = row.thumb || "";
+        // Backfill on demand: a diagram saved before the thumb feature (or whose
+        // render failed) has source but no thumb — render it now, once, and store.
+        if (!thumb && row.source && row.source.trim()) {
+          try {
+            const r = await fetch(`https://render.kymo.studio/${encodeURIComponent(row.kind || "kymo")}/svg`, {
+              method: "POST", headers: { "content-type": "text/plain" }, body: row.source,
+            });
+            if (r.ok) { const s = await r.text(); if (s.length <= 40_000 && s.includes("<svg")) thumb = s; }
+          } catch {}
+          if (thumb) await env.DB.prepare("UPDATE diagrams SET thumb = ?1 WHERE id = ?2 AND owner = ?3").bind(thumb, id, email).run();
+        }
+        if (!thumb) return new Response("no thumb", { status: 404, headers: cors });
+        return new Response(thumb, { headers: { "content-type": "image/svg+xml", "cache-control": "private, max-age=120", ...cors } });
       }
 
       // Trash: list / restore / permanently delete soft-deleted diagrams + folders.
@@ -701,11 +714,31 @@ export default {
         return Response.json({ ok: true }, { headers: cors });
       }
       if (request.method === "PATCH") {
-        // move a diagram to a workspace ("" = Personal)
-        const b = (await request.json().catch(() => ({}))) as { id?: string; ws?: string };
+        // move a diagram to a folder ("" = root) and/or rename it
+        const b = (await request.json().catch(() => ({}))) as { id?: string; ws?: string; title?: string };
         if (!b.id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
-        await assignWorkspace(env, email, b.id, b.ws || "");
+        if (b.title !== undefined) {
+          const title = (b.title || "").trim().slice(0, 60) || "Untitled";
+          const owned = await env.DB.prepare("SELECT 1 FROM diagrams WHERE id = ?1 AND owner = ?2").bind(b.id, email).first();
+          if (!owned) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
+          // route through the room so the DO, D1 and any live editors all update
+          await roomFor(env, b.id).fetch("https://room/set", {
+            method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ owner: email, id: b.id, title }),
+          }).catch(() => {});
+        }
+        if (b.ws !== undefined) await assignWorkspace(env, email, b.id, b.ws || "");
         return Response.json({ ok: true }, { headers: cors });
+      }
+      // Search across title + source + kind (content search — titles are often "Untitled").
+      const q = url.searchParams.get("q");
+      if (q !== null) {
+        await ensureDeletedColumn(env);
+        if (!q.trim()) return Response.json({ diagrams: [] }, { headers: cors });
+        const like = "%" + q.trim().replace(/[%_\\]/g, "") + "%";
+        const rs = await env.DB.prepare(
+          "SELECT id, title, kind FROM diagrams WHERE owner = ?1 AND deleted IS NULL AND (title LIKE ?2 OR source LIKE ?2 OR kind LIKE ?2) ORDER BY updated_at DESC LIMIT 50"
+        ).bind(email, like).all<{ id: string; title: string; kind: string }>();
+        return Response.json({ diagrams: (rs.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind })) }, { headers: cors });
       }
       const diagrams = await listIndex(env, email); // migrate runs here first, so workspaces sees D1 rows
       const workspaces = await listWorkspaces(env, email);

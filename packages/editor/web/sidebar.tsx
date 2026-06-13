@@ -1,18 +1,39 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, colorFor } from "./auth";
-import { useWorkspace, assignDiagram, deleteDiagram, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
+import { useWorkspace, assignDiagram, deleteDiagram, renameDiagram, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
 import { useConfirm } from "./confirm";
-import { DIAGRAMS_API } from "./const";
+import { useToast } from "./toast";
+import { DIAGRAMS_API, TRASH_API } from "./const";
 import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
   ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
   Files, Search, Shapes, Settings, BookOpen, LayoutGrid, LogOut,
+  Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
 type Item = { id: string; title: string; kind?: string; ws?: string };
 export type Panel = "explorer" | "search" | "templates";
+
+// A distinct icon per diagram type so files aren't an undifferentiated "📄 Untitled" pile.
+const KIND_ICON: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
+  kymo: Workflow, mermaid: Waypoints, bpmn: Network,
+  c4plantuml: Boxes, structurizr: Boxes, plantuml: Box,
+  d2: Database, dbml: Database, erd: Database, graphviz: Share2,
+};
+function KindIcon({ kind }: { kind?: string }) {
+  const I = (kind && KIND_ICON[kind]) || FileText;
+  return <I size={15} strokeWidth={1.8} className="sb-icon" />;
+}
+
+// Restore a soft-deleted item (used by the Undo toast after a delete).
+function restoreItem(idToken: string | null, kind: "diagram" | "folder", id: string) {
+  if (!idToken) return;
+  fetch(TRASH_API + "?id_token=" + encodeURIComponent(idToken), {
+    method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind, id }),
+  }).catch(() => {});
+}
 
 // Shared diagram-list fetch for the Explorer + Search panels (only one panel is
 // mounted at a time, so this never double-fetches).
@@ -43,6 +64,7 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
   const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder } = useWorkspace();
   const { items, reload } = useDiagrams();
   const confirm = useConfirm();
+  const toast = useToast();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem("kymo_expanded") || "[]")); } catch { return new Set(); }
@@ -67,6 +89,10 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     const name = (window.prompt("Rename folder", f.name) || "").trim();
     if (name && name !== f.name) await renameFolder(f.id, name);
   }
+  async function onRenameFile(it: Item) {
+    const name = (window.prompt("Rename diagram", it.title || "Untitled") || "").trim();
+    if (name && name !== it.title) { renameDiagram(idToken, it.id, name); setTimeout(reload, 200); }
+  }
   async function onDeleteFolder(f: Folder) {
     const sub = descendantFolderIds(folders, f.id);
     const hasContents = sub.size > 1 || items.some((i) => sub.has(effFolder(i)));
@@ -76,10 +102,14 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     }))) return;
     if (currentId && items.some((i) => i.id === currentId && sub.has(effFolder(i)))) navigate("/"); // the open file was inside
     await deleteFolder(f.id); reload();
+    toast({ message: `Deleted folder “${f.name}”`, actionLabel: "Undo", onAction: () => { restoreItem(idToken, "folder", f.id); setTimeout(reload, 250); } });
   }
   async function onDeleteFile(it: Item) {
     if (!(await confirm({ title: `Delete “${it.title || "Untitled"}”?` }))) return;
-    if (await deleteDiagram(idToken, it.id)) { if (it.id === currentId) navigate("/"); reload(); }
+    if (await deleteDiagram(idToken, it.id)) {
+      if (it.id === currentId) navigate("/"); reload();
+      toast({ message: `Deleted “${it.title || "Untitled"}”`, actionLabel: "Undo", onAction: () => { restoreItem(idToken, "diagram", it.id); setTimeout(reload, 250); } });
+    }
   }
   function openFile(id: string) { navigate("/?d=" + encodeURIComponent(id)); onClose(); }
 
@@ -117,7 +147,11 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
           </span>
         </div>
       );
-      if (open) out.push(...renderLevel(f.id, depth + 1));
+      if (open) {
+        const kids = renderLevel(f.id, depth + 1);
+        out.push(...kids);
+        if (!kids.length) out.push(<div key={"e" + f.id} className="sb-empty-row" style={{ paddingLeft: 6 + (depth + 1) * 14 + 16 }}>empty</div>);
+      }
     }
     for (const it of filesIn(parentId)) {
       const active = it.id === currentId;
@@ -125,10 +159,11 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
       out.push(
         <div key={"d" + it.id} className={"sb-file" + (active ? " active" : "")} style={{ paddingLeft: 6 + depth * 14 + 16 }}
           draggable onDragStart={(e) => { e.stopPropagation(); dragStart(e, "diagram", it.id); }}
-          onClick={() => openFile(it.id)} title={label}>
-          <FileText size={15} strokeWidth={1.8} className="sb-icon" />
+          onClick={() => openFile(it.id)} title={`${label}${it.kind ? " · " + kindLabel(it.kind) : ""}`}>
+          <KindIcon kind={it.kind} />
           <span className="sb-name">{label}</span>
           <span className="sb-actions" onClick={(e) => e.stopPropagation()}>
+            <button title="Rename" onClick={() => onRenameFile(it)}><Pencil size={13} strokeWidth={2} /></button>
             <button title="Delete" onClick={() => onDeleteFile(it)}><Trash2 size={13} strokeWidth={2} /></button>
           </span>
         </div>
@@ -156,29 +191,44 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
 
 // ================================ Search panel ================================
 export function SearchPanel({ currentId, onClose }: { currentId: string | null; onClose: () => void }) {
-  const { items } = useDiagrams();
+  const { idToken } = useAuth();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
-  const needle = q.trim().toLowerCase();
-  const results = needle ? items.filter((i) => (i.title || "Untitled").toLowerCase().includes(needle)) : [];
+  const [results, setResults] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(false);
+  // Server-side search across title + content + kind (titles are often "Untitled").
+  useEffect(() => {
+    const needle = q.trim();
+    if (!needle) { setResults([]); setLoading(false); return; }
+    setLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const r = await fetch(`${DIAGRAMS_API}?q=${encodeURIComponent(needle)}&id_token=${encodeURIComponent(idToken || "")}`, { cache: "no-store" });
+        if (r.ok) setResults((await r.json()).diagrams || []);
+      } catch {} finally { setLoading(false); }
+    }, 250);
+    return () => clearTimeout(t);
+  }, [q, idToken]);
   function openFile(id: string) { navigate("/?d=" + encodeURIComponent(id)); onClose(); }
+  const needle = q.trim();
   return (
     <aside className="sidebar">
       <div className="sb-head"><span className="sb-title">Search</span></div>
       <div className="sb-search"><Search size={14} strokeWidth={2} />
-        <input autoFocus placeholder="Search diagrams…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input autoFocus placeholder="Search title or content…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
       <div className="sb-tree">
-        {needle && results.map((it) => (
+        {results.map((it) => (
           <div key={it.id} className={"sb-file" + (it.id === currentId ? " active" : "")} style={{ paddingLeft: 10 }}
             onClick={() => openFile(it.id)} title={it.title || "Untitled"}>
-            <FileText size={15} strokeWidth={1.8} className="sb-icon" />
+            <KindIcon kind={it.kind} />
             <span className="sb-name">{it.title || "Untitled"}</span>
             {it.kind && <span className="sb-kind">{kindLabel(it.kind)}</span>}
           </div>
         ))}
-        {needle && !results.length && <div className="sb-empty">No diagrams match “{q.trim()}”.</div>}
-        {!needle && <div className="sb-empty">Type to search your diagrams.</div>}
+        {needle && !loading && !results.length && <div className="sb-empty">No diagrams match “{needle}”.</div>}
+        {needle && loading && !results.length && <div className="sb-empty">Searching…</div>}
+        {!needle && <div className="sb-empty">Type to search by title or content.</div>}
       </div>
     </aside>
   );
