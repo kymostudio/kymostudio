@@ -16,7 +16,7 @@ const SELF_RENDERERS = { ...WASM_RENDERERS, ...JS_RENDERERS };
 // the error is final — no fallback round-trip. The wasm kinds stay out of
 // this set: their grammars are subsets (mermaid = flowchart only, …) and
 // kroki may accept what they reject.
-const AUTHORITATIVE = new Set(["bytefield", "nomnoml", "svgbob", "vega", "vegalite", "wavedrom"]);
+const AUTHORITATIVE = new Set(["bytefield", "nomnoml", "pikchr", "svgbob", "vega", "vegalite", "wavedrom"]);
 
 /** Kinds rendered in this worker — exported for the usage doc. */
 export const SELF_KINDS = Object.keys(SELF_RENDERERS).sort();
