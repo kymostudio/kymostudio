@@ -1,0 +1,556 @@
+[
+  {
+    "id": "fc-basic",
+    "grammar": "flowchart",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "visual_diff": 14.0
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 6,
+          "missing": [
+            "Start",
+            "Is it working?",
+            "Yes",
+            "Ship it",
+            "No",
+            "Debug"
+          ]
+        },
+        "visual_diff": 3.1
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 6,
+          "missing": [
+            "Start",
+            "Is it working?",
+            "Yes",
+            "Ship it",
+            "No",
+            "Debug"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "fc-lr",
+    "grammar": "flowchart",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "visual_diff": 16.1
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 5,
+          "missing": [
+            "Client",
+            "Load Balancer",
+            "App 1",
+            "App 2",
+            "Database"
+          ]
+        },
+        "visual_diff": 3.1
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 5,
+          "missing": [
+            "Client",
+            "Load Balancer",
+            "App 1",
+            "App 2",
+            "Database"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "fc-shapes",
+    "grammar": "flowchart",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "visual_diff": 13.3
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 4,
+          "missing": [
+            "Stadium",
+            "Circle",
+            "Diamond",
+            "Store"
+          ]
+        },
+        "visual_diff": 3.9
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 4,
+          "missing": [
+            "Stadium",
+            "Circle",
+            "Diamond",
+            "Store"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "fc-subgraph",
+    "grammar": "flowchart",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "visual_diff": 20.3
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 6,
+          "missing": [
+            "Nginx",
+            "App",
+            "Cache",
+            "Postgres",
+            "Web Tier",
+            "Data Tier"
+          ]
+        },
+        "visual_diff": 3.0
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 6,
+          "missing": [
+            "Nginx",
+            "App",
+            "Cache",
+            "Postgres",
+            "Web Tier",
+            "Data Tier"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "fc-decision",
+    "grammar": "flowchart",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "visual_diff": 14.3
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 5,
+          "missing": [
+            "Receive order",
+            "In stock?",
+            "Take payment",
+            "Notify customer",
+            "Pack items"
+          ]
+        },
+        "visual_diff": 3.4
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 5,
+          "missing": [
+            "Receive order",
+            "In stock?",
+            "Take payment",
+            "Notify customer",
+            "Pack items"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "fc-long",
+    "grammar": "flowchart",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 3,
+          "total": 3,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 3,
+          "total": 3,
+          "missing": []
+        },
+        "visual_diff": 19.9
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 3,
+          "total": 3,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 3,
+          "missing": [
+            "Parse the request",
+            "Validate the payload",
+            "Persist to database"
+          ]
+        },
+        "visual_diff": 5.9
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 3,
+          "total": 3,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 0,
+          "total": 3,
+          "missing": [
+            "Parse the request",
+            "Validate the payload",
+            "Persist to database"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "id": "seq-basic",
+    "grammar": "sequence",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "visual_diff": 17.3
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "visual_diff": 7.0
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 4,
+          "total": 4,
+          "missing": []
+        }
+      }
+    }
+  },
+  {
+    "id": "seq-three",
+    "grammar": "sequence",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 7,
+          "total": 7,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 7,
+          "total": 7,
+          "missing": []
+        },
+        "visual_diff": 15.6
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 7,
+          "total": 7,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 7,
+          "total": 7,
+          "missing": []
+        },
+        "visual_diff": 5.2
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 7,
+          "total": 7,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 7,
+          "total": 7,
+          "missing": []
+        }
+      }
+    }
+  },
+  {
+    "id": "seq-loop",
+    "grammar": "sequence",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "visual_diff": 14.7
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "visual_diff": 8.4
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        }
+      }
+    }
+  },
+  {
+    "id": "seq-alt",
+    "grammar": "sequence",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "visual_diff": 15.8
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "visual_diff": 4.5
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 5,
+          "total": 5,
+          "missing": []
+        }
+      }
+    }
+  },
+  {
+    "id": "seq-async",
+    "grammar": "sequence",
+    "engines": {
+      "kymo": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "visual_diff": 15.6
+      },
+      "merman": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "visual_diff": 4.7
+      },
+      "mermaidjs": {
+        "svg_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        },
+        "raster_recall": {
+          "hit": 6,
+          "total": 6,
+          "missing": []
+        }
+      }
+    }
+  }
+]
