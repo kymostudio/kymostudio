@@ -5,7 +5,6 @@ import { useWorkspace, assignDiagram, deleteDiagram, renameDiagram, childFolders
 import { useConfirm } from "./confirm";
 import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
-import { timeAgo } from "./util";
 import { DIAGRAMS_API, TRASH_API } from "./const";
 import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
@@ -293,19 +292,15 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     const active = it.id === currentId;
     const label = (active && currentTitle && currentTitle !== "Untitled" ? currentTitle : it.title) || "Untitled";
     const isEditing = editing?.kind === "file" && editing.id === r.id;
-    // Only the indistinguishable "Untitled" rows earn a time-ago tag; named files
-    // keep the full width for their name.
-    const meta = label === "Untitled" ? timeAgo(it.updatedAt || 0) : "";
     return (
       <div key={"d" + r.id} data-key={k} className={"sb-row sb-file" + (active ? " active" : "") + (focused ? " kbd" : "")}
         draggable={!isEditing} onDragStart={(e) => { e.stopPropagation(); dragStart(e, "diagram", r.id); }}
         onClick={() => { setFocusKey(k); openFile(r.id); }}
         onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setFocusKey(k); fileMenu(e, it); }}
-        title={`${label}${it.kind ? " · " + kindLabel(it.kind) : ""}${meta ? " · " + meta : ""}`}>
+        title={`${label}${it.kind ? " · " + kindLabel(it.kind) : ""}`}>
         {guides(r.ancestors)}
         <KindIcon kind={it.kind} />
         {isEditing ? renameInput("file", r.id, label) : <span className="sb-name">{label}</span>}
-        {!isEditing && meta && <span className="sb-meta">{meta}</span>}
       </div>
     );
   }
