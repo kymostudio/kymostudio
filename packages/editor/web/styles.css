@@ -171,21 +171,47 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-head button { flex: none; padding: 5px; border: 1px solid transparent; background: transparent; color: var(--dim); border-radius: 7px; }
 .sb-head button:hover { background: var(--bg-raise); border-color: transparent; color: var(--accent); transform: none; box-shadow: none; }
 .sb-tree { flex: 1; overflow: auto; padding: 4px 0 12px; }
+.sb-tree:focus { outline: none; }
 .sb-tree.dragover-root { box-shadow: inset 0 0 0 2px rgba(224, 9, 95, 0.18); }
-.sb-folder, .sb-file { display: flex; align-items: center; gap: 6px; padding: 5px 8px; font-size: 13px; cursor: pointer; color: var(--ink); white-space: nowrap; user-select: none; }
+.sb-folder, .sb-file { position: relative; display: flex; align-items: center; gap: 6px; padding: 3px 8px; font-size: 13px; cursor: pointer; color: var(--ink); white-space: nowrap; user-select: none; }
 .sb-folder:hover, .sb-file:hover { background: var(--bg-raise); }
 .sb-folder { font-weight: 600; }
+/* VS Code-style indent guides: one stretched border-left per ancestor level */
+.sb-guide { flex: none; width: 14px; align-self: stretch; border-left: 1px solid var(--border); }
+.sb-guide.on { border-left-color: var(--accent); }
+.sb-spacer { flex: none; width: 14px; } /* lines a file's icon up under a folder's icon */
 .sb-chev, .sb-icon { flex: none; color: var(--dim); display: inline-flex; }
 .sb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.sb-meta { flex: none; margin-left: 8px; font-size: 11px; color: var(--dim); }
+.sb-folder:hover .sb-meta, .sb-file:hover .sb-meta { display: none; } /* yields the right edge to the action buttons */
+.sb-folder.sel { background: var(--accent-soft); }
+.sb-row.kbd { box-shadow: inset 0 0 0 1px rgba(224, 9, 95, 0.5); }
 .sb-file.active { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+.sb-file.active.kbd { box-shadow: inset 2px 0 0 var(--accent), inset 0 0 0 1px rgba(224, 9, 95, 0.5); }
 .sb-file.active .sb-name { color: var(--accent-deep); font-weight: 600; }
 .sb-file.active .sb-icon { color: var(--accent); }
 .sb-folder.dragover { background: var(--accent-soft); box-shadow: inset 0 0 0 1px rgba(224, 9, 95, 0.4); }
-.sb-actions { flex: none; display: inline-flex; gap: 0; opacity: 0; transition: opacity 0.14s ease; }
+.sb-rename { flex: 1; min-width: 0; font: inherit; font-size: 13px; font-weight: 400; padding: 1px 4px; border: 1px solid var(--accent); border-radius: 4px; background: var(--bg); color: var(--ink); outline: none; }
+/* overlaid on the right edge, NOT in the flex flow, so they don't steal width
+   from the filename at rest (they only appear on hover anyway) */
+.sb-actions { position: absolute; right: 4px; top: 0; bottom: 0; display: inline-flex; align-items: center; gap: 0; padding-left: 6px; background: var(--bg-raise); opacity: 0; transition: opacity 0.14s ease; }
+.sb-file.active .sb-actions { background: var(--accent-soft); }
 .sb-folder:hover .sb-actions, .sb-file:hover .sb-actions, .sb-actions:focus-within { opacity: 1; }
 .sb-actions button { flex: none; padding: 3px; border: 1px solid transparent; background: transparent; color: var(--dim); border-radius: 6px; }
 .sb-actions button:hover { background: var(--bg); border-color: transparent; color: var(--accent); transform: none; box-shadow: none; }
 .sb-empty { padding: 14px 12px; font-size: 12.5px; color: var(--dim); }
+/* right-click context menu (shared component) */
+.ctx-menu { position: fixed; z-index: 60; min-width: 180px; padding: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 34px rgba(36, 33, 49, 0.18); }
+.ctx-item { display: flex; align-items: center; gap: 9px; width: 100%; padding: 6px 9px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; text-align: left; border-radius: 7px; cursor: pointer; }
+.ctx-item:hover { background: var(--bg-raise); }
+.ctx-item.danger { color: #c70854; }
+.ctx-item.danger:hover { background: rgba(199, 8, 84, 0.08); }
+.ctx-item:disabled { opacity: 0.45; cursor: default; }
+.ctx-icon { flex: none; display: inline-flex; width: 16px; color: var(--dim); }
+.ctx-item.danger .ctx-icon { color: #c70854; }
+.ctx-label { flex: 1; }
+.ctx-shortcut { flex: none; font-size: 11px; color: var(--dim); }
+.ctx-sep { height: 1px; margin: 4px 6px; background: var(--border); }
 .sb-backdrop { display: none; }
 @media (hover: none) { .sb-actions { opacity: 1; } }
 /* phones: the rail stays pinned at the left; the panel slides in as a drawer
@@ -459,7 +485,7 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
 }
 
 /* ---- review batch: rename / empty folder / toast / mobile chrome ---- */
-.sb-empty-row { font-size: 12px; color: var(--dim); font-style: italic; padding: 4px 8px; }
+.sb-empty-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--dim); font-style: italic; padding: 2px 8px; }
 /* rename mini-button on the /diagrams rows (fades in on hover like delete) */
 .rmini { opacity: 0; flex: none; border: 0; background: transparent; color: var(--dim); padding: 5px; border-radius: 7px; display: inline-flex; }
 .rrow:hover .rmini, .rmini:focus-visible { opacity: 1; }

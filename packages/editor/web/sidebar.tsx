@@ -1,30 +1,38 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, colorFor } from "./auth";
 import { useWorkspace, assignDiagram, deleteDiagram, renameDiagram, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
 import { useConfirm } from "./confirm";
 import { useToast } from "./toast";
+import { useContextMenu, type MenuItem } from "./context-menu";
+import { timeAgo } from "./util";
 import { DIAGRAMS_API, TRASH_API } from "./const";
 import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
-  ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
-  Files, Search, Shapes, BookOpen, LayoutGrid, LogOut, Menu,
+  ChevronRight, ChevronDown, Folder as FolderIcon, FolderOpen, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
+  Files, Search, Shapes, BookOpen, LayoutGrid, LogOut, Menu, ExternalLink,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
-type Item = { id: string; title: string; kind?: string; ws?: string };
+type Item = { id: string; title: string; kind?: string; ws?: string; updatedAt?: number };
 export type Panel = "explorer" | "search" | "templates";
 
 // A distinct icon per diagram type so files aren't an undifferentiated "📄 Untitled" pile.
-const KIND_ICON: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
+const KIND_ICON: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string; color?: string }>> = {
   kymo: Workflow, mermaid: Waypoints, bpmn: Network,
   c4plantuml: Boxes, structurizr: Boxes, plantuml: Box,
   d2: Database, dbml: Database, erd: Database, graphviz: Share2,
 };
+// …and a distinct hue, the way a VS Code icon theme colours file types.
+const KIND_COLOR: Record<string, string> = {
+  kymo: "#e0095f", mermaid: "#0d9488", bpmn: "#4f46e5",
+  c4plantuml: "#7c3aed", structurizr: "#7c3aed", plantuml: "#7c3aed",
+  d2: "#b45309", dbml: "#b45309", erd: "#b45309", graphviz: "#15803d",
+};
 function KindIcon({ kind }: { kind?: string }) {
   const I = (kind && KIND_ICON[kind]) || FileText;
-  return <I size={15} strokeWidth={1.8} className="sb-icon" />;
+  return <I size={15} strokeWidth={1.8} className="sb-icon" color={(kind && KIND_COLOR[kind]) || "var(--dim)"} />;
 }
 
 // Restore a soft-deleted item (used by the Undo toast after a delete).
@@ -57,6 +65,13 @@ function useDiagrams() {
 }
 
 // ============================ Explorer (file tree) ============================
+// One flat row of the rendered tree. The same ordered list drives the DOM and the
+// keyboard model, so the two can never drift out of sync.
+type Row =
+  | { kind: "folder"; id: string; depth: number; ancestors: string[]; name: string; open: boolean }
+  | { kind: "file"; id: string; depth: number; ancestors: string[]; it: Item }
+  | { kind: "empty"; id: string; depth: number; ancestors: string[] };
+
 export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }: {
   currentId: string | null; currentTitle: string; onNewDiagram: () => void; onClose: () => void;
 }) {
@@ -65,33 +80,68 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
   const { items, reload } = useDiagrams();
   const confirm = useConfirm();
   const toast = useToast();
+  const openMenu = useContextMenu();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem("kymo_expanded") || "[]")); } catch { return new Set(); }
   });
   const [dragOver, setDragOver] = useState<string | null>(null);
+  const [editing, setEditing] = useState<{ kind: "file" | "folder"; id: string } | null>(null);
+  const [focusKey, setFocusKey] = useState<string | null>(null);
+  const treeRef = useRef<HTMLDivElement>(null);
   useEffect(() => { reload(); }, [currentId]); // a save/new file shows up // eslint-disable-line
 
   const persist = (s: Set<string>) => { try { localStorage.setItem("kymo_expanded", JSON.stringify([...s])); } catch {} };
   const toggle = (id: string) => setExpanded((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); persist(n); return n; });
+  const setOpen = (id: string, open: boolean) => setExpanded((s) => { const n = new Set(s); open ? n.add(id) : n.delete(id); persist(n); return n; });
 
-  const folderIds = new Set(folders.map((f) => f.id));
-  const effFolder = (i: Item) => (i.ws && folderIds.has(i.ws) ? i.ws : "");
-  const filesIn = (fid: string) => items.filter((i) => effFolder(i) === fid).sort((a, b) => (a.title || "Untitled").localeCompare(b.title || "Untitled"));
+  const folderIds = useMemo(() => new Set(folders.map((f) => f.id)), [folders]);
+  const effFolder = useCallback((i: Item) => (i.ws && folderIds.has(i.ws) ? i.ws : ""), [folderIds]);
+  const filesIn = useCallback(
+    (fid: string) => items.filter((i) => effFolder(i) === fid).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)),
+    [items, effFolder]
+  );
+
+  // Build the visible, ordered row list (folders first, then files, per level).
+  const rows = useMemo<Row[]>(() => {
+    const out: Row[] = [];
+    const walk = (parentId: string, depth: number, ancestors: string[]) => {
+      for (const f of childFoldersOf(folders, parentId).sort((a, b) => a.name.localeCompare(b.name))) {
+        const open = expanded.has(f.id);
+        out.push({ kind: "folder", id: f.id, depth, ancestors, name: f.name, open });
+        if (open) {
+          const before = out.length;
+          walk(f.id, depth + 1, [...ancestors, f.id]);
+          if (out.length === before) out.push({ kind: "empty", id: f.id, depth: depth + 1, ancestors: [...ancestors, f.id] });
+        }
+      }
+      for (const it of filesIn(parentId)) out.push({ kind: "file", id: it.id, depth, ancestors, it });
+    };
+    walk("", 0, []);
+    return out;
+  }, [folders, expanded, filesIn]);
+
+  // Rows the keyboard can land on (folders + files, not the "empty" placeholder).
+  const navRows = useMemo(() => rows.filter((r) => r.kind !== "empty"), [rows]);
+  const keyOf = (r: { kind: string; id: string }) => r.kind + ":" + r.id;
 
   async function onNewFolder(parentId: string) {
-    const name = (window.prompt("Folder name") || "").trim();
-    if (!name) return;
-    const f = await createFolder(name, parentId);
-    if (f && parentId) setExpanded((s) => { const n = new Set(s); n.add(parentId); persist(n); return n; });
+    const f = await createFolder("New folder", parentId);
+    if (!f) return;
+    if (parentId) setOpen(parentId, true);
+    setEditing({ kind: "folder", id: f.id }); // inline-rename the fresh folder
   }
-  async function onRenameFolder(f: Folder) {
-    const name = (window.prompt("Rename folder", f.name) || "").trim();
-    if (name && name !== f.name) await renameFolder(f.id, name);
-  }
-  async function onRenameFile(it: Item) {
-    const name = (window.prompt("Rename diagram", it.title || "Untitled") || "").trim();
-    if (name && name !== it.title) { renameDiagram(idToken, it.id, name); setTimeout(reload, 200); }
+  function startRename(kind: "file" | "folder", id: string) { setEditing({ kind, id }); }
+  function commitRename(kind: "file" | "folder", id: string, raw: string) {
+    const name = raw.trim();
+    setEditing(null);
+    if (kind === "folder") {
+      const f = folders.find((x) => x.id === id);
+      if (f && name && name !== f.name) renameFolder(id, name);
+    } else {
+      const it = items.find((x) => x.id === id);
+      if (it && name && name !== (it.title || "")) { renameDiagram(idToken, id, name); setTimeout(reload, 200); }
+    }
   }
   async function onDeleteFolder(f: Folder) {
     const sub = descendantFolderIds(folders, f.id);
@@ -112,6 +162,7 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     }
   }
   function openFile(id: string) { navigate("/?d=" + encodeURIComponent(id)); onClose(); }
+  function newDiagramIn(folderId: string) { setCurrentFolder(folderId); onNewDiagram(); }
 
   function dragStart(e: React.DragEvent, kind: "diagram" | "folder", id: string) {
     e.dataTransfer.setData("text/plain", kind + ":" + id); e.dataTransfer.effectAllowed = "move";
@@ -126,50 +177,152 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     else if (kind === "folder" && id && id !== targetFolderId) { await moveFolder(id, targetFolderId); }
   }
 
-  function renderLevel(parentId: string, depth: number): React.ReactNode[] {
-    const out: React.ReactNode[] = [];
-    for (const f of childFoldersOf(folders, parentId).sort((a, b) => a.name.localeCompare(b.name))) {
-      const open = expanded.has(f.id);
-      out.push(
-        <div key={"f" + f.id} className={"sb-folder" + (dragOver === f.id ? " dragover" : "") + (currentFolder === f.id ? " sel" : "")}
-          style={{ paddingLeft: 6 + depth * 14 }} draggable
-          onDragStart={(e) => { e.stopPropagation(); dragStart(e, "folder", f.id); }}
-          onDragOver={(e) => allowDrop(e, f.id)} onDragLeave={() => setDragOver((d) => (d === f.id ? null : d))}
-          onDrop={(e) => dropOn(e, f.id)}
-          onClick={() => { toggle(f.id); setCurrentFolder(f.id); }} title={f.name}>
-          <span className="sb-chev">{open ? <ChevronDown size={14} strokeWidth={2.2} /> : <ChevronRight size={14} strokeWidth={2.2} />}</span>
-          <FolderIcon size={15} strokeWidth={1.9} className="sb-icon" />
-          <span className="sb-name">{f.name}</span>
-          <span className="sb-actions" onClick={(e) => e.stopPropagation()}>
-            <button title="New subfolder" onClick={() => onNewFolder(f.id)}><FolderPlus size={13} strokeWidth={2} /></button>
-            <button title="Rename" onClick={() => onRenameFolder(f)}><Pencil size={13} strokeWidth={2} /></button>
-            <button title="Delete" onClick={() => onDeleteFolder(f)}><Trash2 size={13} strokeWidth={2} /></button>
-          </span>
+  // ---- context menus ----
+  function folderMenu(e: React.MouseEvent, f: Folder) {
+    const items: MenuItem[] = [
+      { label: "New diagram", icon: <FilePlus2 size={14} />, onClick: () => newDiagramIn(f.id) },
+      { label: "New folder", icon: <FolderPlus size={14} />, onClick: () => onNewFolder(f.id) },
+      { sep: true },
+      { label: "Rename", icon: <Pencil size={14} />, shortcut: "F2", onClick: () => startRename("folder", f.id) },
+      { label: "Delete", icon: <Trash2 size={14} />, danger: true, onClick: () => onDeleteFolder(f) },
+    ];
+    openMenu(e, items);
+  }
+  function fileMenu(e: React.MouseEvent, it: Item) {
+    const items: MenuItem[] = [
+      { label: "Open", icon: <ExternalLink size={14} />, onClick: () => openFile(it.id) },
+      { sep: true },
+      { label: "Rename", icon: <Pencil size={14} />, shortcut: "F2", onClick: () => startRename("file", it.id) },
+      { label: "Delete", icon: <Trash2 size={14} />, danger: true, onClick: () => onDeleteFile(it) },
+    ];
+    openMenu(e, items);
+  }
+  function rootMenu(e: React.MouseEvent) {
+    if (e.target !== e.currentTarget) return; // only the empty tree background
+    openMenu(e, [
+      { label: "New diagram", icon: <FilePlus2 size={14} />, onClick: () => newDiagramIn("") },
+      { label: "New folder", icon: <FolderPlus size={14} />, onClick: () => onNewFolder("") },
+    ]);
+  }
+
+  // ---- keyboard navigation (VS Code-ish: arrows, Enter, F2, Delete) ----
+  function onTreeKeyDown(e: React.KeyboardEvent) {
+    if (editing) return; // the rename input owns the keyboard
+    const idx = navRows.findIndex((r) => keyOf(r) === focusKey);
+    const cur = idx >= 0 ? navRows[idx] : null;
+    const move = (next: number) => {
+      const r = navRows[Math.max(0, Math.min(navRows.length - 1, next))];
+      if (r) { setFocusKey(keyOf(r)); if (r.kind === "folder") setCurrentFolder(r.id); }
+    };
+    switch (e.key) {
+      case "ArrowDown": e.preventDefault(); move(idx < 0 ? 0 : idx + 1); break;
+      case "ArrowUp": e.preventDefault(); move(idx < 0 ? 0 : idx - 1); break;
+      case "ArrowRight":
+        e.preventDefault();
+        if (cur?.kind === "folder") { if (!cur.open) setOpen(cur.id, true); else move(idx + 1); }
+        break;
+      case "ArrowLeft":
+        e.preventDefault();
+        if (cur?.kind === "folder" && cur.open) setOpen(cur.id, false);
+        else if (cur) { const p = cur.ancestors[cur.ancestors.length - 1]; if (p) { setFocusKey("folder:" + p); setCurrentFolder(p); } }
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (cur?.kind === "folder") toggle(cur.id);
+        else if (cur?.kind === "file") openFile(cur.id);
+        break;
+      case "F2": if (cur) { e.preventDefault(); startRename(cur.kind, cur.id); } break;
+      case "Delete":
+      case "Backspace":
+        if (cur?.kind === "folder") { const f = folders.find((x) => x.id === cur.id); if (f) { e.preventDefault(); onDeleteFolder(f); } }
+        else if (cur?.kind === "file") { const it = items.find((x) => x.id === cur.id); if (it) { e.preventDefault(); onDeleteFile(it); } }
+        break;
+    }
+  }
+  // Keep the keyboard-focused row scrolled into view.
+  useEffect(() => {
+    if (!focusKey) return;
+    treeRef.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(focusKey)}"]`)?.scrollIntoView({ block: "nearest" });
+  }, [focusKey]);
+
+  // Autofocus + select-all the inline rename input when it mounts.
+  const editRef = useCallback((el: HTMLInputElement | null) => { if (el) { el.focus(); el.select(); } }, []);
+  function renameInput(kind: "file" | "folder", id: string, initial: string) {
+    return (
+      <input className="sb-rename" ref={editRef} defaultValue={initial}
+        onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+          if (e.key === "Enter") commitRename(kind, id, (e.target as HTMLInputElement).value);
+          else if (e.key === "Escape") setEditing(null);
+        }}
+        onBlur={(e) => commitRename(kind, id, e.target.value)} />
+    );
+  }
+
+  function guides(ancestors: string[]) {
+    return ancestors.map((aid, j) => <span key={j} className={"sb-guide" + (aid === currentFolder ? " on" : "")} />);
+  }
+
+  function renderRow(r: Row): React.ReactNode {
+    if (r.kind === "empty") {
+      return <div key={"e" + r.id} className="sb-empty-row">{guides(r.ancestors)}<span className="sb-spacer" /><span className="sb-spacer" />empty</div>;
+    }
+    const k = keyOf(r);
+    const focused = focusKey === k;
+    if (r.kind === "folder") {
+      const f = folders.find((x) => x.id === r.id);
+      const isEditing = editing?.kind === "folder" && editing.id === r.id;
+      return (
+        <div key={"f" + r.id} data-key={k}
+          className={"sb-row sb-folder" + (dragOver === r.id ? " dragover" : "") + (currentFolder === r.id ? " sel" : "") + (focused ? " kbd" : "")}
+          draggable={!isEditing}
+          onDragStart={(e) => { e.stopPropagation(); dragStart(e, "folder", r.id); }}
+          onDragOver={(e) => allowDrop(e, r.id)} onDragLeave={() => setDragOver((d) => (d === r.id ? null : d))}
+          onDrop={(e) => dropOn(e, r.id)}
+          onClick={() => { setFocusKey(k); toggle(r.id); setCurrentFolder(r.id); }}
+          onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setFocusKey(k); f && folderMenu(e, f); }}
+          title={r.name}>
+          {guides(r.ancestors)}
+          <span className="sb-chev">{r.open ? <ChevronDown size={14} strokeWidth={2.2} /> : <ChevronRight size={14} strokeWidth={2.2} />}</span>
+          {r.open ? <FolderOpen size={15} strokeWidth={1.9} className="sb-icon" /> : <FolderIcon size={15} strokeWidth={1.9} className="sb-icon" />}
+          {isEditing ? renameInput("folder", r.id, r.name) : <span className="sb-name">{r.name}</span>}
+          {!isEditing && (
+            <span className="sb-actions" onClick={(e) => e.stopPropagation()}>
+              <button title="New subfolder" onClick={() => onNewFolder(r.id)}><FolderPlus size={13} strokeWidth={2} /></button>
+              <button title="Rename" onClick={() => startRename("folder", r.id)}><Pencil size={13} strokeWidth={2} /></button>
+              <button title="Delete" onClick={() => f && onDeleteFolder(f)}><Trash2 size={13} strokeWidth={2} /></button>
+            </span>
+          )}
         </div>
       );
-      if (open) {
-        const kids = renderLevel(f.id, depth + 1);
-        out.push(...kids);
-        if (!kids.length) out.push(<div key={"e" + f.id} className="sb-empty-row" style={{ paddingLeft: 6 + (depth + 1) * 14 + 16 }}>empty</div>);
-      }
     }
-    for (const it of filesIn(parentId)) {
-      const active = it.id === currentId;
-      const label = (active && currentTitle && currentTitle !== "Untitled" ? currentTitle : it.title) || "Untitled";
-      out.push(
-        <div key={"d" + it.id} className={"sb-file" + (active ? " active" : "")} style={{ paddingLeft: 6 + depth * 14 + 16 }}
-          draggable onDragStart={(e) => { e.stopPropagation(); dragStart(e, "diagram", it.id); }}
-          onClick={() => openFile(it.id)} title={`${label}${it.kind ? " · " + kindLabel(it.kind) : ""}`}>
-          <KindIcon kind={it.kind} />
-          <span className="sb-name">{label}</span>
+    const it = r.it;
+    const active = it.id === currentId;
+    const label = (active && currentTitle && currentTitle !== "Untitled" ? currentTitle : it.title) || "Untitled";
+    const isEditing = editing?.kind === "file" && editing.id === r.id;
+    // Only the indistinguishable "Untitled" rows earn a time-ago tag; named files
+    // keep the full width for their name.
+    const meta = label === "Untitled" ? timeAgo(it.updatedAt || 0) : "";
+    return (
+      <div key={"d" + r.id} data-key={k} className={"sb-row sb-file" + (active ? " active" : "") + (focused ? " kbd" : "")}
+        draggable={!isEditing} onDragStart={(e) => { e.stopPropagation(); dragStart(e, "diagram", r.id); }}
+        onClick={() => { setFocusKey(k); openFile(r.id); }}
+        onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setFocusKey(k); fileMenu(e, it); }}
+        title={`${label}${it.kind ? " · " + kindLabel(it.kind) : ""}${meta ? " · " + meta : ""}`}>
+        {guides(r.ancestors)}
+        <span className="sb-spacer" />
+        <KindIcon kind={it.kind} />
+        {isEditing ? renameInput("file", r.id, label) : <span className="sb-name">{label}</span>}
+        {!isEditing && meta && <span className="sb-meta">{meta}</span>}
+        {!isEditing && (
           <span className="sb-actions" onClick={(e) => e.stopPropagation()}>
-            <button title="Rename" onClick={() => onRenameFile(it)}><Pencil size={13} strokeWidth={2} /></button>
+            <button title="Rename" onClick={() => startRename("file", r.id)}><Pencil size={13} strokeWidth={2} /></button>
             <button title="Delete" onClick={() => onDeleteFile(it)}><Trash2 size={13} strokeWidth={2} /></button>
           </span>
-        </div>
-      );
-    }
-    return out;
+        )}
+      </div>
+    );
   }
 
   return (
@@ -179,10 +332,11 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
         <button title="New diagram" aria-label="New diagram" onClick={onNewDiagram}><FilePlus2 size={15} strokeWidth={2} /></button>
         <button title="New folder" aria-label="New folder" onClick={() => onNewFolder("")}><FolderPlus size={15} strokeWidth={2} /></button>
       </div>
-      <div className={"sb-tree" + (dragOver === "__root__" ? " dragover-root" : "")}
+      <div ref={treeRef} className={"sb-tree" + (dragOver === "__root__" ? " dragover-root" : "")} tabIndex={0}
+        onKeyDown={onTreeKeyDown} onContextMenu={rootMenu}
         onDragOver={(e) => allowDrop(e, "__root__")} onDragLeave={() => setDragOver((d) => (d === "__root__" ? null : d))}
         onDrop={(e) => dropOn(e, "")}>
-        {renderLevel("", 0)}
+        {rows.map(renderRow)}
         {!items.length && !folders.length && <div className="sb-empty">No diagrams yet.</div>}
       </div>
     </aside>

@@ -51,3 +51,37 @@ export function titleFrom(source: string, kind = "kymo"): string {
   const t = (kind === "kymo" ? kymoTitle(source) : directiveTitle(source) || genericTitle(source));
   return t || "Untitled";
 }
+
+// Coarse "x minutes ago" relative time (shared by the Explorer + Diagrams + Trash lists).
+export function timeAgo(ms: number): string {
+  if (!ms) return "";
+  const s = Math.max(1, (Date.now() - ms) / 1000);
+  if (s < 60) return "just now";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m} minute${m > 1 ? "s" : ""} ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hour${h > 1 ? "s" : ""} ago`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d} day${d > 1 ? "s" : ""} ago`;
+  const mo = Math.floor(d / 30);
+  if (mo < 12) return `${mo} month${mo > 1 ? "s" : ""} ago`;
+  const y = Math.floor(mo / 12);
+  return `${y} year${y > 1 ? "s" : ""} ago`;
+}
+
+// Next free "Untitled-N" given existing titles, so abandoned blank diagrams
+// don't all collapse into an indistinguishable "Untitled" pile.
+export function nextUntitledName(titles: Iterable<string>): string {
+  const used = new Set<number>();
+  let hasBare = false;
+  for (const t of titles) {
+    const s = (t || "").trim();
+    if (s === "Untitled") hasBare = true;
+    const m = s.match(/^Untitled-(\d+)$/);
+    if (m) used.add(Number(m[1]));
+  }
+  if (!hasBare && used.size === 0) return "Untitled";
+  let n = 1;
+  while (used.has(n)) n++;
+  return `Untitled-${n}`;
+}

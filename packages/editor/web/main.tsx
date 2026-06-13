@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth";
 import { WorkspaceProvider } from "./workspace";
 import { ConfirmProvider } from "./confirm";
+import { ContextMenuProvider } from "./context-menu";
 import { ToastProvider } from "./toast";
 import EditorPage from "./EditorPage";
 import DiagramsPage from "./DiagramsPage";
@@ -16,12 +17,14 @@ createRoot(document.getElementById("root")!).render(
       <WorkspaceProvider>
         <ConfirmProvider>
         <ToastProvider>
+        <ContextMenuProvider>
         <Routes>
           <Route path="/" element={<EditorPage />} />
           <Route path="/diagrams" element={<DiagramsPage />} />
           <Route path="/trash" element={<TrashPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
+        </ContextMenuProvider>
         </ToastProvider>
         </ConfirmProvider>
       </WorkspaceProvider>

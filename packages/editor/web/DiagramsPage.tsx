@@ -7,25 +7,10 @@ import { useToast } from "./toast";
 import { kindLabel } from "./kroki";
 import { DIAGRAMS_API, TRASH_API } from "./const";
 import { TemplateGallery, setPendingTemplate, type Template } from "./templates";
+import { timeAgo } from "./util";
 import { Search, Plus, Image as ImageIcon, ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, Pencil, Trash2 } from "lucide-react";
 
 type Item = { id: string; title: string; updatedAt: number; ws?: string; kind?: string; hasThumb?: boolean };
-
-function timeAgo(ms: number): string {
-  if (!ms) return "";
-  const s = Math.max(1, (Date.now() - ms) / 1000);
-  if (s < 60) return "just now";
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m} minute${m > 1 ? "s" : ""} ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h} hour${h > 1 ? "s" : ""} ago`;
-  const d = Math.floor(h / 24);
-  if (d < 30) return `${d} day${d > 1 ? "s" : ""} ago`;
-  const mo = Math.floor(d / 30);
-  if (mo < 12) return `${mo} month${mo > 1 ? "s" : ""} ago`;
-  const y = Math.floor(mo / 12);
-  return `${y} year${y > 1 ? "s" : ""} ago`;
-}
 
 export default function DiagramsPage() {
   const { idToken, claims, signOut, expireSession } = useAuth();

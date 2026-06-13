@@ -4,19 +4,10 @@ import { useAuth } from "./auth";
 import { useConfirm } from "./confirm";
 import { kindLabel } from "./kroki";
 import { TRASH_API } from "./const";
+import { timeAgo } from "./util";
 import { Folder as FolderIcon, FileText, RotateCcw, Trash2, ArrowLeft } from "lucide-react";
 
 type TItem = { type: "folder" | "diagram"; id: string; name: string; kind?: string; deletedAt: number };
-
-function timeAgo(ms: number): string {
-  if (!ms) return "";
-  const s = Math.max(1, (Date.now() - ms) / 1000);
-  if (s < 60) return "just now";
-  const m = Math.floor(s / 60); if (m < 60) return `${m} minute${m > 1 ? "s" : ""} ago`;
-  const h = Math.floor(m / 60); if (h < 24) return `${h} hour${h > 1 ? "s" : ""} ago`;
-  const d = Math.floor(h / 24); if (d < 30) return `${d} day${d > 1 ? "s" : ""} ago`;
-  return `${Math.floor(d / 30)} month${d >= 60 ? "s" : ""} ago`;
-}
 
 export default function TrashPage() {
   const { idToken, claims, signOut, expireSession } = useAuth();
