@@ -9,7 +9,7 @@
 // wasm); every other kroki kind proxies to kroki.io. Everything is cached at
 // the edge by content hash (x-render-cache: hit|miss).
 import { cacheKey, cacheable } from "./cache.js";
-import { render } from "./dispatch.js";
+import { render, SELF_KINDS } from "./dispatch.js";
 import { CORS, HttpError } from "./http.js";
 import { decodeRequest } from "./kroki.js";
 
@@ -22,7 +22,7 @@ const USAGE = {
   },
   formats: ["svg", "png", "pdf"],
   options: { scale: "PNG raster scale 1-4 (?scale=2)" },
-  self_rendered: ["kymo", "mermaid", "d2", "graphviz", "bpmn"],
+  self_rendered: SELF_KINDS,
   proxied: "all other kroki.io diagram types",
 };
 

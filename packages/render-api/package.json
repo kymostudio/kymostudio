@@ -12,6 +12,7 @@
   "dependencies": {
     "bytefield-svg": "^1.11.0",
     "json5": "^2.2.3",
+    "kymo-svgbob": "file:../rust/kymo-svgbob/pkg",
     "kymostudio": "^0.4.4",
     "kymostudio-core": "^0.4.4",
     "nomnoml": "^1.7.0",

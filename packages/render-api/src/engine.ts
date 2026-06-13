@@ -7,6 +7,8 @@
 // default path fetches a relative URL, which has nothing to resolve against
 // here. kymostudio's initSync marks the JS lib ready AND instantiates the
 // same core glue (one shared node_modules copy), so one call powers both.
+import svgbobWasm from "kymo-svgbob/kymo_svgbob_bg.wasm";
+import { initSync as svgbobInit, svgbobToSvg } from "kymo-svgbob";
 import wasmModule from "kymostudio-core/kymostudio_core_bg.wasm";
 import {
   bpmnImport,
@@ -33,6 +35,7 @@ let ready = false;
 export function ensure(): void {
   if (ready) return;
   initSync(wasmModule);
+  svgbobInit({ module: svgbobWasm });
   // The wasm build has no system fonts and resvg ignores @font-face — without
   // these, PNG/PDF output silently drops every <text>. Roboto is named in the
   // renderers' font stacks, and the first face also becomes the generic
@@ -67,6 +70,12 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
   bpmn: (source) => {
     ensure();
     return bpmnRender(bpmnImport(source), false, null);
+  },
+  // The same Rust crate kroki runs natively, compiled to wasm
+  // (packages/rust/kymo-svgbob) — authoritative.
+  svgbob: (source) => {
+    ensure();
+    return svgbobToSvg(source);
   },
 };
 

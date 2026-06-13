@@ -13,6 +13,7 @@ on:
       - "packages/render-api/**"
       - "packages/js/**"
       - "packages/rust/kymostudio-core/**"
+      - "packages/rust/kymo-svgbob/**"
       - ".github/workflows/deploy-render-api.yml"
   workflow_dispatch:
 
@@ -40,6 +41,9 @@ jobs:
       - name: Build kymostudio-core wasm (full — pdf/png + registerFont)
         working-directory: packages/rust/kymostudio-core
         run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm,pdf
+      - name: Build kymo-svgbob wasm
+        working-directory: packages/rust/kymo-svgbob
+        run: wasm-pack build --target web --out-dir pkg --out-name kymo_svgbob
       - name: Build packages/js with the fresh core
         working-directory: packages/js
         run: |
