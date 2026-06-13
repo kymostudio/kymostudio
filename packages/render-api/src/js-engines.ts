@@ -6,9 +6,15 @@
 // by kroki identically — so dispatch treats them as authoritative (errors are
 // final 400s, no fallback hop).
 import renderBytefield from "bytefield-svg";
+import JSON5 from "json5";
 import { renderSvg } from "nomnoml";
+import onml from "onml";
+import wavedrom from "wavedrom";
 
 export const JS_RENDERERS: Record<string, (source: string) => string | Promise<string>> = {
   bytefield: (source) => renderBytefield(source),
   nomnoml: (source) => renderSvg(source),
+  // The wavedrom-cli pipeline: JSON5 source → onml tree → SVG string. Index 0
+  // namespaces the element ids, same as kroki's companion.
+  wavedrom: (source) => onml.s(wavedrom.renderAny(0, JSON5.parse(source), wavedrom.waveSkin)),
 };

@@ -15,3 +15,16 @@ declare module "bytefield-svg" {
   const render: (source: string, options?: { embedded?: boolean }) => string;
   export default render;
 }
+
+// wavedrom and onml ship no type declarations either.
+declare module "wavedrom" {
+  const wavedrom: {
+    renderAny: (index: number, source: unknown, skin: unknown) => unknown;
+    waveSkin: unknown;
+  };
+  export default wavedrom;
+}
+declare module "onml" {
+  const onml: { s: (tree: unknown) => string };
+  export default onml;
+}
