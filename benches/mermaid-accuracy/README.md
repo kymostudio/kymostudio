@@ -42,6 +42,7 @@ uv run python accuracy.py  # writes results/REPORT.md
 
 `render.mjs` resolves the wasm engines from `packages/render-api/node_modules`
 (set `RENDER_API_DIR` to override) and fetches the mermaid.js reference from
-kroki.io, so it is **online** — numbers move with kroki. `results/raw/` (the
+kroki.io, so it is **online** — numbers move with kroki. The corpus lives in `datasets/corpus.json` (each entry: id, grammar, source,
+expected labels). `results/raw/` (the
 rendered images) is git-ignored; `recall.json` and `REPORT.md` are committed as
 a dated snapshot.
