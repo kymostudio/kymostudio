@@ -1,6 +1,20 @@
 // Generated from database.sqlite by generate_schema.py — do not edit by hand.
 
 
+Table application {
+  key text [pk]
+  label text [not null]
+  description text
+  sort integer
+}
+
+Table category {
+  key text [pk]
+  label text [not null]
+  description text
+  sort integer
+}
+
 Table criteria {
   category text [not null]
   key text [not null]
@@ -13,6 +27,20 @@ Table criteria {
   }
 
   Note: 'CHECK (category IN (\'type\',\'tool\')) · CHECK (weight > 0 AND weight <= 1)'
+}
+
+Table diagram_lineage {
+  year integer [not null]
+  kind text [not null]
+  predecessor text [not null]
+  successor text [not null]
+  note text
+
+  indexes {
+    (year, predecessor, successor) [pk]
+  }
+
+  Note: 'CHECK (kind IN (\'merge\',\'split\',\'rename\'))'
 }
 
 Table diagram_metric_history {
@@ -58,9 +86,61 @@ Table diagram_scores {
   Note: 'CHECK (score >= 0 AND score <= 10)'
 }
 
+Table diagram_support {
+  key text [pk]
+  gui_level text [not null]
+  dsl_level text [not null]
+  mermaid_support text [not null]
+  notes text [not null]
+  as_of text [not null]
+  kymo_render text
+
+  Note: 'CHECK (gui_level IN (\'rich\',\'some\',\'poor\')) · CHECK (dsl_level IN (\'mature\',\'weak\',\'none\')) · CHECK (mermaid_support IN (\'yes\',\'partial\',\'no\')) · CHECK (kymo_render IN (\'engine\',\'proxy\',\'partial\',\'none\'))'
+}
+
+Table diagram_support_sources {
+  key text [not null]
+  url text [not null]
+
+  indexes {
+    (key, url) [pk]
+  }
+}
+
+Table diagram_support_tools {
+  key text [not null]
+  kind text [not null]
+  name text [not null]
+  url text
+
+  indexes {
+    (key, kind, name) [pk]
+  }
+
+  Note: 'CHECK (kind IN (\'gui\',\'dsl\'))'
+}
+
 Table diagrams {
   key text [pk]
   name text [not null]
+  description text
+  category text
+  domain text
+  application text
+  purpose text
+  standard text
+  aliases text
+  origin_year integer
+  standard_body text
+  reference_url text
+  example_url text
+}
+
+Table domain {
+  key text [pk]
+  label text [not null]
+  description text
+  sort integer
 }
 
 Table github_stars {
@@ -111,6 +191,18 @@ Table stack_overflow_tags {
 Table timeline {
   year integer [pk]
   remark text
+}
+
+Table tool_diagram_support {
+  tool text [not null]
+  diagram text [not null]
+  level text [not null]
+
+  indexes {
+    (tool, diagram) [pk]
+  }
+
+  Note: 'CHECK (level IN (\'native\',\'template\',\'partial\'))'
 }
 
 Table tool_metric_history {
@@ -170,6 +262,12 @@ Table tool_scores {
   Note: 'CHECK (score >= 0 AND score <= 10)'
 }
 
+Table tool_support_meta {
+  tool text [pk]
+  notes text [not null]
+  as_of text [not null]
+}
+
 Table tools {
   key text [pk]
   name text [not null]
@@ -186,10 +284,21 @@ Table wikipedia_pageviews {
   }
 }
 
+Ref: diagram_lineage.successor > diagrams.key
+Ref: diagram_lineage.predecessor > diagrams.key
 Ref: diagram_metric_history.key > diagrams.key
 Ref: diagram_rankings.key > diagrams.key
 Ref: diagram_scores.key > diagrams.key
+Ref: diagram_support.key > diagrams.key
+Ref: diagram_support_sources.key > diagrams.key
+Ref: diagram_support_tools.key > diagrams.key
+Ref: diagrams.application > application.key
+Ref: diagrams.domain > domain.key
+Ref: diagrams.category > category.key
+Ref: tool_diagram_support.diagram > diagrams.key
+Ref: tool_diagram_support.tool > tools.key
 Ref: tool_metric_history.key > tools.key
 Ref: tool_metrics.key > tools.key
 Ref: tool_rankings.key > tools.key
 Ref: tool_scores.key > tools.key
+Ref: tool_support_meta.tool > tools.key
