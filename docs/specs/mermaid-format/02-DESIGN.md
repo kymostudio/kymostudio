@@ -1,7 +1,7 @@
 ---
-title: Mermaid Import — Design (umbrella)
+title: Mermaid Format — Design (umbrella)
 document_id: DESIGN-MERMAID-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -26,7 +26,7 @@ keywords:
   - engine
 ---
 
-# Mermaid Import — Design (umbrella)
+# Mermaid Format — Design (umbrella)
 
 ## 1. Architecture: the engine moves into Rust
 
@@ -56,9 +56,10 @@ chains parse → layout → export. Surfaced to Python (`python.rs`, PyO3
 already load (`from_kymojson` / `parseKymoJson`) and render with no further layout
 — exactly like a `.bpmn` import. Emitting it means the Rust engine did not need a
 renderer at first, and Python/JS need only call the binding. (The parity phase since
-shipped the Python/JS render path, and the core later gained its **own** pure-Rust
-flowchart renderer, `crate::flowchart_svg` — so `mermaid_to_svg` / `d2_to_svg` /
-`dot_to_svg` render without the front-ends at all.)
+shipped the Python/JS render path; the core's **own** pure-Rust flowchart renderer
+`crate::flowchart_svg` — so `mermaid_to_svg` / `d2_to_svg` / `dot_to_svg` render without
+the front-ends at all — is owned by the flowchart hub `FEAT-FLOWCHART-001`, not this feature;
+this feature stops at the `.kymo.json` it feeds in.)
 
 ## 3. Hand-rolled JSON, not serde
 
