@@ -181,7 +181,9 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-folder:hover, .sb-file:hover { background: var(--bg-raise); }
 .sb-folder { font-weight: 400; }
 /* VS Code-style indent guides: one stretched border-left per ancestor level */
-.sb-guide { flex: none; width: 13px; align-self: stretch; border-left: 1px solid var(--border); }
+/* margin bleeds the guide into the row's 2px vertical padding so consecutive
+   segments touch — one continuous line instead of dashes */
+.sb-guide { flex: none; width: 13px; align-self: stretch; margin: -2px 0; border-left: 1px solid var(--border); }
 .sb-guide.on { border-left-color: var(--dim); } /* active subtree — neutral, not a loud accent */
 .sb-spacer { flex: none; width: 14px; } /* lines a file's icon up under a folder's icon */
 .sb-chev, .sb-icon { flex: none; color: var(--dim); display: inline-flex; }
