@@ -46,6 +46,16 @@ impl Scanner {
         }
     }
 
+    /// Consume one char if it matches `c` (used for the `&` node-group separator).
+    pub fn eat(&mut self, c: char) -> bool {
+        if self.peek() == Some(c) {
+            self.i += 1;
+            true
+        } else {
+            false
+        }
+    }
+
     fn starts_with(&self, pat: &str) -> bool {
         pat.chars()
             .enumerate()
