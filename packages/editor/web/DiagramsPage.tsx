@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
 import { useWorkspace, childFoldersOf, flattenTree, descendantFolderIds, type Folder } from "./workspace";
+import { useConfirm } from "./confirm";
 import { kindLabel } from "./kroki";
 import { DIAGRAMS_API } from "./const";
 import { TemplateGallery, setPendingTemplate, type Template } from "./templates";
@@ -28,6 +29,7 @@ function timeAgo(ms: number): string {
 export default function DiagramsPage() {
   const { idToken, claims, signOut, expireSession } = useAuth();
   const { folders, createFolder, renameFolder, deleteFolder, moveFolder } = useWorkspace();
+  const confirm = useConfirm();
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [error, setError] = useState("");
@@ -97,7 +99,12 @@ export default function DiagramsPage() {
     if (name && name !== f.name) await renameFolder(f.id, name);
   }
   async function onDeleteFolder(f: Folder) {
-    if (!window.confirm(`Delete folder "${f.name}"? Its diagrams and subfolders move up one level.`)) return;
+    const sub = descendantFolderIds(folders, f.id);
+    const hasContents = sub.size > 1 || items.some((i) => sub.has(effFolder(i)));
+    if (!(await confirm({
+      title: hasContents ? `Delete folder “${f.name}” and its contents?` : `Delete folder “${f.name}”?`,
+      detail: hasContents ? "All diagrams and subfolders inside will be deleted too." : undefined,
+    }))) return;
     await deleteFolder(f.id);
     load();
   }
@@ -119,7 +126,7 @@ export default function DiagramsPage() {
 
   async function remove(dd: Item) {
     if (!idToken) return;
-    if (!window.confirm(`Delete "${dd.title || "Untitled"}"? This cannot be undone.`)) return;
+    if (!(await confirm({ title: `Delete “${dd.title || "Untitled"}”?` }))) return;
     try {
       const r = await fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" });
       if (!r.ok) { setError(`Delete failed (${r.status})`); return; }
@@ -134,7 +141,7 @@ export default function DiagramsPage() {
 
   async function bulkDelete() {
     if (!idToken || !sel.size) return;
-    if (!window.confirm(`Delete ${sel.size} diagram${sel.size > 1 ? "s" : ""}? This cannot be undone.`)) return;
+    if (!(await confirm({ title: `Delete ${sel.size} diagram${sel.size > 1 ? "s" : ""}?` }))) return;
     try {
       const results = await Promise.all([...sel].map((id) =>
         fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" })

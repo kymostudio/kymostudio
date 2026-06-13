@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, colorFor } from "./auth";
-import { useWorkspace, assignDiagram, deleteDiagram, childFoldersOf, type Folder } from "./workspace";
+import { useWorkspace, assignDiagram, deleteDiagram, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
+import { useConfirm } from "./confirm";
 import { DIAGRAMS_API } from "./const";
 import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
@@ -41,6 +42,7 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
   const { idToken } = useAuth();
   const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder } = useWorkspace();
   const { items, reload } = useDiagrams();
+  const confirm = useConfirm();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem("kymo_expanded") || "[]")); } catch { return new Set(); }
@@ -66,11 +68,17 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     if (name && name !== f.name) await renameFolder(f.id, name);
   }
   async function onDeleteFolder(f: Folder) {
-    if (!window.confirm(`Delete folder "${f.name}"? Its diagrams and subfolders move up one level.`)) return;
+    const sub = descendantFolderIds(folders, f.id);
+    const hasContents = sub.size > 1 || items.some((i) => sub.has(effFolder(i)));
+    if (!(await confirm({
+      title: hasContents ? `Delete folder “${f.name}” and its contents?` : `Delete folder “${f.name}”?`,
+      detail: hasContents ? "All diagrams and subfolders inside will be deleted too." : undefined,
+    }))) return;
+    if (currentId && items.some((i) => i.id === currentId && sub.has(effFolder(i)))) navigate("/"); // the open file was inside
     await deleteFolder(f.id); reload();
   }
   async function onDeleteFile(it: Item) {
-    if (!window.confirm(`Delete "${it.title || "Untitled"}"? This cannot be undone.`)) return;
+    if (!(await confirm({ title: `Delete “${it.title || "Untitled"}”?` }))) return;
     if (await deleteDiagram(idToken, it.id)) { if (it.id === currentId) navigate("/"); reload(); }
   }
   function openFile(id: string) { navigate("/?d=" + encodeURIComponent(id)); onClose(); }

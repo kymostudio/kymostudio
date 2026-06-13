@@ -48,6 +48,23 @@ button, .btn { background: var(--bg); color: var(--ink); border: 1px solid var(-
 button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft); }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
 .btn-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+.btn-danger { background: var(--error); border-color: var(--error); color: #fff; font-weight: 700; }
+.btn-danger:hover { background: #9a1d13; border-color: #9a1d13; }
+.btn-danger:focus-visible { outline: 2px solid rgba(180, 35, 24, 0.5); outline-offset: 1px; }
+
+/* ---- confirm modal (replaces window.confirm for deletes) ---- */
+.confirm-overlay { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(36, 33, 49, 0.4); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+.confirm-card { position: relative; width: min(440px, calc(100vw - 32px)); background: var(--bg); border-radius: var(--radius); box-shadow: 0 24px 64px rgba(36, 33, 49, 0.32); padding: 22px 22px 18px; }
+.confirm-x { position: absolute; top: 12px; right: 12px; border: 0; background: transparent; color: var(--dim); padding: 5px; border-radius: 7px; }
+.confirm-x:hover { background: var(--bg-soft); color: var(--ink); transform: none; box-shadow: none; }
+.confirm-body { display: flex; gap: 14px; padding-right: 18px; }
+.confirm-icon { flex: none; display: inline-flex; color: #e0a23c; margin-top: 1px; }
+.confirm-icon.danger { color: #e0a23c; }
+.confirm-text { min-width: 0; }
+.confirm-title { margin: 0; font-size: 15.5px; font-weight: 700; line-height: 1.4; color: var(--ink); }
+.confirm-detail { margin: 5px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--dim); }
+.confirm-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.confirm-foot button { padding: 8px 18px; }
 
 /* padding is asymmetric on purpose: mixed-case labels are optically centered on
    their x-height band, which sits ~1px below the box center — next to the solid

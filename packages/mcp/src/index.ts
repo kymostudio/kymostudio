@@ -62,11 +62,22 @@ async function ensureFolderColumn(env: Env) {
   folderColReady = true;
 }
 
+// Deletes are SOFT: a `deleted` timestamp column (NULL = live) on both tables.
+// Rows stay in D1 (recoverable / auditable); lists just exclude deleted rows.
+let deletedColReady = false;
+async function ensureDeletedColumn(env: Env) {
+  if (deletedColReady) return;
+  try { await env.DB.prepare("ALTER TABLE diagrams ADD COLUMN deleted INTEGER").run(); } catch {}
+  try { await env.DB.prepare("ALTER TABLE workspaces ADD COLUMN deleted INTEGER").run(); } catch {}
+  deletedColReady = true;
+}
+
 async function listIndex(env: Env, email: string): Promise<IdxEntry[]> {
   await migrateKvToD1(env, email);
   await ensureThumbColumn(env);
+  await ensureDeletedColumn(env);
   const rs = await env.DB.prepare(
-    "SELECT id, title, kind, ws, updated_at, (thumb IS NOT NULL AND thumb != '') AS has_thumb FROM diagrams WHERE owner = ?1 ORDER BY updated_at DESC"
+    "SELECT id, title, kind, ws, updated_at, (thumb IS NOT NULL AND thumb != '') AS has_thumb FROM diagrams WHERE owner = ?1 AND deleted IS NULL ORDER BY updated_at DESC"
   ).bind(email).all<{ id: string; title: string; kind: string; ws: string; updated_at: number; has_thumb: number }>();
   return (rs.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind, ws: r.ws, updatedAt: r.updated_at, hasThumb: !!r.has_thumb }));
 }
@@ -90,13 +101,25 @@ async function removeFromIndex(env: Env, email: string, id: string) {
   }
 }
 
+// Soft delete: mark the row `deleted` (keep it + its room DO content for
+// recovery). Returns 403 when the diagram isn't found / not owned.
 async function destroyDiagram(env: Env, email: string, id: string): Promise<number> {
-  const r = await roomFor(env, id).fetch("https://room/destroy", {
-    method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ owner: email }),
-  });
-  if (r.status === 403) return 403;
-  await removeFromIndex(env, email, id);
+  await ensureDeletedColumn(env);
+  const res = await env.DB.prepare("UPDATE diagrams SET deleted = ?1 WHERE id = ?2 AND owner = ?3 AND deleted IS NULL")
+    .bind(Date.now(), id, email).run();
+  // fix the "last opened" pointer if it pointed at this diagram
+  const last = await env.OAUTH_KV.get(`last:${email}`);
+  if (last === id) {
+    const next = await env.DB.prepare("SELECT id FROM diagrams WHERE owner = ?1 AND deleted IS NULL ORDER BY updated_at DESC LIMIT 1")
+      .bind(email).first<{ id: string }>();
+    if (next) await env.OAUTH_KV.put(`last:${email}`, next.id);
+    else await env.OAUTH_KV.delete(`last:${email}`);
+  }
+  // 0 changes = not found / not owned / already deleted → treat unknown as forbidden
+  if (!res.meta.changes) {
+    const owned = await env.DB.prepare("SELECT 1 FROM diagrams WHERE id = ?1 AND owner = ?2").bind(id, email).first();
+    if (!owned) return 403;
+  }
   return 200;
 }
 
@@ -158,7 +181,8 @@ type Workspace = { id: string; name: string; parentId: string; createdAt: number
 async function listWorkspaces(env: Env, email: string): Promise<Workspace[]> {
   await migrateKvToD1(env, email);
   await ensureFolderColumn(env);
-  const rs = await env.DB.prepare("SELECT id, name, parent_id, created_at FROM workspaces WHERE owner = ?1 ORDER BY created_at")
+  await ensureDeletedColumn(env);
+  const rs = await env.DB.prepare("SELECT id, name, parent_id, created_at FROM workspaces WHERE owner = ?1 AND deleted IS NULL ORDER BY created_at")
     .bind(email).all<{ id: string; name: string; parent_id: string | null; created_at: number }>();
   return (rs.results ?? []).map((r) => ({ id: r.id, name: r.name, parentId: r.parent_id || "", createdAt: r.created_at }));
 }
@@ -560,17 +584,22 @@ export default {
           return Response.json({ ok: true }, { headers: cors });
         }
         if (request.method === "DELETE") {
-          // Delete a folder; reparent its children (subfolders + diagrams) up to
-          // its own parent so nothing is orphaned (structure is preserved).
+          // Soft-delete a folder AND everything inside it — every nested subfolder
+          // and every diagram in that subtree (rows stay in D1, just flagged).
           const id = url.searchParams.get("id") || "";
           if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
-          const row = await env.DB.prepare("SELECT parent_id FROM workspaces WHERE id = ?1 AND owner = ?2")
-            .bind(id, email).first<{ parent_id: string | null }>();
-          if (!row) return Response.json({ error: "not found" }, { status: 404, headers: cors });
-          const parent = row.parent_id || "";
-          await env.DB.prepare("UPDATE workspaces SET parent_id = ?1 WHERE owner = ?2 AND parent_id = ?3").bind(parent, email, id).run();
-          await env.DB.prepare("UPDATE diagrams SET ws = ?1 WHERE owner = ?2 AND ws = ?3").bind(parent, email, id).run();
-          await env.DB.prepare("DELETE FROM workspaces WHERE id = ?1 AND owner = ?2").bind(id, email).run();
+          const all = await listWorkspaces(env, email);
+          if (!all.some((f) => f.id === id)) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+          // the folder + all descendant folders
+          const doomed = new Set<string>([id]);
+          for (let grew = true; grew; ) { grew = false; for (const f of all) if (f.parentId && doomed.has(f.parentId) && !doomed.has(f.id)) { doomed.add(f.id); grew = true; } }
+          const ids = [...doomed];
+          const ph = ids.map((_, i) => `?${i + 2}`).join(",");
+          // soft-delete each diagram in those folders
+          const rs = await env.DB.prepare(`SELECT id FROM diagrams WHERE owner = ?1 AND deleted IS NULL AND ws IN (${ph})`).bind(email, ...ids).all<{ id: string }>();
+          await Promise.all((rs.results ?? []).map((r) => destroyDiagram(env, email, r.id)));
+          // soft-delete the folder rows
+          await env.DB.prepare(`UPDATE workspaces SET deleted = ?1 WHERE owner = ?2 AND id IN (${ids.map((_, i) => `?${i + 3}`).join(",")})`).bind(Date.now(), email, ...ids).run();
           return Response.json({ ok: true }, { headers: cors });
         }
         return Response.json({ workspaces: await listWorkspaces(env, email) }, { headers: cors });
