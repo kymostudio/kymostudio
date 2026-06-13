@@ -58,7 +58,7 @@ async function kroki(source, fmt) {
 }
 
 const DS = HERE + "datasets/";
-const corpus = JSON.parse(readFileSync(DS + "corpus.json", "utf8"));
+const corpus = JSON.parse(readFileSync(DS + "mermaid-kymo/corpus.json", "utf8"));
 const out = [];
 
 for (const c of corpus) {

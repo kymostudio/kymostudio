@@ -42,11 +42,11 @@ uv run python accuracy.py  # writes results/REPORT.md
 
 `render.mjs` resolves the wasm engines from `packages/render-api/node_modules`
 (set `RENDER_API_DIR` to override) and fetches the mermaid.js reference from
-kroki.io, so it is **online** — numbers move with kroki. The scored corpus lives in `datasets/corpus.json` (each entry: id, grammar,
-source, expected labels). `datasets/<grammar>/` additionally holds ~3,970 raw
-mermaid sources split by diagram type, gathered from three public test suites
-(merman, warpdotdev/mermaid-to-svg, mermaid-js cypress) — see
-`datasets/PROVENANCE.md`; those are raw inputs for coverage, not part of the
-scored run. `results/raw/` (the
+kroki.io, so it is **online** — numbers move with kroki. `datasets/` holds one folder per dataset, each with a card (`README.md`). The
+scored set is `datasets/mermaid-kymo/corpus.json` (hand-written, each entry
+`{id, grammar, source, labels}`). The other datasets — `merman/`,
+`mermaid-cypress/`, `mermaid-to-svg/` — are ~3,970 raw mermaid sources split
+by diagram type, for render/convert coverage (not scored). See
+`datasets/README.md`. `results/raw/` (the
 rendered images) is git-ignored; `recall.json` and `REPORT.md` are committed as
 a dated snapshot.
