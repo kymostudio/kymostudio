@@ -113,6 +113,12 @@ pub fn mermaid_sequence_to_svg(src: &str) -> Result<String, JsError> {
     crate::mermaid_to_sequence_svg(src).map_err(|e| JsError::new(&e.to_string()))
 }
 
+/// Render a Mermaid `stateDiagram` / `stateDiagram-v2` -> SVG (text-based).
+#[wasm_bindgen(js_name = mermaidStateToSvg)]
+pub fn mermaid_state_to_svg(src: &str) -> Result<String, JsError> {
+    crate::mermaid_state_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
 /// Render D2 flowchart source → SVG (pure-Rust D2 importer + renderer).
 #[wasm_bindgen(js_name = d2ToSvg)]
 pub fn d2_to_svg(src: &str) -> Result<String, JsError> {

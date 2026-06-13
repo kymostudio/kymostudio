@@ -12,6 +12,7 @@
 mod lexer;
 mod parser;
 mod sequence;
+mod state;
 
 use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
 use crate::model::Shape;
@@ -209,6 +210,17 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
 /// flowcharts), so the body is split on newlines only. The header line selects
 /// the diagram type; anything other than `sequenceDiagram` is reported as
 /// [`MermaidError::Unsupported`].
+/// Parse a Mermaid state diagram (`stateDiagram` / `stateDiagram-v2`) into the
+/// flowchart IR, so it can reuse the flowchart layout + SVG renderer.
+pub fn parse_state(src: &str) -> Result<Flowchart, MermaidError> {
+    let stmts = split_statements(src);
+    let header = stmts.first().ok_or(MermaidError::Empty)?;
+    if !header.1.to_ascii_lowercase().starts_with("statediagram") {
+        return Err(MermaidError::Unsupported(header.1.clone()));
+    }
+    state::parse(&stmts)
+}
+
 pub fn parse_sequence(src: &str) -> Result<crate::sequence::Sequence, MermaidError> {
     let stmts: Vec<(usize, String)> = src
         .lines()
