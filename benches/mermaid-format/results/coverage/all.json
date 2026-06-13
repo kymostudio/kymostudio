@@ -1,4 +1,24 @@
 {
+  "mermaid-kymo": {
+    "flowchart": {
+      "n": 6,
+      "merman_ok": 6,
+      "merman_fo": 6,
+      "merman_text": 0,
+      "kymo_n": 6,
+      "kymo_ok": 6,
+      "timeout": 0
+    },
+    "sequence": {
+      "n": 5,
+      "merman_ok": 5,
+      "merman_fo": 0,
+      "merman_text": 5,
+      "kymo_n": 5,
+      "kymo_ok": 5,
+      "timeout": 0
+    }
+  },
   "merman": {
     "architecture": {
       "n": 182,
