@@ -34,6 +34,7 @@ export default function DiagramsPage() {
   const [q, setQ] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [sel, setSel] = useState<Set<string>>(new Set()); // multi-select for bulk delete/move
 
   useEffect(() => { document.title = "Diagrams · Kymostudio"; return () => { document.title = "Kymostudio"; }; }, []);
 
@@ -110,6 +111,37 @@ export default function DiagramsPage() {
     } catch (e: any) { setError("Delete failed: " + e.message); }
   }
 
+  // ---- bulk selection (clean up the "Untitled" pile-up in one go) ----
+  const toggleSel = (id: string) => setSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const clearSel = () => setSel(new Set());
+  // Selection is scoped to what's visible — reset it when the workspace/search changes.
+  useEffect(() => { setSel(new Set()); }, [currentWs, q]);
+
+  async function bulkDelete() {
+    if (!idToken || !sel.size) return;
+    if (!window.confirm(`Delete ${sel.size} diagram${sel.size > 1 ? "s" : ""}? This cannot be undone.`)) return;
+    try {
+      const results = await Promise.all([...sel].map((id) =>
+        fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" })
+          .then((r) => r.ok).catch(() => false)));
+      if (results.some((ok) => !ok)) setError("Some diagrams could not be deleted.");
+      clearSel();
+      load();
+    } catch (e: any) { setError("Delete failed: " + e.message); }
+  }
+  async function bulkMove(ws: string) {
+    if (!idToken || !sel.size) return;
+    try {
+      await Promise.all([...sel].map((id) =>
+        fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
+          method: "PATCH", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ id, ws }),
+        }).catch(() => {})));
+      clearSel();
+      load();
+    } catch (e: any) { setError("Move failed: " + e.message); }
+  }
+
   const inWs = items.filter((i) => (i.ws || "") === currentWs);
   const filtered = q.trim()
     ? inWs.filter((i) => (i.title || "Untitled").toLowerCase().includes(q.trim().toLowerCase()))
@@ -145,6 +177,30 @@ export default function DiagramsPage() {
               <Search size={17} strokeWidth={2} />
               <input placeholder="Search diagrams…" value={q} onChange={(e) => setQ(e.target.value)} />
             </div>
+            {/* bulk toolbar: select-all toggle, and (when something is picked) delete / move */}
+            {!!filtered.length && (
+              <div className={"bulk-bar" + (sel.size ? " active" : "")}>
+                <label className="bulk-all">
+                  <input type="checkbox"
+                    checked={sel.size > 0 && sel.size === filtered.length}
+                    ref={(el) => { if (el) el.indeterminate = sel.size > 0 && sel.size < filtered.length; }}
+                    onChange={(e) => setSel(e.target.checked ? new Set(filtered.map((i) => i.id)) : new Set())} />
+                  {sel.size ? `${sel.size} selected` : "Select"}
+                </label>
+                {!!sel.size && (
+                  <span className="bulk-actions">
+                    <button className="bulk-del" onClick={bulkDelete}>Delete</button>
+                    <select className="bulk-move" defaultValue="" title="Move selected to workspace"
+                      onChange={(e) => { if (e.target.value !== "__") bulkMove(e.target.value); e.target.value = "__"; }}>
+                      <option value="__">Move to…</option>
+                      <option value="">Personal</option>
+                      {workspaces.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+                    </select>
+                    <button className="linklike" onClick={clearSel}>Clear</button>
+                  </span>
+                )}
+              </div>
+            )}
             {error && <div className="empty">{error}</div>}
             <div className="rows">
               {!loaded && !items.length && !error && [0, 1, 2].map((i) => (
@@ -154,13 +210,16 @@ export default function DiagramsPage() {
                 </div>
               ))}
               {filtered.map((dd) => (
-                <a key={dd.id} className="rrow" href={"/?d=" + encodeURIComponent(dd.id)}
+                <a key={dd.id} className={"rrow" + (sel.has(dd.id) ? " selected" : "")} href={"/?d=" + encodeURIComponent(dd.id)}
                   onClick={(e) => {
                     // SPA navigation → the editor's boot loader shows instead of a blank full-page reload
                     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
                     e.preventDefault();
                     navigate("/?d=" + encodeURIComponent(dd.id));
                   }}>
+                  <input type="checkbox" className="rcheck" checked={sel.has(dd.id)} aria-label="Select diagram"
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => { e.stopPropagation(); toggleSel(dd.id); }} />
                   <span className="rthumb">
                     {dd.hasThumb
                       ? <img loading="lazy" alt="" src={`${DIAGRAMS_API}/thumb?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken || "")}`}

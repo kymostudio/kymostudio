@@ -7,6 +7,8 @@ export const WORKSPACES_API = "https://mcp.kymo.studio/api/workspaces";
 // all edge-cached by content hash, so repeat loads of a share link skip the
 // render entirely (and mermaid skips kroki's ~2.5s puppeteer even on a miss).
 export const RENDER_API = "https://render.kymo.studio";
+// Docs site (VitePress). Per-kind syntax help deep-links off this root.
+export const DOCS_URL = "https://docs.kymo.studio";
 export const SAMPLE = `flowchart TD {
   A[Receive order] --> B{In stock?}
   B -->|Yes| C[Take payment]

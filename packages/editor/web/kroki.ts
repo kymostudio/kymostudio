@@ -1,5 +1,5 @@
 import DOMPurify from "dompurify";
-import { RENDER_API } from "./const";
+import { DOCS_URL, RENDER_API } from "./const";
 
 // Diagram kinds: "kymo" renders locally (wasm); everything else goes through
 // the render API (render.kymo.studio, kroki-compatible — POST source, get SVG
@@ -38,6 +38,29 @@ export const KINDS: { value: string; label: string }[] = [
 
 export function kindLabel(kind: string): string {
   return KINDS.find((k) => k.value === kind)?.label ?? kind;
+}
+
+// Syntax help for a kind: kymo/bpmn → our own docs; the rest → the format's
+// canonical upstream reference, so a stuck user always has a working exit.
+const UPSTREAM_DOCS: Record<string, string> = {
+  mermaid: "https://mermaid.js.org/intro/",
+  plantuml: "https://plantuml.com/",
+  c4plantuml: "https://github.com/plantuml-stdlib/C4-PlantUML",
+  d2: "https://d2lang.com/tour/intro/",
+  graphviz: "https://graphviz.org/doc/info/lang.html",
+  dbml: "https://dbml.dbdiagram.io/docs/",
+  excalidraw: "https://docs.excalidraw.com/",
+  vega: "https://vega.github.io/vega/docs/",
+  vegalite: "https://vega.github.io/vega-lite/docs/",
+  wavedrom: "https://wavedrom.com/tutorial.html",
+  structurizr: "https://docs.structurizr.com/dsl",
+  nomnoml: "https://www.nomnoml.com/",
+  pikchr: "https://pikchr.org/home/doc/trunk/doc/userman.md",
+};
+export function docHref(kind: string): string {
+  if (kind === "kymo" || kind === "bpmn") return DOCS_URL;
+  // Every kroki-relayed kind (actdiag, nwdiag, erd, ditaa, …) is documented at kroki.io.
+  return UPSTREAM_DOCS[kind] ?? "https://kroki.io/#support";
 }
 
 // Kroki SVG is rendered from source we don't control (share links put the source
