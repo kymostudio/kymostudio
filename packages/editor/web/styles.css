@@ -109,8 +109,15 @@ main.scroll { display: block; overflow: auto; }
 .pane { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .pane + .pane { border-left: 1px solid var(--border); }
 textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !important; padding: 16px; background: var(--bg); color: var(--ink); caret-color: var(--accent); font: 13.5px/1.7 var(--mono); tab-size: 2; }
-#preview { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 28px; background: #fff; }
-#preview svg { max-width: 100%; height: auto; background: #fff; }
+#preview { flex: 1; position: relative; overflow: hidden; background: #fff; touch-action: none; cursor: grab; }
+#preview:active { cursor: grabbing; }
+.pv-stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
+.pv-stage svg { display: block; background: #fff; }
+.pv-controls { position: absolute; right: 12px; bottom: 12px; z-index: 6; display: flex; align-items: center; gap: 2px; padding: 3px; background: rgba(255, 255, 255, 0.92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); cursor: default; }
+.pv-controls button { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; background: transparent; color: var(--ink); border-radius: 7px; cursor: pointer; }
+.pv-controls button:hover { background: var(--bg-raise); color: var(--accent); }
+.pv-controls .pv-pct { width: auto; min-width: 46px; padding: 0 7px; font: 12px/1 var(--mono); color: var(--dim); }
+.pv-controls .pv-pct:hover { color: var(--accent); background: var(--bg-raise); }
 .status { font: 12px/1.5 var(--mono); padding: 7px 14px; border-top: 1px solid var(--border); color: var(--dim); min-height: 28px; white-space: pre-wrap; background: var(--bg); }
 .status.error { color: var(--error); background: rgba(180, 35, 24, 0.06); border-top-color: rgba(180, 35, 24, 0.25); font-weight: 600; }
 /* invalid share link: a banner the user can't miss (the status line races with renders) */
@@ -157,6 +164,9 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .rows { margin-top: 6px; }
 .rrow { display: flex; align-items: center; gap: 14px; padding: 18px 10px; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--ink); }
 .rrow:hover { background: var(--bg-soft); }
+.rthumb { flex: none; width: 60px; height: 42px; border: 1px solid var(--border); border-radius: 8px; background: #fff; display: grid; place-items: center; overflow: hidden; color: var(--border-strong); }
+.rthumb.empty { background: var(--bg-soft); }
+.rthumb img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; padding: 3px; }
 .rtitle { font-size: 15px; font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rtime { color: var(--dim); font-size: 13.5px; min-width: 110px; text-align: right; flex: none; }
 .rdel { opacity: 0; background: transparent; border: 0; color: var(--dim); font-size: 13px; font-weight: 500; cursor: pointer; padding: 4px 9px; border-radius: 7px; flex: none; }
@@ -315,7 +325,6 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
   /* diagram first: recipients want to see it, not the source */
   .pane:last-child { order: -1; border-bottom: 1px solid var(--border); }
   .splitter { display: none; }
-  #preview { padding: 14px; }
 }
 
 /* touch devices: hover-revealed affordances must be visible up front */

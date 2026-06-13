@@ -38,14 +38,26 @@ function roomFor(env: Env, id: string) {
 // The EditorRoom DO holds the live document; D1 keeps the queryable copy:
 // metadata always, plus a source snapshot (refreshed on rename/kind change,
 // throttled during typing, flushed when a tab closes).
-type IdxEntry = { id: string; title: string; updatedAt: number; kind?: string; ws?: string };
+type IdxEntry = { id: string; title: string; updatedAt: number; kind?: string; ws?: string; hasThumb?: boolean };
+
+// `thumb` (a rendered SVG snapshot for the Diagrams list) was added after the
+// table shipped — self-migrate idempotently so cold/local/prod D1s converge
+// without a separate migration step. The duplicate-column error on re-run is
+// expected and swallowed; a per-isolate flag keeps it off the hot path.
+let thumbColReady = false;
+async function ensureThumbColumn(env: Env) {
+  if (thumbColReady) return;
+  try { await env.DB.prepare("ALTER TABLE diagrams ADD COLUMN thumb TEXT").run(); } catch {}
+  thumbColReady = true;
+}
 
 async function listIndex(env: Env, email: string): Promise<IdxEntry[]> {
   await migrateKvToD1(env, email);
+  await ensureThumbColumn(env);
   const rs = await env.DB.prepare(
-    "SELECT id, title, kind, ws, updated_at FROM diagrams WHERE owner = ?1 ORDER BY updated_at DESC"
-  ).bind(email).all<{ id: string; title: string; kind: string; ws: string; updated_at: number }>();
-  return (rs.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind, ws: r.ws, updatedAt: r.updated_at }));
+    "SELECT id, title, kind, ws, updated_at, (thumb IS NOT NULL AND thumb != '') AS has_thumb FROM diagrams WHERE owner = ?1 ORDER BY updated_at DESC"
+  ).bind(email).all<{ id: string; title: string; kind: string; ws: string; updated_at: number; has_thumb: number }>();
+  return (rs.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind, ws: r.ws, updatedAt: r.updated_at, hasThumb: !!r.has_thumb }));
 }
 
 async function touchIndex(env: Env, email: string, id: string, title?: string, kind?: string) {
@@ -153,6 +165,7 @@ async function assignWorkspace(env: Env, email: string, diagramId: string, ws: s
 export class EditorRoom extends DurableObject<Env> {
   source = ""; owner = ""; title = ""; diagramId = ""; kind = ""; // kind "" = kymo (native)
   lastIdx = 0; // last indexUpsert (in-memory) — throttles KV writes during typing
+  thumb = ""; lastThumbSrc: string | null = null; // memoized list-thumbnail SVG (per source)
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     ctx.blockConcurrencyWhile(async () => {
@@ -233,12 +246,32 @@ export class EditorRoom extends DurableObject<Env> {
     }
   }
 
+  // Render a list-thumbnail (full SVG, scaled down by the <img> on the client).
+  // render.kymo.studio is content-addressed-cached, so re-renders of an unchanged
+  // source are edge hits; memoize per source to skip even that on rename flushes.
+  // Oversized renders are dropped (placeholder shown) to keep D1 rows small.
+  async thumbFor(): Promise<string> {
+    if (!this.source.trim()) return "";
+    if (this.lastThumbSrc === this.source) return this.thumb;
+    let svg = "";
+    try {
+      const r = await fetch(`https://render.kymo.studio/${encodeURIComponent(this.kind || "kymo")}/svg`, {
+        method: "POST", headers: { "content-type": "text/plain" }, body: this.source,
+      });
+      if (r.ok) { const s = await r.text(); if (s.length <= 40_000 && s.includes("<svg")) svg = s; }
+    } catch {}
+    this.thumb = svg; this.lastThumbSrc = this.source;
+    return svg;
+  }
+
   async indexUpsert() {
     if (!this.owner || !this.diagramId) return;
+    await ensureThumbColumn(this.env);
+    const thumb = await this.thumbFor();
     await this.env.DB.prepare(
-      `INSERT INTO diagrams (id, owner, title, kind, source, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)
-       ON CONFLICT(id) DO UPDATE SET title = ?3, kind = ?4, source = ?5, updated_at = ?6`
-    ).bind(this.diagramId, this.owner, this.title || "Untitled", this.kind || "kymo", this.source, Date.now()).run();
+      `INSERT INTO diagrams (id, owner, title, kind, source, thumb, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+       ON CONFLICT(id) DO UPDATE SET title = ?3, kind = ?4, source = ?5, thumb = COALESCE(NULLIF(?6, ''), thumb), updated_at = ?7`
+    ).bind(this.diagramId, this.owner, this.title || "Untitled", this.kind || "kymo", this.source, thumb, Date.now()).run();
     this.lastIdx = Date.now();
   }
   async webSocketClose(ws: WebSocket) {
@@ -431,7 +464,7 @@ export default {
       return roomFor(env, d).fetch(request);
     }
     // Browser-callable APIs for the signed-in user (Google id_token).
-    if (url.pathname === "/api/diagrams" || url.pathname === "/api/workspaces") {
+    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces") {
       const cors: Record<string, string> = {
         "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
@@ -446,6 +479,18 @@ export default {
         email = pl.email!;
       } catch {
         return Response.json({ error: "unauthorized" }, { status: 401, headers: cors });
+      }
+
+      // Per-diagram thumbnail SVG for the Diagrams list — separate route so the
+      // list JSON stays small and the browser lazy-loads + caches each <img>.
+      if (url.pathname === "/api/diagrams/thumb") {
+        const id = url.searchParams.get("id") || "";
+        if (!id) return new Response("missing id", { status: 400, headers: cors });
+        await ensureThumbColumn(env);
+        const row = await env.DB.prepare("SELECT thumb FROM diagrams WHERE id = ?1 AND owner = ?2")
+          .bind(id, email).first<{ thumb: string | null }>();
+        if (!row || !row.thumb) return new Response("no thumb", { status: 404, headers: cors });
+        return new Response(row.thumb, { headers: { "content-type": "image/svg+xml", "cache-control": "private, max-age=120", ...cors } });
       }
 
       if (url.pathname === "/api/workspaces") {

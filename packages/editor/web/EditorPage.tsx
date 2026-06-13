@@ -6,6 +6,7 @@ import { WorkspaceSwitcher, useWorkspace, assignDiagram } from "./workspace";
 import { KINDS, renderKroki, sanitizeSvg } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
+import { Preview } from "./preview";
 import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
@@ -209,7 +210,7 @@ export default function EditorPage() {
         if (userEdited.current) {
           fresh.current = false;
           room.sendSource(source, kind);
-          const t2 = kind === "kymo" ? titleFrom(source) : "Untitled";
+          const t2 = titleFrom(source, kind);
           if (t2 !== "Untitled") { setTitle(t2); room.sendRename(t2); }
         }
         return;
@@ -229,7 +230,7 @@ export default function EditorPage() {
       room.sendSource(source, kind);
       if (fresh.current) {
         fresh.current = false;
-        const t = kind === "kymo" ? titleFrom(source) : "Untitled";
+        const t = titleFrom(source, kind);
         if (!titleRef.current && t !== "Untitled") { setTitle(t); room.sendRename(t); }
       }
     }, lastSvg.current ? (kind === "kymo" ? 120 : 450) : 0); // debounce typing, but never the very first render
@@ -258,7 +259,7 @@ export default function EditorPage() {
 
   // Without a room there's no stored title — derive one from the source so share
   // links and the guest editor aren't a blank "/" in the header (kymo kind only).
-  const localTitle = !d && kind === "kymo" ? titleFrom(source) : "Untitled";
+  const localTitle = !d ? titleFrom(source, kind) : "Untitled";
   const diagramLabel = title || (localTitle !== "Untitled" ? localTitle : "Untitled");
   // redirecting to the latest diagram, or waiting for the first doc — but a
   // draft legitimately lives at "/" with no room, so it is never "booting"
@@ -603,7 +604,7 @@ export default function EditorPage() {
               {shareError && <div className="share-error">{shareError}</div>}
               {kind === "kymo" && !renderReady && !shareError
                 ? <div className="boot"><KLoader /></div>
-                : <div id="preview" dangerouslySetInnerHTML={{ __html: svg }} />}
+                : <Preview svg={svg} fitKey={(d || "shared") + ":" + kind} />}
             </section>
           </>
         )}

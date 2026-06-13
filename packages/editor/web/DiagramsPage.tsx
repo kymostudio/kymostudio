@@ -5,9 +5,9 @@ import { useWorkspace } from "./workspace";
 import { kindLabel } from "./kroki";
 import { DIAGRAMS_API } from "./const";
 import { TemplateGallery, setPendingTemplate, type Template } from "./templates";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Image as ImageIcon } from "lucide-react";
 
-type Item = { id: string; title: string; updatedAt: number; ws?: string; kind?: string };
+type Item = { id: string; title: string; updatedAt: number; ws?: string; kind?: string; hasThumb?: boolean };
 
 function timeAgo(ms: number): string {
   if (!ms) return "";
@@ -161,6 +161,12 @@ export default function DiagramsPage() {
                     e.preventDefault();
                     navigate("/?d=" + encodeURIComponent(dd.id));
                   }}>
+                  <span className="rthumb">
+                    {dd.hasThumb
+                      ? <img loading="lazy" alt="" src={`${DIAGRAMS_API}/thumb?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken || "")}`}
+                          onError={(e) => { (e.currentTarget.parentElement as HTMLElement).classList.add("empty"); e.currentTarget.remove(); }} />
+                      : <ImageIcon size={16} strokeWidth={1.8} />}
+                  </span>
                   <span className="rtitle">{dd.title || "Untitled"}</span>
                   {dd.kind && <span className="rkind">{kindLabel(dd.kind)}</span>}
                   <select className="rmove" value={dd.ws || ""} title="Move to workspace"
