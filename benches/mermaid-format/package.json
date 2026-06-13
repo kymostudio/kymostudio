@@ -1,0 +1,12 @@
+{
+  "name": "mermaid-format-bench",
+  "private": true,
+  "type": "module",
+  "description": "Accuracy/coverage benches for the kymo mermaid renderers (truth = mermaid.js 11).",
+  "scripts": {
+    "accuracy": "node accuracy-mermaidjs.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.0.0"
+  }
+}
