@@ -34,7 +34,9 @@
             // render entirely, and misses self-render right on the worker for the
             // kinds it covers. If this fails, renderKroki() falls back to a fresh
             // request (render API, then kroki.io direct).
-            var res = fetch("https://render.kymo.studio/" + encodeURIComponent(k) + "/svg", { method: "POST", headers: { "content-type": "text/plain" }, body: src });
+            var hdr = { "content-type": "text/plain" };
+            try { var tok = localStorage.getItem("kymo_idtoken"); if (tok) hdr["authorization"] = "Bearer " + tok; } catch (e) {}
+            var res = fetch("https://render.kymo.studio/" + encodeURIComponent(k) + "/svg", { method: "POST", headers: hdr, body: src });
             res.catch(function () {});
             return { kind: k, src: src, res: res };
           })();

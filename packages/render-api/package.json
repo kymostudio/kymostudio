@@ -13,6 +13,7 @@
     "@softwaretechnik/dbml-renderer": "^1.0.31",
     "@viz-js/viz": "^3.28.0",
     "bytefield-svg": "^1.11.0",
+    "jose": "^5.10.0",
     "json5": "^2.2.3",
     "kymo-mermaid": "file:../rust/kymo-mermaid/pkg",
     "kymo-svgbob": "file:../rust/kymo-svgbob/pkg",

@@ -11,8 +11,8 @@ export class HttpError extends Error {
 export const CORS: Record<string, string> = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
-  "access-control-expose-headers": "x-render-cache, x-render-api-version",
+  "access-control-allow-headers": "content-type, accept, authorization",
+  "access-control-expose-headers": "x-render-cache, x-render-api-version, x-ratelimit-tier",
 };
 
 export type Format = "svg" | "png" | "pdf";

@@ -82,11 +82,19 @@ export async function earlyResponse(kind: string, source: string): Promise<Respo
 }
 
 function postRender(base: string, kind: string, source: string): Promise<Response> {
-  return fetch(`${base}/${encodeURIComponent(kind)}/svg`, {
-    method: "POST",
-    headers: { "content-type": "text/plain" },
-    body: source,
-  });
+  const headers: Record<string, string> = { "content-type": "text/plain" };
+  // Signed-in callers get the higher rate-limit tier. The token only ever goes
+  // to our own render API (never the kroki.io fallback).
+  if (base === RENDER_API) {
+    let token: string | null = null;
+    try {
+      token = localStorage.getItem("kymo_idtoken");
+    } catch {
+      token = null;
+    }
+    if (token) headers["authorization"] = `Bearer ${token}`;
+  }
+  return fetch(`${base}/${encodeURIComponent(kind)}/svg`, { method: "POST", headers, body: source });
 }
 
 export async function renderKroki(kind: string, source: string): Promise<string> {

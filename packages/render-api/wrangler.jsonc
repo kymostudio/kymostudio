@@ -15,8 +15,14 @@
   // dbml-renderer's own svg path requires the legacy viz.js (1.9 MB, runtime
   // wasm compile — unusable here); we only use its "dot" output.
   "alias": { "@aduh95/viz.js/sync": "./src/graphviz/viz-sync-stub.ts" },
-  // Native rate limiting: 60 render requests / 60s per client IP (index.ts).
-  "ratelimits": [{ "name": "RENDER_LIMITER", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } }],
+  // Verify the editor's Google id_token to pick the rate-limit tier (auth.ts).
+  "vars": { "GOOGLE_CLIENT_ID": "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com" },
+  // Native rate limiting, two tiers (index.ts): anonymous keyed on IP, signed-in
+  // keyed on the Google `sub` with a higher ceiling.
+  "ratelimits": [
+    { "name": "ANON_LIMITER", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } },
+    { "name": "USER_LIMITER", "namespace_id": "1002", "simple": { "limit": 120, "period": 60 } }
+  ],
   "routes": [{ "pattern": "render.kymo.studio", "custom_domain": true }],
   "observability": { "enabled": true }
 }
