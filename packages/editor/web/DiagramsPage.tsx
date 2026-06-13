@@ -5,6 +5,7 @@ import { useWorkspace, assignDiagram } from "./workspace";
 import { kindLabel } from "./kroki";
 import { DIAGRAMS_API } from "./const";
 import { newId } from "./util";
+import { TemplateGallery, setPendingTemplate, type Template } from "./templates";
 import { Search, Plus } from "lucide-react";
 
 type Item = { id: string; title: string; updatedAt: number; ws?: string; kind?: string };
@@ -33,6 +34,7 @@ export default function DiagramsPage() {
   const [error, setError] = useState("");
   const [q, setQ] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   useEffect(() => { document.title = "Diagrams · Kymostudio"; return () => { document.title = "Kymostudio"; }; }, []);
 
@@ -62,8 +64,13 @@ export default function DiagramsPage() {
     return () => { document.removeEventListener("visibilitychange", vis); window.removeEventListener("focus", load); };
   }, [load]);
 
-  function newDiagram() {
+  // "New diagram" opens the same type-first template gallery as the editor's
+  // "+ New"; the picked template seeds the fresh room via setPendingTemplate
+  // (consumed by EditorPage's room-switch effect after the navigation).
+  function pickTemplate(t: Template) {
+    setGalleryOpen(false);
     const id = newId();
+    setPendingTemplate({ source: t.source, kind: t.kind });
     assignDiagram(idToken, id, currentWs);
     navigate("/?d=" + id);
   }
@@ -113,11 +120,12 @@ export default function DiagramsPage() {
 
   return (
     <main className="scroll" style={{ height: "100%" }}>
+      {galleryOpen && <TemplateGallery onPick={pickTemplate} onClose={() => setGalleryOpen(false)} />}
       <div className="page">
         <div className="page-head">
           <h1>Diagrams</h1>
           <div className="head-actions">
-            {claims && <button className="pill pill-dark" onClick={newDiagram}>New diagram</button>}
+            {claims && <button className="pill pill-dark" onClick={() => setGalleryOpen(true)} aria-haspopup="dialog">New diagram</button>}
           </div>
         </div>
 

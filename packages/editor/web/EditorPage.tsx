@@ -10,6 +10,8 @@ import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
+import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
+import { sniffKind } from "./detect";
 import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy, BookOpen, MoreHorizontal } from "lucide-react";
 
 export default function EditorPage() {
@@ -61,6 +63,8 @@ export default function EditorPage() {
   const [exportOpen, setExportOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [detected, setDetected] = useState<string | null>(null); // kind chosen by paste auto-detect (transient chip)
   const [sharePayload, setSharePayload] = useState(""); // deflate+base64url of the current source
   const warmedShare = useRef(""); // last kind+source warmed into the render cache
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -144,7 +148,7 @@ export default function EditorPage() {
   // Rooms are switched client-side (+ New uses navigate()), so reset per-room state on ?d change.
   useEffect(() => {
     if (shared) return; // ?s= state is seeded at mount and owned by the decode effect below
-    const imp = pendingImport.current; pendingImport.current = null;
+    const imp = pendingImport.current ?? takePendingTemplate(); pendingImport.current = null;
     setSource(imp ? imp.source : SAMPLE); setKind(imp ? imp.kind : "kymo");
     setTitle(""); setEditingName(false); setShareError(null); setLocalSaved(false);
     synced.current = false; fresh.current = false; userEdited.current = !!imp;
@@ -303,21 +307,37 @@ export default function EditorPage() {
     const ext = kind === "kymo" ? ".kymo" : `.${kind}.txt`;
     saveBlob(new Blob([source], { type: "text/plain;charset=utf-8" }), (diagramLabel || "flowchart") + ext);
   }
-  function newDiagram() {
+  // "+ New" opens the template gallery — users pick a diagram TYPE; the
+  // template carries the right kind, so the syntax choice happens for them.
+  function pickTemplate(t: Template) {
+    setGalleryOpen(false);
     // No room = the only copy of edited content is this tab/URL. Ask first.
     if (!d && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
     if (!idToken) {
       // Guests have no rooms — a ?d= URL would be a dead room that silently loses
-      // everything typed into it. Reset to a fresh local sample instead.
-      setSource(SAMPLE); setKind("kymo"); setTitle(""); setShareError(null);
-      setLocalSaved(false); // pristine sample isn't in the URL — don't claim it is
+      // everything typed into it. Reset to a fresh local template instead.
+      setSource(t.source); setKind(t.kind); setTitle(""); setShareError(null);
+      setLocalSaved(false); // pristine template isn't in the URL — don't claim it is
       userEdited.current = false;
       navigate("/");
       return;
     }
     const id = newId();
+    pendingImport.current = { source: t.source, kind: t.kind }; // seeds the fresh room (same path as "Save a copy")
     assignDiagram(idToken, id, currentWs); // lands in the workspace you're looking at
     navigate("/?d=" + id);
+  }
+  // Paste auto-detect: a whole-buffer paste in a recognizable grammar switches
+  // the kind so the source "just renders" — the select stays as manual override.
+  const detectTimer = useRef<number | undefined>(undefined);
+  function onEditorPaste(text: string, fullReplace: boolean) {
+    if (!fullReplace && userEdited.current) return;
+    const k = sniffKind(text);
+    if (!k || k === kindRef.current || !KINDS.some((x) => x.value === k)) return;
+    setKind(k);
+    setDetected(KINDS.find((x) => x.value === k)?.label ?? k);
+    window.clearTimeout(detectTimer.current);
+    detectTimer.current = window.setTimeout(() => setDetected(null), 4000);
   }
   // Signed-in user viewing a share link: import the shared content into a real room.
   function saveCopy() {
@@ -391,7 +411,7 @@ export default function EditorPage() {
           <a className="navlink mob-hide" href="https://docs.kymo.studio" target="_blank" rel="noopener" title="Kymo documentation"><BookOpen size={15} strokeWidth={2} />Docs</a>
           {claims && <Link className="navlink mob-hide" to="/diagrams"><LayoutGrid size={15} strokeWidth={2} />Diagrams</Link>}
           <span className="vsep mob-hide" />
-          <button className="mob-hide" onClick={newDiagram} title="New diagram"><Plus size={16} strokeWidth={2.2} />New</button>
+          <button className="mob-hide" onClick={() => setGalleryOpen(true)} title="New diagram" aria-haspopup="dialog"><Plus size={16} strokeWidth={2.2} />New</button>
           {shared && claims && (
             <button className="mob-hide" onClick={saveCopy} title="Save a copy to your Diagrams">
               <Save size={16} strokeWidth={2} />
@@ -435,7 +455,7 @@ export default function EditorPage() {
                     Diagrams
                   </Link>
                 )}
-                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); newDiagram(); }}>
+                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); setGalleryOpen(true); }}>
                   <Plus size={17} strokeWidth={2} />
                   New diagram
                 </button>
@@ -514,6 +534,7 @@ export default function EditorPage() {
           </div>
         )}
       </header>
+      {galleryOpen && <TemplateGallery onPick={pickTemplate} onClose={() => setGalleryOpen(false)} />}
       <main ref={mainRef}>
         {booting ? (
           <div className="boot"><KLoader /></div>
@@ -531,6 +552,7 @@ export default function EditorPage() {
                   }}>
                   {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
                 </select>
+                {detected && <span className="detect-chip">auto-detected {detected}</span>}
                 {kind !== "kymo" && (
                   <span className="kroki-note" title={kind === "mermaid"
                     ? "Mermaid renders locally in your browser (mermaid.js). Opening a share link may use the kymo render cache for the first paint."
@@ -539,7 +561,7 @@ export default function EditorPage() {
                   </span>
                 )}
               </div>
-              <CodeEditor value={source} kind={kind} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
+              <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
             <div className="splitter" title="Drag to resize · double-click for 50/50"
               onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />

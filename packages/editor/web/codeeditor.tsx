@@ -109,14 +109,22 @@ const highlight = HighlightStyle.define([
   { tag: t.attributeValue, color: "#b03524" },
 ]);
 
-type Props = { value: string; kind: string; onChange: (v: string) => void };
+type Props = {
+  value: string;
+  kind: string;
+  onChange: (v: string) => void;
+  /** Fires on paste; `fullReplace` = the paste covers (almost) the whole buffer. */
+  onPaste?: (text: string, fullReplace: boolean) => void;
+};
 
-export function CodeEditor({ value, kind, onChange }: Props) {
+export function CodeEditor({ value, kind, onChange, onPaste }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const applyingExternal = useRef(false);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const onPasteRef = useRef(onPaste);
+  onPasteRef.current = onPaste;
   const langComp = useRef(new Compartment()).current;
 
   useEffect(() => {
@@ -132,6 +140,20 @@ export function CodeEditor({ value, kind, onChange }: Props) {
           EditorView.lineWrapping,
           EditorView.updateListener.of((u) => {
             if (u.docChanged && !applyingExternal.current) onChangeRef.current(u.state.doc.toString());
+          }),
+          EditorView.domEventHandlers({
+            paste: (e, view) => {
+              const text = e.clipboardData?.getData("text/plain") ?? "";
+              if (!text || !onPasteRef.current) return false;
+              // full replace = the selection being pasted over plus the pasted
+              // text dominate the buffer (≥80% of what the doc will contain)
+              const sel = view.state.selection.main;
+              const docLen = view.state.doc.length;
+              const after = docLen - (sel.to - sel.from) + text.length;
+              const fullReplace = after === 0 || text.length / after >= 0.8;
+              onPasteRef.current(text, fullReplace);
+              return false; // never consume — CodeMirror applies the paste as usual
+            },
           }),
         ],
       }),
