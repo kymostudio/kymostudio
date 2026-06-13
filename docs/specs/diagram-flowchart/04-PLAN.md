@@ -1,7 +1,7 @@
 ---
 title: Flowchart Conversion Hub — Plan
 document_id: PLAN-FLOWCHART-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-09
 status: Implemented
 classification: Internal
@@ -72,3 +72,4 @@ from the flowchart path via `mermaid_to_drawio` / `drawio_from_kymojson`.
 | Version | Date       | Author | Changes                                   |
 |---------|------------|--------|-------------------------------------------|
 | 0.1     | 2026-06-09 | Vũ Anh | Initial issue — five shipped phases + open items. |
+| 0.2     | 2026-06-13 | Vũ Anh | Folder renamed `docs/specs/flowchart/` → `docs/specs/diagram-flowchart/` (`diagram-<kind>` prefix; the hub is a multi-format diagram family, distinct from the single-format `format-<lang>` folders). All `*-FLOWCHART-001` document_ids and the "Flowchart Conversion Hub" titles unchanged; no path references existed to update. |
