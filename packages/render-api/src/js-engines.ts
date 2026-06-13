@@ -14,6 +14,8 @@ import { expressionInterpreter } from "vega-interpreter";
 import { compile as vegaLiteCompile } from "vega-lite";
 import wavedrom from "wavedrom";
 
+import { pikchrToSvg } from "./pikchr/index.js";
+
 // workerd forbids new Function(), which vega's default expression compiler
 // uses — parse to an AST and evaluate with vega-interpreter instead (vega's
 // own CSP mode). renderer "none" + toSVG keeps it canvas-free.
@@ -36,6 +38,7 @@ function parseSpec(source: string): Record<string, unknown> {
 export const JS_RENDERERS: Record<string, (source: string) => string | Promise<string>> = {
   bytefield: (source) => renderBytefield(source),
   nomnoml: (source) => renderSvg(source),
+  pikchr: (source) => pikchrToSvg(source),
   vega: (source) => vegaToSvg(parseSpec(source)),
   vegalite: (source) => vegaToSvg(vegaLiteCompile(parseSpec(source) as never).spec as Record<string, unknown>),
   // The wavedrom-cli pipeline: JSON5 source → onml tree → SVG string. Index 0
