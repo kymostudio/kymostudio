@@ -36,4 +36,4 @@ uv run python perf.py --reps 5      # timing only
 - **Performance numbers are machine-dependent** — `results/perf.json` is stamped
   with the host environment and is a same-machine reference, not a gate.
 - This bench mirrors, and folds into, the BPMN test spec as
-  `docs/specs/bpmn/03-TEST.md` → *Annex C — Benchmark*.
+  `docs/specs/format-bpmn/03-TEST.md` → *Annex C — Benchmark*.

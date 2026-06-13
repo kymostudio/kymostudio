@@ -6,7 +6,7 @@
 
 ## `bpmn_layout_spike.py` — bpmn-dsl Phase 0 (P0)
 
-Spec docs: `docs/specs/bpmn/modules/dsl/`; plan: `docs/specs/bpmn/modules/dsl/PLAN.md`
+Spec docs: `docs/specs/format-bpmn/modules/dsl/`; plan: `docs/specs/format-bpmn/modules/dsl/PLAN.md`
 (`*-BPMN-DSL-001`). This spike covers **P0** from that plan: a throwaway
 layered-layout prototype on the order graph.
 
@@ -76,7 +76,7 @@ start/end) render via the existing `bpmn_shapes`. Output is **deterministic**
 
 ## `bpmn_export_spike.py` — bpmn-export Phase 0 (P0)
 
-Spec docs: `docs/specs/bpmn/modules/export/`; plan: `docs/specs/bpmn/modules/export/PLAN.md`
+Spec docs: `docs/specs/format-bpmn/modules/export/`; plan: `docs/specs/format-bpmn/modules/export/PLAN.md`
 (`*-BPMN-EXPORT-001`). Covers **P0** from that plan: a throwaway `to_bpmn`
 prototype proving round-trip.
 
