@@ -259,6 +259,12 @@ pub fn mermaid_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
     Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
 }
 
+/// Render a Mermaid state diagram → SVG via the flowchart layout + renderer.
+pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    let fc = mermaid::parse_state(src)?;
+    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
 /// Render D2 flowchart source → SVG, fully in Rust: parse D2 → flowchart IR →
 /// `layout_flowchart` → the [`flowchart_svg`] renderer. No external `d2` binary.
 pub fn d2_to_svg(src: &str) -> Result<String, d2::D2Error> {
