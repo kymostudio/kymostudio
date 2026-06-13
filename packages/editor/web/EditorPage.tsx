@@ -15,7 +15,7 @@ import { TemplateGallery, takePendingTemplate, type Template } from "./templates
 import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, LayoutGrid, Trash2, LogOut } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, Trash2, LogOut } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -478,7 +478,7 @@ export default function EditorPage() {
         {/* identity & document: logo → your Diagrams when signed in (the natural
             "home"), else the product site; then workspace, editable title, sync state */}
         {claims
-          ? <Link className="brand" to="/diagrams" title="My diagrams" aria-label="My diagrams"><img src="/logo.svg" alt="" /></Link>
+          ? <Link className="brand" to="/" title="Home" aria-label="Home"><img src="/logo.svg" alt="" /></Link>
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
         {claims && <WorkspaceSwitcher />}
         {claims && <span className="sep">/</span>}
@@ -590,7 +590,6 @@ export default function EditorPage() {
                 </button>
                 {claims && <>
                   <div className="menu-sep" />
-                  <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMoreOpen(false)}><LayoutGrid size={17} strokeWidth={1.9} />All diagrams</Link>
                   <Link className="acct-item exp-item" to="/trash" onClick={() => setMoreOpen(false)}><Trash2 size={17} strokeWidth={1.9} />Trash</Link>
                   <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); signOut(); }}><LogOut size={17} strokeWidth={1.9} />Sign out</button>
                 </>}

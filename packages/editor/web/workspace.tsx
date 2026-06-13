@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
 import { WORKSPACES_API, DIAGRAMS_API } from "./const";
 import { newId } from "./util";
@@ -180,7 +180,7 @@ export function WorkspaceSwitcher() {
     const name = (window.prompt("Folder name") || "").trim();
     if (!name) return;
     const f = await createFolder(name, currentFolder);
-    if (f) { setCurrentFolder(f.id); setOpen(false); navigate("/diagrams"); }
+    if (f) { setCurrentFolder(f.id); setOpen(false); }
   }
   function newDiagram() {
     const id = newId();
@@ -216,9 +216,6 @@ export function WorkspaceSwitcher() {
             New folder
           </button>
           <div className="menu-sep" />
-          <Link className="acct-item ws-item" to="/diagrams" onClick={() => setOpen(false)}>
-            <span className="ws-check" />All diagrams
-          </Link>
           <button className="acct-item ws-item" onClick={newDiagram}>
             <span className="ws-check" />New diagram
           </button>
