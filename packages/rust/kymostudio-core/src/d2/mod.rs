@@ -168,6 +168,7 @@ pub fn parse(src: &str) -> Result<Flowchart, D2Error> {
             let title = title.unwrap_or_else(|| id.clone());
             let sub_idx = b.fc.subgraphs.len();
             b.fc.subgraphs.push(Subgraph {
+                parent: None,
                 id: id.clone(),
                 title,
                 members: Vec::new(),

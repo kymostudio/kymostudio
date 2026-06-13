@@ -387,16 +387,35 @@ pub fn layout_flowchart(fc: &Flowchart) -> Diagram {
             )
         })
         .collect();
-    for sg in &fc.subgraphs {
-        let members: Vec<&(f64, f64, i32, i32)> = sg
-            .members
+    // Effective members include descendant subgraphs' members, so a nesting
+    // wrapper with no direct nodes still gets a bounding box.
+    let n_sg = fc.subgraphs.len();
+    let mut eff: Vec<Vec<String>> = fc.subgraphs.iter().map(|s| s.members.clone()).collect();
+    let mut descendants = vec![0usize; n_sg];
+    for i in 0..n_sg {
+        let own = fc.subgraphs[i].members.clone();
+        let mut p = fc.subgraphs[i].parent;
+        while let Some(pi) = p {
+            descendants[pi] += 1;
+            for m in &own {
+                if !eff[pi].contains(m) {
+                    eff[pi].push(m.clone());
+                }
+            }
+            p = fc.subgraphs[pi].parent;
+        }
+    }
+    for (si, sg) in fc.subgraphs.iter().enumerate() {
+        let members: Vec<&(f64, f64, i32, i32)> = eff[si]
             .iter()
             .filter_map(|m| pos_of.get(m.as_str()))
             .collect();
         if members.is_empty() {
             continue;
         }
-        let pad = 16.0;
+        // Outer (ancestor) regions get extra padding so they enclose their
+        // nested children and the labels don't collide.
+        let pad = 16.0 + descendants[si] as f64 * 14.0;
         let label_pad = if sg.title.is_empty() { 0.0 } else { 20.0 };
         let mut x0 = f64::INFINITY;
         let mut y0 = f64::INFINITY;

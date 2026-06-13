@@ -258,10 +258,12 @@ fn handle_statement(
         let rest = stmt[8..].trim();
         let (id, title) = parse_subgraph_header(rest, sub_auto);
         let sub_idx = fc.subgraphs.len();
+        let parent = sub_stack.last().copied();
         fc.subgraphs.push(Subgraph {
             id,
             title,
             members: Vec::new(),
+            parent,
         });
         sub_stack.push(sub_idx);
         return Ok(());
