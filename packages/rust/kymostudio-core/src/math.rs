@@ -91,6 +91,17 @@ fn render_tex(s: &str) -> String {
                         let a = read_group(&chars, &mut i);
                         out.push_str(&render_tex(&a));
                     }
+                    // `\begin{env}` / `\end{env}` — drop the wrapper, keep the body.
+                    "begin" | "end" => {
+                        let _ = read_group(&chars, &mut i);
+                    }
+                    // Accents / over-under braces — render the inner content only.
+                    "hat" | "widehat" | "bar" | "vec" | "tilde" | "widetilde" | "dot" | "ddot"
+                    | "overline" | "underline" | "overbrace" | "underbrace" | "overrightarrow"
+                    | "mathring" | "acute" | "grave" | "check" | "breve" => {
+                        let a = read_group(&chars, &mut i);
+                        out.push_str(&render_tex(&a));
+                    }
                     "left" | "right" | "big" | "Big" | "bigg" | "Bigg" | "bigl" | "bigr"
                     | "biggl" | "biggr" | "Bigl" | "Bigr" | "relax" | "displaystyle"
                     | "textstyle" | "scriptstyle" | "limits" | "nolimits" | "quad" | "qquad" => {
@@ -105,6 +116,10 @@ fn render_tex(s: &str) -> String {
                 }
             }
             '{' | '}' | '$' => i += 1,
+            '&' => {
+                out.push(' '); // matrix/cases column separator
+                i += 1;
+            }
             '^' | '_' => i += 1, // drop the marker; the operand renders inline
             '~' => {
                 out.push(' ');
@@ -330,5 +345,9 @@ mod tests {
         assert_eq!(render("costs $5 today"), "costs $5 today");
         // unknown command keeps its name
         assert_eq!(render(r"$\foobar$"), "foobar");
+        // environments and accents flatten to their content
+        assert_eq!(render(r"$\hat{x}$"), "x");
+        let m = render(r"$\begin{cases} a & b \\ c \end{cases}$");
+        assert!(m.contains('a') && m.contains('b') && m.contains('c') && !m.contains("begin"));
     }
 }
