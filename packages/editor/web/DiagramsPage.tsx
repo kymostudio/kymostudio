@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
-import { useWorkspace, childFoldersOf, flattenTree, descendantFolderIds, type Folder } from "./workspace";
+import { useWorkspace, renameDiagram, childFoldersOf, flattenTree, descendantFolderIds, type Folder } from "./workspace";
 import { useConfirm } from "./confirm";
+import { useToast } from "./toast";
 import { kindLabel } from "./kroki";
-import { DIAGRAMS_API } from "./const";
+import { DIAGRAMS_API, TRASH_API } from "./const";
 import { TemplateGallery, setPendingTemplate, type Template } from "./templates";
 import { Search, Plus, Image as ImageIcon, ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, Pencil, Trash2 } from "lucide-react";
 
@@ -30,7 +31,14 @@ export default function DiagramsPage() {
   const { idToken, claims, signOut, expireSession } = useAuth();
   const { folders, createFolder, renameFolder, deleteFolder, moveFolder } = useWorkspace();
   const confirm = useConfirm();
+  const toast = useToast();
   const navigate = useNavigate();
+  const restoreItem = useCallback((kind: "diagram" | "folder", id: string) => {
+    if (!idToken) return;
+    fetch(TRASH_API + "?id_token=" + encodeURIComponent(idToken), {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind, id }),
+    }).then(() => load()).catch(() => {});
+  }, [idToken]); // eslint-disable-line
   const [items, setItems] = useState<Item[]>([]);
   const [error, setError] = useState("");
   const [q, setQ] = useState("");
@@ -98,6 +106,10 @@ export default function DiagramsPage() {
     const name = (window.prompt("Rename folder", f.name) || "").trim();
     if (name && name !== f.name) await renameFolder(f.id, name);
   }
+  async function onRenameDiagram(dd: Item) {
+    const name = (window.prompt("Rename diagram", dd.title || "Untitled") || "").trim();
+    if (name && name !== dd.title) { renameDiagram(idToken, dd.id, name); setTimeout(load, 200); }
+  }
   async function onDeleteFolder(f: Folder) {
     const sub = descendantFolderIds(folders, f.id);
     const hasContents = sub.size > 1 || items.some((i) => sub.has(effFolder(i)));
@@ -107,6 +119,7 @@ export default function DiagramsPage() {
     }))) return;
     await deleteFolder(f.id);
     load();
+    toast({ message: `Deleted folder “${f.name}”`, actionLabel: "Undo", onAction: () => restoreItem("folder", f.id) });
   }
 
   // ---- move a diagram to a folder ("" = root) ----
@@ -131,6 +144,7 @@ export default function DiagramsPage() {
       const r = await fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" });
       if (!r.ok) { setError(`Delete failed (${r.status})`); return; }
       load();
+      toast({ message: `Deleted “${dd.title || "Untitled"}”`, actionLabel: "Undo", onAction: () => restoreItem("diagram", dd.id) });
     } catch (e: any) { setError("Delete failed: " + e.message); }
   }
 
@@ -141,13 +155,16 @@ export default function DiagramsPage() {
 
   async function bulkDelete() {
     if (!idToken || !sel.size) return;
-    if (!(await confirm({ title: `Delete ${sel.size} diagram${sel.size > 1 ? "s" : ""}?` }))) return;
+    const ids = [...sel];
+    if (!(await confirm({ title: `Delete ${ids.length} diagram${ids.length > 1 ? "s" : ""}?` }))) return;
     try {
-      const results = await Promise.all([...sel].map((id) =>
+      const results = await Promise.all(ids.map((id) =>
         fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" })
           .then((r) => r.ok).catch(() => false)));
       if (results.some((ok) => !ok)) setError("Some diagrams could not be deleted.");
       clearSel(); load();
+      toast({ message: `Deleted ${ids.length} diagram${ids.length > 1 ? "s" : ""}`, actionLabel: "Undo",
+        onAction: () => { if (idToken) Promise.all(ids.map((id) => fetch(TRASH_API + "?id_token=" + encodeURIComponent(idToken), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: "diagram", id }) }).catch(() => {}))).then(() => load()); } });
     } catch (e: any) { setError("Delete failed: " + e.message); }
   }
   async function bulkMove(folderId: string) {
@@ -209,14 +226,15 @@ export default function DiagramsPage() {
         }}>
         <input type="checkbox" className="rcheck" checked={sel.has(dd.id)} aria-label="Select diagram"
           onClick={(e) => e.stopPropagation()} onChange={(e) => { e.stopPropagation(); toggleSel(dd.id); }} />
+        {/* always attempt the thumbnail — the backend renders it on demand from the stored source */}
         <span className="rthumb">
-          {dd.hasThumb
-            ? <img loading="lazy" alt="" src={`${DIAGRAMS_API}/thumb?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken || "")}`}
-                onError={(e) => { (e.currentTarget.parentElement as HTMLElement).classList.add("empty"); e.currentTarget.remove(); }} />
-            : <ImageIcon size={16} strokeWidth={1.8} />}
+          <ImageIcon size={16} strokeWidth={1.8} className="rthumb-ph" />
+          <img loading="lazy" alt="" src={`${DIAGRAMS_API}/thumb?id=${encodeURIComponent(dd.id)}&id_token=${encodeURIComponent(idToken || "")}`}
+            onError={(e) => e.currentTarget.remove()} />
         </span>
         <span className="rtitle">{dd.title || "Untitled"}</span>
         {dd.kind && <span className="rkind">{kindLabel(dd.kind)}</span>}
+        <button className="rmini" title="Rename" onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRenameDiagram(dd); }}><Pencil size={14} strokeWidth={2} /></button>
         <MoveSelect value={effFolder(dd)} onPick={(fid) => moveDiagram(dd.id, fid)} />
         <button className="rdel" title="Delete diagram" onClick={(e) => { e.preventDefault(); e.stopPropagation(); remove(dd); }}>Delete</button>
         <span className="rtime">{timeAgo(dd.updatedAt)}</span>
@@ -247,7 +265,11 @@ export default function DiagramsPage() {
           </span>
         </div>
       );
-      if (open) out.push(...renderLevel(f.id, depth + 1));
+      if (open) {
+        const kids = renderLevel(f.id, depth + 1);
+        out.push(...kids);
+        if (!kids.length) out.push(<div key={"e" + f.id} className="frow-empty" style={{ paddingLeft: 8 + (depth + 1) * 22 + 25 }}>This folder is empty</div>);
+      }
     }
     for (const dd of diagramsIn(parentId)) out.push(DiagramRow(dd, depth));
     return out;
@@ -255,7 +277,7 @@ export default function DiagramsPage() {
 
   const searching = q.trim().toLowerCase();
   const searchResults = searching
-    ? items.filter((i) => (i.title || "Untitled").toLowerCase().includes(searching))
+    ? items.filter((i) => (i.title || "Untitled").toLowerCase().includes(searching) || (i.kind && kindLabel(i.kind).toLowerCase().includes(searching)))
     : [];
 
   return (

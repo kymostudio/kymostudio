@@ -75,6 +75,15 @@ export function assignDiagram(idToken: string | null, id: string, folderId: stri
   }).catch(() => {});
 }
 
+// Rename a diagram (routes through the room so the DO/D1/live editors stay in sync).
+export function renameDiagram(idToken: string | null, id: string, title: string) {
+  if (!idToken) return;
+  fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
+    method: "PATCH", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ id, title }),
+  }).catch(() => {});
+}
+
 // Delete a diagram. Resolves true on success so callers can refresh their list.
 export async function deleteDiagram(idToken: string | null, id: string): Promise<boolean> {
   if (!idToken) return false;
