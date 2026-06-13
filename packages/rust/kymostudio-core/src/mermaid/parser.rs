@@ -19,7 +19,8 @@ pub struct ParsedNode {
 
 #[derive(Debug, Clone)]
 pub enum Item {
-    Node(ParsedNode),
+    /// One or more nodes joined by `&` (a fan endpoint), e.g. `A & B`.
+    Nodes(Vec<ParsedNode>),
     Edge(EdgeTok),
 }
 
@@ -30,8 +31,8 @@ pub fn parse_statement(s: &str) -> Result<Vec<Item>, String> {
     let mut items: Vec<Item> = Vec::new();
 
     sc.skip_ws();
-    let first = read_node(&mut sc).ok_or_else(|| format!("expected a node, got: {s:?}"))?;
-    items.push(Item::Node(first));
+    let first = read_node_group(&mut sc).ok_or_else(|| format!("expected a node, got: {s:?}"))?;
+    items.push(Item::Nodes(first));
 
     loop {
         sc.skip_ws();
@@ -44,9 +45,9 @@ pub fn parse_statement(s: &str) -> Result<Vec<Item>, String> {
         };
         items.push(Item::Edge(op));
         sc.skip_ws();
-        let node =
-            read_node(&mut sc).ok_or_else(|| format!("edge with no destination node in: {s:?}"))?;
-        items.push(Item::Node(node));
+        let group = read_node_group(&mut sc)
+            .ok_or_else(|| format!("edge with no destination node in: {s:?}"))?;
+        items.push(Item::Nodes(group));
     }
     Ok(items)
 }
@@ -60,6 +61,23 @@ fn read_node(sc: &mut Scanner) -> Option<ParsedNode> {
     Some(ParsedNode { id, label, shape })
 }
 
+/// Read a fan endpoint: one node, then any `& node` continuations.
+fn read_node_group(sc: &mut Scanner) -> Option<Vec<ParsedNode>> {
+    let mut group = vec![read_node(sc)?];
+    loop {
+        sc.skip_ws();
+        if !sc.eat('&') {
+            break;
+        }
+        sc.skip_ws();
+        match read_node(sc) {
+            Some(n) => group.push(n),
+            None => break,
+        }
+    }
+    Some(group)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -68,7 +86,7 @@ mod tests {
         items
             .iter()
             .filter_map(|it| match it {
-                Item::Node(n) => Some(n.id.as_str()),
+                Item::Nodes(g) => Some(g[0].id.as_str()),
                 _ => None,
             })
             .collect()
@@ -88,14 +106,14 @@ mod tests {
     fn shapes_and_labels() {
         let items = parse_statement("A[Start] --> B{ok?}").unwrap();
         match &items[0] {
-            Item::Node(n) => {
-                assert_eq!(n.label.as_deref(), Some("Start"));
-                assert_eq!(n.shape, Some(Shape::Box));
+            Item::Nodes(g) => {
+                assert_eq!(g[0].label.as_deref(), Some("Start"));
+                assert_eq!(g[0].shape, Some(Shape::Box));
             }
             _ => panic!(),
         }
         match &items[2] {
-            Item::Node(n) => assert_eq!(n.shape, Some(Shape::Diamond)),
+            Item::Nodes(g) => assert_eq!(g[0].shape, Some(Shape::Diamond)),
             _ => panic!(),
         }
     }
@@ -126,6 +144,24 @@ mod tests {
     }
 
     #[test]
+    fn ampersand_fan() {
+        let items = parse_statement("A & B --> C & D").unwrap();
+        match (&items[0], &items[2]) {
+            (Item::Nodes(l), Item::Nodes(r)) => {
+                assert_eq!(
+                    l.iter().map(|n| n.id.as_str()).collect::<Vec<_>>(),
+                    ["A", "B"]
+                );
+                assert_eq!(
+                    r.iter().map(|n| n.id.as_str()).collect::<Vec<_>>(),
+                    ["C", "D"]
+                );
+            }
+            _ => panic!(),
+        }
+    }
+
+    #[test]
     fn shape_variants() {
         let cases = [
             ("A([x])", Shape::Badge),
@@ -138,7 +174,7 @@ mod tests {
         for (src, want) in cases {
             let items = parse_statement(src).unwrap();
             match &items[0] {
-                Item::Node(n) => assert_eq!(n.shape, Some(want), "{src}"),
+                Item::Nodes(g) => assert_eq!(g[0].shape, Some(want), "{src}"),
                 _ => panic!(),
             }
         }

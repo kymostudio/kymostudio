@@ -71,7 +71,7 @@
       "merman_fo": 808,
       "merman_text": 14,
       "kymo_n": 836,
-      "kymo_ok": 448,
+      "kymo_ok": 466,
       "timeout": 2
     },
     "gantt": {
@@ -289,7 +289,7 @@
       "merman_fo": 120,
       "merman_text": 3,
       "kymo_n": 133,
-      "kymo_ok": 101,
+      "kymo_ok": 105,
       "timeout": 3
     },
     "gantt": {

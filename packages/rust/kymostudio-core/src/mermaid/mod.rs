@@ -170,24 +170,31 @@ fn handle_statement(
 
     let items = parse_statement(stmt).map_err(|msg| MermaidError::Syntax { line: lineno, msg })?;
 
-    // Walk items: Node (Edge Node)*. Connect consecutive nodes with the edge.
-    let mut prev: Option<String> = None;
+    // Walk items: NodeGroup (Edge NodeGroup)*. A group is one or more `&`-joined
+    // nodes; an edge between two groups fans out to every (src, dst) pair.
+    let mut prev: Option<Vec<String>> = None;
     let mut pending_edge: Option<lexer::EdgeTok> = None;
     for item in &items {
         match item {
-            Item::Node(n) => {
-                touch_node(fc, index, n);
-                register_member(fc, sub_stack, &n.id);
-                if let (Some(src), Some(op)) = (prev.take(), pending_edge.take()) {
-                    fc.edges.push(FlowEdge {
-                        src,
-                        dst: n.id.clone(),
-                        label: op.label.clone(),
-                        dashed: op.dashed,
-                        no_arrow: op.no_arrow,
-                    });
+            Item::Nodes(group) => {
+                for n in group {
+                    touch_node(fc, index, n);
+                    register_member(fc, sub_stack, &n.id);
                 }
-                prev = Some(n.id.clone());
+                if let (Some(srcs), Some(op)) = (prev.take(), pending_edge.take()) {
+                    for src in &srcs {
+                        for n in group {
+                            fc.edges.push(FlowEdge {
+                                src: src.clone(),
+                                dst: n.id.clone(),
+                                label: op.label.clone(),
+                                dashed: op.dashed,
+                                no_arrow: op.no_arrow,
+                            });
+                        }
+                    }
+                }
+                prev = Some(group.iter().map(|n| n.id.clone()).collect());
             }
             Item::Edge(op) => {
                 pending_edge = Some(op.clone());
