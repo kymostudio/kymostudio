@@ -16,7 +16,7 @@ const SELF_RENDERERS = { ...WASM_RENDERERS, ...JS_RENDERERS };
 // the error is final — no fallback round-trip. The wasm kinds stay out of
 // this set: their grammars are subsets (mermaid = flowchart only, …) and
 // kroki may accept what they reject.
-const AUTHORITATIVE = new Set(["nomnoml"]);
+const AUTHORITATIVE = new Set(["bytefield", "nomnoml"]);
 
 // Every kind the editor offers (packages/editor/web/kroki.ts KINDS) renders
 // through kroki.io except kymo, which only exists here.

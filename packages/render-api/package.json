@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "bytefield-svg": "^1.11.0",
     "kymostudio": "^0.4.4",
     "kymostudio-core": "^0.4.4",
     "nomnoml": "^1.7.0"
