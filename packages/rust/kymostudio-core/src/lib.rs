@@ -383,6 +383,17 @@ mod tests {
     }
 
     #[test]
+    fn nested_subgraph_titles_render() {
+        // An outer subgraph that only contains another subgraph still shows its
+        // title (it used to be dropped for having no direct node members).
+        let svg = super::mermaid_to_svg(
+            "flowchart TD\nsubgraph Wrapper\n subgraph Inner\n  A --> B\n end\nend",
+        )
+        .unwrap();
+        assert!(svg.contains(">Wrapper<") && svg.contains(">Inner<"));
+    }
+
+    #[test]
     fn self_loops_and_cycles_terminate() {
         // Self-loops and predecessor cycles must not hang layout (they used to
         // spin the trunk walk forever). Each of these must render and return.

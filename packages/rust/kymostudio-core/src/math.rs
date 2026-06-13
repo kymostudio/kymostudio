@@ -159,7 +159,14 @@ fn render_tex(s: &str) -> String {
                 out.push(' '); // matrix/cases column separator
                 i += 1;
             }
-            '^' | '_' => i += 1, // drop the marker; the operand renders inline
+            '^' | '_' => {
+                // Drop the marker; separate a braced operand (e.g. an overbrace
+                // label ) with a space so its words stay distinct.
+                i += 1;
+                if i < chars.len() && chars[i] == '{' {
+                    out.push(' ');
+                }
+            }
             '~' => {
                 out.push(' ');
                 i += 1;

@@ -197,10 +197,12 @@ fn handle_decl(
         let title = label.unwrap_or_else(|| id.clone());
         register_member(fc, sub_stack, &id);
         let sub_idx = fc.subgraphs.len();
+        let parent = sub_stack.last().copied();
         fc.subgraphs.push(Subgraph {
             id: id.clone(),
             title,
             members: Vec::new(),
+            parent,
         });
         sub_stack.push(sub_idx);
     } else {

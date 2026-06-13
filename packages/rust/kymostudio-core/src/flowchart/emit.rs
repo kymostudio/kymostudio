@@ -334,6 +334,7 @@ mod tests {
             vec![n("S", "S", Shape::Box), n("A", "A", Shape::Box)],
             vec![],
             vec![Subgraph {
+                parent: None,
                 id: "G".into(),
                 title: "Grp".into(),
                 members: vec!["A".into()],
@@ -381,6 +382,7 @@ mod tests {
             vec![n("A", "A", Shape::Box), n("B", "B", Shape::Box)],
             vec![e("A", "B", "", false, false)],
             vec![Subgraph {
+                parent: None,
                 id: "G".into(),
                 title: "T".into(),
                 members: vec!["B".into()],
@@ -421,6 +423,7 @@ mod tests {
             vec![n("A", "A", Shape::Box)],
             vec![],
             vec![Subgraph {
+                parent: None,
                 id: "G".into(),
                 title: "T".into(),
                 members: vec!["A".into()],
