@@ -15,7 +15,7 @@ const RAW = HERE + "results/raw/";
 mkdirSync(RAW, { recursive: true });
 
 // Resolve the wasm engines from the render-api package (built there).
-const RA = process.env.RENDER_API_DIR || HERE + "../../../packages/render-api";
+const RA = process.env.RENDER_API_DIR || HERE + "../../packages/render-api";
 const require = createRequire(RA + "/package.json");
 
 const core = await import(require.resolve("kymostudio-core"));
