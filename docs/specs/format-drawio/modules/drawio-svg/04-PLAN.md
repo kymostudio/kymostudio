@@ -107,7 +107,7 @@ Relative complexity in **story points** (Fibonacci); the baseline is delivered.
 
 ## 7. Change requests
 
-Later changes to the spec (`docs/specs/drawio/modules/drawio-svg/`) are raised, assessed, and logged in
+Later changes to the spec (`docs/specs/format-drawio/modules/drawio-svg/`) are raised, assessed, and logged in
 `CR/` (raise → assess → approve → implement → re-baseline). `CR-DRAWIO-SVG-003` (zero-dependency
 rewrite — the redesign) and `CR-DRAWIO-SVG-002` (bundled stencils) are registered as **Proposed**.
 
@@ -124,7 +124,7 @@ rewrite — the redesign) and `CR-DRAWIO-SVG-002` (bundled stencils) are registe
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/drawio/modules/drawio-svg/PLAN.md`; authoritative source is the main-branch working
+Version-controlled at `docs/specs/format-drawio/modules/drawio-svg/PLAN.md`; authoritative source is the main-branch working
 tree (history via `git log`).
 
 ### B.2 Distribution

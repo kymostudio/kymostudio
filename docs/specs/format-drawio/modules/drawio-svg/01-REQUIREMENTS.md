@@ -358,7 +358,7 @@ The baseline (`-001`) is the **as-built** tool. Future increments are self-conta
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/drawio/modules/drawio-svg/01-REQUIREMENTS.md`; authoritative source is the main-branch
+Version-controlled at `docs/specs/format-drawio/modules/drawio-svg/01-REQUIREMENTS.md`; authoritative source is the main-branch
 working tree (history via `git log`).
 
 ### B.2 Distribution

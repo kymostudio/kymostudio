@@ -1,6 +1,6 @@
 # drawio → SVG — Change-Request Log
 
-Change-requests against the `drawio-svg` spec (`docs/specs/drawio/modules/drawio-svg/`). The `-001`
+Change-requests against the `drawio-svg` spec (`docs/specs/format-drawio/modules/drawio-svg/`). The `-001`
 baseline was the **as-built** `drawio2svg` tool (`packages/js/src/drawio2svg/`, engine-based); as of
 the spec's **v1.2 zero-dependency direction** (`SN-DRW-02`) that as-is build is **superseded as the
 target** and retained as a reference only. Each increment is a self-contained mini engineering-spec

@@ -152,7 +152,7 @@ REF-DRAWIO-001.
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/drawio/modules/drawio-svg/03-DESIGN.md`; authoritative source is the main-branch
+Version-controlled at `docs/specs/format-drawio/modules/drawio-svg/03-DESIGN.md`; authoritative source is the main-branch
 working tree (history via `git log`).
 
 ### B.2 Distribution

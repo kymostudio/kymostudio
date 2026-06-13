@@ -119,7 +119,7 @@ duplicate-`xmlns`/parse failure of the emitted SVG, is a **failure**. Fidelity g
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/drawio/modules/drawio-svg/04-TEST.md`; authoritative source is the main-branch
+Version-controlled at `docs/specs/format-drawio/modules/drawio-svg/04-TEST.md`; authoritative source is the main-branch
 working tree (history via `git log`).
 
 ### B.2 Distribution
