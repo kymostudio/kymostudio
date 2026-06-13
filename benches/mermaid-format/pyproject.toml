@@ -1,6 +1,6 @@
 [project]
 # Standalone uv project — run from this folder: `uv run python run.py`.
-name = "kymo-bench-mermaid-accuracy"
+name = "kymo-bench-mermaid-format"
 version = "0.0.0"
 description = "Mermaid render-accuracy bench: kymo vs merman vs mermaid.js."
 requires-python = ">=3.10"

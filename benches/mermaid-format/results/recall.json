@@ -13,8 +13,7 @@
           "hit": 6,
           "total": 6,
           "missing": []
-        },
-        "visual_diff": 14.0
+        }
       },
       "merman": {
         "svg_recall": {
@@ -33,8 +32,7 @@
             "No",
             "Debug"
           ]
-        },
-        "visual_diff": 3.1
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -71,8 +69,7 @@
           "hit": 5,
           "total": 5,
           "missing": []
-        },
-        "visual_diff": 16.1
+        }
       },
       "merman": {
         "svg_recall": {
@@ -90,8 +87,7 @@
             "App 2",
             "Database"
           ]
-        },
-        "visual_diff": 3.1
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -127,8 +123,7 @@
           "hit": 4,
           "total": 4,
           "missing": []
-        },
-        "visual_diff": 13.3
+        }
       },
       "merman": {
         "svg_recall": {
@@ -145,8 +140,7 @@
             "Diamond",
             "Store"
           ]
-        },
-        "visual_diff": 3.9
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -181,8 +175,7 @@
           "hit": 6,
           "total": 6,
           "missing": []
-        },
-        "visual_diff": 20.3
+        }
       },
       "merman": {
         "svg_recall": {
@@ -201,8 +194,7 @@
             "Web Tier",
             "Data Tier"
           ]
-        },
-        "visual_diff": 3.0
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -239,8 +231,7 @@
           "hit": 5,
           "total": 5,
           "missing": []
-        },
-        "visual_diff": 14.3
+        }
       },
       "merman": {
         "svg_recall": {
@@ -258,8 +249,7 @@
             "Notify customer",
             "Pack items"
           ]
-        },
-        "visual_diff": 3.4
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -295,8 +285,7 @@
           "hit": 3,
           "total": 3,
           "missing": []
-        },
-        "visual_diff": 19.9
+        }
       },
       "merman": {
         "svg_recall": {
@@ -312,8 +301,7 @@
             "Validate the payload",
             "Persist to database"
           ]
-        },
-        "visual_diff": 5.9
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -347,8 +335,7 @@
           "hit": 4,
           "total": 4,
           "missing": []
-        },
-        "visual_diff": 17.3
+        }
       },
       "merman": {
         "svg_recall": {
@@ -360,8 +347,7 @@
           "hit": 4,
           "total": 4,
           "missing": []
-        },
-        "visual_diff": 7.0
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -391,8 +377,7 @@
           "hit": 7,
           "total": 7,
           "missing": []
-        },
-        "visual_diff": 15.6
+        }
       },
       "merman": {
         "svg_recall": {
@@ -404,8 +389,7 @@
           "hit": 7,
           "total": 7,
           "missing": []
-        },
-        "visual_diff": 5.2
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -435,8 +419,7 @@
           "hit": 5,
           "total": 5,
           "missing": []
-        },
-        "visual_diff": 14.7
+        }
       },
       "merman": {
         "svg_recall": {
@@ -448,8 +431,7 @@
           "hit": 5,
           "total": 5,
           "missing": []
-        },
-        "visual_diff": 8.4
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -479,8 +461,7 @@
           "hit": 5,
           "total": 5,
           "missing": []
-        },
-        "visual_diff": 15.8
+        }
       },
       "merman": {
         "svg_recall": {
@@ -492,8 +473,7 @@
           "hit": 5,
           "total": 5,
           "missing": []
-        },
-        "visual_diff": 4.5
+        }
       },
       "mermaidjs": {
         "svg_recall": {
@@ -523,8 +503,7 @@
           "hit": 6,
           "total": 6,
           "missing": []
-        },
-        "visual_diff": 15.6
+        }
       },
       "merman": {
         "svg_recall": {
@@ -536,8 +515,7 @@
           "hit": 6,
           "total": 6,
           "missing": []
-        },
-        "visual_diff": 4.7
+        }
       },
       "mermaidjs": {
         "svg_recall": {
