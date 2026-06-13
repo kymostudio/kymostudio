@@ -1,6 +1,6 @@
 # render-api bench — render latency vs kroki.io
 
-*2026-06-13T01:08:31+00:00 · https://render.kymo.studio vs https://kroki.io · code-server (Linux-6.8.0-124-generic-x86_64-with-glibc2.39) · 10 reps/case, medians*
+*2026-06-13T01:44:21+00:00 · https://render.kymo.studio vs https://kroki.io · code-server (Linux-6.8.0-124-generic-x86_64-with-glibc2.39) · 10 reps/case, medians*
 
 Snapshot, not a gate: both endpoints are live deployed software — numbers
 move with the network, the vantage point and kroki's queue.
@@ -9,17 +9,19 @@ move with the network, the vantage point and kroki's queue.
 
 | Case | render.kymo.studio | kroki.io | × kroki |
 |---|---|---|---|
-| mermaid/svg (self) | **40 ms** (34–50) | **315 ms** (275–432) | 7.9× |
-| graphviz/svg (self) | **36 ms** (29–139) | **53 ms** (47–66) | 1.5× |
-| graphviz/png (self) | **72 ms** (55–168) | **60 ms** (53–77) | 0.8× |
-| kymo/svg (self) | **48 ms** (37–66) | — | — |
-| nomnoml/svg (self) | **48 ms** (35–74) | **90 ms** (78–120) | 1.9× |
-| bytefield/svg (self) | **71 ms** (48–1,854) | **197 ms** (149–733) | 2.8× |
-| wavedrom/svg (self) | **43 ms** (35–50) | **99 ms** (96–111) | 2.3× |
-| vegalite/svg (self) | **88 ms** (52–134) | **320 ms** (264–421) | 3.6× |
-| svgbob/svg (self) | **47 ms** (37–108) | **47 ms** (39–62) | 1.0× |
-| pikchr/svg (self) | **40 ms** (32–480) | **36 ms** (29–51) | 0.9× |
-| plantuml/svg (proxy) | **85 ms** (68–228) | **62 ms** (57–80) | 0.7× |
+| mermaid/svg (self) | **45 ms** (35–394) | **306 ms** (286–401) | 6.8× |
+| mermaid-seq/svg (self) | **38 ms** (33–55) | **243 ms** (230–334) | 6.4× |
+| dbml/svg (self) | **43 ms** (36–1,380) | **255 ms** (241–595) | 5.9× |
+| graphviz/svg (self) | **38 ms** (31–512) | **53 ms** (48–537) | 1.4× |
+| graphviz/png (self) | **50 ms** (38–107) | **59 ms** (50–114) | 1.2× |
+| kymo/svg (self) | **46 ms** (35–67) | — | — |
+| nomnoml/svg (self) | **48 ms** (37–1,830) | **88 ms** (75–833) | 1.8× |
+| bytefield/svg (self) | **57 ms** (45–100) | **169 ms** (154–772) | 3.0× |
+| wavedrom/svg (self) | **41 ms** (35–50) | **153 ms** (103–1,176) | 3.7× |
+| vegalite/svg (self) | **95 ms** (55–131) | **294 ms** (266–792) | 3.1× |
+| svgbob/svg (self) | **45 ms** (34–107) | **45 ms** (39–50) | 1.0× |
+| pikchr/svg (self) | **42 ms** (35–576) | **35 ms** (32–42) | 0.8× |
+| plantuml/svg (proxy) | **81 ms** (75–93) | **61 ms** (50–77) | 0.8× |
 
 `(self)` renders inside the worker (kymostudio JS engine + kymostudio-core
 wasm); `(proxy)` is forwarded to kroki.io, so its busted row prices the
@@ -29,8 +31,8 @@ extra hop a cache miss pays.
 
 | Case | render.kymo.studio | hit rate |
 |---|---|---|
-| mermaid/svg GET (cold) | **39 ms** (32–47) | 0/10 |
-| mermaid/svg GET (pre-warmed) | **39 ms** (33–48) | 10/10 |
+| mermaid/svg GET (cold) | **38 ms** (35–47) | 0/10 |
+| mermaid/svg GET (pre-warmed) | **38 ms** (32–48) | 10/10 |
 
 Fresh content per repetition. `(pre-warmed)` runs the editor's
 warm-on-share POST first (untimed): opening the Share menu renders the
@@ -41,8 +43,8 @@ already a hit.
 
 | Case | render.kymo.studio | hit rate |
 |---|---|---|
-| mermaid/svg | **38 ms** (34–49) | 10/10 |
-| plantuml/svg | **36 ms** (31–42) | 10/10 |
+| mermaid/svg | **38 ms** (34–50) | 10/10 |
+| plantuml/svg | **39 ms** (33–46) | 10/10 |
 
 Hits are content-addressed (SHA-256 of kind+format+scale+source) with an
 immutable 1-year TTL — a repeat render costs one round-trip to the nearest

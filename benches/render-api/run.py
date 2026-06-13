@@ -46,6 +46,8 @@ DOT = "digraph G { rankdir=LR; client -> lb -> app1; lb -> app2; app1 -> db; app
 PUML = "@startuml\nAlice -> Bob: request\nBob --> Alice: response\n@enduml"
 KYMO = (HERE / "../../samples/order-flow.kymo").resolve().read_text()
 NOMNOML = "[Pirate|eyeCount: Int|raid();pillage()|\n  [beard]--[parrot]\n]\n[<abstract>Marauder]<:--[Pirate]"
+MMDSEQ = "sequenceDiagram\n  Alice->>Bob: request\n  Bob-->>Alice: response\n  Alice->>Bob: again"
+DBML = "Table users {\n  id integer [primary key]\n  username varchar\n}\nTable posts {\n  id integer\n  user_id integer\n}\nRef: posts.user_id > users.id"
 BYTEFIELD = '(draw-column-headers)\n(draw-box "Address" {:span 4})\n(draw-box "Size" {:span 2})\n(draw-gap "Payload")\n(draw-bottom)'
 WAVEDROM = '{ "signal": [\n  { "name": "clk",  "wave": "p......" },\n  { "name": "bus",  "wave": "x.34.5x", "data": ["head", "body", "tail"] }\n]}'
 VEGALITE = '{"data":{"values":[{"m":"Jan","v":28},{"m":"Feb","v":55},{"m":"Mar","v":43}]},"mark":"bar","encoding":{"x":{"field":"m","type":"nominal","sort":null},"y":{"field":"v","type":"quantitative"}}}'
@@ -61,6 +63,8 @@ PIKCHR = 'arrow right 200% "Markdown" "Source"\nbox rad 10px "Markdown" "Formatt
 # it to kroki.io, so its busted delta is the cost of the extra hop.
 CASES = [
     ("mermaid/svg (self)", "mermaid", "svg", MMD, "%%", True),
+    ("mermaid-seq/svg (self)", "mermaid", "svg", MMDSEQ, "%%", True),
+    ("dbml/svg (self)", "dbml", "svg", DBML, "//", True),
     ("graphviz/svg (self)", "graphviz", "svg", DOT, "//", True),
     ("graphviz/png (self)", "graphviz", "png", DOT, "//", True),
     ("kymo/svg (self)", "kymo", "svg", KYMO, "#", False),

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2026-06-13T01:08:31+00:00",
+    "timestamp": "2026-06-13T01:44:21+00:00",
     "mine": "https://render.kymo.studio",
     "kroki": "https://kroki.io",
     "reps": 10,
@@ -16,17 +16,59 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 40,
-        "min_ms": 34,
-        "max_ms": 50
+        "median_ms": 45,
+        "min_ms": 35,
+        "max_ms": 394
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 315,
-        "min_ms": 275,
-        "max_ms": 432
+        "median_ms": 306,
+        "min_ms": 286,
+        "max_ms": 401
+      }
+    },
+    {
+      "name": "mermaid-seq/svg (self)",
+      "kind": "mermaid",
+      "format": "svg",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 38,
+        "min_ms": 33,
+        "max_ms": 55
+      },
+      "kroki": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 243,
+        "min_ms": 230,
+        "max_ms": 334
+      }
+    },
+    {
+      "name": "dbml/svg (self)",
+      "kind": "dbml",
+      "format": "svg",
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 43,
+        "min_ms": 36,
+        "max_ms": 1380
+      },
+      "kroki": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 255,
+        "min_ms": 241,
+        "max_ms": 595
       }
     },
     {
@@ -37,17 +79,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 36,
-        "min_ms": 29,
-        "max_ms": 139
+        "median_ms": 38,
+        "min_ms": 31,
+        "max_ms": 512
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
         "median_ms": 53,
-        "min_ms": 47,
-        "max_ms": 66
+        "min_ms": 48,
+        "max_ms": 537
       }
     },
     {
@@ -58,17 +100,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 72,
-        "min_ms": 55,
-        "max_ms": 168
+        "median_ms": 50,
+        "min_ms": 38,
+        "max_ms": 107
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 60,
-        "min_ms": 53,
-        "max_ms": 77
+        "median_ms": 59,
+        "min_ms": 50,
+        "max_ms": 114
       }
     },
     {
@@ -79,9 +121,9 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 48,
-        "min_ms": 37,
-        "max_ms": 66
+        "median_ms": 46,
+        "min_ms": 35,
+        "max_ms": 67
       }
     },
     {
@@ -93,16 +135,16 @@
         "failed": 0,
         "cache_hits": 0,
         "median_ms": 48,
-        "min_ms": 35,
-        "max_ms": 74
+        "min_ms": 37,
+        "max_ms": 1830
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 90,
-        "min_ms": 78,
-        "max_ms": 120
+        "median_ms": 88,
+        "min_ms": 75,
+        "max_ms": 833
       }
     },
     {
@@ -113,17 +155,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 71,
-        "min_ms": 48,
-        "max_ms": 1854
+        "median_ms": 57,
+        "min_ms": 45,
+        "max_ms": 100
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 197,
-        "min_ms": 149,
-        "max_ms": 733
+        "median_ms": 169,
+        "min_ms": 154,
+        "max_ms": 772
       }
     },
     {
@@ -134,7 +176,7 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 43,
+        "median_ms": 41,
         "min_ms": 35,
         "max_ms": 50
       },
@@ -142,9 +184,9 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 99,
-        "min_ms": 96,
-        "max_ms": 111
+        "median_ms": 153,
+        "min_ms": 103,
+        "max_ms": 1176
       }
     },
     {
@@ -155,17 +197,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 88,
-        "min_ms": 52,
-        "max_ms": 134
+        "median_ms": 95,
+        "min_ms": 55,
+        "max_ms": 131
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 320,
-        "min_ms": 264,
-        "max_ms": 421
+        "median_ms": 294,
+        "min_ms": 266,
+        "max_ms": 792
       }
     },
     {
@@ -176,17 +218,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 47,
-        "min_ms": 37,
-        "max_ms": 108
+        "median_ms": 45,
+        "min_ms": 34,
+        "max_ms": 107
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 47,
+        "median_ms": 45,
         "min_ms": 39,
-        "max_ms": 62
+        "max_ms": 50
       }
     },
     {
@@ -197,17 +239,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 40,
-        "min_ms": 32,
-        "max_ms": 480
+        "median_ms": 42,
+        "min_ms": 35,
+        "max_ms": 576
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 36,
-        "min_ms": 29,
-        "max_ms": 51
+        "median_ms": 35,
+        "min_ms": 32,
+        "max_ms": 42
       }
     },
     {
@@ -218,17 +260,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 85,
-        "min_ms": 68,
-        "max_ms": 228
+        "median_ms": 81,
+        "min_ms": 75,
+        "max_ms": 93
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 62,
-        "min_ms": 57,
-        "max_ms": 80
+        "median_ms": 61,
+        "min_ms": 50,
+        "max_ms": 77
       }
     }
   ],
@@ -240,8 +282,8 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 39,
-        "min_ms": 32,
+        "median_ms": 38,
+        "min_ms": 35,
         "max_ms": 47
       }
     },
@@ -252,8 +294,8 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 10,
-        "median_ms": 39,
-        "min_ms": 33,
+        "median_ms": 38,
+        "min_ms": 32,
         "max_ms": 48
       }
     }
@@ -269,7 +311,7 @@
         "cache_hits": 10,
         "median_ms": 38,
         "min_ms": 34,
-        "max_ms": 49
+        "max_ms": 50
       }
     },
     {
@@ -280,9 +322,9 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 10,
-        "median_ms": 36,
-        "min_ms": 31,
-        "max_ms": 42
+        "median_ms": 39,
+        "min_ms": 33,
+        "max_ms": 46
       }
     }
   ]
