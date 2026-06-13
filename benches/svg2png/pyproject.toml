@@ -1,0 +1,22 @@
+[project]
+# Standalone uv project — run from this folder: `uv run python run.py`.
+name = "kymo-bench-svg2png"
+version = "0.0.0"
+description = "SVG->PNG fidelity + perf bench vs comparison rasterizers."
+requires-python = ">=3.10"
+dependencies = [
+    "kymostudio",
+    "pillow>=10.0",
+    "resvg-py>=0.3",
+    "pyvips>=2.2",
+    "cairosvg>=2.7",
+    "svglib>=1.5",
+    "reportlab>=4.0",
+]
+
+[tool.uv.sources]
+kymostudio = { path = "../../packages/python", editable = true }
+
+[tool.setuptools]
+# No package to build — this project only pins the bench's runtime env.
+py-modules = []

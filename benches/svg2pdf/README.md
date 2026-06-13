@@ -57,16 +57,16 @@ written analysis per round.
 ## Run
 
 ```bash
-cd benches
-uv sync --extra svg2pdf          # one-time: pull the comparison converters
-uv run python svg2pdf/run.py     # fidelity + accuracy + structure + perf → results/
+cd benches/svg2pdf
+uv sync                          # one-time: pull the comparison converters
+uv run python run.py             # fidelity + accuracy + structure + perf → results/
 ```
 
 `run.py` writes `results/{quality,accuracy,perf}.json` and the human-readable
 `results/REPORT.md`. Each pass also runs standalone (`quality.py`, `accuracy.py`,
 `perf.py`). The accuracy pass reads the committed Chrome reference PNGs, so it
 needs no browser; Chrome is only needed to *regenerate* them
-(`uv run python svg2pdf/gen_refs.py`).
+(`uv run python gen_refs.py`).
 
 > Dependencies. The **kymo** engine needs `kymostudio-core >= 0.4` (the release
 > that added `svg_to_pdf`); on an older core it is reported as skipped. Python

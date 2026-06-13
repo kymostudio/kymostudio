@@ -10,11 +10,11 @@ renders a single scorecard: [`results/REPORT.md`](results/REPORT.md).
 ## Run
 
 ```bash
-cd benches && uv sync                  # one-time
-uv run python bpmn/run.py            # writes results/{quality,perf}.json + REPORT.md
-uv run python bpmn/run.py --reps 11  # more reps → steadier timing
-uv run python bpmn/quality.py        # correctness only (pure stdlib, no kymo)
-uv run python bpmn/perf.py --reps 5  # timing only
+cd benches/bpmn && uv sync         # one-time
+uv run python run.py                # writes results/{quality,perf}.json + REPORT.md
+uv run python run.py --reps 11      # more reps → steadier timing
+uv run python quality.py            # correctness only (pure stdlib, no kymo)
+uv run python perf.py --reps 5      # timing only
 ```
 
 ## What it reads (read-only — never re-baselines)

@@ -38,9 +38,9 @@ reported). Treat `results/` as a dated snapshot, never a gate.
 ## Run
 
 ```bash
-cd benches
-uv sync --extra editor          # playwright (pip) — uses your installed Chrome
-uv run python editor/run.py     # quality + perf → results/
+cd benches/editor
+uv sync                         # playwright (pip) — uses your installed Chrome
+uv run python run.py            # quality + perf → results/
 # Options: --reps N · --base-url http://localhost:8794 · --channel '' (bundled
 # chromium — needs `uv run playwright install chromium` first)
 ```

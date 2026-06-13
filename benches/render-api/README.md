@@ -31,9 +31,9 @@ where a snapshot was taken; treat `results/` as a dated snapshot, never a gate.
 ## Run
 
 ```bash
-cd benches && uv run python render-api/run.py            # or plain python3
-uv run python render-api/run.py --reps 20                # steadier medians
-uv run python render-api/run.py --mine http://127.0.0.1:8787   # wrangler dev
+cd benches/render-api && uv run python run.py   # or plain python3
+uv run python run.py --reps 20                  # steadier medians
+uv run python run.py --mine http://127.0.0.1:8787   # wrangler dev
 ```
 
 Writes `results/perf.json` + `results/REPORT.md`. If a round moved anything,
