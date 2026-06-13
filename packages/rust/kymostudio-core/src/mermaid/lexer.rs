@@ -156,7 +156,14 @@ impl Scanner {
     /// double quotes is stripped (Mermaid quotes labels containing delimiters).
     fn read_until(&mut self, close: &str) -> String {
         let start = self.i;
-        while !self.at_end() && !self.starts_with(close) {
+        let mut in_quote = false;
+        while !self.at_end() {
+            let c = self.chars[self.i];
+            if c == '"' {
+                in_quote = !in_quote;
+            } else if !in_quote && self.starts_with(close) {
+                break;
+            }
             self.i += 1;
         }
         let raw: String = self.chars[start..self.i].iter().collect();
@@ -171,6 +178,61 @@ impl Scanner {
         }
     }
 
+    /// For the inline-label link form `-- text -->`, read the label text and the
+    /// closing dash/equal/dot run. A "closing run" is two or more consecutive
+    /// link chars (or one containing `>`); this lets single dashes inside a
+    /// label (`yes-no`) pass through untouched. Returns `(label, closing_run)`
+    /// and advances the cursor only on success.
+    fn try_inline_edge_label(&mut self) -> Option<(String, String)> {
+        let save = self.i;
+        self.skip_ws();
+        let text_start = self.i;
+        // Scan for the start of a closing run before end-of-line / `|`.
+        let mut j = self.i;
+        let close_start = loop {
+            match self.chars.get(j) {
+                None => break None,
+                Some('\n') | Some('|') => break None,
+                Some('-' | '=' | '.') => {
+                    let mut k = j;
+                    while matches!(self.chars.get(k), Some(c) if matches!(c, '-' | '=' | '.' | '>' | '<'))
+                    {
+                        k += 1;
+                    }
+                    let len = k - j;
+                    let run: String = self.chars[j..k].iter().collect();
+                    if len >= 2 || run.contains('>') {
+                        break Some(j);
+                    }
+                    j = k; // a lone `-` inside the label; keep scanning
+                }
+                Some(_) => j += 1,
+            }
+        }?;
+        if close_start == text_start {
+            // No label text between the runs (e.g. `A --- B`): not a labeled edge.
+            self.i = save;
+            return None;
+        }
+        let label: String = self.chars[text_start..close_start].iter().collect();
+        self.i = close_start;
+        let run_start = self.i;
+        while matches!(self.peek(), Some(c) if matches!(c, '-' | '=' | '.' | '>' | '<')) {
+            self.i += 1;
+        }
+        if matches!(self.peek(), Some('x') | Some('o')) && self.i > run_start {
+            self.i += 1;
+        }
+        let run2: String = self.chars[run_start..self.i].iter().collect();
+        let t = label.trim();
+        let text = if t.len() >= 2 && t.starts_with('"') && t.ends_with('"') {
+            t[1..t.len() - 1].to_string()
+        } else {
+            t.to_string()
+        };
+        Some((text, run2))
+    }
+
     /// Try to read an edge operator at the cursor (after optional whitespace).
     /// Returns `None` (and does not advance past the whitespace meaningfully)
     /// when the cursor is not on an edge.
@@ -178,14 +240,14 @@ impl Scanner {
         let save = self.i;
         self.skip_ws();
         match self.peek() {
-            Some('-') | Some('=') | Some('<') => {}
+            Some('-') | Some('=') | Some('<') | Some('.') | Some('~') => {}
             _ => {
                 self.i = save;
                 return None;
             }
         }
         let run_start = self.i;
-        while matches!(self.peek(), Some(c) if matches!(c, '-' | '=' | '.' | '>' | '<')) {
+        while matches!(self.peek(), Some(c) if matches!(c, '-' | '=' | '.' | '>' | '<' | '~')) {
             self.i += 1;
         }
         // Optional single arrowhead glyph (`x` open / `o` circle).
@@ -193,12 +255,23 @@ impl Scanner {
             self.i += 1;
         }
         let run: String = self.chars[run_start..self.i].iter().collect();
-        let dashed = run.contains('.');
-        let has_arrow =
+        let mut dashed = run.contains('.');
+        let mut has_arrow =
             run.contains('>') || run.starts_with('<') || run.ends_with('x') || run.ends_with('o');
 
-        // Optional `|label|` immediately after the operator.
+        // Inline label form `-- text -->` / `== text ==>` / `-. text .->`:
+        // only when the opening run has no arrowhead yet (otherwise the text
+        // after `A-->` is the destination node, not a label).
         let mut label = String::new();
+        if !has_arrow {
+            if let Some((text, run2)) = self.try_inline_edge_label() {
+                label = text;
+                dashed = dashed || run2.contains('.');
+                has_arrow = run2.contains('>') || run2.ends_with('x') || run2.ends_with('o');
+            }
+        }
+
+        // Optional `|label|` immediately after the operator.
         self.skip_ws();
         if self.peek() == Some('|') {
             self.i += 1;
