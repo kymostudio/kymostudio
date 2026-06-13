@@ -13,6 +13,7 @@ import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
 import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } from "./sidebar";
+import { WelcomeView } from "./welcome";
 import { sniffKind } from "./detect";
 import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, LayoutGrid, Trash2, LogOut } from "lucide-react";
 
@@ -52,6 +53,7 @@ export default function EditorPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const welcomeDismissed = useRef(false); // set when the user starts a diagram from the Welcome panel
   const [detected, setDetected] = useState<string | null>(null); // kind chosen by paste auto-detect (transient chip)
   const [sharePayload, setSharePayload] = useState(""); // deflate+base64url of the current source
   const warmedShare = useRef(""); // last kind+source warmed into the render cache
@@ -283,6 +285,10 @@ export default function EditorPage() {
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
   // A draft (no room, not a pristine share view) is unsaved until the explicit Save.
   const isDraft = !d && !shared;
+  // VS Code-style Welcome: a fresh "/" (untouched sample) shows the Welcome panel
+  // instead of the editor. Any in-place action (pick template / open file) arms
+  // `welcomeDismissed`; navigating to a real route re-arms it (effect below).
+  const showWelcome = isDraft && source === SAMPLE && !welcomeDismissed.current;
 
   useEffect(() => {
     document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
@@ -350,8 +356,27 @@ export default function EditorPage() {
   // Nothing is created server-side here: the pick seeds a DRAFT (URL-only). It
   // becomes a room only via the explicit Save — abandoned templates never litter
   // the Diagrams list.
+  // Re-arm the Welcome panel whenever the route changes (back to a fresh "/").
+  useEffect(() => { welcomeDismissed.current = false; }, [d, shared]);
+
+  // "Open file…" on the Welcome panel: load a local diagram source into the draft.
+  function openLocalFile(file: File) {
+    file.text().then((txt) => {
+      const ext = (file.name.split(".").pop() || "").toLowerCase();
+      const byExt = ext === "bpmn" ? "bpmn" : ext === "mmd" || ext === "mermaid" ? "mermaid" : "kymo";
+      const k = sniffKind(txt) || byExt;
+      welcomeDismissed.current = true;
+      userEdited.current = true; titleUserSet.current = false; autoTitle.current = "";
+      setTitle(""); setShareError(null);
+      setKind(KINDS.some((x) => x.value === k) ? k : "kymo");
+      setSource(txt);
+      window.history.replaceState(null, "", "/");
+    }).catch(() => {});
+  }
+
   function pickTemplate(t: Template) {
     setGalleryOpen(false);
+    welcomeDismissed.current = true; // leaving the Welcome panel for a real diagram
     // No room = the only copy of edited content is this tab/URL. Ask first.
     if (!d && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
     titleUserSet.current = false; autoTitle.current = "";
@@ -457,7 +482,9 @@ export default function EditorPage() {
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
         {claims && <WorkspaceSwitcher />}
         {claims && <span className="sep">/</span>}
-        {booting ? <span className="skeleton name-skel" /> : claims ? (
+        {booting ? <span className="skeleton name-skel" /> : showWelcome ? (
+          <span className="diagram-name untitled"><span className="dn-text">Welcome</span></span>
+        ) : claims ? (
           editingName ? (
             <input className="diagram-input" autoFocus maxLength={60} defaultValue={title} placeholder="Untitled"
               onKeyDown={(e) => { if (e.key === "Enter") commitRename((e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditingName(false); }}
@@ -477,7 +504,7 @@ export default function EditorPage() {
             {live ? "Saved" : "Offline"}
           </span>
         )}
-        {isDraft && !booting && (
+        {isDraft && !booting && !showWelcome && (
           <span className="save-ind unsaved" title="This draft isn't on the server yet. Save to keep it in your Diagrams (⌘/Ctrl-S). It also lives in this page's URL.">
             {savingDraft ? "Saving…" : "Unsaved"}
           </span>
@@ -487,7 +514,7 @@ export default function EditorPage() {
         <nav className="nav-group">
           <button className="mob-hide" onClick={() => setGalleryOpen(true)} title="New diagram" aria-haspopup="dialog"><Plus size={16} strokeWidth={2.2} />New</button>
           <a className="btn mob-hide" href={docHref(kind)} target="_blank" rel="noopener noreferrer" title={`Syntax help for ${KINDS.find((x) => x.value === kind)?.label ?? kind}`}><BookOpen size={16} strokeWidth={2} />Docs</a>
-          {isDraft && !booting && (
+          {isDraft && !booting && !showWelcome && (
             <button className="btn-primary mob-hide" onClick={save} title="Save to your Diagrams (⌘/Ctrl-S)">
               <Save size={16} strokeWidth={2} />
               Save
@@ -499,6 +526,7 @@ export default function EditorPage() {
               Save a copy
             </button>
           )}
+          {!showWelcome && (
           <div className="account mob-hide" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setExportOpen((o) => !o)} aria-haspopup="menu" aria-expanded={exportOpen}><Download size={16} strokeWidth={2} />Export <ChevronDown size={16} strokeWidth={2.2} className="chev-icon" /></button>
             {exportOpen && (
@@ -519,6 +547,7 @@ export default function EditorPage() {
               </div>
             )}
           </div>
+          )}
           {/* phones: the low-traffic actions collapse into one ⋯ menu (Share stays a visible CTA) */}
           <div className="account mob-more" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setMoreOpen((o) => !o)} title="More actions" aria-label="More actions" aria-haspopup="menu" aria-expanded={moreOpen}>
@@ -568,6 +597,7 @@ export default function EditorPage() {
               </div>
             )}
           </div>
+          {!showWelcome && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
             {/* Share is the standing CTA, but a draft's Save outranks it — demote Share to secondary then */}
             <button className={isDraft && !booting ? "" : "btn-primary"} onClick={openShare} title="Share this diagram — the entire content lives in the link">
@@ -605,6 +635,7 @@ export default function EditorPage() {
               );
             })()}
           </div>
+          )}
         </nav>
         {/* signed-in account lives at the bottom of the activity bar (VSCode-style); guests sign in here */}
         {!claims && <GoogleButton />}
@@ -623,6 +654,8 @@ export default function EditorPage() {
         <main ref={mainRef}>
         {booting ? (
           <div className="boot"><KLoader /></div>
+        ) : showWelcome ? (
+          <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} />
         ) : (
           <>
             <section className="pane" style={{ flex: `0 0 ${split}%` }}>
