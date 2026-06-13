@@ -40,6 +40,12 @@ node render.mjs            # writes results/raw/*.{svg,png} + results/recall.jso
 uv run python accuracy.py  # writes results/REPORT.md
 ```
 
+# coverage over the raw datasets (merman/cypress/warp) — render every source
+# through merman + kymo, score raster-safety per grammar. Offline (no kroki).
+node coverage.mjs          # writes results/coverage/*.json
+uv run python coverage_report.py  # writes results/COVERAGE.md
+```
+
 `render.mjs` resolves the wasm engines from `packages/render-api/node_modules`
 (set `RENDER_API_DIR` to override) and fetches the mermaid.js reference from
 kroki.io, so it is **online** — numbers move with kroki. `datasets/` holds one folder per dataset, each with a card (`README.md`). The
