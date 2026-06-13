@@ -214,6 +214,12 @@ pub fn mermaid_to_xmi(src: &str) -> Result<String, mermaid::MermaidError> {
     Ok(sequence::emit::to_xmi(&mermaid::parse_sequence(src)?))
 }
 
+/// Render a Mermaid `sequenceDiagram` to SVG (kymo own renderer: real
+/// `<text>`, so PNG/PDF keep their labels). Notes/activations not yet drawn.
+pub fn mermaid_to_sequence_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(sequence::svg::render(&mermaid::parse_sequence(src)?))
+}
+
 /// Convert a Mermaid `sequenceDiagram` to a StarUML native `.mdj` (metadata-
 /// JSON) carrying a laid-out sequence diagram.
 ///
