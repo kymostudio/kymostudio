@@ -18,7 +18,7 @@
     <script>
       // Kroki share links (?k=<kind>&s=<payload>): the diagram is the whole point
       // of the page, so start its render before the app bundle even downloads —
-      // decode the payload and POST to kroki.io right now. renderKroki()
+      // decode the payload and POST to the render API right now. renderKroki()
       // (web/kroki.ts) adopts the in-flight response when React mounts, instead
       // of waiting main.js + mount + debounce (~1.5s on 4G) to send the same request.
       (function () {
@@ -30,10 +30,11 @@
             var bin = atob(s.replace(/-/g, "+").replace(/_/g, "/"));
             var bytes = Uint8Array.from(bin, function (c) { return c.charCodeAt(0); });
             var src = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate"))).text();
-            // The cached render proxy (web/const.ts RENDER_API) — edge cache hit
-            // skips kroki's server render entirely. If this fails, renderKroki()
-            // falls back to a fresh request (proxy, then kroki.io direct).
-            var res = fetch("https://mcp.kymo.studio/api/render/" + encodeURIComponent(k) + "/svg", { method: "POST", headers: { "content-type": "text/plain" }, body: src });
+            // The render API (web/const.ts RENDER_API) — edge cache hit skips the
+            // render entirely, and misses self-render right on the worker for the
+            // kinds it covers. If this fails, renderKroki() falls back to a fresh
+            // request (render API, then kroki.io direct).
+            var res = fetch("https://render.kymo.studio/" + encodeURIComponent(k) + "/svg", { method: "POST", headers: { "content-type": "text/plain" }, body: src });
             res.catch(function () {});
             return { kind: k, src: src, res: res };
           })();
