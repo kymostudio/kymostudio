@@ -24,6 +24,7 @@ Run:  cd benches && uv run python render-api/run.py [--reps N] [--mine URL]
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import platform
 import random
@@ -32,6 +33,7 @@ import statistics
 import time
 import urllib.error
 import urllib.request
+import zlib
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -62,14 +64,19 @@ HIT_CASES = [
 ]
 
 
-def _post(base: str, kind: str, fmt: str, source: str) -> tuple[float, int, str]:
-    """POST one render; return (elapsed_ms, http_status, x-render-cache|'')."""
+def _share_payload(source: str) -> str:
+    """The editor's share encoding: deflate (zlib) + base64url, padding stripped."""
+    return base64.urlsafe_b64encode(zlib.compress(source.encode(), 9)).decode().rstrip("=")
+
+
+def _post(base: str, kind: str, fmt: str, source: str, get_url: str | None = None) -> tuple[float, int, str]:
+    """POST one render (or GET `get_url`); return (elapsed_ms, http_status, x-render-cache|'')."""
     req = urllib.request.Request(
-        f"{base}/{kind}/{fmt}",
-        data=source.encode(),
+        get_url or f"{base}/{kind}/{fmt}",
+        data=None if get_url else source.encode(),
         # A real UA: Cloudflare's bot protection 403s the default Python-urllib one.
         headers={"content-type": "text/plain", "user-agent": "kymo-bench/1.0 (+https://github.com/kymostudio/kymostudio)"},
-        method="POST",
+        method="GET" if get_url else "POST",
     )
     t0 = time.perf_counter()
     try:
@@ -140,6 +147,22 @@ def _report(data: dict) -> str:
         "wasm); `(proxy)` is forwarded to kroki.io, so its busted row prices the",
         "extra hop a cache miss pays.",
         "",
+        "## Share-embed GET — first fetch of a Copy-Markdown-image URL",
+        "",
+        "| Case | render.kymo.studio | hit rate |",
+        "|---|---|---|",
+    ]
+    for c in data.get("share_get", []):
+        s = c["mine"]
+        rate = f"{s['cache_hits']}/{s['reps'] - s['failed']}"
+        lines.append(f"| {c['name']} | {_cell(s)} | {rate} |")
+    lines += [
+        "",
+        "Fresh content per repetition. `(pre-warmed)` runs the editor's",
+        "warm-on-share POST first (untimed): opening the Share menu renders the",
+        "diagram into the content-addressed cache, so the embed's first fetch is",
+        "already a hit.",
+        "",
         "## Edge cache hits (identical source every repetition)",
         "",
         "| Case | render.kymo.studio | hit rate |",
@@ -175,6 +198,39 @@ def main() -> None:
         print(f"  busted  {name}: mine {row['mine'].get('median_ms', '×')} ms"
               + (f", kroki {row['kroki'].get('median_ms', '×')} ms" if on_kroki else ""))
 
+    # Share-embed GET: what GitHub pays on its FIRST fetch of a
+    # Copy-Markdown-image URL — cold (nobody rendered this content yet) vs
+    # pre-warmed (the editor's warm-on-share POST already populated the
+    # content-addressed cache entry the GET hashes to).
+    share_get = []
+    for warmed in (False, True):
+        times, hit_count, failed = [], 0, 0
+        for i in range(args.reps):
+            src = f"{MMD}\n%% share-{random.randrange(1 << 30)}-{i}"
+            url = f"{args.mine}/mermaid/svg/{_share_payload(src)}"
+            try:
+                if warmed:
+                    _post(args.mine, "mermaid", "svg", src)  # the warm-on-share POST (untimed)
+                ms, status, cache = _post(args.mine, "mermaid", "svg", src, get_url=url)
+            except Exception:
+                failed += 1
+                continue
+            if status != 200:
+                failed += 1
+                continue
+            times.append(ms)
+            hit_count += cache == "hit"
+        share_get.append({
+            "name": "mermaid/svg GET " + ("(pre-warmed)" if warmed else "(cold)"),
+            "warmed": warmed,
+            "mine": {
+                "reps": args.reps, "failed": failed, "cache_hits": hit_count,
+                **({"median_ms": round(statistics.median(times)),
+                    "min_ms": round(min(times)), "max_ms": round(max(times))} if times else {}),
+            },
+        })
+        print(f"  shareGET {'warmed' if warmed else 'cold  '}: {share_get[-1]['mine'].get('median_ms', '×')} ms")
+
     hits = []
     for name, kind, fmt, src in HIT_CASES:
         _post(args.mine, kind, fmt, src)  # warm the cache so rep 1 isn't the miss
@@ -193,6 +249,7 @@ def main() -> None:
             "platform": platform.platform(),
         },
         "busted": busted,
+        "share_get": share_get,
         "hits": hits,
     }
     RESULTS.mkdir(exist_ok=True)
