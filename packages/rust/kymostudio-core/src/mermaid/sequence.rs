@@ -150,19 +150,25 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
             continue;
         }
         if lower == "else" || lower.starts_with("else ") {
-            new_operand(&mut stack, *lineno, stmt["else".len()..].trim().to_string())?;
+            if !stack.is_empty() {
+                new_operand(&mut stack, *lineno, stmt["else".len()..].trim().to_string())?;
+            }
             continue;
         }
         if lower == "and" || lower.starts_with("and ") {
-            new_operand(&mut stack, *lineno, stmt["and".len()..].trim().to_string())?;
+            if !stack.is_empty() {
+                new_operand(&mut stack, *lineno, stmt["and".len()..].trim().to_string())?;
+            }
             continue;
         }
         if lower == "option" || lower.starts_with("option ") {
-            new_operand(
-                &mut stack,
-                *lineno,
-                stmt["option".len()..].trim().to_string(),
-            )?;
+            if !stack.is_empty() {
+                new_operand(
+                    &mut stack,
+                    *lineno,
+                    stmt["option".len()..].trim().to_string(),
+                )?;
+            }
             continue;
         }
         if lower == "end" {
@@ -241,8 +247,13 @@ fn frag_open(lower: &str, stmt: &str) -> Option<(FragmentOp, String)> {
         ("critical", FragmentOp::Critical),
         ("break", FragmentOp::Break),
     ] {
-        if lower == kw || lower.starts_with(&format!("{kw} ")) {
-            return Some((op, stmt[kw.len()..].trim().to_string()));
+        if lower == kw
+            || lower
+                .strip_prefix(kw)
+                .is_some_and(|r| r.starts_with([' ', '\t', ';', '#']))
+        {
+            let guard = stmt[kw.len()..].trim_start_matches([';', '#']).trim();
+            return Some((op, guard.to_string()));
         }
     }
     None
@@ -570,5 +581,19 @@ mod tests {
             .participants
             .iter()
             .any(|p| p.id == "W" && p.label == "Worker"));
+    }
+
+    #[test]
+    fn lenient_stray_else_and_boundary_openers() {
+        // A stray `else`/`and` with no open fragment must not error (mermaid is
+        // lenient) — the messages still parse.
+        let s = parse("sequenceDiagram\nAlice->Bob: hi\nelse oops\nBob-->Alice: ok");
+        assert_eq!(s.items.len(), 2);
+        // A fragment opener terminated by `;` (not a space) still opens.
+        let s = parse("sequenceDiagram\nalt;A->>B: x\nelse\nB->>A: y\nend");
+        assert!(s
+            .items
+            .iter()
+            .any(|i| matches!(i, crate::sequence::Item::Fragment(_))));
     }
 }
