@@ -86,7 +86,7 @@ packages share a version number.
   `diamond` shape. Exposed as a Rust API (`mermaid_to_kymojson`), the `kymo` CLI
   (`kymo flow.mmd → flow.kymo.json`), PyO3 (`mermaid_to_kymojson`) and wasm
   (`mermaidToKymoJson`). The output is byte-conformant with `to_kymojson`.
-  See `docs/specs/mermaid-format/` (FEAT-MERMAID-001) and
+  See `docs/specs/format-mermaid/` (FEAT-MERMAID-001) and
   `docs/formats/mermaid/mermaid-mapping.md` (MERMAID-MAP-001); samples
   `samples/pipeline.mmd`, `samples/approval.mmd`.
 

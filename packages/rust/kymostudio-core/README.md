@@ -8,7 +8,7 @@ dependencies.
 The engine half parses diagram-as-code into kymo's model, lays it out, and
 serializes to the `.kymo.json` interchange format the Python/JS front-ends
 consume — written once in Rust instead of duplicated per language. First subsystem:
-**Mermaid flowchart import** (`mermaid_to_kymojson`). See `docs/specs/mermaid-format/`.
+**Mermaid flowchart import** (`mermaid_to_kymojson`). See `docs/specs/format-mermaid/`.
 
 One core crate, compiled to **three targets** from a single source via feature
 flags — so the Rust CLI, the Python package, and the JS/browser playground all
