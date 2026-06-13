@@ -14,6 +14,7 @@ pub mod emit;
 pub mod gaphor;
 pub mod layout;
 pub mod mdj;
+pub mod svg;
 
 /// A parsed sequence diagram, ready for [`emit`].
 #[derive(Debug, Clone, PartialEq, Eq)]

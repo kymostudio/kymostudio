@@ -17,6 +17,7 @@ import {
   bpmnRender,
   d2ToSvg,
   mermaidToSvg,
+  mermaidSequenceToSvg,
   registerFont,
   svgToPdf,
   svgToPng,
@@ -50,8 +51,8 @@ export function ensure(): void {
 }
 
 // First non-comment keyword of a mermaid source (after optional `---` YAML
-// front-matter) — used to route flowcharts to kymo's own engine.
-function mermaidIsFlowchart(source: string): boolean {
+// front-matter) — routes grammars kymo renders itself away from merman.
+function mermaidGrammar(source: string): string {
   const lines = source.split("\n");
   let i = 0;
   if (lines[0]?.trim() === "---") {
@@ -62,10 +63,9 @@ function mermaidIsFlowchart(source: string): boolean {
   for (; i < lines.length; i++) {
     const t = lines[i].trim();
     if (!t || t.startsWith("%%")) continue;
-    const kw = t.split(/[\s{(]/)[0].toLowerCase();
-    return kw === "flowchart" || kw === "graph";
+    return t.split(/[\s{(:]/)[0].toLowerCase();
   }
-  return false;
+  return "";
 }
 
 /** kind → local SVG renderer. Throws the engine's message on bad source. */
@@ -83,12 +83,12 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
   // a given flowchart (e.g. the A-->B&C fan syntax), fall through to merman too.
   mermaid: (source) => {
     ensure();
-    if (mermaidIsFlowchart(source)) {
-      try {
-        return mermaidToSvg(source);
-      } catch {
-        // unsupported flowchart syntax → merman
-      }
+    const grammar = mermaidGrammar(source);
+    try {
+      if (grammar === "flowchart" || grammar === "graph") return mermaidToSvg(source);
+      if (grammar === "sequencediagram") return mermaidSequenceToSvg(source);
+    } catch {
+      // unsupported syntax for kymo's engine → fall through to merman
     }
     return mermaidRenderSvg(source);
   },
