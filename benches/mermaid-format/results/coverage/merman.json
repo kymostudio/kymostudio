@@ -46,12 +46,12 @@
   },
   "flowchart": {
     "n": 838,
-    "merman_ok": 834,
-    "merman_fo": 809,
+    "merman_ok": 833,
+    "merman_fo": 808,
     "merman_text": 14,
-    "kymo_n": 837,
-    "kymo_ok": 324,
-    "timeout": 1
+    "kymo_n": 836,
+    "kymo_ok": 448,
+    "timeout": 2
   },
   "gantt": {
     "n": 146,

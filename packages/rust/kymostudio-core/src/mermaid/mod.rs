@@ -153,6 +153,21 @@ fn handle_statement(
         return Ok(());
     }
 
+    // Metadata statements (styling / interaction / accessibility) carry no graph
+    // structure — kymo does not render them, so accept and skip rather than
+    // failing the whole flowchart. Mermaid: `classDef`, `class`, `style`,
+    // `linkStyle`, `click`, `accTitle:`, `accDescr`.
+    if lower.starts_with("classdef ")
+        || lower.starts_with("class ")
+        || lower.starts_with("style ")
+        || lower.starts_with("linkstyle ")
+        || lower.starts_with("click ")
+        || lower.starts_with("acctitle")
+        || lower.starts_with("accdescr")
+    {
+        return Ok(());
+    }
+
     let items = parse_statement(stmt).map_err(|msg| MermaidError::Syntax { line: lineno, msg })?;
 
     // Walk items: Node (Edge Node)*. Connect consecutive nodes with the edge.
