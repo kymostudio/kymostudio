@@ -1,0 +1,21 @@
+{
+  "_comment": "Fixtures using legacy/ambiguous Mermaid syntax that mermaid.js parses via its full grammar but kymo's lenient parser intentionally throws on. Excluded from the headline accuracy score (they test kymo's non-support of deprecated/ambiguous forms, not a renderer bug). Each: dataset/grammar/file -> reason.",
+  "legacy": [
+    {
+      "file": "merman/flowchart/upstream_pkgtests_flow_text_spec_087.mmd",
+      "reason": "inline edge label literally contains the link delimiter (A-- test text with == -->B); ambiguous without mermaid's full tokenizer"
+    },
+    {
+      "file": "merman/flowchart/upstream_pkgtests_flow_text_spec_090.mmd",
+      "reason": "dotted inline edge label literally contains == (A-. test text with == .->B); same ambiguity"
+    },
+    {
+      "file": "merman/flowchart/upstream_pkgtests_flow_text_spec_203.mmd",
+      "reason": "legacy asymmetric >...] shape chained with arrows (A_node-->odd->Vertex Text]); deprecated/ambiguous form"
+    },
+    {
+      "file": "mermaid-cypress/flowchart/flowchart_053.mmd",
+      "reason": "multiline edge label with embedded --\" across physical lines (v10[\"<11\"] --\"...); ambiguous edge/label boundary"
+    }
+  ]
+}

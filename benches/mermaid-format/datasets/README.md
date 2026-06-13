@@ -14,3 +14,14 @@ mermaid `.mmd`, MIT-compatible (they derive from mermaid.js).
 other three are raw, per-grammar coverage corpora gathered from public test
 suites (deduped by content). Rebuild the coverage corpora with `build-corpus.py`
 (not committed — needs the three upstream repos checked out).
+
+## known-divergent.json — legacy/ambiguous fixtures
+
+A small set of fixtures use legacy or genuinely-ambiguous Mermaid syntax that
+mermaid.js parses via its full grammar but kymo's lenient parser intentionally
+throws on (e.g. an inline edge label that literally contains the link delimiter
+`==`, or the legacy asymmetric `>...]` shape chained with arrows). These are
+listed in `known-divergent.json` with a per-file reason and **excluded from the
+accuracy headline** by `accuracy-mermaidjs.mjs` — they test kymo's non-support
+of deprecated/ambiguous forms, not a renderer bug. Excluding them, flowchart
+label recall vs mermaid.js is 100%.
