@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "kymostudio": "^0.4.4",
-    "kymostudio-core": "^0.4.4"
+    "kymostudio-core": "^0.4.4",
+    "nomnoml": "^1.7.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250601.0",
