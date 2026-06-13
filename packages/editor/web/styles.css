@@ -183,7 +183,6 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-chev, .sb-icon { flex: none; color: var(--dim); display: inline-flex; }
 .sb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .sb-meta { flex: none; margin-left: 8px; font-size: 11px; color: var(--dim); }
-.sb-folder:hover .sb-meta, .sb-file:hover .sb-meta { display: none; } /* yields the right edge to the action buttons */
 .sb-folder.sel { background: var(--accent-soft); }
 .sb-row.kbd { box-shadow: inset 0 0 0 1px rgba(224, 9, 95, 0.5); }
 .sb-file.active { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
@@ -192,13 +191,6 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-file.active .sb-icon { color: var(--accent); }
 .sb-folder.dragover { background: var(--accent-soft); box-shadow: inset 0 0 0 1px rgba(224, 9, 95, 0.4); }
 .sb-rename { flex: 1; min-width: 0; font: inherit; font-size: 13px; font-weight: 400; padding: 1px 4px; border: 1px solid var(--accent); border-radius: 4px; background: var(--bg); color: var(--ink); outline: none; }
-/* overlaid on the right edge, NOT in the flex flow, so they don't steal width
-   from the filename at rest (they only appear on hover anyway) */
-.sb-actions { position: absolute; right: 4px; top: 0; bottom: 0; display: inline-flex; align-items: center; gap: 0; padding-left: 6px; background: var(--bg-raise); opacity: 0; transition: opacity 0.14s ease; }
-.sb-file.active .sb-actions { background: var(--accent-soft); }
-.sb-folder:hover .sb-actions, .sb-file:hover .sb-actions, .sb-actions:focus-within { opacity: 1; }
-.sb-actions button { flex: none; padding: 3px; border: 1px solid transparent; background: transparent; color: var(--dim); border-radius: 6px; }
-.sb-actions button:hover { background: var(--bg); border-color: transparent; color: var(--accent); transform: none; box-shadow: none; }
 .sb-empty { padding: 14px 12px; font-size: 12.5px; color: var(--dim); }
 /* right-click context menu (shared component) */
 .ctx-menu { position: fixed; z-index: 60; min-width: 180px; padding: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 34px rgba(36, 33, 49, 0.18); }
@@ -213,7 +205,6 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .ctx-shortcut { flex: none; font-size: 11px; color: var(--dim); }
 .ctx-sep { height: 1px; margin: 4px 6px; background: var(--border); }
 .sb-backdrop { display: none; }
-@media (hover: none) { .sb-actions { opacity: 1; } }
 /* phones: the rail stays pinned at the left; the panel slides in as a drawer
    beside it, with a backdrop over the editor area. */
 @media (max-width: 720px) {
