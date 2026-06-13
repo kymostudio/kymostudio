@@ -1,8 +1,8 @@
 ---
 title: Kymo Editor (editor.kymo.studio) — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KEDITOR-001
-version: "0.3"
-issue_date: 2026-06-12
+version: "0.4"
+issue_date: 2026-06-13
 status: Implemented
 classification: Internal
 owner: diagrams/ project
@@ -23,6 +23,7 @@ related_documents:
   - FEAT-KMCP-001
   - FEAT-CANVAS-001
   - FEAT-STUDIO-001
+  - FEAT-KRAPI-001
   - REF-KROKI-001
   - RES-MCP-001
 authors:
@@ -45,6 +46,18 @@ keywords:
   - kroki
   - google-sign-in
   - workspaces
+  - folders
+  - folder-tree
+  - trash
+  - soft-delete
+  - templates
+  - drafts
+  - thumbnails
+  - auto-detect
+  - in-browser-mermaid
+  - render-api
+  - vscode-shell
+  - zoom-pan
   - d1
   - url-sharing
   - cloudflare-pages
@@ -59,12 +72,12 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | `FEAT-KEDITOR-001` |
-| Version           | 0.3 |
+| Version           | 0.4 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
-| Related Documents | `DESIGN-KEDITOR-001` (how), `TEST-KEDITOR-001` (V&V), `PLAN-KEDITOR-001` (plan), `FEAT-KRENDER-001` / `FEAT-KSHARE-001` / `FEAT-KLIVE-001` / `FEAT-KLIBRARY-001` / `FEAT-KEMCP-001` (the five modules — see §B.7), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine intermediate), `FEAT-KMCP-001` (the sibling *local* npx MCP server), `FEAT-CANVAS-001` / `FEAT-STUDIO-001` (sibling canvas editors), `REF-KROKI-001` (the external render gateway), `RES-MCP-001` (MCP landscape) |
+| Related Documents | `DESIGN-KEDITOR-001` (how), `TEST-KEDITOR-001` (V&V), `PLAN-KEDITOR-001` (plan), `FEAT-KRENDER-001` / `FEAT-KSHARE-001` / `FEAT-KLIVE-001` / `FEAT-KLIBRARY-001` / `FEAT-KEMCP-001` (the five modules — see §B.7), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine intermediate), `FEAT-KMCP-001` (the sibling *local* npx MCP server), `FEAT-CANVAS-001` / `FEAT-STUDIO-001` (sibling canvas editors), `FEAT-KRAPI-001` (the **render.kymo.studio** Worker the editor now delegates non-kymo rendering to), `REF-KROKI-001` (the upstream render gateway, now a fallback behind `FEAT-KRAPI-001`), `RES-MCP-001` (MCP landscape) |
 
-> This document consolidates the product description (ConOps & StRS), specification overview, and feature requirements (SRS) for **kymo-editor** — the diagram editor at **editor.kymo.studio** and its serverless backend (the `kymo-mcp` Cloudflare Worker at mcp.kymo.studio). It owns the `SN-KE-NN` stakeholder needs and the `FR-KE`/`NFR-KE` requirement IDs, and is the **normative reference** for the shipped system. Version 0.2 **re-baselines** the spec for the product as shipped on 2026-06-12: a React SPA with Google accounts, a per-user multi-diagram library organised into workspaces, CodeMirror editing, 28 kroki.io diagram kinds beside the native kymo DSL, account-free URL sharing, and a per-diagram live-sync + MCP channel (v0.1 described the predecessor: a single textarea, no accounts, one shared room). Since v0.3, kymo-editor is an **umbrella**: the SRS surface is decomposed into five as-built modules under `modules/` (§B.7); this document remains the baseline of record until a module re-baselines its own carve-out.
+> This document consolidates the product description (ConOps & StRS), specification overview, and feature requirements (SRS) for **kymo-editor** — the diagram editor at **editor.kymo.studio** and its serverless backend (the `kymo-mcp` Cloudflare Worker at mcp.kymo.studio). It owns the `SN-KE-NN` stakeholder needs and the `FR-KE`/`NFR-KE` requirement IDs, and is the **normative reference** for the shipped system. Version 0.2 **re-baselines** the spec for the product as shipped on 2026-06-12: a React SPA with Google accounts, a per-user multi-diagram library organised into workspaces, CodeMirror editing, 28 kroki.io diagram kinds beside the native kymo DSL, account-free URL sharing, and a per-diagram live-sync + MCP channel (v0.1 described the predecessor: a single textarea, no accounts, one shared room). Since v0.3, kymo-editor is an **umbrella**: the SRS surface is decomposed into five as-built modules under `modules/` (§B.7); this document remains the baseline of record until a module re-baselines its own carve-out. **Version 0.4 re-baselines the product context (Part A), glossary, and module map for the 2026-06-13 product** — a substantial second growth pass on top of v0.2: non-kymo rendering moved off direct kroki.io to the dedicated **render.kymo.studio** Worker (`FEAT-KRAPI-001`, with kroki.io as fallback) and **Mermaid now renders in-browser** (a Rust slice of *merman* for plain flowcharts, `mermaid.js` for the rest); the flat workspaces became a **nested folder tree** in a **VSCode-style shell** (activity bar + Explorer/Search/Templates panels); deletes became **soft** with a **Trash** view and 30-day auto-purge; **+ New** opens a **template gallery** and authoring is now **draft-first** (no server document until the user saves); plus paste **auto-detect**, a **zoom/pan** preview, server-rendered **thumbnails**, and a **`/login`** route with a session-expiry watchdog. The new functional surface is specified in the modules (§B.7, §C.13); Part C's `FR-KE` numbering stays the v0.2 baseline of record, annotated where behaviour was revised.
 
 ---
 
@@ -80,30 +93,39 @@ kymo authors a diagram-as-code DSL; the fastest way to feel that loop is to type
 
 The result keeps the v0.1 spine — static CDN page, client-side wasm render for kymo, one serverless Worker — and grows a thin product around it: Google sign-in, a D1-backed diagram library with workspaces, CodeMirror editing, a kind switcher with per-kind samples, export to SVG/PNG/source, and `?s=` share links.
 
+A **second growth pass** (v0.4, the 2026-06-13 product) answered the next round of pressures without changing that spine:
+
+4. **One public render service is a single point of failure.** Non-kymo kinds were POSTed straight to the public kroki.io — one European origin, its own queue, bad days, and the source text leaving the device. The editor now delegates to a **dedicated render Worker, render.kymo.studio** (`FEAT-KRAPI-001`): it renders the kinds whose engines run in `workerd` at the edge PoP nearest the caller, **proxies the rest to kroki.io as a fallback**, and caches everything by content hash. **Mermaid moved fully in-browser** — a Rust slice of *merman* (`kymo-mermaid` wasm) for plain flowcharts, the `mermaid.js` reference bundle for every other Mermaid grammar — so the most-used non-kymo kind renders offline with no third party at all.
+5. **A flat workspace list doesn't scale.** Authors with many diagrams need real organisation and a place to undo mistakes. Workspaces became a **nested folder tree** in a **VSCode-style shell** (an activity bar with Explorer / Search / Templates panels), and deletes became **soft** — a **Trash** view with restore and a 30-day auto-purge, so nothing is lost to a misclick.
+6. **A blank textarea is a cold start.** **+ New** now opens a **template gallery** of diagram *types* (each seeds a working starter and sets the kind), authoring is **draft-first** (you edit immediately; no server document is created until you Save), and pasted source has its **language auto-detected**. The preview gained **pan/zoom**, the library gained server-rendered **thumbnails**, and an expired session lands on a dedicated **`/login`** page instead of failing silently.
+
 ### A.2 Users & context of operations (ConOps)
 
-- **Anonymous authors** open `https://editor.kymo.studio`, pick a diagram kind, type source on the left and see the render on the right. They can export SVG/PNG/source and copy a **share link** that embeds the entire diagram in the URL (`?s=…`, plus `&k=<kind>` for non-kymo kinds) — no account, no server-side document. Opening someone else's `?s=` link drops the source into the editor, editable and re-shareable; the address bar keeps itself up to date as they type.
-- **Signed-in authors** (Google) get a persistent **diagram library**: every diagram is its own document (`?d=<id>`) that autosaves as they type, syncs live across their open tabs, can be renamed in the header, and is listed at `/diagrams` (search, kind badge, relative timestamps, delete). Diagrams can be grouped into named **workspaces** ("Personal" is the default bucket).
-- **LLM hosts (Claude Desktop, Cursor, claude.ai)** connect to the remote MCP endpoint (mcp.kymo.studio, Google-OAuth-gated) and manage the *signed-in user's own* diagrams: `new_diagram`, `list_diagrams`, `edit_diagram`, `get_diagram`, `delete_diagram`. Edits pushed by the agent appear live in the user's open editor tabs.
-- **Operators** deploy two artefacts and leave them alone: a static `dist/` to Cloudflare Pages (`kymo-editor` project → editor.kymo.studio) and one Cloudflare Worker (`kymo-mcp` → mcp.kymo.studio) with its Durable Objects, a D1 database, and a KV namespace. There is still no VM, container, or render service to run.
+- **Anonymous authors** open `https://editor.kymo.studio`, pick a diagram **type** from a template gallery (or paste source and let the kind auto-detect), type on the left and see the render on the right — pannable and zoomable. Kymo renders in-browser (wasm); Mermaid renders in-browser too; every other kind renders through **render.kymo.studio** (`FEAT-KRAPI-001`). They edit **draft-first** (no server document is created), can export SVG/PNG/source, and copy a **share link** that embeds the entire diagram in the URL (`?s=…`, plus `&k=<kind>` for non-kymo kinds) — no account, no server-side document. Opening someone else's `?s=` link drops the source into the editor, editable and re-shareable; the address bar keeps itself up to date as they type.
+- **Signed-in authors** (Google) get a persistent **diagram library** in a **VSCode-style shell**: every diagram is its own document (`?d=<id>`) that autosaves as they type, syncs live across their open tabs, can be renamed in the header, and is organised in an Explorer **folder tree** (drag to move; nest arbitrarily). The `/diagrams` page and a Search panel list them with **thumbnails**, kind badges, and relative timestamps; deleting moves a diagram (or a whole folder + its contents) to **Trash** (`/trash`), where it can be restored until a 30-day auto-purge. Draft work is promoted to a saved, folder-placed document on **Save**.
+- **LLM hosts (Claude Desktop, Cursor, claude.ai)** connect to the remote MCP endpoint (mcp.kymo.studio, Google-OAuth-gated) and manage the *signed-in user's own* diagrams: `new_diagram`, `list_diagrams`, `edit_diagram`, `get_diagram`, `delete_diagram` (a soft delete). Edits pushed by the agent appear live in the user's open editor tabs.
+- **Operators** deploy three artefacts and leave them alone: a static `dist/` to Cloudflare Pages (`kymo-editor` project → editor.kymo.studio), the `kymo-mcp` Cloudflare Worker (→ mcp.kymo.studio) with its Durable Objects, D1 database, KV namespace, and a daily purge cron, and the **render.kymo.studio** Worker (`FEAT-KRAPI-001`, deployed and specified separately). There is still no VM or container to run.
 
 ### A.3 Goals & non-goals
 
 **Goals.**
 - Instant in-browser render of the kymo DSL (`flowchart{}` / `bpmn{}`) — no server roundtrip, render parity with the published `kymostudio` JS engine.
-- A practical multi-language diagram pad: 28 kroki.io kinds (Mermaid, PlantUML, D2, GraphViz, …) beside kymo, each with a starter sample and syntax highlighting.
-- Accounts and a per-user, workspace-organised diagram library that autosaves and syncs live across tabs.
+- A practical multi-language diagram pad: 28 non-kymo kinds (Mermaid, PlantUML, D2, GraphViz, …), each with a starter sample and syntax highlighting; **Mermaid renders in-browser** (offline-capable), the rest through **render.kymo.studio** (`FEAT-KRAPI-001`).
+- A low-friction start: a **template gallery** of diagram types, **draft-first** editing, and paste **auto-detect** of the kind.
+- Accounts and a per-user diagram library organised as a **nested folder tree** in a **VSCode-style shell**, with **thumbnails**, search, autosave, and live sync across tabs.
+- **Recoverable deletes**: soft delete → Trash → 30-day auto-purge, for both diagrams and whole folders.
+- A pannable/zoomable preview.
 - Account-free sharing: the whole diagram travels in the URL, kroki-compatible encoding.
 - LLM-authorable in real time via remote MCP, scoped to the signed-in user's diagrams.
-- Zero-ops hosting: static CDN page + one serverless Worker (+ D1/KV/DO state).
+- Zero-ops hosting: static CDN page + serverless Workers (+ D1/KV/DO state).
 
 **Non-goals (this version).**
 - No collaborative cursors, comments, or presence; live sync is last-writer-wins document state for one owner's tabs (and their agent).
-- No durable version history (D1 keeps only the latest snapshot per diagram).
+- No durable version history (D1 keeps only the latest snapshot per diagram; Trash is a 30-day recovery window, not history).
 - No multi-user sharing of *server-side* documents — a `?d=` room is owner-only; cross-user sharing is the `?s=` URL payload.
-- No self-hosted kroki — non-kymo kinds are delegated to the public kroki.io API.
-- No server-side render or export pipeline (export is client-side SVG/PNG/source).
-- No DSL coverage beyond what the engine renders (kymo) or what kroki.io accepts (other kinds).
+- **Rendering of non-kymo, non-Mermaid kinds is delegated to render.kymo.studio** (`FEAT-KRAPI-001`, which falls back to kroki.io) — the editor hosts no render engine for them, and the render Worker's rate limits/abuse controls are that feature's concern, not this one's.
+- No server-side export pipeline (export is client-side SVG/PNG/source; the only server render the editor triggers is the library thumbnail).
+- No DSL coverage beyond what the engine renders (kymo / in-browser Mermaid) or what render.kymo.studio/kroki.io accept (other kinds).
 
 ### A.4 Stakeholder needs (`SN-KE`)
 
@@ -121,10 +143,16 @@ The result keeps the v0.1 spine — static CDN page, client-side wasm render for
 | **SN-KE-10** | A recipient of a shared link wants to **open, edit, and re-share** the diagram **without an account**, and the link must not depend on any stored document. |
 | **SN-KE-11** | An author wants to **export PNG** (for docs/slides) and the **source text**, not just SVG. |
 | **SN-KE-12** | An author wants a **professional editing surface**: syntax highlighting, line numbers, undo/redo, bracket matching, and an adjustable code/preview split. |
+| **SN-KE-13** | An author wants **non-kymo rendering to be fast and resilient** — not hostage to a single public service's queue or outage — and wants the most common kind (Mermaid) to work **offline**, in-browser. *(v0.4)* |
+| **SN-KE-14** | An author with many diagrams wants to **organise them into nested folders** (not a flat list) and rearrange by dragging. *(v0.4, evolves SN-KE-08.)* |
+| **SN-KE-15** | An author wants to **recover a diagram or folder they deleted by mistake**, for a reasonable window, rather than losing it instantly. *(v0.4)* |
+| **SN-KE-16** | An author wants a **fast start**: pick a diagram *type* from a gallery and get a working starter, edit immediately without first committing to a saved document, and have pasted source's **language detected automatically**. *(v0.4)* |
+| **SN-KE-17** | An author wants to **pan and zoom** a large diagram in the preview, and to **recognise diagrams by a thumbnail** in the library. *(v0.4)* |
+| **SN-KE-18** | An author whose **session has expired** wants a clear way to sign back in (not a silent failure), and to keep editing their draft meanwhile. *(v0.4)* |
 
 ### A.5 Scope
 
-In scope: the client SPA (`packages/editor/web/`), its static build/deploy (`build.sh`, `deploy-editor.yml`, Cloudflare Pages `kymo-editor`), and the `kymo-mcp` Worker (`packages/mcp/`: `EditorRoom` Durable Objects, the diagrams/workspaces REST API, the D1 store, Google-OAuth-gated MCP). Out of scope: the engine itself (`packages/js`, `packages/rust/kymostudio-core` — reused unchanged, specified elsewhere), the kroki.io service (external dependency, surveyed in `REF-KROKI-001`), the *local* npx MCP render server (`FEAT-KMCP-001`), and the legacy server stack (`server.js`, `render_kymo.py`, `mcp-server.js` — retained in-tree as history, not part of the shipped product).
+In scope: the client SPA (`packages/editor/web/`), its static build/deploy (`build.sh`, `deploy-editor.yml`, Cloudflare Pages `kymo-editor`), and the `kymo-mcp` Worker (`packages/mcp/`: `EditorRoom` Durable Objects, the diagrams / folders / **trash** REST API, the D1 store, the daily **purge cron**, Google-OAuth-gated MCP). Out of scope: the engine itself (`packages/js`, `packages/rust/kymostudio-core` — reused unchanged, specified elsewhere) and the in-browser Mermaid wasm slice (`packages/rust/kymo-mermaid` — a port of *merman*, specified with the engine); the **render.kymo.studio render Worker** (`packages/render-api`, `FEAT-KRAPI-001`) the editor delegates non-kymo rendering to; the kroki.io service (now the render Worker's upstream fallback, surveyed in `REF-KROKI-001`); the *local* npx MCP render server (`FEAT-KMCP-001`); and the legacy server stack (`server.js`, `render_kymo.py`, `mcp-server.js` — retained in-tree as history, not part of the shipped product). **Note:** the `kymo-mcp` Worker's own `/api/render` kroki-caching proxy (added before `render.kymo.studio` existed) is **superseded** and slated for removal (`FEAT-KRAPI-001` §C; risk R14 in `PLAN-KEDITOR-001`).
 
 ---
 
@@ -148,7 +176,7 @@ kymo-editor is a **thin shell over renderers it does not own**. Kymo kinds call 
 
 ### B.4 Reading guide
 
-Engineers maintaining the page: Part C §C.1–C.3, §C.7–C.8 + `DESIGN-KEDITOR-001` §2–5. Engineers touching accounts, persistence, live sync, or MCP: Part C §C.4–C.6, §C.9 + `DESIGN-KEDITOR-001` §6–10. Reviewers: Part A + §C.11 acceptance.
+Engineers maintaining the page: Part C §C.1–C.3, §C.7–C.8 + `DESIGN-KEDITOR-001` §2–5. Engineers touching accounts, persistence, live sync, or MCP: Part C §C.4–C.6, §C.9 + `DESIGN-KEDITOR-001` §6–10. Reviewers: Part A + §C.10 (v0.4 additions) + §C.13 acceptance.
 
 ### B.5 Status & ownership
 
@@ -158,7 +186,7 @@ Implemented and shipped (see `PLAN-KEDITOR-001` §4). Owned by the `diagrams/` p
 
 - **Editor page** — the React SPA route `/` (`packages/editor/web/EditorPage.tsx`): code pane, splitter, preview pane, header chrome.
 - **Library page** — the route `/diagrams` (`DiagramsPage.tsx`): the signed-in user's diagram list with workspace tabs.
-- **kind** — the diagram language of a document: `kymo` (native, wasm-rendered) or one of 28 kroki.io types.
+- **kind** — the diagram language of a document: `kymo` (native, wasm-rendered), `mermaid` (in-browser, wasm/`mermaid.js`), or one of the other 27 kinds (rendered via **render.kymo.studio**).
 - **wasm core** — `kymostudio-core` compiled to WebAssembly; performs layout; loaded lazily on the editor route.
 - **room** — one diagram's live channel: an **`EditorRoom` Durable Object** keyed by the diagram id, holding the live source/title/kind, the owner, and the connected WebSockets.
 - **share link** — a URL carrying the whole diagram source: `?s=<deflate+base64url>` (+ `&k=<kind>` when not kymo). No server document involved.
@@ -167,6 +195,14 @@ Implemented and shipped (see `PLAN-KEDITOR-001` §4). Owned by the `diagrams/` p
 - **D1 index** — the Worker's database of record: `diagrams` and `workspaces` tables (metadata + latest source snapshot).
 - **origin id** — a per-tab random token used to suppress WebSocket echo.
 - **umbrella / module** — `kymo-editor` is the umbrella (system); `editor-render`/`editor-share`/`editor-live`/`editor-library`/`editor-mcp` are its modules (system elements) under `modules/`.
+- **render.kymo.studio** — the dedicated **render Worker** (`FEAT-KRAPI-001`, `packages/render-api`) the editor POSTs non-kymo, non-Mermaid sources to; renders at the edge where it can, proxies to kroki.io otherwise, caches by content hash. Replaces the v0.2 direct-to-kroki.io path.
+- **in-browser Mermaid** — Mermaid renders client-side: `kymo-mermaid` (a Rust *merman* port compiled to wasm) for plain `flowchart`/`graph` sources, the `mermaid.js` reference bundle for every other Mermaid grammar.
+- **draft** — a diagram being edited at `/` with **no `?d` and no server document**; the URL carries it as a `?s=` share payload. A draft becomes a saved diagram only on explicit **Save**.
+- **template gallery** — the modal **+ New** opens: a grid of diagram *types*, each seeding a working starter source and the matching kind (`web/templates.tsx`).
+- **folder / folder tree** — the nesting unit for a user's diagrams; a `workspaces` D1 row with a `parent_id`. The UI calls them folders (Explorer panel); the REST/D1 layer still names the table `workspaces`.
+- **Trash** — `/trash`: soft-deleted diagrams and folders (D1 `deleted` timestamp), restorable until a daily cron purges anything older than 30 days.
+- **activity bar / panels** — the VSCode-style left rail (Explorer / Search / Templates + account/settings) and the panel it toggles (`web/sidebar.tsx`); state in `localStorage` (`kymo_panel`, `kymo_expanded`).
+- **thumbnail** — a small SVG render of a diagram stored in D1 (`thumb`), produced by the room via render.kymo.studio and shown in the library/Search panel.
 
 ### B.7 Module decomposition (umbrella)
 
@@ -195,6 +231,8 @@ Dependency direction: `editor-library` and `editor-mcp` build on the `editor-liv
 
 **Retained by the umbrella (not re-homed):** `SN-KE-05` (zero-ops hosting) and `NFR-KE-02/03` (operability, portability/build) — the platform/deploy contract spans every module, as do `DESIGN-KEDITOR-001` §11–12 and the deploy gate in `TEST-KEDITOR-001`.
 
+**v0.4 module-native additions (post-decomposition, see §C.10):** the second growth pass added requirements that are **module-native** — they have no v0.2 `FR-KE` ancestor and are specified directly in the modules: `FR-RD-10` (auto-detect) and `FR-RD-11` (zoom/pan) in `editor-render`; `FR-LB-06` (VSCode shell), `FR-LB-07` (thumbnails), `FR-LB-08` (Trash UX) in `editor-library`; `FR-LV-08` (draft-first), `FR-LV-09` (soft delete + purge), `FR-LV-10` (session expiry + `/login`) in `editor-live`. The in-browser-Mermaid + render.kymo.studio render path is a revision of `FR-RD-05` plus the external `FEAT-KRAPI-001`.
+
 ---
 
 ## Part C — Requirements (SRS)
@@ -206,7 +244,7 @@ Requirements use RFC-2119 keywords. Each maps to the stakeholder need(s) it sati
 | ID | Requirement | Source need |
 |----|-------------|-------------|
 | **FR-KE-01** | The editor SHALL render the kymo `flowchart { }` / `bpmn { }` DSL to SVG **entirely in the browser**, via `parseDiagram(source)` → `renderSVG(...)` from the `kymostudio` package with the `kymostudio-core` wasm initialised once on first use. The engine module SHALL be **lazy-loaded** (dynamic import) so the wasm chunk is fetched only on the editor route. There SHALL be no server roundtrip for kymo rendering. *(v0.2: lazy load added.)* | SN-KE-01, SN-KE-06 |
-| **FR-KE-02** | The editor SHALL re-render on input with a debounce of **120 ms for kymo** and **450 ms for kroki kinds**, SHALL discard stale async render responses (a sequence guard), and SHALL show a status line `OK · <n> bytes · <ms>ms` on success. *(v0.2: per-kind debounce + stale guard.)* | SN-KE-01 |
+| **FR-KE-02** | The editor SHALL re-render on input with a debounce of **120 ms for kymo** and **450 ms for kroki kinds**, SHALL discard stale async render responses (a sequence guard), and SHALL show a success status line. *(v0.2: per-kind debounce + stale guard. v0.4: the status text is now the plain word **`Rendered`**, with the `<bytes> bytes · <ms> ms` detail moved to its hover `title` — see `FR-RD-02`. The first render of a session fires without the debounce — v0.3.)* | SN-KE-01 |
 | **FR-KE-03** | The editor SHALL let the user **download** the last successfully rendered SVG, named after the diagram title (`<title>.svg`, falling back to `flowchart.svg`). | SN-KE-02 |
 | **FR-KE-04** | The editor SHALL resolve icon art from a CDN base URL (`setIconBaseURL` → jsDelivr `gh/kymostudio/kymostudio@main/packages/icons`), so no icon assets are bundled or served locally. | SN-KE-05, SN-KE-06 |
 | **FR-KE-05** | On a parse/render error (engine exception or a kroki error response), the editor SHALL surface the message in the status line (error state) and SHALL NOT crash the page. | SN-KE-01 |
@@ -215,8 +253,8 @@ Requirements use RFC-2119 keywords. Each maps to the stakeholder need(s) it sati
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-KE-13** | The editor SHALL offer a **kind selector** with `kymo` plus the 28 kroki kinds enumerated in `web/kroki.ts` (ActDiag … WireViz). Non-kymo kinds SHALL render by `POST https://kroki.io/<kind>/svg` with the raw source as the body; a non-OK response SHALL surface as a render error (FR-KE-05). | SN-KE-09 |
-| **FR-KE-14** | Switching kind SHALL load that kind's **starter sample** (`web/samples.ts`; each verified to render on kroki.io) into the editor and render it — mirroring kroki.io's own selector behaviour. The current kind SHALL be persisted with the diagram and shown as a badge in the library list. | SN-KE-09 |
+| **FR-KE-13** | The editor SHALL offer a **kind selector** with `kymo` plus the 28 non-kymo kinds enumerated in `web/kroki.ts` (ActDiag … WireViz, incl. C4-PlantUML). *(v0.4 — render path re-baselined, see `FR-RD-05`/`FR-RD-10`:)* **Mermaid** SHALL render **in-browser** — a Rust *merman* slice (`kymo-mermaid` wasm) for plain `flowchart`/`graph` sources, the `mermaid.js` bundle for every other Mermaid grammar; **all other non-kymo kinds** SHALL render by `POST https://render.kymo.studio/<kind>/svg` (`FEAT-KRAPI-001`), attaching the Google ID token as a `Bearer` for the higher signed-in rate tier when present, **with a transparent fallback to `https://kroki.io/<kind>/svg`** on a render-Worker 5xx/network error. A non-OK final response SHALL surface as a render error (FR-KE-05). | SN-KE-09, SN-KE-13 |
+| **FR-KE-14** | Switching kind SHALL load that kind's **starter sample** (`web/samples.ts`) into the editor and render it. The current kind SHALL be persisted with the diagram and shown as a badge in the library list. *(v0.4: see also `FR-RD-10` — pasting a full source body **auto-detects** the kind via `sniffKind` and switches the selector, surfacing a transient "auto-detected …" chip.)* | SN-KE-09, SN-KE-16 |
 
 ### C.3 Functional requirements — Editing surface (`FR-KE-15..16`)
 
@@ -246,10 +284,10 @@ Requirements use RFC-2119 keywords. Each maps to the stakeholder need(s) it sati
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-KE-20** | The `/diagrams` **library page** SHALL list the signed-in user's diagrams most-recent first with title, kind badge, relative timestamp, a workspace **move** selector, and **delete** (confirm prompt; destroys the room and the D1 row). It SHALL filter by a **search box** and by the selected workspace tab, and SHALL refresh on window focus / visibility. | SN-KE-08 |
-| **FR-KE-21** | Opening `/` signed-in without `?d`/`?s` SHALL redirect to the user's **most-recently updated** diagram, or to a fresh id when they have none. **+ New** SHALL create a fresh id (16 random base62 chars ≈ 95 bits — the id doubles as the room's capability secret), pre-assign it to the current workspace, and navigate to it; the server row is created lazily on first write. | SN-KE-07, SN-KE-08 |
+| **FR-KE-20** | The `/diagrams` **library page** SHALL list the signed-in user's diagrams most-recent first with title, kind badge, relative timestamp, and a move/delete affordance. It SHALL filter by a **search box** and SHALL refresh on window focus / visibility. *(v0.4 — see `FR-LB-01`/`FR-LB-06`/`FR-LB-07`:)* the list SHALL show a server-rendered **thumbnail** per row; organisation is a **nested folder tree** (Explorer panel) rather than flat tabs; and **delete is now soft** — it moves the diagram to **Trash** (a styled confirm modal replaces `window.confirm`), recoverable for 30 days, not an immediate destroy. | SN-KE-08, SN-KE-14, SN-KE-15, SN-KE-17 |
+| **FR-KE-21** | Opening `/` signed-in without `?d`/`?s` SHALL redirect to the user's **most-recently updated** diagram, or to a fresh draft when they have none. **+ New** SHALL open a **template gallery** of diagram types; picking one seeds a working starter and sets the kind. *(v0.4 — draft-first, see `FR-LB-02`:)* a picked template is a **draft** — edited in-place at `/` with no server document — and is promoted to a saved diagram (a fresh 16-char ≈ 95-bit id that doubles as the room capability, placed in the current folder) **only on explicit Save** (Cmd/Ctrl-S); Save while signed-out first prompts sign-in. | SN-KE-07, SN-KE-16 |
 | **FR-KE-22** | The diagram SHALL be **renameable in the header** (click-to-edit, Enter/blur commits, ≤ 60 chars); the rename broadcasts to other tabs (`meta`) and updates the index. | SN-KE-07 |
-| **FR-KE-23** | Workspaces SHALL support **create / rename / delete** (name ≤ 40 chars); deleting a workspace moves its diagrams back to Personal. The current workspace (`kymo_ws` in `localStorage`) scopes the library view, the header switcher, and where **+ New** lands; a stored workspace that no longer exists falls back to Personal. | SN-KE-08 |
+| **FR-KE-23** | The library SHALL support grouping diagrams. *(v0.4 — re-baselined from flat workspaces to a nested folder tree, see `FR-LB-04`:)* **folders** SHALL support **create / rename / delete / move** with arbitrary **nesting** (each folder carries a `parent_id`), deleting a folder soft-deletes the folder and its entire subtree (folders + diagrams) to Trash, and re-parenting SHALL be **cycle-safe** (a folder cannot become its own descendant). The current folder (`kymo_folder` in `localStorage`) scopes where **+ New** / Save lands; a stored folder that no longer exists falls back to root. | SN-KE-08, SN-KE-14 |
 | **FR-KE-24** | The diagrams and workspaces APIs SHALL be **owner-scoped REST endpoints** on the Worker (`/api/diagrams`, `/api/workspaces`; GET/POST/PATCH/DELETE, CORS-enabled, ID token via query or Bearer) backed by the D1 tables. | SN-KE-07, SN-KE-08 |
 
 ### C.7 Functional requirements — URL sharing (`FR-KE-25..27`)
@@ -275,7 +313,23 @@ Requirements use RFC-2119 keywords. Each maps to the stakeholder need(s) it sati
 | **FR-KE-11** | MCP access SHALL be gated by **Google OAuth**: the Worker serves an OAuth authorization flow (`/authorize` with a GIS login page, `/token`, `/register`) and binds the session's `email` as the tool-call identity. *(v0.2: replaces unauthenticated MCP.)* | SN-KE-03 |
 | **FR-KE-12** | The Worker SHALL serve MCP over **Streamable HTTP at `/mcp`** and legacy **SSE at `/sse`**, the live channel at **`/ws`** (WebSocket, routed before the OAuth layer), and the REST APIs of FR-KE-24. The room's raw `/set`/`/get`/`/destroy` handlers SHALL be internal (reachable only via the Worker's own DO stubs), not public routes. *(v0.2: `/set`/`/get` are no longer public.)* | SN-KE-03 |
 
-### C.10 Non-functional requirements (ISO/IEC 25010) (`NFR-KE`)
+### C.10 Functional additions since v0.2 (v0.4 — full text in the modules)
+
+Per the umbrella convention, new functional surface is specified against **module** IDs (§B.7); this catalogue is the umbrella's index of what shipped after the v0.2 baseline. Each row's normative text lives in the cited module.
+
+| Capability | Module requirement | Summary |
+|------------|--------------------|---------|
+| In-browser Mermaid + render.kymo.studio delegation | `FR-RD-05` (revised), `FEAT-KRAPI-001` | Mermaid renders in-browser (`kymo-mermaid` wasm for plain flowcharts, `mermaid.js` otherwise); other non-kymo kinds POST to render.kymo.studio with a `Bearer` ID token and a kroki.io fallback. |
+| Paste auto-detect | `FR-RD-10` | A full-buffer paste runs `sniffKind`; on a confident match the kind selector switches and a transient "auto-detected …" chip shows. |
+| Zoom / pan preview | `FR-RD-11` | The preview pane supports wheel/pinch zoom (0.1×–8×), drag-pan, fit-to-view on diagram/kind change, and a controls cluster (±, %, Fit; double-click toggles fit↔100 %). |
+| Folder tree | `FR-LB-04` (re-baselined) | Nested folders (`parent_id`), create/rename/move/delete, drag-to-move, cycle-safe re-parenting; the flat-workspace model is retired. |
+| VSCode-style shell | `FR-LB-06` | Activity bar with **Explorer** (folder tree), **Search**, and **Templates** panels + account/settings; panel state persisted (`kymo_panel`, `kymo_expanded`). |
+| Library thumbnails | `FR-LB-07` | The library and Search panel show a server-rendered SVG thumbnail per diagram. |
+| Template gallery + draft-first | `FR-LB-02` (re-baselined), `FR-LV-08` | **+ New** opens a type gallery; a picked template is a draft (no server document) until explicit Save promotes it into the current folder. |
+| Soft delete + Trash + purge | `FR-LB-08`, `FR-LV-09` | Delete is soft (`deleted` timestamp); `/trash` lists, restores (folder restore re-homes the subtree), and permanently purges; a daily cron purges items > 30 days old. |
+| `/login` + session expiry | `FR-LV-10` | A token-expiry watchdog clears the stale token before it can 401; auth-walled pages redirect to `/login?next=…` with a Google sign-in prompt. |
+
+### C.11 Non-functional requirements (ISO/IEC 25010) (`NFR-KE`)
 
 | ID | Attribute | Requirement |
 |----|-----------|-------------|
@@ -287,19 +341,22 @@ Requirements use RFC-2119 keywords. Each maps to the stakeholder need(s) it sati
 | **NFR-KE-06** | Security | ID tokens MUST be verified server-side against Google's JWKS (issuer + audience) on every connect/call; rooms, REST records, and MCP operations MUST be owner-scoped; the room id's entropy (≈ 95 bits) MUST be preserved as it doubles as the access capability. |
 | **NFR-KE-07** | Compatibility (sharing) | The `?s=` payload encoding MUST remain **kroki-compatible** (deflate + base64url) so payloads interchange with kroki.io URLs in both directions. |
 
-### C.11 Out of scope / deferred
+### C.12 Out of scope / deferred
 
-Collaborative cursors / comments / presence; durable version history; cross-user sharing of server-side documents (use `?s=` links); self-hosted kroki; server-side render/export; timed WebSocket auto-reconnect (dropped in the SPA rewrite — risk R10); offline editing of room-backed documents.
+Collaborative cursors / comments / presence; durable version history (Trash is a 30-day recovery window, not history); cross-user sharing of server-side documents (use `?s=` links); the render-Worker substrate itself and its rate-limiting/abuse controls (`FEAT-KRAPI-001`); server-side export pipeline (only the library thumbnail is server-rendered); timed WebSocket auto-reconnect (dropped in the SPA rewrite — risk R10); offline editing of room-backed documents.
 
-### C.12 Acceptance criteria (feature-level)
+### C.13 Acceptance criteria (feature-level)
 
 1. Typing a `flowchart TD { … }` block renders client-side within ~120 ms of pausing, with the byte/ms status line — and kymo rendering works **offline** after the engine chunk has loaded.
-2. Switching the kind to (e.g.) Mermaid loads the Mermaid sample, renders it via kroki.io, highlights its syntax, and shows the kind badge in the library.
+2. Switching the kind to Mermaid loads the Mermaid sample and renders it **in-browser** (no network); switching to (e.g.) PlantUML renders via **render.kymo.studio** (kroki.io only if the render Worker is down); both highlight their syntax and show the kind badge in the library. Pasting a complete diagram source **auto-detects** the kind.
 3. Signed out: editing keeps the address bar a working `?s=` link; opening that link in a private window reproduces the diagram; Share copies it; Export produces SVG, PNG, and source files named after the title.
 4. Signed in: `/` lands on the most-recent diagram; + New creates one in the current workspace; rename in the header sticks; `/diagrams` lists, searches, moves, and deletes; a second tab on the same `?d=` adopts edits live without overwriting itself.
 5. A second Google account opening someone else's `?d=` link is refused (403); the owner is unaffected.
 6. From an MCP host (after Google OAuth): `new_diagram` returns an id + URL; `edit_diagram` updates the open tab live and reports the tab count; `list_diagrams`/`get_diagram`/`delete_diagram` behave as specified.
-7. The deployed system is a Cloudflare Pages static site + the `kymo-mcp` Worker (D1/KV/DO) only.
+7. The deployed system is a Cloudflare Pages static site + the `kymo-mcp` Worker (D1/KV/DO + a daily purge cron) + the `render.kymo.studio` Worker (`FEAT-KRAPI-001`) — no VM or container.
+8. **+ New** opens the template gallery; picking a type seeds a starter editable immediately with no `?d` (a draft); Save (after sign-in) promotes it to a `?d=` document in the current folder; the address bar carries the draft as `?s=` until then.
+9. The Explorer shows a nested folder tree; folders create/rename/drag-move and nest; deleting a diagram or folder moves it (and a folder's subtree) to **`/trash`**, where Restore returns it and Delete-forever purges it; items left in Trash disappear after 30 days.
+10. The preview pans and zooms (wheel/pinch/drag, Fit, double-click); library rows and the Search panel show a thumbnail; an expired session lands on `/login?next=…` and resumes the prior page after sign-in.
 
 ---
 
@@ -310,3 +367,4 @@ Collaborative cursors / comments / presence; durable version history; cross-user
 | 0.1     | 2026-06-10 | Vũ Anh | Initial requirements for the shipped kymo-editor. Owns `SN-KE-01..06`, `FR-KE-01..12` (browser render, live sync, MCP channel), `NFR-KE-01..05`. Documents the client-side-render + Cloudflare-Pages + `kymo-mcp`-Worker architecture as the normative reference and records that it **supersedes** the Python/server stack described in `packages/editor/README.md`. Retrospective spec for the P-set delivered across commits `466db60` → `47ecb4c` → `0860ace` → `7543db7` (see `PLAN-KEDITOR-001` §4). |
 | 0.2     | 2026-06-12 | Vũ Anh | **Re-baseline for the 2026-06-12 product** (commits `58cca51..a3dae51`, P4–P9 in `PLAN-KEDITOR-001`): React SPA + `/diagrams` library, Google accounts, per-diagram owner-scoped rooms, D1 store, workspaces, CodeMirror, 28 kroki kinds + samples, export menu, kroki-style `?s=` URL sharing. Added `SN-KE-07..12`; revised `FR-KE-01..02, 06, 08..12` (per-kind debounce, per-diagram rooms, lazy-seed + auto-title, D1 persistence, per-user MCP tool set, OAuth gating, `/set`/`/get` no longer public); added `FR-KE-13..29` (kinds/samples, CodeMirror/splitter, accounts/ownership, library/workspaces, sharing, export); revised `NFR-KE-01/03` and added `NFR-KE-06/07` (security, share-encoding compatibility). v0.1 non-goals *auth, accounts, named documents, persistence* are now in scope; new non-goals recorded in §A.3. |
 | 0.3     | 2026-06-12 | Vũ Anh | **Umbrella decomposition.** kymo-editor becomes an **umbrella** with five as-built modules under `modules/` — `editor-render` (`FEAT-KRENDER-001`), `editor-share` (`FEAT-KSHARE-001`), `editor-live` (`FEAT-KLIVE-001`), `editor-library` (`FEAT-KLIBRARY-001`), `editor-mcp` (`FEAT-KEMCP-001`) — mirroring the `canvas-studio` decomposition. Added §B.7 (module tree + re-homing map), the `modules/` row in §B.2, and the umbrella/module glossary entry; Part C marked as the v0.2 baseline of record with module IDs as the forward change surface. `SN-KE-05` + `NFR-KE-02/03` (platform/deploy) stay umbrella-owned. No requirement content changed. |
+| 0.4     | 2026-06-13 | Vũ Anh | **Re-baseline for the 2026-06-13 product (second growth pass).** Reconciled Part A (ConOps, goals/non-goals, scope), the glossary, and the module map to the as-built after the v0.2/v0.3 docs: **non-kymo rendering delegates to render.kymo.studio** (`FEAT-KRAPI-001`, kroki.io fallback) and **Mermaid renders in-browser** (`kymo-mermaid` wasm + `mermaid.js`); flat workspaces → **nested folder tree** in a **VSCode-style shell**; **soft delete + Trash + 30-day purge cron**; **template gallery + draft-first** authoring; paste **auto-detect**; **zoom/pan** preview; library **thumbnails**; **`/login`** + session-expiry watchdog. Added `SN-KE-13..18`; annotated `FR-KE-02/13/14/20/21/23` with their v0.4 revisions; added §C.10 (catalogue of the new functional surface, full text in modules: `FR-RD-10/11`, `FR-LB-06/07/08`, `FR-LV-08/09/10`); renumbered the trailing sections (NFR → C.11, deferred → C.12, acceptance → C.13) and added acceptance #8–10. Resolved the `FEAT-KRENDER-001` collision by re-id'ing the render Worker to `FEAT-KRAPI-001`. Operators now deploy **three** artefacts. `FR-KE`/`NFR-KE` numbering stays the v0.2 baseline of record. |

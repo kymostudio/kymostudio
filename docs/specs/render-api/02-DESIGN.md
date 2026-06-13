@@ -1,6 +1,6 @@
 ---
 title: kymo-render-api (Kroki-compatible render Worker) — Design
-document_id: DESIGN-KRENDER-001
+document_id: DESIGN-KRAPI-001
 version: "1.0"
 issue_date: 2026-06-13
 status: Adopted
@@ -10,8 +10,8 @@ audience: Engineers maintaining `packages/render-api`
 review_cycle: On scope change
 supersedes: null
 related_documents:
-  - FEAT-KRENDER-001
-  - TEST-KRENDER-001
+  - FEAT-KRAPI-001
+  - TEST-KRAPI-001
   - DESIGN-KMCP-001
 authors:
   - Vũ Anh
@@ -146,7 +146,7 @@ Bearer token only when targeting `RENDER_API`, never the kroki.io fallback.
 > Native rate limiting is approximate and per-colo: enforcement is exact in
 > local dev (single instance) but on production needs a strong concurrent burst
 > to trip, because counters are distributed across isolates. It is an
-> abuse-control, not a hard quota (see FEAT-KRENDER-001 C.7).
+> abuse-control, not a hard quota (see FEAT-KRAPI-001 C.7).
 
 ## 10. Deployment — NFR-KR-06
 

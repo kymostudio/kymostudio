@@ -1,8 +1,8 @@
 ---
 title: Editor MCP Channel — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KEMCP-001
-version: "0.1"
-issue_date: 2026-06-12
+version: "0.2"
+issue_date: 2026-06-13
 status: Implemented
 classification: Internal
 owner: diagrams/ project
@@ -43,7 +43,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KEMCP-001` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KLIVE-001` (sibling — accounts & live documents; this module builds on it), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KRENDER-001` / `FEAT-KSHARE-001` (siblings), `FEAT-KMCP-001` (the **distinct local npx MCP render server** — see §B.3), `RES-MCP-001` (MCP landscape) |
@@ -122,7 +122,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-MC-01** | The Worker SHALL expose **per-user diagram tools** over MCP — `new_diagram(title?, source?, kind?)`, `list_diagrams()`, `edit_diagram(source?, title?, id?, kind?)`, `get_diagram(id?)`, `delete_diagram(id)` — operating only on the authenticated user's diagrams; `edit_diagram`/`get_diagram` default to the user's **most recent** diagram when `id` is omitted. Content writes broadcast live to the user's open tabs and report the live-tab count; create/edit responses include the `?d=` URL. | SN-MC-01 |
+| **FR-MC-01** | The Worker SHALL expose **per-user diagram tools** over MCP — `new_diagram(title?, source?, kind?)`, `list_diagrams()`, `edit_diagram(source?, title?, id?, kind?)`, `get_diagram(id?)`, `delete_diagram(id)` — operating only on the authenticated user's diagrams; `edit_diagram`/`get_diagram` default to the user's **most recent** diagram when `id` is omitted. Content writes broadcast live to the user's open tabs and report the live-tab count; create/edit responses include the `?d=` URL. *(v0.2: `delete_diagram` is a **soft** delete — it moves the diagram to Trash, recoverable for 30 days, the same `destroyDiagram` path the browser uses — `FR-LV-09`. The tool set is unchanged otherwise: no folder or trash-management tools are exposed.)* | SN-MC-01 |
 | **FR-MC-02** | MCP access SHALL be gated by **Google OAuth**: the Worker serves an OAuth authorization flow (`/authorize` with a GIS login page, `/token`, `/register`) and binds the session's `email` as the tool-call identity. | SN-MC-01 |
 | **FR-MC-03** | The Worker SHALL serve MCP over **Streamable HTTP at `/mcp`** and legacy **SSE at `/sse`**, the live channel at **`/ws`** (WebSocket, routed before the OAuth layer), and the REST APIs of `FR-LB-05`. The room's raw `/set`/`/get`/`/destroy` handlers SHALL be internal (reachable only via the Worker's own DO stubs), not public routes. | SN-MC-01 |
 
@@ -133,7 +133,7 @@ No module-owned NFRs. Inherited and still binding: `NFR-LV-02` (owner-scoping; t
 ### C.3 Acceptance criteria (module-level)
 
 1. From an MCP host after Google OAuth: `new_diagram` returns an id + URL; opening it and calling `edit_diagram(source)` updates the open tab live and reports the live-tab count.
-2. `get_diagram` returns the on-screen source + kind; `list_diagrams` lists most-recent first with URLs; `delete_diagram` removes the diagram from `/diagrams` and closes its room sockets; another user's `id` is refused ("isn't yours").
+2. `get_diagram` returns the on-screen source + kind; `list_diagrams` lists most-recent first with URLs; `delete_diagram` **soft-deletes** — the diagram leaves `/diagrams` and appears in `/trash` (recoverable), and its room sockets close; another user's `id` is refused ("isn't yours").
 3. `/mcp` completes a Streamable-HTTP handshake behind OAuth (`/authorize` → GIS → `/token`); `/sse` serves the legacy transport; `/set`/`/get` are **not** reachable as public Worker routes.
 
 ---
@@ -143,3 +143,4 @@ No module-owned NFRs. Inherited and still binding: `NFR-LV-02` (owner-scoping; t
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-12 | Vũ Anh | Initial **as-built carve-out** from `FEAT-KEDITOR-001` v0.2 under the kymo-editor umbrella decomposition. Re-homes `SN-KE-03 → SN-MC-01`, `FR-KE-10..12 → FR-MC-01..03`. Stub doc-set (01 only); design/V&V remain in `DESIGN-KEDITOR-001` / `TEST-KEDITOR-001`. Records the naming distinction from `FEAT-KMCP-001` (local npx server). |
+| 0.2     | 2026-06-13 | Vũ Anh | **Soft-delete reconciliation (P17).** `FR-MC-01`: `delete_diagram` is now a **soft** delete (moves to Trash, recoverable for 30 days — the shared `destroyDiagram` path, `FR-LV-09` in `FEAT-KLIVE-001`); tool set otherwise unchanged (no folder/trash tools). Acceptance #2 updated. Transports, OAuth gating, and routing (`FR-MC-02/03`) unchanged. |

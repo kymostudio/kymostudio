@@ -1,8 +1,8 @@
 ---
 title: Kymo Editor (editor.kymo.studio) — Implementation Plan
 document_id: PLAN-KEDITOR-001
-version: "0.4"
-issue_date: 2026-06-12
+version: "0.5"
+issue_date: 2026-06-13
 status: Implemented
 classification: Internal
 owner: diagrams/ project
@@ -34,7 +34,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | `PLAN-KEDITOR-001` |
-| Version           | 0.4 |
+| Version           | 0.5 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (requirements), `DESIGN-KEDITOR-001` (design), `TEST-KEDITOR-001` (V&V) |
@@ -53,10 +53,11 @@ Keep the v0.1 spine — client-side kymo render, static Pages hosting, one Worke
 
 ## 3. Architecture (overview)
 
-Two deployables (see `DESIGN-KEDITOR-001` §1):
+Three deployables (see `DESIGN-KEDITOR-001` §1):
 
-- **Pages static** — `packages/editor` esbuild SPA (code-split, wasm chunk lazy), deployed by `deploy-editor.yml` to project `kymo-editor` → editor.kymo.studio.
-- **Worker** — `packages/mcp` (`EditorRoom` DOs + REST APIs + `KymoMCP` behind OAuth), deployed by `wrangler deploy` → **mcp.kymo.studio**; state in D1 (`kymo-editor`) + KV (`OAUTH_KV`) + DO storage.
+- **Pages static** — `packages/editor` esbuild SPA (code-split, kymo-wasm + Mermaid chunks lazy), deployed by `deploy-editor.yml` to project `kymo-editor` → editor.kymo.studio.
+- **kymo-mcp Worker** — `packages/mcp` (`EditorRoom` DOs + REST APIs incl. folders/Trash + `KymoMCP` behind OAuth + a daily purge cron), deployed by `wrangler deploy` → **mcp.kymo.studio**; state in D1 (`kymo-editor`) + KV (`OAUTH_KV`) + DO storage.
+- **render.kymo.studio Worker** — `packages/render-api` (`FEAT-KRAPI-001`), the Kroki-compatible render service the editor delegates non-kymo, non-Mermaid rendering to (kroki.io fallback). Deployed and planned separately; in scope here only as the dependency the editor calls.
 
 ## 4. Phased plan (retrospective — ✓ Shipped)
 
@@ -74,8 +75,14 @@ Two deployables (see `DESIGN-KEDITOR-001` §1):
 | P9 | `a3dae51` | **Kroki-style URL sharing** — deflate+base64url `?s=`/`?k=` codec, address-bar autosync, Share button. Realises FR-KE-25..27, NFR-KE-07. | 5 | ✓ Shipped |
 | P10 | `51d08ec`, `a5ff7b5`, `6577011`, `607b156` | **Share popover & guest hardening** — kroki SVG sanitized with DOMPurify before DOM injection (incl. the foreignObject/`htmlLabels` follow-up); share popover with copy variants (Markdown link / kroki.io GET image URL) auto-copying on open. Realises `FR-RD-09` (`FEAT-KRENDER-001` v0.2) and the v0.2 `FR-SH-03` (`FEAT-KSHARE-001`). *(Post-decomposition: specified against module IDs.)* | 3 | ✓ Shipped |
 | P11 | `ef02c04`, `3785a53` | **Share-link first-load perf + bench** — cold kroki share link ~4.3 s → ~2.4 s on Fast 4G: engine chunk on first kymo render only, `?s=`-seeded mount state, no-debounce first render, early kroki kick-off from the HTML shell, content-hash caching + immutable chunks + modulepreload; plus the online `benches/editor` quality/perf harness. Revises `FR-RD-01/02/05` (`FEAT-KRENDER-001` v0.3); bench folded into `TEST-KEDITOR-001` v0.4 Annex B; ADR-10. | 5 | ✓ Shipped |
+| P12 | `d60cfd0`, `bfc287c`, `07f7d9a`, `2ff6d68` | **render.kymo.studio delegation** — non-kymo rendering moved off direct kroki.io to the dedicated **render.kymo.studio** Worker (`FEAT-KRAPI-001`): `Bearer` ID token for the signed-in rate tier, transparent kroki.io fallback, wasm shipped as its own asset, kind-note copy updated. (A short-lived caching `/api/render` proxy on the mcp Worker — `d60cfd0` — was superseded by the standalone render Worker; R14.) Revises `FR-KE-13`/`FR-RD-05`; ADR-11. | 5 | ✓ Shipped |
+| P13 | `9b9fb62`, `9059021`, `a919cbc`, `4f544ac` | **In-browser Mermaid** — Mermaid renders client-side: a Rust *merman* slice (`kymo-mermaid` wasm) for plain flowcharts, `mermaid.js` (one prebundled chunk) for the rest, kroki demoted to a warm-up race; `mermaid` pinned `~11.15` to the merman rev. Revises `FR-RD-05`; ADR-12. | 8 | ✓ Shipped |
+| P14 | `744acf2`, `992e1bd`, `b2a9965` | **Zoom/pan preview + thumbnails + auto-title** — pan/zoom preview pane (fit, wheel/pinch/drag), server-rendered library thumbnails, auto-title from source, draft-as-not-a-boot-state fix. Realises `FR-RD-11`, `FR-LB-07`; ADR-17. | 5 | ✓ Shipped |
+| P15 | `118771d`, `cef139b`, `9197fb2`, `3e0608d`, `aaafc69`, `57f1115`, `531b5c7` | **Template gallery + draft-first** — **+ New** opens a diagram-type gallery (quick filter); templates start as **drafts** that save on intent (no server document until Save); navbar trims (drop Diagrams/Docs duplicates); empty-room-snapshot kind fix; warm the render cache when Share opens. Realises `FR-LB-02`, `FR-LV-08`; ADR-15. | 8 | ✓ Shipped |
+| P16 | `c5bbc7e`, `b38904d`, `d7bed20`, `2e80d9d`, `127d68a` | **VSCode shell + folder tree** — flat workspaces replaced by a **nested folder tree**; a VSCode-style **activity bar** with Explorer / Search / Templates panels; mobile-first navbar rework + restructure around the actual hierarchy. Realises `FR-LB-04` (re-baselined), `FR-LB-06`; ADR-13/16. | 10 | ✓ Shipped |
+| P17 | `3ddfc92`, `effd174`, `e0e6f73`, `c83aa75`, `d428fb0` | **Soft delete + Trash + session expiry** — draft-first save model; **soft delete** + styled confirm modal; **Trash** with restore + 30-day auto-purge (cron `0 3 * * *`); expire stale sessions + **`/login`**; avatar fix. Realises `FR-LB-08`, `FR-LV-09`, `FR-LV-10`; ADR-14/18. | 8 | ✓ Shipped |
 
-P0/P1 are retained as history; the **shipped product is P2–P11**. The post-v0.2 commits `c83aa75` (session expiry + `/login`) and `127d68a` (navbar restructure) touch the `editor-live` / `editor-library` surfaces and await their own module re-baselines.
+P0/P1 are retained as history; the **shipped product is P2–P17**. P12–P17 are the **second growth pass** (re-baselined into the spec set v0.4/v0.5). The previously-flagged commits `c83aa75` (session expiry + `/login`) and `127d68a` (navbar restructure) are now folded into P17 / P16. The render.kymo.studio Worker itself (incl. `450c14b`, its two-tier rate limit) is planned under `FEAT-KRAPI-001`, not here.
 
 ## 5. Risk register
 
@@ -86,14 +93,16 @@ P0/P1 are retained as history; the **shipped product is P2–P11**. The post-v0.
 | R3 | **CDN icon dependency** — icons resolve from jsDelivr `@main`; a moved/renamed icon path breaks art. | Low | Low | Pin a tag instead of `@main` if churn becomes an issue. | Open |
 | R4 | **README drift** — `packages/editor/README.md` still describes the retired Python/server stack (and now also predates the SPA). | High | Low | This spec is normative; sync or trim the README in a follow-up. | Open |
 | R5 | **Engine drift** — a future `kymostudio` change alters rendered bytes. | Med | Low | Engine golden suites (`TEST-KEDITOR-001` §3); editor owns no goldens. | Open |
-| R6 | **kroki.io dependency** — non-kymo kinds need a third-party service: outage breaks 28 kinds, and the **source text is POSTed off-device** (privacy). | Med | Med | Kymo kinds unaffected (local). Documented in ADR-6; self-hosting kroki is the escape hatch if availability/privacy requirements harden. | Open |
+| R6 | **kroki.io dependency** — non-kymo kinds need a third-party service: outage breaks them, and the **source text is POSTed off-device** (privacy). | Low | Low | **Largely mitigated (P12/P13):** the editor now delegates to its own **render.kymo.studio** Worker (`FEAT-KRAPI-001`) which renders the workerd-capable kinds at the edge and only **falls back** to kroki.io; **Mermaid renders fully in-browser** (no third party at all). Residual: the kinds render.kymo.studio still proxies to kroki.io carry the original coupling/privacy note. ADR-6 (superseded by ADR-11/12). | Mitigated |
 | R7 | **Google coupling** — sign-in, library, live sync, and MCP all hinge on GIS + one OAuth client id. | Low | Med | Signed-out authoring + `?s=` sharing keep the core usable through a Google outage; client id is config (`wrangler.jsonc` var + `const.ts`). | Open |
-| R8 | **D1 schema out-of-band** — tables were provisioned manually; no migration file or backup policy in-tree. | Med | Med | Add a checked-in schema/migration file and enable D1 time-travel/backups; until then the schema is documented in `DESIGN-KEDITOR-001` §7. | Open |
+| R8 | **D1 schema out-of-band** — tables were provisioned manually; no migration file or backup policy in-tree, and the v0.4 columns (`parent_id`, `deleted`, `thumb`) are added at runtime by idempotent `ensure*Column()` helpers that swallow duplicate-column errors — schema drift is invisible to review. | Med | Med | Add a checked-in schema/migration file and enable D1 time-travel/backups; until then the schema is documented in `DESIGN-KEDITOR-001` §7. | Open |
 | R9 | **ID token in query strings** (`/ws?id_token=…`, `/api/*?id_token=…`) — tokens can land in logs/proxies. | Low | Med | Tokens are short-lived (~1 h) and JWKS-verified; REST already accepts `Authorization: Bearer` — moving the WS handshake to a header/subprotocol is the follow-up. | Open |
 | R10 | **No WebSocket auto-reconnect** — the SPA rewrite dropped v0.1's 2 s retry; after a drop, edits stay local-only (`⚡` gone) until the route/token changes. | Med | Med | The indicator makes the state visible; D1 flush-on-close bounds loss. Reinstating backoff-reconnect in `room.ts` is the standing follow-up. | Open |
 | R11 | **Pages 4 h asset cache** could serve a stale bundle after deploy. | — | — | `build.sh` cache-busts JS/CSS URLs — a per-build timestamp originally; a **content hash** since P11 (unchanged deploys keep client caches; `chunks/*` immutable). | Closed |
 | R12 | **No abort/timeout on kroki fetches** — a hung kroki.io request never resolves (status line can sit stale), and rapid typing stacks an un-cancelled request every 450 ms; the `renderSeq` guard only drops responses client-side, the requests themselves run to completion. | Med | Low | Add an `AbortController` (cancel the superseded request, ~20 s timeout) in `renderKroki` — standing code follow-up from the 2026-06-12 kroki review. | Open |
-| R13 | **`kind` unvalidated server-side** — the Worker's `/set` and the MCP `new_diagram`/`edit_diagram` accept any string as `kind`; an agent typo mints a diagram that renders an error forever and badges the raw string. Not dangerous (the client `encodeURIComponent`s the kind into the kroki URL; unknown `?k=` already falls back to kymo), but inconsistent with the client-side allowlist. | Low | Low | Validate against the kind list in the MCP tools / `/set` — standing code follow-up from the 2026-06-12 kroki review. | Open |
+| R13 | **`kind` unvalidated server-side** — the Worker's `/set` and the MCP `new_diagram`/`edit_diagram` accept any string as `kind`; an agent typo mints a diagram that renders an error forever and badges the raw string. Not dangerous (the client `encodeURIComponent`s the kind into the render URL; unknown `?k=` already falls back to kymo), but inconsistent with the client-side allowlist. | Low | Low | Validate against the kind list in the MCP tools / `/set` — standing code follow-up from the 2026-06-12 kroki review. | Open |
+| R14 | **Dead `/api/render` proxy on the mcp Worker** — the caching kroki proxy added in `d60cfd0` is superseded by the standalone render.kymo.studio Worker (`FEAT-KRAPI-001`); the editor no longer calls it, but it still ships and answers (extra attack/maintenance surface; duplicate kroki path). | Low | Low | Remove the route from `packages/mcp` once nothing depends on it (`FEAT-KRAPI-001` §C names this retirement). | Open |
+| R15 | **Mermaid dual-path parity + version pin** — Mermaid renders via two engines (the `kymo-mermaid` *merman* slice for plain flowcharts, `mermaid.js` for the rest), and `kymo-mermaid` is pinned to `mermaid@~11.15`. A `mermaid.js` bump (or a source that straddles the routing heuristic) can render the **same diagram differently** on the two paths, and the pin must be advanced in lockstep with the merman rev. | Low | Med | Conservative routing (only plain, directive-free flowcharts take the slice; everything else and any slice error falls back to `mermaid.js`); keep the pin in lockstep; the `benches/editor` label-survival probe catches gross divergence. | Open |
 
 ## 6. Worklog / timeline
 
@@ -118,6 +127,13 @@ P0/P1 are retained as history; the **shipped product is P2–P11**. The post-v0.
 | `ef02c04` | Share-link first load ~4.3 s → ~2.4 s (engine on first kymo render, early kroki kick-off, content-hash caching) (P11). |
 | `3785a53` | `benches/editor` — online share-link first-load bench + 2026-06-12 research round (P11). |
 | 2026-06-12 | Reconciled the spec set to P11 (`FEAT-KRENDER-001` v0.3, `DESIGN-KEDITOR-001` v0.4 ADR-10, `TEST-KEDITOR-001` v0.4 Annex B). |
+| `d60cfd0`…`2ff6d68` | render.kymo.studio delegation + caching proxy, kind-note copy (P12). |
+| `9b9fb62`…`4f544ac` | In-browser Mermaid (kymo-mermaid slice + mermaid.js), kroki demoted to warm-up, `~11.15` pin (P13). |
+| `744acf2`…`b2a9965` | Zoom/pan preview, library thumbnails, auto-title (P14). |
+| `118771d`…`531b5c7` | Template gallery, draft-first save, quick filter, navbar trims, Share warm-up (P15). |
+| `c5bbc7e`…`2e80d9d`, `127d68a` | Folder tree replaces flat workspaces; VSCode activity bar + Explorer/Search/Templates panels; navbar restructure (P16). |
+| `3ddfc92`…`d428fb0`, `c83aa75` | Soft delete + styled confirm + Trash/restore + 30-day purge cron; session expiry + `/login` (P17). |
+| 2026-06-13 | **Re-baselined the spec set to P17** (the second growth pass): `FEAT-KEDITOR-001` v0.4, `DESIGN-KEDITOR-001` v0.5 (ADR-11..18), `TEST-KEDITOR-001` v0.5 (TC-KE-25..32), this plan v0.5; module re-baselines (`editor-render`/`-library`/`-live`/`-share`/`-mcp`). Resolved the `FEAT-KRENDER-001` collision by re-id'ing the render Worker → `FEAT-KRAPI-001`. Opened R14 (dead `/api/render`) and R15 (Mermaid dual-path/pin). |
 
 ---
 
@@ -129,3 +145,4 @@ P0/P1 are retained as history; the **shipped product is P2–P11**. The post-v0.
 | 0.2     | 2026-06-12 | Vũ Anh | **Extended the retrospective with P4–P9** (identity & multi-diagram, React SPA + library, brand & chrome, workspaces/kroki/CodeMirror, D1 store, URL sharing) with commit traces and SP. Risk register: **closed R1/R2/R11** (per-diagram rooms, custom domain, cache-busting), kept R3–R5, **added R6–R10** (kroki.io availability/privacy, Google coupling, out-of-band D1 schema, token-in-URL, no WS auto-reconnect). |
 | 0.3     | 2026-06-12 | Vũ Anh | **P10 + kroki-review reconciliation.** Added phase **P10 — Share popover & guest hardening** (commits `51d08ec`/`a5ff7b5`/`6577011`/`607b156`, 3 SP): kroki SVG sanitization (`FR-RD-09`) + share popover (`FR-SH-03` v0.2); shipped product now P2–P10. Risk register: **added R12** (no abort/timeout on kroki fetches) and **R13** (`kind` unvalidated server-side) from the 2026-06-12 kroki-integration code review — both with named code follow-ups. Worklog extended (P10 commits, umbrella decomposition, this review). Noted `c83aa75`/`127d68a` as awaiting `editor-live`/`editor-library` re-baselines. |
 | 0.4     | 2026-06-12 | Vũ Anh | **P11 traced.** Added phase **P11 — Share-link first-load perf + bench** (`ef02c04`/`3785a53`, 5 SP): engine chunk on first kymo render, early kroki kick-off, no-debounce first render, content-hash caching, online `benches/editor` harness; shipped product now P2–P11. R11 mitigation wording updated (timestamp → content hash). Worklog extended. Spec links: `FEAT-KRENDER-001` v0.3 (FR-RD-01/02/05), `DESIGN-KEDITOR-001` v0.4 (ADR-10), `TEST-KEDITOR-001` v0.4 (Annex B bench). |
+| 0.5     | 2026-06-13 | Vũ Anh | **Second growth pass traced (P12–P17).** Added **P12** render.kymo.studio delegation, **P13** in-browser Mermaid, **P14** zoom/pan preview + thumbnails, **P15** template gallery + draft-first, **P16** VSCode shell + folder tree, **P17** soft delete + Trash + session expiry; shipped product now **P2–P17** (44 SP added); `c83aa75`/`127d68a` folded in. §3 now three deployables (+ render.kymo.studio). Risk register: **R6 → Mitigated** (own render Worker + in-browser Mermaid; kroki.io demoted to fallback), **R8** wording updated (runtime `ensure*Column` migrations), **added R14** (dead mcp `/api/render` proxy) and **R15** (Mermaid dual-path parity + version pin). Resolved the `FEAT-KRENDER-001` document_id collision by re-id'ing the render Worker → `FEAT-KRAPI-001`. Worklog extended. Spec links: `FEAT-KEDITOR-001` v0.4, `DESIGN-KEDITOR-001` v0.5 (ADR-11..18), `TEST-KEDITOR-001` v0.5 (TC-KE-25..32). |

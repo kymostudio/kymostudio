@@ -1,6 +1,6 @@
 ---
 title: kymo-render-api (Kroki-compatible render Worker) — Verification & Validation
-document_id: TEST-KRENDER-001
+document_id: TEST-KRAPI-001
 version: "1.0"
 issue_date: 2026-06-13
 status: Adopted
@@ -10,8 +10,8 @@ audience: Engineers maintaining `packages/render-api`; reviewers
 review_cycle: On scope change
 supersedes: null
 related_documents:
-  - FEAT-KRENDER-001
-  - DESIGN-KRENDER-001
+  - FEAT-KRAPI-001
+  - DESIGN-KRAPI-001
 authors:
   - Vũ Anh
 language: en

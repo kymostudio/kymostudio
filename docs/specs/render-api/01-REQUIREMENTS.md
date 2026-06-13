@@ -1,7 +1,7 @@
 ---
 title: kymo-render-api (Kroki-compatible render Worker) — Requirements (ConOps, StRS & SRS)
-document_id: FEAT-KRENDER-001
-version: "1.0"
+document_id: FEAT-KRAPI-001
+version: "1.1"
 issue_date: 2026-06-13
 status: Adopted
 classification: Internal
@@ -10,8 +10,8 @@ audience: Engineers maintaining `packages/render-api`; reviewers; stakeholders
 review_cycle: On scope change, or when a phase completes
 supersedes: null
 related_documents:
-  - DESIGN-KRENDER-001
-  - TEST-KRENDER-001
+  - DESIGN-KRAPI-001
+  - TEST-KRAPI-001
   - FEAT-KMCP-001
   - FEAT-KEDITOR-001
   - FEAT-FLOWCHART-001
@@ -93,7 +93,7 @@ flowchart, kymojson, icons, bpmn) and the editor UI.
 ### B.1 Purpose
 
 Specify, as built, the requirements `packages/render-api` satisfies. The
-companion **DESIGN-KRENDER-001** explains *how*; **TEST-KRENDER-001** records
+companion **DESIGN-KRAPI-001** explains *how*; **TEST-KRAPI-001** records
 verification.
 
 ### B.2 Relationship to the engine and the editor
@@ -227,3 +227,4 @@ on push to `main`.
 | Version | Date | Change | Author |
 |---|---|---|---|
 | 1.0 | 2026-06-13 | Initial as-built spec (PRs #321–#337). | Vũ Anh |
+| 1.1 | 2026-06-13 | **Re-id'd the document family `KRENDER → KRAPI`** (`FEAT/DESIGN/TEST-KRAPI-001`) to resolve a `document_id` collision: `FEAT-KRENDER-001` was already owned by the `editor-render` module of the kymo-editor umbrella (`FEAT-KEDITOR-001`). No content change. | Vũ Anh |
