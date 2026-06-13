@@ -16,6 +16,7 @@ import { cacheKey, cacheable } from "./cache.js";
 import { render, SELF_KINDS } from "./dispatch.js";
 import { CORS, HttpError } from "./http.js";
 import { decodeRequest } from "./kroki.js";
+import { identify } from "./auth.js";
 import { API_VERSION, VERSION_INFO } from "./version.js";
 
 // Cloudflare native rate limiting binding (wrangler.jsonc ratelimits).
@@ -23,10 +24,13 @@ interface RateLimiter {
   limit(options: { key: string }): Promise<{ success: boolean }>;
 }
 interface Env {
-  RENDER_LIMITER: RateLimiter;
+  GOOGLE_CLIENT_ID: string;
+  ANON_LIMITER: RateLimiter;
+  USER_LIMITER: RateLimiter;
 }
 
-const RATE = "60 requests/minute per IP";
+const RATE_ANON = "60 requests/minute (anonymous, by IP)";
+const RATE_USER = "120 requests/minute (signed-in)";
 
 const USAGE = {
   name: "kymo-render-api",
@@ -40,7 +44,10 @@ const USAGE = {
   versioned_path: "prefix any render route with /v1 (root path is v1)",
   formats: ["svg", "png", "pdf"],
   options: { scale: "PNG raster scale 1-4 (?scale=2)" },
-  rate_limit: RATE,
+  rate_limit: {
+    anonymous: RATE_ANON,
+    authenticated: RATE_USER + " — send Authorization: Bearer <google id_token>",
+  },
   self_rendered: SELF_KINDS,
   proxied: "all other kroki.io diagram types",
 };
@@ -78,15 +85,20 @@ export default {
     if (pathname === "/version") return withCors(Response.json(VERSION_INFO));
     if (pathname === "/" && request.method === "GET") return withCors(Response.json(USAGE));
 
-    // Rate-limit every render request by client IP (hit or miss). Cloudflare
-    // native rate limiting; one fixed 60s window keyed on the connecting IP.
-    const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
-    const { success } = await env.RENDER_LIMITER.limit({ key: ip });
+    // Two-tier rate limit: a verified Google id_token (the editor's signed-in
+    // token) raises the limit and keys on the user instead of the IP, so people
+    // behind a shared NAT/proxy don't collide. No/invalid token → anonymous,
+    // keyed on the connecting IP. Verification only runs when a token is present.
+    const caller = await identify(request, url, env.GOOGLE_CLIENT_ID);
+    const tier = caller ? "user" : "anon";
+    const limiter = caller ? env.USER_LIMITER : env.ANON_LIMITER;
+    const limitKey = caller ? `user:${caller.sub}` : (request.headers.get("cf-connecting-ip") ?? "unknown");
+    const { success } = await limiter.limit({ key: limitKey });
     if (!success) {
       return withCors(
-        new Response(`rate limit exceeded — ${RATE}`, {
+        new Response(`rate limit exceeded — ${caller ? RATE_USER : RATE_ANON}`, {
           status: 429,
-          headers: { "content-type": "text/plain", "retry-after": "60" },
+          headers: { "content-type": "text/plain", "retry-after": "60", "x-ratelimit-tier": tier },
         }),
       );
     }
@@ -103,12 +115,14 @@ export default {
       if (hit) {
         const res = new Response(hit.body, hit);
         res.headers.set("x-render-cache", "hit");
+        res.headers.set("x-ratelimit-tier", tier);
         return withCors(res);
       }
 
       const res = cacheable(await render(req));
       ctx.waitUntil(cache.put(key, res.clone()));
       res.headers.set("x-render-cache", "miss");
+      res.headers.set("x-ratelimit-tier", tier);
       return withCors(res);
     } catch (e) {
       if (e instanceof HttpError) {
