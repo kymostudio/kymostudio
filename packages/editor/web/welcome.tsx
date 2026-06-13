@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
 import { useDiagrams, KindIcon } from "./sidebar";
-import { Plus, FolderOpen, LayoutGrid } from "lucide-react";
+import { Plus, FolderOpen } from "lucide-react";
 
 // VS Code-style "Welcome" shown in the editor area when you open `/` with no
 // diagram (no ?d= room, no ?s= share). Two columns: Start actions + Recent.
@@ -28,7 +28,6 @@ export function WelcomeView({ onNew, onOpenFile }: { onNew: () => void; onOpenFi
             <h2 className="wel-h">Start</h2>
             <button className="wel-link" onClick={onNew}><Plus size={16} strokeWidth={2} />New diagram…</button>
             <button className="wel-link" onClick={() => fileRef.current?.click()}><FolderOpen size={16} strokeWidth={2} />Open file…</button>
-            <Link className="wel-link" to="/diagrams"><LayoutGrid size={16} strokeWidth={2} />Browse all diagrams</Link>
             <input ref={fileRef} type="file" accept=".kymo,.bpmn,.mmd,.mermaid,.txt,.md" hidden
               onChange={(e) => { const f = e.target.files?.[0]; if (f) onOpenFile(f); e.target.value = ""; }} />
           </section>

@@ -66,7 +66,7 @@ export default function TrashPage() {
         <div className="page-head">
           <h1>Trash</h1>
           <div className="head-actions">
-            <Link className="pill" to="/diagrams"><ArrowLeft size={15} strokeWidth={2} />Diagrams</Link>
+            <Link className="pill" to="/"><ArrowLeft size={15} strokeWidth={2} />Back</Link>
             {!!items.length && <button className="pill" onClick={emptyTrash}>Empty trash</button>}
           </div>
         </div>

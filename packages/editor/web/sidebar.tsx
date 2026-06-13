@@ -10,7 +10,7 @@ import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
-  Files, Search, Shapes, BookOpen, LayoutGrid, LogOut, Menu, ExternalLink,
+  Files, Search, Shapes, BookOpen, LogOut, Menu, ExternalLink,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
@@ -425,7 +425,6 @@ export function ActivityBar({ active, onSelect, onNewDiagram }: { active: Panel 
               <button className="acct-item exp-item" onClick={() => { setMenu(null); onNewDiagram(); }}><FilePlus2 size={16} strokeWidth={1.9} />New diagram</button>
               <button className="acct-item exp-item" onClick={newFolder}><FolderPlus size={16} strokeWidth={1.9} />New folder</button>
               <div className="menu-sep" />
-              <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMenu(null)}><LayoutGrid size={16} strokeWidth={1.9} />All diagrams</Link>
               <Link className="acct-item exp-item" to="/trash" onClick={() => setMenu(null)}><Trash2 size={16} strokeWidth={1.9} />Trash</Link>
               <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
             </div>
