@@ -126,6 +126,7 @@ impl Emit {
         for item in items {
             match item {
                 Item::Message(m) => self.emit_message(&mut buf, indent, m),
+                Item::Autonumber(_) => {}
                 Item::Activate(x) => self.emit_activate(&mut buf, indent, x),
                 Item::Deactivate(x) => self.emit_deactivate(&mut buf, indent, x),
                 Item::Note(n) => {
@@ -334,6 +335,7 @@ fn collect_touched(item: &Item, out: &mut Vec<String>) {
             add(&m.from);
             add(&m.to);
         }
+        Item::Autonumber(_) => {}
         Item::Activate(x) | Item::Deactivate(x) => add(x),
         Item::Note(n) => {
             for t in &n.targets {

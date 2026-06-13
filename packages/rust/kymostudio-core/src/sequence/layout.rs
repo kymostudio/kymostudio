@@ -86,7 +86,7 @@ pub(crate) struct Layout {
     pub(crate) bottom: i64,
     index: HashMap<String, usize>,
     y: i64,
-    auto: bool,
+    auto_on: bool,
     auto_n: i64,
     auto_step: i64,
     open_acts: HashMap<usize, Vec<i64>>,
@@ -117,9 +117,9 @@ impl Layout {
             acts: Vec::new(),
             y: FIRST_MSG_Y,
             bottom: FIRST_MSG_Y,
-            auto: seq.autonumber,
-            auto_n: seq.auto_start - seq.auto_step,
-            auto_step: seq.auto_step,
+            auto_on: false,
+            auto_n: 0,
+            auto_step: 1,
             open_acts: HashMap::new(),
         }
     }
@@ -135,12 +135,13 @@ impl Layout {
                     let from = self.idx(&m.from);
                     let to = self.idx(&m.to);
                     let self_loop = from == to;
-                    let text = if self.auto {
+                    let text = if self.auto_on {
+                        let n = self.auto_n;
                         self.auto_n += self.auto_step;
                         if m.text.is_empty() {
-                            self.auto_n.to_string()
+                            n.to_string()
                         } else {
-                            format!("{} {}", self.auto_n, m.text)
+                            format!("{} {}", n, m.text)
                         }
                     } else {
                         m.text.clone()
@@ -167,6 +168,14 @@ impl Layout {
                     self.y = note.top + note.height + NOTE_GAP;
                     self.notes.push(note);
                 }
+                Item::Autonumber(spec) => match spec {
+                    Some((start, step)) => {
+                        self.auto_on = true;
+                        self.auto_n = *start;
+                        self.auto_step = *step;
+                    }
+                    None => self.auto_on = false,
+                },
                 Item::Activate(x) => {
                     let c = self.idx(x);
                     self.open_acts.entry(c).or_default().push(self.y);
@@ -331,6 +340,7 @@ fn collect(item: &Item, index: &HashMap<String, usize>, out: &mut Vec<usize>) {
             add(&m.to);
         }
         Item::Activate(x) | Item::Deactivate(x) => add(x),
+        Item::Autonumber(_) => {}
         Item::Note(n) => n.targets.iter().for_each(|t| add(t)),
         Item::Fragment(f) => {
             for op in &f.operands {

@@ -68,6 +68,9 @@ pub enum Item {
     Note(Note),
     /// A combined fragment (`loop` / `alt` / `opt` / `par`).
     Fragment(Fragment),
+    /// An `autonumber` directive in the timeline: `Some((start, step))` turns
+    /// numbering on from `start`; `None` is `autonumber off`.
+    Autonumber(Option<(i64, i64)>),
 }
 
 /// UML 2.5.1 `MessageSort` — how a message behaves.
