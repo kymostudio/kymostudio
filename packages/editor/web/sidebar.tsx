@@ -285,7 +285,6 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
           title={r.name}>
           {guides(r.ancestors)}
           <span className="sb-chev">{r.open ? <ChevronDown size={14} strokeWidth={2.2} /> : <ChevronRight size={14} strokeWidth={2.2} />}</span>
-          <span className="sb-spacer" /> {/* no folder glyph — keeps the name column aligned with files */}
           {isEditing ? renameInput("folder", r.id, r.name) : <span className="sb-name">{r.name}</span>}
         </div>
       );
