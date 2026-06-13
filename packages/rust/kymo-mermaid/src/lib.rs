@@ -57,9 +57,15 @@ pub fn flowchart_to_svg(source: &str) -> Result<String, String> {
 /// (If a user literally types <p> in a label, mermaid.js renders it as an
 /// element too — so this matches reference behaviour in that case as well.)
 fn unescape_label_paragraph_wrapper(svg: &str) -> String {
-    svg.replace(r#"<span class="nodeLabel">&lt;p&gt;"#, r#"<span class="nodeLabel"><p>"#)
-        .replace(r#"<span class="edgeLabel">&lt;p&gt;"#, r#"<span class="edgeLabel"><p>"#)
-        .replace("&lt;/p&gt;</span>", "</p></span>")
+    svg.replace(
+        r#"<span class="nodeLabel">&lt;p&gt;"#,
+        r#"<span class="nodeLabel"><p>"#,
+    )
+    .replace(
+        r#"<span class="edgeLabel">&lt;p&gt;"#,
+        r#"<span class="edgeLabel"><p>"#,
+    )
+    .replace("&lt;/p&gt;</span>", "</p></span>")
 }
 
 #[cfg(feature = "wasm")]
@@ -115,9 +121,15 @@ mod tests {
         // <span class="nodeLabel"><p>…<br>…</p></span>; merman escapes the <p>
         // wrapper. Caught live on 2026-06-12 — the editor showed a literal
         // "<p>" before the label text.
-        let svg = flowchart_to_svg("flowchart TD
-  A[dòng một<br/>dòng hai] --> B").unwrap();
-        assert!(svg.contains(r#"<span class="nodeLabel"><p>dòng một"#), "real <p> missing");
+        let svg = flowchart_to_svg(
+            "flowchart TD
+  A[dòng một<br/>dòng hai] --> B",
+        )
+        .unwrap();
+        assert!(
+            svg.contains(r#"<span class="nodeLabel"><p>dòng một"#),
+            "real <p> missing"
+        );
         assert!(!svg.contains("&lt;p&gt;"), "escaped <p> still present");
     }
 
@@ -125,5 +137,26 @@ mod tests {
     fn non_flowchart_errors_cleanly() {
         // The editor uses the error as its fall-back-to-mermaid.js signal.
         assert!(flowchart_to_svg("sequenceDiagram\n  A->>B: hi").is_err());
+    }
+}
+
+/// Render ANY mermaid grammar to SVG via merman's full engine (feature `full`,
+/// built only for the render-api worker — 5.2 MB raw vs the slice's 1.5 MB).
+/// The flowchart slice above stays the editor's lean path.
+#[cfg(feature = "full")]
+pub fn render_any(source: &str) -> Result<String, String> {
+    let out =
+        merman_bindings_core::render_svg(source.as_bytes(), b"{}").map_err(|e| format!("{e:?}"))?;
+    String::from_utf8(out).map_err(|e| e.to_string())
+}
+
+#[cfg(all(feature = "wasm", feature = "full"))]
+mod wasm_full {
+    use wasm_bindgen::prelude::*;
+
+    /// Full-grammar mermaid → SVG (the render-api worker build: wasm,full).
+    #[wasm_bindgen(js_name = mermaidRenderSvg)]
+    pub fn mermaid_render_svg(source: &str) -> Result<String, JsError> {
+        super::render_any(source).map_err(|e| JsError::new(&e))
     }
 }

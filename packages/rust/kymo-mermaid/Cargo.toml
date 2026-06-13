@@ -19,12 +19,17 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 merman-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false }
 merman-render = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false }
+# The FULL engine — every grammar through merman's own dispatch. Only the
+# render-api worker builds this (wasm,full); the editor keeps the lean
+# flowchart slice, so its wire cost is unchanged.
+merman-bindings-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, features = ["core-full", "render"], optional = true }
 serde_json = "1"
 wasm-bindgen = { version = "0.2", optional = true }
 
 [features]
 default = []
 wasm = ["dep:wasm-bindgen"]
+full = ["dep:merman-bindings-core"]
 
 [profile.release]
 opt-level = "z"
