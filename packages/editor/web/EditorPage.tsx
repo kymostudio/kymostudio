@@ -12,8 +12,9 @@ import { RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
+import { EditorSidebar } from "./sidebar";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, PanelLeft } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -68,6 +69,18 @@ export default function EditorPage() {
   splitRef.current = split;
   const mainRef = useRef<HTMLElement>(null);
   const draggingSplit = useRef(false);
+  // VSCode-style file sidebar: open by default on desktop, hidden on phones.
+  const isPhone = () => typeof matchMedia !== "undefined" && matchMedia("(max-width: 720px)").matches;
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const v = localStorage.getItem("kymo_sidebar");
+    return v === "1" ? true : v === "0" ? false : !isPhone();
+  });
+  const setSidebar = useCallback((open: boolean) => {
+    setSidebarOpen(open);
+    try { localStorage.setItem("kymo_sidebar", open ? "1" : "0"); } catch {}
+  }, []);
+  // opening a file closes the drawer on phones only; on desktop the sidebar stays.
+  const closeSidebarOnPhone = useCallback(() => { if (isPhone()) setSidebar(false); }, [setSidebar]);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
@@ -426,6 +439,11 @@ export default function EditorPage() {
       <header>
         {/* identity & document: logo → your Diagrams when signed in (the natural
             "home"), else the product site; then workspace, editable title, sync state */}
+        {claims && !shared && (
+          <button className="sb-toggle" onClick={() => setSidebar(!sidebarOpen)} title="Toggle file sidebar" aria-label="Toggle file sidebar" aria-pressed={sidebarOpen}>
+            <PanelLeft size={17} strokeWidth={2} />
+          </button>
+        )}
         {claims
           ? <Link className="brand" to="/diagrams" title="My diagrams" aria-label="My diagrams"><img src="/logo.svg" alt="" /></Link>
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
@@ -591,7 +609,15 @@ export default function EditorPage() {
         )}
       </header>
       {galleryOpen && <TemplateGallery onPick={pickTemplate} onClose={() => setGalleryOpen(false)} />}
-      <main ref={mainRef}>
+      <div className="workarea">
+        {claims && !shared && sidebarOpen && (
+          <>
+            <EditorSidebar currentId={d} currentTitle={diagramLabel}
+              onNewDiagram={() => setGalleryOpen(true)} onClose={closeSidebarOnPhone} onCollapse={() => setSidebar(false)} />
+            <div className="sb-backdrop" onClick={() => setSidebar(false)} />
+          </>
+        )}
+        <main ref={mainRef}>
         {booting ? (
           <div className="boot"><KLoader /></div>
         ) : (
@@ -639,7 +665,8 @@ export default function EditorPage() {
             </section>
           </>
         )}
-      </main>
+        </main>
+      </div>
       <div className={"status" + (statusErr ? " error" : "")} title={statusTitle}>{status}</div>
     </div>
   );
