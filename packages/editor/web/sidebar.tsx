@@ -287,13 +287,6 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
           <span className="sb-chev">{r.open ? <ChevronDown size={14} strokeWidth={2.2} /> : <ChevronRight size={14} strokeWidth={2.2} />}</span>
           {r.open ? <FolderOpen size={15} strokeWidth={1.9} className="sb-icon" /> : <FolderIcon size={15} strokeWidth={1.9} className="sb-icon" />}
           {isEditing ? renameInput("folder", r.id, r.name) : <span className="sb-name">{r.name}</span>}
-          {!isEditing && (
-            <span className="sb-actions" onClick={(e) => e.stopPropagation()}>
-              <button title="New subfolder" onClick={() => onNewFolder(r.id)}><FolderPlus size={13} strokeWidth={2} /></button>
-              <button title="Rename" onClick={() => startRename("folder", r.id)}><Pencil size={13} strokeWidth={2} /></button>
-              <button title="Delete" onClick={() => f && onDeleteFolder(f)}><Trash2 size={13} strokeWidth={2} /></button>
-            </span>
-          )}
         </div>
       );
     }
@@ -315,12 +308,6 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
         <KindIcon kind={it.kind} />
         {isEditing ? renameInput("file", r.id, label) : <span className="sb-name">{label}</span>}
         {!isEditing && meta && <span className="sb-meta">{meta}</span>}
-        {!isEditing && (
-          <span className="sb-actions" onClick={(e) => e.stopPropagation()}>
-            <button title="Rename" onClick={() => startRename("file", r.id)}><Pencil size={13} strokeWidth={2} /></button>
-            <button title="Delete" onClick={() => onDeleteFile(it)}><Trash2 size={13} strokeWidth={2} /></button>
-          </span>
-        )}
       </div>
     );
   }
