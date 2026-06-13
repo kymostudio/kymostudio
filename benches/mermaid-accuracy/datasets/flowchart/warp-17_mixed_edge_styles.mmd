@@ -1,0 +1,7 @@
+graph TD
+    Request[HTTP Request] ==> Auth{Authenticated?}
+    Auth -->|Yes| Handler[Request Handler]
+    Auth -.->|No| Login[Login Page]
+    Handler --> Response[HTTP Response]
+    Login -.- Session[Session Store]
+    Session --> Auth

@@ -1,0 +1,7 @@
+graph RL
+    Output[Final Output] --> Process[Processing]
+    Process --> Transform[Transform]
+    Transform --> Parse[Parse]
+    Parse --> Input[Raw Input]
+    Process --> Validate[Validation]
+    Validate --> Parse

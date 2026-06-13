@@ -1,0 +1,19 @@
+flowchart TD
+    SRC["Source Extraction<br/>(DuckDB / DocumentDB / S3)"]
+
+    subgraph PIPE["xyzPipeline"]
+        direction TB
+        E["1. Extract records from source"]
+        D["2. xyz HTTP API — mno detection"]
+        M["3. span_mapper: filter_type → entity_type"]
+        R["4. ClinicalRedactor: tag / surrogate"]
+        A["5. xyzAuditLogger — dual-DB write"]
+        E --> D --> M --> R --> A
+    end
+
+    ANON[("xyz_abc.duckdb<br/>no raw mno<br/>· abc_notes<br/>· abc_mno_spans")]
+    AUDIT[("xyz_audit.duckdb<br/>mno audit trail<br/>· abc_mno_audit<br/>· abc_human_review")]
+
+    SRC --> PIPE
+    PIPE --> ANON
+    PIPE --> AUDIT

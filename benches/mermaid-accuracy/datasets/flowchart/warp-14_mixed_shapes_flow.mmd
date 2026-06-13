@@ -1,0 +1,9 @@
+graph TD
+    Start((Start)) --> Input[Get Input]
+    Input --> Validate{Valid?}
+    Validate -->|Yes| Process([Process Data])
+    Validate -->|No| Error{{Error Handler}}
+    Process --> Store[(Database)]
+    Error --> Log[[Log Error]]
+    Store --> End((End))
+    Log --> End

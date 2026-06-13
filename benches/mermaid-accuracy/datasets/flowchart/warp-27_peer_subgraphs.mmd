@@ -1,0 +1,13 @@
+graph TB
+    subgraph Team A
+        A1[Developer 1] --> A2[Developer 2]
+    end
+    subgraph Team B
+        B1[Developer 3] --> B2[Developer 4]
+    end
+    subgraph Team C
+        C1[Developer 5] --> C2[Developer 6]
+    end
+    A2 --> Manager[Project Manager]
+    B2 --> Manager
+    C2 --> Manager

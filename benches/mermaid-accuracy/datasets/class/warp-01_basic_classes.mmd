@@ -1,0 +1,15 @@
+classDiagram
+    class Animal {
+        +int age
+        +String gender
+        +isMammal()
+        +mate()
+    }
+
+    class Duck {
+        +String beakColor
+        +swim()
+        +quack()
+    }
+
+    Animal <|-- Duck

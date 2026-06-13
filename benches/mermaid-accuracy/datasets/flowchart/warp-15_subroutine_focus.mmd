@@ -1,0 +1,8 @@
+graph TD
+    Main[Main Program] --> Init[[Initialize]]
+    Init --> Loop{Continue?}
+    Loop -->|Yes| Process[[Process Item]]
+    Process --> Validate[[Validate Result]]
+    Validate --> Loop
+    Loop -->|No| Cleanup[[Cleanup]]
+    Cleanup --> End[Exit]

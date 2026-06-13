@@ -1,0 +1,22 @@
+graph LR
+    subgraph Input
+        I1[File Input]
+        I2[API Input]
+        I3[Stream Input]
+    end
+    subgraph Transform
+        T1[Parse]
+        T2[Validate]
+        T3[Transform]
+    end
+    subgraph Output
+        O1[Database]
+        O2[Cache]
+    end
+    I1 --> T1
+    I2 --> T1
+    I3 --> T1
+    T1 --> T2
+    T2 --> T3
+    T3 --> O1
+    T3 --> O2

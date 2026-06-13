@@ -1,0 +1,10 @@
+%%{init: {'theme':'base'}}%%
+sequenceDiagram
+    autonumber
+    participant Alice
+    participant Bob
+    participant Charlie
+    Alice<<->>Alice: Bidirectional solid self-reference
+    Bob<<-->>Bob: Bidirectional dotted self-reference
+    Charlie<<->>Charlie: Another bidirectional solid
+    Alice<<-->>Alice: Another bidirectional dotted

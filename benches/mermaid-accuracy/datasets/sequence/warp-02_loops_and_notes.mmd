@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Alice
+    participant Bob
+
+    Note over Alice,Bob: Simple request/response with retry
+
+    Alice->>Bob: Request
+    alt success
+        Bob-->>Alice: 200 OK
+    else transient failure
+        Bob-->>Alice: 503 Retry-After
+        loop retry up to 3 times
+            Alice->>Bob: Request
+        end
+    end

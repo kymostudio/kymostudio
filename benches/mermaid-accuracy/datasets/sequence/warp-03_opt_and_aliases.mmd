@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant User
+    participant WorkspaceView
+    participant RightPanelView
+    participant WorkingDirectoriesModel as WDModel
+    participant CodeReviewView
+
+    User->>WorkspaceView: toggle panel / click diff chip / agent opens panel
+    WorkspaceView->>RightPanelView: open_code_review(repo_path, diff_model, terminal)
+    RightPanelView->>WDModel: get_code_review_view(pane_group_id)
+    opt Old view exists
+        RightPanelView->>CodeReviewView: on_close()
+    end
+    RightPanelView->>RightPanelView: create_code_review_view(repo)
+    RightPanelView->>WDModel: store_code_review_view(pane_group_id, new_view)
+    RightPanelView->>CodeReviewView: on_open(repo)

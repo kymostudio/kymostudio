@@ -1,0 +1,17 @@
+graph TD
+    subgraph Services
+        S1[Auth Service]
+        S2[User Service]
+        S3[Order Service]
+        S4[Payment Service]
+        S5[Notification Service]
+        S6[Analytics Service]
+        S1 --> S2
+        S2 --> S3
+        S3 --> S4
+        S4 --> S5
+        S3 --> S6
+    end
+    Gateway[API Gateway] --> S1
+    Gateway --> S2
+    Gateway --> S3

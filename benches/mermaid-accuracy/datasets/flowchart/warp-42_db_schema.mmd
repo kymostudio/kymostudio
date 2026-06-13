@@ -1,0 +1,9 @@
+graph LR
+    Users[(Users)] --> Orders[(Orders)]
+    Users --> Addresses[(Addresses)]
+    Orders --> OrderItems[(Order Items)]
+    Products[(Products)] --> OrderItems
+    Products --> Categories[(Categories)]
+    Products --> Inventory[(Inventory)]
+    Orders --> Payments[(Payments)]
+    Orders --> Shipments[(Shipments)]

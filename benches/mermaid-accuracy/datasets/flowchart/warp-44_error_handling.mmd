@@ -1,0 +1,11 @@
+graph TD
+    Operation[Operation] --> Try{Try Block}
+    Try -->|Success| Result[Return Result]
+    Try -->|Error| Catch{Catch Error}
+    Catch -->|Recoverable| Retry{Retry?}
+    Catch -->|Fatal| LogError[Log Error]
+    Retry -->|Yes| Operation
+    Retry -->|No| Fallback[Use Fallback]
+    LogError --> Alert[Send Alert]
+    Alert --> Terminate[Terminate]
+    Fallback --> Result

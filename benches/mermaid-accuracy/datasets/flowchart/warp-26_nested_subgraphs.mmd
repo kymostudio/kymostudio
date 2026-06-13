@@ -1,0 +1,12 @@
+graph TB
+    subgraph Outer
+        subgraph Inner1
+            A[Node A] --> B[Node B]
+        end
+        subgraph Inner2
+            C[Node C] --> D[Node D]
+        end
+        B --> C
+    end
+    E[External] --> A
+    D --> F[Output]

@@ -1,0 +1,9 @@
+graph TD
+    API[API Call] --> Sync[Sync Response]
+    API -.-> Queue[Message Queue]
+    Queue -.-> Worker[Background Worker]
+    Worker -.-> Notify[Send Notification]
+    Worker -.-> Email[Send Email]
+    Sync --> Client[Client]
+    Notify -.- Client
+    Email -.- Client

@@ -1,0 +1,27 @@
+graph TB
+    subgraph Client
+        Web[Web App]
+        Mobile[Mobile App]
+    end
+    subgraph Gateway
+        LB[Load Balancer]
+        Auth[Auth Gateway]
+    end
+    subgraph Services
+        API[API Server]
+        Worker[Worker]
+    end
+    subgraph Data
+        DB[(PostgreSQL)]
+        Redis[(Redis)]
+        Queue[Message Queue]
+    end
+    Web --> LB
+    Mobile --> LB
+    LB --> Auth
+    Auth --> API
+    API --> DB
+    API --> Redis
+    API --> Queue
+    Queue --> Worker
+    Worker --> DB

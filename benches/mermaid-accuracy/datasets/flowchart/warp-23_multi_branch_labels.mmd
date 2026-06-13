@@ -1,0 +1,10 @@
+graph TD
+    Start[Entry Point] --> Decision{Choose Path}
+    Decision -->|Option A| PathA[Path A]
+    Decision -->|Option B| PathB[Path B]
+    Decision -->|Option C| PathC[Path C]
+    Decision -->|Option D| PathD[Path D]
+    PathA -->|Complete| End[Exit]
+    PathB -->|Complete| End
+    PathC -->|Complete| End
+    PathD -->|Complete| End

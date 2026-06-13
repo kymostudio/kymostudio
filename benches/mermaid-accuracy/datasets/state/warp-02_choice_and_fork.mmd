@@ -1,0 +1,20 @@
+stateDiagram-v2
+    [*] --> Validate
+    Validate --> IsValid
+
+    state IsValid <<choice>>
+
+    IsValid --> Success : valid
+    IsValid --> Failure : invalid
+
+    state Fork <<fork>>
+    Success --> Fork
+    Fork --> TaskA
+    Fork --> TaskB
+
+    state Join <<join>>
+    TaskA --> Join
+    TaskB --> Join
+    Join --> [*]
+
+    Failure --> [*]

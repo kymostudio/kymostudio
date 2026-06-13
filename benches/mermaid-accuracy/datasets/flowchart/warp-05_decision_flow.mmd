@@ -1,0 +1,6 @@
+graph TD
+    Start[Start] --> Check{Is Valid?}
+    Check -->|Yes| Process[Process Data]
+    Check -->|No| Error[Show Error]
+    Process --> End[End]
+    Error --> End

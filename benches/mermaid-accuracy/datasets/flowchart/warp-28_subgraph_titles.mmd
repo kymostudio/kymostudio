@@ -1,0 +1,12 @@
+graph TB
+    subgraph sg1[Frontend Layer]
+        UI[User Interface] --> State[State Manager]
+    end
+    subgraph sg2[Backend Layer]
+        API[REST API] --> Service[Business Logic]
+    end
+    subgraph sg3[Data Layer]
+        DB[(Database)] --> Cache[(Redis Cache)]
+    end
+    State --> API
+    Service --> DB

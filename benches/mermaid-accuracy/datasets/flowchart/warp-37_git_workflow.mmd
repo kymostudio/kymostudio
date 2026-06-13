@@ -1,0 +1,11 @@
+graph LR
+    Main((main)) --> Feature1([feature-1])
+    Main --> Feature2([feature-2])
+    Feature1 --> PR1{PR Review}
+    Feature2 --> PR2{PR Review}
+    PR1 -->|Approved| Merge1[Merge]
+    PR2 -->|Approved| Merge2[Merge]
+    Merge1 --> Main
+    Merge2 --> Main
+    Main --> Release((release))
+    Release --> Deploy[Deploy to Prod]

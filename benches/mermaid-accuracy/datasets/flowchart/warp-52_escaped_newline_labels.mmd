@@ -1,0 +1,6 @@
+flowchart LR
+  Start([Plan approved]) --> Core["Main session — core foundation\nremove inside-Warp current support"]
+  Core --> Push["Push core branch\nneeded for cloud agents"]
+  Push --> A["propagate-readonly-metadata — remote\nrebase + validate"]
+  A --> B["propagate-readonly-data-settings — remote\nrebase + validate"]
+  B --> Review["Main session reviews reports\nfinal stack status"]

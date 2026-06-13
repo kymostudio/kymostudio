@@ -1,0 +1,9 @@
+graph TD
+    A[Input] -->|status: ok| B[Process]
+    B -->|count = 5| C{Check}
+    C -->|x > 0| D[Positive]
+    C -->|x < 0| E[Negative]
+    C -->|x = 0| F[Zero]
+    D -->|done| G[End]
+    E -->|done| G
+    F -->|done| G

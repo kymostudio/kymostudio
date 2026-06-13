@@ -1,0 +1,10 @@
+graph TB
+    subgraph Frontend
+        A[Component A] --> B[Component B]
+    end
+    subgraph Backend
+        C[Service X] --> D[Service Y]
+    end
+    B --> C
+    D --> E[(Database)]
+    E --> F[Analytics]

@@ -1,0 +1,8 @@
+graph TD
+    User[User Action] ==> Critical[Critical Path]
+    Critical ==> Database[(Main Database)]
+    Database ==> Response[User Response]
+    Critical --> Metrics[Metrics]
+    Critical --> Logs[Logs]
+    Metrics --- Analytics[Analytics]
+    Logs --- Analytics

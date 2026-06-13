@@ -1,0 +1,13 @@
+graph TD
+    Start[Start] --> A{Branch 1}
+    A -->|Left| B[B]
+    A -->|Right| C[C]
+    B --> D{Branch 2}
+    C --> D
+    D -->|Option 1| E[E]
+    D -->|Option 2| F[F]
+    D -->|Option 3| G[G]
+    E --> H[Merge]
+    F --> H
+    G --> H
+    H --> End[End]

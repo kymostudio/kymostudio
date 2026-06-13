@@ -1,0 +1,16 @@
+requirementDiagram
+direction LR
+
+requirement req1 {
+    id: 1
+    text: "The system shall do something"
+    risk: high
+    verifyMethod: test
+}
+
+element el1 {
+    type: "Subsystem"
+    docref: "DOC-1"
+}
+
+req1 - satisfies -> el1

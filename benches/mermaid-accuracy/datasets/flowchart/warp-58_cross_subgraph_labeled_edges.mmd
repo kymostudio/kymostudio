@@ -1,0 +1,13 @@
+flowchart LR
+  subgraph Normal flow
+    R["standalone reasoning msg<br/>(history)"] --> P["pendingReasoning<br/>util.go"]
+    P --> A["assistant tool-call msg<br/>+ reasoning_content"]
+  end
+  subgraph Retry flow
+    S["stream reasoning blocks"] --> RP["reasoningProcessor<br/>AccumulatedReasoning()"]
+    TC["invalid tool call"] --> E["InvalidNativeToolCallError"]
+    RP -- "enrich (xml/plaintext processor)" --> E
+    E -- "Reprompt()" --> SY["synthetic ToolCall.Reasoning"]
+    SY --> A
+  end
+  A --> DS["DeepSeek API"]

@@ -1,0 +1,7 @@
+sequenceDiagram
+        participant Alice
+        participant Bob
+        participant Charlie
+        Alice ()->>() Bob: Central connection
+        Bob ()-->> Charlie: Reverse central connection
+        Charlie ()<<-->>() Alice: Dual central connection

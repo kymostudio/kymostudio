@@ -1,0 +1,16 @@
+classDiagram
+    direction LR
+
+    class HttpClient
+
+    class ApiClient {
+        +request()
+    }
+
+    class IService {
+        <<interface>>
+        +request()
+    }
+
+    IService <|.. ApiClient
+    ApiClient --> HttpClient : uses

@@ -1,0 +1,9 @@
+graph TD
+    A[Request] --> B{Authenticated?}
+    B -->|Yes| C{Authorized?}
+    B -->|No| D[Login Page]
+    C -->|Yes| E[Process Request]
+    C -->|No| F[Access Denied]
+    E --> G[Return Response]
+    D --> A
+    F --> G

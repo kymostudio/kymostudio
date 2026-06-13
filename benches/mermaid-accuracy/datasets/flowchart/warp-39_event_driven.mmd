@@ -1,0 +1,9 @@
+graph TD
+    Producer1[Order Service] --> EventBus{{Event Bus}}
+    Producer2[Payment Service] --> EventBus
+    EventBus --> Consumer1[Inventory Handler]
+    EventBus --> Consumer2[Notification Handler]
+    EventBus --> Consumer3[Analytics Handler]
+    Consumer1 --> InventoryDB[(Inventory)]
+    Consumer2 --> EmailSvc[Email Service]
+    Consumer3 --> DataWarehouse[(Data Warehouse)]

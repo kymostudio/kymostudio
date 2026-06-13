@@ -1,0 +1,15 @@
+requirementDiagram
+    requirement req_a {
+        id: 1
+        text: req A.
+        risk: low
+        verifymethod: analysis
+    }
+    element elem_a {
+        type: module
+    }
+    elem_a - refines -> req_a
+    classDef bold font-weight:bold
+    classDef blue stroke:lightblue,color:#0000FF
+    class req_a bold
+    class elem_a blue,bold

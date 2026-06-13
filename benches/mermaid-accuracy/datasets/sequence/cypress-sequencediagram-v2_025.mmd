@@ -1,0 +1,9 @@
+sequenceDiagram
+        participant Alice
+        participant Bob
+        participant Charlie
+        Alice ()->>() Bob: Central connection
+        Note over Alice,Bob: Central connection note
+        Bob ()-->> Charlie: Reverse central connection
+        Note right of Charlie: Response note
+        Charlie ()<<-->>() Alice: Dual central connection
