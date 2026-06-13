@@ -12,6 +12,9 @@
   // nodejs_compat: nomnoml (and friends) import node builtins like "path".
   "compatibility_flags": ["nodejs_compat"],
   "rules": [{ "type": "Data", "globs": ["**/*.ttf"], "fallthrough": true }],
+  // dbml-renderer's own svg path requires the legacy viz.js (1.9 MB, runtime
+  // wasm compile — unusable here); we only use its "dot" output.
+  "alias": { "@aduh95/viz.js/sync": "./src/graphviz/viz-sync-stub.ts" },
   "routes": [{ "pattern": "render.kymo.studio", "custom_domain": true }],
   "observability": { "enabled": true }
 }

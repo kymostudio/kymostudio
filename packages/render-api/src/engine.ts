@@ -16,7 +16,6 @@ import {
   bpmnImport,
   bpmnRender,
   d2ToSvg,
-  dotToSvg,
   registerFont,
   svgToPdf,
   svgToPng,
@@ -67,10 +66,6 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
   d2: (source) => {
     ensure();
     return d2ToSvg(source);
-  },
-  graphviz: (source) => {
-    ensure();
-    return dotToSvg(source);
   },
   bpmn: (source) => {
     ensure();
