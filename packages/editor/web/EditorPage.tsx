@@ -12,7 +12,7 @@ import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy, BookOpen, MoreHorizontal } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy, MoreHorizontal } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -411,9 +411,7 @@ export default function EditorPage() {
         <div className="spacer" />
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
-          <a className="navlink mob-hide" href="https://docs.kymo.studio" target="_blank" rel="noopener" title="Kymo documentation"><BookOpen size={15} strokeWidth={2} />Docs</a>
           {claims && <Link className="navlink mob-hide" to="/diagrams"><LayoutGrid size={15} strokeWidth={2} />Diagrams</Link>}
-          <span className="vsep mob-hide" />
           <button className="mob-hide" onClick={() => setGalleryOpen(true)} title="New diagram" aria-haspopup="dialog"><Plus size={16} strokeWidth={2.2} />New</button>
           {shared && claims && (
             <button className="mob-hide" onClick={saveCopy} title="Save a copy to your Diagrams">
@@ -448,10 +446,6 @@ export default function EditorPage() {
             </button>
             {moreOpen && (
               <div className="acct-menu">
-                <a className="acct-item exp-item" href="https://docs.kymo.studio" target="_blank" rel="noopener" onClick={() => setMoreOpen(false)}>
-                  <BookOpen size={17} strokeWidth={1.9} />
-                  Docs
-                </a>
                 {claims && (
                   <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMoreOpen(false)}>
                     <LayoutGrid size={17} strokeWidth={1.9} />
