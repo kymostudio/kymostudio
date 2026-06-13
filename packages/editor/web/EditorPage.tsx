@@ -260,7 +260,9 @@ export default function EditorPage() {
   // links and the guest editor aren't a blank "/" in the header (kymo kind only).
   const localTitle = !d && kind === "kymo" ? titleFrom(source) : "Untitled";
   const diagramLabel = title || (localTitle !== "Untitled" ? localTitle : "Untitled");
-  const booting = (!d && !!idToken && !shared) || syncing; // redirecting to the latest diagram, or waiting for the first doc
+  // redirecting to the latest diagram, or waiting for the first doc — but a
+  // draft legitimately lives at "/" with no room, so it is never "booting"
+  const booting = (!d && !!idToken && !shared && !draftMode) || syncing;
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
 
   useEffect(() => {
