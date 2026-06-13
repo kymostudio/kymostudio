@@ -3,14 +3,15 @@
 //! centres, message rows, fragment boxes) and draws everything as SVG
 //! `<rect>`/`<line>`/`<text>` — real text, so PNG/PDF keep their labels.
 //!
-//! Notes and activations are not drawn (the shared layout does not place them
-//! yet); the diagram covers participants, messages (per [`MessageSort`]),
-//! self-messages and combined fragments (`loop`/`alt`/`opt`/`par`).
+//! Covers participants, messages (per [`MessageSort`]), self-messages,
+//! combined fragments (`loop`/`alt`/`opt`/`par`), notes, activation bars and
+//! `autonumber` — everything as real `<text>`, so PNG/PDF keep their labels.
 
-use super::layout::{self, PFrag, PMsg, HEAD_H, HEAD_TOP, HEAD_W, LINE_TOP};
+use super::layout::{self, PActiv, PFrag, PMsg, PNote, HEAD_H, HEAD_TOP, HEAD_W, LINE_TOP};
 use super::{FragmentOp, MessageSort, Sequence};
 
 const MARGIN: i64 = 12;
+const ACT_W: i64 = 8; // activation-bar width
 const FOOT_GAP: i64 = 12;
 const FONT: &str =
     "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
@@ -35,10 +36,46 @@ pub fn render(seq: &Sequence) -> String {
     for f in &lay.frags {
         right = right.max(f.left + f.width);
     }
+    for n in &lay.notes {
+        right = right.max(n.left + n.width);
+    }
+    if !seq.title.is_empty() {
+        right = right.max(seq.title.chars().count() as i64 * 8);
+    }
     let width = right + MARGIN;
     let height = foot_top + HEAD_H + MARGIN;
 
     let mut body = String::new();
+
+    // Box groupings sit behind everything as a tinted backdrop.
+    for b in &seq.boxes {
+        let idxs: Vec<usize> = b
+            .members
+            .iter()
+            .filter_map(|m| seq.participants.iter().position(|p| &p.id == m))
+            .collect();
+        if idxs.is_empty() {
+            continue;
+        }
+        let lo = idxs.iter().map(|&i| lay.centers[i]).min().unwrap() - HEAD_W / 2 - 8;
+        let hi = idxs.iter().map(|&i| lay.centers[i]).max().unwrap() + HEAD_W / 2 + 8;
+        let top = HEAD_TOP - 8;
+        let bot = foot_top + HEAD_H + 8;
+        body += &format!(
+            "<rect x=\"{lo}\" y=\"{top}\" width=\"{}\" height=\"{}\" rx=\"4\" \
+             fill=\"#f1f5f9\" stroke=\"#cbd5e1\" stroke-width=\"1\"/>",
+            hi - lo,
+            bot - top,
+        );
+        if !b.label.is_empty() {
+            body += &format!(
+                "<text x=\"{}\" y=\"{}\" fill=\"#475569\" font-size=\"12\" font-weight=\"600\">{}</text>",
+                lo + 6,
+                top + 14,
+                esc(&b.label),
+            );
+        }
+    }
 
     // Lifelines: dashed verticals from below the head box to the foot box.
     for &cx in &lay.centers {
@@ -52,8 +89,24 @@ pub fn render(seq: &Sequence) -> String {
     for f in &lay.frags {
         body += &frag_svg(f);
     }
+    for a in &lay.acts {
+        body += &activ_svg(a, &lay.centers);
+    }
     for m in &lay.msgs {
         body += &msg_svg(m, &lay.centers);
+    }
+    for n in &lay.notes {
+        body += &note_svg(n);
+    }
+
+    // Diagram title, centred above the participant heads.
+    if !seq.title.is_empty() {
+        body += &format!(
+            "<text x=\"{}\" y=\"22\" text-anchor=\"middle\" fill=\"#1e293b\" \
+             font-size=\"16\" font-weight=\"700\">{}</text>",
+            width / 2,
+            esc(&seq.title),
+        );
     }
 
     // Head + foot boxes for every participant.
@@ -194,7 +247,37 @@ fn op_label(op: FragmentOp) -> &'static str {
         FragmentOp::Alt => "alt",
         FragmentOp::Opt => "opt",
         FragmentOp::Par => "par",
+        FragmentOp::Critical => "critical",
+        FragmentOp::Break => "break",
     }
+}
+
+fn note_svg(n: &PNote) -> String {
+    let mut out = format!(
+        "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"3\" \
+         fill=\"#fff7d6\" stroke=\"#e3c34a\" stroke-width=\"1\"/>",
+        n.left, n.top, n.width, n.height
+    );
+    let cx = n.left + n.width / 2;
+    for (i, line) in n.lines.iter().enumerate() {
+        let ty = n.top + 20 + i as i64 * 16;
+        out += &format!(
+            "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" fill=\"#5b4a17\">{}</text>",
+            esc(line)
+        );
+    }
+    out
+}
+
+fn activ_svg(a: &PActiv, centers: &[i64]) -> String {
+    let cx = centers.get(a.col).copied().unwrap_or(0);
+    let h = (a.bottom - a.top).max(12);
+    format!(
+        "<rect x=\"{}\" y=\"{}\" width=\"{ACT_W}\" height=\"{h}\" \
+         fill=\"#e2e8f0\" stroke=\"#94a3b8\" stroke-width=\"1\"/>",
+        cx - ACT_W / 2,
+        a.top
+    )
 }
 
 fn esc(s: &str) -> String {

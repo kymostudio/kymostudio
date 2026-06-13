@@ -8,7 +8,7 @@
 
 use std::collections::HashMap;
 
-use super::{Fragment, FragmentOp, Item, MessageSort, Sequence};
+use super::{Fragment, FragmentOp, Item, MessageSort, Note, NotePlacement, Sequence};
 
 // ── Layout constants (pixels) ───────────────────────────────────────────────
 pub(crate) const FRAME_LEFT: i64 = 8;
@@ -27,6 +27,10 @@ const OPERAND_DIV: i64 = 22; // divider + guard band before else/and
 const FRAG_PAD: i64 = 12; // padding below the last operand row
 const FRAG_GAP: i64 = 12; // gap after a fragment box
 const FRAG_MARGIN: i64 = 30; // horizontal overhang past spanned lifelines
+const NOTE_LINE: i64 = 16; // text line height inside a note box
+const NOTE_PAD: i64 = 8; // inner padding of a note box
+const NOTE_GAP: i64 = 14; // vertical gap a note occupies past its box
+const NOTE_CHAR_W: i64 = 7; // approx glyph advance at 14px
 
 /// A placed message (one diagram row).
 pub(crate) struct PMsg {
@@ -50,6 +54,22 @@ pub(crate) struct PFrag {
     pub(crate) operands: Vec<(String, i64, i64)>,
 }
 
+/// A placed note box (one or more text lines).
+pub(crate) struct PNote {
+    pub(crate) left: i64,
+    pub(crate) top: i64,
+    pub(crate) width: i64,
+    pub(crate) height: i64,
+    pub(crate) lines: Vec<String>,
+}
+
+/// A placed activation bar on one lifeline.
+pub(crate) struct PActiv {
+    pub(crate) col: usize,
+    pub(crate) top: i64,
+    pub(crate) bottom: i64,
+}
+
 /// The result of laying out a [`Sequence`].
 pub(crate) struct Layout {
     /// Lifeline centre x by participant index.
@@ -58,16 +78,25 @@ pub(crate) struct Layout {
     pub(crate) msgs: Vec<PMsg>,
     /// Combined-fragment boxes.
     pub(crate) frags: Vec<PFrag>,
+    /// Note boxes.
+    pub(crate) notes: Vec<PNote>,
+    /// Activation bars.
+    pub(crate) acts: Vec<PActiv>,
     /// The y just past the last placed element.
     pub(crate) bottom: i64,
     index: HashMap<String, usize>,
     y: i64,
+    auto: bool,
+    auto_n: i64,
+    auto_step: i64,
+    open_acts: HashMap<usize, Vec<i64>>,
 }
 
 /// Lay out a sequence diagram.
 pub(crate) fn layout(seq: &Sequence) -> Layout {
     let mut lay = Layout::new(seq);
     lay.walk(&seq.items);
+    lay.close_all_acts();
     lay
 }
 
@@ -84,8 +113,14 @@ impl Layout {
             index,
             msgs: Vec::new(),
             frags: Vec::new(),
+            notes: Vec::new(),
+            acts: Vec::new(),
             y: FIRST_MSG_Y,
             bottom: FIRST_MSG_Y,
+            auto: seq.autonumber,
+            auto_n: seq.auto_start - seq.auto_step,
+            auto_step: seq.auto_step,
+            open_acts: HashMap::new(),
         }
     }
 
@@ -100,19 +135,46 @@ impl Layout {
                     let from = self.idx(&m.from);
                     let to = self.idx(&m.to);
                     let self_loop = from == to;
+                    let text = if self.auto {
+                        self.auto_n += self.auto_step;
+                        if m.text.is_empty() {
+                            self.auto_n.to_string()
+                        } else {
+                            format!("{} {}", self.auto_n, m.text)
+                        }
+                    } else {
+                        m.text.clone()
+                    };
+                    if m.activate_target {
+                        self.open_acts.entry(to).or_default().push(self.y);
+                    }
                     self.msgs.push(PMsg {
                         from,
                         to,
-                        text: m.text.clone(),
+                        text,
                         sort: m.sort,
                         y: self.y,
                         self_loop,
                         bidirectional: m.bidirectional,
                     });
+                    if m.deactivate_source {
+                        self.close_act(from, self.y);
+                    }
                     self.y += if self_loop { ROW + SELF_EXTRA } else { ROW };
                 }
-                // Activations and notes are not drawn in this version.
-                Item::Activate(_) | Item::Deactivate(_) | Item::Note(_) => {}
+                Item::Note(n) => {
+                    let note = self.place_note(n);
+                    self.y = note.top + note.height + NOTE_GAP;
+                    self.notes.push(note);
+                }
+                Item::Activate(x) => {
+                    let c = self.idx(x);
+                    self.open_acts.entry(c).or_default().push(self.y);
+                }
+                Item::Deactivate(x) => {
+                    let c = self.idx(x);
+                    self.close_act(c, self.y);
+                }
                 Item::Fragment(f) => {
                     let top = self.y;
                     self.y += FRAG_HEADER;
@@ -143,6 +205,92 @@ impl Layout {
                 }
             }
             self.bottom = self.bottom.max(self.y);
+        }
+    }
+
+    /// Position a note box at the current y (placement relative to its targets).
+    fn place_note(&self, n: &Note) -> PNote {
+        let lines: Vec<String> = n
+            .text
+            .split("<br>")
+            .flat_map(|s| s.split("<br/>"))
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect();
+        let lines = if lines.is_empty() {
+            vec![String::new()]
+        } else {
+            lines
+        };
+        let text_w = lines
+            .iter()
+            .map(|l| l.chars().count() as i64)
+            .max()
+            .unwrap_or(0)
+            * NOTE_CHAR_W
+            + NOTE_PAD * 2;
+        let height = lines.len() as i64 * NOTE_LINE + NOTE_PAD * 2;
+        let center = |i: usize| self.centers.get(i).copied().unwrap_or(0);
+        let (left, width) = match n.placement {
+            NotePlacement::Over => {
+                let idxs: Vec<usize> = n.targets.iter().map(|t| self.idx(t)).collect();
+                if idxs.len() >= 2 {
+                    let a = center(idxs[0]);
+                    let b = center(*idxs.last().unwrap());
+                    let (lo, hi) = (a.min(b), a.max(b));
+                    let w = (hi - lo + HEAD_W).max(text_w);
+                    (lo + (hi - lo) / 2 - w / 2, w)
+                } else {
+                    let c = idxs.first().map(|&i| center(i)).unwrap_or(0);
+                    let w = text_w.max(HEAD_W);
+                    (c - w / 2, w)
+                }
+            }
+            NotePlacement::LeftOf => {
+                let c = self.idx(n.targets.first().map(String::as_str).unwrap_or(""));
+                let w = text_w.max(60);
+                (center(c) - HEAD_W / 2 - w, w)
+            }
+            NotePlacement::RightOf => {
+                let c = self.idx(n.targets.first().map(String::as_str).unwrap_or(""));
+                let w = text_w.max(60);
+                (center(c) + HEAD_W / 2, w)
+            }
+        };
+        PNote {
+            left: left.max(FRAME_LEFT),
+            top: self.y,
+            width,
+            height,
+            lines,
+        }
+    }
+
+    /// Close the innermost open activation on `col`, recording its bar.
+    fn close_act(&mut self, col: usize, y: i64) {
+        if let Some(stack) = self.open_acts.get_mut(&col) {
+            if let Some(top) = stack.pop() {
+                self.acts.push(PActiv {
+                    col,
+                    top,
+                    bottom: y.max(top + 12),
+                });
+            }
+        }
+    }
+
+    /// Close any activations still open at the end of the diagram.
+    fn close_all_acts(&mut self) {
+        let cols: Vec<usize> = self.open_acts.keys().copied().collect();
+        let b = self.bottom;
+        for c in cols {
+            while let Some(top) = self.open_acts.get_mut(&c).and_then(|s| s.pop()) {
+                self.acts.push(PActiv {
+                    col: c,
+                    top,
+                    bottom: b,
+                });
+            }
         }
     }
 
