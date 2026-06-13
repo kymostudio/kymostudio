@@ -51,6 +51,17 @@ async function ensureThumbColumn(env: Env) {
   thumbColReady = true;
 }
 
+// `parent_id` turns the flat `workspaces` table into a FOLDER tree (NULL/"" = a
+// root folder). Added after the table shipped — self-migrate idempotently like
+// `thumb` above, so existing workspaces simply become root folders with no data
+// migration. A diagram's `ws` is its parent-folder id ("" = root level).
+let folderColReady = false;
+async function ensureFolderColumn(env: Env) {
+  if (folderColReady) return;
+  try { await env.DB.prepare("ALTER TABLE workspaces ADD COLUMN parent_id TEXT").run(); } catch {}
+  folderColReady = true;
+}
+
 async function listIndex(env: Env, email: string): Promise<IdxEntry[]> {
   await migrateKvToD1(env, email);
   await ensureThumbColumn(env);
@@ -141,13 +152,31 @@ async function migrateKvToD1(env: Env, email: string) {
   await env.OAUTH_KV.put(`d1done:${email}`, "1");
 }
 
-// ---- Workspaces: named groups of diagrams (D1 rows; ws "" = Personal). ----
-type Workspace = { id: string; name: string; createdAt: number };
+// ---- Folders: a tree of named groups (D1 `workspaces` rows; parent_id "" = a
+// root folder). A diagram's `ws` is its parent-folder id ("" = root level). ----
+type Workspace = { id: string; name: string; parentId: string; createdAt: number };
 async function listWorkspaces(env: Env, email: string): Promise<Workspace[]> {
   await migrateKvToD1(env, email);
-  const rs = await env.DB.prepare("SELECT id, name, created_at FROM workspaces WHERE owner = ?1 ORDER BY created_at")
-    .bind(email).all<{ id: string; name: string; created_at: number }>();
-  return (rs.results ?? []).map((r) => ({ id: r.id, name: r.name, createdAt: r.created_at }));
+  await ensureFolderColumn(env);
+  const rs = await env.DB.prepare("SELECT id, name, parent_id, created_at FROM workspaces WHERE owner = ?1 ORDER BY created_at")
+    .bind(email).all<{ id: string; name: string; parent_id: string | null; created_at: number }>();
+  return (rs.results ?? []).map((r) => ({ id: r.id, name: r.name, parentId: r.parent_id || "", createdAt: r.created_at }));
+}
+
+// Would moving folder `id` under `newParent` create a cycle? True if newParent
+// IS id or is a descendant of id. Walks parent links via the folder map.
+function wouldCycle(folders: Workspace[], id: string, newParent: string): boolean {
+  if (!newParent) return false; // moving to root is always safe
+  if (newParent === id) return true;
+  const byId = new Map(folders.map((f) => [f.id, f]));
+  let cur: string | undefined = newParent;
+  const seen = new Set<string>();
+  while (cur && !seen.has(cur)) {
+    if (cur === id) return true;
+    seen.add(cur);
+    cur = byId.get(cur)?.parentId || undefined;
+  }
+  return false;
 }
 async function assignWorkspace(env: Env, email: string, diagramId: string, ws: string) {
   if (ws) {
@@ -494,30 +523,54 @@ export default {
       }
 
       if (url.pathname === "/api/workspaces") {
+        await ensureFolderColumn(env);
         if (request.method === "POST") {
-          const b = (await request.json().catch(() => ({}))) as { name?: string };
+          // Create a folder, optionally nested under `parentId`.
+          const b = (await request.json().catch(() => ({}))) as { name?: string; parentId?: string };
           const name = (b.name || "").trim().slice(0, 40);
           if (!name) return Response.json({ error: "missing name" }, { status: 400, headers: cors });
-          const ws: Workspace = { id: crypto.randomUUID().slice(0, 8), name, createdAt: Date.now() };
-          await env.DB.prepare("INSERT INTO workspaces (id, owner, name, created_at) VALUES (?1, ?2, ?3, ?4)")
-            .bind(ws.id, email, ws.name, ws.createdAt).run();
+          const parentId = (b.parentId || "").trim();
+          if (parentId) {
+            const p = await env.DB.prepare("SELECT id FROM workspaces WHERE id = ?1 AND owner = ?2").bind(parentId, email).first();
+            if (!p) return Response.json({ error: "parent not found" }, { status: 400, headers: cors });
+          }
+          const ws: Workspace = { id: crypto.randomUUID().slice(0, 8), name, parentId, createdAt: Date.now() };
+          await env.DB.prepare("INSERT INTO workspaces (id, owner, name, parent_id, created_at) VALUES (?1, ?2, ?3, ?4, ?5)")
+            .bind(ws.id, email, ws.name, parentId, ws.createdAt).run();
           return Response.json({ ok: true, workspace: ws }, { headers: cors });
         }
         if (request.method === "PATCH") {
-          const b = (await request.json().catch(() => ({}))) as { id?: string; name?: string };
-          const name = (b.name || "").trim().slice(0, 40);
-          if (!b.id || !name) return Response.json({ error: "missing id/name" }, { status: 400, headers: cors });
-          const res = await env.DB.prepare("UPDATE workspaces SET name = ?1 WHERE id = ?2 AND owner = ?3")
-            .bind(name, b.id, email).run();
-          if (!res.meta.changes) return Response.json({ error: "not found" }, { status: 404, headers: cors });
-          return Response.json({ ok: true, workspace: { id: b.id, name } }, { headers: cors });
+          // Rename and/or move (reparent) a folder. `parentId` "" = move to root.
+          const b = (await request.json().catch(() => ({}))) as { id?: string; name?: string; parentId?: string };
+          if (!b.id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+          const name = b.name !== undefined ? (b.name || "").trim().slice(0, 40) : undefined;
+          if (name !== undefined && !name) return Response.json({ error: "missing name" }, { status: 400, headers: cors });
+          if (b.parentId !== undefined) {
+            const parentId = (b.parentId || "").trim();
+            const folders = await listWorkspaces(env, email);
+            if (!folders.some((f) => f.id === b.id)) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+            if (parentId && !folders.some((f) => f.id === parentId)) return Response.json({ error: "parent not found" }, { status: 400, headers: cors });
+            if (wouldCycle(folders, b.id, parentId)) return Response.json({ error: "cannot move a folder into itself" }, { status: 400, headers: cors });
+            await env.DB.prepare("UPDATE workspaces SET parent_id = ?1 WHERE id = ?2 AND owner = ?3").bind(parentId, b.id, email).run();
+          }
+          if (name !== undefined) {
+            const res = await env.DB.prepare("UPDATE workspaces SET name = ?1 WHERE id = ?2 AND owner = ?3").bind(name, b.id, email).run();
+            if (!res.meta.changes && b.parentId === undefined) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+          }
+          return Response.json({ ok: true }, { headers: cors });
         }
         if (request.method === "DELETE") {
+          // Delete a folder; reparent its children (subfolders + diagrams) up to
+          // its own parent so nothing is orphaned (structure is preserved).
           const id = url.searchParams.get("id") || "";
           if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+          const row = await env.DB.prepare("SELECT parent_id FROM workspaces WHERE id = ?1 AND owner = ?2")
+            .bind(id, email).first<{ parent_id: string | null }>();
+          if (!row) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+          const parent = row.parent_id || "";
+          await env.DB.prepare("UPDATE workspaces SET parent_id = ?1 WHERE owner = ?2 AND parent_id = ?3").bind(parent, email, id).run();
+          await env.DB.prepare("UPDATE diagrams SET ws = ?1 WHERE owner = ?2 AND ws = ?3").bind(parent, email, id).run();
           await env.DB.prepare("DELETE FROM workspaces WHERE id = ?1 AND owner = ?2").bind(id, email).run();
-          // its diagrams fall back to Personal
-          await env.DB.prepare("UPDATE diagrams SET ws = '' WHERE owner = ?1 AND ws = ?2").bind(email, id).run();
           return Response.json({ ok: true }, { headers: cors });
         }
         return Response.json({ workspaces: await listWorkspaces(env, email) }, { headers: cors });
