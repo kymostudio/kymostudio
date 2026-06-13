@@ -523,7 +523,7 @@ export default function EditorPage() {
                   <span className="kroki-note" title={kind === "mermaid"
                     ? "Mermaid renders locally in your browser (mermaid.js). Opening a share link may use the kymo render cache for the first paint."
                     : "Non-Kymo diagram types are rendered by render.kymo.studio (some are relayed to the public kroki.io service — your source is sent along). Kymo diagrams render locally in your browser."}>
-                    {kind === "mermaid" ? "renders in-browser" : "renders via kroki.io"}
+                    {kind === "mermaid" ? "renders in-browser" : "renders via render.kymo.studio"}
                   </span>
                 )}
               </div>
