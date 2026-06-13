@@ -86,6 +86,22 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
             capture_box(&seq, before, &mut box_group);
             continue;
         }
+        // `create [participant|actor] X as Y` — declare the lifeline (mid-diagram
+        // creation is not modelled visually; the alias still matters).
+        if let Some(rest) = strip_kw(stmt, "create") {
+            let actor = strip_kw(rest, "actor").is_some();
+            let decl = strip_kw(rest, "participant")
+                .or_else(|| strip_kw(rest, "actor"))
+                .unwrap_or(rest);
+            let before = seq.participants.len();
+            ensure_decl(&mut seq, decl, actor);
+            capture_box(&seq, before, &mut box_group);
+            continue;
+        }
+        // `destroy X` — the lifeline ends; no effect on a static render.
+        if strip_kw(stmt, "destroy").is_some() {
+            continue;
+        }
         // `title` line.
         if lower == "title" || lower.starts_with("title ") || lower.starts_with("title:") {
             seq.title = stmt[5..].trim_start_matches(':').trim().to_string();
@@ -220,6 +236,7 @@ fn frag_open(lower: &str, stmt: &str) -> Option<(FragmentOp, String)> {
         ("loop", FragmentOp::Loop),
         ("alt", FragmentOp::Alt),
         ("opt", FragmentOp::Opt),
+        ("par_over", FragmentOp::Par),
         ("par", FragmentOp::Par),
         ("critical", FragmentOp::Critical),
         ("break", FragmentOp::Break),
@@ -541,5 +558,17 @@ mod tests {
             })
             .collect();
         assert_eq!(autos, vec![Some((10, 5)), None]);
+    }
+
+    #[test]
+    fn create_destroy_and_aliases() {
+        let s = parse(
+            "sequenceDiagram\nA->>B: x\ncreate participant W as Worker\nA->>W: go\ndestroy W",
+        );
+        // the created participant keeps its alias label
+        assert!(s
+            .participants
+            .iter()
+            .any(|p| p.id == "W" && p.label == "Worker"));
     }
 }
