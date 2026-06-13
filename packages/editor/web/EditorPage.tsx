@@ -184,7 +184,10 @@ export default function EditorPage() {
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
       synced.current = true;
       if (fromSelf) return;
-      if (k) setKind(k);
+      // adopt the snapshot's kind only when it carries a real document — a fresh
+      // room's empty snapshot reports the server default ("kymo"), which must not
+      // override the kind a template/"Save a copy" just seeded into the editor
+      if (k && src.trim()) setKind(k);
       if (!src.trim()) {
         fresh.current = true;
         // "Save a copy" / typed-before-sync: content is already waiting in the editor.
