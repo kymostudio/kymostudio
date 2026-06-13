@@ -140,7 +140,8 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 /* ---- activity bar (VSCode-style left icon rail) ---- */
 .activitybar { flex: none; width: 52px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 8px 0; border-right: 1px solid var(--border); background: var(--bg-soft); z-index: 41; }
 .act-group { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; }
-.act-btn { position: relative; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--dim); border-radius: 10px; cursor: pointer; }
+.act-btn { position: relative; width: 44px; height: 44px; padding: 0; flex: none; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--dim); border-radius: 10px; cursor: pointer; }
+.act-btn .avatar { flex: none; }
 .act-btn:hover { background: var(--bg-raise); color: var(--ink); transform: none; box-shadow: none; }
 .act-btn.active { color: var(--ink); }
 .act-btn.active::before { content: ""; position: absolute; left: -6px; top: 9px; bottom: 9px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
