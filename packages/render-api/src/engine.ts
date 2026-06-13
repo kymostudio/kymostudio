@@ -7,6 +7,8 @@
 // default path fetches a relative URL, which has nothing to resolve against
 // here. kymostudio's initSync marks the JS lib ready AND instantiates the
 // same core glue (one shared node_modules copy), so one call powers both.
+import mermanWasm from "kymo-mermaid/kymo_mermaid_bg.wasm";
+import { initSync as mermanInit, mermaidRenderSvg } from "kymo-mermaid";
 import svgbobWasm from "kymo-svgbob/kymo_svgbob_bg.wasm";
 import { initSync as svgbobInit, svgbobToSvg } from "kymo-svgbob";
 import wasmModule from "kymostudio-core/kymostudio_core_bg.wasm";
@@ -15,7 +17,6 @@ import {
   bpmnRender,
   d2ToSvg,
   dotToSvg,
-  mermaidToSvg,
   registerFont,
   svgToPdf,
   svgToPng,
@@ -36,6 +37,7 @@ export function ensure(): void {
   if (ready) return;
   initSync(wasmModule);
   svgbobInit({ module: svgbobWasm });
+  mermanInit({ module: mermanWasm });
   // The wasm build has no system fonts and resvg ignores @font-face — without
   // these, PNG/PDF output silently drops every <text>. Roboto is named in the
   // renderers' font stacks, and the first face also becomes the generic
@@ -55,9 +57,12 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
     ensure();
     return renderSVG(parseDiagram(source));
   },
+  // merman's full engine (all grammars, mermaid-11 look) — the core's
+  // flowchart-only mermaidToSvg is superseded here; kroki fallback stays for
+  // anything merman still rejects.
   mermaid: (source) => {
     ensure();
-    return mermaidToSvg(source);
+    return mermaidRenderSvg(source);
   },
   d2: (source) => {
     ensure();
