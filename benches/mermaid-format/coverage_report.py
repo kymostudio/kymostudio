@@ -78,6 +78,22 @@ def main():
         fo_g = sum(1 for a in byg.values() if a["merman_ok"] and a["merman_fo"] / a["merman_ok"] > 0.5)
         lines.append(f"| {ds} | {n:,} | {pctf(ok, n)} | {fo_g}/{len(byg)} |")
 
+    # detailed: each dataset, every grammar
+    lines += ["", "## By dataset, by grammar", ""]
+    for ds, byg in data.items():
+        n_ds = sum(a["n"] for a in byg.values())
+        lines += [f"### {ds} ({n_ds:,} sources)", "",
+                  "| grammar | sources | merman renders | foreignObject | kymo |",
+                  "|---|---|---|---|---|"]
+        for g, a in sorted(byg.items(), key=lambda x: -x[1]["n"]):
+            kymo = pctf(a["kymo_ok"], a["kymo_n"]) if a["kymo_n"] else "—"
+            to = f" (+{a['timeout']} timeout)" if a.get("timeout") else ""
+            lines.append(
+                f"| {g} | {a['n']:,}{to} | {pctf(a['merman_ok'], a['n'])} | "
+                f"{pctf(a['merman_fo'], a['merman_ok'])} | {kymo} |"
+            )
+        lines.append("")
+
     lines += [
         "",
         "## Reading",
