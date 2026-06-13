@@ -1,7 +1,7 @@
 ---
 title: Pipeline & CLI Architecture — Test Documentation
 document_id: TEST-PIPECLI-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -35,7 +35,7 @@ iso_compliance:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `TEST-PIPECLI-001` |
-| Version           | 0.3 |
+| Version           | 0.4 |
 | Status            | Draft |
 | Owner             | `packages/python` · `packages/js` · `packages/rust` |
 | Related Documents | `FEAT-PIPECLI-001` (traced below), `DESIGN-PIPECLI-001`, `PLAN-PIPECLI-001` |
@@ -58,7 +58,7 @@ structure the requirements demand.
 
 **Items:** `pipeline/{demux,mux}.py`, `pipeline/importers/*`, `pipeline/filters/*`,
 `pipeline/encoders/*`, `pipeline/post/*`, the rewired `cli.py`, the JS `bin`, the Rust CLI.
-**Environment:** Python ≥ 3.13 / uv; Node (JS `node --test`); Rust toolchain. **Oracle data:**
+**Environment:** Python ≥ 3.10 / uv; Node (JS `node --test`); Rust toolchain. **Oracle data:**
 the committed golden SVGs, `tests/corpus_bpmn/baseline.json`, `conformance/golden/`.
 
 ## 3. Test cases (`TC-PC`)
@@ -70,9 +70,9 @@ the committed golden SVGs, `tests/corpus_bpmn/baseline.json`, `conformance/golde
 | `TC-PC-3` | **Importer registry, one-file add** | `FR-PC-2`, `FR-PC-7` | Register a stub importer via a registry entry only (no `cli.py` edit) → `kymo -f stub in` decodes it. |
 | `TC-PC-4` | **Importers do not layout** | `FR-PC-2` | A `kymo_dsl` decode returns a `Diagram` with **unresolved** positions until the `layout` filter runs. |
 | `TC-PC-5` | **Filters are `Diagram → Diagram` and format-agnostic** | `FR-PC-3` | `layout`/`align`/`autosize`/`theme`/`animate` each take and return a `Diagram`; none imports an encoder module. |
-| `TC-PC-6` | **`resolved` flag skips layout** | `FR-PC-6` | A `.bpmn` / `.kymo.json` decode sets `diagram.resolved=True`; **and** a `.kymo` source carrying a `bpmn { }` block becomes `resolved` after the `bpmn_layout` filter — in all three the default chain skips `align`, and output matches today's `src.suffix not in (".bpmn",".json") and not had_bpmn` path. |
+| `TC-PC-6` | **`resolved` flag skips layout** | `FR-PC-6` | All three pre-resolved categories set/earn `diagram.resolved=True`: (a) `.bpmn`/`.kymo.json`/`.mmd`/`.mermaid` decode; (b) a `.kymo` source with a `bpmn { }` block, after the `_core.apply_layout` filter; (c) a source with `flowchart { }` blocks, after the `_core.resolve_flowchart_blocks` filter. In all the default chain skips `align`, and output matches today's `src.suffix not in (".bpmn",".json",".mmd",".mermaid") and not had_bpmn and not had_flowchart` path. |
 | `TC-PC-7` | **Encoder registry; one parse, many targets** | `FR-PC-4`, `FR-PC-9` | `kymo in.kymo -t svg -t figma -t webp` → three outputs, **one** decode/filter pass (assert parse called once). |
-| `TC-PC-8` | **Raster goes through SVG** | `FR-PC-4` | `png`/`webp` encode = `Diagram → SVG → raster`; assert the SVG encoder is invoked en route. |
+| `TC-PC-8` | **Raster/PDF goes through SVG** | `FR-PC-4` | `png`/`webp`/`pdf` encode = `Diagram → SVG → {raster,pdf}` (the `pdf`/`png`/`webp` back-ends live in `kymostudio-core`); assert the SVG encoder is invoked en route. |
 | `TC-PC-9` | **Post stage owns animation snapshot** | `FR-PC-5` | `make_frame_svg` runs in `post/`, on the encoded SVG, not inside the SVG encoder. |
 | `TC-PC-10` | **Mux: `-o` and stdout** | `FR-PC-10`, `FR-PC-12` | `-o out.svg` writes there; `-o -` writes stdout; absent `-o`, "next to input" default holds. |
 | `TC-PC-11` | **Verb-less grammar; `-i` optional; tooling subcommands** | `FR-PC-8`, `FR-PC-14` | `kymo in.kymo -t svg` ≡ `kymo -i in.kymo -t svg`; `icons`/`lint` dispatch as reserved first-token **subcommands** (`kymo lint <src>`); there is **no `--lint` flag** (passing `--lint` is an unknown-option error, not a lint run). |
@@ -130,6 +130,7 @@ the committed golden SVGs, `tests/corpus_bpmn/baseline.json`, `conformance/golde
 | 0.1     | 2026-06-06 | Vũ Anh | Initial test documentation. 20 `TC-PC` cases over pipeline stages + CLI grammar; full RTM against `FR-PC`/`NFR-PC`. |
 | 0.2     | 2026-06-06 | Vũ Anh | Review corrections. `TC-PC-6` extended to cover the DSL-with-`bpmn{}` resolved case (not only `.bpmn`/`.kymo.json`); `TC-PC-18` reframed as grammar parity (JS already ships a `bin`). |
 | 0.3     | 2026-06-06 | Vũ Anh | Grammar-consistency fix (review finding #5). `TC-PC-11` asserts `icons`/`lint` are subcommands and there is no `--lint` flag; `TC-PC-16` asserts `-formats`/`-targets` parse as whole tokens; `TC-PC-17` asserts no bundling + no glued short value. RTM: added `FR-PC-14` row, pointed `FR-PC-16` at `TC-PC-16`+`TC-PC-17`. |
+| 0.4     | 2026-06-13 | Vũ Anh | As-built reconciliation. §2 environment Python ≥ 3.10 (not 3.13). `TC-PC-6` rewritten to the three resolved categories and the current skip condition (`… not in (".bpmn",".json",".mmd",".mermaid") and not had_bpmn and not had_flowchart`), with `_core.apply_layout` / `_core.resolve_flowchart_blocks` as the layout filters. `TC-PC-8` extended to `pdf` and notes the core-owned raster/PDF back-ends. |
 
 ## Annex B — Document Control
 

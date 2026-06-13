@@ -1,7 +1,7 @@
 ---
 title: Pipeline & CLI Architecture — Requirements
 document_id: FEAT-PIPECLI-001
-version: "0.5"
+version: "0.6"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -48,7 +48,7 @@ iso_compliance:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-PIPECLI-001` |
-| Version           | 0.3 |
+| Version           | 0.6 |
 | Status            | Draft |
 | Owner             | `packages/python` (kymo CLI) · `packages/js` · `packages/rust` |
 | Related Documents | `DESIGN-PIPECLI-001`, `TEST-PIPECLI-001`, `PLAN-PIPECLI-001`; evidence base `RES-PIPELINE-001`, `RES-CLI-001` |
@@ -84,25 +84,46 @@ The document set: this `FEAT` (requirements) · `DESIGN-PIPECLI-001` (architectu
 mapping) · `TEST-PIPECLI-001` (V&V) · `PLAN-PIPECLI-001` (phased migration). The
 normative interchange schema between implementations is `KYMOJSON-MAP-001`.
 
-### 0.1 Realized spokes
+### 0.1 Realized spokes — the engine has begun moving into the Rust core
 
-The **Rust `kymo` CLI** already runs a first slice of this design: an output-extension
-**`{ext → fn}` registry** (`FR-PC-7`, in miniature) over a set of registered importers and
-encoders that all flow through one resolved `Diagram`.
+Two slices of this design already ship, and both point the same direction: **the engine
+stages are converging on `kymostudio-core` (Rust)**, surfaced to Python via PyO3 and to JS via
+wasm, with the per-language CLIs as thin front-ends.
 
-Most of these are the **flowchart conversion hub** — its own feature, `FEAT-FLOWCHART-001`
-(IR + the Mermaid/D2/DOT importers, the text emitters, and the pure-Rust SVG renderer; modules
-`FEAT-FLOWCHART-{D2,DOT,SVG}-001`, mappings `MERMAID-MAP-001` / `D2-MAP-001` / `DOT-MAP-001`).
-From this `FEAT`'s view they are *registered importers/encoders*. The one encoder that is **not**
-flowchart-specific is a module here:
+1. **Rust `kymo` CLI** runs an output-extension **`{ext → fn}` registry** (`FR-PC-7`, in
+   miniature) over registered importers and encoders that all flow through one resolved
+   `Diagram` (`packages/rust/kymostudio/src/main.rs`, the `CONVERTERS` table). Most are the
+   **flowchart conversion hub** — its own feature, `FEAT-FLOWCHART-001` (IR + the Mermaid/D2/DOT
+   importers, the text emitters, and the pure-Rust SVG renderer; modules
+   `FEAT-FLOWCHART-{D2,DOT,SVG}-001`, mappings `MERMAID-MAP-001` / `D2-MAP-001` / `DOT-MAP-001`).
+   The one encoder that is **not** flowchart-specific is a module here:
 
-| Module | document_id | Format mapping | What |
-|---|---|---|---|
-| draw.io encoder | `FEAT-PIPECLI-DRAWIO-001` | `DRAWIO-MAP-001` (`docs/formats/drawio.md`) | any `Diagram` → mxGraph XML (source-agnostic) |
+   | Module | document_id | Format mapping | What |
+   |---|---|---|---|
+   | draw.io encoder | `FEAT-PIPECLI-DRAWIO-001` | `DRAWIO-MAP-001` (`docs/formats/drawio.md`) | any `Diagram` → mxGraph XML (source-agnostic) |
 
-BPMN (`BPMN-MAP-001`) and `.kymo.json` (`KYMOJSON-MAP-001`) are the other registered
-importer/encoders. The broader Python/JS-side migration to a six-stage registry (and the
-verb-less CLI grammar) remains the work this `FEAT` specifies.
+2. **The Python CLI is already calling the core for whole stages.** As of 2026-06-13, several
+   of the heaviest stages no longer live in `packages/python` Python modules — they are PyO3
+   calls into `kymostudio-core` (the `kymo._core` bindings). Concretely, `cli.py:load()` /
+   `_load_resolved()` / `main()` delegate:
+
+   | Stage | Function (today) | Where it lives |
+   |-------|------------------|----------------|
+   | DECODE — BPMN | `_core.import_bpmn` | Rust core (was `from_bpmn.py`) |
+   | DECODE — Mermaid | `_core.import_mermaid` | Rust core (`.mmd`/`.mermaid`) |
+   | FILTER — BPMN layout | `_core.apply_layout` | Rust core (was `bpmn_layout.py`) |
+   | FILTER — flowchart resolve | `_core.resolve_flowchart_blocks` | Rust core |
+   | ENCODE — draw.io | `_core.diagram_to_drawio` | Rust core |
+   | ENCODE — BPMN export | `_core.export_bpmn` | Rust core (was `to_bpmn.py`) |
+   | POST — raster PNG / PDF | `_core` (resvg / svg2pdf) via `to_png` / `to_pdf` | Rust core |
+
+   Still in Python: the DSL parser (`dsl.py`), `.kymo.json` decode (`from_kymojson.py`), DSL-DAG
+   `layout.py`, `alignment.py`, and the `to_svg`/`to_figma`/`to_excalidraw`/`to_kymojson` emitters.
+
+`.kymo.json` (`KYMOJSON-MAP-001`) is the wire format between front-end and core. The broader
+work this `FEAT` still specifies is therefore **less "build a Python six-stage engine" and more
+"name the registry seams the core already imposes, and project them through a verb-less CLI"** —
+see `DESIGN-PIPECLI-001` §2/§4/§5 for the core-owned-engine framing.
 
 ## 1. Scope and stakeholder needs (`SN-PC`)
 
@@ -135,7 +156,7 @@ live in the research notes; this baseline takes only what §2/§3 require.
 | `FR-PC-3` | **Filters** SHALL be `Diagram → Diagram` functions registered by name, **format-agnostic** (they know nothing about `.svg`/`.figma`). `layout`, `align`, `autosize`, `animate`, `theme` SHALL each be a filter. | `SN-PC-02` |
 | `FR-PC-4` | **Encoders** SHALL be registered one-per-target. Raster targets (`png`, `webp`) SHALL encode as `Diagram → SVG → raster`, never directly. | `SN-PC-01` |
 | `FR-PC-5` | A **post / bitstream** stage SHALL exist for transforms on the *encoded* payload (animation snapshot, SVG minify, font inlining, sanitize), distinct from the encoder. | `SN-PC-02` |
-| `FR-PC-6` | The "already-resolved" property of pre-positioned sources SHALL become an **explicit `diagram.resolved` flag on the model** that an importer/filter sets — so the filter stage can skip layout deterministically, replacing the `src.suffix not in (".bpmn", ".json") and not had_bpmn` skip in `_load_resolved()`. Note this currently also covers a `.kymo` DSL source carrying a `bpmn { }` block (laid out by `bpmn_layout`, then alignment-skipped), so `resolved` is a per-`Diagram` property, **not** a property of the source format alone. | `SN-PC-02` |
+| `FR-PC-6` | The "already-resolved" property of pre-positioned sources SHALL become an **explicit `diagram.resolved` flag on the model** that an importer/filter sets — so the filter stage can skip layout deterministically, replacing the current skip in `_load_resolved()`: `src.suffix not in (".bpmn", ".json", ".mmd", ".mermaid") and not had_bpmn and not had_flowchart`. Note this covers **three** pre-resolved categories, not one: (a) `.bpmn`/`.kymo.json` sources; (b) a `.kymo` DSL source carrying a `bpmn { }` block (positioned by `_core.apply_layout`, then alignment-skipped); (c) a source carrying `flowchart { }` blocks (positioned by `_core.resolve_flowchart_blocks`). So `resolved` is a per-`Diagram` property, **not** a property of the source format alone, and for (b)/(c) it is the **core layout call**, not the importer, that earns the flag. | `SN-PC-02` |
 | `FR-PC-7` | Stage dispatch SHALL be by **registry lookup, not `if/elif`** — replacing the suffix switch in `load()` and the boolean-flag target chain in `main()`. | `SN-PC-01` |
 
 ### 2.2 CLI grammar (external) — realises `SN-PC-03`, `SN-PC-04`, `SN-PC-05`
@@ -165,7 +186,7 @@ live in the research notes; this baseline takes only what §2/§3 require.
 
 ## 4. Constraints, assumptions, out-of-scope (v1)
 
-- **Constraints.** Python ≥ 3.13 / uv (Python); zero-dep ESM (JS). The DSL spec `docs/DSL.md`
+- **Constraints.** Python ≥ 3.10 / uv (Python); zero-dep ESM (JS). The DSL spec `docs/DSL.md`
   and the `.kymo.json` schema `KYMOJSON-MAP-001` are normative and unchanged by this feature —
   the pipeline reorganises *dispatch*, not the model or the grammars.
 - **Assumptions.** Diagrams are small whole graphs; **streaming does not apply** (a layout pass
@@ -188,6 +209,7 @@ live in the research notes; this baseline takes only what §2/§3 require.
 | 0.3     | 2026-06-06 | Vũ Anh | Grammar-consistency fix (review finding #5). `FR-PC-8`: converter is verb-less; `icons`/`lint` are reserved tooling subcommands beside it. `FR-PC-14`: split aux modes — `--probe`/`--watch` are converter-run flags, `icons`/`lint` are subcommands, **no `--lint` flag** (deliberate divergence from `RES-CLI-001` §4). See `DESIGN-PIPECLI-001` §3 for the grammar layers + parser-tokenisation rules that resolve the `-f`/`-formats`, `-t`/`-targets` ambiguity. |
 | 0.4     | 2026-06-09 | Vũ Anh | Added §0.1 "Realized spokes" — the Rust `kymo` CLI's shipped `{ext→fn}` output registry + the D2/DOT importers, draw.io encoder, and pure-Rust flowchart SVG renderer, each a `modules/` entry (`FEAT-PIPECLI-{D2,DOT,DRAWIO,SVG}-001`) with a `docs/formats/` mapping (`D2-MAP-001`, `DOT-MAP-001`, `DRAWIO-MAP-001`). |
 | 0.5     | 2026-06-09 | Vũ Anh | Promoted the flowchart spokes (D2/DOT importers + SVG renderer) into their own feature `FEAT-FLOWCHART-001`; §0.1 now references it and keeps only the source-agnostic `drawio-encode` module (`FEAT-PIPECLI-DRAWIO-001`). |
+| 0.6     | 2026-06-13 | Vũ Anh | As-built reconciliation + Rust-core reframe. Fixed the control-table version (was stuck at 0.3) and the constraint (Python ≥ 3.10, not 3.13). Rewrote `FR-PC-6` to the **current** skip condition (`… not in (".bpmn",".json",".mmd",".mermaid") and not had_bpmn and not had_flowchart`) and its three resolved categories, with BPMN/flowchart layout now `_core.*` calls. Expanded §0.1 into "the engine has begun moving into the Rust core" with the stage→`_core.*` table (BPMN/Mermaid decode, BPMN/flowchart layout, draw.io/BPMN encode, PNG/PDF post). Defers the engine-owning-stage architecture to `DESIGN-PIPECLI-001`. |
 
 ## Annex B — Document Control
 

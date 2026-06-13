@@ -1,7 +1,7 @@
 ---
 title: Pipeline & CLI Architecture — Design
 document_id: DESIGN-PIPECLI-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -37,7 +37,7 @@ iso_compliance:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `DESIGN-PIPECLI-001` |
-| Version           | 0.3 |
+| Version           | 0.4 |
 | Status            | Draft |
 | Owner             | `packages/python` · `packages/js` · `packages/rust` |
 | Related Documents | `FEAT-PIPECLI-001` (requirements, traced below), `TEST-PIPECLI-001`, `PLAN-PIPECLI-001` |
@@ -49,6 +49,18 @@ pipeline, the registries, the module layout, the CLI grammar that drives it, and
 invariants that keep it honest. It is design-level — file/function names are indicative of
 intent, not a committed API. The narrative evidence is `RES-PIPELINE-001` (§3 proposed
 pipeline, §5 module layout) and `RES-CLI-001` (§4 proposed CLI).
+
+> **Architecture stance (v0.4): the engine lives in `kymostudio-core` (Rust).** The original
+> framing put a six-stage engine inside `packages/python`. As-built, the heavy stages have
+> already moved into the shared Rust core and are reached by PyO3 (Python) / wasm (JS) — BPMN
+> and Mermaid **decode**, BPMN and flowchart **layout filters**, the draw.io and BPMN
+> **encoders**, and the PNG/PDF **post/raster** stage are all `kymostudio-core` today (see
+> `FEAT-PIPECLI-001` §0.1). This design therefore treats **the core as the engine that owns
+> the `decode → filter → encode → post` stages**, with the Python/JS/Rust CLIs as thin
+> front-ends that own DEMUX (sniff/arg-parse) and MUX (write), register stages into the core's
+> registry, and exchange the model as `.kymo.json` (`KYMOJSON-MAP-001`). A few stages remain
+> language-local during migration (the DSL parser, DSL-DAG `layout`, `alignment`, and the
+> SVG/Figma/Excalidraw emitters are still Python) — those are migration state, not the target.
 
 ## 2. The six-stage pipeline (`FR-PC-1`)
 
@@ -71,24 +83,26 @@ central registry (`FR-PC-7`).
 
 | Stage | Role | Today | Target |
 |-------|------|-------|--------|
-| **DEMUX** | sniff extension + magic bytes → importer name; accept `stdin`, `-f` override | suffix switch in `load()` | `pipeline/demux.py` registry (`FR-PC-7`, `FR-PC-10`) |
-| **DECODE** | importer → `Diagram` (no layout/align) | `dsl.py`, `from_bpmn.py`, `from_kymojson.py`, dynamic `.py` | `pipeline/importers/*` (`FR-PC-2`) |
-| **FILTER** | `Diagram → Diagram` passes, format-agnostic | `bpmn_layout.py`, `layout.py`, `alignment.py`, `--animate` flag | `pipeline/filters/*` (`FR-PC-3`) |
-| **ENCODE** | `Diagram` → container bytes/string | `to_svg/figma/excalidraw/bpmn/kymojson` | `pipeline/encoders/*` (`FR-PC-4`) |
-| **POST** | tweak encoded payload, no re-decode | `to_webp.make_frame_svg` (animation snapshot) | `pipeline/post/*` (`FR-PC-5`) |
-| **MUX** | write file / stdout; infer container from `-o`, `-f` overrides | per-branch `out.write_text(...)` in `main()` | `pipeline/mux.py` (`FR-PC-12`) |
+| **DEMUX** | sniff extension + magic bytes → importer name; accept `stdin`, `-f` override | suffix switch in `load()` (front-end) | front-end `demux` registry (`FR-PC-7`, `FR-PC-10`) |
+| **DECODE** | importer → `Diagram` (no layout/align) | core: `_core.import_bpmn`, `_core.import_mermaid`; Python: `dsl.py`, `from_kymojson.py`, dynamic `.py` | core `decode` registry; language-local importers register into it (`FR-PC-2`) |
+| **FILTER** | `Diagram → Diagram` passes, format-agnostic | core: `_core.apply_layout` (BPMN), `_core.resolve_flowchart_blocks`; Python: `layout.py`, `alignment.py`; `--animate` flag | core `filter` registry (`FR-PC-3`) |
+| **ENCODE** | `Diagram` → container bytes/string | core: `_core.diagram_to_drawio`, `_core.export_bpmn`; Python: `to_svg/figma/excalidraw/kymojson` | core `encode` registry (`FR-PC-4`) |
+| **POST** | tweak encoded payload, no re-decode | core: PNG (resvg) / PDF (svg2pdf) via `to_png`/`to_pdf`; Python: `to_webp.make_frame_svg` (animation snapshot) | core `post` stage (`FR-PC-5`) |
+| **MUX** | write file / stdout; infer container from `-o`, `-f` overrides | per-branch `out.write_text(...)`/`write_bytes(...)` in `main()` (front-end) | front-end `mux` (`FR-PC-12`) |
 
 ### 2.1 Stage 1 — DEMUX (`FR-PC-7`, `FR-PC-10`)
 
 ```python
-# pipeline/demux.py
+# front-end demux (sniff + dispatch into the core's decode registry)
 IMPORTERS = {
-    ".kymo":      "kymo_dsl",
-    ".kymo.json": "kymo_json",
-    ".bpmn":      "bpmn_2_0",
-    ".drawio":    "drawio",
-    ".svg":       "svg",
-    ".py":        "python_module",
+    ".kymo":         "kymo_dsl",        # Python: dsl.parse
+    ".kymo.json":    "kymo_json",       # Python: from_kymojson.parse
+    ".bpmn":         "bpmn_2_0",        # core:   _core.import_bpmn
+    ".mmd":          "mermaid",         # core:   _core.import_mermaid
+    ".mermaid":      "mermaid",         # core:   _core.import_mermaid
+    ".drawio":       "drawio",          # (planned import; encoder ships today)
+    ".svg":          "svg",             # (planned)
+    ".py":           "python_module",   # Python: import_module → mod.DIAGRAM
 }
 def sniff(path_or_stream) -> str: ...   # → importer name (extension + magic bytes; -f overrides)
 ```
@@ -97,34 +111,47 @@ Replaces the suffix switch in `load()` and the `unsupported source` check in `ma
 
 ### 2.2 Stage 2 — DECODE (`FR-PC-2`, `FR-PC-6`)
 
-Each importer is an independent module returning a `Diagram`. Importers **must not** run
-layout or alignment. The implicit "pre-resolved" property becomes an **explicit
-`diagram.resolved = True` flag** (`FR-PC-6`), so the filter stage skips layout
-deterministically instead of `_load_resolved()` checking
-`src.suffix not in (".bpmn", ".json") and not had_bpmn`.
+Each importer returns a `Diagram` and **must not** run layout or alignment. Some importers are
+Python modules, some are PyO3 calls into the core (`_core.import_bpmn`, `_core.import_mermaid`)
+— the registry hides which. The implicit "pre-resolved" property becomes an **explicit
+`diagram.resolved = True` flag** (`FR-PC-6`), so the filter stage skips layout deterministically
+instead of `_load_resolved()` checking the as-built condition:
 
-**`resolved` is a per-`Diagram` property, not a property of the source format.** The current
-skip condition fires for `.bpmn`/`.kymo.json` *and* for a `.kymo` DSL source that carries a
-`bpmn { }` block (`had_bpmn`): the BPMN-layout pass positions it, then alignment is skipped.
-So the importer alone cannot always set `resolved` — for the DSL case it is the `bpmn_layout`
-filter that marks the diagram resolved once it has positioned the block. The default chain
-(below) must consult the flag after that filter runs, not before.
+```python
+src.suffix not in (".bpmn", ".json", ".mmd", ".mermaid") and not had_bpmn and not had_flowchart
+```
 
-| Importer | Existing module | `resolved`? |
-|----------|-----------------|-------------|
-| `kymo_dsl` | `dsl.py` | No — **unless** it carries a `bpmn { }` block, then set `resolved` *after* the `bpmn_layout` filter |
-| `bpmn_2_0` | `from_bpmn.py` | Yes (DI geometry) |
-| `kymo_json` | `from_kymojson.py` | Yes |
+**`resolved` is a per-`Diagram` property, not a property of the source format**, and it covers
+**three** pre-resolved categories:
+
+1. `.bpmn`/`.kymo.json`/`.mmd`/`.mermaid` sources — positioned at decode (DI geometry, the
+   serialized resolved model, or core Mermaid layout).
+2. A `.kymo` DSL source carrying a `bpmn { }` block (`had_bpmn`) — positioned by the
+   `_core.apply_layout` filter, then alignment-skipped.
+3. A source carrying `flowchart { }` blocks (`had_flowchart`) — positioned by the
+   `_core.resolve_flowchart_blocks` filter, then alignment-skipped.
+
+So the importer alone cannot always set `resolved` — for categories (2)/(3) it is the **core
+layout filter** that marks the diagram resolved once it has positioned the block. The default
+chain (below) must consult the flag *after* those filters run, not before.
+
+| Importer | Where it runs today | `resolved`? |
+|----------|---------------------|-------------|
+| `kymo_dsl` | Python `dsl.py` | No — **unless** it carries a `bpmn { }` / `flowchart { }` block, then set *after* the corresponding `_core.*` layout filter |
+| `bpmn_2_0` | core `_core.import_bpmn` | Yes (DI geometry) |
+| `mermaid` | core `_core.import_mermaid` | Yes (core layout) |
+| `kymo_json` | Python `from_kymojson.py` | Yes |
 | `python_module` | dynamic `import_module` in `load()` | Depends (`mod.LAYOUT`) |
-| `drawio` | port from `packages/js/src/drawio2svg/` | Yes |
-| `svg` | new | Yes |
+| `drawio` | port from `packages/js/src/drawio2svg/` (planned) | Yes |
+| `svg` | new (planned) | Yes |
 
 ### 2.3 Stage 3 — FILTER GRAPH (`FR-PC-3`, `FR-PC-13`) — the stage kymo is missing most
 
-Today the passes are scattered through `_load_resolved()`: `bpmn_layout.py::layout`
-(`bpmn { }` blocks), `layout.py::layout` (DSL DAG), `alignment.py::resolve_alignments`, with
-`--animate` forwarded to the renderer in `main()`. Each becomes a registered
-`Diagram → Diagram` filter:
+Today the passes are scattered through `_load_resolved()`: `_core.apply_layout` (`bpmn { }`
+blocks, in the Rust core — was `bpmn_layout.py`), `_core.resolve_flowchart_blocks`
+(`flowchart { }` blocks, core), `layout.py::layout` (DSL DAG, Python),
+`alignment.py::resolve_alignments` (Python), with `--animate` forwarded to the renderer in
+`main()`. Each becomes a registered `Diagram → Diagram` filter (some Python, some core-backed):
 
 ```python
 # pipeline/filters.py
@@ -151,28 +178,34 @@ kymo -i a.bpmn -i b.kymo -filter_complex "[0][1]concat=axis=v[out]" -map "[out]"
 
 **Load-bearing invariant:** filters touch only the model; they know nothing about output
 formats. The default chain mirrors the order `_load_resolved()` runs today:
-`bpmn_layout` (only if the diagram has `bpmn { }` blocks) → `layout` (only if a DSL
-`layout { }` spec is present) → `align`. Today **`autosize` is not a separate pass** at this
-point — auto-canvas sizing is one of the passes *inside* `resolve_alignments`; splitting it
-into its own `autosize` filter is part of this work, and must preserve the current ordering.
-A `resolved` diagram skips `layout`/`align` and goes straight to encode.
+`_core.apply_layout` (only if the diagram has `bpmn { }` blocks) → `_core.resolve_flowchart_blocks`
+(only if `flowchart { }` blocks) → `layout` (only if a DSL `layout { }` spec is present) →
+`align` (only if the diagram is **not** `resolved`). Today **`autosize` is not a separate pass**
+at this point — auto-canvas sizing is one of the passes *inside* `resolve_alignments`; splitting
+it into its own `autosize` filter is part of this work, and must preserve the current ordering.
+A `resolved` diagram skips `layout`/`align` and goes straight to encode. Note two of these
+filters (`apply_layout`, `resolve_flowchart_blocks`) are **core-backed** — the registry entry is
+a thin PyO3 shim, not Python layout code.
 
 ### 2.4 Stage 4 — ENCODE (`FR-PC-4`)
 
 ```python
 ENCODERS = {
-    "svg":        to_svg.render,
-    "figma":      to_figma.render,
-    "excalidraw": to_excalidraw.render,
-    "bpmn":       to_bpmn.export,
-    "kymojson":   to_kymojson.export,
-    "png":        compose(to_svg.render, rust_core.svg_to_png),
-    "webp":       compose(to_svg.render, rust_core.svg_to_webp),
+    "svg":        to_svg.render,            # Python
+    "figma":      to_figma.render,          # Python
+    "excalidraw": to_excalidraw.render,     # Python
+    "kymojson":   to_kymojson.export,       # Python
+    "drawio":     _core.diagram_to_drawio,  # core (mxGraph XML; FEAT-PIPECLI-DRAWIO-001)
+    "bpmn":       _core.export_bpmn,         # core (was to_bpmn.export)
+    "png":        compose(to_svg.render, _core.svg_to_png),   # core: resvg
+    "pdf":        compose(to_svg.render, _core.svg_to_pdf),   # core: svg2pdf (vector)
+    "webp":       compose(to_svg.render, _core.svg_to_webp),  # core: resvg
 }
 ```
 
-Raster targets pipe **through SVG first** — `Diagram → SVG → raster` — mirroring FFmpeg's
-wrapper-over-codec containers. No encoder reads from disk; the mux owns I/O.
+Raster/vector targets pipe **through SVG first** — `Diagram → SVG → {png,pdf,webp}` —
+mirroring FFmpeg's wrapper-over-codec containers. The core owns the raster/PDF back-ends
+(resvg, svg2pdf); no encoder reads from disk; the mux owns I/O.
 
 ### 2.5 Stage 5 — POST / BITSTREAM (`FR-PC-5`)
 
@@ -210,11 +243,11 @@ kymo -formats | -targets | -h [topic]
 
 | FFmpeg | kymo equivalent | Requirement |
 |--------|-----------------|-------------|
-| Demuxer (`.mp4`) | Importer (`.bpmn`, `.kymo`, `.kymo.json`, `.drawio`, `.py`) | `FR-PC-2` |
+| Demuxer (`.mp4`) | Importer (`.bpmn`, `.kymo`, `.kymo.json`, `.mmd`/`.mermaid`, `.drawio`, `.py`) | `FR-PC-2` |
 | `-vf scale=…,crop=…` | `-vf layout=dagre,align=center,theme=dark` | `FR-PC-13` |
 | `-c:v libx264` / `-f mp4` | target `-t svg` / format `-f` | `FR-PC-9,10` |
 | Bitstream filter | SVG minify, animation snapshot, font inlining | `FR-PC-5` |
-| Muxer | file writer (svg/webp/png/figma.js/excalidraw/bpmn) | `FR-PC-12` |
+| Muxer | file writer (svg/webp/png/pdf/figma.js/excalidraw/drawio/bpmn) | `FR-PC-12` |
 | `ffprobe` / `ffplay` | `--probe` / `--watch` (flags on one binary) | `FR-PC-14` |
 | `-formats` / `-h full` | `-formats` / `-targets` / `-h [topic]` | `FR-PC-15` |
 
@@ -267,35 +300,46 @@ Because tokens are matched whole and never bundled, `-f` (format override) and `
 
 ## 4. Module layout (`FR-PC-1..7`)
 
+The engine stages (`decode · filter · encode · post`) are owned by **`kymostudio-core`** and
+exposed through its registry; each front-end (Python/JS/Rust) owns only DEMUX (sniff/arg-parse)
+and MUX (write), plus any **language-local stages still being migrated into the core**. A
+registry entry is therefore either a native-language function or a thin binding shim
+(`_core.*` / wasm) — the driver does not care which.
+
 ```
-packages/python/src/kymo/
-├── cli.py                 # arg parsing → pipeline driver (registry lookup, not if/elif)
-├── pipeline/
-│   ├── demux.py           # sniff + dispatch
-│   ├── importers/         # 1 file/format: kymo_dsl, bpmn, kymo_json, drawio, svg, python_module
-│   ├── model.py           # Diagram (= model.py today; + `resolved` flag)
-│   ├── filters/           # 1 file/filter: layout, align, autosize, animate, theme, concat, overlay, subgraph
-│   ├── encoders/          # 1 file/target: svg, figma, excalidraw, bpmn, kymojson, png, webp
-│   ├── post/              # bitstream tweaks: minify_svg, inline_fonts, animate_snapshot
-│   └── mux.py             # write file / stdout, content-type
-└── …
+kymostudio-core (Rust)                packages/python/src/kymo/      packages/js/
+├── decode/   import_bpmn,            ├── cli.py    # demux + mux     ├── render-cli.mjs # demux+mux
+│             import_mermaid, …       │             # + registry wiring│
+├── filter/   apply_layout (bpmn),    ├── _core.py  # PyO3 bindings → core stages
+│             resolve_flowchart, …    ├── dsl.py    # language-local DECODE (DSL)
+├── encode/   diagram_to_drawio,      ├── from_kymojson.py            # language-local DECODE
+│             export_bpmn, …          ├── layout.py, alignment.py     # language-local FILTER
+├── post/     svg→png (resvg),        ├── to_svg/figma/excalidraw/    # language-local ENCODE
+│             svg→pdf (svg2pdf), …    │   kymojson.py
+└── (model: KYMOJSON-MAP-001 wire)    └── to_png.py, to_pdf.py, to_webp.py  # POST shims → core
 ```
 
-Existing modules move into the registry **unchanged in behaviour** — `to_svg.py` →
-`encoders/svg.py`, `from_bpmn.py` → `importers/bpmn.py`, etc. The migration (`PLAN-PIPECLI-001`
-§3) does this move-then-rewire so golden output stays byte-identical (`NFR-PC-1`).
+**Migration shape (`PLAN-PIPECLI-001` §3).** Two motions run in parallel: (a) **into the core** —
+heavy stages already moved (`from_bpmn.py` → `_core.import_bpmn`, `bpmn_layout.py` →
+`_core.apply_layout`, `to_bpmn.py` → `_core.export_bpmn`, raster/PDF → core); the remaining
+Python-local stages (DSL parse, DSL-DAG `layout`, `alignment`, SVG/Figma/Excalidraw emitters)
+follow as parity demands. (b) **behind the registry** — whether a stage is core-backed or
+language-local, it is reached by name, so the driver loses its `if/elif`. Every step is
+move-then-rewire so golden output stays byte-identical (`NFR-PC-1`).
 
 ## 5. Dual/triple-implementation parity (`NFR-PC-3`)
 
 The Rust CLI lives in its own crate `packages/rust/kymostudio` (`src/main.rs`); the
-`kymostudio-core` crate is **library-only** (the resvg engine, no `main.rs`). That `kymo`
-binary today accepts **only `.svg`** (positional or `-i`) and writes PNG — it shares no
-architecture with the Python CLI.
+`kymostudio-core` crate is the **library engine** (resvg/svg2pdf, the importers/encoders, no
+`main.rs`). The `kymo` binary today already runs a `{ext → fn}` `CONVERTERS` registry
+(`FEAT-PIPECLI-001` §0.1) — Mermaid → svg/d2/dot/drawio/xmi/mdj, D2/DOT → svg, etc. — so it is
+**closer to the target registry shape than the Python CLI**, but it does not yet expose the
+verb-less grammar (`FR-PC-8..16`). The gap is grammar parity, not architecture.
 Target state: all three implementations present the **same pipeline diagram and CLI surface**;
-only the implementation differs. `.kymo.json` (`KYMOJSON-MAP-001`) becomes the wire format
-between them — analogous to FFmpeg's raw frame on a Unix pipe. The Rust CLI may be the "fast
-path" (demux + decode + encode for pre-resolved `.kymo.json`), with the filter stage optional
-there (open question, `RES-PIPELINE-001` §9).
+only the front-end language differs, because the engine is the shared core. `.kymo.json`
+(`KYMOJSON-MAP-001`) is the wire format between them — analogous to FFmpeg's raw frame on a Unix
+pipe. A front-end may offer a "fast path" (demux + decode + encode for pre-resolved
+`.kymo.json`), with the filter stage skipped via the `resolved` flag.
 
 ## 6. Invariants
 
@@ -322,6 +366,7 @@ Excalidraw/tldraw scene files — front-ends decoupled from back-ends by a stabl
 | 0.1     | 2026-06-06 | Vũ Anh | Initial design. Six-stage pipeline, registries, module layout, CLI grammar, parity, invariants — derived from `RES-PIPELINE-001` §3/§5 and `RES-CLI-001` §4; traced to `FR-PC`/`NFR-PC`. |
 | 0.2     | 2026-06-06 | Vũ Anh | Review corrections. §2.2: `resolved` is a per-`Diagram` flag (covers DSL-with-`bpmn{}`, set after `bpmn_layout`), not a source-format property. §2.3: default chain restated to match `_load_resolved()` (`bpmn_layout → layout → align`); noted `autosize` is currently a sub-pass of `resolve_alignments`, not a standalone pass. §5: Rust CLI is the `kymostudio` crate (`kymostudio-core` is lib-only). Replaced fragile `cli.py:NN` / `to_webp.py:NN` citations with function names. |
 | 0.3     | 2026-06-06 | Vũ Anh | Grammar-consistency fix (review finding #5). New §3.1 "Grammar layers & parser rules": Layer-0 reserved subcommands (`icons`/`lint`), three option classes (short / long / FFmpeg-homage capability keywords), and four parser rules (whole-token match, no bundling, no glued short value) that make `-f`/`-formats` and `-t`/`-targets` unambiguous. §3 code block regrouped into converter / tooling-subcommands / converter-run-flags; `--lint` removed (lint is `kymo lint`). |
+| 0.4     | 2026-06-13 | Vũ Anh | **Rust-core reframe + as-built reconciliation.** New §1 architecture stance: the engine (`decode·filter·encode·post`) is owned by `kymostudio-core`, reached via PyO3/wasm, with the per-language CLIs as thin front-ends (DEMUX/MUX + registry wiring). Updated the §2 stage table, §2.1 DEMUX (added `.mmd`/`.mermaid`), §2.2 DECODE (skip condition `… not in (".bpmn",".json",".mmd",".mermaid") and not had_bpmn and not had_flowchart`; three resolved categories; `from_bpmn.py`→`_core.import_bpmn`, added mermaid), §2.3 FILTER (`bpmn_layout`→`_core.apply_layout`, added `_core.resolve_flowchart_blocks`), §2.4 ENCODE (`to_bpmn.export`→`_core.export_bpmn`; added `drawio`, `pdf`), §3 mapping (mmd importer; drawio/pdf muxer), and §4 module layout (core-engine vs language-local split). §5: Rust CLI already ships the `CONVERTERS` registry (no longer "`.svg`-only"). |
 
 ## Annex B — Document Control
 
