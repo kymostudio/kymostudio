@@ -3,10 +3,20 @@
 // source (e.g. a mermaid sequenceDiagram — the local grammar is flowchart-only)
 // the request falls through to kroki, which renders every grammar. So local
 // coverage is a latency/cost win, never a compatibility loss.
-import { SELF_RENDERERS, toPdf, toPng } from "./engine.js";
+import { SELF_RENDERERS as WASM_RENDERERS, toPdf, toPng } from "./engine.js";
 import { CONTENT_TYPES, HttpError, type Format } from "./http.js";
+import { JS_RENDERERS } from "./js-engines.js";
 import type { RenderRequest } from "./kroki.js";
 import { proxyKroki } from "./proxy.js";
+
+const SELF_RENDERERS = { ...WASM_RENDERERS, ...JS_RENDERERS };
+
+// Kinds whose local engine IS the engine kroki runs (the upstream package,
+// bundled). A source it rejects would be rejected by kroki identically, so
+// the error is final — no fallback round-trip. The wasm kinds stay out of
+// this set: their grammars are subsets (mermaid = flowchart only, …) and
+// kroki may accept what they reject.
+const AUTHORITATIVE = new Set(["nomnoml"]);
 
 // Every kind the editor offers (packages/editor/web/kroki.ts KINDS) renders
 // through kroki.io except kymo, which only exists here.
@@ -57,9 +67,11 @@ export async function render({ kind, format, source, scale }: RenderRequest): Pr
   try {
     svg = await self(source);
   } catch (e) {
-    // kymo only exists here — its parse errors are final. For the shared
-    // kinds, kroki may still accept what the local subset rejected.
-    if (!PROXY_KINDS.has(kind)) {
+    // kymo only exists here and AUTHORITATIVE kinds run kroki's own engine —
+    // those parse errors are final. For the subset grammars (mermaid
+    // flowchart, d2, dot), kroki may still accept what the local engine
+    // rejected, so fall through.
+    if (!PROXY_KINDS.has(kind) || AUTHORITATIVE.has(kind)) {
       throw new HttpError(400, e instanceof Error ? e.message : String(e));
     }
     return proxyKroki(kind, format, source);

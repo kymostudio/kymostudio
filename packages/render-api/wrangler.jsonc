@@ -9,6 +9,8 @@
   "name": "kymo-render-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-06-01",
+  // nodejs_compat: nomnoml (and friends) import node builtins like "path".
+  "compatibility_flags": ["nodejs_compat"],
   "rules": [{ "type": "Data", "globs": ["**/*.ttf"], "fallthrough": true }],
   "routes": [{ "pattern": "render.kymo.studio", "custom_domain": true }],
   "observability": { "enabled": true }
