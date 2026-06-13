@@ -16,6 +16,7 @@ import {
   bpmnImport,
   bpmnRender,
   d2ToSvg,
+  mermaidToSvg,
   registerFont,
   svgToPdf,
   svgToPng,
@@ -48,6 +49,25 @@ export function ensure(): void {
   ready = true;
 }
 
+// First non-comment keyword of a mermaid source (after optional `---` YAML
+// front-matter) — used to route flowcharts to kymo's own engine.
+function mermaidIsFlowchart(source: string): boolean {
+  const lines = source.split("\n");
+  let i = 0;
+  if (lines[0]?.trim() === "---") {
+    i = 1;
+    while (i < lines.length && lines[i].trim() !== "---") i++;
+    i++;
+  }
+  for (; i < lines.length; i++) {
+    const t = lines[i].trim();
+    if (!t || t.startsWith("%%")) continue;
+    const kw = t.split(/[\s{(]/)[0].toLowerCase();
+    return kw === "flowchart" || kw === "graph";
+  }
+  return false;
+}
+
 /** kind → local SVG renderer. Throws the engine's message on bad source. */
 export const SELF_RENDERERS: Record<string, (source: string) => string | Promise<string>> = {
   // renderSVG is async: kymo sources can reference icon sets, fetched from
@@ -56,11 +76,20 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
     ensure();
     return renderSVG(parseDiagram(source));
   },
-  // merman's full engine (all grammars, mermaid-11 look) — the core's
-  // flowchart-only mermaidToSvg is superseded here; kroki fallback stays for
-  // anything merman still rejects.
+  // Flowcharts render through kymo's own Rust engine (mermaidToSvg): text-based
+  // SVG, so PNG/PDF keep their labels — merman emits HTML labels in
+  // <foreignObject>, which the rasterizer (resvg/svg2pdf) silently drops. Every
+  // other grammar still goes through merman's full engine; if kymo cannot parse
+  // a given flowchart (e.g. the A-->B&C fan syntax), fall through to merman too.
   mermaid: (source) => {
     ensure();
+    if (mermaidIsFlowchart(source)) {
+      try {
+        return mermaidToSvg(source);
+      } catch {
+        // unsupported flowchart syntax → merman
+      }
+    }
     return mermaidRenderSvg(source);
   },
   d2: (source) => {
