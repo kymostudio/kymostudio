@@ -25,5 +25,6 @@
   "routes": [
     { "pattern": "mcp.kymo.studio", "custom_domain": true }
   ],
+  "triggers": { "crons": ["0 3 * * *"] },
   "observability": { "enabled": true }
 }

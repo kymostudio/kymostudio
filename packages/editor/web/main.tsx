@@ -6,6 +6,7 @@ import { WorkspaceProvider } from "./workspace";
 import { ConfirmProvider } from "./confirm";
 import EditorPage from "./EditorPage";
 import DiagramsPage from "./DiagramsPage";
+import TrashPage from "./TrashPage";
 import LoginPage from "./LoginPage";
 
 createRoot(document.getElementById("root")!).render(
@@ -16,6 +17,7 @@ createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/" element={<EditorPage />} />
           <Route path="/diagrams" element={<DiagramsPage />} />
+          <Route path="/trash" element={<TrashPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
         </ConfirmProvider>

@@ -123,6 +123,25 @@ async function destroyDiagram(env: Env, email: string, id: string): Promise<numb
   return 200;
 }
 
+// Permanent delete (from the trash / auto-purge): wipe the room DO + drop the row.
+async function hardDeleteDiagram(env: Env, email: string, id: string) {
+  try {
+    await roomFor(env, id).fetch("https://room/destroy", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ owner: email }),
+    });
+  } catch {}
+  await env.DB.prepare("DELETE FROM diagrams WHERE id = ?1 AND owner = ?2").bind(id, email).run();
+}
+
+// Cron: permanently remove everything soft-deleted before `cutoff` (all owners).
+async function purgeOldDeleted(env: Env, cutoff: number) {
+  await ensureDeletedColumn(env);
+  const ds = await env.DB.prepare("SELECT id, owner FROM diagrams WHERE deleted IS NOT NULL AND deleted < ?1")
+    .bind(cutoff).all<{ id: string; owner: string }>();
+  for (const r of ds.results ?? []) await hardDeleteDiagram(env, r.owner, r.id);
+  await env.DB.prepare("DELETE FROM workspaces WHERE deleted IS NOT NULL AND deleted < ?1").bind(cutoff).run();
+}
+
 // One-time per-user migration of the old KV layout (idx:<email>:<id> metadata
 // keys, legacy idx:<email> list value, wss/wsmap JSON values) into D1. Sources
 // come from each room DO. Guarded by a d1done flag; INSERT OR IGNORE keeps it
@@ -510,6 +529,10 @@ const oauthProvider = new OAuthProvider({
 // /ws is handled before the OAuth provider (it would drop the WebSocket upgrade).
 // The diagram id comes from ?d=<id>; auth + ownership are enforced in the DO.
 export default {
+  // Daily cron: permanently purge anything in the trash older than 30 days.
+  async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(purgeOldDeleted(env, Date.now() - 30 * 24 * 60 * 60 * 1000));
+  },
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === "/ws") {
@@ -517,7 +540,7 @@ export default {
       return roomFor(env, d).fetch(request);
     }
     // Browser-callable APIs for the signed-in user (Google id_token).
-    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces") {
+    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/trash") {
       const cors: Record<string, string> = {
         "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
@@ -544,6 +567,71 @@ export default {
           .bind(id, email).first<{ thumb: string | null }>();
         if (!row || !row.thumb) return new Response("no thumb", { status: 404, headers: cors });
         return new Response(row.thumb, { headers: { "content-type": "image/svg+xml", "cache-control": "private, max-age=120", ...cors } });
+      }
+
+      // Trash: list / restore / permanently delete soft-deleted diagrams + folders.
+      if (url.pathname === "/api/trash") {
+        await ensureFolderColumn(env);
+        await ensureDeletedColumn(env);
+        if (request.method === "GET") {
+          const d = await env.DB.prepare("SELECT id, title, kind, deleted FROM diagrams WHERE owner = ?1 AND deleted IS NOT NULL ORDER BY deleted DESC")
+            .bind(email).all<{ id: string; title: string; kind: string; deleted: number }>();
+          const f = await env.DB.prepare("SELECT id, name, deleted FROM workspaces WHERE owner = ?1 AND deleted IS NOT NULL ORDER BY deleted DESC")
+            .bind(email).all<{ id: string; name: string; deleted: number }>();
+          return Response.json({
+            diagrams: (d.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind, deletedAt: r.deleted })),
+            folders: (f.results ?? []).map((r) => ({ id: r.id, name: r.name, deletedAt: r.deleted })),
+          }, { headers: cors });
+        }
+        if (request.method === "POST") { // restore
+          const b = (await request.json().catch(() => ({}))) as { kind?: string; id?: string };
+          if (!b.id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+          if (b.kind === "diagram") {
+            await env.DB.prepare("UPDATE diagrams SET deleted = NULL WHERE id = ?1 AND owner = ?2").bind(b.id, email).run();
+            return Response.json({ ok: true }, { headers: cors });
+          }
+          if (b.kind === "folder") {
+            const all = (await env.DB.prepare("SELECT id, parent_id, deleted FROM workspaces WHERE owner = ?1").bind(email)
+              .all<{ id: string; parent_id: string | null; deleted: number | null }>()).results ?? [];
+            // restore the folder + its whole subtree (descendant folders + their diagrams)
+            const sub = new Set<string>([b.id]);
+            for (let g = true; g; ) { g = false; for (const x of all) if (x.parent_id && sub.has(x.parent_id) && !sub.has(x.id)) { sub.add(x.id); g = true; } }
+            const ids = [...sub]; const ph = ids.map((_, i) => `?${i + 2}`).join(",");
+            await env.DB.prepare(`UPDATE workspaces SET deleted = NULL WHERE owner = ?1 AND id IN (${ph})`).bind(email, ...ids).run();
+            await env.DB.prepare(`UPDATE diagrams SET deleted = NULL WHERE owner = ?1 AND ws IN (${ph})`).bind(email, ...ids).run();
+            // if its old parent is gone/still-trashed, bring it to the root so it's reachable
+            const me = all.find((x) => x.id === b.id);
+            const parent = me?.parent_id || "";
+            const parentActive = !parent || all.some((x) => x.id === parent && x.deleted == null);
+            if (parent && !parentActive) await env.DB.prepare("UPDATE workspaces SET parent_id = '' WHERE id = ?1 AND owner = ?2").bind(b.id, email).run();
+            return Response.json({ ok: true }, { headers: cors });
+          }
+          return Response.json({ error: "bad kind" }, { status: 400, headers: cors });
+        }
+        if (request.method === "DELETE") { // purge permanently
+          if (url.searchParams.get("all")) {
+            const d = (await env.DB.prepare("SELECT id FROM diagrams WHERE owner = ?1 AND deleted IS NOT NULL").bind(email).all<{ id: string }>()).results ?? [];
+            await Promise.all(d.map((r) => hardDeleteDiagram(env, email, r.id)));
+            await env.DB.prepare("DELETE FROM workspaces WHERE owner = ?1 AND deleted IS NOT NULL").bind(email).run();
+            return Response.json({ ok: true }, { headers: cors });
+          }
+          const id = url.searchParams.get("id") || "";
+          if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+          if (url.searchParams.get("kind") === "folder") {
+            const all = (await env.DB.prepare("SELECT id, parent_id FROM workspaces WHERE owner = ?1").bind(email)
+              .all<{ id: string; parent_id: string | null }>()).results ?? [];
+            const sub = new Set<string>([id]);
+            for (let g = true; g; ) { g = false; for (const x of all) if (x.parent_id && sub.has(x.parent_id) && !sub.has(x.id)) { sub.add(x.id); g = true; } }
+            const ids = [...sub]; const ph = ids.map((_, i) => `?${i + 2}`).join(",");
+            const dl = (await env.DB.prepare(`SELECT id FROM diagrams WHERE owner = ?1 AND ws IN (${ph})`).bind(email, ...ids).all<{ id: string }>()).results ?? [];
+            await Promise.all(dl.map((r) => hardDeleteDiagram(env, email, r.id)));
+            await env.DB.prepare(`DELETE FROM workspaces WHERE owner = ?1 AND id IN (${ph})`).bind(email, ...ids).run();
+          } else {
+            await hardDeleteDiagram(env, email, id);
+          }
+          return Response.json({ ok: true }, { headers: cors });
+        }
+        return Response.json({ error: "method not allowed" }, { status: 405, headers: cors });
       }
 
       if (url.pathname === "/api/workspaces") {

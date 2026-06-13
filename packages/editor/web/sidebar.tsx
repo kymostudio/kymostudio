@@ -250,6 +250,7 @@ export function ActivityBar({ active, onSelect }: { active: Panel | null; onSele
           {menu === "settings" && (
             <div className="acct-menu act-popover">
               <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMenu(null)}><LayoutGrid size={16} strokeWidth={1.9} />All diagrams</Link>
+              <Link className="acct-item exp-item" to="/trash" onClick={() => setMenu(null)}><Trash2 size={16} strokeWidth={1.9} />Trash</Link>
               <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
             </div>
           )}
