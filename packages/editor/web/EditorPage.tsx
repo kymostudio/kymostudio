@@ -10,7 +10,7 @@ import { SAMPLES } from "./samples";
 import { DIAGRAMS_API, RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
-import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
+import { TemplateGallery, takePendingTemplate, peekPendingTemplate, type Template } from "./templates";
 import { sniffKind } from "./detect";
 import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal } from "lucide-react";
 
@@ -26,9 +26,18 @@ export default function EditorPage() {
   const sharedKind = params.get("k");
   const shared = !!sharedSrc && !d;
 
+  // A template pick seeds a DRAFT: no room, nothing saved. It becomes a room on
+  // the explicit Save click, or after the first user edit that renders OK.
+  const [draftMode, setDraftMode] = useState(false);
+  const draftModeRef = useRef(draftMode);
+  draftModeRef.current = draftMode;
+  const draftEdited = useRef(false);
+
   // No ?d: once signed in, jump to the most-recent diagram (or a fresh one).
   useEffect(() => {
-    if (d || shared || !idToken) return;
+    // a draft (template pick, incl. one handed over from /diagrams) owns the
+    // no-?d state — don't bounce away to the most-recent room
+    if (d || shared || !idToken || draftMode || peekPendingTemplate()) return;
     let stop = false;
     (async () => {
       let id: string | null = null;
@@ -45,7 +54,7 @@ export default function EditorPage() {
       navigate("/?d=" + id, { replace: true });
     })();
     return () => { stop = true; };
-  }, [d, shared, idToken, navigate]);
+  }, [d, shared, idToken, draftMode, navigate]);
 
   // Shared links carry their kind in the URL — seed state from it so the first
   // render cycle never runs against the kymo sample (which would pull the 2.5 MB
@@ -128,6 +137,8 @@ export default function EditorPage() {
       if (seq !== renderSeq.current) return;
       lastSvg.current = out; setSvg(out);
       setStatus(`OK · ${out.length} bytes · ${Math.round(performance.now() - t0)}ms`); setStatusErr(false);
+      // a draft the user has touched and that renders OK graduates to a saved room
+      if (draftModeRef.current && draftEdited.current) promoteDraftRef.current();
     } catch (e: any) {
       if (seq !== renderSeq.current) return;
       setStatus(String(e?.message ?? e)); setStatusErr(true);
@@ -151,7 +162,10 @@ export default function EditorPage() {
     const imp = pendingImport.current ?? takePendingTemplate(); pendingImport.current = null;
     setSource(imp ? imp.source : SAMPLE); setKind(imp ? imp.kind : "kymo");
     setTitle(""); setEditingName(false); setShareError(null); setLocalSaved(false);
-    synced.current = false; fresh.current = false; userEdited.current = !!imp;
+    // userEdited only matters when there's a room to push into ("Save a copy" /
+    // a promoted draft); imported content with no ?d is a draft — keep pristine.
+    synced.current = false; fresh.current = false; userEdited.current = !!imp && !!d;
+    if (imp && !d) { setDraftMode(true); draftEdited.current = false; }
   }, [d]);
 
   // Shared link: inflate the ?s= payload into the editor. Re-runs on history
@@ -312,6 +326,9 @@ export default function EditorPage() {
   }
   // "+ New" opens the template gallery — users pick a diagram TYPE; the
   // template carries the right kind, so the syntax choice happens for them.
+  // Nothing is created server-side here: the pick seeds a draft, and the draft
+  // becomes a room only via promoteDraft (Save click, or first edit that
+  // renders OK) — so abandoned templates never litter the Diagrams list.
   function pickTemplate(t: Template) {
     setGalleryOpen(false);
     // No room = the only copy of edited content is this tab/URL. Ask first.
@@ -325,11 +342,30 @@ export default function EditorPage() {
       navigate("/");
       return;
     }
+    setDraftMode(true);
+    draftEdited.current = false;
+    if (d) {
+      pendingImport.current = { source: t.source, kind: t.kind }; // consumed by the ?d-change effect
+      navigate("/");
+    } else {
+      // already on a no-room buffer (draft/share view): seed in place
+      setSource(t.source); setKind(t.kind); setTitle(""); setShareError(null);
+      setLocalSaved(false);
+      userEdited.current = false;
+    }
+  }
+  // Draft → room: register it in the workspace and let the fresh-room path
+  // push the content; autosave is on from here.
+  const promoteDraft = useCallback(() => {
+    if (!draftModeRef.current || !idToken) return;
+    setDraftMode(false);
     const id = newId();
-    pendingImport.current = { source: t.source, kind: t.kind }; // seeds the fresh room (same path as "Save a copy")
+    pendingImport.current = { source: sourceRef.current, kind: kindRef.current };
     assignDiagram(idToken, id, currentWs); // lands in the workspace you're looking at
     navigate("/?d=" + id);
-  }
+  }, [idToken, currentWs, navigate]);
+  const promoteDraftRef = useRef(promoteDraft);
+  promoteDraftRef.current = promoteDraft;
   // Paste auto-detect: a whole-buffer paste in a recognizable grammar switches
   // the kind so the source "just renders" — the select stays as manual override.
   const detectTimer = useRef<number | undefined>(undefined);
@@ -403,7 +439,13 @@ export default function EditorPage() {
             {live ? "Saved" : "Offline"}
           </span>
         )}
-        {!d && localSaved && !booting && (
+        {claims && draftMode && !d && !booting && (
+          <button className="save-ind draft" onClick={promoteDraft}
+            title="This draft isn't saved yet. Save now — or it saves itself after your first successful edit.">
+            Draft — Save
+          </button>
+        )}
+        {!d && localSaved && !draftMode && !booting && (
           <span className="save-ind url" title="Your diagram lives entirely in this page's URL — bookmark or Share it to keep it. Nothing is stored on a server.">
             Saved to URL
           </span>
@@ -551,7 +593,7 @@ export default function EditorPage() {
                   </span>
                 )}
               </div>
-              <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
+              <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; if (draftModeRef.current) draftEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
             <div className="splitter" title="Drag to resize · double-click for 50/50"
               onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />

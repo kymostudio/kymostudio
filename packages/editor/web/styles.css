@@ -64,6 +64,10 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .save-ind::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #34a853; }
 .save-ind.off { color: #8a6116; background: #fdf6e7; border-color: #f0dfb6; }
 .save-ind.off::before { background: #e6a23c; }
+/* an unsaved template draft — the pill doubles as the explicit Save button */
+.save-ind.draft { color: #8a6116; background: #fdf6e7; border-color: #f0dfb6; cursor: pointer; font: inherit; font-size: 11.5px; font-weight: 600; }
+.save-ind.draft::before { background: #e6a23c; }
+.save-ind.draft:hover { border-color: #e6a23c; background: #fbedcf; transform: none; box-shadow: none; }
 .save-ind.url::before { background: #2a9d8f; } /* no-room mode: the URL is the storage */
 .diagram-input { font: inherit; font-size: 14px; font-weight: 600; background: var(--bg); border: 1px solid var(--accent); border-radius: 7px; color: var(--ink); padding: 3px 8px; outline: none; min-width: 160px; }
 

@@ -355,6 +355,10 @@ export function takePendingTemplate(): { source: string; kind: string } | null {
   pendingTemplate = null;
   return t;
 }
+/** Non-consuming check — lets effects that run before the consumer know a draft is inbound. */
+export function peekPendingTemplate(): boolean {
+  return pendingTemplate !== null;
+}
 
 export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template) => void; onClose: () => void }) {
   const [q, setQ] = useState("");

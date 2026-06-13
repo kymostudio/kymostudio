@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
-import { useWorkspace, assignDiagram } from "./workspace";
+import { useWorkspace } from "./workspace";
 import { kindLabel } from "./kroki";
 import { DIAGRAMS_API } from "./const";
-import { newId } from "./util";
 import { TemplateGallery, setPendingTemplate, type Template } from "./templates";
 import { Search, Plus } from "lucide-react";
 
@@ -65,14 +64,12 @@ export default function DiagramsPage() {
   }, [load]);
 
   // "New diagram" opens the same type-first template gallery as the editor's
-  // "+ New"; the picked template seeds the fresh room via setPendingTemplate
-  // (consumed by EditorPage's room-switch effect after the navigation).
+  // "+ New". The pick seeds a DRAFT in the editor (via setPendingTemplate) —
+  // no room is created until the user saves or makes a first successful edit.
   function pickTemplate(t: Template) {
     setGalleryOpen(false);
-    const id = newId();
     setPendingTemplate({ source: t.source, kind: t.kind });
-    assignDiagram(idToken, id, currentWs);
-    navigate("/?d=" + id);
+    navigate("/");
   }
 
   async function onNewWorkspace() {
