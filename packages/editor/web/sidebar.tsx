@@ -266,7 +266,7 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
 
   function renderRow(r: Row): React.ReactNode {
     if (r.kind === "empty") {
-      return <div key={"e" + r.id} className="sb-empty-row">{guides(r.ancestors)}<span className="sb-spacer" /><span className="sb-spacer" />empty</div>;
+      return <div key={"e" + r.id} className="sb-empty-row">{guides(r.ancestors)}<span className="sb-spacer" />empty</div>;
     }
     const k = keyOf(r);
     const focused = focusKey === k;
@@ -303,7 +303,6 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
         onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setFocusKey(k); fileMenu(e, it); }}
         title={`${label}${it.kind ? " · " + kindLabel(it.kind) : ""}${meta ? " · " + meta : ""}`}>
         {guides(r.ancestors)}
-        <span className="sb-spacer" />
         <KindIcon kind={it.kind} />
         {isEditing ? renameInput("file", r.id, label) : <span className="sb-name">{label}</span>}
         {!isEditing && meta && <span className="sb-meta">{meta}</span>}
