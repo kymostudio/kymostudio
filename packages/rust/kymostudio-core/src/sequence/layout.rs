@@ -36,6 +36,7 @@ pub(crate) struct PMsg {
     pub(crate) sort: MessageSort,
     pub(crate) y: i64,
     pub(crate) self_loop: bool,
+    pub(crate) bidirectional: bool,
 }
 
 /// A placed combined fragment box (with operand sub-bands).
@@ -106,6 +107,7 @@ impl Layout {
                         sort: m.sort,
                         y: self.y,
                         self_loop,
+                        bidirectional: m.bidirectional,
                     });
                     self.y += if self_loop { ROW + SELF_EXTRA } else { ROW };
                 }

@@ -19,6 +19,11 @@ const DEFS: &str = "<marker id=\"seq-arrow\" markerWidth=\"12\" markerHeight=\"1
 orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9 Z\" fill=\"#475569\"/></marker>\
 <marker id=\"seq-open\" markerWidth=\"12\" markerHeight=\"10\" refX=\"9\" refY=\"5\" \
 orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9\" fill=\"none\" stroke=\"#475569\" \
+stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></marker>\
+<marker id=\"seq-arrow-start\" markerWidth=\"12\" markerHeight=\"10\" refX=\"1\" refY=\"5\" \
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M10,1 L1,5 L10,9 Z\" fill=\"#475569\"/></marker>\
+<marker id=\"seq-open-start\" markerWidth=\"12\" markerHeight=\"10\" refX=\"1\" refY=\"5\" \
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M10,1 L1,5 L10,9\" fill=\"none\" stroke=\"#475569\" \
 stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></marker>";
 
 /// Render a parsed [`Sequence`] to a self-contained SVG document.
@@ -93,6 +98,12 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
         MessageSort::SynchCall | MessageSort::Reply => "seq-arrow",
         _ => "seq-open",
     };
+    // Bidirectional arrows get a reversed head at the source end too.
+    let start_marker = if m.bidirectional {
+        format!(" marker-start=\"url(#{head}-start)\"")
+    } else {
+        String::new()
+    };
 
     if m.self_loop || x1 == x2 {
         // Self-message: a small rectangular loop to the right of the lifeline.
@@ -100,7 +111,7 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
         let y2 = y + 24;
         let path = format!(
             "<path d=\"M{x1},{y} H{r} V{y2} H{x1}\" fill=\"none\" stroke=\"#475569\" \
-             stroke-width=\"1.4\"{dash} marker-end=\"url(#{head})\"/>"
+             stroke-width=\"1.4\"{dash}{start_marker} marker-end=\"url(#{head})\"/>"
         );
         let label = if m.text.is_empty() {
             String::new()
@@ -117,7 +128,7 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
 
     let line = format!(
         "<line x1=\"{x1}\" y1=\"{y}\" x2=\"{x2}\" y2=\"{y}\" stroke=\"#475569\" \
-         stroke-width=\"1.4\"{dash} marker-end=\"url(#{head})\"/>"
+         stroke-width=\"1.4\"{dash}{start_marker} marker-end=\"url(#{head})\"/>"
     );
     let label = if m.text.is_empty() {
         String::new()

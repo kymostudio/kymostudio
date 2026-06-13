@@ -99,6 +99,8 @@ pub struct Message {
     pub activate_target: bool,
     /// `-` shorthand — deactivate the sender on send.
     pub deactivate_source: bool,
+    /// Mermaid-11 bidirectional arrow (`<<->>` / `<<-->>`): a head at both ends.
+    pub bidirectional: bool,
 }
 
 /// Where a note sits relative to its target lifeline(s).

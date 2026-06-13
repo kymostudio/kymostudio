@@ -34,6 +34,13 @@ struct FragFrame {
 /// Mermaid arrow tokens → [`MessageSort`]. Order is irrelevant: the scanner
 /// picks the match at the earliest index, longest at that index (so `-->>`
 /// wins over `-->` / `->>`).
+/// Mermaid-11 bidirectional arrows (a head at both ends), matched before the
+/// one-directional table. Longest first so `<<-->>` wins over `<<->>`.
+const BIDIR: &[(&str, MessageSort)] = &[
+    ("<<-->>", MessageSort::Reply),    // dashed, both ends
+    ("<<->>", MessageSort::SynchCall), // solid, both ends
+];
+
 const ARROWS: &[(&str, MessageSort)] = &[
     ("-->>", MessageSort::Reply),
     ("-->", MessageSort::AsynchSignal),
@@ -297,7 +304,7 @@ fn parse_message(stmt: &str) -> Option<Message> {
         Some((l, r)) => (l.trim(), r.trim().to_string()),
         None => (stmt.trim(), String::new()),
     };
-    let (start, end, sort) = find_arrow(left)?;
+    let (start, end, sort, bidirectional) = find_arrow(left)?;
     let from = left[..start].trim().to_string();
     let mut rhs = left[end..].trim();
     let mut activate_target = false;
@@ -320,11 +327,19 @@ fn parse_message(stmt: &str) -> Option<Message> {
         sort,
         activate_target,
         deactivate_source,
+        bidirectional,
     })
 }
 
-/// Locate the message arrow: earliest start index, longest match at that index.
-fn find_arrow(left: &str) -> Option<(usize, usize, MessageSort)> {
+/// Locate the message arrow: bidirectional arrows first, then the
+/// one-directional table (earliest start index, longest match at that index).
+/// Returns `(start, end, sort, bidirectional)`.
+fn find_arrow(left: &str) -> Option<(usize, usize, MessageSort, bool)> {
+    for (pat, sort) in BIDIR {
+        if let Some(start) = left.find(pat) {
+            return Some((start, start + pat.len(), *sort, true));
+        }
+    }
     let mut best: Option<(usize, usize, MessageSort)> = None;
     for (pat, sort) in ARROWS {
         if let Some(start) = left.find(pat) {
@@ -335,7 +350,7 @@ fn find_arrow(left: &str) -> Option<(usize, usize, MessageSort)> {
             };
         }
     }
-    best
+    best.map(|(s, e, sort)| (s, e, sort, false))
 }
 
 #[cfg(test)]
@@ -356,6 +371,11 @@ mod tests {
     fn arrow_sorts() {
         assert_eq!(find_arrow("A->>B").unwrap().2, MessageSort::SynchCall);
         assert_eq!(find_arrow("A-->>B").unwrap().2, MessageSort::Reply);
+        // bidirectional arrows are detected with the both-ends flag set
+        let (_, _, sort, bidi) = find_arrow("A<<->>B").unwrap();
+        assert!(bidi && sort == MessageSort::SynchCall);
+        let (_, _, sort, bidi) = find_arrow("A<<-->>B").unwrap();
+        assert!(bidi && sort == MessageSort::Reply);
         assert_eq!(find_arrow("A->B").unwrap().2, MessageSort::AsynchSignal);
         assert_eq!(find_arrow("A-->B").unwrap().2, MessageSort::AsynchSignal);
         assert_eq!(find_arrow("A-)B").unwrap().2, MessageSort::AsynchCall);
