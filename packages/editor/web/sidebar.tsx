@@ -14,7 +14,7 @@ import {
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
-type Item = { id: string; title: string; kind?: string; ws?: string; updatedAt?: number };
+export type Item = { id: string; title: string; kind?: string; ws?: string; updatedAt?: number };
 export type Panel = "explorer" | "search" | "templates";
 
 // A distinct icon per diagram type so files aren't an undifferentiated "📄 Untitled" pile.
@@ -29,7 +29,7 @@ const KIND_COLOR: Record<string, string> = {
   c4plantuml: "#7c3aed", structurizr: "#7c3aed", plantuml: "#7c3aed",
   d2: "#b45309", dbml: "#b45309", erd: "#b45309", graphviz: "#15803d",
 };
-function KindIcon({ kind }: { kind?: string }) {
+export function KindIcon({ kind }: { kind?: string }) {
   const I = (kind && KIND_ICON[kind]) || FileText;
   return <I size={15} strokeWidth={1.8} className="sb-icon" color={(kind && KIND_COLOR[kind]) || "var(--dim)"} />;
 }
@@ -44,7 +44,7 @@ function restoreItem(idToken: string | null, kind: "diagram" | "folder", id: str
 
 // Shared diagram-list fetch for the Explorer + Search panels (only one panel is
 // mounted at a time, so this never double-fetches).
-function useDiagrams() {
+export function useDiagrams() {
   const { idToken } = useAuth();
   const [items, setItems] = useState<Item[]>([]);
   const reload = useCallback(async () => {
