@@ -145,6 +145,8 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .act-btn:hover { background: var(--bg-raise); color: var(--ink); transform: none; box-shadow: none; }
 .act-btn.active { color: var(--ink); }
 .act-btn.active::before { content: ""; position: absolute; left: -6px; top: 9px; bottom: 9px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+/* hamburger sits a touch apart from the panel icons */
+.act-menu { margin-bottom: 6px; }
 .act-account .avatar { width: 28px; height: 28px; font-size: 13px; }
 .act-pop-wrap { position: relative; width: 100%; display: flex; justify-content: center; }
 .act-popover { right: auto; top: auto; left: calc(100% + 6px); bottom: 0; min-width: 210px; }
