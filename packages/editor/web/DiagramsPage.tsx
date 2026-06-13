@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
 import { useWorkspace, childFoldersOf, flattenTree, descendantFolderIds, type Folder } from "./workspace";
 import { useConfirm } from "./confirm";
@@ -319,6 +319,7 @@ export default function DiagramsPage() {
 
             <div className="foot">
               <span>Signed in as {claims.email}</span>
+              <Link className="linklike" to="/trash">Trash</Link>
               <button className="linklike" onClick={signOut}>Sign out</button>
             </div>
           </>

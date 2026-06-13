@@ -2,6 +2,7 @@ export const GOOGLE_CLIENT_ID = "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.a
 export const MCP_WS = "wss://mcp.kymo.studio/ws";
 export const DIAGRAMS_API = "https://mcp.kymo.studio/api/diagrams";
 export const WORKSPACES_API = "https://mcp.kymo.studio/api/workspaces";
+export const TRASH_API = "https://mcp.kymo.studio/api/trash";
 // Kroki-compatible render API (packages/render-api): kymo/mermaid/d2/graphviz/
 // bpmn render in the worker itself, every other kind is proxied to kroki.io —
 // all edge-cached by content hash, so repeat loads of a share link skip the
