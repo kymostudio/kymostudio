@@ -168,6 +168,46 @@ mod tests {
     }
 
     #[test]
+    fn quoted_label_with_delimiters() {
+        let items =
+            parse_statement(r#"a["brackets: [x] {y} (z)"] --> b["he said: 'hi'"]"#).unwrap();
+        match (&items[0], &items[2]) {
+            (Item::Nodes(l), Item::Nodes(r)) => {
+                assert_eq!(l[0].label.as_deref(), Some("brackets: [x] {y} (z)"));
+                assert_eq!(r[0].label.as_deref(), Some("he said: 'hi'"));
+            }
+            _ => panic!(),
+        }
+    }
+
+    #[test]
+    fn inline_edge_label() {
+        let items = parse_statement("A-- yes -->B").unwrap();
+        match &items[1] {
+            Item::Edge(e) => {
+                assert_eq!(e.label, "yes");
+                assert!(!e.no_arrow);
+            }
+            _ => panic!(),
+        }
+        // a lone dash inside the label must survive
+        let items = parse_statement("A == yes-no ==> B").unwrap();
+        match &items[1] {
+            Item::Edge(e) => assert_eq!(e.label, "yes-no"),
+            _ => panic!(),
+        }
+        // plain `A --- B` is a no-arrow link, not a labeled edge
+        let items = parse_statement("A --- B").unwrap();
+        match &items[1] {
+            Item::Edge(e) => {
+                assert!(e.no_arrow);
+                assert_eq!(e.label, "");
+            }
+            _ => panic!(),
+        }
+    }
+
+    #[test]
     fn ampersand_fan() {
         let items = parse_statement("A & B --> C & D").unwrap();
         match (&items[0], &items[2]) {
