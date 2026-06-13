@@ -1,7 +1,7 @@
 {
   "name": "kymo-render-api",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Kroki-compatible diagram render API on a Cloudflare Worker (render.kymo.studio)",
   "type": "module",
   "scripts": {

@@ -12,7 +12,7 @@ export const CORS: Record<string, string> = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, OPTIONS",
   "access-control-allow-headers": "content-type, accept",
-  "access-control-expose-headers": "x-render-cache",
+  "access-control-expose-headers": "x-render-cache, x-render-api-version",
 };
 
 export type Format = "svg" | "png" | "pdf";
