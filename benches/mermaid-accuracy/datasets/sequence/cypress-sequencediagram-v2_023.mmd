@@ -1,0 +1,9 @@
+sequenceDiagram
+        participant Alice
+        participant Bob
+        participant Charlie
+        Alice ()->>() Bob: Activate Bob
+        activate Bob
+        Bob ()-->> Charlie: Message to Charlie
+        Bob ()->>() Alice: Response to Alice
+        deactivate Bob

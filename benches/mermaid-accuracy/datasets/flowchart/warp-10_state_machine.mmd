@@ -1,0 +1,7 @@
+graph LR
+    Idle((Idle)) --> Running((Running))
+    Running --> Paused((Paused))
+    Paused --> Running
+    Running --> Stopped((Stopped))
+    Paused --> Stopped
+    Stopped --> Idle

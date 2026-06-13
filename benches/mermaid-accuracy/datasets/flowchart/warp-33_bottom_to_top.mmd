@@ -1,0 +1,6 @@
+graph BT
+    Foundation[Foundation Layer] --> Core[Core Services]
+    Core --> API[API Layer]
+    API --> UI[User Interface]
+    Core --> Auth[Authentication]
+    Auth --> UI

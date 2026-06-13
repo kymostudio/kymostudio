@@ -1,0 +1,7 @@
+graph TD
+    A[Node A: Init] --> B(Step 1/2)
+    B --> C{x > 0?}
+    C -->|true| D[Result = OK]
+    C -->|false| E[Error: Failed]
+    D --> F[(DB: users)]
+    E --> F

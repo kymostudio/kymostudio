@@ -1,0 +1,21 @@
+graph LR
+    subgraph Source
+        S1[Producer 1]
+        S2[Producer 2]
+    end
+    subgraph Processing
+        P1[Processor A]
+        P2[Processor B]
+    end
+    subgraph Sink
+        D1[Consumer 1]
+        D2[Consumer 2]
+    end
+    S1 --> P1
+    S1 --> P2
+    S2 --> P1
+    S2 --> P2
+    P1 --> D1
+    P1 --> D2
+    P2 --> D1
+    P2 --> D2

@@ -1,0 +1,13 @@
+graph TD
+    User[User] --> Login[Login Page]
+    Login --> Validate{Valid Credentials?}
+    Validate -->|No| Error[Show Error]
+    Error --> Login
+    Validate -->|Yes| MFA{MFA Enabled?}
+    MFA -->|Yes| SendCode[Send MFA Code]
+    MFA -->|No| CreateSession[Create Session]
+    SendCode --> VerifyCode{Verify Code}
+    VerifyCode -->|Valid| CreateSession
+    VerifyCode -->|Invalid| SendCode
+    CreateSession --> SetToken[Set JWT Token]
+    SetToken --> Redirect[Redirect to App]

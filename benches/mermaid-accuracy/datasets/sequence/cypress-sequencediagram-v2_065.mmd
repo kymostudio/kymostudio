@@ -1,0 +1,5 @@
+sequenceDiagram
+          participant API@{ "alias": "Public API" }
+          participant Auth@{ "alias": "Auth Service" }
+          API ->> Auth: Request
+          Auth -->> API: Response

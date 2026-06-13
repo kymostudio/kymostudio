@@ -1,0 +1,14 @@
+graph TD
+    Cart[Shopping Cart] --> Checkout[Checkout]
+    Checkout --> Address[Enter Address]
+    Address --> Shipping{Select Shipping}
+    Shipping -->|Standard| StdShip[Standard 5-7 days]
+    Shipping -->|Express| ExpShip[Express 1-2 days]
+    StdShip --> Payment[Payment]
+    ExpShip --> Payment
+    Payment --> Process{Process Payment}
+    Process -->|Success| Confirm[Order Confirmed]
+    Process -->|Failed| Retry[Retry Payment]
+    Retry --> Payment
+    Confirm --> Email[Send Confirmation]
+    Confirm --> Inventory[Update Inventory]

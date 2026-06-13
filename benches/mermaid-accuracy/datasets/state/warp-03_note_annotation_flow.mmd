@@ -1,0 +1,14 @@
+stateDiagram-v2
+    [*] --> Idle: note loaded / cleared
+    Idle --> TextOnly: highlight text in Note View
+    Idle --> SpanClicked: click Note View span
+    Idle --> RowClicked: click Spans row
+    TextOnly --> Ready: choose entity type
+    SpanClicked --> NeedsEntity: PHI text set, selection active, entity cleared
+    NeedsEntity --> Ready: choose entity type
+    RowClicked --> Ready: row text + entity populated
+    Ready --> Idle: Add / Correct / Reject / Accept
+    TextOnly --> Idle: Clear
+    NeedsEntity --> Idle: Clear
+    RowClicked --> Idle: Clear
+    Ready --> Idle: Clear

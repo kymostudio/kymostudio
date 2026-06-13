@@ -1,0 +1,12 @@
+graph TD
+    Client[Client App] --> Gateway[API Gateway]
+    Gateway --> UserSvc[User Service]
+    Gateway --> OrderSvc[Order Service]
+    Gateway --> ProductSvc[Product Service]
+    UserSvc --> UserDB[(User DB)]
+    OrderSvc --> OrderDB[(Order DB)]
+    ProductSvc --> ProductDB[(Product DB)]
+    OrderSvc -.-> UserSvc
+    OrderSvc -.-> ProductSvc
+    OrderSvc --> Queue[Message Queue]
+    Queue --> NotifySvc[Notification Service]

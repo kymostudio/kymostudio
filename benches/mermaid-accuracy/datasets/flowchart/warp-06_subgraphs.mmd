@@ -1,0 +1,8 @@
+graph TB
+    subgraph Frontend
+        A[Browser] --> B[React App]
+    end
+    subgraph Backend
+        C[API Server] --> D[Database]
+    end
+    B --> C

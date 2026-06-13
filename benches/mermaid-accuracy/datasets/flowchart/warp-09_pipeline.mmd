@@ -1,0 +1,6 @@
+graph LR
+    Source[Source Code] --> Build[Build]
+    Build --> Test[Test]
+    Test --> Deploy[Deploy]
+    Deploy --> Monitor[Monitor]
+    Test -.->|Fail| Source

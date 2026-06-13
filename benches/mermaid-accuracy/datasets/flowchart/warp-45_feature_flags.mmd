@@ -1,0 +1,11 @@
+graph TD
+    Request[User Request] --> CheckFlag{Feature Enabled?}
+    CheckFlag -->|Yes| CheckUser{User in Beta?}
+    CheckFlag -->|No| OldPath[Legacy Flow]
+    CheckUser -->|Yes| NewFeature[New Feature]
+    CheckUser -->|No| Rollout{Rollout Percent?}
+    Rollout -->|In Range| NewFeature
+    Rollout -->|Out of Range| OldPath
+    NewFeature --> Metrics[Log Metrics]
+    OldPath --> Metrics
+    Metrics --> Response[Return Response]

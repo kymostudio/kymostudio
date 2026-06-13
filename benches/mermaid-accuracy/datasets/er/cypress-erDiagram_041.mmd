@@ -1,0 +1,14 @@
+erDiagram
+  direction LR
+
+  subgraph domain
+    direction TB
+
+    CUSTOMER
+    ORDER
+  end
+
+  PRODUCT
+
+  PRODUCT||--o{ domain: links
+  CUSTOMER ||--o{ ORDER : places

@@ -1,0 +1,9 @@
+graph TD
+    Input[Get Value] --> Check1{Value > 100?}
+    Check1 -->|Yes| Check2{Value > 500?}
+    Check1 -->|No| Small[Small Value]
+    Check2 -->|Yes| Large[Large Value]
+    Check2 -->|No| Medium[Medium Value]
+    Small -->|Process| Output[Result]
+    Medium -->|Process| Output
+    Large -->|Process| Output

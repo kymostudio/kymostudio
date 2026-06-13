@@ -1,0 +1,13 @@
+graph TD
+    A[Start] --> B[Process]
+    B --> C{Decision}
+    C -->|Yes| D[Success]
+    C -->|No| E[Error]
+    D --> F[End]
+    E --> F
+    style A fill:#90EE90
+    style B fill:#87CEEB
+    style C fill:#FFD700
+    style D fill:#98FB98
+    style E fill:#FF6B6B
+    style F fill:#DDA0DD

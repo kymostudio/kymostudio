@@ -1,0 +1,13 @@
+graph TD
+    Request[HTTP Request] --> Middleware1[[Rate Limiter]]
+    Middleware1 --> Middleware2[[Auth Middleware]]
+    Middleware2 --> Middleware3[[Validation]]
+    Middleware3 --> Router{Router}
+    Router --> Handler[Request Handler]
+    Handler --> Service[Business Logic]
+    Service --> Repository[[Repository]]
+    Repository --> DB[(Database)]
+    DB --> Repository
+    Repository --> Service
+    Service --> Handler
+    Handler --> Response[HTTP Response]
