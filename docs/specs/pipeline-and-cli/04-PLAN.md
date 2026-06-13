@@ -1,7 +1,7 @@
 ---
 title: Pipeline & CLI Architecture — Plan
 document_id: PLAN-PIPECLI-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-06-06
 status: Draft
 classification: Internal
@@ -36,7 +36,7 @@ iso_compliance:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `PLAN-PIPECLI-001` |
-| Version           | 0.3 |
+| Version           | 0.4 |
 | Status            | Draft |
 | Owner             | `packages/python` · `packages/js` · `packages/rust` |
 | Related Documents | `FEAT-PIPECLI-001`, `DESIGN-PIPECLI-001`, `TEST-PIPECLI-001`; migration evidence `RES-PIPELINE-001` §8, `RES-CLI-001` §6 |
@@ -52,9 +52,10 @@ before any externally-visible grammar change.
 
 ## 2. Design
 
-Per `DESIGN-PIPECLI-001`: stages `demux · decode · filter · encode · post · mux`; a single
-intermediate `Diagram`; registries replacing the `cli.py` suffix switch (`:61–77`) and
-boolean-flag chain (`:196–232`); the CLI grammar as the user-facing projection of the stages.
+Per `DESIGN-PIPECLI-001`: stages `demux · decode · filter · encode · post · mux`, with the
+`decode·filter·encode·post` engine owned by `kymostudio-core` and the per-language CLIs as thin
+front-ends; a single intermediate `Diagram`; registries replacing the `load()` suffix switch and
+the `main()` boolean-flag chain; the CLI grammar as the user-facing projection of the stages.
 
 ## 3. Phases (work breakdown)
 
@@ -74,12 +75,20 @@ follows `RES-PIPELINE-001` §8.
 P1–P2 are pure refactors (no user-visible change). P3–P5 are additive (new surface alongside
 old). P6 extends parity. P7 is the only breaking step and is opt-in / windowed.
 
+**As-built note (2026-06-13).** None of P1–P7 has formally landed (`cli.py` is still
+`if/elif`, no `pipeline/` package, no `-vf`/`-o`/`-t`-as-value). But an **orthogonal motion has
+already moved several engine stages into `kymostudio-core`** (`DESIGN-PIPECLI-001` §1 stance,
+`FEAT-PIPECLI-001` §0.1): BPMN/Mermaid decode, BPMN/flowchart layout, draw.io/BPMN encode, and
+PNG/PDF post are `_core.*` calls today. This *helps* P1/P2 — when those stages get registered,
+they are thin PyO3 shims, not Python code to relocate — but it does **not** by itself satisfy any
+phase exit gate, which still requires the registry + grammar work.
+
 ## 4. Risks and mitigations
 
 | Risk | Mitigation |
 |------|------------|
 | Golden/corpus churn during the move (P1) | Move modules byte-for-byte; rewire dispatch only; gate on `TC-PC-1` every commit. |
-| Filter extraction reorders passes and perturbs geometry | Preserve the exact order `_load_resolved()` runs today — `bpmn_layout` (if `bpmn { }` blocks) → `layout` (if a DSL `layout { }` spec) → `align` (with auto-canvas-size as one of its internal passes, *not* yet a standalone `autosize` filter); the `resolved` flag mirrors the current `src.suffix not in (".bpmn",".json") and not had_bpmn` skip exactly. |
+| Filter extraction reorders passes and perturbs geometry | Preserve the exact order `_load_resolved()` runs today — `_core.apply_layout` (if `bpmn { }` blocks) → `_core.resolve_flowchart_blocks` (if `flowchart { }` blocks) → `layout` (if a DSL `layout { }` spec) → `align` (with auto-canvas-size as one of its internal passes, *not* yet a standalone `autosize` filter); the `resolved` flag mirrors the current `src.suffix not in (".bpmn",".json",".mmd",".mermaid") and not had_bpmn and not had_flowchart` skip exactly. Two of those filters are core-backed (PyO3 shims), so "extraction" for them is registry wiring, not moving layout code. |
 | Multi-input compose semantics under-specified (`concat`/`overlay` id-collisions) | Out of scope v1 (`FEAT` §4); land single-input first; resolve by `CR/` (open question `RES-PIPELINE-001` §9). |
 | Filter-chain DSL grammar bikeshedding | Ship `-vf` parsing behind the additive P3 with the FFmpeg `name=k=v:k=v` form; revisit syntax via `CR/` if it proves too cramped. |
 | JS/Rust drift from Python | `.kymo.json` parity oracle (`TC-PC-18`, `conformance/golden/`) gates P6. |
@@ -108,9 +117,14 @@ per-feature complexity guidance; if P4/P6 grow, split by sub-deliverable via `CR
 
 ## 7. Change requests
 
-None yet. Open design questions (filter-chain grammar, compose/id-collision semantics,
-external layout engines, Rust filter-stage necessity, streaming) are tracked as research in
-`RES-PIPELINE-001` §9 and become `CR/` entries here once a phase needs them resolved.
+None yet. The 2026-06-13 Rust-core reframe (engine owned by `kymostudio-core`) was handled as a
+**design-level clarification** (`DESIGN-PIPECLI-001` v0.4) of where the stages run, not a change
+to any `FR-PC`/`NFR-PC` — `FR-PC-1..7` are written location-agnostic (registry by name, not by
+language), so no `CR/` was minted. If the core later absorbs the remaining Python-local stages
+(DSL parse, `layout`, `alignment`, the emitters) it stays within that scope. Open design
+questions (filter-chain grammar, compose/id-collision semantics, external layout engines, Rust
+filter-stage necessity, streaming) are tracked as research in `RES-PIPELINE-001` §9 and become
+`CR/` entries here once a phase needs them resolved.
 
 ## Annex A — Revision History
 
@@ -121,6 +135,7 @@ external layout engines, Rust filter-stage necessity, streaming) are tracked as 
 | 0.1     | 2026-06-06 | Vũ Anh | Initial plan. Seven-phase incremental migration (scaffold → filters → `-vf` → mux/format → new sources → parity → clean break), gated by the golden/corpus oracle; derived from `RES-PIPELINE-001` §8 and `RES-CLI-001` §6. |
 | 0.2     | 2026-06-06 | Vũ Anh | Review corrections. P2/risk: pass-order wording aligned to `_load_resolved()` (`bpmn_layout → layout → align`, autosize still an alignment sub-pass) and to the corrected `resolved` skip; P6: JS already has a `bin`, so the work is re-grammaring it, and Rust CLI named as the `kymostudio` crate. |
 | 0.3     | 2026-06-06 | Vũ Anh | Grammar-consistency fix (review finding #5). P7 retires only the legacy boolean **converter** flags; the `kymo lint`/`kymo icons` tooling subcommands are kept (not deprecated). |
+| 0.4     | 2026-06-13 | Vũ Anh | As-built reconciliation + Rust-core reframe. §2: engine owned by `kymostudio-core`; replaced fragile `cli.py:NN` citations with `load()`/`main()`. P2 risk: pass order updated to `_core.apply_layout → _core.resolve_flowchart_blocks → layout → align` and the current skip condition; noted core-backed filters are PyO3 shims. Added the §3 "As-built note" (no phase landed; orthogonal core motion underway). §7: recorded the reframe as a design-level clarification (no `CR/`, no `FR-PC` change). |
 
 ## Annex B — Document Control
 
@@ -145,3 +160,4 @@ breaking step, taken only after the deprecation window.
 | Date | Phase | Note |
 |------|-------|------|
 | 2026-06-06 | — | Spec baselined from `RES-PIPELINE-001` + `RES-CLI-001`. No code yet. |
+| 2026-06-13 | — | As-built review: no PIPECLI phase landed (`cli.py` still `if/elif`, no `pipeline/` package). Orthogonal motion: BPMN/Mermaid decode, BPMN/flowchart layout, draw.io/BPMN encode, PNG/PDF post all moved into `kymostudio-core`. Specs reconciled + reframed around the core (FEAT v0.6, DESIGN/TEST/PLAN v0.4). |
