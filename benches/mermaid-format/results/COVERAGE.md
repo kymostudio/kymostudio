@@ -11,7 +11,7 @@ not.*
 
 | grammar | sources | merman renders | merman uses foreignObject | kymo engine | kymo renders |
 |---|---|---|---|---|---|
-| flowchart | 1,033 | 98% | 98% | ✓ | 61% |
+| flowchart | 1,033 | 98% | 98% | ✓ | 91% |
 | sequence | 441 | 91% | 0% | ✓ | 100% |
 | state | 347 | 99% | 97% |  | — |
 | class | 282 | 96% | 99% |  | — |
@@ -68,7 +68,7 @@ not.*
 
 | grammar | sources | merman renders | foreignObject | kymo |
 |---|---|---|---|---|
-| flowchart | 838 (+2 timeout) | 99% | 97% | 56% |
+| flowchart | 838 (+2 timeout) | 99% | 97% | 90% |
 | sequence | 293 | 100% | 0% | 99% |
 | state | 277 | 99% | 97% | — |
 | class | 196 | 100% | 98% | — |
@@ -98,7 +98,7 @@ not.*
 | grammar | sources | merman renders | foreignObject | kymo |
 |---|---|---|---|---|
 | sequence | 140 | 73% | 0% | 100% |
-| flowchart | 136 (+3 timeout) | 88% | 100% | 79% |
+| flowchart | 136 (+3 timeout) | 88% | 100% | 90% |
 | class | 84 | 87% | 100% | — |
 | gitgraph | 71 | 100% | 0% | — |
 | state | 67 | 100% | 100% | — |

@@ -39,6 +39,7 @@ pub fn parse_statement(s: &str) -> Result<Vec<Item>, String> {
         if sc.at_end() {
             break;
         }
+        sc.skip_edge_id();
         let op = match sc.read_operator() {
             Some(op) => op,
             None => return Err(format!("expected an edge operator in: {s:?}")),
@@ -54,10 +55,15 @@ pub fn parse_statement(s: &str) -> Result<Vec<Item>, String> {
 
 fn read_node(sc: &mut Scanner) -> Option<ParsedNode> {
     let id = sc.read_id()?;
-    let (label, shape) = match sc.read_shape() {
-        Some((shape, label)) => (Some(label), Some(shape)),
-        None => (None, None),
+    let (label, shape) = if let Some((shape, label)) = sc.read_shape() {
+        (Some(label), Some(shape))
+    } else if let Some((shape, label)) = sc.read_at_metadata() {
+        (label, shape)
+    } else {
+        (None, None)
     };
+    // `:::class` inline class assignment carries no graph structure.
+    sc.skip_class_suffix();
     Some(ParsedNode { id, label, shape })
 }
 
@@ -141,6 +147,24 @@ mod tests {
             }
             _ => panic!(),
         }
+    }
+
+    #[test]
+    fn at_metadata_shape_and_label() {
+        let items = parse_statement("A@{ shape: circle, label: \"Hi\" } --> B").unwrap();
+        match &items[0] {
+            Item::Nodes(g) => {
+                assert_eq!(g[0].shape, Some(Shape::Circle));
+                assert_eq!(g[0].label.as_deref(), Some("Hi"));
+            }
+            _ => panic!(),
+        }
+    }
+
+    #[test]
+    fn class_shorthand_and_edge_id() {
+        let items = parse_statement("A:::hot e1@--> B").unwrap();
+        assert_eq!(ids(&items), ["A", "B"]);
     }
 
     #[test]
