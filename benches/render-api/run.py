@@ -45,8 +45,17 @@ MMD = "flowchart TD\n  A[Client] --> B{Cache?}\n  B -->|hit| C[Edge]\n  B -->|mi
 DOT = "digraph G { rankdir=LR; client -> lb -> app1; lb -> app2; app1 -> db; app2 -> db; }"
 PUML = "@startuml\nAlice -> Bob: request\nBob --> Alice: response\n@enduml"
 KYMO = (HERE / "../../samples/order-flow.kymo").resolve().read_text()
+NOMNOML = "[Pirate|eyeCount: Int|raid();pillage()|\n  [beard]--[parrot]\n]\n[<abstract>Marauder]<:--[Pirate]"
+BYTEFIELD = '(draw-column-headers)\n(draw-box "Address" {:span 4})\n(draw-box "Size" {:span 2})\n(draw-gap "Payload")\n(draw-bottom)'
+WAVEDROM = '{ "signal": [\n  { "name": "clk",  "wave": "p......" },\n  { "name": "bus",  "wave": "x.34.5x", "data": ["head", "body", "tail"] }\n]}'
+VEGALITE = '{"data":{"values":[{"m":"Jan","v":28},{"m":"Feb","v":55},{"m":"Mar","v":43}]},"mark":"bar","encoding":{"x":{"field":"m","type":"nominal","sort":null},"y":{"field":"v","type":"quantitative"}}}'
+SVGBOB = "       +-------+      .-------.\n       |  Box  |----->| Round |\n       +-------+      '-------'"
+PIKCHR = 'arrow right 200% "Markdown" "Source"\nbox rad 10px "Markdown" "Formatter" fit\narrow right 200% "HTML+SVG" "Output"' 
 
-# (name, kind, format, source, bust-comment-prefix, also-on-kroki)
+# (name, kind, format, source, bust, also-on-kroki). bust is a comment prefix
+# for the random token line, or "ws" for syntaxes with no comments (strict
+# JSON: trailing whitespace changes the cache key, not the parse; svgbob: the
+# token renders as a stray text line — fine for a latency probe).
 # `kymo` exists only on render.kymo.studio; everything else is rendered by
 # both services. plantuml is the PROXIED control: render.kymo.studio forwards
 # it to kroki.io, so its busted delta is the cost of the extra hop.
@@ -55,6 +64,12 @@ CASES = [
     ("graphviz/svg (self)", "graphviz", "svg", DOT, "//", True),
     ("graphviz/png (self)", "graphviz", "png", DOT, "//", True),
     ("kymo/svg (self)", "kymo", "svg", KYMO, "#", False),
+    ("nomnoml/svg (self)", "nomnoml", "svg", NOMNOML, "//", True),
+    ("bytefield/svg (self)", "bytefield", "svg", BYTEFIELD, ";;", True),
+    ("wavedrom/svg (self)", "wavedrom", "svg", WAVEDROM, "//", True),
+    ("vegalite/svg (self)", "vegalite", "svg", VEGALITE, "ws", True),
+    ("svgbob/svg (self)", "svgbob", "svg", SVGBOB, "", True),
+    ("pikchr/svg (self)", "pikchr", "svg", PIKCHR, "#", True),
     ("plantuml/svg (proxy)", "plantuml", "svg", PUML, "'", True),
 ]
 
@@ -88,10 +103,17 @@ def _post(base: str, kind: str, fmt: str, source: str, get_url: str | None = Non
         return (time.perf_counter() - t0) * 1000, e.code, ""
 
 
+def _bust(source: str, bust: str, i: int) -> str:
+    token = f"bust-{random.randrange(1 << 30)}-{i}"
+    if bust == "ws":  # strict-JSON kinds: whitespace changes the hash, not the parse
+        return source + "\n" * (1 + i) + " " * random.randrange(1, 80)
+    return f"{source}\n{bust} {token}" if bust else f"{source}\n{token}"
+
+
 def _series(base: str, kind: str, fmt: str, source: str, reps: int, bust: str | None) -> dict:
     times, hits, failed = [], 0, 0
     for i in range(reps):
-        body = f"{source}\n{bust} bust-{random.randrange(1 << 30)}-{i}" if bust else source
+        body = _bust(source, bust, i) if bust is not None else source
         try:
             ms, status, cache = _post(base, kind, fmt, body)
         except Exception:
@@ -191,7 +213,7 @@ def main() -> None:
     busted = []
     for name, kind, fmt, src, bust, on_kroki in CASES:
         row = {"name": name, "kind": kind, "format": fmt,
-               "mine": _series(args.mine, kind, fmt, src, args.reps, bust)}
+               "mine": _series(args.mine, kind, fmt, src, args.reps, bust)}  # bust="" → raw-line token
         if on_kroki:
             row["kroki"] = _series(KROKI, kind, fmt, src, args.reps, bust)
         busted.append(row)
