@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2026-06-12T23:53:46+00:00",
+    "timestamp": "2026-06-13T00:26:52+00:00",
     "mine": "https://render.kymo.studio",
     "kroki": "https://kroki.io",
     "reps": 10,
@@ -16,17 +16,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 45,
-        "min_ms": 40,
-        "max_ms": 74
+        "median_ms": 93,
+        "min_ms": 34,
+        "max_ms": 131
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 295,
-        "min_ms": 284,
-        "max_ms": 329
+        "median_ms": 297,
+        "min_ms": 283,
+        "max_ms": 349
       }
     },
     {
@@ -37,16 +37,16 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 36,
-        "min_ms": 33,
-        "max_ms": 52
+        "median_ms": 50,
+        "min_ms": 36,
+        "max_ms": 113
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 50,
-        "min_ms": 46,
+        "median_ms": 58,
+        "min_ms": 47,
         "max_ms": 68
       }
     },
@@ -58,17 +58,17 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 106,
-        "min_ms": 59,
-        "max_ms": 160
+        "median_ms": 93,
+        "min_ms": 61,
+        "max_ms": 152
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 56,
-        "min_ms": 47,
-        "max_ms": 89
+        "median_ms": 59,
+        "min_ms": 54,
+        "max_ms": 71
       }
     },
     {
@@ -79,9 +79,9 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 50,
-        "min_ms": 41,
-        "max_ms": 77
+        "median_ms": 52,
+        "min_ms": 49,
+        "max_ms": 114
       }
     },
     {
@@ -92,17 +92,43 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 83,
-        "min_ms": 67,
-        "max_ms": 102
+        "median_ms": 94,
+        "min_ms": 79,
+        "max_ms": 1364
       },
       "kroki": {
         "reps": 10,
         "failed": 0,
         "cache_hits": 0,
-        "median_ms": 61,
-        "min_ms": 54,
-        "max_ms": 72
+        "median_ms": 59,
+        "min_ms": 53,
+        "max_ms": 81
+      }
+    }
+  ],
+  "share_get": [
+    {
+      "name": "mermaid/svg GET (cold)",
+      "warmed": false,
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 0,
+        "median_ms": 46,
+        "min_ms": 38,
+        "max_ms": 67
+      }
+    },
+    {
+      "name": "mermaid/svg GET (pre-warmed)",
+      "warmed": true,
+      "mine": {
+        "reps": 10,
+        "failed": 0,
+        "cache_hits": 10,
+        "median_ms": 38,
+        "min_ms": 34,
+        "max_ms": 55
       }
     }
   ],
@@ -115,9 +141,9 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 10,
-        "median_ms": 45,
-        "min_ms": 37,
-        "max_ms": 48
+        "median_ms": 44,
+        "min_ms": 31,
+        "max_ms": 51
       }
     },
     {
@@ -128,9 +154,9 @@
         "reps": 10,
         "failed": 0,
         "cache_hits": 10,
-        "median_ms": 40,
-        "min_ms": 35,
-        "max_ms": 66
+        "median_ms": 38,
+        "min_ms": 33,
+        "max_ms": 52
       }
     }
   ]

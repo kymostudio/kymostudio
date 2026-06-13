@@ -7,7 +7,7 @@ import { KINDS, renderKroki, sanitizeSvg } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { SAMPLES } from "./samples";
-import { DIAGRAMS_API, SAMPLE } from "./const";
+import { DIAGRAMS_API, RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy, BookOpen, MoreHorizontal } from "lucide-react";
@@ -62,6 +62,7 @@ export default function EditorPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [sharePayload, setSharePayload] = useState(""); // deflate+base64url of the current source
+  const warmedShare = useRef(""); // last kind+source warmed into the render cache
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
   const [renderReady, setRenderReady] = useState(false); // wasm engine loaded
@@ -280,6 +281,17 @@ export default function EditorPage() {
     const payload = await encodeShare(source);
     setSharePayload(payload);
     copyText("link", shareUrl(kind, payload), true); // default action: opening Share already puts the link in the clipboard
+    // Warm the render cache (fire-and-forget): opening Share signals intent, so
+    // render now — the recipient's first paint, and GitHub's first fetch of a
+    // Copy-Markdown-image URL, become an edge cache hit instead of a render.
+    // POST and the GET share-URL hash to the same content-addressed entry.
+    const warmKey = kind + "\0" + source;
+    if (warmedShare.current !== warmKey) {
+      warmedShare.current = warmKey;
+      fetch(`${RENDER_API}/${encodeURIComponent(kind)}/svg`, {
+        method: "POST", headers: { "content-type": "text/plain" }, body: source,
+      }).catch(() => {});
+    }
   }
   async function copyText(key: string, text: string, silent = false) {
     try { await navigator.clipboard.writeText(text); } catch { if (!silent) window.prompt("Copy:", text); return; }
