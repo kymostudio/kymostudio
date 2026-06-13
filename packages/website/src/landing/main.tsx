@@ -157,7 +157,336 @@ const KINDS: { name: string; href: string; glyph: React.ReactNode }[] = [
   { name: "XY chart", href: EDITOR, glyph: <svg viewBox="0 0 24 24" {...G}><path d="M4.5 4v15.5H20" /><path d="M7 14.5l3.8-4.7 3.4 2.9 4.8-6.7" /></svg> },
 ];
 
-function KindsRow({ items, reverse }: { items: typeof KINDS; reverse?: boolean }) {
+// Every kind opens a ready-made example in the editor. The diagram source is
+// deflate+base64url-encoded into the share URL (the editor's own scheme,
+// share.ts) — computed once on mount; until then (or on browsers without
+// CompressionStream) the links fall back to the plain hrefs above.
+const KIND_EXAMPLES: Record<string, { kind: string; source: string }> = {
+  Flowchart: {
+    kind: "kymo",
+    source: `flowchart TD {
+  A[Receive order] --> B{In stock?}
+  B -->|Yes| C[Take payment]
+  B -->|No| D[Notify customer]
+  C --> E[Pack items]
+  E --> F((Ship order))
+  D --> G[Cancel order]
+}`,
+  },
+  Architecture: {
+    kind: "mermaid",
+    source: `architecture-beta
+    group api(cloud)[API]
+
+    service db(database)[Database] in api
+    service disk1(disk)[Storage] in api
+    service disk2(disk)[Storage] in api
+    service server(server)[Server] in api
+
+    db:L -- R:server
+    disk1:T -- B:server
+    disk2:T -- B:db`,
+  },
+  BPMN: {
+    kind: "bpmn",
+    source: `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs" targetNamespace="http://kymo.studio/bpmn">
+  <bpmn:process id="proc" isExecutable="false">
+    <bpmn:startEvent id="start" name="Start">
+      <bpmn:outgoing>f1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="task" name="Do work">
+      <bpmn:incoming>f1</bpmn:incoming>
+      <bpmn:outgoing>f2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="end" name="End">
+      <bpmn:incoming>f2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="f1" sourceRef="start" targetRef="task" />
+    <bpmn:sequenceFlow id="f2" sourceRef="task" targetRef="end" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="dia">
+    <bpmndi:BPMNPlane id="plane" bpmnElement="proc">
+      <bpmndi:BPMNShape id="s_start" bpmnElement="start">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="s_task" bpmnElement="task">
+        <dc:Bounds x="240" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="s_end" bpmnElement="end">
+        <dc:Bounds x="392" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="e_f1" bpmnElement="f1">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="240" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="e_f2" bpmnElement="f2">
+        <di:waypoint x="340" y="120" />
+        <di:waypoint x="392" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>`,
+  },
+  Sequence: {
+    kind: "mermaid",
+    source: `sequenceDiagram
+    participant A as Alice
+    participant J as John
+    A->>J: Hello John, how are you?
+    J-->>A: Great!
+    A-)J: See you later`,
+  },
+  Class: {
+    kind: "mermaid",
+    source: `classDiagram
+    Animal <|-- Duck
+    Animal <|-- Fish
+    Animal <|-- Zebra
+    Animal : +int age
+    Animal : +String gender
+    Animal : +isMammal()
+    Animal : +mate()
+    class Duck{
+        +String beakColor
+        +swim()
+        +quack()
+    }
+    class Fish{
+        -int sizeInFeet
+        -canEat()
+    }
+    class Zebra{
+        +bool is_wild
+        +run()
+    }`,
+  },
+  ER: {
+    kind: "mermaid",
+    source: `erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses`,
+  },
+  State: {
+    kind: "mermaid",
+    source: `stateDiagram-v2
+    [*] --> Still
+    Still --> [*]
+    Still --> Moving
+    Moving --> Still
+    Moving --> Crash
+    Crash --> [*]`,
+  },
+  C4: {
+    kind: "mermaid",
+    source: `C4Context
+    title System Context diagram for Internet Banking
+    Person(customer, "Banking Customer", "A customer of the bank.")
+    System(banking, "Internet Banking System", "Allows customers to view accounts.")
+    System_Ext(mail, "E-mail System", "The internal e-mail system.")
+    Rel(customer, banking, "Uses")
+    Rel(banking, mail, "Sends e-mail", "SMTP")`,
+  },
+  "Use case": {
+    kind: "plantuml",
+    source: `@startuml
+left to right direction
+actor Customer
+actor Support
+rectangle Store {
+  Customer -- (Browse catalog)
+  Customer -- (Place order)
+  (Place order) .> (Pay) : include
+  Support -- (Handle refund)
+}
+@enduml`,
+  },
+  Activity: {
+    kind: "plantuml",
+    source: `@startuml
+start
+:Receive order;
+if (In stock?) then (yes)
+  :Take payment;
+  :Pack items;
+  :Ship order;
+else (no)
+  :Notify customer;
+  :Cancel order;
+endif
+stop
+@enduml`,
+  },
+  Component: {
+    kind: "plantuml",
+    source: `@startuml
+package "Storefront" {
+  [Web App] --> [API Gateway]
+}
+[API Gateway] --> [Orders Service]
+[API Gateway] --> [Catalog Service]
+[Orders Service] --> [Payments]
+database "Orders DB" as DB
+[Orders Service] --> DB
+@enduml`,
+  },
+  Deployment: {
+    kind: "plantuml",
+    source: `@startuml
+node "Cloud" {
+  node "Kubernetes" {
+    artifact "api v2.4" as api
+    artifact "worker v2.4" as worker
+  }
+  database "Postgres" as db
+  queue "Events" as q
+}
+node "Browser" as b
+b --> api : HTTPS
+api --> db
+api --> q
+q --> worker
+@enduml`,
+  },
+  Database: {
+    kind: "d2",
+    source: `users: {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  email: varchar
+  created_at: timestamp
+}
+
+orders: {
+  shape: sql_table
+  id: int {constraint: primary_key}
+  user_id: int {constraint: foreign_key}
+  total: decimal
+}
+
+orders.user_id -> users.id`,
+  },
+  Gantt: {
+    kind: "mermaid",
+    source: `gantt
+    title A Gantt Diagram
+    dateFormat YYYY-MM-DD
+    section Section
+        A task          :a1, 2024-01-01, 30d
+        Another task    :after a1, 20d
+    section Another
+        Task in Another :2024-01-12, 12d
+        another task    :24d`,
+  },
+  Timeline: {
+    kind: "mermaid",
+    source: `timeline
+    title History of Social Media
+    2002 : LinkedIn
+    2004 : Facebook
+         : Google
+    2005 : YouTube
+    2006 : Twitter`,
+  },
+  "Git graph": {
+    kind: "mermaid",
+    source: `gitGraph
+    commit
+    commit
+    branch develop
+    checkout develop
+    commit
+    commit
+    checkout main
+    merge develop
+    commit
+    commit`,
+  },
+  // NOT nwdiag: kroki's blockdiag family currently answers 200 with an empty
+  // body, which the editor shows as a blank preview.
+  Network: {
+    kind: "graphviz",
+    source: `graph network {
+  rankdir=TB;
+  node [shape=box, style=rounded, fontname="Helvetica"];
+  internet [shape=ellipse, label="Internet"];
+  router  [label="Router"];
+  sw1 [label="Switch A"];
+  sw2 [label="Switch B"];
+  internet -- router;
+  router -- sw1;
+  router -- sw2;
+  sw1 -- web01;
+  sw1 -- web02;
+  sw2 -- db01;
+  sw2 -- db02;
+}`,
+  },
+  Mindmap: {
+    kind: "mermaid",
+    source: `mindmap
+  root((kymo))
+    Origins
+      Long history
+      Popularisation
+    Research
+      On effectiveness
+      On automatic creation
+    Tools
+      Pen and paper
+      Diagram as code`,
+  },
+  Kanban: {
+    kind: "mermaid",
+    source: `kanban
+  Todo
+    [Create Documentation]
+    docs[Create Blog about the new diagram]
+  [In progress]
+    id6[Create renderer so that it works in all cases]
+  id9[Ready for deploy]
+    id8[Design grammar]
+  id10[Done]
+    id5[define getData]`,
+  },
+  Timing: {
+    kind: "wavedrom",
+    source: `{ "signal": [
+  { "name": "clk",  "wave": "p......" },
+  { "name": "bus",  "wave": "x.34.5x", "data": ["head", "body", "tail"] },
+  { "name": "wire", "wave": "0.1..0." }
+]}`,
+  },
+  Pie: {
+    kind: "mermaid",
+    source: `pie title Pets adopted by volunteers
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15`,
+  },
+  "XY chart": {
+    kind: "mermaid",
+    source: `xychart-beta
+    title "Sales Revenue"
+    x-axis [jan, feb, mar, apr, may, jun, jul]
+    y-axis "Revenue (in $)" 4000 --> 11000
+    bar [5000, 6000, 7500, 8200, 9500, 10500, 11000]
+    line [5000, 6000, 7500, 8200, 9500, 10500, 11000]`,
+  },
+};
+
+// Same encoding as the editor's share.ts: zlib deflate → base64url.
+async function editorShareUrl(kind: string, source: string): Promise<string> {
+  const stream = new Blob([new TextEncoder().encode(source)]).stream().pipeThrough(new CompressionStream("deflate"));
+  const bytes = new Uint8Array(await new Response(stream).arrayBuffer());
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  const s = btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return `${EDITOR}/?${kind === "kymo" ? "" : `k=${encodeURIComponent(kind)}&`}s=${s}`;
+}
+
+function KindsRow({ items, links, reverse }: { items: typeof KINDS; links: Record<string, string>; reverse?: boolean }) {
   return (
     <div className={reverse ? "kinds-marquee reverse" : "kinds-marquee"}>
       <div className="kinds-track">
@@ -165,7 +494,7 @@ function KindsRow({ items, reverse }: { items: typeof KINDS; reverse?: boolean }
           <a
             className="kind"
             key={`${k.name}-${i}`}
-            href={k.href}
+            href={links[k.name] ?? k.href}
             aria-hidden={i >= items.length || undefined}
             tabIndex={i >= items.length ? -1 : undefined}
           >
@@ -179,6 +508,17 @@ function KindsRow({ items, reverse }: { items: typeof KINDS; reverse?: boolean }
 }
 
 function KindsStrip() {
+  const [links, setLinks] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (typeof CompressionStream === "undefined") return; // keep fallback hrefs
+    let stop = false;
+    (async () => {
+      const out: Record<string, string> = {};
+      for (const [name, ex] of Object.entries(KIND_EXAMPLES)) out[name] = await editorShareUrl(ex.kind, ex.source);
+      if (!stop) setLinks(out);
+    })();
+    return () => { stop = true; };
+  }, []);
   // three rows, each blending two thirds of the catalogue: A+B / B+C / C+A —
   // long enough that the marquee's duplicate copy stays off-screen
   const third = Math.ceil(KINDS.length / 3);
@@ -190,9 +530,9 @@ function KindsStrip() {
       <p className="kinds-head">
         <strong>Every diagram, one studio</strong> — from architecture to BPMN, your agent picks the right kind.
       </p>
-      <KindsRow items={[...A, ...B]} />
-      <KindsRow items={[...B, ...C]} reverse />
-      <KindsRow items={[...C, ...A]} />
+      <KindsRow items={[...A, ...B]} links={links} />
+      <KindsRow items={[...B, ...C]} links={links} reverse />
+      <KindsRow items={[...C, ...A]} links={links} />
     </section>
   );
 }
