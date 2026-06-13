@@ -1,7 +1,7 @@
 ---
-title: Mermaid Import — Test & Verification (umbrella)
+title: Mermaid Format — Test & Verification (umbrella)
 document_id: TEST-MERMAID-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -25,7 +25,7 @@ keywords:
   - conformance
 ---
 
-# Mermaid Import — Test & Verification (umbrella)
+# Mermaid Format — Test & Verification (umbrella)
 
 ## 1. Levels
 

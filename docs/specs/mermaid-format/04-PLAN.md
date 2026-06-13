@@ -1,7 +1,7 @@
 ---
-title: Mermaid Import — Plan (umbrella)
+title: Mermaid Format — Plan (umbrella)
 document_id: PLAN-MERMAID-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -25,7 +25,7 @@ keywords:
   - roadmap
 ---
 
-# Mermaid Import — Plan (umbrella)
+# Mermaid Format — Plan (umbrella)
 
 ## Phase 1 — Flowchart import in the Rust core (this delivery)
 
@@ -111,3 +111,8 @@ producing the same resolved `Diagram`.
   Support" → "Mermaid Import" (v0.2): the family is the *import* direction; emitting
   Mermaid text belongs to the flowchart hub (`FEAT-FLOWCHART-001`). All
   `*-MERMAID-*-001` document_ids unchanged.
+- 2026-06-13 — folder renamed `mermaid-import/` → `mermaid-format/` and titles
+  "Mermaid Import" → "Mermaid Format" (v0.3): "import" undersold the feature. Scope
+  clarified to the Mermaid **format front-end** (parse/import) + the diagram-type
+  roadmap; emit/IR/render/D2/DOT are explicitly owned by `FEAT-FLOWCHART-001` (boundary
+  note tightened in 01/02). All `*-MERMAID-*-001` document_ids unchanged.

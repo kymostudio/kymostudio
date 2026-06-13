@@ -1,7 +1,7 @@
 ---
-title: Mermaid Import — Requirements (umbrella)
+title: Mermaid Format — Requirements (umbrella)
 document_id: FEAT-MERMAID-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -31,7 +31,14 @@ keywords:
   - flowchart
 ---
 
-# Mermaid Import — Requirements (umbrella)
+# Mermaid Format — Requirements (umbrella)
+
+> **Scope.** This feature owns the Mermaid **format front-end** (parsing/import of `.mmd` into
+> the kymo model) and the Mermaid **diagram-type roadmap** (flowchart implemented;
+> sequence/state/class/er reserved). The format-neutral IR, the Mermaid/D2/DOT **text emitters**,
+> the **D2/DOT importers**, the pure-Rust **SVG renderer**, and the **draw.io encoder** are owned
+> by the sibling flowchart hub `FEAT-FLOWCHART-001` — this feature *feeds* that hub via the IR; it
+> does not own those parts.
 
 ## Part A — ConOps / StRS (concept & stakeholder needs)
 
@@ -105,7 +112,9 @@ Pipeline: `mermaid::parse` (dispatch by header) → `layout::layout_flowchart`
 
 > **Since shipped (later phases):** the items originally deferred here have since
 > landed — the Python/JS renderers draw icon-less flowchart nodes + the `diamond`
-> glyph (Phase 2), and the core gained a **pure-Rust flowchart SVG renderer**
-> (`crate::flowchart_svg`, `mermaid_to_svg`). The flowchart IR also feeds text
-> emitters (Mermaid/D2/DOT), a draw.io encoder, and D2/DOT *importers* — see
-> MERMAID-MAP-001 §8.
+> glyph (Phase 2). The rendering and cross-format paths that grew out of this work were
+> **promoted into the flowchart hub `FEAT-FLOWCHART-001`** and are owned there, not here:
+> the pure-Rust SVG renderer (`crate::flowchart_svg`, `mermaid_to_svg`), the text emitters
+> (Mermaid/D2/DOT), the draw.io encoder, and the D2/DOT *importers*. This feature's parse
+> output (the IR / `.kymo.json`) is what feeds those — see MERMAID-MAP-001 §8 and
+> `FEAT-FLOWCHART-001`.
