@@ -11,6 +11,7 @@
   --accent-deep: #c70854;
   --accent-soft: rgba(224, 9, 95, 0.08);
   --sel: #e9eaf1;          /* neutral row selection (explorer) */
+  --sel-border: #db2777;   /* selected-row box border (brand pink) */
   --focus-ring: #b4b8ca;   /* neutral keyboard-focus ring */
   --teal: #ddecee;
   --error: #b42318;
@@ -189,9 +190,9 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 /* calm neutral selection / focus; the open file keeps a thin brand accent bar */
 .sb-folder.sel { background: var(--sel); }
 .sb-row.kbd { box-shadow: inset 0 0 0 1px var(--focus-ring); }
-.sb-file.active { background: var(--sel); box-shadow: inset 2px 0 0 var(--accent); }
-.sb-file.active.kbd { box-shadow: inset 2px 0 0 var(--accent), inset 0 0 0 1px var(--focus-ring); }
-.sb-file.active .sb-name { font-weight: 600; }
+.sb-file.active { background: var(--sel); box-shadow: inset 0 0 0 1px var(--sel-border); }
+.sb-file.active.kbd { box-shadow: inset 0 0 0 1px var(--sel-border); }
+.sb-file.active .sb-name { font-weight: 400; }
 .sb-folder.dragover { background: var(--accent-soft); box-shadow: inset 0 0 0 1px rgba(224, 9, 95, 0.4); }
 .sb-rename { flex: 1; min-width: 0; font: inherit; font-size: 13px; font-weight: 400; padding: 1px 4px; border: 1px solid var(--accent); border-radius: 4px; background: var(--bg); color: var(--ink); outline: none; }
 .sb-empty { padding: 14px 12px; font-size: 12.5px; color: var(--dim); }
