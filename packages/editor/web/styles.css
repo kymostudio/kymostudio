@@ -120,11 +120,31 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .pv-controls button:hover { background: var(--bg-raise); color: var(--accent); }
 .pv-controls .pv-pct { width: auto; min-width: 46px; padding: 0 7px; font: 12px/1 var(--mono); color: var(--dim); }
 .pv-controls .pv-pct:hover { color: var(--accent); background: var(--bg-raise); }
-/* ---- file sidebar (VSCode-style explorer in the editor) ---- */
-.sb-toggle { flex: none; padding: 7px; border-color: transparent; background: transparent; color: var(--dim); }
-.sb-toggle:hover { background: var(--bg-soft); border-color: transparent; transform: none; box-shadow: none; color: var(--ink); }
-.sb-toggle[aria-pressed="true"] { color: var(--ink); }
+/* ---- activity bar (VSCode-style left icon rail) ---- */
+.activitybar { flex: none; width: 52px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 8px 0; border-right: 1px solid var(--border); background: var(--bg-soft); z-index: 41; }
+.act-group { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; }
+.act-btn { position: relative; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--dim); border-radius: 10px; cursor: pointer; }
+.act-btn:hover { background: var(--bg-raise); color: var(--ink); transform: none; box-shadow: none; }
+.act-btn.active { color: var(--ink); }
+.act-btn.active::before { content: ""; position: absolute; left: -6px; top: 9px; bottom: 9px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+.act-account .avatar { width: 28px; height: 28px; font-size: 13px; }
+.act-pop-wrap { position: relative; width: 100%; display: flex; justify-content: center; }
+.act-popover { right: auto; top: auto; left: calc(100% + 6px); bottom: 0; min-width: 210px; }
+.act-popover .acct-item { display: flex; align-items: center; gap: 9px; }
+
+/* ---- file sidebar / panels (VSCode-style explorer in the editor) ---- */
 .sidebar { flex: none; width: 240px; display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--border); background: var(--bg-soft); }
+/* search / filter box at the top of the Search & Templates panels */
+.sb-search { display: flex; align-items: center; gap: 7px; margin: 8px 10px; padding: 6px 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+.sb-search:focus-within { border-color: rgba(224, 9, 95, 0.45); }
+.sb-search svg { flex: none; color: var(--dim); }
+.sb-search input { border: 0; outline: 0; flex: 1; min-width: 0; font: inherit; font-size: 13px; background: transparent; color: var(--ink); }
+.sb-kind { flex: none; font-size: 10.5px; color: var(--dim); background: var(--bg-raise); border-radius: 999px; padding: 1px 7px; }
+.sb-tpl { display: flex; align-items: center; gap: 8px; padding: 7px 10px; cursor: pointer; color: var(--ink); }
+.sb-tpl:hover { background: var(--bg-raise); }
+.sb-tpl-glyph { flex: none; width: 18px; height: 18px; display: inline-flex; color: var(--dim); }
+.sb-tpl:hover .sb-tpl-glyph { color: var(--accent); }
+.sb-tpl-glyph svg { width: 18px; height: 18px; }
 .sb-head { display: flex; align-items: center; gap: 2px; padding: 8px 8px 8px 12px; border-bottom: 1px solid var(--border); }
 .sb-title { flex: 1; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
 .sb-head button { flex: none; padding: 5px; border: 1px solid transparent; background: transparent; color: var(--dim); border-radius: 7px; }
@@ -147,10 +167,11 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-empty { padding: 14px 12px; font-size: 12.5px; color: var(--dim); }
 .sb-backdrop { display: none; }
 @media (hover: none) { .sb-actions { opacity: 1; } }
-/* phones: the sidebar becomes a slide-in drawer over the editor */
+/* phones: the rail stays pinned at the left; the panel slides in as a drawer
+   beside it, with a backdrop over the editor area. */
 @media (max-width: 720px) {
-  .sidebar { position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; width: min(280px, 82vw); box-shadow: 0 8px 40px rgba(36, 33, 49, 0.28); }
-  .sb-backdrop { display: block; position: fixed; inset: 0; z-index: 39; background: rgba(36, 33, 49, 0.35); }
+  .sidebar { position: fixed; top: 0; bottom: 0; left: 52px; z-index: 40; width: min(260px, 74vw); box-shadow: 0 8px 40px rgba(36, 33, 49, 0.28); }
+  .sb-backdrop { display: block; position: fixed; top: 0; bottom: 0; right: 0; left: 52px; z-index: 39; background: rgba(36, 33, 49, 0.35); }
 }
 
 .status { font: 12px/1.5 var(--mono); padding: 7px 14px; border-top: 1px solid var(--border); color: var(--dim); min-height: 28px; white-space: pre-wrap; background: var(--bg); }

@@ -1,48 +1,52 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "./auth";
-import { useWorkspace, assignDiagram, deleteDiagram, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth, colorFor } from "./auth";
+import { useWorkspace, assignDiagram, deleteDiagram, childFoldersOf, type Folder } from "./workspace";
 import { DIAGRAMS_API } from "./const";
-import { ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, FilePlus2, FileText, Pencil, Trash2, PanelLeftClose } from "lucide-react";
+import { kindLabel, docHref } from "./kroki";
+import { TEMPLATES, type Template } from "./templates";
+import {
+  ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
+  Files, Search, Shapes, Settings, BookOpen, LayoutGrid, LogOut,
+} from "lucide-react";
 
 type Item = { id: string; title: string; kind?: string; ws?: string };
+export type Panel = "explorer" | "search" | "templates";
 
-// VSCode-style file explorer rendered inside the editor. Compact sibling of the
-// full DiagramsPage tree — shares the folder model + helpers (workspace.tsx) but
-// renders narrow rows (no thumb/kind/time/bulk). Click a file to open it.
-export function EditorSidebar({ currentId, currentTitle, onNewDiagram, onClose, onCollapse }: {
-  currentId: string | null;
-  currentTitle: string;
-  onNewDiagram: () => void;
-  onClose: () => void;     // called after opening a file (closes the drawer on mobile)
-  onCollapse: () => void;  // the collapse button (always hides the sidebar)
+// Shared diagram-list fetch for the Explorer + Search panels (only one panel is
+// mounted at a time, so this never double-fetches).
+function useDiagrams() {
+  const { idToken } = useAuth();
+  const [items, setItems] = useState<Item[]>([]);
+  const reload = useCallback(async () => {
+    if (!idToken) return;
+    try {
+      const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
+      if (r.ok) setItems(((await r.json()).diagrams) || []);
+    } catch {}
+  }, [idToken]);
+  useEffect(() => { reload(); }, [reload]);
+  useEffect(() => {
+    const f = () => { if (!document.hidden) reload(); };
+    window.addEventListener("focus", reload); document.addEventListener("visibilitychange", f);
+    return () => { window.removeEventListener("focus", reload); document.removeEventListener("visibilitychange", f); };
+  }, [reload]);
+  return { items, reload };
+}
+
+// ============================ Explorer (file tree) ============================
+export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }: {
+  currentId: string | null; currentTitle: string; onNewDiagram: () => void; onClose: () => void;
 }) {
   const { idToken } = useAuth();
   const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder } = useWorkspace();
+  const { items, reload } = useDiagrams();
   const navigate = useNavigate();
-  const [items, setItems] = useState<Item[]>([]);
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem("kymo_expanded") || "[]")); } catch { return new Set(); }
   });
   const [dragOver, setDragOver] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    if (!idToken) return;
-    try {
-      const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
-      if (!r.ok) return;
-      const j = await r.json();
-      setItems(j.diagrams || []);
-    } catch {}
-  }, [idToken]);
-  // reload on mount, when the open diagram changes (a new save shows up), and on focus
-  useEffect(() => { load(); }, [load, currentId]);
-  useEffect(() => {
-    const f = () => { if (!document.hidden) load(); };
-    window.addEventListener("focus", load);
-    document.addEventListener("visibilitychange", f);
-    return () => { window.removeEventListener("focus", load); document.removeEventListener("visibilitychange", f); };
-  }, [load]);
+  useEffect(() => { reload(); }, [currentId]); // a save/new file shows up // eslint-disable-line
 
   const persist = (s: Set<string>) => { try { localStorage.setItem("kymo_expanded", JSON.stringify([...s])); } catch {} };
   const toggle = (id: string) => setExpanded((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); persist(n); return n; });
@@ -63,19 +67,14 @@ export function EditorSidebar({ currentId, currentTitle, onNewDiagram, onClose, 
   }
   async function onDeleteFolder(f: Folder) {
     if (!window.confirm(`Delete folder "${f.name}"? Its diagrams and subfolders move up one level.`)) return;
-    await deleteFolder(f.id);
-    load();
+    await deleteFolder(f.id); reload();
   }
   async function onDeleteFile(it: Item) {
     if (!window.confirm(`Delete "${it.title || "Untitled"}"? This cannot be undone.`)) return;
-    if (await deleteDiagram(idToken, it.id)) {
-      if (it.id === currentId) navigate("/"); // closing the open file → fresh draft
-      load();
-    }
+    if (await deleteDiagram(idToken, it.id)) { if (it.id === currentId) navigate("/"); reload(); }
   }
   function openFile(id: string) { navigate("/?d=" + encodeURIComponent(id)); onClose(); }
 
-  // ---- drag & drop (same protocol as DiagramsPage) ----
   function dragStart(e: React.DragEvent, kind: "diagram" | "folder", id: string) {
     e.dataTransfer.setData("text/plain", kind + ":" + id); e.dataTransfer.effectAllowed = "move";
   }
@@ -85,7 +84,7 @@ export function EditorSidebar({ currentId, currentTitle, onNewDiagram, onClose, 
   async function dropOn(e: React.DragEvent, targetFolderId: string) {
     e.preventDefault(); e.stopPropagation(); setDragOver(null);
     const [kind, id] = (e.dataTransfer.getData("text/plain") || "").split(":");
-    if (kind === "diagram" && id) { assignDiagram(idToken, id, targetFolderId); setTimeout(load, 150); }
+    if (kind === "diagram" && id) { assignDiagram(idToken, id, targetFolderId); setTimeout(reload, 150); }
     else if (kind === "folder" && id && id !== targetFolderId) { await moveFolder(id, targetFolderId); }
   }
 
@@ -114,9 +113,6 @@ export function EditorSidebar({ currentId, currentTitle, onNewDiagram, onClose, 
     }
     for (const it of filesIn(parentId)) {
       const active = it.id === currentId;
-      // For the open file, prefer its LIVE label (so a rename reflects instantly) —
-      // but only when that label is meaningful, so a still-loading doc doesn't
-      // flicker the row to "Untitled".
       const label = (active && currentTitle && currentTitle !== "Untitled" ? currentTitle : it.title) || "Untitled";
       out.push(
         <div key={"d" + it.id} className={"sb-file" + (active ? " active" : "")} style={{ paddingLeft: 6 + depth * 14 + 16 }}
@@ -139,7 +135,6 @@ export function EditorSidebar({ currentId, currentTitle, onNewDiagram, onClose, 
         <span className="sb-title">Explorer</span>
         <button title="New diagram" aria-label="New diagram" onClick={onNewDiagram}><FilePlus2 size={15} strokeWidth={2} /></button>
         <button title="New folder" aria-label="New folder" onClick={() => onNewFolder("")}><FolderPlus size={15} strokeWidth={2} /></button>
-        <button title="Hide sidebar" aria-label="Hide sidebar" onClick={onCollapse}><PanelLeftClose size={15} strokeWidth={2} /></button>
       </div>
       <div className={"sb-tree" + (dragOver === "__root__" ? " dragover-root" : "")}
         onDragOver={(e) => allowDrop(e, "__root__")} onDragLeave={() => setDragOver((d) => (d === "__root__" ? null : d))}
@@ -148,5 +143,110 @@ export function EditorSidebar({ currentId, currentTitle, onNewDiagram, onClose, 
         {!items.length && !folders.length && <div className="sb-empty">No diagrams yet.</div>}
       </div>
     </aside>
+  );
+}
+
+// ================================ Search panel ================================
+export function SearchPanel({ currentId, onClose }: { currentId: string | null; onClose: () => void }) {
+  const { items } = useDiagrams();
+  const navigate = useNavigate();
+  const [q, setQ] = useState("");
+  const needle = q.trim().toLowerCase();
+  const results = needle ? items.filter((i) => (i.title || "Untitled").toLowerCase().includes(needle)) : [];
+  function openFile(id: string) { navigate("/?d=" + encodeURIComponent(id)); onClose(); }
+  return (
+    <aside className="sidebar">
+      <div className="sb-head"><span className="sb-title">Search</span></div>
+      <div className="sb-search"><Search size={14} strokeWidth={2} />
+        <input autoFocus placeholder="Search diagrams…" value={q} onChange={(e) => setQ(e.target.value)} />
+      </div>
+      <div className="sb-tree">
+        {needle && results.map((it) => (
+          <div key={it.id} className={"sb-file" + (it.id === currentId ? " active" : "")} style={{ paddingLeft: 10 }}
+            onClick={() => openFile(it.id)} title={it.title || "Untitled"}>
+            <FileText size={15} strokeWidth={1.8} className="sb-icon" />
+            <span className="sb-name">{it.title || "Untitled"}</span>
+            {it.kind && <span className="sb-kind">{kindLabel(it.kind)}</span>}
+          </div>
+        ))}
+        {needle && !results.length && <div className="sb-empty">No diagrams match “{q.trim()}”.</div>}
+        {!needle && <div className="sb-empty">Type to search your diagrams.</div>}
+      </div>
+    </aside>
+  );
+}
+
+// ============================== Templates panel ==============================
+export function TemplatesPanel({ onPick, onClose }: { onPick: (t: Template) => void; onClose: () => void }) {
+  const [q, setQ] = useState("");
+  const needle = q.trim().toLowerCase();
+  const shown = needle ? TEMPLATES.filter((t) => `${t.name} ${t.via} ${t.kind}`.toLowerCase().includes(needle)) : TEMPLATES;
+  return (
+    <aside className="sidebar">
+      <div className="sb-head"><span className="sb-title">Templates</span></div>
+      <div className="sb-search"><Search size={14} strokeWidth={2} />
+        <input placeholder="Filter types…" value={q} onChange={(e) => setQ(e.target.value)} />
+      </div>
+      <div className="sb-tree">
+        {shown.map((t) => (
+          <div key={t.name} className="sb-tpl" onClick={() => { onPick(t); onClose(); }} title={`New ${t.name} (${t.via})`}>
+            <span className="sb-tpl-glyph">{t.glyph}</span>
+            <span className="sb-name">{t.name}</span>
+            <span className="sb-kind">{t.via}</span>
+          </div>
+        ))}
+        {!shown.length && <div className="sb-empty">No type matches “{q.trim()}”.</div>}
+      </div>
+    </aside>
+  );
+}
+
+// =============================== Activity bar ================================
+export function ActivityBar({ active, onSelect }: { active: Panel | null; onSelect: (p: Panel) => void }) {
+  const { claims, signOut } = useAuth();
+  const [menu, setMenu] = useState<"account" | "settings" | null>(null);
+  useEffect(() => {
+    if (!menu) return;
+    const h = () => setMenu(null);
+    document.addEventListener("click", h);
+    return () => document.removeEventListener("click", h);
+  }, [menu]);
+  const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
+  const Btn = ({ id, label, children }: { id: Panel; label: string; children: React.ReactNode }) => (
+    <button className={"act-btn" + (active === id ? " active" : "")} title={label} aria-label={label}
+      aria-pressed={active === id} onClick={() => onSelect(id)}>{children}</button>
+  );
+  return (
+    <nav className="activitybar" onClick={(e) => e.stopPropagation()}>
+      <div className="act-group">
+        <Btn id="explorer" label="Explorer"><Files size={22} strokeWidth={1.7} /></Btn>
+        <Btn id="search" label="Search"><Search size={22} strokeWidth={1.9} /></Btn>
+        <Btn id="templates" label="Templates"><Shapes size={22} strokeWidth={1.8} /></Btn>
+      </div>
+      <div className="act-group">
+        <div className="act-pop-wrap">
+          <button className="act-btn act-account" title="Account" aria-label="Account" aria-haspopup="menu"
+            onClick={() => setMenu((m) => (m === "account" ? null : "account"))}>
+            <span className="avatar" style={{ background: colorFor((claims?.email || "x").toLowerCase()) }}>{initial}</span>
+          </button>
+          {menu === "account" && (
+            <div className="acct-menu act-popover">
+              <div className="acct-head">Signed in as<b>{claims?.email}</b></div>
+              <button className="acct-item" onClick={() => { setMenu(null); signOut(); }}><LogOut size={15} strokeWidth={2} />Sign out</button>
+            </div>
+          )}
+        </div>
+        <div className="act-pop-wrap">
+          <button className="act-btn" title="Settings" aria-label="Settings" aria-haspopup="menu"
+            onClick={() => setMenu((m) => (m === "settings" ? null : "settings"))}><Settings size={21} strokeWidth={1.8} /></button>
+          {menu === "settings" && (
+            <div className="acct-menu act-popover">
+              <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMenu(null)}><LayoutGrid size={16} strokeWidth={1.9} />All diagrams</Link>
+              <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 }

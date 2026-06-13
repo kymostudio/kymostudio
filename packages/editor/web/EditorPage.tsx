@@ -12,9 +12,9 @@ import { RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
-import { EditorSidebar } from "./sidebar";
+import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } from "./sidebar";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, PanelLeft } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -69,18 +69,27 @@ export default function EditorPage() {
   splitRef.current = split;
   const mainRef = useRef<HTMLElement>(null);
   const draggingSplit = useRef(false);
-  // VSCode-style file sidebar: open by default on desktop, hidden on phones.
+  // VSCode-style activity bar: which side panel is open (null = collapsed).
+  // Explorer open by default on desktop, collapsed on phones.
   const isPhone = () => typeof matchMedia !== "undefined" && matchMedia("(max-width: 720px)").matches;
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    const v = localStorage.getItem("kymo_sidebar");
-    return v === "1" ? true : v === "0" ? false : !isPhone();
+  const [activePanel, setActivePanel] = useState<Panel | null>(() => {
+    const v = localStorage.getItem("kymo_panel");
+    if (v === "explorer" || v === "search" || v === "templates") return v;
+    if (v === "none") return null;
+    return isPhone() ? null : "explorer";
   });
-  const setSidebar = useCallback((open: boolean) => {
-    setSidebarOpen(open);
-    try { localStorage.setItem("kymo_sidebar", open ? "1" : "0"); } catch {}
+  // click an activity icon: toggle off if it's already active, else switch to it.
+  const selectPanel = useCallback((p: Panel) => {
+    setActivePanel((cur) => {
+      const next = cur === p ? null : p;
+      try { localStorage.setItem("kymo_panel", next ?? "none"); } catch {}
+      return next;
+    });
   }, []);
-  // opening a file closes the drawer on phones only; on desktop the sidebar stays.
-  const closeSidebarOnPhone = useCallback(() => { if (isPhone()) setSidebar(false); }, [setSidebar]);
+  // opening a file closes the panel on phones only (it's a drawer there).
+  const closePanelOnPhone = useCallback(() => {
+    if (isPhone()) { setActivePanel(null); try { localStorage.setItem("kymo_panel", "none"); } catch {} }
+  }, []);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
@@ -439,11 +448,6 @@ export default function EditorPage() {
       <header>
         {/* identity & document: logo → your Diagrams when signed in (the natural
             "home"), else the product site; then workspace, editable title, sync state */}
-        {claims && !shared && (
-          <button className="sb-toggle" onClick={() => setSidebar(!sidebarOpen)} title="Toggle file sidebar" aria-label="Toggle file sidebar" aria-pressed={sidebarOpen}>
-            <PanelLeft size={17} strokeWidth={2} />
-          </button>
-        )}
         {claims
           ? <Link className="brand" to="/diagrams" title="My diagrams" aria-label="My diagrams"><img src="/logo.svg" alt="" /></Link>
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
@@ -592,29 +596,18 @@ export default function EditorPage() {
             })()}
           </div>
         </nav>
+        {/* signed-in account lives at the bottom of the activity bar (VSCode-style); guests sign in here */}
         {!claims && <GoogleButton />}
-        {claims && (
-          <div className="account" onClick={(e) => e.stopPropagation()}>
-            <button className="acct-btn" onClick={() => setMenuOpen((o) => !o)} title="Account" aria-label="Account" aria-haspopup="menu" aria-expanded={menuOpen}>
-              <span className="avatar" style={{ background: colorFor((claims.email || "x").toLowerCase()) }}>{initial}</span>
-              <ChevronDown size={14} strokeWidth={2.2} className="chev" />
-            </button>
-            {menuOpen && (
-              <div className="acct-menu">
-                <div className="acct-head">Signed in as<b>{claims.email}</b></div>
-                <button className="acct-item" onClick={() => { setMenuOpen(false); signOut(); }}>Sign out</button>
-              </div>
-            )}
-          </div>
-        )}
       </header>
       {galleryOpen && <TemplateGallery onPick={pickTemplate} onClose={() => setGalleryOpen(false)} />}
       <div className="workarea">
-        {claims && !shared && sidebarOpen && (
+        {claims && !shared && (
           <>
-            <EditorSidebar currentId={d} currentTitle={diagramLabel}
-              onNewDiagram={() => setGalleryOpen(true)} onClose={closeSidebarOnPhone} onCollapse={() => setSidebar(false)} />
-            <div className="sb-backdrop" onClick={() => setSidebar(false)} />
+            <ActivityBar active={activePanel} onSelect={selectPanel} />
+            {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onNewDiagram={() => setGalleryOpen(true)} onClose={closePanelOnPhone} />}
+            {activePanel === "search" && <SearchPanel currentId={d} onClose={closePanelOnPhone} />}
+            {activePanel === "templates" && <TemplatesPanel onPick={pickTemplate} onClose={closePanelOnPhone} />}
+            {activePanel && <div className="sb-backdrop" onClick={closePanelOnPhone} />}
           </>
         )}
         <main ref={mainRef}>
