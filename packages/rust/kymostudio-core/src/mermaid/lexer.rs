@@ -109,6 +109,49 @@ impl Scanner {
         None
     }
 
+    /// Mermaid 11 `@{ shape: X, label: "Y" }` node metadata. Best-effort: maps
+    /// the shape name to one of our six shapes and pulls out the label.
+    pub fn read_at_metadata(&mut self) -> Option<(Option<Shape>, Option<String>)> {
+        if !self.starts_with("@{") {
+            return None;
+        }
+        self.i += 2;
+        let body = self.read_until("}");
+        let shape = meta_field(&body, "shape").map(|s| map_shape(&s));
+        let label = meta_field(&body, "label").or_else(|| meta_field(&body, "text"));
+        Some((shape, label))
+    }
+
+    /// Consume an inline `:::className` class assignment (no graph effect).
+    pub fn skip_class_suffix(&mut self) {
+        if self.starts_with(":::") {
+            self.i += 3;
+            while matches!(self.peek(), Some(c) if c.is_ascii_alphanumeric() || c == '_' || c == '-')
+            {
+                self.i += 1;
+            }
+        }
+    }
+
+    /// Consume a Mermaid 11 edge id prefix (`e1@` before an operator).
+    pub fn skip_edge_id(&mut self) {
+        let save = self.i;
+        while matches!(self.peek(), Some(c) if c.is_ascii_alphanumeric() || c == '_') {
+            self.i += 1;
+        }
+        if self.i > save
+            && self.peek() == Some('@')
+            && matches!(
+                self.peek_at(1),
+                Some('-') | Some('=') | Some('<') | Some('.')
+            )
+        {
+            self.i += 1; // consume the `@`; the word before it was the edge id
+            return;
+        }
+        self.i = save;
+    }
+
     /// Read inner text until `close`, consuming it. A leading/trailing pair of
     /// double quotes is stripped (Mermaid quotes labels containing delimiters).
     fn read_until(&mut self, close: &str) -> String {
@@ -166,5 +209,70 @@ impl Scanner {
             no_arrow: !has_arrow,
             label,
         })
+    }
+}
+
+/// Pull `key: value` out of a `@{...}` metadata body (commas separate fields,
+/// quotes protect commas/colons in the value).
+fn meta_field(body: &str, key: &str) -> Option<String> {
+    for part in split_fields(body) {
+        if let Some((k, v)) = part.split_once(':') {
+            if k.trim() == key {
+                return Some(unquote(v.trim()));
+            }
+        }
+    }
+    None
+}
+
+fn split_fields(body: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let (mut cur, mut q) = (String::new(), None::<char>);
+    for c in body.chars() {
+        match q {
+            Some(qc) => {
+                if c == qc {
+                    q = None;
+                }
+                cur.push(c);
+            }
+            None => match c {
+                '"' | '\'' => {
+                    q = Some(c);
+                    cur.push(c);
+                }
+                ',' => {
+                    out.push(std::mem::take(&mut cur));
+                }
+                _ => cur.push(c),
+            },
+        }
+    }
+    if !cur.trim().is_empty() {
+        out.push(cur);
+    }
+    out
+}
+
+fn unquote(s: &str) -> String {
+    let t = s.trim();
+    if t.len() >= 2
+        && ((t.starts_with('"') && t.ends_with('"')) || (t.starts_with('\'') && t.ends_with('\'')))
+    {
+        t[1..t.len() - 1].to_string()
+    } else {
+        t.to_string()
+    }
+}
+
+/// Map a Mermaid 11 shape name to one of our six shapes (best effort).
+fn map_shape(name: &str) -> Shape {
+    match name.trim().to_ascii_lowercase().as_str() {
+        "circle" | "circ" | "dbl-circ" | "fr-circ" | "doublecircle" => Shape::Circle,
+        "diam" | "diamond" | "decision" | "fork" | "join" => Shape::Diamond,
+        "hex" | "hexagon" | "prepare" => Shape::Hex,
+        "cyl" | "cylinder" | "db" | "das" | "database" | "disk" | "lin-cyl" => Shape::Cylinder,
+        "stadium" | "pill" | "term" | "terminal" | "rounded" => Shape::Badge,
+        _ => Shape::Box,
     }
 }
