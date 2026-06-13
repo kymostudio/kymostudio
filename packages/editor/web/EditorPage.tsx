@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
 import { WorkspaceSwitcher, useWorkspace, assignDiagram } from "./workspace";
@@ -12,7 +12,7 @@ import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, LayoutGrid, Copy, MoreHorizontal } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -380,7 +380,7 @@ export default function EditorPage() {
   return (
     <div className="layout">
       <header>
-        {/* identity & document: logo → product home in a new tab (Diagrams stays reachable via the navlink), workspace, editable title, sync state */}
+        {/* identity & document: logo → product home in a new tab (Diagrams stays reachable via the workspace menu), workspace, editable title, sync state */}
         <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>
         {claims && <WorkspaceSwitcher />}
         {claims && <span className="sep">/</span>}
@@ -411,7 +411,6 @@ export default function EditorPage() {
         <div className="spacer" />
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
-          {claims && <Link className="navlink mob-hide" to="/diagrams"><LayoutGrid size={15} strokeWidth={2} />Diagrams</Link>}
           <button className="mob-hide" onClick={() => setGalleryOpen(true)} title="New diagram" aria-haspopup="dialog"><Plus size={16} strokeWidth={2.2} />New</button>
           {shared && claims && (
             <button className="mob-hide" onClick={saveCopy} title="Save a copy to your Diagrams">
@@ -446,12 +445,6 @@ export default function EditorPage() {
             </button>
             {moreOpen && (
               <div className="acct-menu">
-                {claims && (
-                  <Link className="acct-item exp-item" to="/diagrams" onClick={() => setMoreOpen(false)}>
-                    <LayoutGrid size={17} strokeWidth={1.9} />
-                    Diagrams
-                  </Link>
-                )}
                 <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); setGalleryOpen(true); }}>
                   <Plus size={17} strokeWidth={2} />
                   New diagram
