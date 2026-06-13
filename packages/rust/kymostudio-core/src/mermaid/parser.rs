@@ -31,8 +31,23 @@ pub fn parse_statement(s: &str) -> Result<Vec<Item>, String> {
     let mut items: Vec<Item> = Vec::new();
 
     sc.skip_ws();
-    let first = read_node_group(&mut sc).ok_or_else(|| format!("expected a node, got: {s:?}"))?;
-    items.push(Item::Nodes(first));
+    if let Some(first) = read_node_group(&mut sc) {
+        items.push(Item::Nodes(first));
+    } else {
+        // A statement may begin with an edge operator (line continuation): the
+        // source comes from the previous statement; read the destination here.
+        sc.skip_edge_id();
+        match sc.read_operator() {
+            Some(op) => {
+                items.push(Item::Edge(op));
+                sc.skip_ws();
+                let group = read_node_group(&mut sc)
+                    .ok_or_else(|| format!("edge with no destination node in: {s:?}"))?;
+                items.push(Item::Nodes(group));
+            }
+            None => return Err(format!("expected a node, got: {s:?}")),
+        }
+    }
 
     loop {
         sc.skip_ws();
@@ -44,24 +59,37 @@ pub fn parse_statement(s: &str) -> Result<Vec<Item>, String> {
             Some(op) => op,
             None => return Err(format!("expected an edge operator in: {s:?}")),
         };
-        items.push(Item::Edge(op));
         sc.skip_ws();
-        let group = read_node_group(&mut sc)
-            .ok_or_else(|| format!("edge with no destination node in: {s:?}"))?;
-        items.push(Item::Nodes(group));
+        match read_node_group(&mut sc) {
+            Some(group) => {
+                items.push(Item::Edge(op));
+                items.push(Item::Nodes(group));
+            }
+            // A trailing operator with nothing after it (e.g. `g-->`) is a
+            // dangling edge; Mermaid tolerates it, so drop it and stop.
+            None if sc.at_end() => break,
+            None => return Err(format!("edge with no destination node in: {s:?}")),
+        }
     }
     Ok(items)
 }
 
 fn read_node(sc: &mut Scanner) -> Option<ParsedNode> {
     let id = sc.read_id()?;
-    let (label, shape) = if let Some((shape, label)) = sc.read_shape() {
-        (Some(label), Some(shape))
-    } else if let Some((shape, label)) = sc.read_at_metadata() {
-        (label, shape)
-    } else {
-        (None, None)
-    };
+    let (mut label, mut shape) = (None, None);
+    if let Some((sh, lb)) = sc.read_shape() {
+        shape = Some(sh);
+        label = Some(lb);
+    }
+    // An `@{ shape: X, label: Y }` block may follow (with or without a shape).
+    if let Some((sh, lb)) = sc.read_at_metadata() {
+        if sh.is_some() {
+            shape = sh;
+        }
+        if lb.is_some() {
+            label = lb;
+        }
+    }
     // `:::class` inline class assignment carries no graph structure.
     sc.skip_class_suffix();
     Some(ParsedNode { id, label, shape })
@@ -165,6 +193,30 @@ mod tests {
     fn class_shorthand_and_edge_id() {
         let items = parse_statement("A:::hot e1@--> B").unwrap();
         assert_eq!(ids(&items), ["A", "B"]);
+    }
+
+    #[test]
+    fn double_circle_and_multidir_links() {
+        // (((...))) double circle
+        let items = parse_statement("a(((Big)))").unwrap();
+        match &items[0] {
+            Item::Nodes(g) => {
+                assert_eq!(g[0].shape, Some(Shape::Circle));
+                assert_eq!(g[0].label.as_deref(), Some("Big"));
+            }
+            _ => panic!(),
+        }
+        // o--o and x--x multi-directional links parse as edges
+        for src in ["A o--o B", "A x--x B"] {
+            let items = parse_statement(src).unwrap();
+            assert!(matches!(&items[1], Item::Edge(_)), "{src}");
+        }
+        // <-- label --> bidirectional inline label
+        let items = parse_statement("A <-- hi --> B").unwrap();
+        match &items[1] {
+            Item::Edge(e) => assert_eq!(e.label, "hi"),
+            _ => panic!(),
+        }
     }
 
     #[test]
