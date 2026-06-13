@@ -4,7 +4,7 @@
 // override). Glyphs + sources mirror the landing page's "Every diagram, one
 // studio" strip (packages/website/src/landing/main.tsx), where every example
 // was render-verified.
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const G = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 
@@ -357,6 +357,11 @@ export function takePendingTemplate(): { source: string; kind: string } | null {
 }
 
 export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template) => void; onClose: () => void }) {
+  const [q, setQ] = useState("");
+  const needle = q.trim().toLowerCase();
+  const shown = needle
+    ? TEMPLATES.filter((t) => `${t.name} ${t.via} ${t.kind}`.toLowerCase().includes(needle))
+    : TEMPLATES;
   useEffect(() => {
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", k);
@@ -369,15 +374,25 @@ export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template) => 
           <h2>New diagram</h2>
           <p className="tpl-sub">Pick a diagram type — you get a working starter to edit. Or paste any source into the editor; the language is detected automatically.</p>
           <button className="tpl-close" onClick={onClose} aria-label="Close">✕</button>
+          <input
+            className="tpl-search" autoFocus type="search" placeholder="Filter types — try “sequence” or “plantuml”"
+            value={q} aria-label="Filter diagram types"
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && shown.length) onPick(shown[0]); // quick flow: type "seq" ⏎
+              else if (e.key === "Escape" && q) { e.stopPropagation(); setQ(""); } // 1st Esc clears, 2nd closes
+            }}
+          />
         </div>
         <div className="tpl-grid">
-          {TEMPLATES.map((t) => (
+          {shown.map((t) => (
             <button key={t.name} className="tpl-card" onClick={() => onPick(t)}>
               {t.glyph}
               <span className="tpl-name">{t.name}</span>
               <span className="tpl-via">{t.via}</span>
             </button>
           ))}
+          {!shown.length && <p className="tpl-empty">No diagram type matches “{q.trim()}”.</p>}
         </div>
       </div>
     </div>
