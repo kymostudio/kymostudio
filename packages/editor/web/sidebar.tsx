@@ -26,7 +26,7 @@ const KIND_ICON: Record<string, React.ComponentType<{ size?: number; strokeWidth
 };
 // …and a distinct hue, the way a VS Code icon theme colours file types.
 const KIND_COLOR: Record<string, string> = {
-  kymo: "#e0095f", mermaid: "#0d9488", bpmn: "#4f46e5",
+  kymo: "#db2777", mermaid: "#0d9488", bpmn: "#4f46e5",
   c4plantuml: "#7c3aed", structurizr: "#7c3aed", plantuml: "#7c3aed",
   d2: "#b45309", dbml: "#b45309", erd: "#b45309", graphviz: "#15803d",
 };
