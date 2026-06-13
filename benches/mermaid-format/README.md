@@ -56,3 +56,23 @@ by diagram type, for render/convert coverage (not scored). See
 `datasets/README.md`. `results/raw/` (the
 rendered images) is git-ignored; `recall.json` and `REPORT.md` are committed as
 a dated snapshot.
+
+## accuracy-mermaidjs.mjs — truth is mermaid.js itself
+
+`accuracy-mermaidjs.mjs` is the canonical accuracy bench. The ground truth is
+**mermaid.js 11** (rendered in headless Chrome via puppeteer), **not merman** —
+merman lacks KaTeX and has render quirks, so using it as the reference unfairly
+penalises kymo. Metric: raster-safe label recall (fraction of mermaid.js's
+*visible* word-tokens that appear in kymo's `<text>`, the text that survives to
+PNG/PDF). Non-visible reference text is excluded — KaTeX MathML `<annotation>`,
+accessibility `<title>`/`<desc>`, and hidden actor-link menus.
+
+```
+npm i                              # once — installs puppeteer-core
+CHROME=/usr/bin/google-chrome-stable N=200 node accuracy-mermaidjs.mjs
+```
+
+`CHROME` points at a Chrome/Chromium; `MERMAID` overrides the mermaid bundle
+(default: the editor package's dist). Reference tokens are cached under
+`results/mermaidjs-cache/` (git-ignored). Latest (sampled): flowchart ~98%
+recall / ~99% perfect, sequence ~100% / ~99% perfect.
