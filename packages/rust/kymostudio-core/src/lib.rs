@@ -19,6 +19,7 @@ pub mod flowchart;
 pub mod flowchart_svg;
 pub mod kymojson;
 pub mod layout;
+pub mod math;
 pub mod mermaid;
 pub mod model;
 pub mod sequence;
@@ -217,7 +218,30 @@ pub fn mermaid_to_xmi(src: &str) -> Result<String, mermaid::MermaidError> {
 /// Render a Mermaid `sequenceDiagram` to SVG (kymo own renderer: real
 /// `<text>`, so PNG/PDF keep their labels). Notes/activations not yet drawn.
 pub fn mermaid_to_sequence_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(sequence::svg::render(&mermaid::parse_sequence(src)?))
+    let mut seq = mermaid::parse_sequence(src)?;
+    for item in &mut seq.items {
+        render_sequence_item_math(item);
+    }
+    Ok(sequence::svg::render(&seq))
+}
+
+/// Render `$…$` TeX math in a sequence item's text (recursing into fragments).
+fn render_sequence_item_math(item: &mut sequence::Item) {
+    match item {
+        sequence::Item::Message(m) => m.text = math::render(&m.text),
+        sequence::Item::Note(n) => n.text = math::render(&n.text),
+        sequence::Item::Fragment(f) => {
+            for op in &mut f.operands {
+                op.guard = math::render(&op.guard);
+                for it in &mut op.items {
+                    render_sequence_item_math(it);
+                }
+            }
+        }
+        sequence::Item::Activate(_)
+        | sequence::Item::Deactivate(_)
+        | sequence::Item::Autonumber(_) => {}
+    }
 }
 
 /// Convert a Mermaid `sequenceDiagram` to a StarUML native `.mdj` (metadata-
@@ -255,13 +279,29 @@ pub fn mermaid_to_drawio(src: &str) -> Result<String, mermaid::MermaidError> {
 /// [`flowchart_svg`] renderer). The Rust core's own flowchart SVG (its own look,
 /// not byte-identical to the Python/JS renderers).
 pub fn mermaid_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    let fc = mermaid::parse(src)?;
+    let mut fc = mermaid::parse(src)?;
+    render_flowchart_math(&mut fc);
     Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
+/// Render Mermaid `$…$` TeX math in every flowchart label (nodes, edges,
+/// subgraph titles) to Unicode, so PNG/PDF show symbols, not raw LaTeX.
+fn render_flowchart_math(fc: &mut flowchart::Flowchart) {
+    for n in &mut fc.nodes {
+        n.label = math::render(&n.label);
+    }
+    for e in &mut fc.edges {
+        e.label = math::render(&e.label);
+    }
+    for g in &mut fc.subgraphs {
+        g.title = math::render(&g.title);
+    }
 }
 
 /// Render a Mermaid state diagram → SVG via the flowchart layout + renderer.
 pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    let fc = mermaid::parse_state(src)?;
+    let mut fc = mermaid::parse_state(src)?;
+    render_flowchart_math(&mut fc);
     Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
 }
 
