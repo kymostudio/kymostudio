@@ -1,0 +1,17 @@
+[project]
+# Standalone uv project — run from this folder: `uv run python run.py`.
+name = "kymo-bench-editor"
+version = "0.0.0"
+description = "Editor share-link first-load bench (Playwright, online)."
+requires-python = ">=3.10"
+dependencies = [
+    "kymostudio",
+    "playwright>=1.45",
+]
+
+[tool.uv.sources]
+kymostudio = { path = "../../packages/python", editable = true }
+
+[tool.setuptools]
+# No package to build — this project only pins the bench's runtime env.
+py-modules = []

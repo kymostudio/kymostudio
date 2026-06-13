@@ -36,9 +36,9 @@ case (an SVG 2 `ic`-unit feature only Chrome implements) — read the
 ## Run
 
 ```bash
-cd benches
-uv sync --extra svg2png          # one-time: pull the comparison rasterizers
-uv run python svg2png/run.py     # fidelity + accuracy + perf → results/
+cd benches/svg2png
+uv sync                          # one-time: pull the comparison rasterizers
+uv run python run.py             # fidelity + accuracy + perf → results/
 ```
 
 `run.py` writes `results/{quality,accuracy,perf}.json` and the human-readable
@@ -62,7 +62,7 @@ accuracy bench runs without Chrome; Chrome is only needed to regenerate them.
 ```bash
 # regenerate the dataset (needs network + Chrome):
 python svg2png/datasets/select_dataset.py copy svg2png/datasets/resvg-suite 12 <suite-sha>
-uv run python svg2png/gen_refs.py            # re-render Chrome refs
+uv run python gen_refs.py                    # re-render Chrome refs
 ```
 
 See [`datasets/resvg-suite/PROVENANCE.md`](datasets/resvg-suite/PROVENANCE.md) for

@@ -1,0 +1,11 @@
+[project]
+# Standalone uv project — run from this folder: `uv run python run.py`.
+name = "kymo-bench-render-api"
+version = "0.0.0"
+description = "render.kymo.studio latency bench (stdlib only, online)."
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.setuptools]
+# No package to build — this project only pins the bench's runtime env.
+py-modules = []

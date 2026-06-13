@@ -30,11 +30,14 @@ own visual style for complete raster text.
 ## Run
 
 ```bash
+cd benches/mermaid-accuracy
+uv sync                    # one-time: Pillow + numpy
+
 # 1. render all engines + score recall (needs render-api's wasm engines built)
 node render.mjs            # writes results/raw/*.{svg,png} + results/recall.json
 
-# 2. pixel-diff vs mermaid.js + assemble the report (needs Pillow)
-python3 accuracy.py        # writes results/REPORT.md
+# 2. pixel-diff vs mermaid.js + assemble the report
+uv run python accuracy.py  # writes results/REPORT.md
 ```
 
 `render.mjs` resolves the wasm engines from `packages/render-api/node_modules`
