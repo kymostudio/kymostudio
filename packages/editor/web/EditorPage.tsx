@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
 import { WorkspaceSwitcher, useWorkspace, assignDiagram } from "./workspace";
-import { KINDS, renderKroki, sanitizeSvg } from "./kroki";
+import { KINDS, renderKroki, sanitizeSvg, docHref } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { Preview } from "./preview";
 import { SAMPLES } from "./samples";
-import { DIAGRAMS_API, RENDER_API, SAMPLE } from "./const";
+import { RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
-import { TemplateGallery, takePendingTemplate, peekPendingTemplate, type Template } from "./templates";
+import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -27,35 +27,11 @@ export default function EditorPage() {
   const sharedKind = params.get("k");
   const shared = !!sharedSrc && !d;
 
-  // A template pick seeds a DRAFT: no room, nothing saved. It becomes a room on
-  // the explicit Save click, or after the first user edit that renders OK.
-  const [draftMode, setDraftMode] = useState(false);
-  const draftModeRef = useRef(draftMode);
-  draftModeRef.current = draftMode;
-  const draftEdited = useRef(false);
-
-  // No ?d: once signed in, jump to the most-recent diagram (or a fresh one).
-  useEffect(() => {
-    // a draft (template pick, incl. one handed over from /diagrams) owns the
-    // no-?d state — don't bounce away to the most-recent room
-    if (d || shared || !idToken || draftMode || peekPendingTemplate()) return;
-    let stop = false;
-    (async () => {
-      let id: string | null = null;
-      try {
-        const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
-        if (r.ok) {
-          const j = await r.json();
-          const list = (j.diagrams || []).slice().sort((a: any, b: any) => (b.updatedAt || 0) - (a.updatedAt || 0));
-          if (list.length) id = list[0].id;
-        }
-      } catch {}
-      if (stop) return;
-      if (!id) id = newId();
-      navigate("/?d=" + id, { replace: true });
-    })();
-    return () => { stop = true; };
-  }, [d, shared, idToken, draftMode, navigate]);
+  // Save model is two-state: a no-?d buffer is always a DRAFT that lives only in
+  // the URL (?s=) — nothing on the server until the explicit Save (button /
+  // Cmd-S). Landing on "/" therefore shows a fresh draft of the sample; existing
+  // files are opened from /diagrams. (Old behaviour auto-created a server room on
+  // the first edit, which littered the Diagrams list with anonymous drafts.)
 
   // Shared links carry their kind in the URL — seed state from it so the first
   // render cycle never runs against the kymo sample (which would pull the 2.5 MB
@@ -65,6 +41,7 @@ export default function EditorPage() {
   const [kind, setKind] = useState(initialKind);
   const [svg, setSvg] = useState("");
   const [status, setStatus] = useState(initialKind === "kymo" ? "Loading engine…" : "Rendering…");
+  const [statusTitle, setStatusTitle] = useState(""); // dev detail (bytes · ms), shown only on hover
   const [statusErr, setStatusErr] = useState(false);
   const [live, setLive] = useState(false);
   const [title, setTitle] = useState("");
@@ -80,8 +57,8 @@ export default function EditorPage() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
   const [renderReady, setRenderReady] = useState(false); // wasm engine loaded
-  const [localSaved, setLocalSaved] = useState(false);   // no-room content is persisted in the URL
   const [editingName, setEditingName] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false); // explicit Save in flight (draft → room)
   // split = width of the source pane in % (dbdiagram-style draggable divider)
   const [split, setSplit] = useState(() => {
     const v = parseFloat(localStorage.getItem("kymo_split") || "");
@@ -98,7 +75,13 @@ export default function EditorPage() {
   const lastSvg = useRef("");
   const fresh = useRef(false);      // room exists on the server but has no document yet
   const userEdited = useRef(false); // the user actually typed in this room
-  const pendingImport = useRef<{ source: string; kind: string } | null>(null); // "Save a copy": carry shared content into the new room
+  const pendingImport = useRef<{ source: string; kind: string; title?: string } | null>(null); // carry draft/shared content into a new room
+  const pendingSave = useRef(false); // guest hit Save → sign in, then auto-save once the token lands
+  // Auto-title tracks the source (titleFrom) until the user renames by hand; then
+  // it locks. `autoTitle` is the last value we derived, so we can tell an
+  // untouched auto name from one the user typed.
+  const autoTitle = useRef("");
+  const titleUserSet = useRef(false);
   const titleRef = useRef(title);
   titleRef.current = title;
   const kindRef = useRef(kind);
@@ -137,12 +120,12 @@ export default function EditorPage() {
       }
       if (seq !== renderSeq.current) return;
       lastSvg.current = out; setSvg(out);
-      setStatus(`OK · ${out.length} bytes · ${Math.round(performance.now() - t0)}ms`); setStatusErr(false);
-      // a draft the user has touched and that renders OK graduates to a saved room
-      if (draftModeRef.current && draftEdited.current) promoteDraftRef.current();
+      // Plain-language success — the byte/latency detail is dev-debug, kept only
+      // in the tooltip. Errors stay verbose (the catch below), they're useful.
+      setStatus("Rendered"); setStatusTitle(`${out.length.toLocaleString()} bytes · ${Math.round(performance.now() - t0)} ms`); setStatusErr(false);
     } catch (e: any) {
       if (seq !== renderSeq.current) return;
-      setStatus(String(e?.message ?? e)); setStatusErr(true);
+      setStatus(String(e?.message ?? e)); setStatusTitle(""); setStatusErr(true);
     }
   }, [loadEngine]);
 
@@ -162,11 +145,13 @@ export default function EditorPage() {
     if (shared) return; // ?s= state is seeded at mount and owned by the decode effect below
     const imp = pendingImport.current ?? takePendingTemplate(); pendingImport.current = null;
     setSource(imp ? imp.source : SAMPLE); setKind(imp ? imp.kind : "kymo");
-    setTitle(""); setEditingName(false); setShareError(null); setLocalSaved(false);
-    // userEdited only matters when there's a room to push into ("Save a copy" /
-    // a promoted draft); imported content with no ?d is a draft — keep pristine.
+    setTitle(imp?.title || ""); setEditingName(false); setShareError(null); setSavingDraft(false);
+    // A manually-named draft carries its title into the new room; otherwise the
+    // name auto-tracks the source until the user renames.
+    titleUserSet.current = !!imp?.title; autoTitle.current = "";
+    // userEdited only matters when there's a room to push into (an explicit Save /
+    // "Save a copy"); imported content with no ?d is a draft — keep pristine.
     synced.current = false; fresh.current = false; userEdited.current = !!imp && !!d;
-    if (imp && !d) { setDraftMode(true); draftEdited.current = false; }
   }, [d]);
 
   // Shared link: inflate the ?s= payload into the editor. Re-runs on history
@@ -179,8 +164,8 @@ export default function EditorPage() {
         if (stop) return;
         if (sharedKind && KINDS.some((k) => k.value === sharedKind)) setKind(sharedKind);
         userEdited.current = false; // pristine shared content — leave the URL alone until they type
+        titleUserSet.current = false; autoTitle.current = "";
         setShareError(null);
-        setLocalSaved(true); // the content already lives in the URL
         setSource(src);
       })
       .catch(() => {
@@ -193,7 +178,9 @@ export default function EditorPage() {
 
   const room = useRoom(roomId, idToken, {
     onLive: setLive, // not cleared here: the OLD socket closing on room switch would kill the boot state
-    onMeta: (t) => setTitle(t && t !== "Untitled" ? t : ""),
+    // A rename event locks auto-title — unless it's the echo of our OWN auto-rename
+    // (title === the value we just derived), which must keep tracking the source.
+    onMeta: (t) => { if (t && t !== autoTitle.current) titleUserSet.current = true; setTitle(t && t !== "Untitled" ? t : ""); },
     onDoc: (src, t, fromSelf, k) => {
       setSyncing(false);
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
@@ -205,16 +192,20 @@ export default function EditorPage() {
       if (k && src.trim()) setKind(k);
       if (!src.trim()) {
         fresh.current = true;
-        // "Save a copy" / typed-before-sync: content is already waiting in the editor.
-        // Nothing will touch `source` again, so persist it now instead of on next keystroke.
+        // explicit Save / "Save a copy" / typed-before-sync: content is already
+        // waiting in the editor. Nothing will touch `source` again, so persist it
+        // now instead of on next keystroke.
         if (userEdited.current) {
           fresh.current = false;
           room.sendSource(source, kind);
-          const t2 = titleFrom(source, kind);
-          if (t2 !== "Untitled") { setTitle(t2); room.sendRename(t2); }
+          const t2 = titleUserSet.current ? titleRef.current : titleFrom(source, kind);
+          if (t2 && t2 !== "Untitled") { autoTitle.current = titleUserSet.current ? autoTitle.current : t2; setTitle(t2); room.sendRename(t2); }
         }
         return;
       }
+      // A stored title that no longer matches its source was typed by a human → lock it.
+      autoTitle.current = titleFrom(src, k || kind);
+      titleUserSet.current = !!(t && t !== "Untitled" && t !== autoTitle.current);
       fresh.current = false;
       applyingRemote.current = true;
       setSource(src);
@@ -225,13 +216,17 @@ export default function EditorPage() {
     const id = setTimeout(() => {
       doRender(source, kind);
       if (applyingRemote.current) { applyingRemote.current = false; return; }
+      if (!d) return; // draft: no server room; the header title comes from localTitle and the URL-sync effect persists it
       if (!synced.current) return;
       if (fresh.current && !userEdited.current) return; // untouched sample: nothing worth persisting
       room.sendSource(source, kind);
-      if (fresh.current) {
-        fresh.current = false;
+      fresh.current = false;
+      // Auto-title: keep the saved name in step with the source until the user
+      // renames by hand (titleUserSet locks it).
+      if (!titleUserSet.current) {
         const t = titleFrom(source, kind);
-        if (!titleRef.current && t !== "Untitled") { setTitle(t); room.sendRename(t); }
+        const nt = t !== "Untitled" ? t : "";
+        if (nt && nt !== titleRef.current) { autoTitle.current = nt; setTitle(nt); room.sendRename(nt); }
       }
     }, lastSvg.current ? (kind === "kymo" ? 120 : 450) : 0); // debounce typing, but never the very first render
     return () => clearTimeout(id);
@@ -244,7 +239,6 @@ export default function EditorPage() {
     if (d || !userEdited.current || !source.trim()) return;
     const t = setTimeout(async () => {
       window.history.replaceState(null, "", shareUrl(kind, await encodeShare(source)));
-      setLocalSaved(true);
     }, 300);
     return () => clearTimeout(t);
   }, [source, kind, d]); // eslint-disable-line
@@ -261,10 +255,12 @@ export default function EditorPage() {
   // links and the guest editor aren't a blank "/" in the header (kymo kind only).
   const localTitle = !d ? titleFrom(source, kind) : "Untitled";
   const diagramLabel = title || (localTitle !== "Untitled" ? localTitle : "Untitled");
-  // redirecting to the latest diagram, or waiting for the first doc — but a
-  // draft legitimately lives at "/" with no room, so it is never "booting"
-  const booting = (!d && !!idToken && !shared && !draftMode) || syncing;
+  // Only a room waiting for its first doc "boots"; a draft lives at "/" with no
+  // room, so it renders immediately.
+  const booting = syncing;
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
+  // A draft (no room, not a pristine share view) is unsaved until the explicit Save.
+  const isDraft = !d && !shared;
 
   useEffect(() => {
     document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
@@ -329,46 +325,51 @@ export default function EditorPage() {
   }
   // "+ New" opens the template gallery — users pick a diagram TYPE; the
   // template carries the right kind, so the syntax choice happens for them.
-  // Nothing is created server-side here: the pick seeds a draft, and the draft
-  // becomes a room only via promoteDraft (Save click, or first edit that
-  // renders OK) — so abandoned templates never litter the Diagrams list.
+  // Nothing is created server-side here: the pick seeds a DRAFT (URL-only). It
+  // becomes a room only via the explicit Save — abandoned templates never litter
+  // the Diagrams list.
   function pickTemplate(t: Template) {
     setGalleryOpen(false);
     // No room = the only copy of edited content is this tab/URL. Ask first.
     if (!d && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
-    if (!idToken) {
-      // Guests have no rooms — a ?d= URL would be a dead room that silently loses
-      // everything typed into it. Reset to a fresh local template instead.
-      setSource(t.source); setKind(t.kind); setTitle(""); setShareError(null);
-      setLocalSaved(false); // pristine template isn't in the URL — don't claim it is
-      userEdited.current = false;
-      navigate("/");
-      return;
-    }
-    setDraftMode(true);
-    draftEdited.current = false;
+    titleUserSet.current = false; autoTitle.current = "";
     if (d) {
-      pendingImport.current = { source: t.source, kind: t.kind }; // consumed by the ?d-change effect
+      pendingImport.current = { source: t.source, kind: t.kind }; // consumed by the ?d-change effect → lands as a draft
       navigate("/");
     } else {
       // already on a no-room buffer (draft/share view): seed in place
       setSource(t.source); setKind(t.kind); setTitle(""); setShareError(null);
-      setLocalSaved(false);
       userEdited.current = false;
+      window.history.replaceState(null, "", "/"); // pristine template isn't in the URL yet
     }
   }
-  // Draft → room: register it in the workspace and let the fresh-room path
-  // push the content; autosave is on from here.
-  const promoteDraft = useCallback(() => {
-    if (!draftModeRef.current || !idToken) return;
-    setDraftMode(false);
+  // Pop the Google sign-in prompt (guests can't own server files).
+  const promptSignIn = useCallback(() => { (window as any).google?.accounts?.id?.prompt?.(); }, []);
+  // Explicit Save: a draft → a real server file. Guests are prompted to sign in
+  // first, then the save replays once the token lands (pendingSave).
+  const save = useCallback(() => {
+    if (d) return; // already a saved room
+    if (!sourceRef.current.trim()) return;
+    if (!idToken) { pendingSave.current = true; promptSignIn(); return; }
+    setSavingDraft(true);
     const id = newId();
-    pendingImport.current = { source: sourceRef.current, kind: kindRef.current };
+    pendingImport.current = { source: sourceRef.current, kind: kindRef.current, title: titleUserSet.current ? titleRef.current : undefined };
     assignDiagram(idToken, id, currentWs); // lands in the workspace you're looking at
     navigate("/?d=" + id);
-  }, [idToken, currentWs, navigate]);
-  const promoteDraftRef = useRef(promoteDraft);
-  promoteDraftRef.current = promoteDraft;
+  }, [d, idToken, currentWs, navigate, promptSignIn]);
+  const saveRef = useRef(save); saveRef.current = save;
+  // Guest hit Save → signed in → finish the save now that we have a token.
+  useEffect(() => {
+    if (idToken && pendingSave.current) { pendingSave.current = false; saveRef.current(); }
+  }, [idToken]);
+  // Cmd/Ctrl-S saves a draft (no-op once it's a room — it autosaves).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "s" || e.key === "S")) { e.preventDefault(); if (!d) saveRef.current(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [d]);
   // Paste auto-detect: a whole-buffer paste in a recognizable grammar switches
   // the kind so the source "just renders" — the select stays as manual override.
   const detectTimer = useRef<number | undefined>(undefined);
@@ -390,7 +391,11 @@ export default function EditorPage() {
   }
   function commitRename(v: string) {
     const t = v.trim();
-    if (t && t !== title) { room.sendRename(t); setTitle(t); }
+    if (t && t !== title) {
+      titleUserSet.current = true; // a hand-typed name locks auto-title
+      if (d) room.sendRename(t); // a draft keeps the name locally; save() carries it into the room
+      setTitle(t);
+    }
     setEditingName(false);
   }
 
@@ -419,8 +424,11 @@ export default function EditorPage() {
   return (
     <div className="layout">
       <header>
-        {/* identity & document: logo → product home in a new tab (Diagrams stays reachable via the workspace menu), workspace, editable title, sync state */}
-        <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>
+        {/* identity & document: logo → your Diagrams when signed in (the natural
+            "home"), else the product site; then workspace, editable title, sync state */}
+        {claims
+          ? <Link className="brand" to="/diagrams" title="My diagrams" aria-label="My diagrams"><img src="/logo.svg" alt="" /></Link>
+          : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
         {claims && <WorkspaceSwitcher />}
         {claims && <span className="sep">/</span>}
         {booting ? <span className="skeleton name-skel" /> : claims ? (
@@ -437,26 +445,28 @@ export default function EditorPage() {
             </span>
           )
         ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")} title={diagramLabel}><span className="dn-text">{diagramLabel}</span></span>}
+        {/* one save indicator, always with text: a saved file syncs live; a draft is unsaved until you Save */}
         {claims && d && !booting && (
           <span className={"save-ind" + (live ? "" : " off")} title={live ? "All changes are saved in real time" : "Disconnected — changes are not being saved"}>
             {live ? "Saved" : "Offline"}
           </span>
         )}
-        {claims && draftMode && !d && !booting && (
-          <button className="save-ind draft" onClick={promoteDraft}
-            title="This draft isn't saved yet. Save now — or it saves itself after your first successful edit.">
-            Draft — Save
-          </button>
-        )}
-        {!d && localSaved && !draftMode && !booting && (
-          <span className="save-ind url" title="Your diagram lives entirely in this page's URL — bookmark or Share it to keep it. Nothing is stored on a server.">
-            Saved to URL
+        {isDraft && !booting && (
+          <span className="save-ind unsaved" title="This draft isn't on the server yet. Save to keep it in your Diagrams (⌘/Ctrl-S). It also lives in this page's URL.">
+            {savingDraft ? "Saving…" : "Unsaved"}
           </span>
         )}
         <div className="spacer" />
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
           <button className="mob-hide" onClick={() => setGalleryOpen(true)} title="New diagram" aria-haspopup="dialog"><Plus size={16} strokeWidth={2.2} />New</button>
+          <a className="btn mob-hide" href={docHref(kind)} target="_blank" rel="noopener noreferrer" title={`Syntax help for ${KINDS.find((x) => x.value === kind)?.label ?? kind}`}><BookOpen size={16} strokeWidth={2} />Docs</a>
+          {isDraft && !booting && (
+            <button className="btn-primary mob-hide" onClick={save} title="Save to your Diagrams (⌘/Ctrl-S)">
+              <Save size={16} strokeWidth={2} />
+              Save
+            </button>
+          )}
           {shared && claims && (
             <button className="mob-hide" onClick={saveCopy} title="Save a copy to your Diagrams">
               <Save size={16} strokeWidth={2} />
@@ -490,10 +500,20 @@ export default function EditorPage() {
             </button>
             {moreOpen && (
               <div className="acct-menu">
+                {isDraft && !booting && (
+                  <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); save(); }}>
+                    <Save size={17} strokeWidth={1.9} />
+                    Save to my Diagrams
+                  </button>
+                )}
                 <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); setGalleryOpen(true); }}>
                   <Plus size={17} strokeWidth={2} />
                   New diagram
                 </button>
+                <a className="acct-item exp-item" href={docHref(kind)} target="_blank" rel="noopener noreferrer" onClick={() => setMoreOpen(false)}>
+                  <BookOpen size={17} strokeWidth={1.9} />
+                  Docs
+                </a>
                 {shared && claims && (
                   <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); saveCopy(); }}>
                     <Save size={17} strokeWidth={1.9} />
@@ -517,7 +537,8 @@ export default function EditorPage() {
             )}
           </div>
           <div className="account" onClick={(e) => e.stopPropagation()}>
-            <button className="btn-primary" onClick={openShare} title="Share this diagram — the entire content lives in the link">
+            {/* Share is the standing CTA, but a draft's Save outranks it — demote Share to secondary then */}
+            <button className={isDraft && !booting ? "" : "btn-primary"} onClick={openShare} title="Share this diagram — the entire content lives in the link">
               <Link2 size={16} strokeWidth={2} />
               Share
             </button>
@@ -577,16 +598,26 @@ export default function EditorPage() {
           <>
             <section className="pane" style={{ flex: `0 0 ${split}%` }}>
               <div className="pane-bar">
-                <select className="kind-select" value={kind} title="Diagram type"
+                {/* a visible label so the dropdown reads as a 28-format switcher, not a mystery control */}
+                <label className="kind-label" htmlFor="kind-select">Type</label>
+                <select id="kind-select" className="kind-select" value={kind} title="Diagram type — 28 formats"
                   onChange={(e) => {
-                    // kroki.io behaviour: switching type loads that type's example and renders it
+                    // kroki.io behaviour: switching type loads that type's example. That OVERWRITES
+                    // the buffer, so confirm first when the user has typed something worth keeping.
                     const k = e.target.value;
+                    const sample = kindRef.current === "kymo" ? SAMPLE : (SAMPLES[kindRef.current] ?? "");
+                    const dirty = source.trim() && source !== sample;
+                    if (dirty && !window.confirm(`Switch to ${KINDS.find((x) => x.value === k)?.label ?? k}?\nThis replaces the current source with a ${KINDS.find((x) => x.value === k)?.label ?? k} starter — your edits will be lost.`)) {
+                      e.target.value = kindRef.current; // revert the select; leave source untouched
+                      return;
+                    }
                     userEdited.current = true;
                     setKind(k);
                     setSource(k === "kymo" ? SAMPLE : (SAMPLES[k] ?? ""));
                   }}>
                   {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
                 </select>
+                <a className="syntax-link" href={docHref(kind)} target="_blank" rel="noopener noreferrer" title={`Syntax help for ${KINDS.find((x) => x.value === kind)?.label ?? kind}`}><HelpCircle size={13} strokeWidth={2} />Syntax</a>
                 {detected && <span className="detect-chip">auto-detected {detected}</span>}
                 {kind !== "kymo" && (
                   <span className="kroki-note" title={kind === "mermaid"
@@ -596,7 +627,7 @@ export default function EditorPage() {
                   </span>
                 )}
               </div>
-              <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; if (draftModeRef.current) draftEdited.current = true; setShareError(null); setSource(v); }} />
+              <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
             <div className="splitter" title="Drag to resize · double-click for 50/50"
               onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />
@@ -609,7 +640,7 @@ export default function EditorPage() {
           </>
         )}
       </main>
-      <div className={"status" + (statusErr ? " error" : "")}>{status}</div>
+      <div className={"status" + (statusErr ? " error" : "")} title={statusTitle}>{status}</div>
     </div>
   );
 }
