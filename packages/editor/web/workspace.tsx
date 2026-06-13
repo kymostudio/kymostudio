@@ -75,6 +75,15 @@ export function assignDiagram(idToken: string | null, id: string, folderId: stri
   }).catch(() => {});
 }
 
+// Delete a diagram. Resolves true on success so callers can refresh their list.
+export async function deleteDiagram(idToken: string | null, id: string): Promise<boolean> {
+  if (!idToken) return false;
+  try {
+    const r = await fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" });
+    return r.ok;
+  } catch { return false; }
+}
+
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const { idToken } = useAuth();
   const [folders, setFolders] = useState<Folder[]>([]);
