@@ -10,7 +10,7 @@ import { DIAGRAMS_API, TRASH_API } from "./const";
 import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
-  ChevronRight, ChevronDown, Folder as FolderIcon, FolderOpen, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
+  ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
   Files, Search, Shapes, BookOpen, LayoutGrid, LogOut, Menu, ExternalLink,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
@@ -285,7 +285,7 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
           title={r.name}>
           {guides(r.ancestors)}
           <span className="sb-chev">{r.open ? <ChevronDown size={14} strokeWidth={2.2} /> : <ChevronRight size={14} strokeWidth={2.2} />}</span>
-          {r.open ? <FolderOpen size={15} strokeWidth={1.9} className="sb-icon" /> : <FolderIcon size={15} strokeWidth={1.9} className="sb-icon" />}
+          <span className="sb-spacer" /> {/* no folder glyph — keeps the name column aligned with files */}
           {isEditing ? renameInput("folder", r.id, r.name) : <span className="sb-name">{r.name}</span>}
         </div>
       );
