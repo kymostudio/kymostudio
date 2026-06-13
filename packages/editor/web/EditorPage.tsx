@@ -90,10 +90,6 @@ export default function EditorPage() {
   const closePanelOnPhone = useCallback(() => {
     if (isPhone()) { setActivePanel(null); try { localStorage.setItem("kymo_panel", "none"); } catch {} }
   }, []);
-  // hamburger: collapse the panel if open, else reopen the Explorer.
-  const toggleSidebar = useCallback(() => {
-    setActivePanel((cur) => { const next = cur ? null : "explorer"; try { localStorage.setItem("kymo_panel", next ?? "none"); } catch {} return next; });
-  }, []);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
@@ -617,7 +613,7 @@ export default function EditorPage() {
       <div className="workarea">
         {claims && !shared && (
           <>
-            <ActivityBar active={activePanel} onSelect={selectPanel} onToggle={toggleSidebar} />
+            <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} />
             {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onNewDiagram={() => setGalleryOpen(true)} onClose={closePanelOnPhone} />}
             {activePanel === "search" && <SearchPanel currentId={d} onClose={closePanelOnPhone} />}
             {activePanel === "templates" && <TemplatesPanel onPick={pickTemplate} onClose={closePanelOnPhone} />}
