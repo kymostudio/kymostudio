@@ -228,11 +228,11 @@ pub fn mermaid_to_sequence_svg(src: &str) -> Result<String, mermaid::MermaidErro
 /// Render `$…$` TeX math in a sequence item's text (recursing into fragments).
 fn render_sequence_item_math(item: &mut sequence::Item) {
     match item {
-        sequence::Item::Message(m) => m.text = math::render(&m.text),
-        sequence::Item::Note(n) => n.text = math::render(&n.text),
+        sequence::Item::Message(m) => m.text = clean_label(&m.text),
+        sequence::Item::Note(n) => n.text = clean_label(&n.text),
         sequence::Item::Fragment(f) => {
             for op in &mut f.operands {
-                op.guard = math::render(&op.guard);
+                op.guard = clean_label(&op.guard);
                 for it in &mut op.items {
                     render_sequence_item_math(it);
                 }
@@ -284,17 +284,22 @@ pub fn mermaid_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
     Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
 }
 
-/// Render Mermaid `$…$` TeX math in every flowchart label (nodes, edges,
-/// subgraph titles) to Unicode, so PNG/PDF show symbols, not raw LaTeX.
+/// Normalise a Mermaid label for rendering: `<br>` line breaks become spaces,
+/// then `$…$` TeX math is rendered to Unicode.
+fn clean_label(s: &str) -> String {
+    math::render(&math::strip_br(s))
+}
+
+/// Apply [`clean_label`] to every flowchart label (nodes, edges, subgraph titles).
 fn render_flowchart_math(fc: &mut flowchart::Flowchart) {
     for n in &mut fc.nodes {
-        n.label = math::render(&n.label);
+        n.label = clean_label(&n.label);
     }
     for e in &mut fc.edges {
-        e.label = math::render(&e.label);
+        e.label = clean_label(&e.label);
     }
     for g in &mut fc.subgraphs {
-        g.title = math::render(&g.title);
+        g.title = clean_label(&g.title);
     }
 }
 

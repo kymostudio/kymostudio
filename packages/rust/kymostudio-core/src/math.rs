@@ -4,6 +4,36 @@
 //! rasterised PNG/PDF shows readable math instead of raw LaTeX. Unknown commands
 //! fall back to their bare name. Text with no matched `$` pair is unchanged.
 
+/// Replace `<br>` / `<br/>` / `<br />` (any case) with a space — Mermaid treats
+/// them as line breaks in labels.
+pub fn strip_br(s: &str) -> String {
+    let lower = s.to_ascii_lowercase();
+    if !lower.contains("<br") {
+        return s.to_string();
+    }
+    let chars: Vec<char> = s.chars().collect();
+    let lc: Vec<char> = lower.chars().collect();
+    let mut out = String::new();
+    let mut i = 0;
+    while i < chars.len() {
+        if lc[i] == '<' && lc[i + 1..].starts_with(&['b', 'r']) {
+            // consume up to and including the next '>'
+            let mut j = i + 3;
+            while j < chars.len() && chars[j] != '>' {
+                j += 1;
+            }
+            if j < chars.len() {
+                out.push(' ');
+                i = j + 1;
+                continue;
+            }
+        }
+        out.push(chars[i]);
+        i += 1;
+    }
+    out
+}
+
 /// Render every `$…$` / `$$…$$` math span in `s`; leave the rest verbatim.
 pub fn render(s: &str) -> String {
     if !s.contains('$') {
@@ -108,6 +138,15 @@ fn render_tex(s: &str) -> String {
                         if matches!(cmd.as_str(), "quad" | "qquad") {
                             out.push(' ');
                         }
+                    }
+                    // Function names render as their name plus a space (they take an
+                    // argument: `\cos t` → `cos t`, not `cost`).
+                    "sin" | "cos" | "tan" | "cot" | "sec" | "csc" | "sinh" | "cosh" | "tanh"
+                    | "arcsin" | "arccos" | "arctan" | "log" | "ln" | "lg" | "exp" | "lim"
+                    | "limsup" | "liminf" | "max" | "min" | "sup" | "inf" | "arg" | "deg"
+                    | "det" | "dim" | "gcd" | "hom" | "ker" | "mod" | "bmod" => {
+                        out.push_str(&cmd);
+                        out.push(' ');
                     }
                     _ => match sym(&cmd) {
                         Some(u) => out.push_str(u),
@@ -349,5 +388,7 @@ mod tests {
         assert_eq!(render(r"$\hat{x}$"), "x");
         let m = render(r"$\begin{cases} a & b \\ c \end{cases}$");
         assert!(m.contains('a') && m.contains('b') && m.contains('c') && !m.contains("begin"));
+        // function names keep a space before their argument
+        assert_eq!(render(r"$\cos t + \sin t$"), "cos t + sin t");
     }
 }
