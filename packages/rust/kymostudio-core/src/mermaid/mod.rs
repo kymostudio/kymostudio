@@ -51,19 +51,106 @@ fn strip_comment(line: &str) -> &str {
     }
 }
 
-/// Parse Mermaid source into a [`Flowchart`], or fail with [`MermaidError`].
-pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
-    // Flatten to statements: split on newlines AND `;`, dropping `%%` comments
-    // (and `%%{init}%%` directives). The first statement is the type header.
-    let mut stmts: Vec<(usize, String)> = Vec::new();
-    for (i, line) in src.lines().enumerate() {
-        for seg in strip_comment(line).split(';') {
-            let seg = seg.trim();
-            if !seg.is_empty() {
-                stmts.push((i + 1, seg.to_string()));
+/// Split a flowchart source into statements, separating on newlines and `;`
+/// and dropping `%%` comments (incl. `%%{init}%%` directives) — but only
+/// outside a `"..."` string, so a quoted label may span physical lines and
+/// contain `;`/`%%`. Each statement carries the 1-based line where it began.
+fn split_statements(src: &str) -> Vec<(usize, String)> {
+    let mut out: Vec<(usize, String)> = Vec::new();
+    let mut cur = String::new();
+    let mut line = 1usize; // current physical line
+    let mut start = 1usize; // line where `cur` began
+    let mut in_str = false; // inside a double-quoted string
+    let mut in_comment = false; // inside a `%%` line comment
+    let mut data_depth = 0u32; // brace nesting inside an `@{ ... }` node-data block
+    let mut chars = src.chars().peekable();
+    let flush = |cur: &mut String, start: usize, out: &mut Vec<(usize, String)>| {
+        let t = cur.trim();
+        if !t.is_empty() {
+            out.push((start, t.to_string()));
+        }
+        cur.clear();
+    };
+    while let Some(c) = chars.next() {
+        // Inside a quoted string, everything is literal; fold newlines so a
+        // label may span physical lines.
+        if in_str {
+            cur.push(if c == '\n' { ' ' } else { c });
+            if c == '\n' {
+                line += 1;
+            } else if c == '"' {
+                in_str = false;
             }
+            continue;
+        }
+        // A `%%` comment runs to end of line; the line still ends the statement.
+        if in_comment {
+            if c == '\n' {
+                in_comment = false;
+                flush(&mut cur, start, &mut out);
+                start = line + 1;
+                line += 1;
+            }
+            continue;
+        }
+        // Inside `@{ ... }` node metadata, keep everything in one statement and
+        // turn YAML line breaks into `,` field separators.
+        if data_depth > 0 {
+            match c {
+                '"' => {
+                    in_str = true;
+                    cur.push(c);
+                }
+                '{' => {
+                    data_depth += 1;
+                    cur.push(c);
+                }
+                '}' => {
+                    data_depth -= 1;
+                    cur.push(c);
+                }
+                '\n' => {
+                    cur.push(',');
+                    line += 1;
+                }
+                _ => cur.push(c),
+            }
+            continue;
+        }
+        match c {
+            '\n' => {
+                flush(&mut cur, start, &mut out);
+                start = line + 1;
+                line += 1;
+            }
+            '"' => {
+                in_str = true;
+                cur.push(c);
+            }
+            '@' if chars.peek() == Some(&'{') => {
+                chars.next();
+                cur.push_str("@{");
+                data_depth = 1;
+            }
+            '%' if chars.peek() == Some(&'%') => {
+                chars.next();
+                in_comment = true;
+            }
+            ';' => {
+                flush(&mut cur, start, &mut out);
+                start = line;
+            }
+            _ => cur.push(c),
         }
     }
+    flush(&mut cur, start, &mut out);
+    out
+}
+
+/// Parse Mermaid source into a [`Flowchart`], or fail with [`MermaidError`].
+pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
+    // Flatten to statements. The first statement is the type header.
+    let stmts = split_statements(src);
 
     let header = stmts.first().ok_or(MermaidError::Empty)?;
     let (kind, direction) = detect_type(&header.1)?;
@@ -82,8 +169,27 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
     // Stack of open subgraph indices (innermost last).
     let mut sub_stack: Vec<usize> = Vec::new();
     let mut sub_auto = 0usize;
+    // The final node of the previous statement, for line continuation.
+    let mut last_node: Option<Vec<String>> = None;
 
+    // Skip the body of an `accDescr { ... }` / `accTitle { ... }` accessibility
+    // block — those lines are prose, not graph statements.
+    let mut skip_block = false;
     for (lineno, stmt) in stmts.iter().skip(1) {
+        if skip_block {
+            if stmt.contains('}') {
+                skip_block = false;
+            }
+            continue;
+        }
+        let low = stmt.to_ascii_lowercase();
+        if (low.starts_with("accdescr") || low.starts_with("acctitle"))
+            && stmt.contains('{')
+            && !stmt.contains('}')
+        {
+            skip_block = true;
+            continue;
+        }
         handle_statement(
             stmt,
             *lineno,
@@ -91,6 +197,7 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
             &mut index,
             &mut sub_stack,
             &mut sub_auto,
+            &mut last_node,
         )?;
     }
     Ok(fc)
@@ -125,6 +232,7 @@ fn handle_statement(
     index: &mut Vec<(String, usize)>,
     sub_stack: &mut Vec<usize>,
     sub_auto: &mut usize,
+    last_node: &mut Option<Vec<String>>,
 ) -> Result<(), MermaidError> {
     let lower = stmt.to_ascii_lowercase();
 
@@ -172,7 +280,11 @@ fn handle_statement(
 
     // Walk items: NodeGroup (Edge NodeGroup)*. A group is one or more `&`-joined
     // nodes; an edge between two groups fans out to every (src, dst) pair.
-    let mut prev: Option<Vec<String>> = None;
+    let mut prev: Option<Vec<String>> = if matches!(items.first(), Some(Item::Edge(_))) {
+        last_node.clone() // line continuation: source is the previous node
+    } else {
+        None
+    };
     let mut pending_edge: Option<lexer::EdgeTok> = None;
     for item in &items {
         match item {
@@ -200,6 +312,9 @@ fn handle_statement(
                 pending_edge = Some(op.clone());
             }
         }
+    }
+    if prev.is_some() {
+        *last_node = prev;
     }
     Ok(())
 }

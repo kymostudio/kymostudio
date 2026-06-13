@@ -79,6 +79,16 @@ impl Scanner {
     /// `(shape, label)`. Two-char delimiters are checked before one-char ones.
     pub fn read_shape(&mut self) -> Option<(Shape, String)> {
         // (open, close, shape) — longest openers first.
+        const THREE: &[(&str, &str, Shape)] = &[
+            ("(((", ")))", Shape::Circle), // double circle
+        ];
+        for (open, close, shape) in THREE {
+            if self.starts_with(open) {
+                self.i += 3;
+                let label = self.read_until(close);
+                return Some((*shape, label));
+            }
+        }
         const TWO: &[(&str, &str, Shape)] = &[
             ("[[", "]]", Shape::Box),      // subroutine
             ("[(", ")]", Shape::Cylinder), // database / cylinder
@@ -126,9 +136,14 @@ impl Scanner {
     pub fn skip_class_suffix(&mut self) {
         if self.starts_with(":::") {
             self.i += 3;
-            while matches!(self.peek(), Some(c) if c.is_ascii_alphanumeric() || c == '_' || c == '-')
-            {
-                self.i += 1;
+            while let Some(c) = self.peek() {
+                if c.is_ascii_alphanumeric() || c == '_' {
+                    self.i += 1;
+                } else if c == '-' && !matches!(self.peek_at(1), Some('-') | Some('>')) {
+                    self.i += 1; // a hyphen inside the class name, not an arrow
+                } else {
+                    break;
+                }
             }
         }
     }
@@ -241,33 +256,46 @@ impl Scanner {
         self.skip_ws();
         match self.peek() {
             Some('-') | Some('=') | Some('<') | Some('.') | Some('~') => {}
+            // Leading circle/cross arrowhead (`o--o`, `x--x`), only when a link
+            // run follows so we don't mistake a node id starting with o/x.
+            Some('o') | Some('x')
+                if matches!(self.peek_at(1), Some('-') | Some('=') | Some('.')) => {}
             _ => {
                 self.i = save;
                 return None;
             }
         }
         let run_start = self.i;
+        if matches!(self.peek(), Some('o') | Some('x')) {
+            self.i += 1;
+        }
         while matches!(self.peek(), Some(c) if matches!(c, '-' | '=' | '.' | '>' | '<' | '~')) {
             self.i += 1;
         }
-        // Optional single arrowhead glyph (`x` open / `o` circle).
+        // Optional trailing arrowhead glyph (`x` open / `o` circle).
         if matches!(self.peek(), Some('x') | Some('o')) && self.i > run_start {
             self.i += 1;
         }
         let run: String = self.chars[run_start..self.i].iter().collect();
         let mut dashed = run.contains('.');
-        let mut has_arrow =
-            run.contains('>') || run.starts_with('<') || run.ends_with('x') || run.ends_with('o');
+        let mut has_arrow = run.contains('>')
+            || run.starts_with('<')
+            || run.starts_with('o')
+            || run.starts_with('x')
+            || run.ends_with('x')
+            || run.ends_with('o');
 
-        // Inline label form `-- text -->` / `== text ==>` / `-. text .->`:
-        // only when the opening run has no arrowhead yet (otherwise the text
-        // after `A-->` is the destination node, not a label).
+        // Inline label form `-- text -->` / `== text ==>` / `<-- text -->`:
+        // applies when the opening run does not yet end with an arrowhead
+        // (otherwise the text after `A-->` is the destination node, not a label).
+        let opens = !(run.ends_with('>') || run.ends_with('x') || run.ends_with('o'));
         let mut label = String::new();
-        if !has_arrow {
+        if opens {
             if let Some((text, run2)) = self.try_inline_edge_label() {
                 label = text;
                 dashed = dashed || run2.contains('.');
-                has_arrow = run2.contains('>') || run2.ends_with('x') || run2.ends_with('o');
+                has_arrow =
+                    has_arrow || run2.contains('>') || run2.ends_with('x') || run2.ends_with('o');
             }
         }
 

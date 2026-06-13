@@ -315,6 +315,23 @@ mod tests {
     }
 
     #[test]
+    fn multiline_node_data_and_continuation() {
+        // Multi-line `@{ ... }` node-data block (YAML newline-separated fields).
+        let svg = super::mermaid_to_svg(
+            "flowchart TB\nA@{\n  shape: circle\n  label: \"Hi\"\n}\nA --> B",
+        )
+        .expect("node-data block");
+        assert!(svg.starts_with("<?xml") && svg.contains(">Hi<"));
+
+        // Line continuation: the edge on the second line attaches to `A`.
+        let svg = super::mermaid_to_svg("flowchart TB\nA[One]\n--> B[Two]").expect("continuation");
+        assert!(svg.contains(">One<") && svg.contains(">Two<"));
+
+        // A dangling trailing edge (`g-->`) is tolerated, not an error.
+        super::mermaid_to_svg("flowchart LR\na-->b\nb-->").expect("dangling edge");
+    }
+
+    #[test]
     fn self_loops_and_cycles_terminate() {
         // Self-loops and predecessor cycles must not hang layout (they used to
         // spin the trunk walk forever). Each of these must render and return.
