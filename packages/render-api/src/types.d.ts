@@ -28,3 +28,8 @@ declare module "onml" {
   const onml: { s: (tree: unknown) => string };
   export default onml;
 }
+
+// vega-interpreter ships no type declarations.
+declare module "vega-interpreter" {
+  export const expressionInterpreter: unknown;
+}

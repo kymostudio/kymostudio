@@ -16,6 +16,9 @@
     "kymostudio-core": "^0.4.4",
     "nomnoml": "^1.7.0",
     "onml": "^2.1.0",
+    "vega": "^6.2.0",
+    "vega-interpreter": "^2.2.1",
+    "vega-lite": "^6.4.3",
     "wavedrom": "^3.6.1"
   },
   "devDependencies": {
