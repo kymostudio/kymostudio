@@ -315,6 +315,20 @@ mod tests {
     }
 
     #[test]
+    fn self_loops_and_cycles_terminate() {
+        // Self-loops and predecessor cycles must not hang layout (they used to
+        // spin the trunk walk forever). Each of these must render and return.
+        for src in [
+            "flowchart TD\nA --> A",
+            "flowchart TD\na --> b\nb --> c\nc --> b\nb --> b",
+            "flowchart\nA --> A\nsubgraph B\nB1 --> B1\nend",
+        ] {
+            let svg = super::mermaid_to_svg(src).expect("render");
+            assert!(svg.starts_with("<?xml"), "{src:?}");
+        }
+    }
+
+    #[test]
     fn mermaid_and_d2_to_svg() {
         // mmd → SVG and the equivalent D2 → SVG both render the diamond + label.
         let mmd = super::mermaid_to_svg("flowchart TD\nA[Go] --> B{ok?}").unwrap();

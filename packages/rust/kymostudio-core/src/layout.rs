@@ -138,7 +138,9 @@ pub fn layout_flowchart(fc: &Flowchart) -> Diagram {
         .max_by_key(|n| (rank[n.as_str()], -(decl[n.as_str()] as i64)))
         .cloned();
     while let Some(c) = cur {
-        trunk.insert(c.clone());
+        if !trunk.insert(c.clone()) {
+            break; // predecessor cycle (e.g. a self-loop) — stop walking
+        }
         cur = pred
             .get(&c)
             .and_then(|ps| {
