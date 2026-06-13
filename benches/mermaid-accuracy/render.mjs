@@ -57,7 +57,8 @@ async function kroki(source, fmt) {
   return fmt === "png" ? Buffer.from(await r.arrayBuffer()) : await r.text();
 }
 
-const corpus = JSON.parse(readFileSync(HERE + "corpus.json", "utf8"));
+const DS = HERE + "datasets/";
+const corpus = JSON.parse(readFileSync(DS + "corpus.json", "utf8"));
 const out = [];
 
 for (const c of corpus) {
