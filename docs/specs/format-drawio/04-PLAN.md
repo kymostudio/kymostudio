@@ -1,7 +1,7 @@
 ---
 title: draw.io Interoperability — Plan (umbrella)
 document_id: PLAN-DRAWIO-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-03
 status: Draft
 classification: Internal
@@ -124,11 +124,12 @@ Family-scope changes and new modules are raised under the affected layer: a new 
 |---------|------------|--------|----------------|
 | 0.1     | 2026-06-03 | Vũ Anh | Initial umbrella plan: scope/approach, module roadmap (drawio-svg delivered; import/raster proposed), risks, indicative estimate. |
 | 0.2     | 2026-06-03 | Vũ Anh | **Zero-dependency direction.** Reframed scope/approach to a dependency-free decode substrate + own emitters; reclassified `drawio-svg` from *delivered* to *as-is gap / redesign pending*; reworked risks around the fidelity-vs-zero-dep trade-off; bumped the `drawio-svg` estimate (own SVG emitter). |
+| 0.3     | 2026-06-13 | Vũ Anh | Folder renamed `docs/specs/drawio/` → `docs/specs/format-drawio/` (`format-<lang>` prefix scheme, siblings `format-bpmn/` / `format-mermaid/`). All `*-DRAWIO-001` document_ids and the "draw.io Interoperability" titles unchanged; self-referential paths in the family's Annex B.1 sections updated. |
 
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/drawio/05-PLAN.md`; authoritative source is the main-branch working
+Version-controlled at `docs/specs/format-drawio/05-PLAN.md`; authoritative source is the main-branch working
 tree (history via `git log`).
 
 ### B.2 Distribution

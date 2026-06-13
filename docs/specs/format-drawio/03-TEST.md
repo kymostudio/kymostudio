@@ -105,7 +105,7 @@ drift on existing paths, is a **failure**.
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/drawio/04-TEST.md`; authoritative source is the main-branch working
+Version-controlled at `docs/specs/format-drawio/04-TEST.md`; authoritative source is the main-branch working
 tree (history via `git log`).
 
 ### B.2 Distribution

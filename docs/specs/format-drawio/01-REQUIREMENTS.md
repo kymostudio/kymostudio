@@ -221,7 +221,7 @@ published `kymostudio` package's dependency-free standard extends to the interop
 ## Annex B — Document Control
 
 ### B.1 Storage and Retrieval
-Version-controlled at `docs/specs/drawio/01-REQUIREMENTS.md`; authoritative source is the main-branch working
+Version-controlled at `docs/specs/format-drawio/01-REQUIREMENTS.md`; authoritative source is the main-branch working
 tree (history via `git log`).
 
 ### B.2 Distribution
