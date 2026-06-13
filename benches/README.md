@@ -29,13 +29,13 @@ real pipeline) to roll them up — it never re-baselines them.
 | [`editor/`](editor/) | editor.kymo.studio **share-link first load** (online: deployed site + live kroki.io) — diagram renders with every label intact (correctness, incl. the foreignObject-sanitizer regression) and the wasm engine chunk loads only for the kymo DSL **and** cold-load time to first diagram on throttled Fast 4G (performance) | [`editor/results/REPORT.md`](editor/results/REPORT.md) |
 | [`svg2pdf/`](svg2pdf/) | SVG→PDF converter comparison — kymo's svg2pdf core vs cairosvg, svglib, librsvg (`rsvg-convert`), fpdf2: fidelity + vector-structure vs the kymo reference (PDFs rasterized via PyMuPDF) (correctness) **and** convert timing (performance) | [`svg2pdf/results/REPORT.md`](svg2pdf/results/REPORT.md) |
 | [`render-api/`](render-api/) | render.kymo.studio render latency (online) vs kroki.io — self-render vs proxy, cache hit/miss, warm-on-share (performance) | [`render-api/results/REPORT.md`](render-api/results/REPORT.md) |
-| [`mermaid-accuracy/`](mermaid-accuracy/) | mermaid render fidelity — kymo's own engine vs merman vs mermaid.js: raster-safe text recall **and** visual distance to mermaid.js (correctness) | [`mermaid-accuracy/results/REPORT.md`](mermaid-accuracy/results/REPORT.md) |
+| [`mermaid-format/`](mermaid-format/) | mermaid render fidelity — kymo's own engine vs merman vs mermaid.js: raster-safe text recall **and** visual distance to mermaid.js (correctness) | [`mermaid-format/results/REPORT.md`](mermaid-format/results/REPORT.md) |
 
 The offline engine benches (`bpmn`, `svg2png`, `svg2pdf`, `editor`) follow the
 same shape: read-only `quality.py` (correctness, pure stdlib), `perf.py` (timing,
 imports `kymo`), `run.py` (both → `results/`), and a committed `results/` with
 `quality.json`, `perf.json`, `REPORT.md`. The online API benches (`render-api`,
-`mermaid-accuracy`) are thinner — a `run.py` (or `render.mjs` + `accuracy.py`)
+`mermaid-format`) are thinner — a `run.py` (or `render.mjs` + `accuracy.py`)
 that hits the live service and writes a dated `results/` snapshot.
 
 Related: [`../conformance/`](../conformance/) locks Python↔JS parity (the source

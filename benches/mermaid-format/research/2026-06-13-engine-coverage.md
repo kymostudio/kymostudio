@@ -1,6 +1,6 @@
 # Engine coverage at corpus scale: where raster text breaks, and how far kymo reaches
 
-*The study behind `benches/mermaid-accuracy/` (`coverage.mjs` / `COVERAGE.md`).
+*The study behind `benches/mermaid-format/` (`coverage.mjs` / `COVERAGE.md`).
 Written 2026-06-13. Renders all 3,966 raw sources (merman + mermaid-cypress +
 mermaid-to-svg datasets) through merman and, for flowchart/sequence, kymo. Each
 render runs in a worker with a 4 s timeout — four sources (self-referential

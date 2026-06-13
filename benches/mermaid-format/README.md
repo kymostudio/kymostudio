@@ -1,4 +1,4 @@
-# mermaid-accuracy — kymo vs merman vs mermaid.js
+# mermaid-format — kymo vs merman vs mermaid.js
 
 Measures how faithfully render.kymo.studio's two mermaid engines reproduce a
 diagram, against **mermaid.js itself** (rendered by kroki.io) as the ground
@@ -30,7 +30,7 @@ own visual style for complete raster text.
 ## Run
 
 ```bash
-cd benches/mermaid-accuracy
+cd benches/mermaid-format
 uv sync                    # one-time: Pillow + numpy
 
 # 1. render all engines + score recall (needs render-api's wasm engines built)
