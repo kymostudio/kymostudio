@@ -1,7 +1,7 @@
 # Mermaid engine coverage — kymo & merman over the raw corpora
 
 *Renders every source in the `merman`, `mermaid-cypress` and `mermaid-to-svg`
-datasets (3,966 diagrams, 24 grammars) through merman (all grammars) and,
+datasets (3,977 diagrams, 24 grammars) through merman (all grammars) and,
 where kymo has its own engine (flowchart, sequence), through kymo too. Offline —
 kymo + merman wasm only. Measures render success and whether the SVG is
 raster-safe: real `<text>` survives PNG/PDF; `<foreignObject>` (HTML labels) does
@@ -11,8 +11,8 @@ not.*
 
 | grammar | sources | merman renders | merman uses foreignObject | kymo engine | kymo renders |
 |---|---|---|---|---|---|
-| flowchart | 1,027 | 98% | 98% | ✓ | 44% |
-| sequence | 436 | 91% | 0% | ✓ | 100% |
+| flowchart | 1,033 | 98% | 98% | ✓ | 45% |
+| sequence | 441 | 91% | 0% | ✓ | 100% |
 | state | 347 | 99% | 97% |  | — |
 | class | 282 | 96% | 99% |  | — |
 | gitgraph | 249 | 91% | 0% |  | — |
@@ -35,7 +35,7 @@ not.*
 | journey | 26 | 100% | 62% |  | — |
 | info | 18 | 94% | 0% |  | — |
 | zenuml | 18 | 94% | 0% |  | — |
-| **all** | 3,966 | 95% | 58% | | |
+| **all** | 3,977 | 95% | 58% | | |
 
 - **merman renders** — fraction of real sources merman parses+renders without
   error (its robustness on the upstream corpus).
@@ -50,6 +50,7 @@ not.*
 
 | dataset | sources | merman renders | foreignObject grammars |
 |---|---|---|---|
+| mermaid-kymo | 11 | 100% | 1/2 |
 | merman | 3,078 | 97% | 9/24 |
 | mermaid-cypress | 803 | 90% | 9/24 |
 | mermaid-to-svg | 85 | 100% | 9/21 |

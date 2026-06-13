@@ -16,7 +16,7 @@ const RA = process.env.RENDER_API_DIR || HERE + "../../packages/render-api";
 const WORKER = HERE + "cov-worker.mjs";
 const TIMEOUT = 4000; // ms per source before we declare a hang
 
-const DATASETS = ["merman", "mermaid-cypress", "mermaid-to-svg"];
+const DATASETS = ["mermaid-kymo", "merman", "mermaid-cypress", "mermaid-to-svg"];
 
 function spawn() {
   const w = new Worker(WORKER, { workerData: { RA } });
@@ -60,34 +60,28 @@ let count = 0;
 for (const ds of DATASETS) {
   const base = DS + ds + "/";
   if (!existsSync(base)) continue;
-  const grammars = readdirSync(base, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
   const byG = {};
-  for (const g of grammars) {
-    const gdir = base + g + "/";
-    const files = readdirSync(gdir).filter((f) => f.endsWith(".mmd"));
-    const acc = blank();
-    for (const f of files) {
-      const src = readFileSync(gdir + f, "utf8");
-      acc.n++;
-      const r = await render(src, g);
-      if (r.timeout) {
-        acc.timeout++;
-      } else {
-        acc.merman_ok += r.merman_ok;
-        acc.merman_fo += r.merman_fo;
-        acc.merman_text += r.merman_text;
-        acc.kymo_n += r.kymo_n;
-        acc.kymo_ok += r.kymo_ok;
-      }
-      if (++count % 200 === 0) process.stderr.write(`  ${count} rendered\n`);
+  const add = async (src, g) => {
+    const acc = (byG[g] ??= blank());
+    acc.n++;
+    const r = await render(src, g);
+    if (r.timeout) acc.timeout++;
+    else { acc.merman_ok += r.merman_ok; acc.merman_fo += r.merman_fo; acc.merman_text += r.merman_text; acc.kymo_n += r.kymo_n; acc.kymo_ok += r.kymo_ok; }
+    if (++count % 200 === 0) process.stderr.write(`  ${count} rendered\n`);
+  };
+  if (existsSync(base + "corpus.json")) {
+    // datasets that store sources inline (mermaid-kymo)
+    for (const e of JSON.parse(readFileSync(base + "corpus.json", "utf8"))) await add(e.source, e.grammar);
+  } else {
+    for (const g of readdirSync(base, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name)) {
+      for (const f of readdirSync(base + g + "/").filter((x) => x.endsWith(".mmd"))) await add(readFileSync(base + g + "/" + f, "utf8"), g);
     }
-    byG[g] = acc;
   }
   writeFileSync(OUT + ds + ".json", JSON.stringify(byG, null, 2) + "\n");
   all[ds] = byG;
   const tot = Object.values(byG).reduce((a, b) => a + b.n, 0);
   const to = Object.values(byG).reduce((a, b) => a + b.timeout, 0);
-  console.error(`${ds}: ${tot} sources, ${grammars.length} grammars, ${to} timeouts`);
+  console.error(`${ds}: ${tot} sources, ${Object.keys(byG).length} grammars, ${to} timeouts`);
 }
 
 writeFileSync(OUT + "all.json", JSON.stringify(all, null, 2) + "\n");

@@ -5,7 +5,7 @@ import pathlib
 
 HERE = pathlib.Path(__file__).resolve().parent
 COV = HERE / "results" / "coverage"
-DATASETS = ["merman", "mermaid-cypress", "mermaid-to-svg"]
+DATASETS = ["mermaid-kymo", "merman", "mermaid-cypress", "mermaid-to-svg"]
 KYMO_GRAMMARS = {"flowchart", "sequence"}
 
 
