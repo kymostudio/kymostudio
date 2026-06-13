@@ -9,7 +9,7 @@ import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
   ChevronRight, ChevronDown, Folder as FolderIcon, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
-  Files, Search, Shapes, Settings, BookOpen, LayoutGrid, LogOut,
+  Files, Search, Shapes, Settings, BookOpen, LayoutGrid, LogOut, Menu,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
@@ -260,7 +260,7 @@ export function TemplatesPanel({ onPick, onClose }: { onPick: (t: Template) => v
 }
 
 // =============================== Activity bar ================================
-export function ActivityBar({ active, onSelect }: { active: Panel | null; onSelect: (p: Panel) => void }) {
+export function ActivityBar({ active, onSelect, onToggle }: { active: Panel | null; onSelect: (p: Panel) => void; onToggle: () => void }) {
   const { claims, signOut } = useAuth();
   const [menu, setMenu] = useState<"account" | "settings" | null>(null);
   useEffect(() => {
@@ -277,6 +277,7 @@ export function ActivityBar({ active, onSelect }: { active: Panel | null; onSele
   return (
     <nav className="activitybar" onClick={(e) => e.stopPropagation()}>
       <div className="act-group">
+        <button className="act-btn act-menu" onClick={onToggle} title="Toggle sidebar" aria-label="Toggle sidebar"><Menu size={22} strokeWidth={2} /></button>
         <Btn id="explorer" label="Explorer"><Files size={22} strokeWidth={1.7} /></Btn>
         <Btn id="search" label="Search"><Search size={22} strokeWidth={1.9} /></Btn>
         <Btn id="templates" label="Templates"><Shapes size={22} strokeWidth={1.8} /></Btn>
