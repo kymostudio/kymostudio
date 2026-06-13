@@ -475,14 +475,12 @@ export default function EditorPage() {
                     {copiedKey === "md" ? <Check size={17} strokeWidth={2.2} /> : <Code2 size={17} strokeWidth={1.9} />}
                     {copiedKey === "md" ? "Copied!" : "Copy Markdown link"}
                   </button>
-                  {kind !== "kymo" && (
-                    <button className="acct-item exp-item" disabled={!link}
-                      title="SVG image rendered by kroki.io — paste straight into a GitHub README"
-                      onClick={() => copyText("img", `![${diagramLabel}](https://kroki.io/${encodeURIComponent(kind)}/svg/${sharePayload})`)}>
-                      {copiedKey === "img" ? <Check size={17} strokeWidth={2.2} /> : <FileImage size={17} strokeWidth={1.9} />}
-                      {copiedKey === "img" ? "Copied!" : "Copy Markdown image"}
-                    </button>
-                  )}
+                  <button className="acct-item exp-item" disabled={!link}
+                    title="SVG image rendered by render.kymo.studio — paste straight into a GitHub README"
+                    onClick={() => copyText("img", `![${diagramLabel}](https://render.kymo.studio/${encodeURIComponent(kind)}/svg/${sharePayload})`)}>
+                    {copiedKey === "img" ? <Check size={17} strokeWidth={2.2} /> : <FileImage size={17} strokeWidth={1.9} />}
+                    {copiedKey === "img" ? "Copied!" : "Copy Markdown image"}
+                  </button>
                 </div>
               );
             })()}
@@ -524,7 +522,7 @@ export default function EditorPage() {
                 {kind !== "kymo" && (
                   <span className="kroki-note" title={kind === "mermaid"
                     ? "Mermaid renders locally in your browser (mermaid.js). Opening a share link may use the kymo render cache for the first paint."
-                    : "Non-Kymo diagram types are rendered by the public kroki.io service — your source is sent to it. Kymo diagrams render locally in your browser."}>
+                    : "Non-Kymo diagram types are rendered by render.kymo.studio (some are relayed to the public kroki.io service — your source is sent along). Kymo diagrams render locally in your browser."}>
                     {kind === "mermaid" ? "renders in-browser" : "renders via kroki.io"}
                   </span>
                 )}

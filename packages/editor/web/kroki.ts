@@ -2,7 +2,8 @@ import DOMPurify from "dompurify";
 import { RENDER_API } from "./const";
 
 // Diagram kinds: "kymo" renders locally (wasm); everything else goes through
-// the free https://kroki.io render API (POST source, get SVG back).
+// the render API (render.kymo.studio, kroki-compatible — POST source, get SVG
+// back; kinds the worker doesn't self-render are relayed to kroki.io).
 export const KINDS: { value: string; label: string }[] = [
   { value: "kymo", label: "Kymo" },
   { value: "actdiag", label: "ActDiag" },
@@ -89,9 +90,9 @@ function postRender(base: string, kind: string, source: string): Promise<Respons
 }
 
 export async function renderKroki(kind: string, source: string): Promise<string> {
-  // Proxy first (edge-cached by content hash — repeat share-link loads skip
-  // kroki's server render); fall back to kroki.io directly if the proxy is
-  // unreachable or broken, so the worker is never a single point of failure.
+  // Render API first (edge-cached by content hash, self-renders the kinds it
+  // covers); fall back to kroki.io directly if it is unreachable or broken,
+  // so the worker is never a single point of failure.
   let r = await earlyResponse(kind, source);
   if (r && r.status >= 500) r = null; // dead upstream on the warm-up — retry through the fallback chain
   if (!r) {
