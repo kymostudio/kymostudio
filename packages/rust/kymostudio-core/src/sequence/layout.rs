@@ -86,7 +86,8 @@ pub(crate) struct Layout {
     pub(crate) bottom: i64,
     index: HashMap<String, usize>,
     y: i64,
-    auto_on: bool,
+    auto_enabled: bool,
+    auto_display: bool,
     auto_n: i64,
     auto_step: i64,
     open_acts: HashMap<usize, Vec<i64>>,
@@ -117,8 +118,9 @@ impl Layout {
             acts: Vec::new(),
             y: FIRST_MSG_Y,
             bottom: FIRST_MSG_Y,
-            auto_on: false,
-            auto_n: 0,
+            auto_enabled: false,
+            auto_display: false,
+            auto_n: 1,
             auto_step: 1,
             open_acts: HashMap::new(),
         }
@@ -135,10 +137,13 @@ impl Layout {
                     let from = self.idx(&m.from);
                     let to = self.idx(&m.to);
                     let self_loop = from == to;
-                    let text = if self.auto_on {
+                    let text = if self.auto_enabled {
                         let n = self.auto_n;
-                        self.auto_n += self.auto_step;
-                        if m.text.is_empty() {
+                        let show = self.auto_display;
+                        self.auto_n += self.auto_step; // advances even when hidden
+                        if !show {
+                            m.text.clone()
+                        } else if m.text.is_empty() {
                             n.to_string()
                         } else {
                             format!("{} {}", n, m.text)
@@ -168,13 +173,18 @@ impl Layout {
                     self.y = note.top + note.height + NOTE_GAP;
                     self.notes.push(note);
                 }
-                Item::Autonumber(spec) => match spec {
-                    Some((start, step)) => {
-                        self.auto_on = true;
+                Item::Autonumber(cmd) => match cmd {
+                    super::AutoNumber::Set(start, step) => {
+                        self.auto_enabled = true;
+                        self.auto_display = true;
                         self.auto_n = *start;
                         self.auto_step = *step;
                     }
-                    None => self.auto_on = false,
+                    super::AutoNumber::On => {
+                        self.auto_enabled = true;
+                        self.auto_display = true;
+                    }
+                    super::AutoNumber::Off => self.auto_display = false,
                 },
                 Item::Activate(x) => {
                     let c = self.idx(x);
