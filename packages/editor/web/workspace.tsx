@@ -1,13 +1,17 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
-import { WORKSPACES_API, DIAGRAMS_API } from "./const";
+import { WORKSPACES_API, DIAGRAMS_API, PROJECTS_API } from "./const";
 import { newId } from "./util";
 import { Check, ChevronDown, FolderPlus, Folder as FolderIcon } from "lucide-react";
 
 // A folder in the diagram tree. parentId "" = a root-level folder. (The backend
 // stores these in the `workspaces` table; "folder" is the user-facing concept.)
 export type Folder = { id: string; name: string; parentId: string; createdAt: number };
+
+// A project: the layer ABOVE folders. A project owns many folders + diagrams.
+// The user always has at least one (the backend auto-creates "Personal").
+export type Project = { id: string; name: string; createdAt: number };
 
 // ---- pure tree helpers (operate on the flat folder list) ----
 export function childFoldersOf(folders: Folder[], parentId: string): Folder[] {
@@ -59,20 +63,45 @@ type WsVal = {
   renameFolder: (id: string, name: string) => Promise<void>;
   deleteFolder: (id: string) => Promise<void>;
   moveFolder: (id: string, parentId: string) => Promise<boolean>; // false = rejected (cycle)
+  // ---- projects (the layer above folders) ----
+  projects: Project[];
+  currentProject: string;       // active project id ("" until the list loads)
+  currentProjectName: string;   // name of currentProject (for the breadcrumb)
+  setCurrentProject: (id: string) => void;
+  createProject: (name: string) => Promise<Project | null>;
+  renameProject: (id: string, name: string) => Promise<void>;
+  deleteProject: (id: string) => Promise<boolean>; // false = rejected (e.g. last project)
 };
 const Ctx = createContext<WsVal>({
   folders: [], currentFolder: "", currentName: "My Diagrams",
   setCurrentFolder: () => {}, refresh: async () => {},
   createFolder: async () => null, renameFolder: async () => {}, deleteFolder: async () => {}, moveFolder: async () => false,
+  projects: [], currentProject: "", currentProjectName: "Personal", setCurrentProject: () => {},
+  createProject: async () => null, renameProject: async () => {}, deleteProject: async () => false,
 });
 
-// Fire-and-forget: put a (possibly not-yet-indexed) diagram into a folder ("" = root).
-export function assignDiagram(idToken: string | null, id: string, folderId: string) {
+// Fire-and-forget: put a (possibly not-yet-indexed) diagram into a folder ("" =
+// root), optionally also stamping the project it belongs to (for new diagrams
+// created while a non-default project is current).
+export function assignDiagram(idToken: string | null, id: string, folderId: string, projectId?: string) {
   if (!idToken) return;
   fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
     method: "PATCH", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ id, ws: folderId }),
+    body: JSON.stringify(projectId ? { id, ws: folderId, project: projectId } : { id, ws: folderId }),
   }).catch(() => {});
+}
+
+// Move a diagram to another project (clears its folder — folders are project-local).
+// Resolves true on success so callers can refresh their lists.
+export async function moveDiagramToProject(idToken: string | null, id: string, projectId: string): Promise<boolean> {
+  if (!idToken) return false;
+  try {
+    const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
+      method: "PATCH", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id, project: projectId }),
+    });
+    return r.ok;
+  } catch { return false; }
 }
 
 // Rename a diagram (routes through the room so the DO/D1/live editors stay in sync).
@@ -96,25 +125,53 @@ export async function deleteDiagram(idToken: string | null, id: string): Promise
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const { idToken } = useAuth();
   const [folders, setFolders] = useState<Folder[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [currentFolder, setCurrent] = useState<string>(() => localStorage.getItem("kymo_folder") || "");
+  const [currentProject, setProject] = useState<string>(() => localStorage.getItem("kymo_project") || "");
 
   const setCurrentFolder = useCallback((id: string) => {
     setCurrent(id);
     try { if (id) localStorage.setItem("kymo_folder", id); else localStorage.removeItem("kymo_folder"); } catch {}
   }, []);
+  // Raw pin: set + persist the project, no side effects. Used by the auto-pin
+  // effect so loading the page doesn't clobber the stored folder.
+  const pinProject = useCallback((id: string) => {
+    setProject(id);
+    try { if (id) localStorage.setItem("kymo_project", id); else localStorage.removeItem("kymo_project"); } catch {}
+  }, []);
+  // User-facing switch: changing project also resets the folder (folders are
+  // project-local, so the old folder id is meaningless in the new project).
+  const setCurrentProject = useCallback((id: string) => {
+    pinProject(id);
+    setCurrentFolder("");
+  }, [pinProject, setCurrentFolder]);
+
+  // Scope every folder/diagram fetch to the active project (omitted until the
+  // list loads → the backend's default project, which stays back-compatible).
+  const projectQuery = currentProject ? "&project=" + encodeURIComponent(currentProject) : "";
 
   const refresh = useCallback(async () => {
     if (!idToken) return;
+    const tok = encodeURIComponent(idToken);
     try {
-      const r = await fetch(WORKSPACES_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
-      if (!r.ok) return;
-      const j = await r.json();
-      setFolders(j.workspaces || []);
+      const [pr, wr] = await Promise.all([
+        fetch(PROJECTS_API + "?id_token=" + tok, { cache: "no-store" }),
+        fetch(WORKSPACES_API + "?id_token=" + tok + projectQuery, { cache: "no-store" }),
+      ]);
+      if (pr.ok) setProjects(((await pr.json()).projects) || []);
+      if (wr.ok) setFolders(((await wr.json()).workspaces) || []);
       setLoaded(true);
     } catch {}
-  }, [idToken]);
+  }, [idToken, projectQuery]);
   useEffect(() => { refresh(); }, [refresh]);
+
+  // Once projects load, pin currentProject to a real id: keep the stored one if
+  // it still exists, else fall back to the default (oldest) project.
+  useEffect(() => {
+    if (!projects.length) return;
+    if (!currentProject || !projects.some((p) => p.id === currentProject)) pinProject(projects[0].id);
+  }, [projects, currentProject, pinProject]);
 
   // A stored current folder that no longer exists (deleted elsewhere) falls back to root.
   useEffect(() => {
@@ -131,10 +188,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   }, [idToken]);
 
   const createFolder = useCallback(async (name: string, parentId: string) => {
-    const j = await api("POST", { name, parentId });
+    const j = await api("POST", { name, parentId }, projectQuery); // new folder lands in the current project
     await refresh();
     return j?.workspace ?? null;
-  }, [api, refresh]);
+  }, [api, refresh, projectQuery]);
   const renameFolder = useCallback(async (id: string, name: string) => { await api("PATCH", { id, name }); await refresh(); }, [api, refresh]);
   const deleteFolder = useCallback(async (id: string) => {
     await api("DELETE", undefined, "&id=" + encodeURIComponent(id));
@@ -149,9 +206,35 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     return r !== null;
   }, [api, refresh, folders]);
 
+  // ---- project CRUD (PROJECTS_API) ----
+  const projApi = useCallback(async (method: string, body?: any, query = "") => {
+    if (!idToken) return null;
+    const r = await fetch(PROJECTS_API + "?id_token=" + encodeURIComponent(idToken) + query, {
+      method, headers: body ? { "content-type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    return r.ok ? (await r.json().catch(() => ({}))) : null;
+  }, [idToken]);
+  const createProject = useCallback(async (name: string) => {
+    const j = await projApi("POST", { name });
+    await refresh();
+    return j?.project ?? null;
+  }, [projApi, refresh]);
+  const renameProject = useCallback(async (id: string, name: string) => { await projApi("PATCH", { id, name }); await refresh(); }, [projApi, refresh]);
+  const deleteProject = useCallback(async (id: string) => {
+    const r = await projApi("DELETE", undefined, "&id=" + encodeURIComponent(id));
+    if (currentProject === id) setCurrentProject(""); // re-pins to default on next load
+    await refresh();
+    return r !== null;
+  }, [projApi, refresh, currentProject, setCurrentProject]);
+
   const currentName = folders.find((f) => f.id === currentFolder)?.name || "My Diagrams";
+  const currentProjectName = projects.find((p) => p.id === currentProject)?.name || "Personal";
   return (
-    <Ctx.Provider value={{ folders, currentFolder, currentName, setCurrentFolder, refresh, createFolder, renameFolder, deleteFolder, moveFolder }}>
+    <Ctx.Provider value={{
+      folders, currentFolder, currentName, setCurrentFolder, refresh, createFolder, renameFolder, deleteFolder, moveFolder,
+      projects, currentProject, currentProjectName, setCurrentProject, createProject, renameProject, deleteProject,
+    }}>
       {children}
     </Ctx.Provider>
   );
@@ -162,7 +245,7 @@ export const useWorkspace = () => useContext(Ctx);
 // land) and a menu to switch folder, create one, or jump to the Diagrams tree.
 export function WorkspaceSwitcher() {
   const { idToken, claims } = useAuth();
-  const { folders, currentFolder, currentName, setCurrentFolder, createFolder, refresh } = useWorkspace();
+  const { folders, currentFolder, currentName, setCurrentFolder, createFolder, refresh, currentProject } = useWorkspace();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -184,7 +267,7 @@ export function WorkspaceSwitcher() {
   }
   function newDiagram() {
     const id = newId();
-    assignDiagram(idToken, id, currentFolder);
+    assignDiagram(idToken, id, currentFolder, currentProject || undefined);
     setOpen(false);
     navigate("/?d=" + id);
   }
