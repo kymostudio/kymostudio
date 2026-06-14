@@ -22,6 +22,9 @@ import {
   mermaidClassToSvg,
   mermaidErToSvg,
   mermaidBlockToSvg,
+  mermaidMindmapToSvg,
+  mermaidKanbanToSvg,
+  mermaidRequirementToSvg,
   registerFont,
   svgToPdf,
   svgToPng,
@@ -97,6 +100,10 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
         return mermaidClassToSvg(source);
       if (grammar === "erdiagram") return mermaidErToSvg(source);
       if (grammar === "block" || grammar === "block-beta") return mermaidBlockToSvg(source);
+      if (grammar === "mindmap") return mermaidMindmapToSvg(source);
+      if (grammar === "kanban") return mermaidKanbanToSvg(source);
+      if (grammar === "requirement" || grammar === "requirementdiagram")
+        return mermaidRequirementToSvg(source);
     } catch {
       // unsupported syntax for kymo's engine → fall through to merman
     }

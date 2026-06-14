@@ -332,6 +332,25 @@ pub fn mermaid_block_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
     Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
 }
 
+/// Render a Mermaid `mindmap` → SVG (tree via the flowchart renderer).
+pub fn mermaid_mindmap_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    let mut fc = mermaid::parse_mindmap(src)?;
+    render_flowchart_math(&mut fc);
+    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
+/// Render a Mermaid `kanban` board → SVG (columns via the flowchart renderer).
+pub fn mermaid_kanban_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    let mut fc = mermaid::parse_kanban(src)?;
+    render_flowchart_math(&mut fc);
+    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
+/// Render a Mermaid `requirementDiagram` → SVG (reuses the class-box renderer).
+pub fn mermaid_requirement_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(classdiagram::svg::render(&mermaid::parse_requirement(src)?))
+}
+
 /// Render D2 flowchart source → SVG, fully in Rust: parse D2 → flowchart IR →
 /// `layout_flowchart` → the [`flowchart_svg`] renderer. No external `d2` binary.
 pub fn d2_to_svg(src: &str) -> Result<String, d2::D2Error> {
