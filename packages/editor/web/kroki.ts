@@ -40,6 +40,19 @@ export function kindLabel(kind: string): string {
   return KINDS.find((k) => k.value === kind)?.label ?? kind;
 }
 
+// File extension per diagram kind, so Explorer/Recent read like real files
+// (hello.kymo, order.bpmn, flow.mmd). Unmapped kinds fall back to the kind name.
+const KIND_EXT: Record<string, string> = {
+  kymo: "kymo", mermaid: "mmd", bpmn: "bpmn",
+  c4plantuml: "puml", plantuml: "puml", structurizr: "dsl",
+  d2: "d2", dbml: "dbml", erd: "er", graphviz: "dot", excalidraw: "excalidraw",
+  vega: "vega.json", vegalite: "vl.json", wavedrom: "json",
+  actdiag: "diag", blockdiag: "diag", nwdiag: "diag", rackdiag: "diag", packetdiag: "diag", seqdiag: "diag",
+};
+export function extFor(kind?: string): string {
+  return (kind && KIND_EXT[kind]) || kind || "kymo";
+}
+
 // Syntax help for a kind: kymo/bpmn → our own docs; the rest → the format's
 // canonical upstream reference, so a stuck user always has a working exit.
 const UPSTREAM_DOCS: Record<string, string> = {

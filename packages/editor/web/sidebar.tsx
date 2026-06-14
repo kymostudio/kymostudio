@@ -6,7 +6,7 @@ import { useConfirm } from "./confirm";
 import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
 import { DIAGRAMS_API, TRASH_API } from "./const";
-import { kindLabel, docHref } from "./kroki";
+import { kindLabel, docHref, extFor } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
@@ -290,10 +290,10 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
         draggable={!isEditing} onDragStart={(e) => { e.stopPropagation(); dragStart(e, "diagram", r.id); }}
         onClick={() => { setFocusKey(k); openFile(r.id); }}
         onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setFocusKey(k); fileMenu(e, it); }}
-        title={`${label}${it.kind ? " · " + kindLabel(it.kind) : ""}`}>
+        title={`${label}.${extFor(it.kind)}${it.kind ? " · " + kindLabel(it.kind) : ""}`}>
         {guides(r.ancestors)}
         <KindIcon kind={it.kind} />
-        {isEditing ? renameInput("file", r.id, label) : <span className="sb-name">{label}</span>}
+        {isEditing ? renameInput("file", r.id, label) : <span className="sb-name">{label}<span className="sb-ext">.{extFor(it.kind)}</span></span>}
       </div>
     );
   }

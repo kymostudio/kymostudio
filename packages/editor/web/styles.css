@@ -191,6 +191,7 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-spacer { flex: none; width: 14px; } /* lines a file's icon up under a folder's icon */
 .sb-chev, .sb-icon { flex: none; color: var(--dim); display: inline-flex; }
 .sb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.sb-ext { color: var(--dim); } /* the .ext suffix, dimmed so the name reads first */
 /* calm neutral selection / focus; the open file keeps a thin brand accent bar */
 .sb-folder.sel { background: var(--sel); }
 .sb-row.kbd { box-shadow: inset 0 0 0 1px var(--focus-ring); }
@@ -248,6 +249,7 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .wel-recent { display: flex; align-items: center; justify-content: flex-start; gap: 9px; width: 100%; padding: 6px 8px; margin-left: -8px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 14px; text-align: left; border-radius: 7px; cursor: pointer; }
 .wel-recent:hover { background: var(--bg-raise); }
 .wel-recent-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wel-ext { color: var(--dim); }
 /* Templates — walkthrough-style cards */
 .wel-tpls { display: flex; flex-direction: column; gap: 8px; }
 .wel-tpl { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; padding: 10px 13px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-soft); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
