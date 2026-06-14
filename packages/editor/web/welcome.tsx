@@ -16,13 +16,7 @@ export function WelcomeView({ onNew, onOpenFile }: { onNew: () => void; onOpenFi
   return (
     <div className="welcome">
       <div className="wel-inner">
-        <div className="wel-head">
-          <img className="wel-logo" src="/logo.svg" alt="" />
-          <div>
-            <h1 className="wel-title">kymo<span className="wel-accent">studio</span></h1>
-            <p className="wel-tag">Diagram superpowers</p>
-          </div>
-        </div>
+        <img className="wel-lockup" src="/wordmark.svg" alt="kymostudio — Diagram superpowers" />
         <div className="wel-cols">
           <section className="wel-col">
             <h2 className="wel-h">Start</h2>
