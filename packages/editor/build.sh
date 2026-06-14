@@ -9,6 +9,7 @@ cp web/index.html dist/index.html
 cp web/index.html dist/trash.html
 cp web/index.html dist/login.html
 cp web/styles.css dist/styles.css
+cp web/welcome-hero.svg dist/welcome-hero.svg
 cp ../../docs/brand/logo.svg ../../docs/brand/wordmark.svg ../../docs/brand/favicon.svg ../../docs/brand/favicon.ico ../../docs/brand/favicon-32.png ../../docs/brand/favicon-48.png ../../docs/brand/apple-touch-icon.png dist/
 printf '/* /index.html 200\n' > dist/_redirects
 # Chunk names embed a content hash — let browsers cache them forever; the HTML

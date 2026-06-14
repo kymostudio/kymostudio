@@ -46,8 +46,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const g = (window as any).google?.accounts?.id;
       if (!g) { setTimeout(init, 150); return; }
       ensureGsiInit(g);
-      // No One Tap auto-prompt here: a guest opening a share link hasn't asked
-      // to sign in. Prompts fire contextually (login page, session renewal).
+      // Returning user landing on a bare "/" (no share ?s= / doc ?d=): let One
+      // Tap auto sign them in (auto_select is on) — they came back for their own
+      // work. Share links and doc routes stay silent: a guest opening someone
+      // else's diagram hasn't asked to sign in. (Needs an authorized JS origin,
+      // so this only fires in production, not on localhost.)
+      const sp = new URLSearchParams(location.search);
+      if (!tokenValid(localStorage.getItem("kymo_idtoken")) &&
+          location.pathname === "/" && !sp.has("s") && !sp.has("d")) {
+        g.prompt();
+      }
     }
     init();
     return () => { stop = true; };
