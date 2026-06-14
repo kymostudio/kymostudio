@@ -19,9 +19,9 @@ colour palette.
 Rules of thumb:
 
 - **Tagline is fixed.** "Diagram superpowers" is the one line that appears inside
-  rendered brand assets — changing it means re-rendering `social-preview.png` and
-  both `github-hero-*.png` (see the regeneration commands below) *and* updating
-  every surface in the table.
+  the brand assets — changing it means regenerating `wordmark.svg` /
+  `wordmark-dark.svg` (`tools/outline_wordmark.py`) and re-rendering
+  `social-preview.png` (commands below) *and* updating every surface in the table.
 - **One slogan everywhere.** "Prompt it. See it appear. Watch it animate." is the
   single action line (it replaced the earlier "Type it." variant in 2026-06). If
   it ever changes, keep the three-beat rhythm — verb + `See it appear. Watch it
@@ -40,9 +40,7 @@ Rules of thumb:
 | `apple-touch-icon.png` | iOS / `apple-touch-icon` (180×180, rendered from the full master). |
 | `social-preview.svg` | **Social-preview banner source** (1280×640 viewBox) — GitHub og-image, horizontal lockup: tile + two-tone wordmark + tagline "Diagram superpowers". |
 | `social-preview.png` | Rendered banner (2560×1280, 2×). The committed render is canonical — see font caveat below. |
-| `github-hero-dark.svg` / `-light.svg` | **README hero source** (1000×280 viewBox, transparent bg) — tile + two-tone wordmark + tagline; dark = white primary, light = navy primary. |
-| `github-hero-dark.png` / `-light.png` | Rendered heroes (2000×560, 2×) used by the root README's `<picture>` (dark/light via `prefers-color-scheme`). Same font caveat as the banner. |
-| `wordmark.svg` | **Reusable horizontal lockup** (light, transparent, tight `viewBox`) — tile + two-tone wordmark + tagline "Diagram superpowers", with the **text outlined to paths** (no font dependency, like `favicon.svg`). Ships as a live SVG for in-app use via `<img>`: `packages/editor`'s `build.sh` copies it in and the Welcome screen serves it at `/wordmark.svg`. Regenerate with `tools/outline_wordmark.py`. Reuse anywhere a brand lockup is needed. |
+| `wordmark.svg` / `wordmark-dark.svg` | **Reusable horizontal lockup** (transparent, tight `viewBox`) — tile + two-tone wordmark + tagline "Diagram superpowers", with the **text outlined to paths** (no font dependency, like `favicon.svg`). Light = navy primary, dark = white primary. Used by **both** the root README hero (`<picture>` light/dark, SVG — outlined so GitHub renders it correctly) **and** the editor (`packages/editor`'s `build.sh` copies it in; the Welcome screen serves it at `/wordmark.svg`). Regenerate both with `tools/outline_wordmark.py`. Reuse anywhere a brand lockup is needed. |
 
 **Favicon ≠ a shrunk master.** The master's node-dot handles turn to mush at
 small sizes, so the favicon (`favicon.svg`) is a separate glyph: the same pink
@@ -69,22 +67,24 @@ magick favicon-48.png favicon-32.png \
 rsvg-convert -w 180 -h 180 logo.svg -o apple-touch-icon.png   # apple-touch from the master
 ```
 
-Regenerate the social-preview banner (after a tagline/layout change):
+Regenerate the lockups + social-preview banner (after a tagline/layout change):
 
 ```bash
-cd docs/brand
-rsvg-convert -w 2560 -h 1280 social-preview.svg -o social-preview.png
-rsvg-convert -w 2000 -h 560 github-hero-dark.svg -o github-hero-dark.png
-rsvg-convert -w 2000 -h 560 github-hero-light.svg -o github-hero-light.png
+# Lockups (light + dark) — outlines the text, so run on macOS (SF …Rounded font):
+python3 -m venv .venv && .venv/bin/pip install fonttools uharfbuzz
+.venv/bin/python tools/outline_wordmark.py        # → docs/brand/wordmark{,-dark}.svg
+# Social-preview banner (still <text>, baked to PNG — see caveat):
+cd docs/brand && rsvg-convert -w 2560 -h 1280 social-preview.svg -o social-preview.png
 ```
 
-**Banner font caveat.** Unlike the master logo (pure geometry), the banner's
-wordmark + tagline are `<text>` set in **SF Pro Rounded** (Black 900 / Medium
-500) — the same face as `favicon.svg`'s glyph, but *not* outlined. Rendering
-therefore requires SF Pro Rounded installed (macOS with Apple's SF fonts);
-elsewhere the text falls back to whatever fontconfig picks. The committed
-`social-preview.png` is the canonical render — re-render only on a machine with
-the font. Upload it at repo **Settings → Social preview** (no API; web UI only).
+**Banner font caveat.** `social-preview.svg`'s wordmark + tagline are `<text>` set
+in **SF Pro Rounded** (Black 900 / Medium 500) — the same face as `favicon.svg`'s
+glyph, but *not* outlined. Rendering therefore requires SF Pro Rounded installed
+(macOS with Apple's SF fonts); elsewhere the text falls back to whatever
+fontconfig picks. The committed `social-preview.png` is the canonical render —
+re-render only on a machine with the font. Upload it at repo **Settings → Social
+preview** (no API; web UI only). (The README hero avoids this: its `wordmark*.svg`
+lockups are outlined — see below.)
 
 `wordmark.svg` avoids this caveat entirely: its wordmark + tagline are **outlined
 to `<path>`** (via `tools/outline_wordmark.py`, which HarfBuzz-shapes the text in

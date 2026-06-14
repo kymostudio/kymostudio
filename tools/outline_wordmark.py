@@ -21,12 +21,16 @@ from fontTools.pens.transformPen import TransformPen
 import uharfbuzz as hb
 
 SRC = "/System/Library/Fonts/SFNSRounded.ttf"  # macOS "SF …Rounded" variable font
-OUT = os.path.join(os.path.dirname(__file__), "..", "docs", "brand", "wordmark.svg")
+BRAND = os.path.join(os.path.dirname(__file__), "..", "docs", "brand")
 
 # layout (matches the github-hero geometry): baseline + size per run
 WX, WY, WSZ = 316, 158, 92   # wordmark, Black 900
 TX, TY, TSZ = 320, 216, 32   # tagline,  Medium 500
-INK, ACCENT, DIM = "#242131", "#e0095f", "#6b6878"
+# two themes (kymo / studio / tagline fills) for the README <picture> light+dark
+VARIANTS = [
+    ("wordmark.svg",      "#242131", "#e0095f", "#6b6878"),  # light: navy primary
+    ("wordmark-dark.svg", "#ffffff", "#e0095f", "#DDECEE"),  # dark:  white primary
+]
 
 
 def instanced(wght):
@@ -78,17 +82,18 @@ TILE = '''  <g transform="translate(96 50) scale(1.8)">
     </g>
   </g>'''
 
-svg = f'''<svg viewBox="{vb_x} {vb_y} {vb_w} {vb_h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="kymostudio — Diagram superpowers">
-  <!-- Reusable horizontal brand lockup (light): tile + two-tone wordmark + tagline.
+for name, kymo_fill, studio_fill, tag_fill in VARIANTS:
+    svg = f'''<svg viewBox="{vb_x} {vb_y} {vb_w} {vb_h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="kymostudio — Diagram superpowers">
+  <!-- Reusable horizontal brand lockup: tile + two-tone wordmark + tagline.
        Wordmark/tagline are OUTLINED paths (SF Pro Rounded, Black 900 / Medium 500) so
-       the lockup renders identically in any browser — no font dependency. Regenerate
-       with tools/outline_wordmark.py after a text/weight change. -->
+       the lockup renders identically in any browser / on GitHub — no font dependency.
+       Regenerate (both light + dark) with tools/outline_wordmark.py. -->
 {TILE}
-  <path fill="{INK}" d="{d_kymo}"/>
-  <path fill="{ACCENT}" d="{d_studio}"/>
-  <path fill="{DIM}" d="{d_tag}"/>
+  <path fill="{kymo_fill}" d="{d_kymo}"/>
+  <path fill="{studio_fill}" d="{d_studio}"/>
+  <path fill="{tag_fill}" d="{d_tag}"/>
 </svg>
 '''
-with open(OUT, "w") as fh:
-    fh.write(svg)
-print("wrote", os.path.relpath(OUT), "viewBox", vb_x, vb_y, vb_w, vb_h)
+    with open(os.path.join(BRAND, name), "w") as fh:
+        fh.write(svg)
+    print("wrote", name, "viewBox", vb_x, vb_y, vb_w, vb_h)
