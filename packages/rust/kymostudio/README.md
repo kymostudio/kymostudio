@@ -20,6 +20,7 @@ needed:
 
 ```bash
 brew tap kymostudio/brew https://github.com/kymostudio/kymostudio
+brew trust kymostudio/brew      # Homebrew 6.0+ only: trust the third-party tap
 brew install kymostudio         # install-name `kymostudio`, command `kymo`
 ```
 

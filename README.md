@@ -55,6 +55,7 @@ Or grab a prebuilt `kymo` binary with Homebrew (macOS/Linux):
 
 ```bash
 brew tap kymostudio/brew https://github.com/kymostudio/kymostudio
+brew trust kymostudio/brew     # Homebrew 6.0+ only: trust the third-party tap
 brew install kymostudio        # the command is `kymo`
 ```
 
