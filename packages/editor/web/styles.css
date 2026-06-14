@@ -239,10 +239,10 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .wel-tag { font-size: 15px; color: var(--dim); margin: 2px 0 0; }
 .wel-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
 .wel-h { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); margin: 0 0 12px; }
-.wel-link { display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 0; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: 14px; text-align: left; text-decoration: none; cursor: pointer; }
+.wel-link { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; padding: 7px 0; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: 14px; text-align: left; text-decoration: none; cursor: pointer; }
 .wel-link:hover { color: var(--accent-deep); }
 .wel-link svg { flex: none; }
-.wel-recent { display: flex; align-items: center; gap: 9px; width: 100%; padding: 6px 8px; margin-left: -8px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 14px; text-align: left; border-radius: 7px; cursor: pointer; }
+.wel-recent { display: flex; align-items: center; justify-content: flex-start; gap: 9px; width: 100%; padding: 6px 8px; margin-left: -8px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 14px; text-align: left; border-radius: 7px; cursor: pointer; }
 .wel-recent:hover { background: var(--bg-raise); }
 .wel-recent-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .wel-empty { font-size: 13.5px; color: var(--dim); margin: 4px 0 12px; }
