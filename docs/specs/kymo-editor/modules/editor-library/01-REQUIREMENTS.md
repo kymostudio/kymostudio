@@ -1,7 +1,7 @@
 ---
 title: Editor Library — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KLIBRARY-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-13
 status: Implemented
 classification: Internal
@@ -17,6 +17,7 @@ related_documents:
   - FEAT-KSHARE-001
   - FEAT-KLIVE-001
   - FEAT-KEMCP-001
+  - FEAT-KHOME-001
 authors:
   - Vũ Anh
 language: en
@@ -46,7 +47,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KLIBRARY-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KLIVE-001` (sibling — accounts & live documents; this module builds on it; owns the draft/soft-delete data model), `FEAT-KRENDER-001` (sibling — render & editing surface; thumbnails reuse its render paths), `FEAT-KSHARE-001` (sibling — sharing & export), `FEAT-KEMCP-001` (sibling — MCP channel), `FEAT-KRAPI-001` (the render Worker that produces thumbnails) |
@@ -66,7 +67,7 @@ Once diagrams are owned and durable (`editor-live`), the next gap is *coming bac
 ### A.2 Users & context of operations (ConOps)
 
 - **Who:** signed-in authors with more than one diagram.
-- **Mechanics:** the Explorer panel shows a **folder tree**; `/diagrams` and the Search panel list the owner's live rows from D1 with **thumbnails**, kind badges, and relative times (refresh on focus); deleting moves a diagram (or a folder + subtree) to **Trash** via a styled confirm; the header offers click-to-edit rename, a folder switcher, and **+ New** → the **template gallery**; `/` signed-in redirects to the most-recently-updated diagram (or a fresh **draft**).
+- **Mechanics:** the Explorer panel shows a **folder tree**; `/diagrams` and the Search panel list the owner's live rows from D1 with **thumbnails**, kind badges, and relative times (refresh on focus); deleting moves a diagram (or a folder + subtree) to **Trash** via a styled confirm; the header offers click-to-edit rename, a folder switcher, and **+ New** → the **template gallery**; `/` presents the **Welcome home** (`FR-HM-01`, `FEAT-KHOME-001`; Recent lists the most-recently-updated diagrams, or a sign-in invite for guests).
 - **Constraint:** strictly owner-scoped — the library never lists or touches another account's diagrams (`FR-LV-03`); lists exclude soft-deleted rows.
 
 ### A.3 Goals & non-goals
@@ -93,7 +94,7 @@ Once diagrams are owned and durable (`editor-live`), the next gap is *coming bac
 
 ### B.1 Purpose & motivation
 
-Part of the five-module decomposition of the shipped `kymo-editor` (see `FEAT-KEDITOR-001` and `FEAT-KRENDER-001` §B.1 for the rationale and the module tree). This module is the **organisation layer** over the `editor-live` spine. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
+Part of the six-module decomposition of the shipped `kymo-editor` (see `FEAT-KEDITOR-001` and `FEAT-KRENDER-001` §B.1 for the rationale and the module tree). This module is the **organisation layer** over the `editor-live` spine. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
 
 ### B.2 Document map
 
@@ -101,7 +102,7 @@ Stub doc-set: only this `01-REQUIREMENTS.md` exists. The *how* lives in `DESIGN-
 
 ### B.3 Relationship to the kymo-editor umbrella & sibling modules
 
-See the module tree in `FEAT-KRENDER-001` §B.3 (identical for all five siblings). Dependency direction: this module **builds on `editor-live`** — it queries the D1 rows that `FR-LV-07` writes and inherits the owner-scoping of `FR-LV-03`; the kind badges it shows come from the kind selector (`FEAT-KRENDER-001`, `FR-RD-06`).
+See the module tree in `FEAT-KRENDER-001` §B.3 (identical for all six siblings). Dependency direction: this module **builds on `editor-live`** — it queries the D1 rows that `FR-LV-07` writes and inherits the owner-scoping of `FR-LV-03`; the kind badges it shows come from the kind selector (`FEAT-KRENDER-001`, `FR-RD-06`).
 
 **Re-homing summary (from `FEAT-KEDITOR-001`)** — requirement text carried over verbatim in Part C:
 
@@ -133,7 +134,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 | ID | Requirement | Source need |
 |----|-------------|-------------|
 | **FR-LB-01** | The `/diagrams` **library page** SHALL list the signed-in user's **live** diagrams most-recent first with title, kind badge, relative timestamp, a **thumbnail** (FR-LB-07), a folder **move** affordance, and **delete** (a styled confirm — FR-LB-08 — that **soft-deletes** to Trash, not an immediate destroy). It SHALL filter by a **search box** and SHALL refresh on window focus / visibility. *(v0.2: thumbnails; delete is soft; folder tree replaces workspace tabs.)* | SN-LB-02 |
-| **FR-LB-02** | Opening `/` signed-in without `?d`/`?s` SHALL redirect to the user's **most-recently updated** diagram, or to a fresh **draft** when they have none. **+ New** SHALL open a **template gallery** (`web/templates.tsx`) of diagram types (filterable); picking one seeds a working starter + sets the kind as a **draft** (no server document — the draft model is `FR-LV-08`). The draft is promoted to a saved diagram — a fresh 16-char ≈ 95-bit id (the room capability), placed in the **current folder** (`assignDiagram`) — only on explicit **Save**; the server row materialises on first write. *(v0.2: + New → template gallery + draft-first, re-baselined from "create a fresh id immediately".)* | SN-LB-01, SN-LB-04 |
+| **FR-LB-02** | Opening `/` without `?d`/`?s` SHALL present the **Welcome home** (`FR-HM-01`, `FEAT-KHOME-001`) — *not* an auto-redirect; its **Recent** list surfaces the user's **most-recently updated** diagrams (signed-out: a sign-in invite). **+ New** SHALL open a **template gallery** (`web/templates.tsx`) of diagram types (filterable); picking one seeds a working starter + sets the kind as a **draft** (no server document — the draft model is `FR-LV-08`). The draft is promoted to a saved diagram — a fresh 16-char ≈ 95-bit id (the room capability), placed in the **current folder** (`assignDiagram`) — only on explicit **Save**; the server row materialises on first write. *(v0.2: + New → template gallery + draft-first, re-baselined from "create a fresh id immediately". v0.3: `/` landing is the **Welcome home** (`FEAT-KHOME-001`), not a redirect.)* | SN-LB-01, SN-LB-04 |
 | **FR-LB-03** | The diagram SHALL be **renameable in the header** (click-to-edit, Enter/blur commits, ≤ 60 chars); the rename broadcasts to other tabs (`meta`) and updates the index. | SN-LB-01 |
 | **FR-LB-04** | Diagrams SHALL be organised in a **nested folder tree** (the D1 `workspaces` table + `parent_id`; UI: the Explorer panel). Folders SHALL support **create / rename / delete / move** with arbitrary **nesting** (name ≤ 40 chars); a diagram's folder is its `ws`. Re-parenting SHALL be **cycle-safe** (client `wouldCycle` + server check — a folder cannot move under its own descendant). Deleting a folder **soft-deletes the folder and its entire subtree** (descendant folders + their diagrams) to Trash (FR-LB-08). The current folder (`kymo_folder` in `localStorage`) scopes the switcher and where **+ New** / Save lands; a stored folder that no longer exists falls back to root. *(v0.2: re-baselined from flat workspaces — ADR-13.)* | SN-LB-02 |
 | **FR-LB-05** | The diagrams, folders, and trash APIs SHALL be **owner-scoped REST endpoints** on the Worker — `/api/diagrams` (GET list; PATCH move `{id, ws}`; DELETE soft-delete; `/thumb` GET), `/api/workspaces` (GET; POST `{name, parentId?}`; PATCH rename/reparent `{id, name?, parentId?}`; DELETE soft-delete folder + subtree), and `/api/trash` (GET; POST restore `{kind, id}`; DELETE purge `?id=&kind=` or `?all`) — CORS-enabled, ID token via query or Bearer, backed by the D1 tables. | SN-LB-01, SN-LB-02, SN-LB-03 |
@@ -147,7 +148,7 @@ No module-owned NFRs. Inherited and still binding: `NFR-LV-02` (owner-scoping of
 
 ### C.3 Acceptance criteria (module-level)
 
-1. Signed in: `/` lands on the most-recent diagram; **+ New** opens the template gallery and a picked type is a draft until Save promotes it into the current folder; rename in the header sticks and propagates to other tabs.
+1. `/` shows the **Welcome home** (`FR-HM-01`; Recent lists the most-recent diagrams, guests get a sign-in invite); **+ New** opens the template gallery and a picked type is a draft until Save promotes it into the current folder; rename in the header sticks and propagates to other tabs.
 2. `/diagrams` lists by recency with kind badges, relative times, and **thumbnails**; search (box / Search panel) filters by title; the Explorer **folder tree** scopes the view; move re-homes a row; delete (styled confirm) sends it to Trash; window re-focus refreshes the list.
 3. Folder create / rename / nest / drag-move behave (≤ 40 chars; cycle-safe); deleting a folder sends the folder + subtree to Trash; a stale stored `kymo_folder` falls back to root.
 4. `/trash` lists soft-deleted diagrams + folders; Restore returns them (folder restore rebuilds its subtree); Delete-forever / Empty-trash purge; items left 30 days are auto-purged.
@@ -161,3 +162,4 @@ No module-owned NFRs. Inherited and still binding: `NFR-LV-02` (owner-scoping of
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-12 | Vũ Anh | Initial **as-built carve-out** from `FEAT-KEDITOR-001` v0.2 under the kymo-editor umbrella decomposition. Re-homes `SN-KE-07(partial)/08 → SN-LB-01..02`, `FR-KE-20..24 → FR-LB-01..05`. Stub doc-set (01 only); design/V&V remain in `DESIGN-KEDITOR-001` / `TEST-KEDITOR-001`. Post-v0.2 navbar-restructure commit noted as a candidate re-baseline. |
 | 0.2     | 2026-06-13 | Vũ Anh | **Second growth pass re-baseline (P14–P17).** Added `SN-LB-03` (recover deletes) and `SN-LB-04` (fast start from templates). **Re-baselined `FR-LB-02`** (+ New → template gallery + draft-first) and **`FR-LB-04`** (flat workspaces → nested, cycle-safe **folder tree** with drag-move + subtree soft-delete). **Added `FR-LB-06`** (VSCode shell — activity bar + Explorer/Search/Templates), **`FR-LB-07`** (library thumbnails), **`FR-LB-08`** (soft delete + styled confirm + Trash restore/purge). Extended `FR-LB-01`/`FR-LB-05` (thumbnails, soft delete; `/api/trash` + nested-folder + `/thumb` endpoints). Scope/goals/ConOps updated; acceptance rewritten (5 items); folded `127d68a` into P16. V&V → TC-KE-21/22/28/29/30/32 (`TEST-KEDITOR-001` v0.5). Data-model halves owned by `FEAT-KLIVE-001` (`FR-LV-07/08/09`); thumbnail rendering by `FEAT-KRAPI-001`. See ADR-13/14/15/16/17 in `DESIGN-KEDITOR-001` v0.5. |
+| 0.3     | 2026-06-15 | Vũ Anh | **Reconcile `/` landing to as-built** (guest-flow audit): `FR-LB-02`/§A.2/acceptance #1 no longer say `/` **redirects** to the most-recent diagram — it presents the **Welcome home** (new sibling `FEAT-KHOME-001` `FR-HM-01`) whose Recent list surfaces the most-recent diagrams (a sign-in invite for guests). Registered `FEAT-KHOME-001` (`related_documents`; six-module tree). No code/behaviour change. |

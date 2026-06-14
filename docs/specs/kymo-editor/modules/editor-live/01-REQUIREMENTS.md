@@ -1,7 +1,7 @@
 ---
 title: Editor Live — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KLIVE-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-13
 status: Implemented
 classification: Internal
@@ -17,6 +17,7 @@ related_documents:
   - FEAT-KSHARE-001
   - FEAT-KLIBRARY-001
   - FEAT-KEMCP-001
+  - FEAT-KHOME-001
 authors:
   - Vũ Anh
 language: en
@@ -49,7 +50,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KLIVE-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KRENDER-001` (sibling — render & editing surface), `FEAT-KSHARE-001` (sibling — sharing & export), `FEAT-KLIBRARY-001` (sibling — library & workspaces, built on this module), `FEAT-KEMCP-001` (sibling — MCP channel, built on this module), `FEAT-KRAPI-001` (the render Worker the room calls to produce thumbnails) |
@@ -95,7 +96,7 @@ One shared canvas can't serve two people: real use needs documents that are owne
 
 ### B.1 Purpose & motivation
 
-Part of the five-module decomposition of the shipped `kymo-editor` (see `FEAT-KEDITOR-001` and `FEAT-KRENDER-001` §B.1 for the rationale and the module tree). This module is the **spine**: both `editor-library` and `editor-mcp` operate on the identity, ownership, and persistence it defines. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
+Part of the six-module decomposition of the shipped `kymo-editor` (see `FEAT-KEDITOR-001` and `FEAT-KRENDER-001` §B.1 for the rationale and the module tree). This module is the **spine**: both `editor-library` and `editor-mcp` operate on the identity, ownership, and persistence it defines. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
 
 ### B.2 Document map
 
@@ -103,7 +104,7 @@ Stub doc-set: only this `01-REQUIREMENTS.md` exists. The *how* lives in `DESIGN-
 
 ### B.3 Relationship to the kymo-editor umbrella & sibling modules
 
-See the module tree in `FEAT-KRENDER-001` §B.3 (identical for all five siblings). Dependency direction: **`editor-library` and `editor-mcp` build on this module** (its ownership rules and D1/DO state); `editor-render` and `editor-share` are independent of it (they work signed-out by FR-LV-02).
+See the module tree in `FEAT-KRENDER-001` §B.3 (identical for all six siblings). Dependency direction: **`editor-library` and `editor-mcp` build on this module** (its ownership rules and D1/DO state); `editor-render` and `editor-share` are independent of it (they work signed-out by FR-LV-02).
 
 **Re-homing summary (from `FEAT-KEDITOR-001`)** — requirement text carried over verbatim in Part C:
 
@@ -138,7 +139,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-LV-01** | The SPA SHALL support **Google Sign-In** (GIS): the ID token is kept in `localStorage` (`kymo_idtoken`) and treated as absent when its `exp` is within 30 s; sign-out SHALL clear the token, disable GIS auto-select, and re-offer the prompt. The header SHALL show the account (avatar initial, email) with a sign-out menu. | SN-LV-02 |
+| **FR-LV-01** | The SPA SHALL support **Google Sign-In** (GIS): the ID token is kept in `localStorage` (`kymo_idtoken`) and treated as absent when its `exp` is within 30 s; sign-out SHALL clear the token and disable GIS auto-select (it SHALL NOT re-prompt — re-offering the prompt is the **session-expiry** path, `expireSession` in `FR-LV-10`). The **activity-bar footer** (`web/sidebar.tsx`) SHALL show the account (avatar initial, email) with a sign-out menu. | SN-LV-02 |
 | **FR-LV-02** | **Signed-out mode SHALL remain fully usable for authoring**: editing, rendering, kind switching, export, and `?s=` share links MUST work with no account. Only room-backed features (library, autosave, live sync, rename) require sign-in. | SN-LV-02 |
 | **FR-LV-03** | The backend SHALL verify the Google ID token **server-side** (JWKS, issuer + audience) on every WebSocket connect and REST call, SHALL bind a room to its **first authenticated writer as owner**, and SHALL refuse other accounts' access to the room, its REST records, and its MCP operations (403). An `ALLOWED_EMAILS` allowlist (empty = open) MAY gate the deployment. | SN-LV-02 |
 
@@ -155,7 +156,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-LV-08** | Authoring SHALL be **draft-first**: a `/` session with no `?d` (a fresh visit, a picked template, or a loaded `?s=` link) SHALL have **no room and no WebSocket** — nothing reaches `EditorRoom` and no D1 row exists; the address bar carries the work as a `?s=` link (`FR-SH-02`). An explicit **Save** SHALL mint a fresh id (`newId(16)`), place the diagram in the current folder (`assignWorkspace`), seed the room on first write (lazy-seed + auto-title per FR-LV-06), and navigate to `?d=<id>`. Save while signed-out SHALL prompt sign-in first, then save. The header SHALL indicate **Unsaved / Saving… / Saved** accordingly. *(v0.2 — ADR-15.)* | SN-LV-03 |
+| **FR-LV-08** | Authoring SHALL be **draft-first**: a `/` session with no `?d` (a fresh visit, a picked template, or a loaded `?s=` link) SHALL have **no room and no WebSocket** — nothing reaches `EditorRoom` and no D1 row exists; the address bar carries the work as a `?s=` link (`FR-SH-02`). An explicit **Save** SHALL mint a fresh id (`newId(16)`), place the diagram in the current folder (`assignDiagram`), seed the room on first write (lazy-seed + auto-title per FR-LV-06), and navigate to `?d=<id>`. Save while signed-out SHALL prompt sign-in first, then save. The header SHALL indicate **Unsaved / Saving…** accordingly (the steady "Saved" pill is intentionally omitted — once it is a room, saving is silent/automatic). *(v0.2 — ADR-15; v0.3 reconcile: `assignDiagram`, no "Saved" pill.)* | SN-LV-03 |
 | **FR-LV-09** | Deletion SHALL be **soft**: `destroyDiagram` SHALL stamp the row's `deleted` (a timestamp; lists exclude non-NULL), cascading to a folder's whole subtree; the MCP `delete_diagram` SHALL use the same soft path. Restore SHALL clear `deleted`; permanent removal (`hardDeleteDiagram`: room `/destroy` + row delete) SHALL be reachable only via the Trash purge actions (`FR-LB-08`) and a **daily cron** (`0 3 * * *`, `purgeOldDeleted`) that hard-deletes anything soft-deleted > 30 days. *(v0.2 — ADR-14.)* | SN-LV-03 |
 | **FR-LV-10** | The client SHALL guard against **stale sessions**: a watchdog timer SHALL fire ~30 s before the ID token's `exp` and call `expireSession()` (clear the token, re-`prompt()`), so the token is gone before any call can 401; an auth-walled route that still receives a 401 SHALL call `expireSession()` and redirect to **`/login?next=<same-app path>`** (`web/LoginPage.tsx` auto-prompts One Tap and returns to `next` on sign-in). A **draft** being edited SHALL survive the expiry (editing continues; only Save needs sign-in). *(v0.2 — commit `c83aa75`, ADR-18.)* | SN-LV-03 |
 
@@ -185,3 +186,4 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-12 | Vũ Anh | Initial **as-built carve-out** from `FEAT-KEDITOR-001` v0.2 under the kymo-editor umbrella decomposition. Re-homes `SN-KE-04/07(partial) → SN-LV-01..02`, `FR-KE-17/18/19/06/07/08/09 → FR-LV-01..07`, `NFR-KE-04/06 → NFR-LV-01..02`. Stub doc-set (01 only); design/V&V remain in `DESIGN-KEDITOR-001` / `TEST-KEDITOR-001`. Post-v0.2 session-expiry/`/login` commit noted as the first candidate re-baseline. |
 | 0.2     | 2026-06-13 | Vũ Anh | **Second growth pass re-baseline (P14–P17).** Added `SN-LV-03` and **`FR-LV-08`** (draft-first save), **`FR-LV-09`** (soft delete + 30-day purge cron; MCP delete is soft too), **`FR-LV-10`** (session-expiry watchdog + `/login`; `c83aa75` folded into P17, no longer a pending re-baseline). Extended **`FR-LV-07`** with the room-rendered **thumbnail** upsert (via `FEAT-KRAPI-001`). Renumbered NFR → §C.4, acceptance → §C.5 (added items 6–8). V&V → TC-KE-28/29/31 (`TEST-KEDITOR-001` v0.5). These are the data-model/lifecycle halves of `FEAT-KLIBRARY-001` v0.2's UX. See ADR-14/15/17/18 in `DESIGN-KEDITOR-001` v0.5. |
+| 0.3     | 2026-06-15 | Vũ Anh | **Reconcile to as-built** (spec-stale fixes from the guest-flow audit): `FR-LV-01` — sign-out does **not** re-prompt (that is the `expireSession`/`FR-LV-10` path), and the account avatar/email/sign-out menu lives in the **activity-bar footer** (`web/sidebar.tsx`), not the header; `FR-LV-08` — `assignWorkspace` → `assignDiagram`, and the header state is **Unsaved / Saving…** only (the steady "Saved" pill was dropped). Registered the new sibling `FEAT-KHOME-001` (`related_documents`; six-module tree). No behaviour change. |
