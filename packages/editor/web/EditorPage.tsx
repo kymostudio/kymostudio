@@ -16,7 +16,7 @@ import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } f
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, Trash2, LogOut, ArrowLeft, ArrowRight, PanelLeft, SquareCode, Eye, Boxes } from "lucide-react";
+import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, HelpCircle, Menu, PanelLeft, SquareCode, Eye } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -50,9 +50,7 @@ export default function EditorPage() {
   const [title, setTitle] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
-  const [exportOpen, setExportOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const welcomeDismissed = useRef(false); // set when the user starts a diagram from the Welcome panel
   const [detected, setDetected] = useState<string | null>(null); // kind chosen by paste auto-detect (transient chip)
@@ -287,7 +285,7 @@ export default function EditorPage() {
   }, [source, kind, d]); // eslint-disable-line
 
   useEffect(() => {
-    const h = () => { setMenuOpen(false); setExportOpen(false); setShareOpen(false); setMoreOpen(false); };
+    const h = () => { setMenuOpen(false); setShareOpen(false); };
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") h(); };
     document.addEventListener("click", h);
     document.addEventListener("keydown", k);
@@ -519,13 +517,6 @@ export default function EditorPage() {
         {claims
           ? <Link className="brand" to="/" title="Home" aria-label="Home"><img src="/logo.svg" alt="" /></Link>
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
-        {/* browser-shell history nav (signed-in editing only) */}
-        {claims && !shared && !showWelcome && (
-          <div className="hist-nav">
-            <button className="hist-btn" onClick={() => navigate(-1)} title="Back" aria-label="Back"><ArrowLeft size={17} strokeWidth={2.2} /></button>
-            <button className="hist-btn" onClick={() => navigate(1)} title="Forward" aria-label="Forward"><ArrowRight size={17} strokeWidth={2.2} /></button>
-          </div>
-        )}
         {/* address bar (breadcrumb + ⌘K jump) wraps the editable title when signed in;
             guests / welcome / share links show the bare title */}
         {claims && !shared && !showWelcome
@@ -562,58 +553,9 @@ export default function EditorPage() {
               Save
             </button>
           )}
-          {/* every low-traffic action (New · Docs · Export · Trash · Sign out) lives
-              in one ⋯ menu now — Share is the only standing button beside it */}
-          {!showWelcome && (
-          <div className="account hdr-more" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setMoreOpen((o) => !o)} title="More actions" aria-label="More actions" aria-haspopup="menu" aria-expanded={moreOpen}>
-              <MoreHorizontal size={18} strokeWidth={2.2} />
-            </button>
-            {moreOpen && (
-              <div className="acct-menu">
-                {isDraft && !booting && (
-                  <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); save(); }}>
-                    <Save size={17} strokeWidth={1.9} />
-                    Save to my Diagrams
-                  </button>
-                )}
-                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); setGalleryOpen(true); }}>
-                  <Plus size={17} strokeWidth={2} />
-                  New diagram
-                </button>
-                <a className="acct-item exp-item" href={docHref(kind)} target="_blank" rel="noopener noreferrer" onClick={() => setMoreOpen(false)}>
-                  <BookOpen size={17} strokeWidth={1.9} />
-                  Docs
-                </a>
-                {shared && claims && (
-                  <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); saveCopy(); }}>
-                    <Save size={17} strokeWidth={1.9} />
-                    Save a copy
-                  </button>
-                )}
-                <div className="menu-sep" />
-                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); download(); }}>
-                  <FileCode2 size={17} strokeWidth={1.9} />
-                  Export SVG
-                </button>
-                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); exportPNG(); }}>
-                  <FileImage size={17} strokeWidth={1.9} />
-                  Export PNG
-                </button>
-                <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); exportSource(); }}>
-                  <Code2 size={17} strokeWidth={1.9} />
-                  Source (.kymo)
-                </button>
-                {claims && <>
-                  <div className="menu-sep" />
-                  <Link className="acct-item exp-item" to="/projects" onClick={() => setMoreOpen(false)}><Boxes size={17} strokeWidth={1.9} />Projects</Link>
-                  <Link className="acct-item exp-item" to="/trash" onClick={() => setMoreOpen(false)}><Trash2 size={17} strokeWidth={1.9} />Trash</Link>
-                  <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); signOut(); }}><LogOut size={17} strokeWidth={1.9} />Sign out</button>
-                </>}
-              </div>
-            )}
-          </div>
-          )}
+          {/* Share is the only standing action button; export + save-a-copy fold
+              into its popover, and New/Docs/Projects/Trash/Sign-out live on the
+              activity-bar rail (hamburger + account). */}
           {!showWelcome && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
             {/* Share is the standing CTA, but a draft's Save outranks it — demote Share to secondary then */}
@@ -648,6 +590,13 @@ export default function EditorPage() {
                     {copiedKey === "img" ? <Check size={17} strokeWidth={2.2} /> : <FileImage size={17} strokeWidth={1.9} />}
                     {copiedKey === "img" ? "Copied!" : "Copy Markdown image"}
                   </button>
+                  <div className="menu-sep" />
+                  <button className="acct-item exp-item" onClick={() => { setShareOpen(false); download(); }}><FileCode2 size={17} strokeWidth={1.9} />Export SVG</button>
+                  <button className="acct-item exp-item" onClick={() => { setShareOpen(false); exportPNG(); }}><FileImage size={17} strokeWidth={1.9} />Export PNG</button>
+                  <button className="acct-item exp-item" onClick={() => { setShareOpen(false); exportSource(); }}><Code2 size={17} strokeWidth={1.9} />Export source (.kymo)</button>
+                  {shared && claims && (
+                    <button className="acct-item exp-item" onClick={() => { setShareOpen(false); saveCopy(); }}><Save size={17} strokeWidth={1.9} />Save a copy to my diagrams</button>
+                  )}
                 </div>
               );
             })()}

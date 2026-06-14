@@ -434,6 +434,7 @@ export function ActivityBar({ active, onSelect, onNewDiagram }: { active: Panel 
               <button className="acct-item exp-item" onClick={() => { setMenu(null); onNewDiagram(); }}><FilePlus2 size={16} strokeWidth={1.9} />New diagram</button>
               <button className="acct-item exp-item" onClick={newFolder}><FolderPlus size={16} strokeWidth={1.9} />New folder</button>
               <div className="menu-sep" />
+              <Link className="acct-item exp-item" to="/projects" onClick={() => setMenu(null)}><Boxes size={16} strokeWidth={1.9} />Projects</Link>
               <Link className="acct-item exp-item" to="/trash" onClick={() => setMenu(null)}><Trash2 size={16} strokeWidth={1.9} />Trash</Link>
               <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
             </div>
