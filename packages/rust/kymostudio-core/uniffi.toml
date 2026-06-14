@@ -1,0 +1,8 @@
+# uniffi binding config — package/module names for the generated Kotlin & Swift.
+# Consumed by `uniffi-bindgen generate --config` in packages/mobile/build-*.sh.
+
+[bindings.kotlin]
+package_name = "studio.kymo.core"
+
+[bindings.swift]
+module_name = "KymostudioCore"
