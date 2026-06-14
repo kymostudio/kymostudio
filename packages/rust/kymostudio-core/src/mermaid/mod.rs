@@ -22,6 +22,7 @@ mod state;
 
 use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
 use crate::model::Shape;
+use crate::style::FlowStyle;
 use parser::{parse_statement, Item};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -385,7 +386,7 @@ fn touch_node(fc: &mut Flowchart, index: &mut Vec<(String, usize)>, n: &parser::
         fc.nodes.push(FlowNode {
             id: n.id.clone(),
             label: n.label.clone().unwrap_or_else(|| n.id.clone()),
-            shape: n.shape.unwrap_or(Shape::Box),
+            shape: n.shape.unwrap_or(Shape::Rect),
         });
         index.push((n.id.clone(), idx));
     }
@@ -453,6 +454,62 @@ fn parse_direction(tok: &str) -> Direction {
         "RL" => Direction::Rl,
         "BT" => Direction::Bt,
         _ => Direction::Tb, // TD / TB / anything else
+    }
+}
+
+/// Like [`parse`], but first strips a leading `---…---` YAML frontmatter and
+/// returns any [`FlowStyle`] hinted by the frontmatter or a `%%{init}%%`
+/// directive (`look:`/`theme:`/`kymoStyle:` naming `mermaid` or `kymo`).
+pub fn parse_with_config(src: &str) -> Result<(Flowchart, Option<FlowStyle>), MermaidError> {
+    let (body, style) = extract_config(src);
+    Ok((parse(&body)?, style))
+}
+
+/// Strip a leading frontmatter block and detect a style hint.
+fn extract_config(src: &str) -> (String, Option<FlowStyle>) {
+    let mut style: Option<FlowStyle> = None;
+    // `%%{init: {...}}%%` directive (anywhere).
+    for line in src.lines() {
+        let t = line.trim();
+        if t.starts_with("%%{") && t.to_ascii_lowercase().contains("init") {
+            style = style.or_else(|| scan_kv(t));
+        }
+    }
+    // Leading `---` … `---` YAML frontmatter.
+    let lines: Vec<&str> = src.lines().collect();
+    let mut i = 0;
+    while i < lines.len() && lines[i].trim().is_empty() {
+        i += 1;
+    }
+    if i < lines.len() && lines[i].trim() == "---" {
+        let mut j = i + 1;
+        while j < lines.len() && lines[j].trim() != "---" {
+            j += 1;
+        }
+        if j < lines.len() {
+            for line in &lines[i + 1..j] {
+                style = style.or_else(|| scan_kv(line));
+            }
+            return (lines[j + 1..].join("\n"), style);
+        }
+    }
+    (src.to_string(), style)
+}
+
+/// Pull a [`FlowStyle`] out of a `look:`/`theme:`/`kymoStyle:` fragment whose
+/// value names `mermaid` or `kymo`.
+fn scan_kv(line: &str) -> Option<FlowStyle> {
+    let low = line.to_ascii_lowercase();
+    if !(low.contains("look") || low.contains("theme") || low.contains("kymostyle")) {
+        return None;
+    }
+    let val = low.rsplit(':').next().unwrap_or("");
+    if val.contains("mermaid") {
+        Some(FlowStyle::Mermaid)
+    } else if val.contains("kymo") {
+        Some(FlowStyle::Kymo)
+    } else {
+        None
     }
 }
 

@@ -10,6 +10,7 @@
 //! Python/JS flowchart SVG (independent impls), but the same visual language.
 
 use crate::model::{Anchor, Component, Diagram, Edge, Region, Shape};
+use crate::style::FlowStyle;
 use std::collections::HashMap;
 
 const STYLE: &str = "\
@@ -33,27 +34,61 @@ stroke-linecap=\"round\" stroke-linejoin=\"round\"/></marker>\
 <pattern id=\"dot-grid\" width=\"24\" height=\"24\" patternUnits=\"userSpaceOnUse\">\
 <circle cx=\"1.5\" cy=\"1.5\" r=\"1.2\" fill=\"#0f172a\" fill-opacity=\"0.05\"/></pattern>";
 
-/// Render a resolved flowchart diagram to a self-contained SVG document.
+const FONT_KYMO: &str =
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+const FONT_MERMAID: &str = "'trebuchet ms', verdana, arial, sans-serif";
+
+/// mermaid.js default theme: lavender nodes, purple borders, `#333` edges.
+const STYLE_MERMAID: &str = "\
+text{fill:#333333}\
+.fc-shape{fill:#ECECFF;stroke:#9370DB;stroke-width:1}\
+.fc-shape-line{fill:none;stroke:#9370DB;stroke-width:1}\
+.fc-label{font-size:15px;fill:#333333;text-anchor:middle;dominant-baseline:central}\
+.edge-path{fill:none;stroke:#333333;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}\
+.edge-label{font-size:12px;fill:#333333;text-anchor:middle;\
+paint-order:stroke;stroke:#e8e8e8;stroke-width:5;stroke-linejoin:round}\
+.region-rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1}\
+.region-label{font-size:12px;fill:#333333;paint-order:stroke;stroke:#ffffde;stroke-width:3}";
+
+/// mermaid arrowhead: a filled triangle (vs kymo's open chevron); no dot grid.
+const DEFS_MERMAID: &str = "\
+<marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"8\" markerHeight=\"8\" \
+orient=\"auto\" markerUnits=\"userSpaceOnUse\">\
+<path d=\"M0,0 L10,5 L0,10 z\" fill=\"#333333\"/></marker>";
+
+/// Render a resolved flowchart diagram to a self-contained SVG document
+/// (kymo's native style).
 pub fn render(d: &Diagram) -> String {
+    render_styled(d, FlowStyle::Kymo)
+}
+
+/// Render with an explicit [`FlowStyle`] — kymo-native or mermaid-like.
+pub fn render_styled(d: &Diagram, style: FlowStyle) -> String {
     let by_id: HashMap<&str, &Component> =
         d.components.iter().map(|c| (c.id.as_str(), c)).collect();
 
-    let regions: String = d.regions.iter().map(region_rect).collect();
+    let regions: String = d.regions.iter().map(|r| region_rect(r, style)).collect();
     let edges: String = d.edges.iter().map(|e| edge_svg(e, &by_id)).collect();
-    let nodes: String = d.components.iter().map(node_svg).collect();
+    let nodes: String = d.components.iter().map(|c| node_svg(c, style)).collect();
     let region_labels: String = d.regions.iter().map(region_label).collect();
 
+    let (css, defs, font) = match style {
+        FlowStyle::Kymo => (STYLE, DEFS, FONT_KYMO),
+        FlowStyle::Mermaid => (STYLE_MERMAID, DEFS_MERMAID, FONT_MERMAID),
+    };
+    let (w, h) = (d.width, d.height);
+    let bg = match style {
+        FlowStyle::Kymo => format!(
+            "<rect width=\"{w}\" height=\"{h}\" fill=\"#fafafa\"/>\n<rect width=\"{w}\" height=\"{h}\" class=\"bg-grid\"/>\n"
+        ),
+        FlowStyle::Mermaid => String::new(),
+    };
     format!(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
          <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {w} {h}\" width=\"{w}\" height=\"{h}\" \
-         style=\"max-width:100%;height:auto\" \
-         font-family=\"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif\">\n\
-         <style>{STYLE}</style>\n<defs>{DEFS}</defs>\n\
-         <rect width=\"{w}\" height=\"{h}\" fill=\"#fafafa\"/>\n\
-         <rect width=\"{w}\" height=\"{h}\" class=\"bg-grid\"/>\n\
-         {regions}{edges}{nodes}{region_labels}</svg>\n",
-        w = d.width,
-        h = d.height,
+         style=\"max-width:100%;height:auto\" font-family=\"{font}\">\n\
+         <style>{css}</style>\n<defs>{defs}</defs>\n\
+         {bg}{regions}{edges}{nodes}{region_labels}</svg>\n"
     )
 }
 
@@ -64,69 +99,80 @@ fn half(c: &Component) -> (i32, i32) {
     (w / 2, h / 2)
 }
 
-fn node_svg(c: &Component) -> String {
+fn node_svg(c: &Component, style: FlowStyle) -> String {
     let (cx, cy) = c.pos;
     let (hw, hh) = half(c);
-    let glyph =
-        match c.shape {
-            Shape::Circle => format!(
-                "<ellipse class=\"fc-shape\" cx=\"{cx}\" cy=\"{cy}\" rx=\"{hw}\" ry=\"{hh}\"/>"
-            ),
-            Shape::Diamond => {
-                let pts = format!(
-                    "{cx},{} {},{cy} {cx},{} {},{cy}",
-                    cy - hh,
-                    cx + hw,
-                    cy + hh,
-                    cx - hw
-                );
-                format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
-            }
-            Shape::Hex => {
-                let s = hh.min(hw / 2);
-                let pts = format!(
-                    "{},{cy} {},{} {},{} {},{cy} {},{} {},{}",
-                    cx - hw,
-                    cx - hw + s,
-                    cy - hh,
-                    cx + hw - s,
-                    cy - hh,
-                    cx + hw,
-                    cx + hw - s,
-                    cy + hh,
-                    cx - hw + s,
-                    cy + hh,
-                );
-                format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
-            }
-            Shape::Cylinder => {
-                let ry = (4).max(((hh as f64) * 0.22).round() as i32);
-                let (top, bot) = (cy - hh + ry, cy + hh - ry);
-                format!(
+    // Sharp `[...]` rect vs rounded box only differ under the mermaid style.
+    let box_rx = match (style, c.shape) {
+        (FlowStyle::Mermaid, Shape::Rect) => 0,
+        (FlowStyle::Mermaid, _) => 5,
+        _ => 6,
+    };
+    let glyph = match c.shape {
+        Shape::Circle => {
+            format!("<ellipse class=\"fc-shape\" cx=\"{cx}\" cy=\"{cy}\" rx=\"{hw}\" ry=\"{hh}\"/>")
+        }
+        Shape::Diamond => {
+            let pts = format!(
+                "{cx},{} {},{cy} {cx},{} {},{cy}",
+                cy - hh,
+                cx + hw,
+                cy + hh,
+                cx - hw
+            );
+            format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
+        }
+        Shape::Hex => {
+            let s = hh.min(hw / 2);
+            let pts = format!(
+                "{},{cy} {},{} {},{} {},{cy} {},{} {},{}",
+                cx - hw,
+                cx - hw + s,
+                cy - hh,
+                cx + hw - s,
+                cy - hh,
+                cx + hw,
+                cx + hw - s,
+                cy + hh,
+                cx - hw + s,
+                cy + hh,
+            );
+            format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
+        }
+        Shape::Cylinder => {
+            let ry = (4).max(((hh as f64) * 0.22).round() as i32);
+            let (top, bot) = (cy - hh + ry, cy + hh - ry);
+            format!(
                 "<path class=\"fc-shape\" d=\"M{},{top} V{bot} A{hw},{ry} 0 0 0 {},{bot} V{top} \
                  A{hw},{ry} 0 0 1 {},{top} Z\"/>\
                  <path class=\"fc-shape-line\" d=\"M{},{top} A{hw},{ry} 0 0 0 {},{top}\"/>",
-                cx - hw, cx + hw, cx - hw, cx - hw, cx + hw,
+                cx - hw,
+                cx + hw,
+                cx - hw,
+                cx - hw,
+                cx + hw,
             )
-            }
-            Shape::Badge => format!(
+        }
+        Shape::Badge => {
+            format!(
             "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{hh}\"/>",
             cx - hw, cy - hh, 2 * hw, 2 * hh,
-        ),
-            Shape::StateStart => {
-                format!("<circle cx=\"{cx}\" cy=\"{cy}\" r=\"8\" fill=\"#334155\"/>")
-            }
-            Shape::StateEnd => format!(
+        )
+        }
+        Shape::StateStart => {
+            format!("<circle cx=\"{cx}\" cy=\"{cy}\" r=\"8\" fill=\"#334155\"/>")
+        }
+        Shape::StateEnd => format!(
                 "<circle cx=\"{cx}\" cy=\"{cy}\" r=\"9\" fill=\"#ffffff\" stroke=\"#334155\" \
                  stroke-width=\"1.5\"/><circle cx=\"{cx}\" cy=\"{cy}\" r=\"4.5\" fill=\"#334155\"/>"
             ),
-            _ => {
-                format!(
-            "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"6\"/>",
+        _ => {
+            format!(
+            "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{box_rx}\"/>",
             cx - hw, cy - hh, 2 * hw, 2 * hh,
         )
-            }
-        };
+        }
+    };
     let label = if c.name.is_empty() {
         String::new()
     } else {
@@ -218,12 +264,16 @@ fn edge_svg(e: &Edge, by_id: &HashMap<&str, &Component>) -> String {
 
 // ── regions (clusters) ───────────────────────────────────────────────────────
 
-fn region_rect(r: &Region) -> String {
+fn region_rect(r: &Region, style: FlowStyle) -> String {
     if !r.visible {
         return String::new();
     }
     let (x, y, w, h) = r.bounds;
-    format!("<rect class=\"region-rect\" x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"12\"/>\n")
+    let rx = match style {
+        FlowStyle::Mermaid => 6,
+        FlowStyle::Kymo => 12,
+    };
+    format!("<rect class=\"region-rect\" x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"{rx}\"/>\n")
 }
 
 fn region_label(r: &Region) -> String {

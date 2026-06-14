@@ -48,6 +48,7 @@ str_enum! {
     /// the Python/JS renderers gain the glyph when they consume kymojson.
     Shape {
         Circle => "circle", Cube => "cube", CubeBig => "cube-big", Box => "box",
+        Rect => "rect",
         Cylinder => "cylinder", Hex => "hex", Diamond => "diamond",
         Annotation => "annotation", AwsTile => "aws-tile", AwsTileHero => "aws-tile-hero",
         Badge => "badge", Image => "image",
@@ -57,6 +58,17 @@ str_enum! {
         BpmnTask => "bpmn-task", BpmnSubprocess => "bpmn-subprocess",
         BpmnGateway => "bpmn-gateway", BpmnDataObject => "bpmn-data-object",
         BpmnDataStore => "bpmn-data-store", BpmnAnnotation => "bpmn-annotation",
+    }
+}
+
+/// `Rect` (a render-only sharp-rectangle variant of `Box`) has no Python/JS
+/// equivalent, so the kymojson interchange format serializes it as `box`.
+impl Shape {
+    pub fn kymojson_str(self) -> &'static str {
+        match self {
+            Shape::Rect => "box",
+            other => other.as_str(),
+        }
     }
 }
 

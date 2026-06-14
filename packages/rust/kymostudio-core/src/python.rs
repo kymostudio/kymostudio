@@ -135,6 +135,15 @@ fn mermaid_to_svg(src: &str) -> PyResult<String> {
     crate::mermaid_to_svg(src).map_err(|e| PyValueError::new_err(e.to_string()))
 }
 
+/// Render Mermaid flowchart source → SVG with a style (`"mermaid"`/`"kymo"`;
+/// `None`/unknown → source/default).
+#[pyfunction]
+#[pyo3(signature = (src, style = None))]
+fn mermaid_to_svg_styled(src: &str, style: Option<&str>) -> PyResult<String> {
+    let st = style.and_then(crate::style::FlowStyle::from_str_opt);
+    crate::mermaid_to_svg_styled(src, st).map_err(|e| PyValueError::new_err(e.to_string()))
+}
+
 /// Render D2 flowchart source → SVG (pure-Rust D2 importer + renderer).
 #[pyfunction]
 fn d2_to_svg(src: &str) -> PyResult<String> {
@@ -180,6 +189,7 @@ fn _kymostudio_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(mermaid_to_mermaid, m)?)?;
     m.add_function(wrap_pyfunction!(mermaid_to_drawio, m)?)?;
     m.add_function(wrap_pyfunction!(mermaid_to_svg, m)?)?;
+    m.add_function(wrap_pyfunction!(mermaid_to_svg_styled, m)?)?;
     m.add_function(wrap_pyfunction!(d2_to_svg, m)?)?;
     m.add_function(wrap_pyfunction!(d2_to_kymojson, m)?)?;
     m.add_function(wrap_pyfunction!(dot_to_svg, m)?)?;
