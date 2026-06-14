@@ -480,8 +480,8 @@ export default function EditorPage() {
         {claims
           ? <Link className="brand" to="/" title="Home" aria-label="Home"><img src="/logo.svg" alt="" /></Link>
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
-        {claims && <WorkspaceSwitcher />}
-        {claims && <span className="sep">/</span>}
+        {claims && !showWelcome && <WorkspaceSwitcher />}
+        {claims && !showWelcome && <span className="sep">/</span>}
         {booting ? <span className="skeleton name-skel" /> : showWelcome ? (
           <span className="diagram-name untitled"><span className="dn-text">Welcome</span></span>
         ) : claims ? (
@@ -654,7 +654,7 @@ export default function EditorPage() {
         {booting ? (
           <div className="boot"><KLoader /></div>
         ) : showWelcome ? (
-          <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} />
+          <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} onTemplate={pickTemplate} />
         ) : (
           <>
             <section className="pane" style={{ flex: `0 0 ${split}%` }}>
@@ -702,7 +702,7 @@ export default function EditorPage() {
         )}
         </main>
       </div>
-      <div className={"status" + (statusErr ? " error" : "")} title={statusTitle}>{status}</div>
+      {!showWelcome && <div className={"status" + (statusErr ? " error" : "")} title={statusTitle}>{status}</div>}
     </div>
   );
 }
