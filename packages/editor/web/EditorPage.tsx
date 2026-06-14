@@ -522,10 +522,11 @@ export default function EditorPage() {
         {claims && !shared && !showWelcome
           ? <AddressBar titleNode={titleEl} />
           : titleEl}
-        {/* one save indicator, always with text: a saved file syncs live; a draft is unsaved until you Save */}
-        {claims && d && !booting && (
-          <span className={"save-ind" + (live ? "" : " off")} title={live ? "All changes are saved in real time" : "Disconnected — changes are not being saved"}>
-            {live ? "Saved" : "Offline"}
+        {/* the steady "Saved" pill is dropped (saving is silent + automatic); only
+            surface the disconnection warning, and the unsaved-draft state below */}
+        {claims && d && !booting && !live && (
+          <span className="save-ind off" title="Disconnected — changes are not being saved">
+            Offline
           </span>
         )}
         {isDraft && !booting && !showWelcome && (
