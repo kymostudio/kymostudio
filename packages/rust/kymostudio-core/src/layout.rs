@@ -95,6 +95,10 @@ fn node_size(label: &str, shape: Shape, style: FlowStyle) -> (i32, i32) {
                 (d, d)
             }
             Shape::Hex => ((tw + 35).max(60), 39),
+            Shape::Parallelogram
+            | Shape::ParallelogramAlt
+            | Shape::Trapezoid
+            | Shape::TrapezoidAlt => ((tw + 55).max(70), 39),
             Shape::Cylinder => ((tw + 30).max(56), 54),
             Shape::Badge => ((tw + 30).max(56), 54),
             Shape::Box => ((tw + 30).max(56), 54), // rounded `(...)`

@@ -61,7 +61,9 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
             g.set_parent(m, Some(&sg.id));
         }
     }
-    for e in &fc.edges {
+    // Reverse insertion order so the dagre crate's order phase breaks ties
+    // the same way dagre-d3-es (mermaid's lib) does.
+    for e in fc.edges.iter().rev() {
         let (lw, lh) = if e.label.is_empty() {
             (0.0, 0.0)
         } else {
@@ -80,13 +82,15 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
     }
 
     layout(&mut g, None);
+    const MX: i32 = 8;
+    const MY: i32 = 8;
 
     for n in &fc.nodes {
         if let Some(nd) = g.node(&n.id) {
             let mut c = Component::flowchart(n.id.clone(), n.label.clone(), n.shape);
             c.pos = (
-                nd.x.unwrap_or(0.0).round() as i32,
-                nd.y.unwrap_or(0.0).round() as i32,
+                nd.x.unwrap_or(0.0).round() as i32 + MX,
+                nd.y.unwrap_or(0.0).round() as i32 + MY,
             );
             c.size = Some((nd.width.round() as i32, nd.height.round() as i32));
             d.components.push(c);
@@ -102,8 +106,8 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
             );
             let mut r = Region::cluster(sg.id.clone(), sg.title.clone(), sg.members.clone());
             r.bounds = (
-                (x - w / 2.0).round() as i32,
-                (y - h / 2.0).round() as i32,
+                (x - w / 2.0).round() as i32 + MX,
+                (y - h / 2.0).round() as i32 + MY,
                 w.round() as i32,
                 h.round() as i32,
             );
@@ -119,7 +123,7 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
             let pts: Vec<(i32, i32)> = ed
                 .points
                 .iter()
-                .map(|p| (p.x.round() as i32, p.y.round() as i32))
+                .map(|p| (p.x.round() as i32 + MX, p.y.round() as i32 + MY))
                 .collect();
             if pts.len() >= 2 {
                 edge.points = Some(pts);

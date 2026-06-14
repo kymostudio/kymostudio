@@ -85,7 +85,7 @@ pub fn render_styled_with(
         .iter()
         .map(|c| node_svg(c, style, styles.get(&c.id), default_fill))
         .collect();
-    let region_labels: String = d.regions.iter().map(region_label).collect();
+    let region_labels: String = d.regions.iter().map(|r| region_label(r, style)).collect();
 
     let (css, defs, font) = match style {
         FlowStyle::Kymo => (STYLE, DEFS, FONT_KYMO),
@@ -355,39 +355,73 @@ fn region_rect(r: &Region, style: FlowStyle) -> String {
     format!("<rect class=\"region-rect\" x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"{rx}\"/>\n")
 }
 
-fn region_label(r: &Region) -> String {
+fn region_label(r: &Region, style: FlowStyle) -> String {
     if !r.visible || r.label.is_empty() {
         return String::new();
     }
-    let (x, y, _w, _h) = r.bounds;
-    format!(
-        "<text class=\"region-label\" text-anchor=\"start\" x=\"{}\" y=\"{}\">{}</text>\n",
-        x + 12,
-        y + 16,
-        esc(&r.label)
-    )
+    let (x, y, w, _h) = r.bounds;
+    // Mermaid centres the cluster title at the top; kymo left-aligns it.
+    if matches!(style, FlowStyle::Mermaid) {
+        format!(
+            "<text class=\"region-label\" text-anchor=\"middle\" x=\"{}\" y=\"{}\">{}</text>\n",
+            x + w / 2,
+            y + 16,
+            esc(&r.label)
+        )
+    } else {
+        format!(
+            "<text class=\"region-label\" text-anchor=\"start\" x=\"{}\" y=\"{}\">{}</text>\n",
+            x + 12,
+            y + 16,
+            esc(&r.label)
+        )
+    }
 }
 
-/// Smooth a polyline (dagre waypoints) into a Catmull-Rom cubic-bezier path so
-/// edges curve like mermaid curveBasis, while still passing through the routed
-/// points.
+/// Render a polyline (dagre waypoints) as a uniform cubic B-spline, matching
+/// d3 `curveBasis` exactly (mermaid's edge curve).
 fn smooth_path(pts: &[(i32, i32)]) -> String {
-    if pts.len() == 2 {
+    let n = pts.len();
+    if n == 2 {
         return format!("M{},{} L{},{}", pts[0].0, pts[0].1, pts[1].0, pts[1].1);
     }
-    let mut d = format!("M{},{}", pts[0].0, pts[0].1);
-    for i in 0..pts.len() - 1 {
-        let p0 = pts[i.saturating_sub(1)];
-        let p1 = pts[i];
-        let p2 = pts[i + 1];
-        let p3 = pts[(i + 2).min(pts.len() - 1)];
-        let c1 = (p1.0 + (p2.0 - p0.0) / 6, p1.1 + (p2.1 - p0.1) / 6);
-        let c2 = (p2.0 - (p3.0 - p1.0) / 6, p2.1 - (p3.1 - p1.1) / 6);
+    let p = |i: usize| (pts[i].0 as f64, pts[i].1 as f64);
+    let bezier = |d: &mut String, x0: f64, y0: f64, x1: f64, y1: f64, x: f64, y: f64| {
         d.push_str(&format!(
-            " C{},{} {},{} {},{}",
-            c1.0, c1.1, c2.0, c2.1, p2.0, p2.1
+            " C{:.2},{:.2} {:.2},{:.2} {:.2},{:.2}",
+            (2.0 * x0 + x1) / 3.0,
+            (2.0 * y0 + y1) / 3.0,
+            (x0 + 2.0 * x1) / 3.0,
+            (y0 + 2.0 * y1) / 3.0,
+            (x0 + 4.0 * x1 + x) / 6.0,
+            (y0 + 4.0 * y1 + y) / 6.0,
         ));
+    };
+    let (mut x0, mut y0) = (0.0_f64, 0.0_f64);
+    let (mut x1, mut y1) = (0.0_f64, 0.0_f64);
+    let mut d = String::new();
+    for i in 0..n {
+        let (x, y) = p(i);
+        match i {
+            0 => d.push_str(&format!("M{:.2},{:.2}", x, y)),
+            1 => {}
+            2 => {
+                d.push_str(&format!(
+                    " L{:.2},{:.2}",
+                    (5.0 * x0 + x1) / 6.0,
+                    (5.0 * y0 + y1) / 6.0
+                ));
+                bezier(&mut d, x0, y0, x1, y1, x, y);
+            }
+            _ => bezier(&mut d, x0, y0, x1, y1, x, y),
+        }
+        x0 = x1;
+        x1 = x;
+        y0 = y1;
+        y1 = y;
     }
+    bezier(&mut d, x0, y0, x1, y1, x1, y1);
+    d.push_str(&format!(" L{:.2},{:.2}", x1, y1));
     d
 }
 
