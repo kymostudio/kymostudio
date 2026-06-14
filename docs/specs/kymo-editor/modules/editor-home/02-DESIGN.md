@@ -1,7 +1,7 @@
 ---
 title: Editor Home — Design
 document_id: DESIGN-KHOME-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-15
 status: Implemented
 classification: Internal
@@ -37,7 +37,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `DESIGN-KHOME-001` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KHOME-001` (the *what*), `TEST-KHOME-001` (V&V), `PLAN-KHOME-001` (delivery), `DESIGN-KEDITOR-001` (the umbrella design — §2 client app structure, ADR-15 draft-first, ADR-16 shell), `FEAT-KLIBRARY-001` / `FEAT-KLIVE-001` / `FEAT-KRENDER-001` (the siblings whose capabilities the Welcome composes) |
@@ -81,11 +81,11 @@ hands off to), and `editor-live` (`FR-LV-02` guest boundary, `FR-LV-08` draft)**
 |---------------|----------------|
 | `web/welcome.tsx` → `WelcomeView({ onNew, onOpenFile, onTemplate })` | The view. Reads `claims` (`useAuth`) and the library `items` (`useDiagrams`); computes `recent = [...items].sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0)).slice(0, 8)` and `quick` (the `QUICK` names — Flowchart / Sequence / BPMN / C4 / ER / Class — resolved against `TEMPLATES`). Renders `.welcome > .wel-inner` (the `wordmark.svg` lockup) + a two-column `.wel-cols`. |
 | `WelcomeView` → **Start** block | `New diagram…` → `onNew`; `Open file…` → clicks a hidden `<input type=file accept=".kymo,.bpmn,.mmd,.mermaid,.txt,.md">` whose `onChange` calls `onOpenFile(file)` and clears the input. |
-| `WelcomeView` → **Recent** block | Signed-out: a `.wel-guest` with "Sign in to see your diagrams." + a **Sign in with Google** button that calls `google.accounts.id.prompt()` (`FR-LV-02` boundary). Signed-in: up to 8 `recent` rows (kind icon + title + ext) → `navigate("/?d=" + id)`; empty → "No diagrams yet — pick a template to start." |
+| `WelcomeView` → **Recent** block | Signed-out (heading **"No sign-in needed"**): a `.wel-note` value note ("Pick a template and start right away…") with an inline **Sign in** link (`.wel-inline-link`) that calls `google.accounts.id.prompt()` (`FR-LV-02` boundary); the guest column also leads with a `.wel-tagline` + a `.wel-hero` illustration (`welcome-hero.svg`). Signed-in (heading **"Recent"**): up to 8 `recent` rows (kind icon + title + ext) → `navigate("/?d=" + id)`; empty → "No diagrams yet — pick a template to start." **Column order:** guest = [Start, Recent]; signed-in = [Recent, Start] (a returning user resumes first). |
 | `WelcomeView` → **Templates** block | `quick.map` → `.wel-tpl` buttons (glyph + name + `via`) → `onTemplate(t)`. |
 | `WelcomeView` → **Learn** block | A Documentation link to `docHref("kymo")` (external, `target=_blank rel=noopener`). |
-| `EditorPage` → `showWelcome` | `const showWelcome = isDraft && source === SAMPLE && !welcomeDismissed.current`, where `isDraft = !d && !shared`. Gates the render branch (`booting ? … : showWelcome ? <WelcomeView/> : <panes/>`). |
-| `EditorPage` → `welcomeDismissed` (ref) | Armed (`= true`) by any in-place start action (`pickTemplate`, `openLocalFile`); **reset to `false` on a route change** (`useEffect(… , [d, shared])`) so navigating Back to a fresh `/` restores the Welcome. |
+| `EditorPage` → `showWelcome` | `const showWelcome = isDraft && source === SAMPLE && !welcomeDismissed`, where `isDraft = !d && !shared`. Gates the render branch (`booting ? … : showWelcome ? <WelcomeView/> : <panes/>`). |
+| `EditorPage` → `welcomeDismissed` (**state**, `useState(false)`) | Set (`setWelcomeDismissed(true)`) by any in-place start action (`pickTemplate`, `openLocalFile`); **reset to `false` on a route change** (`useEffect(… , [d, shared])`) so navigating Back to a fresh `/` restores the Welcome. (State, not a ref — `+ New` keeps the same `SAMPLE` source, so only a re-render hides the panel.) |
 | `EditorPage` → `onNew` wiring | `WelcomeView.onNew = () => setGalleryOpen(true)` → opens `<TemplateGallery>` (owned by `editor-library`, `FR-LB-02`). |
 | `EditorPage` → `openLocalFile(file)` | `FR-HM-02`. See §3. |
 
@@ -109,7 +109,7 @@ no server document until Save — `FR-LV-08`). The same `sniffKind` powers paste
 `EditorPage` renders a reduced header for the Welcome state:
 
 - **Brand:** signed-out → an external link to `https://kymo.studio`; signed-in → an internal `/` Home link.
-- **Title:** the `titleEl` `showWelcome` branch renders the literal word **"Welcome"**.
+- **Title:** none — `titleEl` is `null` on the Welcome (a redundant "Welcome" label was removed from the header; the panel below is self-evident).
 - **Actions:** the Export / Share controls and the pane-toggle group are wrapped in `{!showWelcome && …}`,
   so they are **hidden** on the Welcome; a guest sees the `<GoogleButton/>`.
 - **Activity bar / Explorer:** shown only when `claims && !shared` (the signed-in shell, `FR-LB-06`); a guest
@@ -134,7 +134,7 @@ as a code follow-up in `PLAN-KHOME-001` §5.
   the editor without a navigation), while a route change to `?d`/`?s` resets it (a `?s=` link bypasses the
   Welcome entirely; Back to a fresh `/` restores it). Rationale: keeps the draft-first model (ADR-15) intact
   — the Welcome is a *state*, not a page. Trade-off: the gate couples to the `SAMPLE` sentinel and an
-  in-memory ref rather than URL state.
+  in-memory `useState` flag rather than URL state.
 - **ADR-HM-3 — Guest sign-in is contextual, in Recent.** There is no One-Tap auto-prompt on the Welcome
   (a visitor hasn't asked to sign in); the CTA sits in the **Recent** column, where the payoff ("see your
   diagrams") is. This realises the `FR-LV-02` boundary (signed-out is fully usable) and matches `auth.tsx`'s
@@ -149,3 +149,4 @@ as a code follow-up in `PLAN-KHOME-001` §5.
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-15 | Vũ Anh | Initial design for the Welcome home, carved out of `DESIGN-KEDITOR-001` §2 as `editor-home` grew its own doc-set. Documents `WelcomeView` + its four blocks, the `showWelcome`/`welcomeDismissed` gate, the reduced header chrome, and `openLocalFile`. ADR-HM-1..4 (Welcome-not-redirect; derived gate; contextual guest sign-in; compose-don't-own). Records the `document.title` gap (R-HM1). |
+| 0.2     | 2026-06-15 | Vũ Anh | Reconcile §2 / §4 / ADR-HM-2 to the merged `welcome.tsx`: guest Recent = **"No sign-in needed"** note + inline Sign in (+ tagline / hero), column order, `welcomeDismissed` is React **state** (not a ref), and **no "Welcome" header title** (`titleEl` is `null`). Noted the `data-testid` selectors added to `welcome.tsx` for the E2E smoke suite. |
