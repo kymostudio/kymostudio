@@ -130,7 +130,7 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
                 edge.points = Some(pts);
             }
             if let (Some(lx), Some(ly)) = (ed.x, ed.y) {
-                edge.label_pos = Some((lx.round() as i32, ly.round() as i32));
+                edge.label_pos = Some((lx.round() as i32 + MX, ly.round() as i32 + MY));
             }
             d.edges.push(edge);
         }
