@@ -23,9 +23,8 @@ to merman (mirrors `render-api/engine.ts`). ~50 sources per type per dataset.
 
 | group | types | mermaid.js | kymo | merman |
 |---|---|---|---|---|
-| **kymo's own engines** | flowchart, state, **class, er, block** | **0%** | **~100%** | 0% |
+| **kymo's own engines** | flowchart, state, class, er, block, **mindmap, kanban, requirement** | **0%** | **~100%** | 0% |
 | | sequence | 100% | **100%** | 89–100% |
-| **lost by everyone** | kanban, mindmap, requirement | ~0% | ~0% | ~0% |
 | **already raster-safe** | c4, gantt, info, journey, packet, pie, quadrant, radar, sankey, timeline, treemap, xychart | 100% | 100% | 100% |
 | | architecture, gitgraph | ~97/100% | ~88/100% | ~88/100% |
 
@@ -37,15 +36,14 @@ to merman (mirrors `render-api/engine.ts`). ~50 sources per type per dataset.
    **100%**, class **100%** (modulo a text-wrapping stress fixture), state
    **87–100%**.
 2. **sequence**: all three are text-based (~100%); kymo edges out merman.
-3. **kanban, mindmap, requirement**: *every* tool still scores ~0% — these labels
-   vanish in any serverless PNG/PDF today. They are the next kymo targets.
+3. **No type is lost by every tool any more** — every foreignObject-only diagram
+   has a kymo text engine (the latest: mindmap, kanban, requirement, all ~100%).
 4. **~14 types are already raster-safe everywhere** — reimplementing them buys
    nothing.
 
 ## Takeaway
 
-kymo now has its own text engine for **six** diagram types (flowchart, sequence,
-state, class, er, block) and is the only serverless-raster-safe renderer for the
-five that mermaid.js/merman lose to foreignObject. The remaining foreignObject
-gap is **kanban, mindmap, requirement** — where, like the others before them,
-kymo could go from 0% to ~100% by emitting `<text>`.
+kymo now has its own text engine for **nine** diagram types (flowchart, sequence,
+state, class, er, block, mindmap, kanban, requirement) and is the only
+serverless-raster-safe renderer for the eight that mermaid.js/merman lose to
+foreignObject. The remaining ~14 types are already raster-safe in every tool.
