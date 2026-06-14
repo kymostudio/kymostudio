@@ -142,7 +142,7 @@ fn is_arrow_line(line: &str) -> bool {
                 j += 1;
             }
             let run: String = chars[i..j].iter().collect();
-            if run.len() >= 2 && (run.contains('>') || run.contains('<') || run.len() >= 3) {
+            if run.len() >= 2 && (run.contains('-') || run.contains('=') || run.contains('.')) {
                 return true;
             }
             i = j;
@@ -225,6 +225,30 @@ fn tokenize(line: &str) -> Vec<(String, String)> {
                 .trim()
                 .trim_matches('"')
                 .to_string();
+        }
+        // optional `<["label"]>` arrow-block wrapper (+ trailing `(direction)`).
+        if i < chars.len() && chars[i] == '<' {
+            let start = i;
+            while i < chars.len() && chars[i] != '>' {
+                i += 1;
+            }
+            if i < chars.len() {
+                i += 1;
+            }
+            let inner: String = chars[start..i].iter().collect();
+            if let Some(a) = inner.find('"') {
+                if let Some(b) = inner[a + 1..].find('"') {
+                    label = inner[a + 1..a + 1 + b].to_string();
+                }
+            }
+        }
+        if i < chars.len() && chars[i] == '(' {
+            while i < chars.len() && chars[i] != ')' {
+                i += 1;
+            }
+            if i < chars.len() {
+                i += 1;
+            }
         }
         // optional :span
         if i < chars.len() && chars[i] == ':' {

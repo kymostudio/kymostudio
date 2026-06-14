@@ -7,7 +7,7 @@
 //! `: label`. Styling / click / note lines are accepted and ignored.
 
 use super::MermaidError;
-use crate::classdiagram::{ClassBox, ClassDiagram, RelKind, Relation};
+use crate::classdiagram::{ClassBox, ClassDiagram, ClassNote, RelKind, Relation};
 use crate::flowchart::Direction;
 
 /// Parse class-diagram source into a [`ClassDiagram`].
@@ -33,8 +33,12 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         direction: Direction::Tb,
         classes: Vec::new(),
         relations: Vec::new(),
+        notes: Vec::new(),
+        namespaces: Vec::new(),
     };
     let mut cur: Option<usize> = None; // open `class X { … }` block
+    let mut ns: Option<usize> = None; // open namespace
+    let mut pending_note: Option<String> = None; // unterminated `note "…`
     let mut started = false;
     let mut skip_note = false;
 
@@ -53,6 +57,21 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         if skip_note {
             if low == "end note" {
                 skip_note = false;
+            }
+            continue;
+        }
+        if let Some(buf) = pending_note.as_mut() {
+            if let Some(q) = stmt.find('"') {
+                buf.push(' ');
+                buf.push_str(&stmt[..q]);
+                cd.notes.push(ClassNote {
+                    text: note_text(buf),
+                    target: None,
+                });
+                pending_note = None;
+            } else {
+                buf.push(' ');
+                buf.push_str(stmt);
             }
             continue;
         }
@@ -75,9 +94,37 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             cd.direction = parse_dir(stmt[10..].trim());
             continue;
         }
-        // metadata / interaction — ignored.
-        if low.starts_with("note") {
-            if !stmt.contains(':') {
+        // `namespace X { … }` grouping — skip the wrapper; inner classes parse
+        // normally, and the matching bare `}` is skipped below.
+        if low == "namespace" || low.starts_with("namespace ") {
+            let name = stmt[9..].trim().trim_end_matches('{').trim().to_string();
+            cd.namespaces.push((name, Vec::new()));
+            ns = Some(cd.namespaces.len() - 1);
+            continue;
+        }
+        if stmt == "}" {
+            ns = None; // closes a namespace / stray brace
+            continue;
+        }
+        // notes: `note "text"`, `note for X "text"`, or a `note … end note` block.
+        if low == "note" || low.starts_with("note ") {
+            let rest = stmt[4..].trim();
+            if let Some(r) = rest.strip_prefix("for ") {
+                let (tgt, text) = split_note_target(r);
+                cd.notes.push(ClassNote {
+                    text: note_text(&text),
+                    target: Some(tgt),
+                });
+            } else if let Some(body) = rest.strip_prefix('"') {
+                if let Some(q) = body.find('"') {
+                    cd.notes.push(ClassNote {
+                        text: note_text(&body[..q]),
+                        target: None,
+                    });
+                } else {
+                    pending_note = Some(body.to_string());
+                }
+            } else if rest.is_empty() {
                 skip_note = true;
             }
             continue;
@@ -100,6 +147,12 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             let opens = rest.ends_with('{');
             let head = rest.trim_end_matches('{').trim();
             let ci = decl_class(&mut cd.classes, head);
+            if let Some(n) = ns {
+                let id = cd.classes[ci].id.clone();
+                if !cd.namespaces[n].1.contains(&id) {
+                    cd.namespaces[n].1.push(id);
+                }
+            }
             if opens {
                 cur = Some(ci);
             }
@@ -129,6 +182,27 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
     }
 
     Ok(cd)
+}
+
+/// `note for X "text"` → (X, text).
+fn split_note_target(s: &str) -> (String, String) {
+    let s = s.trim();
+    if let Some(q) = s.find('"') {
+        let tgt = s[..q].trim().trim_matches('"').to_string();
+        let text = s[q..].trim().trim_matches('"').to_string();
+        (tgt, text)
+    } else {
+        (s.to_string(), String::new())
+    }
+}
+
+/// Fold escaped/`<br>` line breaks in a note to spaces.
+fn note_text(s: &str) -> String {
+    s.replace("\\n", " ")
+        .replace("<br>", " ")
+        .replace("<br/>", " ")
+        .trim()
+        .to_string()
 }
 
 fn strip_comment(line: &str) -> &str {
@@ -225,7 +299,7 @@ fn parse_relation(stmt: &str) -> Option<Relation> {
 /// not mistaken for one).
 fn find_rel_op(s: &str) -> Option<(usize, usize)> {
     let bytes: Vec<(usize, char)> = s.char_indices().collect();
-    let is_rel = |c: char| matches!(c, '<' | '>' | '|' | '*' | 'o' | '.' | '-');
+    let is_rel = |c: char| matches!(c, '<' | '>' | '|' | '*' | 'o' | '.' | '-' | '(' | ')');
     let mut i = 0;
     let mut best: Option<(usize, usize)> = None;
     while i < bytes.len() {
@@ -263,6 +337,10 @@ fn classify(op: &str) -> (RelKind, bool, bool) {
     } else {
         op.chars().last().unwrap_or('-')
     };
+    if op.contains('(') || op.contains(')') {
+        // lollipop interface notation — treat as a plain link.
+        return (RelKind::Link, dashed, false);
+    }
     let kind = match deco {
         '|' | '<' if op.contains('|') => {
             if dashed {

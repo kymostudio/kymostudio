@@ -4,7 +4,7 @@
 //! their kind. Everything is real `<text>`, so PNG/PDF keep the labels.
 
 use super::{ClassBox, ClassDiagram, RelKind, Relation};
-use crate::flowchart::{FlowEdge, FlowNode, Flowchart};
+use crate::flowchart::{FlowEdge, FlowNode, Flowchart, Subgraph};
 use crate::layout;
 use crate::model::{Component, Shape};
 use std::collections::HashMap;
@@ -46,11 +46,47 @@ pub fn render(cd: &ClassDiagram) -> String {
             no_arrow: true, // class edges draw their own UML heads
         });
     }
+    for (name, members) in &cd.namespaces {
+        fc.subgraphs.push(Subgraph {
+            id: format!("__ns_{name}"),
+            title: name.clone(),
+            members: members.clone(),
+            parent: None,
+        });
+    }
+    // Notes become extra layout nodes (so they don't overlap) and draw as
+    // yellow boxes; `note for X` links to its target.
+    for (i, n) in cd.notes.iter().enumerate() {
+        let id = format!("__note{i}");
+        fc.nodes.push(FlowNode {
+            id: id.clone(),
+            label: n.text.clone(),
+            shape: Shape::Box,
+        });
+        if let Some(t) = &n.target {
+            fc.edges.push(FlowEdge {
+                src: id,
+                dst: t.clone(),
+                label: String::new(),
+                dashed: true,
+                no_arrow: true,
+            });
+        }
+    }
     let dia = layout::layout_flowchart(&fc);
     let by_id: HashMap<&str, &Component> =
         dia.components.iter().map(|c| (c.id.as_str(), c)).collect();
 
     let mut body = String::new();
+    for region in &dia.regions {
+        let (rx, ry, rw, rh) = region.bounds;
+        body += &format!(
+            "<rect x=\"{rx}\" y=\"{ry}\" width=\"{rw}\" height=\"{rh}\" rx=\"4\" fill=\"none\"              stroke=\"#94a3b8\" stroke-width=\"1\" stroke-dasharray=\"4 3\"/>             <text x=\"{}\" y=\"{}\" fill=\"#475569\" font-size=\"12\" font-weight=\"600\">{}</text>",
+            rx + 6,
+            ry + 15,
+            esc(&region.label)
+        );
+    }
     for r in &cd.relations {
         if let (Some(a), Some(b)) = (by_id.get(r.from.as_str()), by_id.get(r.to.as_str())) {
             body += &edge_svg(r, a, b);
@@ -59,6 +95,11 @@ pub fn render(cd: &ClassDiagram) -> String {
     for c in &cd.classes {
         if let Some(comp) = by_id.get(c.id.as_str()) {
             body += &box_svg(c, comp);
+        }
+    }
+    for (i, n) in cd.notes.iter().enumerate() {
+        if let Some(comp) = by_id.get(format!("__note{i}").as_str()) {
+            body += &note_box(&n.text, comp);
         }
     }
 
@@ -126,6 +167,24 @@ fn box_svg(c: &ClassBox, comp: &Component) -> String {
     for m in &c.methods {
         ty += LINE_H;
         out += &row(ty, m);
+    }
+    out
+}
+
+fn note_box(text: &str, comp: &Component) -> String {
+    let (cx, cy) = comp.pos;
+    let (w, h) = comp.size.unwrap_or((120, 36));
+    let (x, y) = (cx - w / 2, cy - h / 2);
+    let mut out = format!(
+        "<rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"2\" fill=\"#fff7d6\"          stroke=\"#e3c34a\" stroke-width=\"1\"/>"
+    );
+    for (i, line) in text.split('\n').enumerate() {
+        out += &format!(
+            "<text x=\"{}\" y=\"{}\" fill=\"#5b4a17\" font-size=\"12\">{}</text>",
+            x + 6,
+            y + 16 + i as i32 * LINE_H,
+            esc(line)
+        );
     }
     out
 }
