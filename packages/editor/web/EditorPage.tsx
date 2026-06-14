@@ -53,7 +53,10 @@ export default function EditorPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const welcomeDismissed = useRef(false); // set when the user starts a diagram from the Welcome panel
+  // Set when the user starts a diagram from the Welcome panel. State, not a ref:
+  // picking the Flowchart template seeds the editor with SAMPLE (its source is
+  // byte-identical), so source never changes — only a re-render hides Welcome.
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
   const [detected, setDetected] = useState<string | null>(null); // kind chosen by paste auto-detect (transient chip)
   const [sharePayload, setSharePayload] = useState(""); // deflate+base64url of the current source
   const warmedShare = useRef(""); // last kind+source warmed into the render cache
@@ -306,7 +309,7 @@ export default function EditorPage() {
   // VS Code-style Welcome: a fresh "/" (untouched sample) shows the Welcome panel
   // instead of the editor. Any in-place action (pick template / open file) arms
   // `welcomeDismissed`; navigating to a real route re-arms it (effect below).
-  const showWelcome = isDraft && source === SAMPLE && !welcomeDismissed.current;
+  const showWelcome = isDraft && source === SAMPLE && !welcomeDismissed;
 
   useEffect(() => {
     document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
@@ -375,7 +378,7 @@ export default function EditorPage() {
   // becomes a room only via the explicit Save — abandoned templates never litter
   // the Diagrams list.
   // Re-arm the Welcome panel whenever the route changes (back to a fresh "/").
-  useEffect(() => { welcomeDismissed.current = false; }, [d, shared]);
+  useEffect(() => { setWelcomeDismissed(false); }, [d, shared]);
 
   // "Open file…" on the Welcome panel: load a local diagram source into the draft.
   function openLocalFile(file: File) {
@@ -383,7 +386,7 @@ export default function EditorPage() {
       const ext = (file.name.split(".").pop() || "").toLowerCase();
       const byExt = ext === "bpmn" ? "bpmn" : ext === "mmd" || ext === "mermaid" ? "mermaid" : "kymo";
       const k = sniffKind(txt) || byExt;
-      welcomeDismissed.current = true;
+      setWelcomeDismissed(true);
       userEdited.current = true; titleUserSet.current = false; autoTitle.current = "";
       setTitle(""); setShareError(null);
       setKind(KINDS.some((x) => x.value === k) ? k : "kymo");
@@ -394,7 +397,7 @@ export default function EditorPage() {
 
   function pickTemplate(t: Template) {
     setGalleryOpen(false);
-    welcomeDismissed.current = true; // leaving the Welcome panel for a real diagram
+    setWelcomeDismissed(true); // leaving the Welcome panel for a real diagram
     // No room = the only copy of edited content is this tab/URL. Ask first.
     if (!d && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
     titleUserSet.current = false; autoTitle.current = "";
@@ -486,11 +489,13 @@ export default function EditorPage() {
     try { localStorage.setItem("kymo_split", "50"); } catch {}
   }
 
-  // The document title element: a skeleton while booting, "Welcome" on the home
-  // screen, an inline rename field / editable name when signed in, else read-only.
-  // Rendered standalone for guests/welcome/share and inside the AddressBar otherwise.
+  // The document title element: a skeleton while booting, nothing on the Welcome
+  // home screen (the panel below is self-evident — a redundant "Welcome" label in
+  // the header just clutters it), an inline rename field / editable name when
+  // signed in, else read-only. Rendered standalone for guests/welcome/share and
+  // inside the AddressBar otherwise.
   const titleEl = booting ? <span className="skeleton name-skel" /> : showWelcome ? (
-    <span className="diagram-name untitled"><span className="dn-text">Welcome</span></span>
+    null
   ) : claims ? (
     editingName ? (
       <input className="diagram-input" autoFocus maxLength={60} defaultValue={title} placeholder="Untitled"
