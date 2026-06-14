@@ -2,3 +2,5 @@ node_modules/
 results/mermaidjs-cache/
 results/raw/
 results/kroki-cache/
+results/mermaidjs-all-cache/
+results/mjs-vr-cache/

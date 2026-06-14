@@ -1,0 +1,167 @@
+{
+  "truth": "mermaid.js 11",
+  "metric": "raster-safe label recall",
+  "rows": [
+    {
+      "g": "architecture",
+      "n": 45,
+      "kymo": 96.1,
+      "merman": 96.1,
+      "own": false
+    },
+    {
+      "g": "block",
+      "n": 37,
+      "kymo": 0,
+      "merman": 0,
+      "own": false
+    },
+    {
+      "g": "c4",
+      "n": 42,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "class",
+      "n": 48,
+      "kymo": 0,
+      "merman": 0,
+      "own": false
+    },
+    {
+      "g": "er",
+      "n": 48,
+      "kymo": 0,
+      "merman": 0,
+      "own": false
+    },
+    {
+      "g": "flowchart",
+      "n": 36,
+      "kymo": 100,
+      "merman": 1.4,
+      "own": true
+    },
+    {
+      "g": "gantt",
+      "n": 47,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "gitgraph",
+      "n": 44,
+      "kymo": 84.5,
+      "merman": 84.5,
+      "own": false
+    },
+    {
+      "g": "info",
+      "n": 17,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "journey",
+      "n": 23,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "kanban",
+      "n": 50,
+      "kymo": 0,
+      "merman": 0,
+      "own": false
+    },
+    {
+      "g": "mindmap",
+      "n": 50,
+      "kymo": 0,
+      "merman": 0,
+      "own": false
+    },
+    {
+      "g": "packet",
+      "n": 20,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "pie",
+      "n": 39,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "quadrant",
+      "n": 48,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "radar",
+      "n": 28,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "requirement",
+      "n": 46,
+      "kymo": 0,
+      "merman": 0,
+      "own": false
+    },
+    {
+      "g": "sankey",
+      "n": 20,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "sequence",
+      "n": 46,
+      "kymo": 100,
+      "merman": 97.8,
+      "own": true
+    },
+    {
+      "g": "state",
+      "n": 48,
+      "kymo": 87.3,
+      "merman": 0,
+      "own": true
+    },
+    {
+      "g": "timeline",
+      "n": 50,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "treemap",
+      "n": 40,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    },
+    {
+      "g": "xychart",
+      "n": 27,
+      "kymo": 100,
+      "merman": 100,
+      "own": false
+    }
+  ]
+}

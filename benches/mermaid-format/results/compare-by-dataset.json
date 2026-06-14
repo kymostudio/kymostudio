@@ -1,0 +1,548 @@
+{
+  "truth": "mermaid.js 11 visible labels",
+  "metric": "raster-safe recall under resvg/svg2pdf",
+  "datasets": {
+    "merman": [
+      {
+        "g": "architecture",
+        "n": 45,
+        "mjs": 97,
+        "kymo": 96,
+        "merman": 96,
+        "own": false
+      },
+      {
+        "g": "block",
+        "n": 36,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "c4",
+        "n": 42,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "class",
+        "n": 49,
+        "mjs": 2,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "er",
+        "n": 47,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "flowchart",
+        "n": 37,
+        "mjs": 0,
+        "kymo": 100,
+        "merman": 0,
+        "own": true
+      },
+      {
+        "g": "gantt",
+        "n": 48,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "gitgraph",
+        "n": 46,
+        "mjs": 100,
+        "kymo": 80,
+        "merman": 80,
+        "own": false
+      },
+      {
+        "g": "info",
+        "n": 14,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "journey",
+        "n": 17,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "kanban",
+        "n": 50,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "mindmap",
+        "n": 50,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "packet",
+        "n": 16,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "pie",
+        "n": 39,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "quadrant",
+        "n": 48,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "radar",
+        "n": 27,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "requirement",
+        "n": 44,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "sankey",
+        "n": 16,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "sequence",
+        "n": 49,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 99,
+        "own": true
+      },
+      {
+        "g": "state",
+        "n": 44,
+        "mjs": 0,
+        "kymo": 91,
+        "merman": 0,
+        "own": true
+      },
+      {
+        "g": "timeline",
+        "n": 50,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "treemap",
+        "n": 33,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "xychart",
+        "n": 27,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      }
+    ],
+    "mermaid-cypress": [
+      {
+        "g": "architecture",
+        "n": 14,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "block",
+        "n": 25,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "c4",
+        "n": 6,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "class",
+        "n": 42,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "er",
+        "n": 48,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "flowchart",
+        "n": 39,
+        "mjs": 0,
+        "kymo": 100,
+        "merman": 0,
+        "own": true
+      },
+      {
+        "g": "gantt",
+        "n": 41,
+        "mjs": 100,
+        "kymo": 98,
+        "merman": 98,
+        "own": false
+      },
+      {
+        "g": "gitgraph",
+        "n": 50,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "info",
+        "n": 2,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "journey",
+        "n": 4,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "kanban",
+        "n": 10,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "mindmap",
+        "n": 18,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "packet",
+        "n": 3,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "pie",
+        "n": 14,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "quadrant",
+        "n": 13,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "radar",
+        "n": 5,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "requirement",
+        "n": 31,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "sankey",
+        "n": 3,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "sequence",
+        "n": 43,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 89,
+        "own": true
+      },
+      {
+        "g": "state",
+        "n": 49,
+        "mjs": 0,
+        "kymo": 87,
+        "merman": 0,
+        "own": true
+      },
+      {
+        "g": "timeline",
+        "n": 12,
+        "mjs": 100,
+        "kymo": 83,
+        "merman": 83,
+        "own": false
+      },
+      {
+        "g": "treemap",
+        "n": 17,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "xychart",
+        "n": 11,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      }
+    ],
+    "mermaid-to-svg": [
+      {
+        "g": "block",
+        "n": 3,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "c4",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "class",
+        "n": 2,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "er",
+        "n": 1,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "flowchart",
+        "n": 48,
+        "mjs": 0,
+        "kymo": 100,
+        "merman": 0,
+        "own": true
+      },
+      {
+        "g": "gantt",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "gitgraph",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 40,
+        "merman": 40,
+        "own": false
+      },
+      {
+        "g": "info",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "journey",
+        "n": 2,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "kanban",
+        "n": 4,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "mindmap",
+        "n": 1,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "packet",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "pie",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "quadrant",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "radar",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "requirement",
+        "n": 1,
+        "mjs": 0,
+        "kymo": 0,
+        "merman": 0,
+        "own": false
+      },
+      {
+        "g": "sankey",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "sequence",
+        "n": 3,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": true
+      },
+      {
+        "g": "state",
+        "n": 3,
+        "mjs": 0,
+        "kymo": 100,
+        "merman": 0,
+        "own": true
+      },
+      {
+        "g": "timeline",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      },
+      {
+        "g": "xychart",
+        "n": 1,
+        "mjs": 100,
+        "kymo": 100,
+        "merman": 100,
+        "own": false
+      }
+    ]
+  }
+}
