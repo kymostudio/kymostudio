@@ -24,6 +24,17 @@ export const TEMPLATES: Template[] = [
 }`,
   },
   {
+    name: "Flowchart", kind: "mermaid", via: "Mermaid",
+    glyph: <svg viewBox="0 0 24 24" {...G}><rect x="6.5" y="3" width="11" height="5.5" rx="1.3" /><path d="M12 8.5v3" /><path d="M12 11.5l4.5 4.5-4.5 4.5-4.5-4.5z" /></svg>,
+    source: `flowchart TD
+  A[Receive order] --> B{In stock?}
+  B -->|Yes| C[Take payment]
+  B -->|No| D[Notify customer]
+  C --> E[Pack items]
+  E --> F((Ship order))
+  D --> G[Cancel order]`,
+  },
+  {
     name: "Architecture", kind: "mermaid", via: "Mermaid",
     glyph: <svg viewBox="0 0 24 24" {...G}><rect x="3" y="3.5" width="18" height="17" rx="2" /><rect x="6.5" y="7" width="5.5" height="5" rx="1" /><path d="M12 12l3 3" /><rect x="15" y="13" width="4" height="4" rx="1" /></svg>,
     source: `architecture-beta
