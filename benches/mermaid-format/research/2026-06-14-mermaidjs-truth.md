@@ -44,9 +44,9 @@ over a ≤50-source sample.
 | class | 196 | 100/2 | 100/**100** | 98/**0** | own ⭐ |
 | er | 85 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | block | 119 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
-| kanban | 82 | 100/0 | 100/**0** | 100/**0** | — |
-| mindmap | 107 | 100/0 | 100/**0** | 100/**0** | — |
-| requirement | 48 | 100/0 | 100/**0** | 100/**0** | — |
+| mindmap | 107 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
+| kanban | 82 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
+| requirement | 48 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | architecture | 182 | 100/97 | 99/96 | 99/96 | — |
 | gitgraph | 177 | 100/100 | 80/80 | 80/80 | — |
 | c4 61, gantt 146, info 15, journey 20, packet 35, pie 71, quadrant 54, radar 49, sankey 23, timeline 77, treemap 43, xychart 63 | — | 100/100 | 100/100 | 100/100 | — |
@@ -61,9 +61,9 @@ over a ≤50-source sample.
 | class | 84 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | er | 52 | 100/**0** | 100/**100** | 90/**0** | own ⭐ |
 | block | 36 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
-| kanban | 10 | 100/0 | 100/**0** | 100/**0** | — |
-| mindmap | 19 | 100/0 | 100/**0** | 100/**0** | — |
-| requirement | 31 | 100/0 | 100/**0** | 100/**0** | — |
+| mindmap | 19 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
+| kanban | 10 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
+| requirement | 31 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | gantt | 41 | 100/100 | 98/98 | 98/98 | — |
 | timeline | 12 | 100/100 | 83/83 | 83/83 | — |
 | architecture 17, c4 6, gitgraph 71, info 2, journey 4, packet 4, pie 14, quadrant 14, radar 5, sankey 3, treemap 17, xychart 17 | — | 100/100 | 100/100 | 100/100 | — |
@@ -76,7 +76,7 @@ over a ≤50-source sample.
 | sequence | 3 | 100/100 | 100/**100** | 100/100 | own |
 | state | 3 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | class 2, er 1, block 4 | — | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
-| kanban 4, mindmap 1, requirement 1 | — | 100/0 | 100/**0** | 100/**0** | — |
+| mindmap 1, kanban 4, requirement 1 | — | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | gitgraph | 1 | 100/100 | 40/40 | 40/40 | — |
 | c4, gantt, info, journey, packet, pie, quadrant, radar, sankey, timeline, xychart | 1–2 | 100/100 | 100/100 | 100/100 | — |
 
@@ -84,13 +84,13 @@ over a ≤50-source sample.
 
 1. **In a browser, every tool shows the labels** (~100). The difference is
    entirely in **serverless rasterisation**.
-2. **kymo's six own engines** — flowchart, sequence, state, **class, er, block** —
-   keep their labels in a serverless PNG/PDF where **mermaid.js and merman both
-   score 0/raster** (both emit `<foreignObject>`). kymo is the only
-   serverless-raster-safe renderer for these. Sequence is text-based in all three;
-   kymo still edges out merman.
-3. **kanban, mindmap, requirement** are now the *only* types lost by every tool
-   (100 browser, 0 raster) — the remaining kymo targets.
+2. **kymo's nine own engines** — flowchart, sequence, state, class, er, block,
+   **mindmap, kanban, requirement** — keep their labels in a serverless PNG/PDF
+   where **mermaid.js and merman both score 0/raster** (both emit
+   `<foreignObject>`). kymo is the only serverless-raster-safe renderer for these.
+   Sequence is text-based in all three; kymo still edges out merman.
+3. **No diagram type is now lost by every tool.** Every foreignObject-only type
+   has a kymo text engine.
 4. **~14 types are 100/100 everywhere** — already raster-safe, no work needed.
 
 ## kymo's own engines — accuracy headline (label recall vs mermaid.js, full corpus)
@@ -102,6 +102,9 @@ over a ≤50-source sample.
 | class | **100%** | **100%** |
 | er | **100%** | **100%** |
 | block | **100%** | **100%** |
+| mindmap | **100%** | **100%** |
+| kanban | **100%** | **100%** |
+| requirement | **100%** | **100%** |
 | state | 88.9% | 78% |
 
 State is lower because its renderer does not draw notes yet. 7 fixtures are

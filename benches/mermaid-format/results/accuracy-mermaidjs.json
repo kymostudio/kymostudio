@@ -234,6 +234,36 @@
       "legacyExcluded": 0,
       "misses": {},
       "missExample": {}
+    },
+    "mindmap": {
+      "n": 125,
+      "recall": 100,
+      "perfect": 100,
+      "imperfect": 0,
+      "refSkip": 1,
+      "legacyExcluded": 1,
+      "misses": {},
+      "missExample": {}
+    },
+    "kanban": {
+      "n": 96,
+      "recall": 100,
+      "perfect": 100,
+      "imperfect": 0,
+      "refSkip": 0,
+      "legacyExcluded": 0,
+      "misses": {},
+      "missExample": {}
+    },
+    "requirement": {
+      "n": 76,
+      "recall": 100,
+      "perfect": 100,
+      "imperfect": 0,
+      "refSkip": 4,
+      "legacyExcluded": 0,
+      "misses": {},
+      "missExample": {}
     }
   }
 }

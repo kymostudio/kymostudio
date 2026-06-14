@@ -119,10 +119,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "mindmap",
@@ -130,10 +130,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "packet",
@@ -185,10 +185,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "sankey",
@@ -374,10 +374,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "mindmap",
@@ -385,10 +385,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "packet",
@@ -440,10 +440,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "sankey",
@@ -618,10 +618,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "mindmap",
@@ -629,10 +629,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "packet",
@@ -684,10 +684,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "sankey",
