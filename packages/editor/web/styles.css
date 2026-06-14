@@ -146,8 +146,9 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .act-btn { position: relative; width: 44px; height: 44px; padding: 0; flex: none; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--dim); border-radius: 10px; cursor: pointer; }
 .act-btn .avatar { flex: none; }
 .act-btn:hover { background: var(--bg-raise); color: var(--ink); transform: none; box-shadow: none; }
-.act-btn.active { color: var(--ink); }
-.act-btn.active::before { content: ""; position: absolute; left: -6px; top: 9px; bottom: 9px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+.act-btn.active { color: var(--accent); background: var(--accent-soft); }
+.act-btn.active:hover { color: var(--accent); background: var(--accent-soft); }
+.act-btn.active::before { content: ""; position: absolute; left: -6px; top: 7px; bottom: 7px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
 /* hamburger sits a touch apart from the panel icons */
 .act-menu { margin-bottom: 6px; }
 .act-account .avatar { width: 28px; height: 28px; font-size: 13px; }
@@ -230,24 +231,35 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .name-skel { width: 110px; height: 14px; vertical-align: middle; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 .boot { flex: 1; display: grid; place-items: center; background: var(--bg-soft); }
-/* VS Code-style Welcome panel (shown in the editor area on a fresh "/") */
+/* Welcome home (editor area on a fresh "/"): lockup → Start → Recent cards */
 .welcome { flex: 1; min-width: 0; overflow: auto; display: flex; background: var(--bg); }
-.wel-inner { margin: auto; width: min(720px, 90%); padding: 48px 24px 72px; }
-/* brand lockup — reused from docs/brand/wordmark.svg (tile + two-tone wordmark + tagline) */
-/* larger, prominent lockup (the SVG carries its own internal padding, viewBox 0 0 1000 280) */
-.wel-lockup { display: block; height: 124px; width: auto; margin: -16px 0 16px; }
-.wel-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.wel-inner { margin: auto; width: min(940px, 92%); padding: 44px 28px 64px; }
+/* lockup kept modest so the actions lead, not the logo (SVG carries internal padding) */
+.wel-lockup { display: block; height: 72px; width: auto; margin: 0 0 30px; }
+.wel-block { margin-bottom: 30px; }
 .wel-h { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); margin: 0 0 12px; }
-.wel-link { display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; padding: 7px 0; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: 14px; text-align: left; text-decoration: none; cursor: pointer; }
+/* Start: actions inline + a row of quick-start template chips */
+.wel-start { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 14px; }
+.wel-link { display: inline-flex; align-items: center; gap: 9px; padding: 4px 0; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: 14px; text-decoration: none; cursor: pointer; }
 .wel-link:hover { color: var(--accent-deep); }
 .wel-link svg { flex: none; }
-.wel-recent { display: flex; align-items: center; justify-content: flex-start; gap: 9px; width: 100%; padding: 6px 8px; margin-left: -8px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 14px; text-align: left; border-radius: 7px; cursor: pointer; }
-.wel-recent:hover { background: var(--bg-raise); }
-.wel-recent-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wel-templates { display: flex; flex-wrap: wrap; gap: 8px; }
+.wel-tpl { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-soft); color: var(--ink); font: inherit; font-size: 13px; cursor: pointer; }
+.wel-tpl:hover { background: var(--bg-raise); border-color: var(--border-strong); }
+.wel-tpl-glyph { display: inline-flex; width: 16px; height: 16px; color: var(--dim); }
+.wel-tpl-glyph svg { width: 16px; height: 16px; }
+/* Recent: visual thumbnail cards (diagrams are recognised by shape) */
+.wel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+.wel-card { display: flex; flex-direction: column; gap: 8px; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; min-width: 0; }
+.wel-thumb { position: relative; aspect-ratio: 3 / 2; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-soft); overflow: hidden; color: var(--border-strong); }
+.wel-thumb svg { width: 26px; height: 26px; }
+.wel-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 8px; background: #fff; }
+.wel-card:hover .wel-thumb { border-color: var(--border-strong); }
+.wel-card-name { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 13px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .wel-empty { font-size: 13.5px; color: var(--dim); margin: 4px 0 12px; }
 .wel-signin { padding: 7px 13px; border: 1px solid var(--border); border-radius: var(--radius-btn); background: var(--bg-soft); color: var(--ink); font: inherit; font-size: 13.5px; cursor: pointer; }
 .wel-signin:hover { background: var(--bg-raise); }
-@media (max-width: 640px) { .wel-cols { grid-template-columns: 1fr; gap: 28px; } .wel-inner { padding: 28px 18px 56px; } }
+@media (max-width: 640px) { .wel-inner { padding: 28px 18px 56px; } .wel-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; } }
 /* Miro-style logo loader: the K's three strokes sweep through the brand tile —
    slide in from the left (hard ease-out), hold, accelerate out to the right. */
 .kloader { display: grid; grid-template-rows: 1fr; width: 100px; min-height: 100px; background: var(--accent); border-radius: 18px; overflow: hidden; }
