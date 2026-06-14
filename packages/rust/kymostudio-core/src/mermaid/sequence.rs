@@ -246,6 +246,7 @@ fn frag_open(lower: &str, stmt: &str) -> Option<(FragmentOp, String)> {
         ("par", FragmentOp::Par),
         ("critical", FragmentOp::Critical),
         ("break", FragmentOp::Break),
+        ("rect", FragmentOp::Rect),
     ] {
         if lower == kw
             || lower
@@ -596,5 +597,17 @@ mod tests {
             .items
             .iter()
             .any(|i| matches!(i, crate::sequence::Item::Fragment(_))));
+    }
+
+    #[test]
+    fn rect_grouping_is_a_rect_fragment() {
+        use crate::sequence::{FragmentOp, Item};
+        let s = parse("sequenceDiagram\nrect rgb(0,0,255)\nA->>B: x\nend\nA->>B: y");
+        let rect = s.items.iter().find_map(|i| match i {
+            Item::Fragment(f) if f.operator == FragmentOp::Rect => Some(f),
+            _ => None,
+        });
+        let rect = rect.expect("rect fragment");
+        assert_eq!(rect.operands[0].guard, "rgb(0,0,255)");
     }
 }

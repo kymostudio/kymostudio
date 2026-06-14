@@ -197,6 +197,19 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
 }
 
 fn frag_svg(f: &PFrag) -> String {
+    // `rect <color>` — a plain coloured background band, no operator tab/border.
+    if matches!(f.operator, FragmentOp::Rect) {
+        let color = f
+            .operands
+            .first()
+            .map(|o| o.0.as_str())
+            .filter(|c| !c.is_empty())
+            .unwrap_or("#000");
+        return format!(
+            "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{}\" opacity=\"0.4\"/>",
+            f.left, f.top, f.width, f.height, color
+        );
+    }
     let mut out = format!(
         "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"none\" \
          stroke=\"#94a3b8\" stroke-width=\"1.2\"/>",
@@ -249,6 +262,7 @@ fn op_label(op: FragmentOp) -> &'static str {
         FragmentOp::Par => "par",
         FragmentOp::Critical => "critical",
         FragmentOp::Break => "break",
+        FragmentOp::Rect => "",
     }
 }
 
