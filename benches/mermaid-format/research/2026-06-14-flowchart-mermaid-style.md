@@ -43,26 +43,36 @@ orthogonal Z-paths vs mermaid's splines), and cluster-label placement.
 ## The pixel-overlay metric does NOT move — and why that's expected
 
 Re-running the overlay bench (`pixel-diff.mjs`) on the 5-flowchart sample,
-rendering the kymo side in **mermaid style** vs kymo native, both overlaid on
-mermaid.js:
+overlaying three renderers on mermaid.js: **merman** (`kymo-mermaid`, a Rust port
+of mermaid), kymo **native**, and kymo **mermaid-style**:
 
-| source | kymo-native vs mermaid.js | kymo-**mermaid-style** vs mermaid.js |
-|---|---|---|
-| appli_001 | 2.5% | 2.4% |
-| conf-and-directives_000 | 6.0% | 6.2% |
-| conf-and-directives_001 | 5.8% | 6.1% |
-| conf-and-directives_002 | 49.8% | 50.0% |
-| conf-and-directives_003 | 6.5% | 6.8% |
-| **mean** | **14.1%** | **14.3%** |
+| source | **merman** | kymo-native | kymo-**mermaid-style** |
+|---|---|---|---|
+| appli_001 | 0.8% | 2.5% | 2.4% |
+| conf-and-directives_000 | 2.0% | 6.0% | 6.2% |
+| conf-and-directives_001 | 1.6% | 5.8% | 6.1% |
+| conf-and-directives_002 | 1.3% | 49.8% | 50.0% |
+| conf-and-directives_003 | 1.7% | 6.5% | 6.8% |
+| **mean** | **1.5%** | **14.1%** | **14.3%** |
 
-Matching mermaid's colours/shapes leaves the overlay diff **essentially
-unchanged** (a hair higher — the lavender fills add ink that, sitting at kymo's
-*different* node positions, does not overlap mermaid's). This is the pixel-overlay
-metric's defining property restated: it is **layout-dominated**. Two diagrams that
-look stylistically identical but are laid out differently still don't overlap, so
-colour fidelity alone can't lower the number. To move it you must match **layout**
-(dagre ranking + spline edges) — the deferred v2 work. The correct validation of
-the style switch is therefore **visual** (above), not the overlay score.
+This is the decisive evidence that the overlay metric is **layout-dominated**:
+
+- **merman ≈ 1.5%** — near-perfect overlap. merman is a Rust *port* of mermaid, so
+  it reproduces mermaid's **dagre layout, style, *and* `classDef` colours** — its
+  output sits almost exactly on top of mermaid.js.
+- **kymo ≈ 14%, in either style** — kymo uses its **own** Sugiyama layout, so nodes
+  land at different positions. Switching to mermaid colours/shapes leaves the
+  number **essentially unchanged** (a hair higher — the lavender fills add ink that,
+  at kymo's *different* positions, doesn't overlap mermaid's).
+
+`conf-and-directives_002` makes it loudest: merman **1.3%** (matches layout *and*
+applies the source's `classDef` cyan/red fills → nearly identical to mermaid.js)
+vs kymo **~50%** (own layout, no `classDef`). Two diagrams that look stylistically
+identical but are laid out differently still don't overlap, so colour fidelity
+alone can't lower the score. To move it you must match **layout** (dagre ranking +
+spline edges) — the deferred v2 work, and exactly what merman already does. The
+correct validation of the style switch is therefore **visual** (above), not the
+overlay number.
 
 ## Status
 
