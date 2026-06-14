@@ -161,6 +161,12 @@ a.exp-item { text-decoration: none; } /* Docs/Diagrams links inside the ⋯ menu
 
 .hdr-more { display: inline-flex; }
 
+/* three-region toggles (Explorer · Source · Preview) — a segmented control */
+.pane-toggles { display: inline-flex; align-items: center; gap: 2px; padding: 2px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; }
+.pane-tg { width: 30px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--dim); border-radius: 7px; cursor: pointer; }
+.pane-tg:hover { background: var(--bg); color: var(--ink); transform: none; box-shadow: none; }
+.pane-tg.on { color: var(--accent); background: var(--bg); box-shadow: 0 1px 2px rgba(36, 33, 49, 0.06); }
+
 /* ---- editor panes ---- */
 main { flex: 1; display: flex; min-height: 0; }
 main.scroll { display: block; overflow: auto; }
