@@ -324,6 +324,14 @@ pub fn mermaid_er_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
     Ok(classdiagram::svg::render(&mermaid::parse_er(src)?))
 }
 
+/// Render a Mermaid `block` / `block-beta` diagram → SVG (reuses the flowchart
+/// layout + renderer; the column grid is laid out as a graph).
+pub fn mermaid_block_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    let mut fc = mermaid::parse_block(src)?;
+    render_flowchart_math(&mut fc);
+    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
 /// Render D2 flowchart source → SVG, fully in Rust: parse D2 → flowchart IR →
 /// `layout_flowchart` → the [`flowchart_svg`] renderer. No external `d2` binary.
 pub fn d2_to_svg(src: &str) -> Result<String, d2::D2Error> {
