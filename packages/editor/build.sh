@@ -34,12 +34,12 @@ npx esbuild web/main.tsx --bundle --format=esm --splitting --outdir=dist \
 # hop on the critical path). The engine-*.js chunk is a dynamic import — never
 # preload it; share links rendered via kroki must not pay for the wasm.
 for c in $(grep -o 'chunks/chunk-[A-Za-z0-9]*\.js' dist/main.js | sort -u); do
-  sed -i "s|</head>|<link rel=\"modulepreload\" href=\"/$c\" />\n  </head>|" dist/index.html dist/diagrams.html dist/trash.html dist/login.html
+  sed -i "s|</head>|<link rel=\"modulepreload\" href=\"/$c\" />\n  </head>|" dist/index.html dist/trash.html dist/login.html
 done
 # Cache-bust: Pages serves assets with max-age=14400, so version the URLs by
 # CONTENT hash — browsers refetch right after a deploy that actually changed a
 # file, and keep their cache across deploys that didn't.
 V=$(cat dist/main.js dist/styles.css | md5sum | cut -c1-8)
-sed -i "s|/styles.css|/styles.css?v=$V|g; s|/main.js|/main.js?v=$V|g" dist/index.html dist/diagrams.html dist/trash.html dist/login.html
+sed -i "s|/styles.css|/styles.css?v=$V|g; s|/main.js|/main.js?v=$V|g" dist/index.html dist/trash.html dist/login.html
 
 echo "✓ built dist/ ($(du -sh dist | cut -f1))"
