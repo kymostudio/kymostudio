@@ -30,9 +30,8 @@ const N = parseInt(process.env.N || "200");
 
 // Legacy/ambiguous fixtures kymo intentionally diverges on (see
 // datasets/known-divergent.json) — excluded from the headline score.
-const DIVERGENT = new Set(
-  (JSON.parse(readFileSync(DS + "known-divergent.json", "utf8")).legacy || []).map((d) => d.file),
-);
+const _kd = JSON.parse(readFileSync(DS + "known-divergent.json", "utf8"));
+const DIVERGENT = new Set([...(_kd.legacy || []), ...(_kd.exotic || [])].map((d) => d.file));
 
 const require = createRequire(RA + "/package.json");
 const core = await import(require.resolve("kymostudio-core"));
@@ -56,6 +55,7 @@ async function ensureBrowser() {
 }
 const mermaidRender = (src) => page.evaluate(async (s) => { try { const { svg } = await window.mermaid.render("mm" + Math.floor(performance.now()), s); return svg; } catch { return "__ERR__"; } }, src);
 
+const summary = {};
 for (const g of ["flowchart", "sequence", "state"]) {
   const files = [];
   for (const ds of ["merman", "mermaid-cypress", "mermaid-to-svg"]) {
@@ -80,8 +80,13 @@ for (const g of ["flowchart", "sequence", "state"]) {
     for (const m of miss) { mc[m] = (mc[m] || 0) + 1; if (!ex[m]) ex[m] = fn; }
   }
   if (!scored) continue;
-  console.log(`\n${g.toUpperCase()} (mermaid.js 11 truth, n=${scored}, ref-skip ${referr}, legacy-excluded ${legacy}): ${(100 * sum / scored).toFixed(1)}% recall, ${(100 * perf / scored).toFixed(0)}% perfect, ${scored - perf} imperfect`);
+  const recall = +(100 * sum / scored).toFixed(2);
+  const perfect = +(100 * perf / scored).toFixed(2);
+  summary[g] = { n: scored, recall, perfect, imperfect: scored - perf, refSkip: referr, legacyExcluded: legacy, misses: Object.fromEntries(Object.entries(mc).sort((a, b) => b[1] - a[1])), missExample: ex };
+  console.log(`\n${g.toUpperCase()} (mermaid.js 11 truth, n=${scored}, ref-skip ${referr}, legacy-excluded ${legacy}): ${recall}% recall, ${perfect.toFixed(0)}% perfect, ${scored - perf} imperfect`);
   const top = Object.entries(mc).sort((a, b) => b[1] - a[1]).slice(0, 12);
   if (top.length) console.log("  misses: " + top.map(([t, n]) => `${t}(${n})`).join("  "));
 }
 if (browser) await browser.close();
+writeFileSync(HERE + "results/accuracy-mermaidjs.json", JSON.stringify({ truth: "mermaid.js 11 (headless chrome)", n: N, generated: process.env.STAMP || "", grammars: summary }, null, 2) + "\n");
+console.log("\nwrote results/accuracy-mermaidjs.json");
