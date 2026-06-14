@@ -46,7 +46,7 @@ text{fill:#333333}\
 .fc-shape-line{fill:none;stroke:#9370DB;stroke-width:1}\
 .fc-label{font-size:16px;fill:#333333;text-anchor:middle}\
 .edge-path{fill:none;stroke:#333333;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}\
-.edge-label{font-size:12px;fill:#333333;text-anchor:middle;\
+.edge-label{font-size:16px;fill:#333333;text-anchor:middle;\
 paint-order:stroke;stroke:#e8e8e8;stroke-width:5;stroke-linejoin:round}\
 .region-rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1}\
 .region-label{font-size:12px;fill:#333333;paint-order:stroke;stroke:#ffffde;stroke-width:3}";
@@ -79,7 +79,7 @@ pub fn render_styled_with(
         d.components.iter().map(|c| (c.id.as_str(), c)).collect();
 
     let regions: String = d.regions.iter().map(|r| region_rect(r, style)).collect();
-    let edges: String = d.edges.iter().map(|e| edge_svg(e, &by_id)).collect();
+    let edges: String = d.edges.iter().map(|e| edge_svg(e, &by_id, style)).collect();
     let nodes: String = d
         .components
         .iter()
@@ -312,7 +312,7 @@ fn edge_path(sp: (i32, i32), dp: (i32, i32), sa: Anchor) -> String {
     }
 }
 
-fn edge_svg(e: &Edge, by_id: &HashMap<&str, &Component>) -> String {
+fn edge_svg(e: &Edge, by_id: &HashMap<&str, &Component>, style: FlowStyle) -> String {
     let (Some(s), Some(t)) = (by_id.get(e.src.as_str()), by_id.get(e.dst.as_str())) else {
         return String::new();
     };
@@ -336,9 +336,16 @@ fn edge_svg(e: &Edge, by_id: &HashMap<&str, &Component>) -> String {
     };
     let mut out = format!("<path class=\"edge-path\"{dash} d=\"{path}\"{marker}/>\n");
     if !e.label.is_empty() {
-        let (lx, ly) = e
-            .label_pos
-            .unwrap_or(((sp.0 + dp.0) / 2, (sp.1 + dp.1) / 2));
+        // Mermaid places the edge label at the destination node x, dagre label y.
+        let (lx, ly) = match e.label_pos {
+            Some((_, ply)) => (dp.0, ply),
+            None => ((sp.0 + dp.0) / 2, (sp.1 + dp.1) / 2),
+        };
+        let ly = if matches!(style, FlowStyle::Mermaid) {
+            ly + 5
+        } else {
+            ly
+        };
         out.push_str(&format!(
             "<text class=\"edge-label\" x=\"{lx}\" y=\"{ly}\">{}</text>\n",
             esc(&e.label)
