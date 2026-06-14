@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
-import { WorkspaceSwitcher, useWorkspace, assignDiagram } from "./workspace";
+import { useWorkspace, assignDiagram } from "./workspace";
 import { KINDS, renderKroki, sanitizeSvg, docHref } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
@@ -14,8 +14,9 @@ import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
 import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
+import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, Trash2, LogOut } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, Trash2, LogOut, ArrowLeft, ArrowRight } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -468,6 +469,26 @@ export default function EditorPage() {
     try { localStorage.setItem("kymo_split", "50"); } catch {}
   }
 
+  // The document title element: a skeleton while booting, "Welcome" on the home
+  // screen, an inline rename field / editable name when signed in, else read-only.
+  // Rendered standalone for guests/welcome/share and inside the AddressBar otherwise.
+  const titleEl = booting ? <span className="skeleton name-skel" /> : showWelcome ? (
+    <span className="diagram-name untitled"><span className="dn-text">Welcome</span></span>
+  ) : claims ? (
+    editingName ? (
+      <input className="diagram-input" autoFocus maxLength={60} defaultValue={title} placeholder="Untitled"
+        onKeyDown={(e) => { if (e.key === "Enter") commitRename((e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditingName(false); }}
+        onBlur={(e) => commitRename(e.target.value)} />
+    ) : (
+      <span className={"diagram-name editable" + (title ? "" : " untitled")} title={`${diagramLabel} — Rename`}
+        role="button" tabIndex={0} aria-label="Rename diagram" onClick={() => setEditingName(true)}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setEditingName(true); } }}>
+        <span className="dn-text">{diagramLabel}</span>
+        <Pencil size={12.5} strokeWidth={2.1} className="pencil" />
+      </span>
+    )
+  ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")} title={diagramLabel}><span className="dn-text">{diagramLabel}</span></span>;
+
   return (
     <div className="layout">
       <header>
@@ -476,28 +497,22 @@ export default function EditorPage() {
           <button className="hdr-menu mob-only" onClick={() => selectPanel("explorer")} title="Files" aria-label="Files"><Menu size={18} strokeWidth={2.2} /></button>
         )}
         {/* identity & document: logo → your Diagrams when signed in (the natural
-            "home"), else the product site; then workspace, editable title, sync state */}
+            "home"), else the product site */}
         {claims
           ? <Link className="brand" to="/" title="Home" aria-label="Home"><img src="/logo.svg" alt="" /></Link>
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
-        {claims && !showWelcome && <WorkspaceSwitcher />}
-        {claims && !showWelcome && <span className="sep">/</span>}
-        {booting ? <span className="skeleton name-skel" /> : showWelcome ? (
-          <span className="diagram-name untitled"><span className="dn-text">Welcome</span></span>
-        ) : claims ? (
-          editingName ? (
-            <input className="diagram-input" autoFocus maxLength={60} defaultValue={title} placeholder="Untitled"
-              onKeyDown={(e) => { if (e.key === "Enter") commitRename((e.target as HTMLInputElement).value); else if (e.key === "Escape") setEditingName(false); }}
-              onBlur={(e) => commitRename(e.target.value)} />
-          ) : (
-            <span className={"diagram-name editable" + (title ? "" : " untitled")} title={`${diagramLabel} — Rename`}
-              role="button" tabIndex={0} aria-label="Rename diagram" onClick={() => setEditingName(true)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setEditingName(true); } }}>
-              <span className="dn-text">{diagramLabel}</span>
-              <Pencil size={12.5} strokeWidth={2.1} className="pencil" />
-            </span>
-          )
-        ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")} title={diagramLabel}><span className="dn-text">{diagramLabel}</span></span>}
+        {/* browser-shell history nav (signed-in editing only) */}
+        {claims && !shared && !showWelcome && (
+          <div className="hist-nav">
+            <button className="hist-btn" onClick={() => navigate(-1)} title="Back" aria-label="Back"><ArrowLeft size={17} strokeWidth={2.2} /></button>
+            <button className="hist-btn" onClick={() => navigate(1)} title="Forward" aria-label="Forward"><ArrowRight size={17} strokeWidth={2.2} /></button>
+          </div>
+        )}
+        {/* address bar (breadcrumb + ⌘K jump) wraps the editable title when signed in;
+            guests / welcome / share links show the bare title */}
+        {claims && !shared && !showWelcome
+          ? <AddressBar titleNode={titleEl} />
+          : titleEl}
         {/* one save indicator, always with text: a saved file syncs live; a draft is unsaved until you Save */}
         {claims && d && !booting && (
           <span className={"save-ind" + (live ? "" : " off")} title={live ? "All changes are saved in real time" : "Disconnected — changes are not being saved"}>
@@ -512,45 +527,17 @@ export default function EditorPage() {
         <div className="spacer" />
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
-          {/* New + Docs are already in the Welcome's Start/Learn sections — hide them there */}
-          {!showWelcome && <button className="mob-hide" onClick={() => setGalleryOpen(true)} title="New diagram" aria-haspopup="dialog"><Plus size={16} strokeWidth={2.2} />New</button>}
-          {!showWelcome && <a className="btn mob-hide" href={docHref(kind)} target="_blank" rel="noopener noreferrer" title={`Syntax help for ${KINDS.find((x) => x.value === kind)?.label ?? kind}`}><BookOpen size={16} strokeWidth={2} />Docs</a>}
+          {/* draft Save stays a visible CTA when there's unsaved work to rescue */}
           {isDraft && !booting && !showWelcome && (
             <button className="btn-primary mob-hide" onClick={save} title="Save to your Diagrams (⌘/Ctrl-S)">
               <Save size={16} strokeWidth={2} />
               Save
             </button>
           )}
-          {shared && claims && (
-            <button className="mob-hide" onClick={saveCopy} title="Save a copy to your Diagrams">
-              <Save size={16} strokeWidth={2} />
-              Save a copy
-            </button>
-          )}
+          {/* every low-traffic action (New · Docs · Export · Trash · Sign out) lives
+              in one ⋯ menu now — Share is the only standing button beside it */}
           {!showWelcome && (
-          <div className="account mob-hide" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setExportOpen((o) => !o)} aria-haspopup="menu" aria-expanded={exportOpen}><Download size={16} strokeWidth={2} />Export <ChevronDown size={16} strokeWidth={2.2} className="chev-icon" /></button>
-            {exportOpen && (
-              <div className="acct-menu exp-menu">
-                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}>
-                  <FileCode2 size={17} strokeWidth={1.9} />
-                  To SVG
-                </button>
-                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportPNG(); }}>
-                  <FileImage size={17} strokeWidth={1.9} />
-                  To PNG
-                </button>
-                <div className="menu-sep" />
-                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}>
-                  <Code2 size={17} strokeWidth={1.9} />
-                  Source (.kymo)
-                </button>
-              </div>
-            )}
-          </div>
-          )}
-          {/* phones: the low-traffic actions collapse into one ⋯ menu (Share stays a visible CTA) */}
-          <div className="account mob-more" onClick={(e) => e.stopPropagation()}>
+          <div className="account hdr-more" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setMoreOpen((o) => !o)} title="More actions" aria-label="More actions" aria-haspopup="menu" aria-expanded={moreOpen}>
               <MoreHorizontal size={18} strokeWidth={2.2} />
             </button>
@@ -597,6 +584,7 @@ export default function EditorPage() {
               </div>
             )}
           </div>
+          )}
           {!showWelcome && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
             {/* Share is the standing CTA, but a draft's Save outranks it — demote Share to secondary then */}

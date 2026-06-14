@@ -124,6 +124,43 @@ a.exp-item { text-decoration: none; } /* Docs/Diagrams links inside the ⋯ menu
 .share-menu .acct-item[disabled] { opacity: 0.5; cursor: default; }
 .chev-icon { color: var(--dim); margin-right: -3px; }
 
+/* ---- IDE-shell navbar: history nav + address bar (#37) ---- */
+.hist-nav { display: inline-flex; align-items: center; gap: 2px; flex: none; }
+.hist-btn { width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--dim); border-radius: 8px; cursor: pointer; }
+.hist-btn:hover { background: var(--bg-soft); color: var(--ink); transform: none; box-shadow: none; }
+
+.addrbar { position: relative; flex: 1 1 auto; min-width: 0; max-width: 720px; }
+.addr-crumbs { display: flex; align-items: center; gap: 1px; min-width: 0; height: 34px; padding: 0 4px 0 6px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; }
+.addr-crumbs:hover { background: var(--bg-raise); }
+.crumb { display: inline-flex; align-items: center; gap: 5px; max-width: 220px; min-width: 0; padding: 4px 7px; border: 0; background: transparent; color: var(--ink); font-size: 13.5px; font-weight: 550; border-radius: 6px; cursor: pointer; }
+.crumb:hover { background: var(--bg); }
+.crumb svg { flex: none; color: var(--dim); }
+.crumb-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crumb-proj { font-weight: 650; }
+.crumb-chev { margin-left: -1px; }
+.crumb-sep { flex: none; color: var(--border-strong); }
+.crumb-file { flex: 1 1 auto; min-width: 0; padding: 0; cursor: default; }
+.crumb-file:hover { background: transparent; }
+.crumb-file .diagram-name { padding: 4px 7px; }
+.crumb-file .diagram-input { margin: 0; }
+.addr-proj { position: relative; }
+.addr-proj-menu { left: 0; right: auto; min-width: 230px; }
+.addr-jump { margin-left: auto; flex: none; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--dim); border-radius: 7px; cursor: pointer; }
+.addr-jump:hover { background: var(--bg); color: var(--accent); }
+
+/* address bar in search / jump-palette mode */
+.addr-search { position: relative; display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; background: var(--bg); border: 1px solid var(--accent); border-radius: 9px; box-shadow: 0 0 0 3px var(--accent-soft); }
+.addr-search-icon { flex: none; color: var(--dim); }
+.addr-input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 13.5px; }
+.addr-results { position: absolute; left: 0; right: 0; top: calc(100% + 6px); max-height: 60vh; overflow: auto; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px; box-shadow: 0 12px 32px rgba(36, 33, 49, 0.16); z-index: 30; }
+.addr-group { padding: 6px 8px 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--dim); }
+.addr-hit { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; padding: 7px 9px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--ink); font-size: 13.5px; cursor: pointer; }
+.addr-hit:hover { background: var(--bg-soft); border-color: transparent; }
+.addr-hit-icon { flex: none; color: var(--dim); }
+.addr-hit-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.hdr-more { display: inline-flex; }
+
 /* ---- editor panes ---- */
 main { flex: 1; display: flex; min-height: 0; }
 main.scroll { display: block; overflow: auto; }
@@ -490,6 +527,10 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
 @media (max-width: 720px) {
   .mob-hide { display: none !important; } /* collapsed into the ⋯ menu */
   .mob-more { display: inline-flex; }
+  /* IDE-shell chrome shrinks on phones: drop back/forward + the jump affordance,
+     let the breadcrumb truncate hard so the action menu stays reachable */
+  .hist-nav, .addr-jump { display: none; }
+  .crumb { max-width: 130px; }
   /* status text stays readable when it carries a warning ("Offline") or the
      unsaved-draft state; only the steady-state "Saved" shrinks to its dot.
      Tooltips don't exist on touch. */
