@@ -142,7 +142,7 @@ mod tests {
         match &items[0] {
             Item::Nodes(g) => {
                 assert_eq!(g[0].label.as_deref(), Some("Start"));
-                assert_eq!(g[0].shape, Some(Shape::Box));
+                assert_eq!(g[0].shape, Some(Shape::Rect)); // [..] = sharp rect
             }
             _ => panic!(),
         }

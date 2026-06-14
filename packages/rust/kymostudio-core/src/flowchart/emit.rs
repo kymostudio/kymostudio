@@ -62,7 +62,8 @@ fn mmd_node(n: &FlowNode) -> String {
         Shape::Hex => ("{{", "}}"),
         Shape::Cylinder => ("[(", ")]"),
         Shape::Badge => ("([", "])"),
-        _ => ("[", "]"), // box & anything without a flowchart glyph
+        Shape::Box => ("(", ")"), // rounded
+        _ => ("[", "]"),          // sharp rect & anything without a flowchart glyph
     };
     format!("{}{}{}{}", n.id, open, mmd_quote(&n.label), close)
 }
@@ -281,7 +282,8 @@ mod tests {
     // ── Mermaid ──────────────────────────────────────────────────────────
     #[test]
     fn mermaid_shape_wrappers() {
-        assert!(to_mermaid(&one(Shape::Box)).contains("A[\"Lbl\"]"));
+        assert!(to_mermaid(&one(Shape::Rect)).contains("A[\"Lbl\"]")); // sharp
+        assert!(to_mermaid(&one(Shape::Box)).contains("A(\"Lbl\")")); // rounded
         assert!(to_mermaid(&one(Shape::Circle)).contains("A((\"Lbl\"))"));
         assert!(to_mermaid(&one(Shape::Diamond)).contains("A{\"Lbl\"}"));
         assert!(to_mermaid(&one(Shape::Hex)).contains("A{{\"Lbl\"}}"));
@@ -321,7 +323,7 @@ mod tests {
     fn one_label(label: &str) -> Flowchart {
         fc(
             Direction::Tb,
-            vec![n("A", label, Shape::Box)],
+            vec![n("A", label, Shape::Rect)],
             vec![],
             vec![],
         )
@@ -331,7 +333,7 @@ mod tests {
     fn mermaid_subgraph_membership_order_preserved() {
         let g = fc(
             Direction::Tb,
-            vec![n("S", "S", Shape::Box), n("A", "A", Shape::Box)],
+            vec![n("S", "S", Shape::Rect), n("A", "A", Shape::Rect)],
             vec![],
             vec![Subgraph {
                 parent: None,

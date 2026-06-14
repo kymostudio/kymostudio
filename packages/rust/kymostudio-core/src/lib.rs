@@ -24,6 +24,7 @@ pub mod math;
 pub mod mermaid;
 pub mod model;
 pub mod sequence;
+pub mod style;
 
 // The `.kymo` DSL front-end (parser + layout + alignment + rich SVG renderer) —
 // the Rust port of packages/python/src/kymo. Native/mobile only; the wasm and
@@ -301,9 +302,22 @@ pub fn mermaid_to_drawio(src: &str) -> Result<String, mermaid::MermaidError> {
 /// [`flowchart_svg`] renderer). The Rust core's own flowchart SVG (its own look,
 /// not byte-identical to the Python/JS renderers).
 pub fn mermaid_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    let mut fc = mermaid::parse(src)?;
+    mermaid_to_svg_styled(src, None)
+}
+
+/// Render a Mermaid flowchart with an explicit [`style::FlowStyle`], falling back
+/// to a style hinted in the source, then to kymo (API param > source > kymo).
+pub fn mermaid_to_svg_styled(
+    src: &str,
+    style: Option<style::FlowStyle>,
+) -> Result<String, mermaid::MermaidError> {
+    let (mut fc, src_style) = mermaid::parse_with_config(src)?;
+    let resolved = style.or(src_style).unwrap_or_default();
     render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+    Ok(flowchart_svg::render_styled(
+        &layout::layout_flowchart_styled(&fc, resolved),
+        resolved,
+    ))
 }
 
 /// Normalise a Mermaid label for rendering: `<br>` line breaks become spaces,

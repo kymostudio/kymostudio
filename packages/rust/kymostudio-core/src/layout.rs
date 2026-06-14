@@ -17,6 +17,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::flowchart::{Direction, FlowEdge, Flowchart};
 use crate::model::{py_round, Component, Diagram, Edge, Region, Shape};
+use crate::style::FlowStyle;
 
 const H_GAP: f64 = 48.0; // gap between layer columns (main axis)
 const V_GAP: f64 = 40.0; // gap between boxes within a layer (cross axis)
@@ -32,12 +33,17 @@ const CHAR_W: f64 = 8.0; // ~13px semibold label, with breathing room
 
 /// Real (width, height) of a flowchart node's glyph box, sized to its label.
 /// Boxes stay upright regardless of flow direction.
-fn node_size(label: &str, shape: Shape) -> (i32, i32) {
+fn node_size(label: &str, shape: Shape, style: FlowStyle) -> (i32, i32) {
     // Multi-line labels (class / er boxes) size by their widest line and row
     // count; single-line labels keep the original shape-based sizing.
     let lines: Vec<&str> = label.split('\n').collect();
     let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
-    let text_w = (max_chars as f64 * CHAR_W).ceil() as i32;
+    // Mermaid style uses a larger (~16px) font, so its boxes are wider.
+    let char_w = match style {
+        FlowStyle::Mermaid => 9.8,
+        FlowStyle::Kymo => CHAR_W,
+    };
+    let text_w = (max_chars as f64 * char_w).ceil() as i32;
     if lines.len() > 1 {
         let w = (text_w + 24).max(80);
         let h = lines.len() as i32 * 18 + 16;
@@ -69,8 +75,13 @@ fn median(vals: &[f64]) -> f64 {
     }
 }
 
-/// Lay out a parsed flowchart into a fully positioned diagram.
+/// Lay out a parsed flowchart into a fully positioned diagram (kymo sizing).
 pub fn layout_flowchart(fc: &Flowchart) -> Diagram {
+    layout_flowchart_styled(fc, FlowStyle::Kymo)
+}
+
+/// Lay out a parsed flowchart, sizing nodes per the given [`FlowStyle`].
+pub fn layout_flowchart_styled(fc: &Flowchart, style: FlowStyle) -> Diagram {
     let mut diagram = Diagram::default();
     if fc.nodes.is_empty() {
         diagram.width = py_round(2.0 * MARGIN);
@@ -92,7 +103,7 @@ pub fn layout_flowchart(fc: &Flowchart) -> Diagram {
     let mut sw: HashMap<String, f64> = HashMap::new(); // main extent
     let mut sh: HashMap<String, f64> = HashMap::new(); // cross extent
     for n in &fc.nodes {
-        let (w, h) = node_size(&n.label, n.shape);
+        let (w, h) = node_size(&n.label, n.shape, style);
         real.insert(n.id.as_str(), (w, h));
         let (main, cross) = if horizontal { (w, h) } else { (h, w) };
         sw.insert(n.id.clone(), main as f64);

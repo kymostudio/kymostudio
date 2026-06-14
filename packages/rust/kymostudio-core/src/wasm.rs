@@ -107,6 +107,14 @@ pub fn mermaid_to_svg(src: &str) -> Result<String, JsError> {
     crate::mermaid_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
 }
 
+/// Render a Mermaid flowchart with a style name (`"mermaid"`/`"kymo"`; `""` or
+/// an unknown value lets the source/default decide).
+#[wasm_bindgen(js_name = mermaidToSvgStyled)]
+pub fn mermaid_to_svg_styled(src: &str, style: &str) -> Result<String, JsError> {
+    let st = crate::style::FlowStyle::from_str_opt(style);
+    crate::mermaid_to_svg_styled(src, st).map_err(|e| JsError::new(&e.to_string()))
+}
+
 /// Render a Mermaid `sequenceDiagram` -> SVG (kymo own renderer, text-based).
 #[wasm_bindgen(js_name = mermaidSequenceToSvg)]
 pub fn mermaid_sequence_to_svg(src: &str) -> Result<String, JsError> {

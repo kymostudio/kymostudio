@@ -85,7 +85,7 @@ fn component(c: &Component) -> J {
         ("name", J::str(&c.name)),
         ("subtitle", J::str(&c.subtitle)),
         ("icon", J::str(&c.icon)),
-        ("shape", J::str(c.shape.as_str())),
+        ("shape", J::str(c.shape.kymojson_str())),
         ("accent", J::str(c.accent.as_str())),
         ("pos", J::point(c.pos)),
         ("size", J::opt_point(c.size)),

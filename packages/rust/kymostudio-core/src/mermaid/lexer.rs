@@ -104,7 +104,7 @@ impl Scanner {
             }
         }
         const ONE: &[(char, &str, Shape)] = &[
-            ('[', "]", Shape::Box),     // rectangle
+            ('[', "]", Shape::Rect),    // sharp rectangle
             ('(', ")", Shape::Box),     // rounded
             ('{', "}", Shape::Diamond), // decision rhombus
             ('>', "]", Shape::Box),     // asymmetric flag
