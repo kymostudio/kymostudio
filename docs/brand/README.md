@@ -42,7 +42,7 @@ Rules of thumb:
 | `social-preview.png` | Rendered banner (2560×1280, 2×). The committed render is canonical — see font caveat below. |
 | `github-hero-dark.svg` / `-light.svg` | **README hero source** (1000×280 viewBox, transparent bg) — tile + two-tone wordmark + tagline; dark = white primary, light = navy primary. |
 | `github-hero-dark.png` / `-light.png` | Rendered heroes (2000×560, 2×) used by the root README's `<picture>` (dark/light via `prefers-color-scheme`). Same font caveat as the banner. |
-| `wordmark.svg` | **Reusable horizontal lockup** (light, transparent, tight `viewBox`) — tile + two-tone wordmark + tagline "Diagram superpowers". Shipped as a **live SVG** (not rasterised) for in-app use via `<img>`: `packages/editor`'s `build.sh` copies it into the editor and the Welcome screen serves it at `/wordmark.svg`. Reuse it anywhere a brand lockup is needed. |
+| `wordmark.svg` | **Reusable horizontal lockup** (light, transparent, tight `viewBox`) — tile + two-tone wordmark + tagline "Diagram superpowers", with the **text outlined to paths** (no font dependency, like `favicon.svg`). Ships as a live SVG for in-app use via `<img>`: `packages/editor`'s `build.sh` copies it in and the Welcome screen serves it at `/wordmark.svg`. Regenerate with `tools/outline_wordmark.py`. Reuse anywhere a brand lockup is needed. |
 
 **Favicon ≠ a shrunk master.** The master's node-dot handles turn to mush at
 small sizes, so the favicon (`favicon.svg`) is a separate glyph: the same pink
@@ -86,12 +86,11 @@ elsewhere the text falls back to whatever fontconfig picks. The committed
 `social-preview.png` is the canonical render — re-render only on a machine with
 the font. Upload it at repo **Settings → Social preview** (no API; web UI only).
 
-`wordmark.svg` carries the same `<text>` (not outlined), but it ships as a **live
-SVG** rather than a baked PNG — so the fallback happens per viewer at render time:
-Apple devices get SF Pro Rounded, others fall back to a system sans (the
-`font-family` lists `ui-rounded, -apple-system, 'Segoe UI', Roboto, system-ui`).
-The two-tone colours always hold. For a pixel-identical mark on every platform,
-outline the text to paths from a machine with the font.
+`wordmark.svg` avoids this caveat entirely: its wordmark + tagline are **outlined
+to `<path>`** (via `tools/outline_wordmark.py`, which HarfBuzz-shapes the text in
+the SF NS Rounded system VF at weight 900/500 and bakes the glyph outlines), so it
+renders identically in every browser with no font installed — the same reason
+`favicon.svg` is outlined. Re-run that script after any wordmark/tagline change.
 
 **ICO quality notes** — what makes this lossless / maximum-quality:
 
