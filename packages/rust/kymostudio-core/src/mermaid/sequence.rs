@@ -445,7 +445,39 @@ fn find_arrow(left: &str) -> Option<(usize, usize, MessageSort, bool)> {
             };
         }
     }
-    best.map(|(s, e, sort)| (s, e, sort, false))
+    if let Some((s, e, sort)) = best {
+        return Some((s, e, sort, false));
+    }
+    // Fallback: a mermaid-11 exotic arrow (`-|/`, `//-`, `--|/`, …). Find the
+    // longest run of link chars that contains a real connector (`-`/`=`/`<`/`>`)
+    // so we don't mistake a `/` or `.` inside a participant id for an arrow.
+    const LINK: &[char] = &[
+        '-', '=', '/', '|', '\\', '<', '>', 'x', 'o', ')', '(', '.', '~',
+    ];
+    let chars: Vec<char> = left.chars().collect();
+    let mut i = 0;
+    while i < chars.len() {
+        if LINK.contains(&chars[i]) {
+            let mut j = i;
+            while j < chars.len() && LINK.contains(&chars[j]) {
+                j += 1;
+            }
+            let run = &chars[i..j];
+            if run.len() >= 2 && run.iter().any(|c| matches!(c, '-' | '=' | '<' | '>')) {
+                let bstart = left.char_indices().nth(i).map(|(b, _)| b).unwrap_or(0);
+                let bend = left
+                    .char_indices()
+                    .nth(j)
+                    .map(|(b, _)| b)
+                    .unwrap_or(left.len());
+                return Some((bstart, bend, MessageSort::AsynchSignal, false));
+            }
+            i = j;
+        } else {
+            i += 1;
+        }
+    }
+    None
 }
 
 #[cfg(test)]
