@@ -87,7 +87,7 @@ TILE = '''  <g transform="translate(96 50) scale(1.8)">
   </g>'''
 
 for name, kymo_fill, studio_fill, tag_fill in VARIANTS:
-    svg = f'''<svg viewBox="{vb_x} {vb_y} {vb_w} {vb_h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="kymostudio — Diagram superpowers">
+    svg = f'''<svg width="{vb_w}" height="{vb_h}" viewBox="{vb_x} {vb_y} {vb_w} {vb_h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="kymostudio — Diagram superpowers">
   <!-- Reusable horizontal brand lockup: tile + two-tone wordmark + tagline.
        Wordmark/tagline are OUTLINED paths (SF Pro Rounded, Black 900 / Medium 500) so
        the lockup renders identically in any browser / on GitHub — no font dependency.
