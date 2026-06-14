@@ -136,25 +136,23 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
         }
     }
 
-    if let Some(out) = g.graph_label::<GraphLabel>() {
-        d.width = out.width.round() as i32;
-        d.height = out.height.round() as i32;
-    }
-    if d.width <= 0 || d.height <= 0 {
-        let maxx = d
-            .components
-            .iter()
-            .map(|c| c.pos.0 + c.size.unwrap_or((0, 0)).0 / 2)
-            .max()
-            .unwrap_or(40);
-        let maxy = d
-            .components
-            .iter()
-            .map(|c| c.pos.1 + c.size.unwrap_or((0, 0)).1 / 2)
-            .max()
-            .unwrap_or(40);
-        d.width = maxx + 8;
-        d.height = maxy + 8;
-    }
+    // The crate's graph_label.width clips the widest node, so size the diagram
+    // from the actual node + cluster extents (+ the margin), matching mermaid.
+    let maxx = d
+        .components
+        .iter()
+        .map(|c| c.pos.0 + c.size.unwrap_or((0, 0)).0 / 2)
+        .chain(d.regions.iter().map(|r| r.bounds.0 + r.bounds.2))
+        .max()
+        .unwrap_or(40);
+    let maxy = d
+        .components
+        .iter()
+        .map(|c| c.pos.1 + c.size.unwrap_or((0, 0)).1 / 2)
+        .chain(d.regions.iter().map(|r| r.bounds.1 + r.bounds.3))
+        .max()
+        .unwrap_or(40);
+    d.width = maxx + MX;
+    d.height = maxy + MY;
     d
 }
