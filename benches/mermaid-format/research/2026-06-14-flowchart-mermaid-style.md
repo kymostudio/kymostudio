@@ -28,22 +28,30 @@ to `"box"` in kymojson, so the cross-language contract and its goldens are
 unchanged; the only golden touched is one emit `.mmd` where a `(...)` node now
 round-trips as `(...)` instead of `[...]` (a fidelity fix).
 
-## Visual proof (same source, three renders)
+## Visual proof (same source, five renders)
 
-| kymo native | kymo **mermaid-style** | merman | mermaid.js 11.15 |
-|---|---|---|---|
-| ![](assets/2026-06-14-style/kymo-native.png) | ![](assets/2026-06-14-style/kymo-mermaid-style.png) | ![](assets/2026-06-14-style/merman.png) | ![](assets/2026-06-14-style/mermaidjs.png) |
+| kymo native | kymo **mermaid-style** | kymo **dagre** | merman | mermaid.js 11.15 |
+|---|---|---|---|---|
+| ![](assets/2026-06-14-style/kymo-native.png) | ![](assets/2026-06-14-style/kymo-mermaid-style.png) | ![](assets/2026-06-14-style/kymo-dagre.png) | ![](assets/2026-06-14-style/merman.png) | ![](assets/2026-06-14-style/mermaidjs.png) |
 
-The mermaid-style render matches mermaid.js's visual *language* closely: same node
-fill/border, sharp rectangles, diamond/circle glyphs, yellow `Section` cluster,
-`#333` filled arrows, edge-label backgrounds, no grid. What still differs is
-**layout** — node positions (kymo mirrors Do-it/Skip), edge curvature (kymo routes
-orthogonal Z-paths vs mermaid's splines), and cluster-label placement.
+Three kymo renders, left to right, show the progression:
 
-**merman** (third) is shown for contrast: as a Rust *port* of mermaid it reproduces
-mermaid.js's exact layout *and* style — note Do-it/Skip on the same sides, the same
-spline edges and cluster placement — which is why it overlays on mermaid.js at
-~1.5% (table below) while kymo, in either style, sits at ~14% on layout alone.
+- **kymo native** — kymo's own look *and* its own Sugiyama layout.
+- **kymo mermaid-style** (`mermaidToSvgStyled`) — mermaid *colours/shapes* on kymo's
+  Sugiyama layout. Matches the visual *language* (node fill/border, sharp rects,
+  diamond/circle, yellow `Section`, `#333` filled arrows, no grid) but **not the
+  layout**: it mirrors Do-it/Skip and routes orthogonal Z-edges, so the overlay
+  barely moves (~14%, the layout-dominated finding above).
+- **kymo dagre** (`mermaidToSvgDagre`) — the float-precision dagre path. Now matches
+  mermaid.js's **layout too**: Do-it left / Skip right, the full-width yellow
+  `Section` cluster spanning both, dagre ranks, and `curveBasis` spline edges. It is
+  visually indistinguishable from **merman** and **mermaid.js** (right two columns)
+  and overlays mermaid.js at **0.21%** on this exact diagram (see the float-precision
+  section below) — beating merman's port.
+
+**merman** is a Rust *port* of mermaid (exact dagre layout + style); it overlays
+mermaid.js at ~1.5% on the 5-file sample. The kymo **dagre** column shows kymo's
+own renderer reaching the same fidelity without the port.
 
 ## The pixel-overlay metric does NOT move — and why that's expected
 
