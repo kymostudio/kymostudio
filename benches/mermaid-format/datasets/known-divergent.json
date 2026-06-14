@@ -26,6 +26,22 @@
     {
       "file": "mermaid-cypress/sequence/sequencediagram_013.mmd",
       "reason": "decimal autonumber (autonumber 10.1 .01); kymo's autonumber counter is integer"
+    },
+    {
+      "file": "merman/class/stress_class_svg_font_size_precedence_001.mmd",
+      "reason": "mermaid wraps a very long method/class name across lines into separate word-tokens; kymo keeps it on one line"
+    },
+    {
+      "file": "mermaid-cypress/class/classDiagram-v2_021.mmd",
+      "reason": "mermaid renders a literal \\n in a note (token \"nDo\"); kymo correctly folds it to a space"
+    },
+    {
+      "file": "merman/er/upstream_alias_relationship_order.mmd",
+      "reason": "stress fixture with stray tokens before an aliased entity (buzz/fizz)"
+    },
+    {
+      "file": "mermaid-cypress/er/erDiagram_040.mmd",
+      "reason": "invalid  block inside an erDiagram (not ER syntax)"
     }
   ]
 }
