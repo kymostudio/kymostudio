@@ -51,6 +51,13 @@ npm install kymostudio        # JavaScript
 cargo install kymostudio      # Rust
 ```
 
+Or grab a prebuilt `kymo` binary with Homebrew (macOS/Linux):
+
+```bash
+brew tap kymostudio/brew https://github.com/kymostudio/kymostudio
+brew install kymostudio        # the command is `kymo`
+```
+
 ## Usage
 
 ### 1. Render a diagram

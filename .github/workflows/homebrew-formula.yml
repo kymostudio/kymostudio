@@ -1,0 +1,73 @@
+# Refresh the in-repo Homebrew formula after a release.
+#
+# Invoked by the dist-generated release.yml as a `post-announce-jobs` step
+# (see dist-workspace.toml). By the time this runs, the `host` job has uploaded
+# every tarball + the unified `sha256.sum` to the GitHub release, so we can read
+# the real checksums, render HomebrewFormula/kymostudio.rb, and commit it back
+# to `main`. The formula lives in this repo (no dedicated tap repo), so a push
+# with the default GITHUB_TOKEN is enough — no PAT.
+#
+# `main` is not branch-protected, so the bot can push directly. A push made with
+# GITHUB_TOKEN does not re-trigger workflows, and release.yml only fires on tags
+# / PRs anyway — so this commit cannot loop back into another release.
+name: Update Homebrew formula
+
+on:
+  workflow_call:
+    inputs:
+      plan:
+        description: "dist plan JSON (from the release workflow's plan job)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update-formula:
+    # Stable releases only — never overwrite the formula for a prerelease (rc).
+    if: ${{ fromJSON(inputs.plan).announcement_is_prerelease == false }}
+    runs-on: ubuntu-22.04
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TAG: ${{ fromJSON(inputs.plan).announcement_tag }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+      - name: Download release checksums
+        run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'sha256.sum' --dir /tmp --clobber
+      - name: Render formula
+        run: |
+          python3 scripts/render_homebrew_formula.py \
+            --tag "$TAG" --checksums /tmp/sha256.sum \
+            --out HomebrewFormula/kymostudio.rb
+      - name: Commit & push if changed
+        run: |
+          if git diff --quiet -- HomebrewFormula/kymostudio.rb; then
+            echo "Formula already up to date for ${TAG}."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add HomebrewFormula/kymostudio.rb
+          git commit -m "chore(homebrew): update formula to ${TAG}"
+          # Rebase-retry once in case main advanced while we built.
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              echo "Pushed formula update (attempt $attempt)."
+              exit 0
+            fi
+            echo "push failed; rebasing onto latest main and retrying…"
+            git pull --rebase origin main
+          done
+          echo "::error::could not push Homebrew formula update after retries"
+          exit 1

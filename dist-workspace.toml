@@ -1,0 +1,35 @@
+# cargo-dist (`dist`) — prebuilt `kymo` binaries + Homebrew formula.
+#
+# Why this file exists at the repo root: `packages/rust/kymostudio` is a
+# standalone crate (its own Cargo.lock, no [workspace]), so dist needs an
+# explicit workspace pointer to find it. We deliberately do NOT use dist's
+# built-in `homebrew` installer (that publishes to a dedicated `homebrew-*`
+# tap repo we don't have) — instead the `homebrew-formula` post-announce job
+# (.github/workflows/homebrew-formula.yml) renders HomebrewFormula/kymostudio.rb
+# from this run's dist-manifest.json and commits it back to `main`.
+[workspace]
+members = ["cargo:packages/rust/kymostudio"]
+
+[dist]
+# Generated/maintained with this dist version; pinned so CI matches local.
+cargo-dist-version = "0.32.0"
+# CI backend + where releases are hosted.
+ci = ["github"]
+# Only the curl|sh installer — binaries are also raw release assets the
+# Homebrew formula downloads. (No "homebrew" installer; see header.)
+installers = ["shell"]
+# The Homebrew-relevant platform set (mirrors the wheel matrix in
+# release-crate.yml). aarch64-linux may need dist's zig path; drop if flaky.
+targets = [
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+]
+# `/kymo-bump` already creates the GitHub release (`gh release create`) at tag
+# time, so dist attaches assets to the existing release instead of owning it.
+create-release = false
+# Keep PRs cheap: only plan on PRs, full cross-compile on `v*` tags.
+pr-run-mode = "plan"
+# Our custom formula-update job, invoked after all artifacts are uploaded.
+post-announce-jobs = ["./homebrew-formula"]
