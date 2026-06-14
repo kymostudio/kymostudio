@@ -20,7 +20,7 @@
 
 use std::collections::HashMap;
 
-use super::{Item, Message, Sequence};
+use super::{FragmentOp, Item, Message, Sequence};
 
 const HEADER: &str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
@@ -142,6 +142,12 @@ body=\"{}\" annotatedElement=\"{}\"/>",
                         xml_attr(&n.text),
                         anno.join(" ")
                     ));
+                }
+                Item::Fragment(f) if matches!(f.operator, FragmentOp::Rect) => {
+                    // A rect band carries no UML semantics — emit its messages inline.
+                    for operand in &f.operands {
+                        buf.push_str(&self.emit_items(&operand.items, indent));
+                    }
                 }
                 Item::Fragment(f) => {
                     let cf_id = self.new_id("frag");

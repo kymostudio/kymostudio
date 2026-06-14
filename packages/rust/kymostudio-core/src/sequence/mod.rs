@@ -171,6 +171,8 @@ pub enum FragmentOp {
     Critical,
     /// `break`.
     Break,
+    /// `rect <color>` — a coloured background band (not a UML operator).
+    Rect,
 }
 
 impl FragmentOp {
@@ -183,6 +185,7 @@ impl FragmentOp {
             FragmentOp::Par => "par",
             FragmentOp::Critical => "critical",
             FragmentOp::Break => "break",
+            FragmentOp::Rect => "rect",
         }
     }
 }
