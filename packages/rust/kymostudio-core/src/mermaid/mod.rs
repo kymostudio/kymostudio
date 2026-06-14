@@ -10,6 +10,7 @@
 //! geometry, unlike a `.bpmn` import). See FEAT-MERMAID-001 / MERMAID-MAP-001.
 
 mod classdiagram;
+mod erdiagram;
 mod lexer;
 mod parser;
 mod sequence;
@@ -216,6 +217,11 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
 /// Parse a Mermaid `classDiagram` into the class-diagram IR.
 pub fn parse_class(src: &str) -> Result<crate::classdiagram::ClassDiagram, MermaidError> {
     classdiagram::parse(src)
+}
+
+/// Parse a Mermaid `erDiagram` into the class-diagram IR (reusing the renderer).
+pub fn parse_er(src: &str) -> Result<crate::classdiagram::ClassDiagram, MermaidError> {
+    erdiagram::parse(src)
 }
 
 pub fn parse_state(src: &str) -> Result<Flowchart, MermaidError> {
