@@ -81,12 +81,23 @@ overlay number.
 
 ## Status
 
+> **Superseded below.** The "overlay can't move without dagre" finding (the 14%
+> sections above) was the *starting* point. A dagre-backed, float-precision
+> mermaid render path was then built on the kymo Rust side and brings the overlay
+> mean to **0.44%** — see *Float-precision dagre pipeline* at the end of this doc.
+> The sections above are kept as the research trail that motivated it.
+
 v1 shipped: theme (colours/font/background/arrowheads/clusters), sharp-vs-rounded
 rect fidelity, a light mermaid sizing bump, and the API + source-config plumbing.
 92 tests pass; kymojson goldens byte-identical; one emit golden re-blessed (a
-correctness fix). Deferred: dagre-like layout, spline edge routing, exact mermaid
-text metrics, and a Trebuchet font for the resvg deploy path (today it falls back
-to the registered sans-serif).
+correctness fix).
+
+What was "deferred" then is now **done** on the dagre path (`mermaid_to_svg_dagre`):
+dagre ranking (the `dagre` crate), spline edges (d3 `curveBasis`), and exact
+mermaid text metrics (`node_size_mermaid_f`, float). Still deferred: a Trebuchet
+font for the resvg deploy path (today it falls back to the registered sans-serif),
+and closing the `LR` sub-pixel rank-spacing drift (a dagre-crate vs dagre-d3-es
+arithmetic diff, not a renderer issue).
 
 ---
 
