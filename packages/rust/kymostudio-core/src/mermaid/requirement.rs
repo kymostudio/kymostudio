@@ -187,8 +187,8 @@ fn parse_relation(line: &str) -> Option<Relation> {
         return None;
     }
     Some(Relation {
-        from: from.trim().to_string(),
-        to: to.trim().to_string(),
+        from: from.trim().trim_matches('"').trim().to_string(),
+        to: to.trim().trim_matches('"').trim().to_string(),
         kind: RelKind::Dependency,
         dashed: true,
         head_at_from: false,
