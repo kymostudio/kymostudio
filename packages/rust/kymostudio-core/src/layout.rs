@@ -33,7 +33,16 @@ const CHAR_W: f64 = 8.0; // ~13px semibold label, with breathing room
 /// Real (width, height) of a flowchart node's glyph box, sized to its label.
 /// Boxes stay upright regardless of flow direction.
 fn node_size(label: &str, shape: Shape) -> (i32, i32) {
-    let text_w = (label.chars().count() as f64 * CHAR_W).ceil() as i32;
+    // Multi-line labels (class / er boxes) size by their widest line and row
+    // count; single-line labels keep the original shape-based sizing.
+    let lines: Vec<&str> = label.split('\n').collect();
+    let max_chars = lines.iter().map(|l| l.chars().count()).max().unwrap_or(0);
+    let text_w = (max_chars as f64 * CHAR_W).ceil() as i32;
+    if lines.len() > 1 {
+        let w = (text_w + 24).max(80);
+        let h = lines.len() as i32 * 18 + 16;
+        return (w, h);
+    }
     let (w, h) = match shape {
         Shape::Circle => {
             let d = (text_w + 28).max(56);
