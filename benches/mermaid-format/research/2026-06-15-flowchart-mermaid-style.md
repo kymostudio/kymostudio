@@ -20,10 +20,24 @@ surfaces**:
   reusing the core wasm already loaded for kymo diagrams; the **~470 KB merman
   wasm is no longer bundled**.
 
-Fidelity, measured by pixel-overlay vs mermaid.js 11.15 (both rasterised in
-Chrome) on a 7-case set: **mean 0.19 %, every case ≤ 0.45 %** — vs the merman
-port at 1.96 %. Verified live in a real browser on complex inputs (cycles,
-nested back-edges, a subgraph cluster, mixed shapes, 8 edge labels).
+Fidelity — pixel-overlay diff vs mermaid.js 11.15, both rasterised in Chrome
+(`~/mjs-bench/cmp7.mjs`). Lower is better; kymo-dagre beats the merman port on
+every case but one (subgraph), and by 10× on the mean:
+
+| case | kymo-dagre | merman |
+|---|---|---|
+| chain | **0.10 %** | 0.81 % |
+| branch | **0.23 %** | 2.48 % |
+| rounds | **0.03 %** | 3.56 % |
+| LR | **0.07 %** | 2.69 % |
+| subgraph | 0.45 % | **0.18 %** |
+| diamondchain | **0.21 %** | 1.90 % |
+| wide | **0.21 %** | 2.13 % |
+| **mean** | **0.19 %** | 1.96 % |
+
+All 7 cases ≤ 0.45 %. Verified live in a real browser (editor.kymo.studio) on
+complex inputs too — cycles, nested back-edges, a subgraph cluster, mixed shapes
+(circle/diamond/rect/cylinder), 8 edge labels — all rendered correctly.
 
 ### Visual proof (same source, five renders)
 
