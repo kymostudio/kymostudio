@@ -1,5 +1,5 @@
 {
-  "_comment": "Fixtures using legacy/ambiguous Mermaid syntax that mermaid.js parses via its full grammar but kymo's lenient parser intentionally throws on. Excluded from the headline accuracy score (they test kymo's non-support of deprecated/ambiguous forms, not a renderer bug). Each: dataset/grammar/file -> reason.",
+  "_comment": "Fixtures kymo intentionally diverges on, excluded from the headline accuracy score. legacy = deprecated/ambiguous Mermaid syntax that mermaid.js parses via its full grammar but kymo's lenient parser throws on. exotic = pathological parser stress fixtures / out-of-scope features (full KaTeX layout, decimal autonumber) that no real diagram uses. Each: dataset/grammar/file -> reason.",
   "legacy": [
     {
       "file": "merman/flowchart/upstream_pkgtests_flow_text_spec_087.mmd",
@@ -16,6 +16,16 @@
     {
       "file": "mermaid-cypress/flowchart/flowchart_053.mmd",
       "reason": "multiline edge label with embedded --\" across physical lines (v10[\"<11\"] --\"...); ambiguous edge/label boundary"
+    }
+  ],
+  "exotic": [
+    {
+      "file": "mermaid-cypress/flowchart/katex_000.mmd",
+      "reason": "double-backslash-escaped, deeply-nested KaTeX with custom commands (\\phase, \\relax, nested \\Bigg/\\begin{cases}/continued \\frac); kymo has a lightweight TeX->Unicode pass, not a full KaTeX layout engine"
+    },
+    {
+      "file": "mermaid-cypress/sequence/sequencediagram_013.mmd",
+      "reason": "decimal autonumber (autonumber 10.1 .01); kymo's autonumber counter is integer"
     }
   ]
 }
