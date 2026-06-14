@@ -1,7 +1,7 @@
 <div align="center">
 	<picture>
-		<source media="(prefers-color-scheme: dark)" srcset="https://github.com/kymostudio/kymostudio/raw/main/docs/brand/github-hero-dark.png" />
-		<img alt="kymostudio — Diagram superpowers" src="https://github.com/kymostudio/kymostudio/raw/main/docs/brand/github-hero-light.png" />
+		<source media="(prefers-color-scheme: dark)" srcset="https://github.com/kymostudio/kymostudio/raw/main/docs/brand/wordmark-dark.svg" />
+		<img alt="kymostudio — Diagram superpowers" width="460" src="https://github.com/kymostudio/kymostudio/raw/main/docs/brand/wordmark.svg" />
 	</picture>
 </div>
 

@@ -1,8 +1,8 @@
 <svg viewBox="80 44 823 192" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="kymostudio — Diagram superpowers">
-  <!-- Reusable horizontal brand lockup (light): tile + two-tone wordmark + tagline.
+  <!-- Reusable horizontal brand lockup: tile + two-tone wordmark + tagline.
        Wordmark/tagline are OUTLINED paths (SF Pro Rounded, Black 900 / Medium 500) so
-       the lockup renders identically in any browser — no font dependency. Regenerate
-       with tools/outline_wordmark.py after a text/weight change. -->
+       the lockup renders identically in any browser / on GitHub — no font dependency.
+       Regenerate (both light + dark) with tools/outline_wordmark.py. -->
   <g transform="translate(96 50) scale(1.8)">
     <rect width="100" height="100" rx="18" fill="#e0095f"/>
     <g transform="translate(50 50) scale(0.98) translate(-50 -50)">
