@@ -16,7 +16,16 @@ categories = ["multimedia::images", "wasm"]
 [lib]
 name = "kymostudio_core"
 path = "src/lib.rs"
-crate-type = ["rlib", "cdylib"]
+# rlib -> CLI crate + tests; cdylib -> Python (pyo3), wasm (wasm-bindgen), and
+# the Android JNI .so (uniffi); staticlib -> the iOS .xcframework (uniffi).
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+# Bindings generator for the native mobile build (uniffi proc-macro `--library`
+# mode reads metadata from the compiled lib). Only built with the `mobile` feature.
+[[bin]]
+name = "uniffi-bindgen"
+path = "src/bin/uniffi_bindgen.rs"
+required-features = ["mobile"]
 
 [dependencies]
 # Core SVG engine. system-fonts + memmap-fonts pull in fs/mmap (no good on
@@ -39,6 +48,17 @@ wasm-bindgen = { version = "0.2", optional = true }
 # canonical model JSON the cross-language conformance suite compares against.
 roxmltree = { version = "0.20", optional = true }
 serde_json = { version = "1", optional = true }
+
+# `.kymo` DSL front-end dep — pulled in only by the `kymo` feature (native
+# mobile/CLI). The wasm (JS) and Python wheels DON'T enable `kymo`: each has its
+# own native `.kymo` parser (dsl.ts / dsl.py), so regex stays out of those
+# artifacts. The mobile build needs a Rust-side parser, where regex keeps the
+# port near 1:1 with `dsl.py` and off the binary-size-critical wasm path.
+regex = { version = "1", optional = true }
+
+# Native mobile FFI (Kotlin + Swift bindings via uniffi proc-macro). Only pulled
+# in by the `mobile` feature; the `cli` feature lets the `uniffi-bindgen` bin run.
+uniffi = { version = "0.28", features = ["cli"], optional = true }
 
 [dev-dependencies]
 # Used by tests/bpmn_conformance.rs to load + compare the shared golden JSON.
@@ -78,6 +98,18 @@ wasm = ["dep:wasm-bindgen", "bpmn"]
 # native builds + the Python wheel; validated by tests/bpmn_conformance.rs against
 # the shared conformance/golden/ JSON. Pure Rust (no resvg dependency).
 bpmn = ["dep:roxmltree", "dep:serde_json"]
+
+# `.kymo` DSL front-end (parser + layout + alignment + rich SVG renderer) — the
+# Rust port of packages/python/src/kymo. Native/mobile only; NOT enabled for the
+# wasm/python artifacts (they have their own `.kymo` impl). Brings in `regex`.
+# Also gates the headless `editor::EditorSession`.
+kymo = ["dep:regex"]
+
+# Native mobile bindings — the uniffi FFI surface (src/ffi.rs) over the editor
+# session, generating Kotlin (Android .so) + Swift (iOS .xcframework). Implies
+# `kymo` (the engine + editor). NO pdf / NO system-fonts (mobile registers a
+# bundled font at startup); render_png uses resvg's rasterizer (always on).
+mobile = ["kymo", "dep:uniffi"]
 
 [profile.release]
 opt-level = 3

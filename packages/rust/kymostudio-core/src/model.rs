@@ -28,11 +28,15 @@ pub fn py_round(x: f64) -> i32 {
 macro_rules! str_enum {
     ($(#[$m:meta])* $name:ident { $($variant:ident => $s:literal),+ $(,)? }) => {
         $(#[$m])*
-        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
         pub enum $name { $($variant),+ }
         impl $name {
             pub fn as_str(self) -> &'static str {
                 match self { $(Self::$variant => $s),+ }
+            }
+            /// Parse the DSL/JSON string token into the enum (`None` if unknown).
+            pub fn from_str(s: &str) -> Option<Self> {
+                match s { $($s => Some(Self::$variant),)+ _ => None }
             }
         }
     };
@@ -113,6 +117,137 @@ pub struct Component {
     pub align_gap: i32,
     pub align_offset: Point,
     pub label_box: Option<(i32, i32, i32, i32)>,
+}
+
+impl Shape {
+    /// Half-size `(w/2, h/2)` of the icon bounding box, used for anchor-point
+    /// computation. Mirrors `model.SHAPE_HALF` (Python). Real BPMN sizes arrive
+    /// via [`Component::size`]; these are fallbacks.
+    pub fn shape_half(self) -> (i32, i32) {
+        use Shape::*;
+        match self {
+            Circle => (38, 38),
+            Cube => (40, 40),
+            CubeBig => (50, 50),
+            Box => (35, 35),
+            Cylinder => (35, 35),
+            Hex => (35, 32),
+            Diamond => (40, 28),
+            Annotation => (0, 0),
+            AwsTile => (32, 32),
+            AwsTileHero => (40, 40),
+            Badge => (14, 14),
+            Image => (32, 32),
+            BpmnStart | BpmnEnd | BpmnIntermediate | BpmnBoundary => (18, 18),
+            BpmnTask | BpmnSubprocess => (50, 40),
+            BpmnGateway | BpmnDataStore => (25, 25),
+            BpmnDataObject => (18, 25),
+            BpmnAnnotation => (0, 0),
+        }
+    }
+
+    /// Space the name+subtitle take BELOW the icon — pushes top/bottom anchors
+    /// outside the label area. Mirrors `model.LABEL_HEIGHT` (Python).
+    pub fn label_height(self) -> i32 {
+        use Shape::*;
+        match self {
+            Circle => 38,
+            Cube => 42,
+            CubeBig => 48,
+            Box => 38,
+            Cylinder => 38,
+            Hex => 40,
+            AwsTile | AwsTileHero => 48,
+            Image => 26,
+            // diamond, annotation, badge, and every BPMN glyph: 0
+            _ => 0,
+        }
+    }
+}
+
+impl Component {
+    /// `(w/2, h/2)` — explicit [`size`](Self::size) if set (integer halving,
+    /// like Python `//`), else the per-shape [`Shape::shape_half`].
+    pub fn half(&self) -> (i32, i32) {
+        match self.size {
+            Some((w, h)) => (w.div_euclid(2), h.div_euclid(2)),
+            None => self.shape.shape_half(),
+        }
+    }
+
+    /// The `(x, y)` where an edge enters/exits this component on `side`.
+    /// `bottom` pushes past the label band — but only for icon-bearing nodes
+    /// that actually carry a name/subtitle (mirrors `Component.anchor`).
+    pub fn anchor(&self, side: Anchor) -> Point {
+        let (cx, cy) = self.pos;
+        let (hw, hh) = self.half();
+        let labelled = (!self.name.is_empty() || !self.subtitle.is_empty()) && !self.icon.is_empty();
+        let lh = if labelled { self.shape.label_height() } else { 0 };
+        match side {
+            Anchor::Top => (cx, cy - hh),
+            Anchor::Right => (cx + hw, cy),
+            Anchor::Bottom => (cx, cy + hh + lh),
+            Anchor::Left => (cx - hw, cy),
+            Anchor::Center => (cx, cy),
+        }
+    }
+}
+
+impl Region {
+    /// The `(x, y)` where an edge attaches to this region's border on `side`.
+    /// Same signature as [`Component::anchor`] so edges target either kind.
+    /// Requires `bounds` to be resolved beforehand.
+    pub fn anchor(&self, side: Anchor) -> Point {
+        let (x, y, w, h) = self.bounds;
+        match side {
+            Anchor::Top => (x + w / 2, y),
+            Anchor::Right => (x + w, y + h / 2),
+            Anchor::Bottom => (x + w / 2, y + h),
+            Anchor::Left => (x, y + h / 2),
+            Anchor::Center => (x + w / 2, y + h / 2),
+        }
+    }
+}
+
+/// An edge endpoint — a [`Component`] or a [`Region`] (both expose `anchor`).
+#[derive(Clone, Copy)]
+pub enum Node<'a> {
+    Component(&'a Component),
+    Region(&'a Region),
+}
+
+impl Node<'_> {
+    pub fn anchor(&self, side: Anchor) -> Point {
+        match self {
+            Node::Component(c) => c.anchor(side),
+            Node::Region(r) => r.anchor(side),
+        }
+    }
+}
+
+/// Return the effective `(src_anchor, dst_anchor)` for an edge. A `None` slot is
+/// auto-picked from geometry: whichever side faces the other node's centre,
+/// strongly biased horizontal (vertical only wins when `|dy| > 2·|dx|`).
+/// Mirrors `model.resolve_anchors` (Python).
+pub fn resolve_anchors(e: &Edge, src: Node, dst: Node) -> (Anchor, Anchor) {
+    if let (Some(sa), Some(da)) = (e.src_anchor, e.dst_anchor) {
+        return (sa, da);
+    }
+    let sc = src.anchor(Anchor::Center);
+    let dc = dst.anchor(Anchor::Center);
+    let (dx, dy) = (dc.0 - sc.0, dc.1 - sc.1);
+    let (auto_sa, auto_da) = if dy.abs() > 2 * dx.abs() {
+        if dy >= 0 {
+            (Anchor::Bottom, Anchor::Top)
+        } else {
+            (Anchor::Top, Anchor::Bottom)
+        }
+    } else if dx >= 0 {
+        (Anchor::Right, Anchor::Left)
+    } else {
+        (Anchor::Left, Anchor::Right)
+    };
+    (e.src_anchor.unwrap_or(auto_sa), e.dst_anchor.unwrap_or(auto_da))
 }
 
 impl Component {

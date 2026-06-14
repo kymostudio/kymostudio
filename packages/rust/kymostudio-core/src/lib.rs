@@ -25,6 +25,27 @@ pub mod mermaid;
 pub mod model;
 pub mod sequence;
 
+// The `.kymo` DSL front-end (parser + layout + alignment + rich SVG renderer) —
+// the Rust port of packages/python/src/kymo. Native/mobile only; the wasm and
+// Python artifacts keep their own `.kymo` implementations (dsl.ts / dsl.py).
+#[cfg(feature = "kymo")]
+pub mod kymo;
+
+// Headless editor session (document / shapes / selection / undo / drag-writeback
+// / hit-test / camera) — drives the native mobile UIs. Built on the `.kymo`
+// engine, so it shares the `kymo` feature.
+#[cfg(feature = "kymo")]
+pub mod editor;
+
+// uniffi FFI surface (Kotlin + Swift bindings) over the editor session — the
+// native Android/iOS binding. Built only with the `mobile` feature.
+// `setup_scaffolding!` must live at the crate root: the proc-macro derives in
+// `ffi.rs` reference `crate::UniFfiTag`, which this macro defines here.
+#[cfg(feature = "mobile")]
+uniffi::setup_scaffolding!();
+#[cfg(feature = "mobile")]
+mod ffi;
+
 // Language-binding facades — each compiled only when its feature is on.
 #[cfg(feature = "python")]
 mod python;
