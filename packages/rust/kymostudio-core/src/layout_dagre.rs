@@ -67,7 +67,8 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
         let (lw, lh) = if e.label.is_empty() {
             (0.0, 0.0)
         } else {
-            ((e.label.chars().count() as f64 * 8.5).max(10.0), 16.0)
+            // mermaid sizes the edge label to its measured text, height 24.
+            (crate::layout::text_w_mermaid(&e.label).max(10.0), 24.0)
         };
         g.set_edge(
             e.src.clone(),
