@@ -68,8 +68,7 @@ export function useDiagrams() {
 // keyboard model, so the two can never drift out of sync.
 type Row =
   | { kind: "folder"; id: string; depth: number; ancestors: string[]; name: string; open: boolean }
-  | { kind: "file"; id: string; depth: number; ancestors: string[]; it: Item }
-  | { kind: "empty"; id: string; depth: number; ancestors: string[] };
+  | { kind: "file"; id: string; depth: number; ancestors: string[]; it: Item };
 
 export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }: {
   currentId: string | null; currentTitle: string; onNewDiagram: () => void; onClose: () => void;
@@ -115,11 +114,7 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
       for (const f of childFoldersOf(folders, parentId).sort((a, b) => a.name.localeCompare(b.name))) {
         const open = expanded.has(f.id);
         out.push({ kind: "folder", id: f.id, depth, ancestors, name: f.name, open });
-        if (open) {
-          const before = out.length;
-          walk(f.id, depth + 1, [...ancestors, f.id]);
-          if (out.length === before) out.push({ kind: "empty", id: f.id, depth: depth + 1, ancestors: [...ancestors, f.id] });
-        }
+        if (open) walk(f.id, depth + 1, [...ancestors, f.id]); // expanded-but-empty shows nothing (VS Code-style)
       }
       for (const it of filesIn(parentId)) out.push({ kind: "file", id: it.id, depth, ancestors, it });
     };
@@ -127,8 +122,8 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     return out;
   }, [folders, expanded, filesIn]);
 
-  // Rows the keyboard can land on (folders + files, not the "empty" placeholder).
-  const navRows = useMemo(() => rows.filter((r) => r.kind !== "empty"), [rows]);
+  // Rows the keyboard can land on (every row is now a folder or file).
+  const navRows = rows;
   const keyOf = (r: { kind: string; id: string }) => r.kind + ":" + r.id;
 
   async function onNewFolder(parentId: string) {
@@ -271,9 +266,6 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
   }
 
   function renderRow(r: Row): React.ReactNode {
-    if (r.kind === "empty") {
-      return <div key={"e" + r.id} className="sb-empty-row">{guides(r.ancestors)}<span className="sb-spacer" />empty</div>;
-    }
     const k = keyOf(r);
     const focused = focusKey === k;
     if (r.kind === "folder") {
