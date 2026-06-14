@@ -14,6 +14,7 @@ use resvg::{tiny_skia, usvg};
 // interchange format the Python/JS front-ends consume.
 pub mod classdiagram;
 pub mod d2;
+pub mod dagre_svg;
 pub mod dot;
 pub mod drawio;
 pub mod flowchart;
@@ -331,12 +332,8 @@ pub fn mermaid_to_svg_dagre(src: &str) -> Result<String, mermaid::MermaidError> 
     render_flowchart_math(&mut fc);
     let style = style::FlowStyle::Mermaid;
     let (styles, gfill) = mermaid::extract_node_styles(src);
-    Ok(flowchart_svg::render_styled_with(
-        &layout_dagre::layout_flowchart_dagre(&fc, style),
-        style,
-        &styles,
-        gfill.as_deref(),
-    ))
+    let geom = layout_dagre::dagre_geom(&fc, style);
+    Ok(dagre_svg::render(&geom, style, &styles, gfill.as_deref()))
 }
 
 /// Normalise a Mermaid label for rendering: `<br>` line breaks become spaces,

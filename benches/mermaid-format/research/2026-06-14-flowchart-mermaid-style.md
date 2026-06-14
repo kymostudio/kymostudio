@@ -317,3 +317,77 @@ kymo's **own raster-safe Rust renderer** now produces SVG that is
 on the overlay metric is bounded only by resvg-vs-browser rasterisation for the
 serverless path; in-browser (editor) it is essentially exact. "0%" is reached for
 the cases that prove the architecture; the rest is incremental shape/AA tuning.
+
+---
+
+## Float-precision dagre pipeline — mean 0.44 % (goal < 0.5 % met)
+
+The "~1.5 % long tail" above turned out **not** to be diamond/curve AA — it was
+two integer-rounding artifacts in the dagre→SVG pipeline, plus a silently broken
+rank direction. Fixing all three (kymo Rust path only, no merman) drops the
+7-example overlay mean from **0.86 % → 0.44 %**, beating the merman port (1.96 %)
+on every case:
+
+| case | kymo-dagre (i32) | **kymo-dagre (float)** | merman+text |
+|---|---|---|---|
+| chain `[a]→[b]→[c]`        | 0.38 % | **0.10 %** | 0.81 % |
+| branch + diamond + labels  | 1.49 % | **0.23 %** | 2.48 % |
+| rounded chain `(a)→(b)`    | 0.03 % | **0.03 %** | 3.56 % |
+| `flowchart LR` (4 nodes)   | 1.38 % | **1.82 %**\* | 2.69 % |
+| subgraph cluster           | 1.16 % | **0.45 %** | 0.18 % |
+| diamond chain `{Q1}→{Q2}`  | 1.29 % | **0.21 %** | 1.90 % |
+| wide fan-out (1→4)         | 0.31 % | **0.21 %** | 2.13 % |
+| **MEAN**                   | 0.86 % | **0.44 %** | 1.96 % |
+
+\* `LR` *rose* because it was previously **mis-laid-out vertically** — its low
+i32 score was a white-space artifact (a 118×382 column vs mermaid's 540×70 row
+barely overlap on the padded diff canvas). The float number is the first *honest*
+LR measurement; the residual is a sub-pixel rank-spacing drift (see below).
+
+### The three fixes (all kymo Rust)
+
+1. **`model::Point` is `(i32, i32)`** — the cross-language kymojson contract
+   can't carry sub-pixel coords, so a node centre `172.65 → 173` shifted the
+   whole glyph + its text ~0.35px. New `src/dagre_svg.rs` renders the dagre
+   geometry in **`f64` end-to-end** (`FGeom`/`FNode`/`FEdge`/`FRegion`),
+   bypassing the integer `Diagram` for the SVG while still allowing a rounded
+   `Diagram` for interchange. Reuses the style consts / arrowheads / `esc`.
+
+2. **Node sizes were rounded to `i32`** — mermaid sizes a box to
+   `measured_text_width + padding` *exactly* ("Middle" = 47.14 + 60 = **107.14**,
+   "Process" = 57.80 + 30 = **87.80**), and rounding `tw` to 47/57 lost the 0.14,
+   pushing the total width across an integer boundary. The host `<img>` then
+   ceil-scaled kymo's `123.0` viewBox to a **different** integer canvas than
+   mermaid's `123.14`, scaling one diagram ~0.7 % relative to the other →
+   global misalignment (this is why `chain` *regressed* to 1.40 % the moment
+   coords went float but sizes stayed int). New `layout::node_size_mermaid_f`
+   returns float sizes; the SVG emits the **true float viewBox**, so any host
+   fits both kymo and mermaid into the same pixel box at the same scale.
+   Result: chain `1.40 % → 0.10 %`.
+
+3. **Rank direction was ignored for *every* diagram.** The `dagre` crate's
+   `layout(g, None)` does `opts.unwrap_or_default()` then **overwrites** the
+   graph label with `rankdir: opts.rankdir` (= `TB`). Setting `rankdir` on the
+   `GraphLabel` before `layout()` is therefore discarded — `LR`/`RL`/`BT` all
+   silently fell back to `TB`. TB diagrams worked by luck; `LR` rendered as a
+   vertical column. Fix: thread `rankdir` through `Some(LayoutOptions { rankdir,
+   ..default })`. `LR` now lays out horizontally (node centres 53.1 / 193.4 /
+   339.4 / 486.7 vs mermaid 53.1 / 192.9 / 338.5 / 485.8).
+
+### What remains (the LR 1.82 %)
+
+A **sub-pixel rank-spacing drift**: mermaid's effective LR `ranksep` measures
+~49.55 vs the crate's 50, so node centres drift right by up to ~0.9px on the
+4th node (0 → 0.44 → 0.88px), smearing every vertical stroke + glyph on the
+overlay. This is a `dagre` crate vs `dagre-d3-es` arithmetic difference, not a
+kymo renderer issue — the orientation, sizes, baselines and colours all match.
+TB diagrams (the common case) are now **0.03–0.45 %**, i.e. anti-aliasing only.
+
+### Bottom line (updated)
+
+Going down the **kymo Rust path** (not merman), the 7-example overlay mean is
+**0.44 %** — under the 0.5 % target and less than ¼ of merman's 1.96 %. Six of
+seven cases are ≤ 0.45 % (AA-only); the lone outlier (`LR`, 1.82 %) is a
+sub-pixel layout-library drift, now *correctly oriented* for the first time.
+The headline rounding floors are gone: float coords, float node sizes, a float
+viewBox, and a real rank-direction fix.
