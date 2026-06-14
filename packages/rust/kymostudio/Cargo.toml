@@ -30,3 +30,9 @@ kymostudio-core = { path = "../kymostudio-core", version = "0.4" }
 opt-level = 3
 lto = true
 strip = true
+
+# cargo-dist (`dist`) builds release binaries with `--profile dist`; it must
+# exist or `dist build` fails with "profile `dist` is not defined". Inherit the
+# tuned release profile above (opt-level 3 + LTO + strip). See dist-workspace.toml.
+[profile.dist]
+inherits = "release"
