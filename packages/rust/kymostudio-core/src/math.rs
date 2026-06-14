@@ -7,6 +7,8 @@
 /// Replace `<br>` / `<br/>` / `<br />` (any case) with a space — Mermaid treats
 /// them as line breaks in labels.
 pub fn strip_br(s: &str) -> String {
+    // Literal escaped breaks `\n` / `\t` become spaces too.
+    let s = &s.replace("\\n", " ").replace("\\t", " ");
     let lower = s.to_ascii_lowercase();
     if !lower.contains("<br") {
         return s.to_string();

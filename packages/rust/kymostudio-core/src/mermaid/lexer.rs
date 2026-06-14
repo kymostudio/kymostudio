@@ -316,14 +316,46 @@ impl Scanner {
 /// Pull `key: value` out of a `@{...}` metadata body (commas separate fields,
 /// quotes protect commas/colons in the value).
 fn meta_field(body: &str, key: &str) -> Option<String> {
-    for part in split_fields(body) {
+    let fields = split_fields(body);
+    for (i, part) in fields.iter().enumerate() {
         if let Some((k, v)) = part.split_once(':') {
             if k.trim() == key {
-                return Some(unquote(v.trim()));
+                let v = v.trim();
+                // YAML block scalar (`label: |` / `label: >`): the value is the
+                // following continuation fields, up to the next `key:` field.
+                if v == "|" || v == ">" {
+                    let mut out = Vec::new();
+                    for next in &fields[i + 1..] {
+                        if is_yaml_key(next) {
+                            break;
+                        }
+                        let t = next.trim();
+                        if !t.is_empty() {
+                            out.push(t);
+                        }
+                    }
+                    return Some(out.join(" "));
+                }
+                return Some(unquote(v));
             }
         }
     }
     None
+}
+
+/// Does a folded `@{}` field look like a new `key: value` entry (vs a block
+/// continuation line)? Keys are short bare identifiers.
+fn is_yaml_key(field: &str) -> bool {
+    match field.split_once(':') {
+        Some((k, _)) => {
+            let k = k.trim();
+            !k.is_empty()
+                && k.len() <= 32
+                && k.chars()
+                    .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+        }
+        None => false,
+    }
 }
 
 fn split_fields(body: &str) -> Vec<String> {

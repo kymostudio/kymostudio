@@ -287,7 +287,10 @@ pub fn mermaid_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
 /// Normalise a Mermaid label for rendering: `<br>` line breaks become spaces,
 /// then `$…$` TeX math is rendered to Unicode.
 fn clean_label(s: &str) -> String {
-    math::render(&math::strip_br(s))
+    // Render `$…$` math FIRST (so TeX commands like \\text / \\nabla are mapped to
+    // Unicode), then collapse `<br>` and literal `\\n` / `\\t` breaks — otherwise
+    // the break-stripper would eat the `\\t` in `\\text`, the `\\n` in `\\nabla`, etc.
+    math::strip_br(&math::render(s))
 }
 
 /// Apply [`clean_label`] to every flowchart label (nodes, edges, subgraph titles).
