@@ -33,6 +33,33 @@ const CHAR_W: f64 = 8.0; // ~13px semibold label, with breathing room
 
 /// Real (width, height) of a flowchart node's glyph box, sized to its label.
 /// Boxes stay upright regardless of flow direction.
+/// Per-character advance widths for mermaid's font at 16px (ASCII 32..126),
+/// measured from Chrome. Lets `node_size` match mermaid's text metrics so dagre
+/// packs nodes at mermaid's coordinates.
+const CHAR_W_MERMAID: [f64; 95] = [
+    4.45, 4.45, 5.68, 8.90, 8.90, 14.23, 10.67, 3.05, 5.33, 5.33, 6.23, 9.34, 4.45, 5.33, 4.45,
+    4.45, 8.90, 8.90, 8.90, 8.90, 8.90, 8.90, 8.90, 8.90, 8.90, 8.90, 4.45, 4.45, 9.34, 9.34, 9.34,
+    8.90, 16.24, 10.67, 10.67, 11.55, 11.55, 10.67, 9.77, 12.45, 11.55, 4.45, 8.00, 10.67, 8.90,
+    13.33, 11.55, 12.45, 10.67, 12.45, 11.55, 10.67, 9.77, 11.55, 10.67, 15.10, 10.67, 10.67, 9.77,
+    4.45, 4.45, 4.45, 7.51, 8.90, 5.33, 8.90, 8.90, 8.00, 8.90, 8.90, 4.45, 8.90, 8.90, 3.55, 3.55,
+    8.00, 3.55, 13.33, 8.90, 8.90, 8.90, 8.90, 5.33, 8.00, 4.45, 8.90, 8.00, 11.55, 8.00, 8.00,
+    8.00, 5.34, 4.16, 5.34, 9.34,
+];
+
+/// Width of a single-line label in mermaid's 16px font.
+fn text_w_mermaid(s: &str) -> f64 {
+    s.chars()
+        .map(|c| {
+            let i = c as u32;
+            if (32..127).contains(&i) {
+                CHAR_W_MERMAID[(i - 32) as usize]
+            } else {
+                8.9
+            }
+        })
+        .sum()
+}
+
 /// Public wrapper so the dagre adapter can size nodes identically.
 pub(crate) fn node_size_for(label: &str, shape: Shape, style: FlowStyle) -> (i32, i32) {
     node_size(label, shape, style)
@@ -57,21 +84,21 @@ fn node_size(label: &str, shape: Shape, style: FlowStyle) -> (i32, i32) {
     // Mermaid (16px trebuchet) node sizing, calibrated against mermaid.js 11:
     // rect ~6.82*chars + 64, height 54; other shapes per-shape padding.
     if matches!(style, FlowStyle::Mermaid) {
-        let tw = (max_chars as f64 * 6.82) as i32;
+        let tw = text_w_mermaid(label).round() as i32;
         let (w, h) = match shape {
             Shape::Circle => {
-                let d = (tw + 24).max(50);
+                let d = (tw + 16).max(50);
                 (d, d)
             }
             Shape::Diamond => {
-                let d = (tw + 63).max(70);
+                let d = (tw + 54).max(70);
                 (d, d)
             }
-            Shape::Hex => ((tw + 43).max(60), 39),
-            Shape::Cylinder => ((tw + 40).max(56), 54),
-            Shape::Badge => ((tw + 39).max(56), 54),
-            Shape::Box => ((tw + 39).max(56), 54), // rounded `(...)`
-            _ => ((tw + 64).max(70), 54),          // sharp Rect `[...]` & default
+            Shape::Hex => ((tw + 35).max(60), 39),
+            Shape::Cylinder => ((tw + 30).max(56), 54),
+            Shape::Badge => ((tw + 30).max(56), 54),
+            Shape::Box => ((tw + 30).max(56), 54), // rounded `(...)`
+            _ => ((tw + 60).max(70), 54),          // sharp Rect `[...]` & default
         };
         return (w, h);
     }
