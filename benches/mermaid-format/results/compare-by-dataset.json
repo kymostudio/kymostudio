@@ -20,10 +20,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "c4",
@@ -42,10 +42,10 @@
         "mjsB": 100,
         "mjsR": 2,
         "kB": 98,
-        "kR": 0,
+        "kR": 98,
         "mB": 98,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "er",
@@ -53,10 +53,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "flowchart",
@@ -275,10 +275,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "c4",
@@ -297,21 +297,21 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "er",
         "n": 48,
         "mjsB": 100,
         "mjsR": 0,
-        "kB": 90,
-        "kR": 0,
+        "kB": 100,
+        "kR": 100,
         "mB": 90,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "flowchart",
@@ -519,10 +519,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "c4",
@@ -541,10 +541,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "er",
@@ -552,10 +552,10 @@
         "mjsB": 100,
         "mjsR": 0,
         "kB": 100,
-        "kR": 0,
+        "kR": 100,
         "mB": 100,
         "mR": 0,
-        "own": false
+        "own": true
       },
       {
         "g": "flowchart",

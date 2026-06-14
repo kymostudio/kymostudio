@@ -14,25 +14,23 @@
 
 > **Note on names.** A dataset folder is named after where its `.mmd` *sources*
 > were collected (e.g. `merman/` = the merman project's test corpus). It is **not**
-> the renderer — every tool renders every dataset. The `merman` *engine* scoring
-> 0% on the `merman` *dataset* is not circular: the two are unrelated.
+> the renderer — every tool renders every dataset.
 
 ## Method
 
 Ground truth = mermaid.js 11.15 itself (headless Chrome via puppeteer). Metric =
 label recall: of the labels mermaid.js *shows*, the fraction present in each
-tool's output, reported in **two modes**:
+tool's output, in **two modes**:
 
 - **browser** — labels in `<text>` *or* `<foreignObject>` (what a browser PNG
-  shows; foreignObject HTML is rendered).
+  shows).
 - **raster** — labels in `<text>` only (what a **serverless** SVG→PNG/PDF via
-  resvg/svg2pdf keeps; foreignObject is dropped — kymo's deploy target:
-  render.kymo.studio, the editor's wasm export).
+  resvg/svg2pdf keeps — foreignObject is dropped; kymo's deploy target).
 
-So a `100/0` cell means "all labels render in a browser, none survive a
-serverless raster". kymo routes flowchart/sequence/state to its own engine, the
-rest to merman (mirrors `render-api/engine.ts`). `Sources` is the full per-type
-count; recall is over a ≤50-source sample.
+So `100/0` = "all labels render in a browser, none survive a serverless raster".
+kymo now has its own engine for **flowchart, sequence, state, class, er, block**;
+everything else routes to merman. `Sources` is the full per-type count; recall is
+over a ≤50-source sample.
 
 ## Per dataset → per diagram type — recall as **browser / raster**
 
@@ -41,11 +39,11 @@ count; recall is over a ≤50-source sample.
 | diagram | sources | mermaid.js | **kymo** | merman | engine |
 |---|---|---|---|---|---|
 | flowchart | 838 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
-| state | 277 | 100/**0** | 91/**91** | 100/**0** | own ⭐ |
 | sequence | 293 | 100/100 | 100/**100** | 99/99 | own |
-| class | 196 | 100/2 | 98/**0** | 98/**0** | — |
-| er | 85 | 100/0 | 100/**0** | 100/**0** | — |
-| block | 119 | 100/0 | 100/**0** | 100/**0** | — |
+| state | 277 | 100/**0** | 91/**91** | 100/**0** | own ⭐ |
+| class | 196 | 100/2 | 100/**100** | 98/**0** | own ⭐ |
+| er | 85 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
+| block | 119 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | kanban | 82 | 100/0 | 100/**0** | 100/**0** | — |
 | mindmap | 107 | 100/0 | 100/**0** | 100/**0** | — |
 | requirement | 48 | 100/0 | 100/**0** | 100/**0** | — |
@@ -58,11 +56,11 @@ count; recall is over a ≤50-source sample.
 | diagram | sources | mermaid.js | **kymo** | merman | engine |
 |---|---|---|---|---|---|
 | flowchart | 136 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
-| state | 67 | 100/**0** | 87/**87** | 94/**0** | own ⭐ |
 | sequence | 140 | 100/100 | 100/**100** | 89/89 | own |
-| class | 84 | 100/0 | 100/**0** | 100/**0** | — |
-| er | 52 | 100/0 | 90/**0** | 90/**0** | — |
-| block | 36 | 100/0 | 100/**0** | 100/**0** | — |
+| state | 67 | 100/**0** | 87/**87** | 94/**0** | own ⭐ |
+| class | 84 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
+| er | 52 | 100/**0** | 100/**100** | 90/**0** | own ⭐ |
+| block | 36 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | kanban | 10 | 100/0 | 100/**0** | 100/**0** | — |
 | mindmap | 19 | 100/0 | 100/**0** | 100/**0** | — |
 | requirement | 31 | 100/0 | 100/**0** | 100/**0** | — |
@@ -75,35 +73,38 @@ count; recall is over a ≤50-source sample.
 | diagram | sources | mermaid.js | **kymo** | merman | engine |
 |---|---|---|---|---|---|
 | flowchart | 53 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
-| state | 3 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
 | sequence | 3 | 100/100 | 100/**100** | 100/100 | own |
-| class 2, er 1, block 4, kanban 4, mindmap 1, requirement 1 | — | 100/0 | 100/**0** | 100/**0** | — |
+| state | 3 | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
+| class 2, er 1, block 4 | — | 100/**0** | 100/**100** | 100/**0** | own ⭐ |
+| kanban 4, mindmap 1, requirement 1 | — | 100/0 | 100/**0** | 100/**0** | — |
 | gitgraph | 1 | 100/100 | 40/40 | 40/40 | — |
 | c4, gantt, info, journey, packet, pie, quadrant, radar, sankey, timeline, xychart | 1–2 | 100/100 | 100/100 | 100/100 | — |
 
 ## Findings
 
-1. **In a browser, every tool shows the labels** (~100 across the board). The
-   difference is entirely in **serverless rasterisation**.
-2. **flowchart & state**: kymo is the *only* tool whose labels survive a
-   serverless PNG/PDF — **mermaid.js and merman both 0/raster** (both emit
-   `<foreignObject>`). kymo: flowchart **100**, state **87–100**.
-3. **sequence**: all three are text-based (100/100); kymo perfect, edges out
-   merman (89–99).
-4. **class, er, block, kanban, mindmap, requirement**: **100 browser, 0 raster**
-   for *every* tool — these labels vanish in any serverless PNG/PDF today (kymo
-   routes to merman). **Next targets** — class & er (UML) are the highest value.
-5. **~14 types are 100/100 everywhere** — already raster-safe, no work needed.
+1. **In a browser, every tool shows the labels** (~100). The difference is
+   entirely in **serverless rasterisation**.
+2. **kymo's six own engines** — flowchart, sequence, state, **class, er, block** —
+   keep their labels in a serverless PNG/PDF where **mermaid.js and merman both
+   score 0/raster** (both emit `<foreignObject>`). kymo is the only
+   serverless-raster-safe renderer for these. Sequence is text-based in all three;
+   kymo still edges out merman.
+3. **kanban, mindmap, requirement** are now the *only* types lost by every tool
+   (100 browser, 0 raster) — the remaining kymo targets.
+4. **~14 types are 100/100 everywhere** — already raster-safe, no work needed.
 
 ## kymo's own engines — accuracy headline (label recall vs mermaid.js, full corpus)
 
-| grammar | n | recall | perfect |
-|---|---|---|---|
-| flowchart | 799 | **100%** | **100%** |
-| sequence | 410 | **100%** | **100%** |
-| state | 322 | 88.9% | 78% |
+| grammar | recall | perfect |
+|---|---|---|
+| flowchart | **100%** | **100%** |
+| sequence | **100%** | **100%** |
+| class | **100%** | **100%** |
+| er | **100%** | **100%** |
+| block | **100%** | **100%** |
+| state | 88.9% | 78% |
 
-State is lower because its renderer does not draw notes yet (visible in its
-browser column too: 87–91 vs merman's 94–100). 6 fixtures are marked
-`known-divergent.json` (4 legacy ambiguous-syntax + 2 exotic: double-escaped
-KaTeX, decimal autonumber).
+State is lower because its renderer does not draw notes yet. 7 fixtures are
+marked `known-divergent.json` (4 legacy ambiguous-syntax + 3 exotic: double-escaped
+KaTeX, decimal autonumber, mermaid text-wrapping of very long class names — which
+kymo cannot replicate at mermaid's exact pixel metrics).
