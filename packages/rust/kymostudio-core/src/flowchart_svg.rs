@@ -113,6 +113,13 @@ fn node_svg(c: &Component) -> String {
             "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{hh}\"/>",
             cx - hw, cy - hh, 2 * hw, 2 * hh,
         ),
+            Shape::StateStart => {
+                format!("<circle cx=\"{cx}\" cy=\"{cy}\" r=\"8\" fill=\"#334155\"/>")
+            }
+            Shape::StateEnd => format!(
+                "<circle cx=\"{cx}\" cy=\"{cy}\" r=\"9\" fill=\"#ffffff\" stroke=\"#334155\" \
+                 stroke-width=\"1.5\"/><circle cx=\"{cx}\" cy=\"{cy}\" r=\"4.5\" fill=\"#334155\"/>"
+            ),
             _ => {
                 format!(
             "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"6\"/>",

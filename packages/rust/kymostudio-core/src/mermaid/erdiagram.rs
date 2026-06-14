@@ -1,11 +1,12 @@
 //! Parse a Mermaid `erDiagram` into the [`crate::classdiagram`] IR so it reuses
 //! the class-diagram renderer: entities become boxes (name + attribute rows),
-//! relationships become labelled links. Crow's-foot cardinality glyphs are not
+//! relationships become labelled links with crow's-foot cardinality glyphs.
+//! (legacy doc line)
 //! drawn (no text), but every entity name, attribute and relationship label
 //! renders as real `<text>`.
 
 use super::MermaidError;
-use crate::classdiagram::{ClassBox, ClassDiagram, RelKind, Relation};
+use crate::classdiagram::{ClassBox, ClassDiagram, Crow, RelKind, Relation};
 use crate::flowchart::Direction;
 
 /// Parse er-diagram source into a [`ClassDiagram`].
@@ -175,7 +176,13 @@ fn parse_relation(stmt: &str) -> Option<Relation> {
         None => (stmt.trim(), String::new()),
     };
     let (start, end) = find_rel_op(lhs)?;
-    let dashed = lhs[start..end].contains('.'); // non-identifying
+    let conn = &lhs[start..end];
+    let dashed = conn.contains('.'); // non-identifying
+                                     // `<left><dashes><right>` — classify each end's crow's-foot glyph.
+    let l_end = conn.find(['-', '.']).unwrap_or(conn.len());
+    let r_start = conn.rfind(['-', '.']).map_or(conn.len(), |i| i + 1);
+    let from_crow = crow_of(&conn[..l_end]);
+    let to_crow = crow_of(&conn[r_start..]);
     let from = lhs[..start].trim().trim_matches('"').to_string();
     let to = lhs[end..].trim().trim_matches('"').to_string();
     if from.is_empty() || to.is_empty() {
@@ -190,7 +197,21 @@ fn parse_relation(stmt: &str) -> Option<Relation> {
         label,
         from_card: String::new(),
         to_card: String::new(),
+        from_crow,
+        to_crow,
     })
+}
+
+/// Map a crow's-foot cardinality token (`||`, `o{`, `}|`, …) to its glyph.
+fn crow_of(tok: &str) -> Crow {
+    let foot = tok.contains('{') || tok.contains('}');
+    let zero = tok.contains('o');
+    match (foot, zero) {
+        (true, true) => Crow::ZeroMany,
+        (true, false) => Crow::OneMany,
+        (false, true) => Crow::ZeroOne,
+        (false, false) => Crow::One,
+    }
 }
 
 #[cfg(test)]
