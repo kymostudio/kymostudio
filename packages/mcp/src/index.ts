@@ -72,13 +72,32 @@ async function ensureDeletedColumn(env: Env) {
   deletedColReady = true;
 }
 
-async function listIndex(env: Env, email: string): Promise<IdxEntry[]> {
+// `project_id` adds a PROJECT layer ABOVE folders: a project owns many folders
+// (workspaces) + diagrams. Added after both tables shipped — self-migrate
+// idempotently like the columns above. Pre-projects rows have project_id NULL;
+// they are adopted into the user's default project lazily (see
+// `ensureDefaultProject`), and default-scoped lists also sweep in NULL rows so
+// an editor that doesn't yet send `?project=` keeps seeing everything.
+let projectColsReady = false;
+async function ensureProjectColumns(env: Env) {
+  if (projectColsReady) return;
+  try { await env.DB.prepare("CREATE TABLE IF NOT EXISTS projects (id TEXT PRIMARY KEY, owner TEXT, name TEXT, created_at INTEGER, deleted INTEGER)").run(); } catch {}
+  try { await env.DB.prepare("ALTER TABLE workspaces ADD COLUMN project_id TEXT").run(); } catch {}
+  try { await env.DB.prepare("ALTER TABLE diagrams ADD COLUMN project_id TEXT").run(); } catch {}
+  projectColsReady = true;
+}
+
+async function listIndex(env: Env, email: string, proj?: ProjectScope): Promise<IdxEntry[]> {
   await migrateKvToD1(env, email);
   await ensureThumbColumn(env);
   await ensureDeletedColumn(env);
-  const rs = await env.DB.prepare(
-    "SELECT id, title, kind, ws, updated_at, (thumb IS NOT NULL AND thumb != '') AS has_thumb FROM diagrams WHERE owner = ?1 AND deleted IS NULL ORDER BY updated_at DESC"
-  ).bind(email).all<{ id: string; title: string; kind: string; ws: string; updated_at: number; has_thumb: number }>();
+  await ensureProjectColumns(env);
+  const scope = proj ? (proj.isDefault ? " AND (project_id = ?2 OR project_id IS NULL)" : " AND project_id = ?2") : "";
+  const stmt = env.DB.prepare(
+    `SELECT id, title, kind, ws, updated_at, (thumb IS NOT NULL AND thumb != '') AS has_thumb FROM diagrams WHERE owner = ?1 AND deleted IS NULL${scope} ORDER BY updated_at DESC`
+  );
+  const rs = await (proj ? stmt.bind(email, proj.id) : stmt.bind(email))
+    .all<{ id: string; title: string; kind: string; ws: string; updated_at: number; has_thumb: number }>();
   return (rs.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind, ws: r.ws, updatedAt: r.updated_at, hasThumb: !!r.has_thumb }));
 }
 
@@ -197,12 +216,15 @@ async function migrateKvToD1(env: Env, email: string) {
 // ---- Folders: a tree of named groups (D1 `workspaces` rows; parent_id "" = a
 // root folder). A diagram's `ws` is its parent-folder id ("" = root level). ----
 type Workspace = { id: string; name: string; parentId: string; createdAt: number };
-async function listWorkspaces(env: Env, email: string): Promise<Workspace[]> {
+async function listWorkspaces(env: Env, email: string, proj?: ProjectScope): Promise<Workspace[]> {
   await migrateKvToD1(env, email);
   await ensureFolderColumn(env);
   await ensureDeletedColumn(env);
-  const rs = await env.DB.prepare("SELECT id, name, parent_id, created_at FROM workspaces WHERE owner = ?1 AND deleted IS NULL ORDER BY created_at")
-    .bind(email).all<{ id: string; name: string; parent_id: string | null; created_at: number }>();
+  await ensureProjectColumns(env);
+  const scope = proj ? (proj.isDefault ? " AND (project_id = ?2 OR project_id IS NULL)" : " AND project_id = ?2") : "";
+  const stmt = env.DB.prepare(`SELECT id, name, parent_id, created_at FROM workspaces WHERE owner = ?1 AND deleted IS NULL${scope} ORDER BY created_at`);
+  const rs = await (proj ? stmt.bind(email, proj.id) : stmt.bind(email))
+    .all<{ id: string; name: string; parent_id: string | null; created_at: number }>();
   return (rs.results ?? []).map((r) => ({ id: r.id, name: r.name, parentId: r.parent_id || "", createdAt: r.created_at }));
 }
 
@@ -231,6 +253,55 @@ async function assignWorkspace(env: Env, email: string, diagramId: string, ws: s
   } else {
     await env.DB.prepare("UPDATE diagrams SET ws = '' WHERE id = ?1 AND owner = ?2").bind(diagramId, email).run();
   }
+}
+
+// ---- Projects: the layer ABOVE folders. A project owns many folders + diagrams
+// (D1 `projects` rows; `project_id` columns on workspaces + diagrams). ----
+type Project = { id: string; name: string; createdAt: number };
+// The resolved project a request is scoped to. `isDefault` = the user's oldest
+// project, which also owns pre-projects rows (project_id NULL) for back-compat.
+type ProjectScope = { id: string; isDefault: boolean };
+
+// Ensure the user has at least one project. On first use create "Personal" and
+// ADOPT every pre-projects row (project_id IS NULL) into it, so existing folders
+// + diagrams keep showing. Returns the default (oldest) project's id.
+async function ensureDefaultProject(env: Env, email: string): Promise<string> {
+  await ensureProjectColumns(env);
+  const row = await env.DB.prepare("SELECT id FROM projects WHERE owner = ?1 AND deleted IS NULL ORDER BY created_at LIMIT 1")
+    .bind(email).first<{ id: string }>();
+  if (row) return row.id;
+  const id = crypto.randomUUID().slice(0, 8);
+  await env.DB.prepare("INSERT INTO projects (id, owner, name, created_at) VALUES (?1, ?2, 'Personal', ?3)")
+    .bind(id, email, Date.now()).run();
+  await env.DB.prepare("UPDATE workspaces SET project_id = ?1 WHERE owner = ?2 AND project_id IS NULL").bind(id, email).run();
+  await env.DB.prepare("UPDATE diagrams SET project_id = ?1 WHERE owner = ?2 AND project_id IS NULL").bind(id, email).run();
+  return id;
+}
+
+async function listProjects(env: Env, email: string): Promise<Project[]> {
+  await ensureDefaultProject(env, email);
+  const rs = await env.DB.prepare("SELECT id, name, created_at FROM projects WHERE owner = ?1 AND deleted IS NULL ORDER BY created_at")
+    .bind(email).all<{ id: string; name: string; created_at: number }>();
+  return (rs.results ?? []).map((r) => ({ id: r.id, name: r.name, createdAt: r.created_at }));
+}
+
+// Resolve the project to scope a request to. Explicit `?project=<id>` must be
+// owned + live; omitted → the user's default project. An editor that never
+// sends `project` thus always lands on the default → it keeps working unchanged.
+async function resolveProject(env: Env, email: string, projectId: string | null): Promise<ProjectScope | null> {
+  const def = await ensureDefaultProject(env, email);
+  if (!projectId) return { id: def, isDefault: true };
+  const row = await env.DB.prepare("SELECT id FROM projects WHERE id = ?1 AND owner = ?2 AND deleted IS NULL").bind(projectId, email).first();
+  if (!row) return null;
+  return { id: projectId, isDefault: projectId === def };
+}
+
+// Move a diagram to a project (NULL/"" leaves it where it is — no-op guard at call site).
+async function assignProject(env: Env, email: string, diagramId: string, projectId: string) {
+  await env.DB.prepare(
+    `INSERT INTO diagrams (id, owner, project_id, updated_at) VALUES (?1, ?2, ?3, ?4)
+     ON CONFLICT(id) DO UPDATE SET project_id = ?3`
+  ).bind(diagramId, email, projectId, Date.now()).run();
 }
 
 // ---- One diagram = one EditorRoom DO (keyed by diagram id). Owner-scoped. ----
@@ -540,7 +611,7 @@ export default {
       return roomFor(env, d).fetch(request);
     }
     // Browser-callable APIs for the signed-in user (Google id_token).
-    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/trash") {
+    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/projects" || url.pathname === "/api/trash") {
       const cors: Record<string, string> = {
         "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
@@ -586,14 +657,18 @@ export default {
       if (url.pathname === "/api/trash") {
         await ensureFolderColumn(env);
         await ensureDeletedColumn(env);
+        await ensureProjectColumns(env);
         if (request.method === "GET") {
           const d = await env.DB.prepare("SELECT id, title, kind, deleted FROM diagrams WHERE owner = ?1 AND deleted IS NOT NULL ORDER BY deleted DESC")
             .bind(email).all<{ id: string; title: string; kind: string; deleted: number }>();
           const f = await env.DB.prepare("SELECT id, name, deleted FROM workspaces WHERE owner = ?1 AND deleted IS NOT NULL ORDER BY deleted DESC")
             .bind(email).all<{ id: string; name: string; deleted: number }>();
+          const p = await env.DB.prepare("SELECT id, name, deleted FROM projects WHERE owner = ?1 AND deleted IS NOT NULL ORDER BY deleted DESC")
+            .bind(email).all<{ id: string; name: string; deleted: number }>();
           return Response.json({
             diagrams: (d.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind, deletedAt: r.deleted })),
             folders: (f.results ?? []).map((r) => ({ id: r.id, name: r.name, deletedAt: r.deleted })),
+            projects: (p.results ?? []).map((r) => ({ id: r.id, name: r.name, deletedAt: r.deleted })),
           }, { headers: cors });
         }
         if (request.method === "POST") { // restore
@@ -619,6 +694,13 @@ export default {
             if (parent && !parentActive) await env.DB.prepare("UPDATE workspaces SET parent_id = '' WHERE id = ?1 AND owner = ?2").bind(b.id, email).run();
             return Response.json({ ok: true }, { headers: cors });
           }
+          if (b.kind === "project") {
+            // restore the project + everything inside it (folders + diagrams)
+            await env.DB.prepare("UPDATE projects SET deleted = NULL WHERE id = ?1 AND owner = ?2").bind(b.id, email).run();
+            await env.DB.prepare("UPDATE workspaces SET deleted = NULL WHERE owner = ?1 AND project_id = ?2").bind(email, b.id).run();
+            await env.DB.prepare("UPDATE diagrams SET deleted = NULL WHERE owner = ?1 AND project_id = ?2").bind(email, b.id).run();
+            return Response.json({ ok: true }, { headers: cors });
+          }
           return Response.json({ error: "bad kind" }, { status: 400, headers: cors });
         }
         if (request.method === "DELETE") { // purge permanently
@@ -626,11 +708,18 @@ export default {
             const d = (await env.DB.prepare("SELECT id FROM diagrams WHERE owner = ?1 AND deleted IS NOT NULL").bind(email).all<{ id: string }>()).results ?? [];
             await Promise.all(d.map((r) => hardDeleteDiagram(env, email, r.id)));
             await env.DB.prepare("DELETE FROM workspaces WHERE owner = ?1 AND deleted IS NOT NULL").bind(email).run();
+            await env.DB.prepare("DELETE FROM projects WHERE owner = ?1 AND deleted IS NOT NULL").bind(email).run();
             return Response.json({ ok: true }, { headers: cors });
           }
           const id = url.searchParams.get("id") || "";
           if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
-          if (url.searchParams.get("kind") === "folder") {
+          if (url.searchParams.get("kind") === "project") {
+            // purge the project + every folder + diagram inside it
+            const dl = (await env.DB.prepare("SELECT id FROM diagrams WHERE owner = ?1 AND project_id = ?2").bind(email, id).all<{ id: string }>()).results ?? [];
+            await Promise.all(dl.map((r) => hardDeleteDiagram(env, email, r.id)));
+            await env.DB.prepare("DELETE FROM workspaces WHERE owner = ?1 AND project_id = ?2").bind(email, id).run();
+            await env.DB.prepare("DELETE FROM projects WHERE owner = ?1 AND id = ?2").bind(email, id).run();
+          } else if (url.searchParams.get("kind") === "folder") {
             const all = (await env.DB.prepare("SELECT id, parent_id FROM workspaces WHERE owner = ?1").bind(email)
               .all<{ id: string; parent_id: string | null }>()).results ?? [];
             const sub = new Set<string>([id]);
@@ -647,6 +736,45 @@ export default {
         return Response.json({ error: "method not allowed" }, { status: 405, headers: cors });
       }
 
+      if (url.pathname === "/api/projects") {
+        await ensureProjectColumns(env);
+        if (request.method === "POST") {
+          const b = (await request.json().catch(() => ({}))) as { name?: string };
+          const name = (b.name || "").trim().slice(0, 40);
+          if (!name) return Response.json({ error: "missing name" }, { status: 400, headers: cors });
+          await ensureDefaultProject(env, email); // keep "Personal" as the oldest/default
+          const p: Project = { id: crypto.randomUUID().slice(0, 8), name, createdAt: Date.now() };
+          await env.DB.prepare("INSERT INTO projects (id, owner, name, created_at) VALUES (?1, ?2, ?3, ?4)")
+            .bind(p.id, email, p.name, p.createdAt).run();
+          return Response.json({ ok: true, project: p }, { headers: cors });
+        }
+        if (request.method === "PATCH") {
+          const b = (await request.json().catch(() => ({}))) as { id?: string; name?: string };
+          if (!b.id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+          const name = (b.name || "").trim().slice(0, 40);
+          if (!name) return Response.json({ error: "missing name" }, { status: 400, headers: cors });
+          const res = await env.DB.prepare("UPDATE projects SET name = ?1 WHERE id = ?2 AND owner = ?3 AND deleted IS NULL")
+            .bind(name, b.id, email).run();
+          if (!res.meta.changes) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+          return Response.json({ ok: true }, { headers: cors });
+        }
+        if (request.method === "DELETE") {
+          // Soft-delete a project AND cascade to its folders + diagrams. Always
+          // keep at least one project (can't delete your last one).
+          const id = url.searchParams.get("id") || "";
+          if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
+          const projs = await listProjects(env, email);
+          if (!projs.some((p) => p.id === id)) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+          if (projs.length <= 1) return Response.json({ error: "cannot delete your only project" }, { status: 400, headers: cors });
+          const now = Date.now();
+          await env.DB.prepare("UPDATE diagrams SET deleted = ?1 WHERE owner = ?2 AND project_id = ?3 AND deleted IS NULL").bind(now, email, id).run();
+          await env.DB.prepare("UPDATE workspaces SET deleted = ?1 WHERE owner = ?2 AND project_id = ?3 AND deleted IS NULL").bind(now, email, id).run();
+          await env.DB.prepare("UPDATE projects SET deleted = ?1 WHERE id = ?2 AND owner = ?3").bind(now, id, email).run();
+          return Response.json({ ok: true }, { headers: cors });
+        }
+        return Response.json({ projects: await listProjects(env, email) }, { headers: cors });
+      }
+
       if (url.pathname === "/api/workspaces") {
         await ensureFolderColumn(env);
         if (request.method === "POST") {
@@ -659,9 +787,11 @@ export default {
             const p = await env.DB.prepare("SELECT id FROM workspaces WHERE id = ?1 AND owner = ?2").bind(parentId, email).first();
             if (!p) return Response.json({ error: "parent not found" }, { status: 400, headers: cors });
           }
+          const proj = await resolveProject(env, email, url.searchParams.get("project"));
+          if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
           const ws: Workspace = { id: crypto.randomUUID().slice(0, 8), name, parentId, createdAt: Date.now() };
-          await env.DB.prepare("INSERT INTO workspaces (id, owner, name, parent_id, created_at) VALUES (?1, ?2, ?3, ?4, ?5)")
-            .bind(ws.id, email, ws.name, parentId, ws.createdAt).run();
+          await env.DB.prepare("INSERT INTO workspaces (id, owner, name, parent_id, project_id, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)")
+            .bind(ws.id, email, ws.name, parentId, proj.id, ws.createdAt).run();
           return Response.json({ ok: true, workspace: ws }, { headers: cors });
         }
         if (request.method === "PATCH") {
@@ -703,7 +833,11 @@ export default {
           await env.DB.prepare(`UPDATE workspaces SET deleted = ?1 WHERE owner = ?2 AND id IN (${ids.map((_, i) => `?${i + 3}`).join(",")})`).bind(Date.now(), email, ...ids).run();
           return Response.json({ ok: true }, { headers: cors });
         }
-        return Response.json({ workspaces: await listWorkspaces(env, email) }, { headers: cors });
+        {
+          const proj = await resolveProject(env, email, url.searchParams.get("project"));
+          if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
+          return Response.json({ workspaces: await listWorkspaces(env, email, proj) }, { headers: cors });
+        }
       }
 
       if (request.method === "DELETE") {
@@ -714,8 +848,8 @@ export default {
         return Response.json({ ok: true }, { headers: cors });
       }
       if (request.method === "PATCH") {
-        // move a diagram to a folder ("" = root) and/or rename it
-        const b = (await request.json().catch(() => ({}))) as { id?: string; ws?: string; title?: string };
+        // move a diagram to a folder ("" = root) and/or another project and/or rename it
+        const b = (await request.json().catch(() => ({}))) as { id?: string; ws?: string; title?: string; project?: string };
         if (!b.id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
         if (b.title !== undefined) {
           const title = (b.title || "").trim().slice(0, 60) || "Untitled";
@@ -725,6 +859,15 @@ export default {
           await roomFor(env, b.id).fetch("https://room/set", {
             method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ owner: email, id: b.id, title }),
           }).catch(() => {});
+        }
+        if (b.project !== undefined && b.project) {
+          // moving across projects also clears the folder (folders are project-local)
+          const proj = await resolveProject(env, email, b.project);
+          if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
+          const owned = await env.DB.prepare("SELECT 1 FROM diagrams WHERE id = ?1 AND owner = ?2").bind(b.id, email).first();
+          if (!owned) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
+          await assignProject(env, email, b.id, proj.id);
+          if (b.ws === undefined) await env.DB.prepare("UPDATE diagrams SET ws = '' WHERE id = ?1 AND owner = ?2").bind(b.id, email).run();
         }
         if (b.ws !== undefined) await assignWorkspace(env, email, b.id, b.ws || "");
         return Response.json({ ok: true }, { headers: cors });
@@ -740,9 +883,12 @@ export default {
         ).bind(email, like).all<{ id: string; title: string; kind: string }>();
         return Response.json({ diagrams: (rs.results ?? []).map((r) => ({ id: r.id, title: r.title, kind: r.kind })) }, { headers: cors });
       }
-      const diagrams = await listIndex(env, email); // migrate runs here first, so workspaces sees D1 rows
-      const workspaces = await listWorkspaces(env, email);
-      return Response.json({ email, diagrams, workspaces }, { headers: cors });
+      const proj = await resolveProject(env, email, url.searchParams.get("project"));
+      if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
+      const diagrams = await listIndex(env, email, proj); // migrate runs here first, so workspaces sees D1 rows
+      const workspaces = await listWorkspaces(env, email, proj);
+      const projects = await listProjects(env, email);
+      return Response.json({ email, diagrams, workspaces, projects, project: proj.id }, { headers: cors });
     }
     // Public caching proxy for kroki.io renders: POST /api/render/<kind>/svg with
     // the diagram source as the body (mirrors kroki's own API). kroki renders
