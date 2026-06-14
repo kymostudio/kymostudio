@@ -9,6 +9,7 @@
 //! Coordinates are NOT assigned here; `layout.rs` does that (Mermaid carries no
 //! geometry, unlike a `.bpmn` import). See FEAT-MERMAID-001 / MERMAID-MAP-001.
 
+mod blockdiagram;
 mod classdiagram;
 mod erdiagram;
 mod lexer;
@@ -222,6 +223,11 @@ pub fn parse_class(src: &str) -> Result<crate::classdiagram::ClassDiagram, Merma
 /// Parse a Mermaid `erDiagram` into the class-diagram IR (reusing the renderer).
 pub fn parse_er(src: &str) -> Result<crate::classdiagram::ClassDiagram, MermaidError> {
     erdiagram::parse(src)
+}
+
+/// Parse a Mermaid `block` / `block-beta` diagram into the flowchart IR.
+pub fn parse_block(src: &str) -> Result<Flowchart, MermaidError> {
+    blockdiagram::parse(src)
 }
 
 pub fn parse_state(src: &str) -> Result<Flowchart, MermaidError> {
