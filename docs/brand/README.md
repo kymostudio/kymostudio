@@ -88,7 +88,8 @@ lockups are outlined — see below.)
 
 `wordmark.svg` avoids this caveat entirely: its wordmark + tagline are **outlined
 to `<path>`** (via `tools/outline_wordmark.py`, which HarfBuzz-shapes the text in
-the SF NS Rounded system VF at weight 900/500 and bakes the glyph outlines), so it
+**SF Pro Rounded** Black 900 / Medium 500 — the same static faces the old hero PNG
+used — and bakes the glyph outlines), so it
 renders identically in every browser with no font installed — the same reason
 `favicon.svg` is outlined. Re-run that script after any wordmark/tagline change.
 

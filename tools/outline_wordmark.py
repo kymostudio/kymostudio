@@ -12,15 +12,17 @@ Requires (run on macOS, where the rounded system font lives):
     .venv/bin/python tools/outline_wordmark.py
 Edit text/geometry/weights below, then re-run.
 """
-import io
 import os
 from fontTools.ttLib import TTFont
-from fontTools.varLib import instancer
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 import uharfbuzz as hb
 
-SRC = "/System/Library/Fonts/SFNSRounded.ttf"  # macOS "SF …Rounded" variable font
+# The exact static faces the original github-hero PNG was rendered with
+# (fc-match "SF Pro Rounded:weight=210" → Black; tagline is Medium). Using these
+# keeps the outlined lockup identical to the historical hero.
+FONT_BLACK = "/Library/Fonts/SF-Pro-Rounded-Black.otf"   # wordmark (Black 900)
+FONT_MEDIUM = "/Library/Fonts/SF-Pro-Rounded-Medium.otf"  # tagline  (Medium 500)
 BRAND = os.path.join(os.path.dirname(__file__), "..", "docs", "brand")
 
 # layout (matches the github-hero geometry): baseline + size per run
@@ -33,11 +35,10 @@ VARIANTS = [
 ]
 
 
-def instanced(wght):
-    f = TTFont(SRC)
-    instancer.instantiateVariableFont(f, {"wght": wght, "GRAD": 400}, inplace=True)
-    buf = io.BytesIO(); f.save(buf)
-    return f, buf.getvalue()
+def load(path):
+    with open(path, "rb") as fh:
+        raw = fh.read()
+    return TTFont(path), raw
 
 
 def run_path(tt, raw, text, x, baseline, size):
@@ -58,8 +59,8 @@ def run_path(tt, raw, text, x, baseline, size):
     return pen.getCommands(), penx
 
 
-ttB, rawB = instanced(900)
-ttM, rawM = instanced(500)
+ttB, rawB = load(FONT_BLACK)
+ttM, rawM = load(FONT_MEDIUM)
 d_kymo, x_mid = run_path(ttB, rawB, "kymo", WX, WY, WSZ)
 d_studio, x_end = run_path(ttB, rawB, "studio", x_mid, WY, WSZ)
 d_tag, t_end = run_path(ttM, rawM, "Diagram superpowers", TX, TY, TSZ)
