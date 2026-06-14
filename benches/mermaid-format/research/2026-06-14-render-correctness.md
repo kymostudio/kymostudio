@@ -65,6 +65,36 @@ circle+foot at ORDER, matching exactly.
 - Re-rendered samples confirm every glyph appears: class ▽◇ + `1`/`*`,
   requirement arrow, er `||`/`o{`/`|{`, state filled-dot vs bullseye.
 
+## The 12 already-raster-safe types — verified correct, no engine needed
+
+The recall table lists ~14 types at 100/100 in every tool (c4, gantt, info,
+journey, packet, pie, quadrant, radar, sankey, timeline, treemap, xychart).
+These have **no kymo own-engine** — they fall through `SELF_RENDERERS.mermaid`
+to merman (`mermaidRenderSvg`). The natural worry after the class/er/state
+findings: are they *correct*, or just raster-safe? Ran the same visual pass —
+merman SVG → resvg PNG (the real deploy path) vs mermaid.js.
+
+| type | merman render (kymo's deploy path) | `<foreignObject>` | verdict |
+|---|---|---|---|
+| pie / xychart / sankey | slices / line+axes / flow band — all labelled | 0 | ✓ |
+| quadrant | title, both axes, 4 quadrant labels, points placed correctly | 0 | ✓ |
+| c4 | boxes + person icon + «stereotype» + arrows + rel labels | 0 | ✓ |
+| packet / treemap | bit-field ranges / value-sized nested boxes | 0 | ✓ |
+| radar | multi-axis, filled curves, legend, grid | 0 | ✓ |
+| gantt / timeline | task bars + sections + date axis / era cards | 0 | ✓ |
+| journey / info | **matches mermaid.js** (the dataset sample is degenerate → title only) | 0 | ✓ |
+
+Every label is native `<text>` (**0 foreignObject** in all of them), so they
+survive resvg/svg2pdf. merman is a direct mermaid.js port, so for these
+chart-style grammars it reproduces both the structure *and* the raster-safety.
+
+**Nothing to build.** This is the opposite of the box types: there, merman
+emitted `<foreignObject>` and kymo *had* to write a text engine; here merman is
+already text-based and faithful. Re-implementing these in kymo would be pure
+waste — confirmed now on the **correctness** axis, not just recall. The two
+"empty-looking" cases (a minimal quadrant, a title-only journey) render
+identically in mermaid.js — the sample, not the renderer, is sparse.
+
 ## Open (layout only — not a semantic error)
 
 - **state**: two opposite transitions between the same pair (`Idle --> Active`,
