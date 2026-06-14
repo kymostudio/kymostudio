@@ -1,7 +1,7 @@
 ---
 title: Editor Share — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KSHARE-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-06-13
 status: Implemented
 classification: Internal
@@ -17,6 +17,7 @@ related_documents:
   - FEAT-KLIVE-001
   - FEAT-KLIBRARY-001
   - FEAT-KEMCP-001
+  - FEAT-KHOME-001
   - FEAT-KRAPI-001
   - REF-KROKI-001
 authors:
@@ -44,7 +45,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KSHARE-001` |
-| Version           | 0.3 |
+| Version           | 0.4 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KRENDER-001` (sibling — render & editing surface), `FEAT-KLIVE-001` (sibling — accounts & live documents), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KEMCP-001` (sibling — MCP channel), `FEAT-KRAPI-001` (the render Worker the Markdown-image GET URL now points at), `REF-KROKI-001` (the encoding it stays compatible with) |
@@ -88,7 +89,7 @@ Sharing must not require sign-in: a reader given a link should see (and tweak) t
 
 ### B.1 Purpose & motivation
 
-Part of the five-module decomposition of the shipped `kymo-editor` (see `FEAT-KEDITOR-001` and `FEAT-KRENDER-001` §B.1 for the rationale and the module tree). This module is the **outbound surface** — the only one a recipient with no account ever touches. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
+Part of the six-module decomposition of the shipped `kymo-editor` (see `FEAT-KEDITOR-001` and `FEAT-KRENDER-001` §B.1 for the rationale and the module tree). This module is the **outbound surface** — the only one a recipient with no account ever touches. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
 
 ### B.2 Document map
 
@@ -96,7 +97,7 @@ Stub doc-set: only this `01-REQUIREMENTS.md` exists. The *how* lives in `DESIGN-
 
 ### B.3 Relationship to the kymo-editor umbrella & sibling modules
 
-See the module tree in `FEAT-KRENDER-001` §B.3 (identical for all five siblings).
+See the module tree in `FEAT-KRENDER-001` §B.3 (identical for all six siblings).
 
 **Re-homing summary (from `FEAT-KEDITOR-001`)** — requirement text carried over verbatim in Part C:
 
@@ -131,7 +132,7 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 |----|-------------|-------------|
 | **FR-SH-01** | The editor SHALL encode share links **kroki-style**: source → raw-deflate (`CompressionStream("deflate")`, zlib) → **base64url** (`+`→`-`, `/`→`_`, padding stripped) → `/?s=<payload>`, with `&k=<kind>` prepended for non-kymo kinds (omitted for kymo). Decoding SHALL accept payloads lifted from kroki.io GET URLs unchanged; an undecodable payload SHALL surface as a status-line error. | SN-SH-02 |
 | **FR-SH-02** | When editing **without a room** (signed out, or a shared link), the editor SHALL keep the address bar a **working share link** — re-encoding into `?s=` via `history.replaceState` on a 300 ms debounce. A `?d=` room link takes precedence over `?s=` when both are present. | SN-SH-02 |
-| **FR-SH-03** | The **Share** action SHALL open a **popover** that copies the share URL to the clipboard immediately on open (with a prompt fallback) and confirms visually. The popover SHALL offer: the URL in a select-on-focus field with a **Copy** button; a **length warning** when the link exceeds 2 000 characters (chat apps may truncate); **Copy Markdown link** (`[<title>](<url>)`); and — for non-kymo kinds — **Copy Markdown image**, a **render.kymo.studio GET** URL (`https://render.kymo.studio/<kind>/svg/<payload>`) built from the same `?s=` payload (the `NFR-SH-01` interchange — render.kymo.studio accepts the Kroki GET encoding — usable directly in a GitHub README). *(v0.2: popover with copy variants + auto-copy replaces the v0.1 single copy-button — commits `6577011`/`607b156`. v0.3: the GET image URL points at **render.kymo.studio** instead of kroki.io — commit `07f7d9a`; and opening Share fires a fire-and-forget **warm-up POST** of the current kind+source to render.kymo.studio — `warmedShare` dedupe, commit `531b5c7` — so the recipient's first paint and GitHub's image fetch hit a warm content-hash cache.)* **Known gap:** a very long source can still produce a GET URL longer than the upstream limit; the 2 000-character warning covers only the editor link, not the GET URL. | SN-SH-01, SN-SH-02 |
+| **FR-SH-03** | The **Share** action SHALL open a **popover** that copies the share URL to the clipboard immediately on open (with a prompt fallback) and confirms visually. The popover SHALL offer: the URL in a select-on-focus field with a **Copy** button; a **length warning** when the link exceeds 2 000 characters (chat apps may truncate); **Copy Markdown link** (`[<title>](<url>)`); and **Copy Markdown image** — shown for **any kind** (render.kymo.studio renders kymo too, so the button is not gated to non-kymo kinds), a **render.kymo.studio GET** URL (`https://render.kymo.studio/<kind>/svg/<payload>`) built from the same `?s=` payload (the `NFR-SH-01` interchange — render.kymo.studio accepts the Kroki GET encoding — usable directly in a GitHub README). *(v0.2: popover with copy variants + auto-copy replaces the v0.1 single copy-button — commits `6577011`/`607b156`. v0.3: the GET image URL points at **render.kymo.studio** instead of kroki.io — commit `07f7d9a`; and opening Share fires a fire-and-forget **warm-up POST** of the current kind+source to render.kymo.studio — `warmedShare` dedupe, commit `531b5c7` — so the recipient's first paint and GitHub's image fetch hit a warm content-hash cache.)* **Known gap:** a very long source can still produce a GET URL longer than the upstream limit; the 2 000-character warning covers only the editor link, not the GET URL. | SN-SH-01, SN-SH-02 |
 
 ### C.2 Functional requirements — Export (`FR-SH-04..06`)
 
@@ -162,3 +163,4 @@ Requirements use RFC-2119 keywords; text is carried over as-built from `FEAT-KED
 | 0.1     | 2026-06-12 | Vũ Anh | Initial **as-built carve-out** from `FEAT-KEDITOR-001` v0.2 under the kymo-editor umbrella decomposition. Re-homes `SN-KE-02/10/11 → SN-SH-01..03`, `FR-KE-25/26/27/03/28/29 → FR-SH-01..06`, `NFR-KE-07 → NFR-SH-01`. Stub doc-set (01 only); design/V&V remain in `DESIGN-KEDITOR-001` / `TEST-KEDITOR-001`. Post-v0.2 share-popover commits noted as the first candidate re-baseline. |
 | 0.2     | 2026-06-12 | Vũ Anh | **Re-baseline `FR-SH-03` to the shipped share popover** (commits `6577011`/`607b156`, P10 in `PLAN-KEDITOR-001` v0.3): auto-copy on open, URL field + Copy, > 2 000-char truncation warning, Copy Markdown link, and Copy Markdown image (kroki.io GET URL from the same `?s=` payload — the `NFR-SH-01` interchange). Recorded the known gap that kroki.io's ~4 k GET URL limit is not separately warned about. Acceptance #2 updated; TC-KE-16 revised in `TEST-KEDITOR-001` v0.3. |
 | 0.3     | 2026-06-13 | Vũ Anh | **render.kymo.studio re-point (P12/P15).** `FR-SH-03`: the **Copy Markdown image** GET URL now targets `https://render.kymo.studio/<kind>/svg/<payload>` (`FEAT-KRAPI-001`) instead of kroki.io (commit `07f7d9a`), preserving the `NFR-SH-01` Kroki-GET encoding interchange; and opening Share fires a **warm-up POST** to render.kymo.studio (`531b5c7`) so the recipient's first paint hits a warm content-hash cache. Acceptance #2 updated. Codec, address-bar autosync, and export paths unchanged. |
+| 0.4     | 2026-06-15 | Vũ Anh | **Reconcile `FR-SH-03` to as-built** (spec-stale fix from the guest-flow audit): **Copy Markdown image** is rendered for **any kind**, not only non-kymo — render.kymo.studio renders kymo too, so the editor does not gate the button. Registered the new sibling `FEAT-KHOME-001` (`related_documents`; six-module tree in `FEAT-KRENDER-001` §B.3). No codec/export change. |

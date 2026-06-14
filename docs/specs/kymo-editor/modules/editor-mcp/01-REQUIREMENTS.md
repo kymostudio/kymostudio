@@ -17,6 +17,7 @@ related_documents:
   - FEAT-KSHARE-001
   - FEAT-KLIVE-001
   - FEAT-KLIBRARY-001
+  - FEAT-KHOME-001
   - FEAT-KMCP-001
   - RES-MCP-001
 authors:
@@ -46,7 +47,7 @@ keywords:
 | Version           | 0.2 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
-| Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KLIVE-001` (sibling — accounts & live documents; this module builds on it), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KRENDER-001` / `FEAT-KSHARE-001` (siblings), `FEAT-KMCP-001` (the **distinct local npx MCP render server** — see §B.3), `RES-MCP-001` (MCP landscape) |
+| Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KLIVE-001` (sibling — accounts & live documents; this module builds on it), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KRENDER-001` / `FEAT-KSHARE-001` / `FEAT-KHOME-001` (siblings), `FEAT-KMCP-001` (the **distinct local npx MCP render server** — see §B.3), `RES-MCP-001` (MCP landscape) |
 
 > **Module of the `kymo-editor` umbrella** (`FEAT-KEDITOR-001`). This module owns the **remote MCP channel** at mcp.kymo.studio: the Google-OAuth gate, the Streamable-HTTP/SSE transports and Worker routing, and the five per-user diagram tools an LLM host drives while the user watches edits land live. It owns the `SN-MC` and `FR-MC` IDs, re-homed as-built from `FEAT-KEDITOR-001` (see §B.3). **Not to be confused with `FEAT-KMCP-001`** — the sibling *local* stdio MCP render server. This is a **stub doc-set** (01 only): the *how* and *V&V* remain in `DESIGN-KEDITOR-001` §8/§10 and `TEST-KEDITOR-001` until this module grows its own 02/03/04.
 
@@ -85,7 +86,7 @@ The original reason kymo-editor grew a Worker at all (P3) was to let an **LLM au
 
 ### B.1 Purpose & motivation
 
-Part of the five-module decomposition of the shipped `kymo-editor` (see `FEAT-KEDITOR-001` and `FEAT-KRENDER-001` §B.1 for the rationale and the module tree). This module is the **agent door** into the `editor-live` spine. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
+Part of the six-module decomposition of the shipped `kymo-editor` (see `FEAT-KEDITOR-001` and `FEAT-KRENDER-001` §B.1 for the rationale and the module tree). This module is the **agent door** into the `editor-live` spine. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
 
 ### B.2 Document map
 
@@ -93,7 +94,7 @@ Stub doc-set: only this `01-REQUIREMENTS.md` exists. The *how* lives in `DESIGN-
 
 ### B.3 Relationship to the kymo-editor umbrella & sibling modules
 
-See the module tree in `FEAT-KRENDER-001` §B.3 (identical for all five siblings). Dependency direction: this module **builds on `editor-live`** — tool identity is the OAuth session's `email`, writes go through the rooms of `FR-LV-04..07`, and ownership refusals are `FR-LV-03`'s.
+See the module tree in `FEAT-KRENDER-001` §B.3 (identical for all six siblings). Dependency direction: this module **builds on `editor-live`** — tool identity is the OAuth session's `email`, writes go through the rooms of `FR-LV-04..07`, and ownership refusals are `FR-LV-03`'s.
 
 **Naming note:** `FEAT-KEMCP-001` (this module — the **remote**, hosted channel at mcp.kymo.studio) is distinct from `FEAT-KMCP-001` (the **local** npx stdio MCP server that renders files on the user's machine, doc-set `docs/specs/kymo-mcp/`). The remote channel edits hosted documents the user is watching; the local server renders local files.
 

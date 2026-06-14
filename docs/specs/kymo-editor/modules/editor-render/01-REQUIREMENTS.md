@@ -17,6 +17,7 @@ related_documents:
   - FEAT-KLIVE-001
   - FEAT-KLIBRARY-001
   - FEAT-KEMCP-001
+  - FEAT-KHOME-001
   - FEAT-FLOWCHART-001
   - FEAT-KYMOJSON-001
   - FEAT-KRAPI-001
@@ -55,7 +56,7 @@ keywords:
 | Version           | 0.4 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
-| Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KSHARE-001` (sibling — sharing & export), `FEAT-KLIVE-001` (sibling — accounts & live documents), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KEMCP-001` (sibling — MCP channel), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine reused unchanged, incl. the in-browser Mermaid `kymo-mermaid` wasm slice), `FEAT-KRAPI-001` (the **render.kymo.studio** Worker non-kymo kinds now POST to), `REF-KROKI-001` (the upstream render gateway, now a fallback) |
+| Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KSHARE-001` (sibling — sharing & export), `FEAT-KLIVE-001` (sibling — accounts & live documents), `FEAT-KLIBRARY-001` (sibling — library & workspaces), `FEAT-KEMCP-001` (sibling — MCP channel), `FEAT-KHOME-001` (sibling — landing / Welcome home), `FEAT-FLOWCHART-001` (the native DSL), `FEAT-KYMOJSON-001` (the engine reused unchanged, incl. the in-browser Mermaid `kymo-mermaid` wasm slice), `FEAT-KRAPI-001` (the **render.kymo.studio** Worker non-kymo kinds now POST to), `REF-KROKI-001` (the upstream render gateway, now a fallback) |
 
 > **Module of the `kymo-editor` umbrella** (`FEAT-KEDITOR-001`). This module owns the **authoring & rendering surface**: the client-side render paths (kymo wasm; **in-browser Mermaid**; **render.kymo.studio** delegation for the other kinds), the 29-kind selector with per-kind samples + **paste auto-detect**, the **zoom/pan preview**, and the editing surface (CodeMirror 6 + pane splitter). It owns the `SN-RD`, `FR-RD`, and `NFR-RD` IDs, re-homed as-built from `FEAT-KEDITOR-001` (see §B.3). This is a **stub doc-set** (01 only): the *how* and *V&V* remain in `DESIGN-KEDITOR-001` §2–5 / §11 and `TEST-KEDITOR-001` until this module grows its own 02/03/04. **Note on the document_id:** `FEAT-KRENDER-001` denotes **this editor module**; the standalone render Worker is `FEAT-KRAPI-001` (re-id'd from a prior `KRENDER` collision, 2026-06-13).
 
@@ -100,7 +101,7 @@ The fastest way to feel a diagram-as-code loop is to type source and watch the d
 
 ### B.1 Purpose & motivation
 
-`kymo-editor` shipped complete (P2–P9, `PLAN-KEDITOR-001` §4). To keep the spec navigable as the product grows, the maintainer is splitting it into **five sibling modules**, mirroring the `canvas-studio` umbrella decomposition (`FEAT-STUDIO-001` → toolbar/export/items). This module is the **authoring & rendering surface** — the part of the product a signed-out, first-time visitor already fully exercises. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
+`kymo-editor` shipped complete (P2–P9, `PLAN-KEDITOR-001` §4). To keep the spec navigable as the product grows, the maintainer is splitting it into **six sibling modules**, mirroring the `canvas-studio` umbrella decomposition (`FEAT-STUDIO-001` → toolbar/export/items). This module is the **authoring & rendering surface** — the part of the product a signed-out, first-time visitor already fully exercises. As an as-built carve-out it re-homes the relevant `FEAT-KEDITOR-001` IDs (§B.3) and changes no behaviour.
 
 ### B.2 Document map
 
@@ -114,7 +115,8 @@ kymo-editor (FEAT-KEDITOR-001) → UMBRELLA — the shipped editor.kymo.studio p
         ├── editor-share          → URL sharing & export                 [as-built]
         ├── editor-live           → accounts, rooms & persistence       [as-built]
         ├── editor-library        → library & workspaces                [as-built]
-        └── editor-mcp            → remote MCP channel                  [as-built]
+        ├── editor-mcp            → remote MCP channel                  [as-built]
+        └── editor-home           → landing / Welcome home              [as-built]
 ```
 
 **Re-homing summary (from `FEAT-KEDITOR-001`)** — requirement text is carried over verbatim in Part C; the umbrella remains the v0.2 baseline of record:
