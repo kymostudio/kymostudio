@@ -15,6 +15,14 @@ share, so SVG→PNG output stays consistent across implementations).
 cargo install kymostudio        # provides the `kymo` binary
 ```
 
+Or install a prebuilt binary with Homebrew (macOS/Linux) — no Rust toolchain
+needed:
+
+```bash
+brew tap kymostudio/brew https://github.com/kymostudio/kymostudio
+brew install kymostudio         # install-name `kymostudio`, command `kymo`
+```
+
 ## Usage
 
 ```bash
