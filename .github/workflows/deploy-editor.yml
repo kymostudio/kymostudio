@@ -14,6 +14,7 @@ on:
       - "packages/editor/web/**"
       - "packages/editor/build.sh"
       - "packages/editor/package.json"
+      - "docs/brand/**" # build.sh bundles logo/wordmark/favicons from here
       - "packages/js/**"
       - "packages/rust/kymostudio-core/**"
       - "packages/rust/kymo-mermaid/**"
