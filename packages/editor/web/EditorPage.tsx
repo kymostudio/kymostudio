@@ -16,7 +16,7 @@ import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } f
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, Trash2, LogOut, ArrowLeft, ArrowRight } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, Trash2, LogOut, ArrowLeft, ArrowRight, PanelLeft, SquareCode, Eye } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -92,6 +92,24 @@ export default function EditorPage() {
   // opening a file closes the panel on phones only (it's a drawer there).
   const closePanelOnPhone = useCallback(() => {
     if (isPhone()) { setActivePanel(null); try { localStorage.setItem("kymo_panel", "none"); } catch {} }
+  }, []);
+
+  // Three-region visibility (VS Code-style): the side Explorer (activePanel) plus
+  // the source editor and the preview. At least one of source/preview stays on.
+  const [panes, setPanes] = useState<{ source: boolean; preview: boolean }>(() => {
+    try { const j = JSON.parse(localStorage.getItem("kymo_panes") || ""); if (j && typeof j.source === "boolean" && typeof j.preview === "boolean") return j; } catch {}
+    return { source: true, preview: true };
+  });
+  const togglePane = useCallback((k: "source" | "preview") => {
+    setPanes((p) => {
+      const next = { ...p, [k]: !p[k] };
+      if (!next.source && !next.preview) return p; // never hide both regions
+      try { localStorage.setItem("kymo_panes", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+  const toggleExplorer = useCallback(() => {
+    setActivePanel((cur) => { const next = cur ? null : "explorer"; try { localStorage.setItem("kymo_panel", next ?? "none"); } catch {} return next; });
   }, []);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
@@ -527,6 +545,16 @@ export default function EditorPage() {
         <div className="spacer" />
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
+          {/* three-region toggles (VS Code-style): Explorer · Source · Preview */}
+          {!showWelcome && !booting && (
+            <div className="pane-toggles mob-hide" role="group" aria-label="Panels">
+              {claims && !shared && (
+                <button className={"pane-tg" + (activePanel ? " on" : "")} onClick={toggleExplorer} title="Toggle Explorer" aria-pressed={!!activePanel}><PanelLeft size={16} strokeWidth={2} /></button>
+              )}
+              <button className={"pane-tg" + (panes.source ? " on" : "")} onClick={() => togglePane("source")} title="Toggle Source" aria-pressed={panes.source}><SquareCode size={16} strokeWidth={2} /></button>
+              <button className={"pane-tg" + (panes.preview ? " on" : "")} onClick={() => togglePane("preview")} title="Toggle Preview" aria-pressed={panes.preview}><Eye size={16} strokeWidth={2} /></button>
+            </div>
+          )}
           {/* draft Save stays a visible CTA when there's unsaved work to rescue */}
           {isDraft && !booting && !showWelcome && (
             <button className="btn-primary mob-hide" onClick={save} title="Save to your Diagrams (⌘/Ctrl-S)">
@@ -646,7 +674,8 @@ export default function EditorPage() {
           <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} onTemplate={pickTemplate} />
         ) : (
           <>
-            <section className="pane" style={{ flex: `0 0 ${split}%` }}>
+            {panes.source && (
+            <section className="pane" style={panes.preview ? { flex: `0 0 ${split}%` } : undefined}>
               <div className="pane-bar">
                 {/* a visible label so the dropdown reads as a 28-format switcher, not a mystery control */}
                 <label className="kind-label" htmlFor="kind-select">Type</label>
@@ -679,14 +708,19 @@ export default function EditorPage() {
               </div>
               <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
-            <div className="splitter" title="Drag to resize · double-click for 50/50"
-              onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />
+            )}
+            {panes.source && panes.preview && (
+              <div className="splitter" title="Drag to resize · double-click for 50/50"
+                onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />
+            )}
+            {panes.preview && (
             <section className="pane">
               {shareError && <div className="share-error">{shareError}</div>}
               {kind === "kymo" && !renderReady && !shareError
                 ? <div className="boot"><KLoader /></div>
                 : <Preview svg={svg} fitKey={(d || "shared") + ":" + kind} />}
             </section>
+            )}
           </>
         )}
         </main>
