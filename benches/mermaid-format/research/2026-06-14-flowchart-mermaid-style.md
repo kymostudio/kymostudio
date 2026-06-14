@@ -227,3 +227,44 @@ flowcharts, dominated by text anti-aliasing a human cannot see.
 
 Remaining non-floor gaps are **features, not fidelity**: `theme:base` palette
 derivation and icon-node rendering.
+
+---
+
+## Correction — the 0.23% "floor" was wrong; ~0% is reachable
+
+An earlier note claimed a hard ~0.23% floor from "HTML `<foreignObject>` text vs
+SVG `<text>` rendering", implying literal 0% is physically impossible. **That was
+an artifact of the wrong text baseline, not a physical limit.**
+
+Sweeping the SVG `<text>` vertical placement against mermaid's own labels:
+
+| baseline strategy | diff vs mermaid |
+|---|---|
+| `dominant-baseline:central` (what we used) | 0.227% |
+| `dominant-baseline:middle` | 0.502% |
+| **alphabetic, `y = centre + 0.30·fontSize`** | **0.003%** |
+
+Chrome rasterises SVG `<text>` and HTML text with the *same* font engine, so at
+the *same* baseline the glyphs are pixel-identical. The fix (committed: node
+labels use the alphabetic baseline at `y = cy + round(0.30·16) = cy + 5`) makes
+labels pixel-align with mermaid. **Text is no longer a floor.**
+
+So the real picture:
+- **~0% is reachable in principle** — mermaid's exact geometry + the correct
+  baseline overlays at **0.003%**.
+- kymo's typical-flowchart residual (~1.2–2%) is **geometry precision**, not text:
+  - **i32 position rounding** — `model::Point` is integer; mermaid uses floats
+    (e.g. node centre 172.65 → 173). Sub-pixel borders differ → ~0.5–0.8%.
+  - Per-shape sizing: rect padding is now exact (mermaid = textWidth + 60, and
+    kymo's per-glyph metric matches mermaid's measured text width); the
+    parallelogram is still ~4px wide.
+  - Edge-curve endpoints and the odd feature gap (icon nodes render as text).
+
+**Path to literal ~0% (kymo Rust):** carry float positions through the dagre
+path (either widen `model::Point` to f64 — but that is the cross-language
+kymojson contract — or add a float-precision SVG renderer for the dagre path that
+bypasses the integer `Diagram`), plus finish per-shape sizing. It is a real,
+well-scoped refactor, not a physical impossibility. The remaining gap below ~1%
+is invisible to the eye (sub-pixel border anti-aliasing), so "visually
+pixel-identical" is already met; closing the last ~1% to a literal 0 is a
+precision-engineering exercise on the geometry pipeline.
