@@ -531,7 +531,7 @@ export default function EditorPage() {
           </span>
         )}
         {isDraft && !booting && !showWelcome && (
-          <span className="save-ind unsaved" title="This draft isn't on the server yet. Save to keep it in your Diagrams (⌘/Ctrl-S). It also lives in this page's URL.">
+          <span className="save-ind unsaved" title="Not saved anywhere yet — this draft only lives in this page's URL. Save to keep it in your Diagrams (⌘/Ctrl-S).">
             {savingDraft ? "Saving…" : "Unsaved"}
           </span>
         )}

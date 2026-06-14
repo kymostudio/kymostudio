@@ -305,6 +305,10 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .wel-tpl-name { font-size: 14px; font-weight: 600; }
 .wel-tpl-via { font-size: 12px; color: var(--dim); }
 .wel-empty { font-size: 13.5px; color: var(--dim); margin: 4px 0 12px; }
+/* Guest "No sign-in needed" note — value-first framing + inline contextual sign-in */
+.wel-note { font-size: 13.5px; line-height: 1.5; color: var(--dim); margin: 4px 0 0; max-width: 36ch; }
+.wel-inline-link { padding: 0; border: 0; background: transparent; color: var(--accent); font: inherit; cursor: pointer; }
+.wel-inline-link:hover { color: var(--accent-deep); text-decoration: underline; }
 .wel-signin { padding: 7px 13px; border: 1px solid var(--border); border-radius: var(--radius-btn); background: var(--bg-soft); color: var(--ink); font: inherit; font-size: 13.5px; cursor: pointer; }
 .wel-signin:hover { background: var(--bg-raise); }
 @media (max-width: 720px) { .wel-cols { grid-template-columns: 1fr; gap: 32px; } .wel-inner { padding: 28px 18px 56px; } }
