@@ -65,6 +65,39 @@ pub(crate) fn node_size_for(label: &str, shape: Shape, style: FlowStyle) -> (i32
     node_size(label, shape, style)
 }
 
+/// Float-precision mermaid node sizing (no rounding) for the dagre path, so the
+/// diagram extent and node centres match mermaid.js to sub-pixel: mermaid sizes a
+/// box to `measured_text_width + padding` exactly (e.g. "Middle" 47.14 + 60 =
+/// 107.14), and the integer [`node_size`] rounds that 0.14 away — enough to push
+/// the total width across an integer boundary and misalign the whole canvas.
+pub(crate) fn node_size_mermaid_f(label: &str, shape: Shape) -> (f64, f64) {
+    let lines: Vec<&str> = label.split('\n').collect();
+    if lines.len() > 1 {
+        let mw = lines
+            .iter()
+            .map(|l| text_w_mermaid(l))
+            .fold(0.0_f64, f64::max);
+        return ((mw + 24.0).max(80.0), lines.len() as f64 * 18.0 + 16.0);
+    }
+    let tw = text_w_mermaid(label);
+    match shape {
+        Shape::Circle => {
+            let d = (tw + 16.0).max(50.0);
+            (d, d)
+        }
+        Shape::Diamond => {
+            let d = (tw + 54.0).max(70.0);
+            (d, d)
+        }
+        Shape::Hex => ((tw + 35.0).max(60.0), 39.0),
+        Shape::Parallelogram | Shape::ParallelogramAlt | Shape::Trapezoid | Shape::TrapezoidAlt => {
+            ((tw + 55.0).max(70.0), 39.0)
+        }
+        Shape::Cylinder | Shape::Badge | Shape::Box => ((tw + 30.0).max(56.0), 54.0),
+        _ => ((tw + 60.0).max(70.0), 54.0),
+    }
+}
+
 fn node_size(label: &str, shape: Shape, style: FlowStyle) -> (i32, i32) {
     // Multi-line labels (class / er boxes) size by their widest line and row
     // count; single-line labels keep the original shape-based sizing.

@@ -14,7 +14,7 @@ use crate::style::{FlowStyle, NodeStyle};
 use std::collections::HashMap as StyleMap;
 use std::collections::HashMap;
 
-const STYLE: &str = "\
+pub(crate) const STYLE: &str = "\
 text{fill:#1f2937}\
 .bg-grid{fill:url(#dot-grid)}\
 .fc-shape{fill:#eff6ff;stroke:#3b82f6;stroke-width:1.6}\
@@ -27,7 +27,7 @@ paint-order:stroke;stroke:#fafafa;stroke-width:4;stroke-linejoin:round}\
 .region-label{font-size:11px;font-weight:500;fill:#475569;\
 paint-order:stroke;stroke:#eaf3ff;stroke-width:3}";
 
-const DEFS: &str = "\
+pub(crate) const DEFS: &str = "\
 <marker id=\"arrow\" viewBox=\"0 0 12 10\" refX=\"11\" refY=\"5\" markerWidth=\"11\" markerHeight=\"11\" \
 orient=\"auto\" markerUnits=\"userSpaceOnUse\">\
 <path d=\"M2,1 L11,5 L2,9\" fill=\"none\" stroke=\"#64748b\" stroke-width=\"1.6\" \
@@ -35,12 +35,12 @@ stroke-linecap=\"round\" stroke-linejoin=\"round\"/></marker>\
 <pattern id=\"dot-grid\" width=\"24\" height=\"24\" patternUnits=\"userSpaceOnUse\">\
 <circle cx=\"1.5\" cy=\"1.5\" r=\"1.2\" fill=\"#0f172a\" fill-opacity=\"0.05\"/></pattern>";
 
-const FONT_KYMO: &str =
+pub(crate) const FONT_KYMO: &str =
     "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
-const FONT_MERMAID: &str = "'trebuchet ms', verdana, arial, sans-serif";
+pub(crate) const FONT_MERMAID: &str = "'trebuchet ms', verdana, arial, sans-serif";
 
 /// mermaid.js default theme: lavender nodes, purple borders, `#333` edges.
-const STYLE_MERMAID: &str = "\
+pub(crate) const STYLE_MERMAID: &str = "\
 text{fill:#333333}\
 .fc-shape{fill:#ECECFF;stroke:#9370DB;stroke-width:1}\
 .fc-shape-line{fill:none;stroke:#9370DB;stroke-width:1}\
@@ -49,10 +49,10 @@ text{fill:#333333}\
 .edge-label{font-size:16px;fill:#333333;text-anchor:middle;\
 paint-order:stroke;stroke:#e8e8e8;stroke-width:5;stroke-linejoin:round}\
 .region-rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1}\
-.region-label{font-size:12px;fill:#333333;paint-order:stroke;stroke:#ffffde;stroke-width:3}";
+.region-label{font-size:16px;fill:#333333;paint-order:stroke;stroke:#ffffde;stroke-width:3}";
 
 /// mermaid arrowhead: a filled triangle (vs kymo's open chevron); no dot grid.
-const DEFS_MERMAID: &str = "\
+pub(crate) const DEFS_MERMAID: &str = "\
 <marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"8\" markerHeight=\"8\" \
 orient=\"auto\" markerUnits=\"userSpaceOnUse\">\
 <path d=\"M0,0 L10,5 L0,10 z\" fill=\"#333333\"/></marker>";
@@ -362,7 +362,7 @@ fn region_rect(r: &Region, style: FlowStyle) -> String {
     }
     let (x, y, w, h) = r.bounds;
     let rx = match style {
-        FlowStyle::Mermaid => 6,
+        FlowStyle::Mermaid => 0,
         FlowStyle::Kymo => 12,
     };
     format!("<rect class=\"region-rect\" x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"{rx}\"/>\n")
@@ -439,7 +439,7 @@ fn smooth_path(pts: &[(i32, i32)]) -> String {
 }
 
 /// Escape `& < >` for XML text content.
-fn esc(s: &str) -> String {
+pub(crate) fn esc(s: &str) -> String {
     s.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")

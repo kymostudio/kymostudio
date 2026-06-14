@@ -1,55 +1,55 @@
 //! Dagre-based flowchart layout — a mermaid-faithful alternative to the native
 //! Sugiyama layout in [`crate::layout`]. Builds a dagre graph from the
 //! [`Flowchart`] IR, runs the dagre.js port (`dagre` crate), and maps node
-//! positions, edge waypoints, and compound cluster bounds into a kymo
-//! [`Diagram`]. The renderer ([`crate::flowchart_svg`]) draws it; with the
-//! mermaid [`FlowStyle`] the output aims to match mermaid.js 11.
+//! positions, edge waypoints, and compound cluster bounds into float geometry
+//! ([`FGeom`]). The float renderer ([`crate::dagre_svg`]) draws it; with the
+//! mermaid [`FlowStyle`] the output aims to match mermaid.js 11. A rounded
+//! [`Diagram`] is also available for the kymojson interchange path.
 
+use crate::dagre_svg::{FEdge, FGeom, FNode, FRegion};
 use crate::flowchart::{Direction, Flowchart};
-use crate::layout::node_size_for;
-use crate::model::{Component, Diagram, Edge, Region};
+use crate::layout::{node_size_for, node_size_mermaid_f};
 use crate::style::FlowStyle;
 use dagre::graph::{Graph, GraphOptions};
 use dagre::layout::layout;
-use dagre::layout::types::{EdgeLabel, GraphLabel, NodeLabel, RankDir};
+use dagre::layout::types::{EdgeLabel, LayoutOptions, NodeLabel, RankDir};
 
-/// Lay out a flowchart with dagre, sizing nodes per `style`.
-pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
-    let mut d = Diagram::default();
+const MX: f64 = 8.0;
+const MY: f64 = 8.0;
+
+/// Lay out a flowchart with dagre, sizing nodes per `style`, keeping every
+/// coordinate in `f64` (no rounding) so the renderer can match mermaid sub-pixel.
+pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
+    let mut geom = FGeom::default();
     if fc.nodes.is_empty() {
-        d.width = 40;
-        d.height = 40;
-        return d;
+        geom.w = 40.0;
+        geom.h = 40.0;
+        return geom;
     }
 
     let mut g: Graph<NodeLabel, EdgeLabel> = Graph::with_options(GraphOptions {
         compound: !fc.subgraphs.is_empty(),
         ..Default::default()
     });
-    let gl = GraphLabel {
-        rankdir: match fc.direction {
-            Direction::Tb => RankDir::TB,
-            Direction::Bt => RankDir::BT,
-            Direction::Lr => RankDir::LR,
-            Direction::Rl => RankDir::RL,
-        },
-        nodesep: 50.0,
-        edgesep: 10.0,
-        ranksep: 50.0,
-        marginx: 8.0,
-        marginy: 8.0,
-        compound: !fc.subgraphs.is_empty(),
-        ..Default::default()
+    let rankdir = match fc.direction {
+        Direction::Tb => RankDir::TB,
+        Direction::Bt => RankDir::BT,
+        Direction::Lr => RankDir::LR,
+        Direction::Rl => RankDir::RL,
     };
-    g.set_graph_label(gl);
 
     for n in &fc.nodes {
-        let (w, h) = node_size_for(&n.label, n.shape, style);
+        let (w, h) = if matches!(style, FlowStyle::Mermaid) {
+            node_size_mermaid_f(&n.label, n.shape)
+        } else {
+            let (wi, hi) = node_size_for(&n.label, n.shape, style);
+            (wi as f64, hi as f64)
+        };
         g.set_node(
             n.id.clone(),
             Some(NodeLabel {
-                width: w as f64,
-                height: h as f64,
+                width: w,
+                height: h,
                 ..Default::default()
             }),
         );
@@ -82,19 +82,25 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
         );
     }
 
-    layout(&mut g, None);
-    const MX: i32 = 8;
-    const MY: i32 = 8;
+    layout(
+        &mut g,
+        Some(LayoutOptions {
+            rankdir,
+            ..Default::default()
+        }),
+    );
 
     for n in &fc.nodes {
         if let Some(nd) = g.node(&n.id) {
-            let mut c = Component::flowchart(n.id.clone(), n.label.clone(), n.shape);
-            c.pos = (
-                nd.x.unwrap_or(0.0).round() as i32 + MX,
-                nd.y.unwrap_or(0.0).round() as i32 + MY,
-            );
-            c.size = Some((nd.width.round() as i32, nd.height.round() as i32));
-            d.components.push(c);
+            geom.nodes.push(FNode {
+                id: n.id.clone(),
+                name: n.label.clone(),
+                shape: n.shape,
+                cx: nd.x.unwrap_or(0.0) + MX,
+                cy: nd.y.unwrap_or(0.0) + MY,
+                w: nd.width,
+                h: nd.height,
+            });
         }
     }
     for sg in &fc.subgraphs {
@@ -105,54 +111,54 @@ pub fn layout_flowchart_dagre(fc: &Flowchart, style: FlowStyle) -> Diagram {
                 cd.width,
                 cd.height,
             );
-            let mut r = Region::cluster(sg.id.clone(), sg.title.clone(), sg.members.clone());
-            r.bounds = (
-                (x - w / 2.0).round() as i32 + MX,
-                (y - h / 2.0).round() as i32 + MY,
-                w.round() as i32,
-                h.round() as i32,
-            );
-            r.visible = true;
-            d.regions.push(r);
+            geom.regions.push(FRegion {
+                label: sg.title.clone(),
+                x: x - w / 2.0 + MX,
+                y: y - h / 2.0 + MY,
+                w,
+                h,
+                visible: true,
+            });
         }
     }
+    // node centre x by id, for the mermaid edge-label anchor.
+    let cx_by_id: std::collections::HashMap<&str, f64> =
+        geom.nodes.iter().map(|n| (n.id.as_str(), n.cx)).collect();
     for e in &fc.edges {
         if let Some(ed) = g.edge(&e.src, &e.dst, None) {
-            let mut edge = Edge::routed(e.src.clone(), e.dst.clone(), e.label.clone());
-            edge.dashed = e.dashed;
-            edge.no_arrow = e.no_arrow;
-            let pts: Vec<(i32, i32)> = ed
-                .points
-                .iter()
-                .map(|p| (p.x.round() as i32 + MX, p.y.round() as i32 + MY))
-                .collect();
-            if pts.len() >= 2 {
-                edge.points = Some(pts);
-            }
-            if let (Some(lx), Some(ly)) = (ed.x, ed.y) {
-                edge.label_pos = Some((lx.round() as i32 + MX, ly.round() as i32 + MY));
-            }
-            d.edges.push(edge);
+            let points: Vec<(f64, f64)> = ed.points.iter().map(|p| (p.x + MX, p.y + MY)).collect();
+            let label_pt = match (ed.x, ed.y) {
+                (Some(_), Some(ly)) => {
+                    let lx = cx_by_id.get(e.dst.as_str()).copied().unwrap_or(0.0);
+                    Some((lx, ly + MY))
+                }
+                _ => None,
+            };
+            geom.edges.push(FEdge {
+                label: e.label.clone(),
+                dashed: e.dashed,
+                no_arrow: e.no_arrow,
+                points,
+                label_pt,
+            });
         }
     }
 
     // The crate's graph_label.width clips the widest node, so size the diagram
     // from the actual node + cluster extents (+ the margin), matching mermaid.
-    let maxx = d
-        .components
+    let maxx = geom
+        .nodes
         .iter()
-        .map(|c| c.pos.0 + c.size.unwrap_or((0, 0)).0 / 2)
-        .chain(d.regions.iter().map(|r| r.bounds.0 + r.bounds.2))
-        .max()
-        .unwrap_or(40);
-    let maxy = d
-        .components
+        .map(|n| n.cx + n.w / 2.0)
+        .chain(geom.regions.iter().map(|r| r.x + r.w))
+        .fold(40.0_f64, f64::max);
+    let maxy = geom
+        .nodes
         .iter()
-        .map(|c| c.pos.1 + c.size.unwrap_or((0, 0)).1 / 2)
-        .chain(d.regions.iter().map(|r| r.bounds.1 + r.bounds.3))
-        .max()
-        .unwrap_or(40);
-    d.width = maxx + MX;
-    d.height = maxy + MY;
-    d
+        .map(|n| n.cy + n.h / 2.0)
+        .chain(geom.regions.iter().map(|r| r.y + r.h))
+        .fold(40.0_f64, f64::max);
+    geom.w = maxx + MX;
+    geom.h = maxy + MY;
+    geom
 }
