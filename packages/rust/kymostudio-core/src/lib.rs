@@ -319,6 +319,11 @@ pub fn mermaid_class_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
     Ok(classdiagram::svg::render(&mermaid::parse_class(src)?))
 }
 
+/// Render a Mermaid `erDiagram` → SVG (reuses the class-box renderer).
+pub fn mermaid_er_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(classdiagram::svg::render(&mermaid::parse_er(src)?))
+}
+
 /// Render D2 flowchart source → SVG, fully in Rust: parse D2 → flowchart IR →
 /// `layout_flowchart` → the [`flowchart_svg`] renderer. No external `d2` binary.
 pub fn d2_to_svg(src: &str) -> Result<String, d2::D2Error> {
