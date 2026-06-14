@@ -54,10 +54,21 @@ pub struct ClassBox {
     pub methods: Vec<String>,
 }
 
+/// A free or attached note.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ClassNote {
+    pub text: String,
+    /// `note for X` attaches to class `X`.
+    pub target: Option<String>,
+}
+
 /// A parsed class diagram.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClassDiagram {
     pub direction: Direction,
     pub classes: Vec<ClassBox>,
     pub relations: Vec<Relation>,
+    pub notes: Vec<ClassNote>,
+    /// `namespace X { … }` groupings: (name, member class ids).
+    pub namespaces: Vec<(String, Vec<String>)>,
 }

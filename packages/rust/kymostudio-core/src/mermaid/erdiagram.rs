@@ -23,6 +23,8 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         direction: Direction::Tb,
         classes: Vec::new(),
         relations: Vec::new(),
+        notes: Vec::new(),
+        namespaces: Vec::new(),
     };
     let mut cur: Option<usize> = None;
     let mut started = false;
