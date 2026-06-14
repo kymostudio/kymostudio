@@ -6,11 +6,10 @@ set -euo pipefail
 cd "$(dirname "$0")"
 rm -rf dist && mkdir -p dist
 cp web/index.html dist/index.html
-cp web/index.html dist/diagrams.html
 cp web/index.html dist/trash.html
 cp web/index.html dist/login.html
 cp web/styles.css dist/styles.css
-cp ../../docs/brand/logo.svg ../../docs/brand/favicon.svg ../../docs/brand/favicon.ico ../../docs/brand/favicon-32.png ../../docs/brand/favicon-48.png ../../docs/brand/apple-touch-icon.png dist/
+cp ../../docs/brand/logo.svg ../../docs/brand/wordmark.svg ../../docs/brand/favicon.svg ../../docs/brand/favicon.ico ../../docs/brand/favicon-32.png ../../docs/brand/favicon-48.png ../../docs/brand/apple-touch-icon.png dist/
 printf '/* /index.html 200\n' > dist/_redirects
 # Chunk names embed a content hash — let browsers cache them forever; the HTML
 # entry points keep the default 4h and roll the references on deploy.
