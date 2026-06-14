@@ -44,7 +44,7 @@ const STYLE_MERMAID: &str = "\
 text{fill:#333333}\
 .fc-shape{fill:#ECECFF;stroke:#9370DB;stroke-width:1}\
 .fc-shape-line{fill:none;stroke:#9370DB;stroke-width:1}\
-.fc-label{font-size:15px;fill:#333333;text-anchor:middle;dominant-baseline:central}\
+.fc-label{font-size:16px;fill:#333333;text-anchor:middle}\
 .edge-path{fill:none;stroke:#333333;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}\
 .edge-label{font-size:12px;fill:#333333;text-anchor:middle;\
 paint-order:stroke;stroke:#e8e8e8;stroke-width:5;stroke-linejoin:round}\
@@ -249,8 +249,14 @@ fn node_svg(
             .as_ref()
             .map(|c| format!(" style=\"fill:{c}\""))
             .unwrap_or_default();
+        // Mermaid uses an HTML alphabetic baseline; match it (y = centre + 0.30*16).
+        let ly = if matches!(style, FlowStyle::Mermaid) {
+            cy + 5
+        } else {
+            cy
+        };
         format!(
-            "<text class=\"fc-label\" x=\"{cx}\" y=\"{cy}\"{cstyle}>{}</text>",
+            "<text class=\"fc-label\" x=\"{cx}\" y=\"{ly}\"{cstyle}>{}</text>",
             esc(&c.name)
         )
     };
