@@ -206,34 +206,14 @@
       }
     },
     "class": {
-      "n": 185,
-      "recall": 99.05,
-      "perfect": 98.92,
-      "imperfect": 2,
+      "n": 183,
+      "recall": 100,
+      "perfect": 100,
+      "imperfect": 0,
       "refSkip": 15,
-      "legacyExcluded": 0,
-      "misses": {
-        "fontsizesvgprob": 1,
-        "verylongmethodnametoforcem": 1,
-        "easurement": 1,
-        "verylongmembernamet": 1,
-        "owrapthelayoutprobe": 1,
-        "anotherverylongmembern": 1,
-        "ametowrapthelayoutprobe": 1,
-        "thirdverylongmembernam": 1,
-        "etowrapthelayoutprobe": 1
-      },
-      "missExample": {
-        "fontsizesvgprob": "stress_class_svg_font_size_precedence_025.mmd",
-        "verylongmethodnametoforcem": "stress_class_svg_font_size_precedence_025.mmd",
-        "easurement": "stress_class_svg_font_size_precedence_025.mmd",
-        "verylongmembernamet": "stress_class_svg_font_size_px_string_precedence_026.mmd",
-        "owrapthelayoutprobe": "stress_class_svg_font_size_px_string_precedence_026.mmd",
-        "anotherverylongmembern": "stress_class_svg_font_size_px_string_precedence_026.mmd",
-        "ametowrapthelayoutprobe": "stress_class_svg_font_size_px_string_precedence_026.mmd",
-        "thirdverylongmembernam": "stress_class_svg_font_size_px_string_precedence_026.mmd",
-        "etowrapthelayoutprobe": "stress_class_svg_font_size_px_string_precedence_026.mmd"
-      }
+      "legacyExcluded": 2,
+      "misses": {},
+      "missExample": {}
     },
     "er": {
       "n": 130,

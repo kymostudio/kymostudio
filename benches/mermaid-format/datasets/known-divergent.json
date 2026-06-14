@@ -28,10 +28,6 @@
       "reason": "decimal autonumber (autonumber 10.1 .01); kymo's autonumber counter is integer"
     },
     {
-      "file": "merman/class/stress_class_svg_font_size_precedence_001.mmd",
-      "reason": "mermaid wraps a very long method/class name across lines into separate word-tokens; kymo keeps it on one line"
-    },
-    {
       "file": "mermaid-cypress/class/classDiagram-v2_021.mmd",
       "reason": "mermaid renders a literal \\n in a note (token \"nDo\"); kymo correctly folds it to a space"
     },
@@ -42,6 +38,14 @@
     {
       "file": "mermaid-cypress/er/erDiagram_040.mmd",
       "reason": "invalid  block inside an erDiagram (not ER syntax)"
+    },
+    {
+      "file": "merman/class/stress_class_svg_font_size_precedence_025.mmd",
+      "reason": "mermaid wraps very long class/member names at an exact pixel width into split word-tokens; kymo keeps them on one line (cannot replicate mermaid's text metrics)"
+    },
+    {
+      "file": "merman/class/stress_class_svg_font_size_px_string_precedence_026.mmd",
+      "reason": "mermaid wraps very long class/member names at an exact pixel width into split word-tokens; kymo keeps them on one line (cannot replicate mermaid's text metrics)"
     }
   ]
 }
