@@ -35,12 +35,13 @@ export function WelcomeView({ onNew, onOpenFile, onTemplate }: {
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) onOpenFile(f); e.target.value = ""; }} />
             </section>
             <section className="wel-block">
-              <h2 className="wel-h">Recent</h2>
+              <h2 className="wel-h">{claims ? "Recent" : "No sign-in needed"}</h2>
               {!claims ? (
-                <div className="wel-guest">
-                  <p className="wel-empty">Sign in to see your diagrams.</p>
-                  <button className="wel-signin" onClick={() => (window as any).google?.accounts?.id?.prompt?.()}>Sign in with Google</button>
-                </div>
+                <p className="wel-note">
+                  Pick a template and start right away — your work lives in this page's link as you edit.{" "}
+                  <button className="wel-inline-link" onClick={() => (window as any).google?.accounts?.id?.prompt?.()}>Sign in</button>{" "}
+                  to save it to your diagrams and open it from any device.
+                </p>
               ) : recent.length ? (
                 recent.map((it) => (
                   <button key={it.id} className="wel-recent" title={it.title || "Untitled"} onClick={() => navigate("/?d=" + encodeURIComponent(it.id))}>
