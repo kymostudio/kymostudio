@@ -17,6 +17,7 @@ import {
   bpmnRender,
   d2ToSvg,
   mermaidToSvg,
+  mermaidToSvgDagre,
   mermaidSequenceToSvg,
   mermaidStateToSvg,
   mermaidClassToSvg,
@@ -83,7 +84,8 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
     ensure();
     return renderSVG(parseDiagram(source));
   },
-  // Flowcharts render through kymo's own Rust engine (mermaidToSvg): text-based
+  // Flowcharts render through kymo's own Rust engine (mermaidToSvgDagre: dagre
+  // layout + mermaid-faithful style, ~0.2% pixel-overlay vs mermaid.js): text-based
   // SVG, so PNG/PDF keep their labels — merman emits HTML labels in
   // <foreignObject>, which the rasterizer (resvg/svg2pdf) silently drops. Every
   // other grammar still goes through merman's full engine; if kymo cannot parse
@@ -92,7 +94,7 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
     ensure();
     const grammar = mermaidGrammar(source);
     try {
-      if (grammar === "flowchart" || grammar === "graph") return mermaidToSvg(source);
+      if (grammar === "flowchart" || grammar === "graph") return mermaidToSvgDagre(source);
       if (grammar === "sequencediagram") return mermaidSequenceToSvg(source);
       if (grammar === "statediagram" || grammar === "statediagram-v2")
         return mermaidStateToSvg(source);
