@@ -65,8 +65,11 @@ d_kymo, x_mid = run_path(ttB, rawB, "kymo", WX, WY, WSZ)
 d_studio, x_end = run_path(ttB, rawB, "studio", x_mid, WY, WSZ)
 d_tag, t_end = run_path(ttM, rawM, "Diagram superpowers", TX, TY, TSZ)
 
-vb_x, vb_y, vb_h = 80, 44, 192
-vb_w = round(max(x_end, t_end) + 22 - vb_x)
+# Generous framing matching the original hero (viewBox 0 0 1000 280): the tile
+# sits at (96,50) so this yields ~50px top/bottom + ~96px left margin; width keeps
+# a comfortable right margin (≥96px) around the wordmark.
+vb_x, vb_y, vb_h = 0, 0, 280
+vb_w = max(1000, round(max(x_end, t_end) + 96))
 
 TILE = '''  <g transform="translate(96 50) scale(1.8)">
     <rect width="100" height="100" rx="18" fill="#e0095f"/>
