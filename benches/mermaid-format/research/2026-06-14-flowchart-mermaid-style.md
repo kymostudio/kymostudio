@@ -92,7 +92,7 @@ overlay number.
 > **Superseded below.** The "overlay can't move without dagre" finding (the 14%
 > sections above) was the *starting* point. A dagre-backed, float-precision
 > mermaid render path was then built on the kymo Rust side and brings the overlay
-> mean to **0.44%** — see *Float-precision dagre pipeline* at the end of this doc.
+> mean to **0.19%** — see *Float-precision dagre pipeline* at the end of this doc.
 > The sections above are kept as the research trail that motivated it.
 
 v1 shipped: theme (colours/font/background/arrowheads/clusters), sharp-vs-rounded
@@ -103,9 +103,9 @@ correctness fix).
 What was "deferred" then is now **done** on the dagre path (`mermaid_to_svg_dagre`):
 dagre ranking (the `dagre` crate), spline edges (d3 `curveBasis`), and exact
 mermaid text metrics (`node_size_mermaid_f`, float). Still deferred: a Trebuchet
-font for the resvg deploy path (today it falls back to the registered sans-serif),
-and closing the `LR` sub-pixel rank-spacing drift (a dagre-crate vs dagre-d3-es
-arithmetic diff, not a renderer issue).
+font for the resvg deploy path (today it falls back to the registered sans-serif).
+(The `LR` outlier flagged in earlier drafts is closed — it was a single glyph
+width, now 0.07 %.)
 
 ---
 
@@ -339,7 +339,7 @@ the cases that prove the architecture; the rest is incremental shape/AA tuning.
 
 ---
 
-## Float-precision dagre pipeline — mean 0.44 % (goal < 0.5 % met)
+## Float-precision dagre pipeline — mean 0.19 % (goal < 0.5 % met)
 
 The "~1.5 % long tail" above turned out **not** to be diamond/curve AA — it was
 two integer-rounding artifacts in the dagre→SVG pipeline, plus a silently broken
@@ -352,16 +352,17 @@ on every case:
 | chain `[a]→[b]→[c]`        | 0.38 % | **0.10 %** | 0.81 % |
 | branch + diamond + labels  | 1.49 % | **0.23 %** | 2.48 % |
 | rounded chain `(a)→(b)`    | 0.03 % | **0.03 %** | 3.56 % |
-| `flowchart LR` (4 nodes)   | 1.38 % | **1.82 %**\* | 2.69 % |
+| `flowchart LR` (4 nodes)   | 1.38 % | **0.07 %** | 2.69 % |
 | subgraph cluster           | 1.16 % | **0.45 %** | 0.18 % |
 | diamond chain `{Q1}→{Q2}`  | 1.29 % | **0.21 %** | 1.90 % |
 | wide fan-out (1→4)         | 0.31 % | **0.21 %** | 2.13 % |
-| **MEAN**                   | 0.86 % | **0.44 %** | 1.96 % |
+| **MEAN**                   | 0.86 % | **0.19 %** | 1.96 % |
 
-\* `LR` *rose* because it was previously **mis-laid-out vertically** — its low
-i32 score was a white-space artifact (a 118×382 column vs mermaid's 540×70 row
-barely overlap on the padded diff canvas). The float number is the first *honest*
-LR measurement; the residual is a sub-pixel rank-spacing drift (see below).
+`LR` told the real story in two acts. Threading the rank direction (fix 3 below)
+first *exposed* it: the i32 score was a white-space artifact (a 118×382 column vs
+mermaid's 540×70 row barely overlap), and the honest horizontal measurement came
+in at 1.82 %. That residual then turned out to be **a single mis-calibrated glyph**
+(see below), not a layout-library drift — fixed, `LR` is now **0.07 %**.
 
 ### The three fixes (all kymo Rust)
 
@@ -393,20 +394,23 @@ LR measurement; the residual is a sub-pixel rank-spacing drift (see below).
    ..default })`. `LR` now lays out horizontally (node centres 53.1 / 193.4 /
    339.4 / 486.7 vs mermaid 53.1 / 192.9 / 338.5 / 485.8).
 
-### What remains (the LR 1.82 %)
+### The LR "drift" was one glyph, not a layout-library diff
 
-A **sub-pixel rank-spacing drift**: mermaid's effective LR `ranksep` measures
-~49.55 vs the crate's 50, so node centres drift right by up to ~0.9px on the
-4th node (0 → 0.44 → 0.88px), smearing every vertical stroke + glyph on the
-overlay. This is a `dagre` crate vs `dagre-d3-es` arithmetic difference, not a
-kymo renderer issue — the orientation, sizes, baselines and colours all match.
-TB diagrams (the common case) are now **0.03–0.45 %**, i.e. anti-aliasing only.
+The remaining `LR` 1.82 % looked like a sub-pixel `ranksep` drift — node centres
+drifting right by 0 → 0.44 → 0.88 → 0.88 px. Measuring each node's width pinned it:
+**every node matched mermaid except `Two`** (kymo 90.22 vs mermaid 89.34, Δ0.88),
+and the centre drift is exactly that 0.88 propagating downstream. `Two` is the only
+label with a **`w`**; `One`/`Three`/`Four` have none. mermaid's `w` advance at 16px
+is `"Two"(29.34) − "T"(9.77) − "o"(8.90) = 10.67`, but `CHAR_W_MERMAID['w']` held
+**11.55**. Correcting that one table entry drops `LR` to **0.07 %** and the mean to
+**0.19 %** — every case is now ≤ 0.45 %, anti-aliasing only. So the drift was a
+kymo text-metric bug, not a `dagre` vs `dagre-d3-es` arithmetic difference.
 
 ### Bottom line (updated)
 
 Going down the **kymo Rust path** (not merman), the 7-example overlay mean is
-**0.44 %** — under the 0.5 % target and less than ¼ of merman's 1.96 %. Six of
-seven cases are ≤ 0.45 % (AA-only); the lone outlier (`LR`, 1.82 %) is a
-sub-pixel layout-library drift, now *correctly oriented* for the first time.
-The headline rounding floors are gone: float coords, float node sizes, a float
-viewBox, and a real rank-direction fix.
+**0.19 %** — well under the 0.5 % target and ~1/10 of merman's 1.96 %. **All seven
+cases are ≤ 0.45 %** (anti-aliasing only). The fixes, in order of impact: float
+coords end-to-end, float node sizes + a float viewBox, a real rank-direction fix
+(`LR`/`RL`/`BT` were silently `TB`), and a one-glyph text-metric correction
+(`w` 11.55→10.67) that closed the last outlier `LR` from 1.82 % to 0.07 %.
