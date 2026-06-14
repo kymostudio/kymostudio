@@ -143,6 +143,10 @@ impl Shape {
             BpmnGateway | BpmnDataStore => (25, 25),
             BpmnDataObject => (18, 25),
             BpmnAnnotation => (0, 0),
+            // State-diagram terminals (mermaid `[*]`) — small filled circles,
+            // sized to match the glyph drawn in flowchart_svg (r=8 / r=9).
+            StateStart => (8, 8),
+            StateEnd => (9, 9),
         }
     }
 
