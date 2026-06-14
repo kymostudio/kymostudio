@@ -512,8 +512,9 @@ export default function EditorPage() {
         <div className="spacer" />
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
-          <button className="mob-hide" onClick={() => setGalleryOpen(true)} title="New diagram" aria-haspopup="dialog"><Plus size={16} strokeWidth={2.2} />New</button>
-          <a className="btn mob-hide" href={docHref(kind)} target="_blank" rel="noopener noreferrer" title={`Syntax help for ${KINDS.find((x) => x.value === kind)?.label ?? kind}`}><BookOpen size={16} strokeWidth={2} />Docs</a>
+          {/* New + Docs are already in the Welcome's Start/Learn sections — hide them there */}
+          {!showWelcome && <button className="mob-hide" onClick={() => setGalleryOpen(true)} title="New diagram" aria-haspopup="dialog"><Plus size={16} strokeWidth={2.2} />New</button>}
+          {!showWelcome && <a className="btn mob-hide" href={docHref(kind)} target="_blank" rel="noopener noreferrer" title={`Syntax help for ${KINDS.find((x) => x.value === kind)?.label ?? kind}`}><BookOpen size={16} strokeWidth={2} />Docs</a>}
           {isDraft && !booting && !showWelcome && (
             <button className="btn-primary mob-hide" onClick={save} title="Save to your Diagrams (⌘/Ctrl-S)">
               <Save size={16} strokeWidth={2} />
