@@ -9,6 +9,19 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-06-14
+
+### Added
+
+- **Homebrew install** for the `kymo` CLI. Prebuilt binaries (macOS arm64/x86_64,
+  Linux x86_64/arm64) are now built on each release via cargo-dist and published
+  as a formula in this repo:
+
+  ```bash
+  brew tap kymostudio/brew https://github.com/kymostudio/kymostudio
+  brew install kymostudio        # the command stays `kymo`
+  ```
+
 ## [0.4.4] - 2026-06-12
 
 ### Changed

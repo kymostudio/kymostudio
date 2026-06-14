@@ -284,14 +284,14 @@ dependencies = [
 
 [[package]]
 name = "kymostudio"
-version = "0.4.4"
+version = "0.4.5"
 dependencies = [
  "kymostudio-core",
 ]
 
 [[package]]
 name = "kymostudio-core"
-version = "0.4.4"
+version = "0.4.5"
 dependencies = [
  "resvg 0.47.0",
  "svg2pdf",
