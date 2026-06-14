@@ -137,6 +137,24 @@ pub fn mermaid_block_to_svg(src: &str) -> Result<String, JsError> {
     crate::mermaid_block_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
 }
 
+/// Render a Mermaid `mindmap` -> SVG (text-based).
+#[wasm_bindgen(js_name = mermaidMindmapToSvg)]
+pub fn mermaid_mindmap_to_svg(src: &str) -> Result<String, JsError> {
+    crate::mermaid_mindmap_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Render a Mermaid `kanban` board -> SVG (text-based).
+#[wasm_bindgen(js_name = mermaidKanbanToSvg)]
+pub fn mermaid_kanban_to_svg(src: &str) -> Result<String, JsError> {
+    crate::mermaid_kanban_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
+/// Render a Mermaid `requirementDiagram` -> SVG (text-based).
+#[wasm_bindgen(js_name = mermaidRequirementToSvg)]
+pub fn mermaid_requirement_to_svg(src: &str) -> Result<String, JsError> {
+    crate::mermaid_requirement_to_svg(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
 /// Render D2 flowchart source → SVG (pure-Rust D2 importer + renderer).
 #[wasm_bindgen(js_name = d2ToSvg)]
 pub fn d2_to_svg(src: &str) -> Result<String, JsError> {

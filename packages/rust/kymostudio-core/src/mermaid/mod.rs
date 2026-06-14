@@ -12,8 +12,11 @@
 mod blockdiagram;
 mod classdiagram;
 mod erdiagram;
+mod kanban;
 mod lexer;
+mod mindmap;
 mod parser;
+mod requirement;
 mod sequence;
 mod state;
 
@@ -228,6 +231,21 @@ pub fn parse_er(src: &str) -> Result<crate::classdiagram::ClassDiagram, MermaidE
 /// Parse a Mermaid `block` / `block-beta` diagram into the flowchart IR.
 pub fn parse_block(src: &str) -> Result<Flowchart, MermaidError> {
     blockdiagram::parse(src)
+}
+
+/// Parse a Mermaid `mindmap` into the flowchart IR.
+pub fn parse_mindmap(src: &str) -> Result<Flowchart, MermaidError> {
+    mindmap::parse(src)
+}
+
+/// Parse a Mermaid `kanban` board into the flowchart IR.
+pub fn parse_kanban(src: &str) -> Result<Flowchart, MermaidError> {
+    kanban::parse(src)
+}
+
+/// Parse a Mermaid `requirementDiagram` into the class-diagram IR.
+pub fn parse_requirement(src: &str) -> Result<crate::classdiagram::ClassDiagram, MermaidError> {
+    requirement::parse(src)
 }
 
 pub fn parse_state(src: &str) -> Result<Flowchart, MermaidError> {
