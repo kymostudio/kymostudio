@@ -19,7 +19,7 @@ import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save,
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
-  const { currentFolder } = useWorkspace();
+  const { currentFolder, currentProject } = useWorkspace();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const d = params.get("d");
@@ -401,9 +401,9 @@ export default function EditorPage() {
     setSavingDraft(true);
     const id = newId();
     pendingImport.current = { source: sourceRef.current, kind: kindRef.current, title: titleUserSet.current ? titleRef.current : undefined };
-    assignDiagram(idToken, id, currentFolder); // lands in the folder you're saving into
+    assignDiagram(idToken, id, currentFolder, currentProject || undefined); // lands in the folder you're saving into
     navigate("/?d=" + id);
-  }, [d, idToken, currentFolder, navigate, promptSignIn]);
+  }, [d, idToken, currentFolder, currentProject, navigate, promptSignIn]);
   const saveRef = useRef(save); saveRef.current = save;
   // Guest hit Save → signed in → finish the save now that we have a token.
   useEffect(() => {
@@ -433,7 +433,7 @@ export default function EditorPage() {
   function saveCopy() {
     const id = newId();
     pendingImport.current = { source, kind };
-    assignDiagram(idToken, id, currentFolder);
+    assignDiagram(idToken, id, currentFolder, currentProject || undefined);
     navigate("/?d=" + id);
   }
   function commitRename(v: string) {

@@ -46,14 +46,16 @@ function restoreItem(idToken: string | null, kind: "diagram" | "folder", id: str
 // mounted at a time, so this never double-fetches).
 export function useDiagrams() {
   const { idToken } = useAuth();
+  const { currentProject } = useWorkspace();
   const [items, setItems] = useState<Item[]>([]);
+  const projectQuery = currentProject ? "&project=" + encodeURIComponent(currentProject) : "";
   const reload = useCallback(async () => {
     if (!idToken) return;
     try {
-      const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
+      const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken) + projectQuery, { cache: "no-store" });
       if (r.ok) setItems(((await r.json()).diagrams) || []);
     } catch {}
-  }, [idToken]);
+  }, [idToken, projectQuery]);
   useEffect(() => { reload(); }, [reload]);
   useEffect(() => {
     const f = () => { if (!document.hidden) reload(); };
