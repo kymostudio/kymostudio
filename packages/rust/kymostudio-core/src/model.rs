@@ -148,6 +148,8 @@ impl Shape {
             Cube => (40, 40),
             CubeBig => (50, 50),
             Box => (35, 35),
+            // Sharp rect + parallelogram/trapezoid share the box footprint.
+            Rect | Parallelogram | ParallelogramAlt | Trapezoid | TrapezoidAlt => (35, 35),
             Cylinder => (35, 35),
             Hex => (35, 32),
             Diamond => (40, 28),
