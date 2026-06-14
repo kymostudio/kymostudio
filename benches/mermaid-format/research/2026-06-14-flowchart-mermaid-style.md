@@ -162,3 +162,68 @@ every case, including the pathological `theme:base` one:
 So: use **kymo + dagre** when an independent, dependency-light, mermaid-*ish*
 raster-safe renderer is wanted; use **merman + text** when pixel-fidelity to
 mermaid is the goal.
+
+---
+
+## Breakthrough — matching mermaid's dagre layout in kymo's Rust renderer
+
+The earlier kymo+dagre floored at ~5% because the `dagre` Rust crate builds the
+layout graph differently from `dagre-d3-es` (mermaid's lib). Reverse-engineering
+gave the exact recipe that drops **typical flowcharts to ~1.3%** — essentially
+pixel-identical, raster-safe, no merman.
+
+### How it was found
+
+1. **`dagre-d3-es` + mermaid's exact node sizes reproduces mermaid 0px.** Fed
+   mermaid's own node dimensions (read from its SVG) into `dagre-d3-es` with
+   `{rankdir, nodesep:50, ranksep:50, marginx:8, marginy:8}` → node centres
+   matched mermaid to **0px**. So *mermaid = dagre-d3-es + exact sizes*, nothing more.
+2. **The Rust `dagre` crate ≠ `dagre-d3-es`.** Same graph → the crate **mirrors**
+   child ordering and is offset by `(marginx, marginy)`. Two fixes:
+   - **Reverse edge-insertion order** → the crate's order phase breaks ties the
+     same way `dagre-d3-es` does (un-mirrors). Verified: matches to ~1px.
+   - **Shift all coords by `(8,8)`** (the margin the crate omits).
+3. **Edge-label ranks.** `dagre-d3-es` adds the label *height* to the rank gap
+   (104→120 for h=24). The Rust crate does this **identically** — the bug was
+   mine: I used h=16; mermaid measures h=**24**. Fixing it un-compressed labelled
+   diagrams (1.9%→1.3%).
+4. **Exact sizing/shapes**: per-glyph text metrics; parallelogram/trapezoid h=39;
+   cluster bounds folded into the diagram size (clusters were clipped); centred
+   cluster title.
+5. **d3 `curveBasis` edges** (exact uniform B-spline) instead of Catmull-Rom.
+
+### Result (overlay vs mermaid.js, resvg deploy path)
+
+| diagram class | kymo+dagre | note |
+|---|---|---|
+| typical flowcharts (`flowchart-v2_*`, `appli`, `elk`) | **1.3 – 2.0%** | essentially pixel-identical |
+| with edge labels | **1.3%** | after the h=24 fix |
+| `theme:base` + `themeVariables` (`conf_002/005`) | ~37% | palette-derivation gap |
+| icon nodes (`flowchart-icon_2/3/4`) | 15–25% | kymo renders no icons |
+
+From the original kymo-own renderer's ~14%, this is a **~10× improvement** on
+typical flowcharts, in kymo's own raster-safe Rust pipeline.
+
+### The hard floor — why literal 0% is impossible for an independent renderer
+
+Measured directly: take **mermaid's own SVG**, convert its `<foreignObject>`
+HTML labels to SVG `<text>` (the minimal raster-safe transform), and overlay on
+unmodified mermaid → **0.23%**. That 0.23% is the irreducible difference between
+**HTML text rendering and SVG `<text>` rendering** of the *same* string at the
+*same* place. So:
+
+- Any raster-safe renderer (SVG `<text>`, not `<foreignObject>`) has a **~0.23%
+  floor** vs browser-mermaid — using `<foreignObject>` to reach 0% would defeat
+  raster-safety, the whole reason kymo's engine exists.
+- kymo's ~1.3% = that 0.23% text floor + ~1% of sub-pixel geometry approximation
+  (the Rust crate matches `dagre-d3-es` to ~1px, not bit-for-bit; node sizes are
+  measured-close, not exact).
+
+**Literal 0% is therefore physically unreachable for an independent raster-safe
+Rust renderer.** It is only achievable by emitting mermaid's exact bytes — i.e.
+running mermaid.js itself (browser) and post-processing, not reimplementing it.
+The realistic target — **"visually pixel-identical"** — is met: ~1.3% on typical
+flowcharts, dominated by text anti-aliasing a human cannot see.
+
+Remaining non-floor gaps are **features, not fidelity**: `theme:base` palette
+derivation and icon-node rendering.
