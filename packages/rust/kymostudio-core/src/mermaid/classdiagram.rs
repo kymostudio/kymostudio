@@ -37,7 +37,7 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         namespaces: Vec::new(),
     };
     let mut cur: Option<usize> = None; // open `class X { … }` block
-    let mut ns: Option<usize> = None; // open namespace
+    let mut ns_stack: Vec<usize> = Vec::new(); // open (nestable) namespaces
     let mut pending_note: Option<String> = None; // unterminated `note "…`
     let mut started = false;
     let mut skip_note = false;
@@ -99,11 +99,11 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         if low == "namespace" || low.starts_with("namespace ") {
             let name = stmt[9..].trim().trim_end_matches('{').trim().to_string();
             cd.namespaces.push((name, Vec::new()));
-            ns = Some(cd.namespaces.len() - 1);
+            ns_stack.push(cd.namespaces.len() - 1);
             continue;
         }
         if stmt == "}" {
-            ns = None; // closes a namespace / stray brace
+            ns_stack.pop(); // closes a namespace / stray brace
             continue;
         }
         // notes: `note "text"`, `note for X "text"`, or a `note … end note` block.
@@ -147,10 +147,10 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             let opens = rest.ends_with('{');
             let head = rest.trim_end_matches('{').trim();
             let ci = decl_class(&mut cd.classes, head);
-            if let Some(n) = ns {
-                let id = cd.classes[ci].id.clone();
+            let id = cd.classes[ci].id.clone();
+            for &n in &ns_stack {
                 if !cd.namespaces[n].1.contains(&id) {
-                    cd.namespaces[n].1.push(id);
+                    cd.namespaces[n].1.push(id.clone());
                 }
             }
             if opens {
