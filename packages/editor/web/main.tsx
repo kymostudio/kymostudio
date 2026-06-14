@@ -8,6 +8,7 @@ import { ContextMenuProvider } from "./context-menu";
 import { ToastProvider } from "./toast";
 import EditorPage from "./EditorPage";
 import TrashPage from "./TrashPage";
+import ProjectsPage from "./ProjectsPage";
 import LoginPage from "./LoginPage";
 
 createRoot(document.getElementById("root")!).render(
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
         <ContextMenuProvider>
         <Routes>
           <Route path="/" element={<EditorPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/trash" element={<TrashPage />} />
           <Route path="/login" element={<LoginPage />} />
           {/* removed /diagrams (the Explorer + Welcome replace it) — stale links fall home */}
