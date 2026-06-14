@@ -265,17 +265,32 @@ type ProjectScope = { id: string; isDefault: boolean };
 // Ensure the user has at least one project. On first use create "Personal" and
 // ADOPT every pre-projects row (project_id IS NULL) into it, so existing folders
 // + diagrams keep showing. Returns the default (oldest) project's id.
+// A per-owner DETERMINISTIC id for the default project, so the concurrent
+// requests an editor fires on first load (diagrams + workspaces in parallel)
+// all compute the SAME id — INSERT OR IGNORE then collapses them to one row
+// instead of racing in three separate "Personal" projects.
+async function defaultProjectId(email: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("kymo-default-project:" + email));
+  const hex = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  return "def" + hex.slice(0, 13); // 16-char, globally unique per owner
+}
 async function ensureDefaultProject(env: Env, email: string): Promise<string> {
   await ensureProjectColumns(env);
-  const row = await env.DB.prepare("SELECT id FROM projects WHERE owner = ?1 AND deleted IS NULL ORDER BY created_at LIMIT 1")
+  let row = await env.DB.prepare("SELECT id FROM projects WHERE owner = ?1 AND deleted IS NULL ORDER BY created_at LIMIT 1")
     .bind(email).first<{ id: string }>();
   if (row) return row.id;
-  const id = crypto.randomUUID().slice(0, 8);
-  await env.DB.prepare("INSERT INTO projects (id, owner, name, created_at) VALUES (?1, ?2, 'Personal', ?3)")
+  const id = await defaultProjectId(email);
+  // race-safe: only the first of N concurrent inserts wins (PK conflict on the
+  // shared deterministic id), the rest are ignored.
+  await env.DB.prepare("INSERT OR IGNORE INTO projects (id, owner, name, created_at) VALUES (?1, ?2, 'Personal', ?3)")
     .bind(id, email, Date.now()).run();
-  await env.DB.prepare("UPDATE workspaces SET project_id = ?1 WHERE owner = ?2 AND project_id IS NULL").bind(id, email).run();
-  await env.DB.prepare("UPDATE diagrams SET project_id = ?1 WHERE owner = ?2 AND project_id IS NULL").bind(id, email).run();
-  return id;
+  // re-read so we adopt rows into whichever row actually landed
+  row = await env.DB.prepare("SELECT id FROM projects WHERE owner = ?1 AND deleted IS NULL ORDER BY created_at LIMIT 1")
+    .bind(email).first<{ id: string }>();
+  const finalId = row?.id || id;
+  await env.DB.prepare("UPDATE workspaces SET project_id = ?1 WHERE owner = ?2 AND project_id IS NULL").bind(finalId, email).run();
+  await env.DB.prepare("UPDATE diagrams SET project_id = ?1 WHERE owner = ?2 AND project_id IS NULL").bind(finalId, email).run();
+  return finalId;
 }
 
 async function listProjects(env: Env, email: string): Promise<Project[]> {
