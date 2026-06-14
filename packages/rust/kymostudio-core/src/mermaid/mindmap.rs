@@ -35,6 +35,10 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
         if text.eq_ignore_ascii_case("mindmap") {
             continue;
         }
+        // `::icon(...)` / `:::class` decorate the previous node — skip them.
+        if text.starts_with("::") {
+            continue;
+        }
         let (label, shape) = node_label(text);
         if label.is_empty() {
             continue;
@@ -73,11 +77,11 @@ fn strip_comment(line: &str) -> &str {
     }
 }
 
-/// Extract a mindmap node's label + shape, stripping `::icon` / `@{…}` metadata.
+/// Extract a mindmap node's label + shape. A bracketed label is taken whole
+/// (so `:::` *inside* the text survives); only a trailing `@{…}` / `:::class`
+/// outside the brackets is dropped.
 fn node_label(text: &str) -> (String, Shape) {
-    // drop trailing ::icon class and @{...} metadata
-    let text = text.split("::").next().unwrap_or(text);
-    let text = text.split("@{").next().unwrap_or(text).trim();
+    let text = text.trim();
     // shape wrappers: [..] (..) ((..)) {{..}} ))..(( )..(
     let shapes: &[(&str, &str, Shape)] = &[
         ("((", "))", Shape::Circle),
@@ -101,7 +105,9 @@ fn node_label(text: &str) -> (String, Shape) {
             }
         }
     }
-    (text.trim().trim_matches('"').to_string(), Shape::Box)
+    let plain = text.split("@{").next().unwrap_or(text);
+    let plain = plain.split(":::").next().unwrap_or(plain);
+    (plain.trim().trim_matches('"').to_string(), Shape::Box)
 }
 
 #[cfg(test)]

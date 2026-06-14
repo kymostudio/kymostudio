@@ -4,7 +4,7 @@
 //! `<text>`.
 
 use super::MermaidError;
-use crate::flowchart::{Direction, FlowNode, Flowchart, Subgraph};
+use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart};
 use crate::model::Shape;
 
 /// Parse kanban source into a [`Flowchart`].
@@ -40,44 +40,47 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
     }
     let base = base.unwrap_or(0);
 
-    let mut cur_col: Option<usize> = None;
+    // Columns and cards both become nodes (a card links to its column); this
+    // way an empty column still renders its title.
+    let mut cur_col: Option<String> = None;
     let mut counter = 0usize;
     let mut started = false;
     for line in &lines {
-        if line.trim().is_empty() {
+        let t = line.trim();
+        if t.is_empty() {
             continue;
         }
         if !started {
             started = true;
             continue;
         }
+        let low = t.to_ascii_lowercase();
+        // decorations / styling decorate the previous card — skip.
+        if t.starts_with("::") || low.starts_with("style ") || low.starts_with("class ") {
+            continue;
+        }
         let indent = line.len() - line.trim_start().len();
-        let (label, _shape) = node_label(line.trim());
+        let (label, _shape) = node_label(t);
         if label.is_empty() {
             continue;
         }
+        let id = format!("__k{counter}");
+        counter += 1;
+        fc.nodes.push(FlowNode {
+            id: id.clone(),
+            label,
+            shape: Shape::Box,
+        });
         if indent <= base {
-            // a column
-            let idx = fc.subgraphs.len();
-            fc.subgraphs.push(Subgraph {
-                id: format!("__col{idx}"),
-                title: label,
-                members: Vec::new(),
-                parent: None,
+            cur_col = Some(id);
+        } else if let Some(col) = &cur_col {
+            fc.edges.push(FlowEdge {
+                src: col.clone(),
+                dst: id,
+                label: String::new(),
+                dashed: false,
+                no_arrow: true,
             });
-            cur_col = Some(idx);
-        } else {
-            // a card in the current column
-            let id = format!("__card{counter}");
-            counter += 1;
-            fc.nodes.push(FlowNode {
-                id: id.clone(),
-                label,
-                shape: Shape::Box,
-            });
-            if let Some(ci) = cur_col {
-                fc.subgraphs[ci].members.push(id);
-            }
         }
     }
 
@@ -150,12 +153,13 @@ mod tests {
             "kanban\n  Todo\n    t1[Write code]@{ assigned: \"Alice\" }\n  Doing\n    t2[Review]",
         )
         .unwrap();
-        assert_eq!(fc.subgraphs.len(), 2);
-        assert_eq!(fc.subgraphs[0].title, "Todo");
-        // card label includes the assignee from @{}
+        // columns and cards are all nodes; a card links to its column.
+        assert!(fc.nodes.iter().any(|n| n.label == "Todo"));
+        assert!(fc.nodes.iter().any(|n| n.label == "Doing"));
         assert!(fc
             .nodes
             .iter()
             .any(|n| n.label.contains("Write code") && n.label.contains("Alice")));
+        assert!(!fc.edges.is_empty());
     }
 }
