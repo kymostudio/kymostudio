@@ -9,7 +9,7 @@ import { DIAGRAMS_API, TRASH_API } from "./const";
 import { kindLabel, docHref } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
-  ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2, ArrowDownUp,
+  ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
   Files, Search, Shapes, BookOpen, LogOut, Menu, ExternalLink,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
@@ -84,8 +84,6 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     try { return new Set(JSON.parse(localStorage.getItem("kymo_expanded") || "[]")); } catch { return new Set(); }
   });
   const [dragOver, setDragOver] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<"edited" | "name">(() => (localStorage.getItem("kymo_sort") === "name" ? "name" : "edited"));
-  const toggleSort = () => setSortBy((s) => { const n = s === "edited" ? "name" : "edited"; try { localStorage.setItem("kymo_sort", n); } catch {} return n; });
   const [editing, setEditing] = useState<{ kind: "file" | "folder"; id: string } | null>(null);
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const treeRef = useRef<HTMLDivElement>(null);
@@ -97,14 +95,10 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
 
   const folderIds = useMemo(() => new Set(folders.map((f) => f.id)), [folders]);
   const effFolder = useCallback((i: Item) => (i.ws && folderIds.has(i.ws) ? i.ws : ""), [folderIds]);
+  // VS Code-style: always alphabetical (folders are sorted by name in the walk too).
   const filesIn = useCallback(
-    (fid: string) => {
-      const list = items.filter((i) => effFolder(i) === fid);
-      return sortBy === "name"
-        ? list.sort((a, b) => (a.title || "Untitled").localeCompare(b.title || "Untitled"))
-        : list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-    },
-    [items, effFolder, sortBy]
+    (fid: string) => items.filter((i) => effFolder(i) === fid).sort((a, b) => (a.title || "Untitled").localeCompare(b.title || "Untitled")),
+    [items, effFolder]
   );
 
   // Build the visible, ordered row list (folders first, then files, per level).
@@ -308,7 +302,6 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     <aside className="sidebar">
       <div className="sb-head">
         <span className="sb-title">Explorer</span>
-        <button title={sortBy === "name" ? "Sorted by name — click for last edited" : "Sorted by last edited — click for name"} aria-label="Toggle sort" onClick={toggleSort}><ArrowDownUp size={14} strokeWidth={2} /></button>
         <button title="New diagram" aria-label="New diagram" onClick={onNewDiagram}><FilePlus2 size={15} strokeWidth={2} /></button>
         <button title="New folder" aria-label="New folder" onClick={() => onNewFolder("")}><FolderPlus size={15} strokeWidth={2} /></button>
       </div>
