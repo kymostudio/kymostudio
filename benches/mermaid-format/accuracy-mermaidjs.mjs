@@ -36,7 +36,7 @@ const DIVERGENT = new Set([...(_kd.legacy || []), ...(_kd.exotic || [])].map((d)
 const require = createRequire(RA + "/package.json");
 const core = await import(require.resolve("kymostudio-core"));
 core.initSync({ module: readFileSync(require.resolve("kymostudio-core/kymostudio_core_bg.wasm")) });
-const KY = { flowchart: core.mermaidToSvg, sequence: core.mermaidSequenceToSvg, state: core.mermaidStateToSvg };
+const KY = { flowchart: core.mermaidToSvg, sequence: core.mermaidSequenceToSvg, state: core.mermaidStateToSvg, class: core.mermaidClassToSvg, er: core.mermaidErToSvg, block: core.mermaidBlockToSvg };
 
 const decode = (s) => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, " ").replace(/&#x?[0-9a-fA-F]+;/g, " ").replace(/&amp;/g, "&");
 const clean = (svg) => svg.replace(/<annotation\b[\s\S]*?<\/annotation>/g, " ").replace(/<title[\s\S]*?<\/title>/g, " ").replace(/<desc[\s\S]*?<\/desc>/g, " ").replace(/<style[\s\S]*?<\/style>/g, " ").replace(/<a [^>]*xlink:href[\s\S]*?<\/a>/g, " ");
@@ -56,7 +56,7 @@ async function ensureBrowser() {
 const mermaidRender = (src) => page.evaluate(async (s) => { try { const { svg } = await window.mermaid.render("mm" + Math.floor(performance.now()), s); return svg; } catch { return "__ERR__"; } }, src);
 
 const summary = {};
-for (const g of ["flowchart", "sequence", "state"]) {
+for (const g of ["flowchart", "sequence", "state", "class", "er", "block"]) {
   const files = [];
   for (const ds of ["merman", "mermaid-cypress", "mermaid-to-svg"]) {
     const dir = DS + ds + "/" + g + "/"; if (!existsSync(dir)) continue;
