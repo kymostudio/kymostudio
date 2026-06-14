@@ -7,7 +7,7 @@
 //! `: label`. Styling / click / note lines are accepted and ignored.
 
 use super::MermaidError;
-use crate::classdiagram::{ClassBox, ClassDiagram, ClassNote, RelKind, Relation};
+use crate::classdiagram::{ClassBox, ClassDiagram, ClassNote, Crow, RelKind, Relation};
 use crate::flowchart::Direction;
 
 /// Parse class-diagram source into a [`ClassDiagram`].
@@ -291,6 +291,8 @@ fn parse_relation(stmt: &str) -> Option<Relation> {
         label,
         from_card,
         to_card,
+        from_crow: Crow::None,
+        to_crow: Crow::None,
     })
 }
 

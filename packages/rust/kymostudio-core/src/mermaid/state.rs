@@ -139,19 +139,12 @@ fn resolve(
             .last()
             .map(|i| fc.subgraphs[*i].id.clone())
             .unwrap_or_default();
-        let id = if is_source {
-            format!("[*]s@{scope}")
+        let (id, shape) = if is_source {
+            (format!("[*]s@{scope}"), Shape::StateStart)
         } else {
-            format!("[*]e@{scope}")
+            (format!("[*]e@{scope}"), Shape::StateEnd)
         };
-        touch(
-            &id,
-            Some(String::new()),
-            Some(Shape::Circle),
-            fc,
-            index,
-            sub_stack,
-        );
+        touch(&id, Some(String::new()), Some(shape), fc, index, sub_stack);
         id
     } else {
         touch(token, None, None, fc, index, sub_stack)

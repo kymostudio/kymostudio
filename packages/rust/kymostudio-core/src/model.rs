@@ -48,6 +48,7 @@ str_enum! {
         Annotation => "annotation", AwsTile => "aws-tile", AwsTileHero => "aws-tile-hero",
         Badge => "badge", Image => "image",
         BpmnStart => "bpmn-start", BpmnEnd => "bpmn-end",
+        StateStart => "state-start", StateEnd => "state-end",
         BpmnIntermediate => "bpmn-intermediate", BpmnBoundary => "bpmn-boundary",
         BpmnTask => "bpmn-task", BpmnSubprocess => "bpmn-subprocess",
         BpmnGateway => "bpmn-gateway", BpmnDataObject => "bpmn-data-object",

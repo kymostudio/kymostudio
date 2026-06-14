@@ -4,7 +4,7 @@
 //! become labelled links. All real `<text>`.
 
 use super::MermaidError;
-use crate::classdiagram::{ClassBox, ClassDiagram, RelKind, Relation};
+use crate::classdiagram::{ClassBox, ClassDiagram, Crow, RelKind, Relation};
 use crate::flowchart::Direction;
 
 const KINDS: &[&str] = &[
@@ -195,6 +195,8 @@ fn parse_relation(line: &str) -> Option<Relation> {
         label: ty.to_string(),
         from_card: String::new(),
         to_card: String::new(),
+        from_crow: Crow::None,
+        to_crow: Crow::None,
     })
 }
 

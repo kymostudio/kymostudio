@@ -26,6 +26,22 @@ pub enum RelKind {
     Link,
 }
 
+/// Crow's-foot multiplicity for one end of an ER relationship.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Crow {
+    /// No crow's-foot glyph (non-ER relationship).
+    #[default]
+    None,
+    /// `|o` / `o|` — zero or one (bar + circle).
+    ZeroOne,
+    /// `||` — exactly one (two bars).
+    One,
+    /// `}o` / `o{` — zero or many (crow's foot + circle).
+    ZeroMany,
+    /// `}|` / `|{` — one or many (crow's foot + bar).
+    OneMany,
+}
+
 /// A directed class relationship.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Relation {
@@ -40,6 +56,10 @@ pub struct Relation {
     pub label: String,
     pub from_card: String,
     pub to_card: String,
+    /// Crow's-foot glyph at the `from` end (ER diagrams only).
+    pub from_crow: Crow,
+    /// Crow's-foot glyph at the `to` end (ER diagrams only).
+    pub to_crow: Crow,
 }
 
 /// One class box with its three compartments.

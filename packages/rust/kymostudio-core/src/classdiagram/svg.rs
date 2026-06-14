@@ -3,7 +3,7 @@
 //! [`crate::layout::layout_flowchart`]; relationships draw the UML arrowhead for
 //! their kind. Everything is real `<text>`, so PNG/PDF keep the labels.
 
-use super::{ClassBox, ClassDiagram, RelKind, Relation};
+use super::{ClassBox, ClassDiagram, Crow, RelKind, Relation};
 use crate::flowchart::{FlowEdge, FlowNode, Flowchart, Subgraph};
 use crate::layout;
 use crate::model::{Component, Shape};
@@ -87,11 +87,6 @@ pub fn render(cd: &ClassDiagram) -> String {
             esc(&region.label)
         );
     }
-    for r in &cd.relations {
-        if let (Some(a), Some(b)) = (by_id.get(r.from.as_str()), by_id.get(r.to.as_str())) {
-            body += &edge_svg(r, a, b);
-        }
-    }
     for c in &cd.classes {
         if let Some(comp) = by_id.get(c.id.as_str()) {
             body += &box_svg(c, comp);
@@ -100,6 +95,12 @@ pub fn render(cd: &ClassDiagram) -> String {
     for (i, n) in cd.notes.iter().enumerate() {
         if let Some(comp) = by_id.get(format!("__note{i}").as_str()) {
             body += &note_box(&n.text, comp);
+        }
+    }
+    // Edges last: UML heads + multiplicity must sit on top of the boxes.
+    for r in &cd.relations {
+        if let (Some(a), Some(b)) = (by_id.get(r.from.as_str()), by_id.get(r.to.as_str())) {
+            body += &edge_svg(r, a, b);
         }
     }
 
@@ -197,9 +198,14 @@ fn divider(x: i32, ty: i32, w: i32) -> String {
 }
 
 fn edge_svg(r: &Relation, a: &Component, b: &Component) -> String {
-    // The decorated end is `from` when head_at_from, else `to`.
-    let (sx, sy) = a.pos;
-    let (ex, ey) = b.pos;
+    // Clip the centre-to-centre line to each box border so the UML head lands
+    // on the edge (visible) instead of buried in the target box centre.
+    let (acx, acy) = a.pos;
+    let (bcx, bcy) = b.pos;
+    let (aw, ah) = a.size.unwrap_or((120, 60));
+    let (bw, bh) = b.size.unwrap_or((120, 60));
+    let (sx, sy) = border_point(acx, acy, aw / 2, ah / 2, bcx, bcy);
+    let (ex, ey) = border_point(bcx, bcy, bw / 2, bh / 2, acx, acy);
     let dash = if r.dashed {
         " stroke-dasharray=\"5 4\""
     } else {
@@ -227,6 +233,14 @@ fn edge_svg(r: &Relation, a: &Component, b: &Component) -> String {
         "<line x1=\"{x1}\" y1=\"{y1}\" x2=\"{x2}\" y2=\"{y2}\" stroke=\"#334155\" \
          stroke-width=\"1.2\"{dash}{mk}/>"
     );
+    if r.from_crow != Crow::None || r.to_crow != Crow::None {
+        let len = (((ex - sx) as f64).powi(2) + ((ey - sy) as f64).powi(2))
+            .sqrt()
+            .max(1.0);
+        let (ux, uy) = ((ex - sx) as f64 / len, (ey - sy) as f64 / len);
+        out += &crow_end(sx, sy, ux, uy, r.from_crow);
+        out += &crow_end(ex, ey, -ux, -uy, r.to_crow);
+    }
     let (mx, my) = ((sx + ex) / 2, (sy + ey) / 2);
     if !r.label.is_empty() {
         out += &format!(
@@ -244,10 +258,74 @@ fn edge_svg(r: &Relation, a: &Component, b: &Component) -> String {
     out
 }
 
-/// A multiplicity label placed just inside the `(px,py)` end, toward (qx,qy).
+/// Draw an ER crow's-foot glyph at entity border `(ex,ey)`; `(ux,uy)` is the
+/// unit vector pointing away from the entity into the relationship gap.
+fn crow_end(ex: i32, ey: i32, ux: f64, uy: f64, card: Crow) -> String {
+    if card == Crow::None {
+        return String::new();
+    }
+    let (px, py) = (-uy, ux); // perpendicular
+    let pt = |d: f64, off: f64| {
+        (
+            (ex as f64 + ux * d + px * off).round() as i32,
+            (ey as f64 + uy * d + py * off).round() as i32,
+        )
+    };
+    let seg = |a: (i32, i32), b: (i32, i32)| {
+        format!(
+            "<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke=\"#334155\" stroke-width=\"1.2\"/>",
+            a.0, a.1, b.0, b.1
+        )
+    };
+    let bar = |d: f64| seg(pt(d, 7.0), pt(d, -7.0));
+    let foot = || {
+        let apex = pt(16.0, 0.0);
+        seg(apex, pt(0.0, 7.0)) + &seg(apex, pt(0.0, 0.0)) + &seg(apex, pt(0.0, -7.0))
+    };
+    let circle = |d: f64| {
+        let (cx, cy) = pt(d, 0.0);
+        format!(
+            "<circle cx=\"{cx}\" cy=\"{cy}\" r=\"5\" fill=\"#ffffff\" stroke=\"#334155\" stroke-width=\"1.2\"/>"
+        )
+    };
+    match card {
+        Crow::One => bar(7.0) + &bar(13.0),
+        Crow::ZeroOne => bar(7.0) + &circle(16.0),
+        Crow::OneMany => foot() + &bar(20.0),
+        Crow::ZeroMany => foot() + &circle(23.0),
+        Crow::None => String::new(),
+    }
+}
+
+/// Border intersection of the ray from box centre `(cx,cy)` toward `(tx,ty)`.
+fn border_point(cx: i32, cy: i32, hw: i32, hh: i32, tx: i32, ty: i32) -> (i32, i32) {
+    let dx = (tx - cx) as f64;
+    let dy = (ty - cy) as f64;
+    if dx == 0.0 && dy == 0.0 {
+        return (cx, cy);
+    }
+    let sx = if dx != 0.0 {
+        hw as f64 / dx.abs()
+    } else {
+        f64::INFINITY
+    };
+    let sy = if dy != 0.0 {
+        hh as f64 / dy.abs()
+    } else {
+        f64::INFINITY
+    };
+    let s = sx.min(sy);
+    (cx + (dx * s).round() as i32, cy + (dy * s).round() as i32)
+}
+
+/// A multiplicity label just outside the `(px,py)` box border, toward `(qx,qy)`.
 fn card(px: i32, py: i32, qx: i32, qy: i32, t: &str) -> String {
-    let nx = px + (qx - px).signum() * 14;
-    let ny = py + (qy - py).signum() * 14;
+    let dx = (qx - px) as f64;
+    let dy = (qy - py) as f64;
+    let len = (dx * dx + dy * dy).sqrt().max(1.0);
+    let (ux, uy) = (dx / len, dy / len);
+    let nx = (px as f64 + ux * 12.0 - uy * 9.0).round() as i32;
+    let ny = (py as f64 + uy * 12.0 + ux * 9.0).round() as i32;
     format!(
         "<text x=\"{nx}\" y=\"{ny}\" text-anchor=\"middle\" font-size=\"11\" fill=\"#64748b\">{}</text>",
         esc(t)
