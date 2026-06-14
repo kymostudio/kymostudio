@@ -54,9 +54,9 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
             started = true;
             continue;
         }
-        let low = t.to_ascii_lowercase();
-        // decorations / styling decorate the previous card — skip.
-        if t.starts_with("::") || low.starts_with("style ") || low.starts_with("class ") {
+        // `::icon` / `:::class` decorate the previous card — skip. (kanban has no
+        // `style`/`class` keyword, so mermaid renders those lines as cards.)
+        if t.starts_with("::") {
             continue;
         }
         let indent = line.len() - line.trim_start().len();
@@ -102,8 +102,7 @@ fn node_label(text: &str) -> (String, Shape) {
         (Some(a), Some(b)) if b > a => meta_values(&text[a + 2..b]),
         _ => String::new(),
     };
-    let text = text.split("@{").next().unwrap_or(text);
-    let text = text.split("::").next().unwrap_or(text).trim();
+    let text = text.split("@{").next().unwrap_or(text).trim();
     let suffix = if meta.is_empty() {
         String::new()
     } else {
@@ -129,8 +128,9 @@ fn node_label(text: &str) -> (String, Shape) {
             }
         }
     }
+    let plain = text.split(":::").next().unwrap_or(text);
     (
-        format!("{}{suffix}", text.trim().trim_matches('"')),
+        format!("{}{suffix}", plain.trim().trim_matches('"')),
         Shape::Box,
     )
 }
