@@ -9,6 +9,14 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.6] - 2026-06-14
+
+### Fixed
+
+- Define the cargo-dist `[profile.dist]` build profile so the prebuilt-binary /
+  Homebrew release pipeline (added in 0.4.5) actually builds. 0.4.6 is the first
+  release to publish `kymo` binaries and a populated Homebrew formula.
+
 ## [0.4.5] - 2026-06-14
 
 ### Added

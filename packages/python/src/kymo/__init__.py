@@ -19,7 +19,7 @@ from .lint_bpmn import lint as lint_bpmn
 from .model import Component, Diagram, Edge, Region
 from .to_svg import render
 
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 
 
 # BPMN import/export delegate to the Rust core (the single source of truth). Imported
