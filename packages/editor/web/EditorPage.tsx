@@ -16,7 +16,7 @@ import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } f
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
-import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, Trash2, LogOut, ArrowLeft, ArrowRight, PanelLeft, SquareCode, Eye } from "lucide-react";
+import { ChevronDown, Download, FileCode2, FileImage, Code2, Link2, Check, Save, Plus, Pencil, Copy, MoreHorizontal, BookOpen, HelpCircle, Menu, Trash2, LogOut, ArrowLeft, ArrowRight, PanelLeft, SquareCode, Eye, Boxes } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -606,6 +606,7 @@ export default function EditorPage() {
                 </button>
                 {claims && <>
                   <div className="menu-sep" />
+                  <Link className="acct-item exp-item" to="/projects" onClick={() => setMoreOpen(false)}><Boxes size={17} strokeWidth={1.9} />Projects</Link>
                   <Link className="acct-item exp-item" to="/trash" onClick={() => setMoreOpen(false)}><Trash2 size={17} strokeWidth={1.9} />Trash</Link>
                   <button className="acct-item exp-item" onClick={() => { setMoreOpen(false); signOut(); }}><LogOut size={17} strokeWidth={1.9} />Sign out</button>
                 </>}

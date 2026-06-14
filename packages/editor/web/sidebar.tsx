@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, colorFor } from "./auth";
-import { useWorkspace, assignDiagram, deleteDiagram, renameDiagram, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
+import { useWorkspace, assignDiagram, deleteDiagram, renameDiagram, moveDiagramToProject, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
 import { useConfirm } from "./confirm";
 import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
@@ -76,7 +76,7 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
   currentId: string | null; currentTitle: string; onNewDiagram: () => void; onClose: () => void;
 }) {
   const { idToken } = useAuth();
-  const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder } = useWorkspace();
+  const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder, projects, currentProject } = useWorkspace();
   const { items, reload } = useDiagrams();
   const confirm = useConfirm();
   const toast = useToast();
@@ -186,13 +186,27 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
     openMenu(e, items);
   }
   function fileMenu(e: React.MouseEvent, it: Item) {
+    const at = { clientX: e.clientX, clientY: e.clientY };
+    const others = projects.filter((p) => p.id !== currentProject);
     const items: MenuItem[] = [
       { label: "Open", icon: <ExternalLink size={14} />, onClick: () => openFile(it.id) },
       { sep: true },
       { label: "Rename", icon: <Pencil size={14} />, shortcut: "F2", onClick: () => startRename("file", it.id) },
+      ...(others.length ? [{ label: "Move to project…", icon: <Boxes size={14} />, onClick: () => moveToProjectMenu(at, it) }] : []),
+      { sep: true },
       { label: "Delete", icon: <Trash2 size={14} />, danger: true, onClick: () => onDeleteFile(it) },
     ];
     openMenu(e, items);
+  }
+  // Second-level picker: choose the destination project for a diagram.
+  function moveToProjectMenu(at: { clientX: number; clientY: number }, it: Item) {
+    const items: MenuItem[] = projects
+      .filter((p) => p.id !== currentProject)
+      .map((p) => ({
+        label: p.name, icon: <Boxes size={14} />,
+        onClick: async () => { await moveDiagramToProject(idToken, it.id, p.id); reload(); toast({ message: `Moved “${it.title || "Untitled"}” to ${p.name}` }); },
+      }));
+    openMenu(at, items);
   }
   function rootMenu(e: React.MouseEvent) {
     if (e.target !== e.currentTarget) return; // only the empty tree background
