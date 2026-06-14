@@ -19,6 +19,7 @@ import {
   mermaidToSvg,
   mermaidSequenceToSvg,
   mermaidStateToSvg,
+  mermaidClassToSvg,
   registerFont,
   svgToPdf,
   svgToPng,
@@ -90,6 +91,8 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
       if (grammar === "sequencediagram") return mermaidSequenceToSvg(source);
       if (grammar === "statediagram" || grammar === "statediagram-v2")
         return mermaidStateToSvg(source);
+      if (grammar === "classdiagram" || grammar === "classdiagram-v2")
+        return mermaidClassToSvg(source);
     } catch {
       // unsupported syntax for kymo's engine → fall through to merman
     }

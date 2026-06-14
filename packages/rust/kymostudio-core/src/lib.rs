@@ -12,6 +12,7 @@ use resvg::{tiny_skia, usvg};
 // The shared diagram engine — pure Rust, no SVG deps. Mermaid import parses
 // into [`model::Diagram`], lays it out, and serializes to the `.kymo.json`
 // interchange format the Python/JS front-ends consume.
+pub mod classdiagram;
 pub mod d2;
 pub mod dot;
 pub mod drawio;
@@ -311,6 +312,11 @@ pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
     let mut fc = mermaid::parse_state(src)?;
     render_flowchart_math(&mut fc);
     Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+}
+
+/// Render a Mermaid `classDiagram` → SVG (kymo own multi-compartment renderer).
+pub fn mermaid_class_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    Ok(classdiagram::svg::render(&mermaid::parse_class(src)?))
 }
 
 /// Render D2 flowchart source → SVG, fully in Rust: parse D2 → flowchart IR →

@@ -1,0 +1,63 @@
+//! Class-diagram IR. A `classDiagram` parses to a set of class boxes (name,
+//! stereotype, attribute and method compartments) plus typed relationships.
+//! Rendered by [`svg`] as real `<text>` (raster-safe), positioned by reusing
+//! [`crate::layout::layout_flowchart`].
+
+use crate::flowchart::Direction;
+
+pub mod svg;
+
+/// A UML class relationship kind (determines the arrowhead / line style).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RelKind {
+    /// `<|--` solid line, hollow triangle (inheritance / generalization).
+    Inheritance,
+    /// `*--` solid line, filled diamond (composition).
+    Composition,
+    /// `o--` solid line, hollow diamond (aggregation).
+    Aggregation,
+    /// `-->` solid line, open arrow (association).
+    Association,
+    /// `..>` dashed line, open arrow (dependency).
+    Dependency,
+    /// `..|>` dashed line, hollow triangle (realization).
+    Realization,
+    /// `--` / `..` plain link, no arrowhead.
+    Link,
+}
+
+/// A directed class relationship.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Relation {
+    pub from: String,
+    pub to: String,
+    pub kind: RelKind,
+    /// Dashed line (dependency / realization / dotted link).
+    pub dashed: bool,
+    /// The decoration sits on the `from` end (the operator pointed left, e.g.
+    /// `A <|-- B` means B inherits A: the triangle is at A).
+    pub head_at_from: bool,
+    pub label: String,
+    pub from_card: String,
+    pub to_card: String,
+}
+
+/// One class box with its three compartments.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ClassBox {
+    pub id: String,
+    /// Display name (without generics markup), defaults to the id.
+    pub name: String,
+    /// `<<interface>>` / `<<abstract>>` etc. (no guillemets).
+    pub stereotype: String,
+    pub attributes: Vec<String>,
+    pub methods: Vec<String>,
+}
+
+/// A parsed class diagram.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ClassDiagram {
+    pub direction: Direction,
+    pub classes: Vec<ClassBox>,
+    pub relations: Vec<Relation>,
+}
