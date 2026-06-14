@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
 import { useDiagrams, KindIcon } from "./sidebar";
 import { TEMPLATES, type Template } from "./templates";
-import { docHref } from "./kroki";
+import { docHref, extFor } from "./kroki";
 import { Plus, FolderOpen, BookOpen } from "lucide-react";
 
 // A few common starters surfaced as the right column (rest live in the gallery).
@@ -44,7 +44,7 @@ export function WelcomeView({ onNew, onOpenFile, onTemplate }: {
               ) : recent.length ? (
                 recent.map((it) => (
                   <button key={it.id} className="wel-recent" title={it.title || "Untitled"} onClick={() => navigate("/?d=" + encodeURIComponent(it.id))}>
-                    <KindIcon kind={it.kind} /><span className="wel-recent-name">{it.title || "Untitled"}</span>
+                    <KindIcon kind={it.kind} /><span className="wel-recent-name">{it.title || "Untitled"}<span className="wel-ext">.{extFor(it.kind)}</span></span>
                   </button>
                 ))
               ) : (
