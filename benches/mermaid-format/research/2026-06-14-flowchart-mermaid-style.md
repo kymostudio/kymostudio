@@ -30,15 +30,20 @@ round-trips as `(...)` instead of `[...]` (a fidelity fix).
 
 ## Visual proof (same source, three renders)
 
-| kymo native | kymo **mermaid-style** | mermaid.js 11.15 |
-|---|---|---|
-| ![](assets/2026-06-14-style/kymo-native.png) | ![](assets/2026-06-14-style/kymo-mermaid-style.png) | ![](assets/2026-06-14-style/mermaidjs.png) |
+| kymo native | kymo **mermaid-style** | merman | mermaid.js 11.15 |
+|---|---|---|---|
+| ![](assets/2026-06-14-style/kymo-native.png) | ![](assets/2026-06-14-style/kymo-mermaid-style.png) | ![](assets/2026-06-14-style/merman.png) | ![](assets/2026-06-14-style/mermaidjs.png) |
 
-The mermaid-style render matches mermaid.js's visual language closely: same node
+The mermaid-style render matches mermaid.js's visual *language* closely: same node
 fill/border, sharp rectangles, diamond/circle glyphs, yellow `Section` cluster,
 `#333` filled arrows, edge-label backgrounds, no grid. What still differs is
 **layout** — node positions (kymo mirrors Do-it/Skip), edge curvature (kymo routes
 orthogonal Z-paths vs mermaid's splines), and cluster-label placement.
+
+**merman** (third) is shown for contrast: as a Rust *port* of mermaid it reproduces
+mermaid.js's exact layout *and* style — note Do-it/Skip on the same sides, the same
+spline edges and cluster placement — which is why it overlays on mermaid.js at
+~1.5% (table below) while kymo, in either style, sits at ~14% on layout alone.
 
 ## The pixel-overlay metric does NOT move — and why that's expected
 
