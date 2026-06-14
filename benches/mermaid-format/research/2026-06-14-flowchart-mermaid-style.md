@@ -87,3 +87,78 @@ rect fidelity, a light mermaid sizing bump, and the API + source-config plumbing
 correctness fix). Deferred: dagre-like layout, spline edge routing, exact mermaid
 text metrics, and a Trebuchet font for the resvg deploy path (today it falls back
 to the registered sans-serif).
+
+---
+
+## Update — kymo own-renderer + dagre layout (the "match mermaid" push)
+
+The v1 above is "mermaid-*styled*" on kymo's own Sugiyama layout, which the
+overlay metric showed barely moves (layout-dominated). This update pushes kymo's
+**own** renderer toward mermaid-*faithful* by porting the layers that actually
+matter, while staying raster-safe (no merman in the render path).
+
+### What was added (all in kymo's own pipeline)
+
+| Layer | How |
+|---|---|
+| **Dagre layout** | the [`dagre`](https://crates.io/crates/dagre) crate (a dagre.js port, Apache-2.0, wasm-safe) — `src/layout_dagre.rs` builds a compound graph from the `Flowchart` IR, runs `layout()`, maps node positions + **edge waypoints** + cluster bounds into a `Diagram` |
+| **Mermaid node sizing** | calibrated against mermaid.js 11: rect ≈ `6.82·chars + 64`, height 54; per-shape padding for round/circle/diamond/hex |
+| **Parallelogram / trapezoid** | `[/…/]` `[\…\]` `[/…\]` `[\…/]` → new `Shape::{Parallelogram,…}` (kymojson-mapped to `box`), rendered as polygons |
+| **Per-node colours** | `classDef` / `class` / `:::` / `style` / `%%{init themeVariables.primaryColor}%%` → a render-time `id→NodeStyle` map applied as inline style (no IR/kymojson change) |
+| **Spline edges** | Catmull-Rom cubic-bezier through the dagre waypoints (mermaid `curveBasis` feel) |
+
+New entry point: `mermaidToSvgDagre(src)` (wasm) / `mermaid_to_svg_dagre`.
+
+### Result (overlay vs mermaid.js, candidates rasterised through resvg = deploy path)
+
+| source | kymo-own (Sugiyama) | **kymo + dagre** | merman + text (Option A) |
+|---|---|---|---|
+| appli_001 | 2.1% | **1.8%** | 0.6% |
+| conf_000 | 5.2% | **5.0%** | 1.4% |
+| conf_001 | 5.1% | **4.8%** | 1.2% |
+| conf_002 | 47.7% | **44.7%** | 1.4% |
+| conf_003 | 5.3% | **5.3%** | 1.3% |
+| **mean** | 13.1% | **12.3%** | **1.2%** |
+
+Visual (same source, kymo + dagre, rasterised via resvg):
+
+![](assets/2026-06-14-style/kymo-dagre.png)
+
+This now reads as a genuine mermaid flowchart — sharp `[...]` rects, diamond,
+circle, yellow cluster, **curved edges**, mermaid colours, mermaid-proportioned
+sizing — and it is **raster-safe** (kymo's own `<text>`).
+
+### Honest finding: each layer only shaves a little
+
+dagre + sizing + shapes + colours + splines moved the mean 14.1% → 12.3% — small,
+because the residual is **not** the things we fixed. Overlaying conf_000 shows it
+directly: node positions are offset **20–40px** and the two branch children are
+**mirrored** (kymo's dagre tie-break puts Skip left, mermaid puts it right). The
+remaining gap is:
+
+1. **Fine layout-coordinate divergence** — even with the same algorithm, exact
+   coordinates differ because kymo's node sizes are *calibrated* (per-char average)
+   not *measured* (per-glyph trebuchet), and mermaid inserts edge-label dummy nodes
+   that shift ranks. Plus ordering tie-breaks differ.
+2. **Font** — resvg renders the labels in Roboto (no Trebuchet registered), so every
+   label's pixels differ slightly — an irreducible floor on small diagrams.
+3. **`theme: base` (conf_002)** — `themeVariables.primaryColor` is applied, but
+   `base` re-derives the *whole* palette (cluster, edges, contrast); matching it is a
+   theme-derivation port. Pathological, not representative.
+
+### Verdict
+
+kymo's own renderer + dagre reaches **"close"** (~2–5% on normal flowcharts,
+raster-safe, no merman dep) and looks convincingly mermaid-like. Reaching
+**"identical"** (≤1.5%) is a long tail — per-glyph Trebuchet metrics, exact
+ordering tie-breaks, edge-label dummy ranks, full theme derivation, a registered
+Trebuchet font — i.e. precisely re-porting mermaid's flowchart wrapper. The
+direct comparison makes the trade-off explicit: **merman + a foreignObject→text
+postprocess** reaches **1.2%** (mermaid's exact engine, ~50 lines) and wins on
+every case, including the pathological `theme:base` one:
+
+![](assets/2026-06-14-style/merman-postprocess.png)
+
+So: use **kymo + dagre** when an independent, dependency-light, mermaid-*ish*
+raster-safe renderer is wanted; use **merman + text** when pixel-fidelity to
+mermaid is the goal.

@@ -115,6 +115,12 @@ pub fn mermaid_to_svg_styled(src: &str, style: &str) -> Result<String, JsError> 
     crate::mermaid_to_svg_styled(src, st).map_err(|e| JsError::new(&e.to_string()))
 }
 
+/// PROTOTYPE: Mermaid flowchart -> SVG via dagre layout + mermaid style.
+#[wasm_bindgen(js_name = mermaidToSvgDagre)]
+pub fn mermaid_to_svg_dagre(src: &str) -> Result<String, JsError> {
+    crate::mermaid_to_svg_dagre(src).map_err(|e| JsError::new(&e.to_string()))
+}
+
 /// Render a Mermaid `sequenceDiagram` -> SVG (kymo own renderer, text-based).
 #[wasm_bindgen(js_name = mermaidSequenceToSvg)]
 pub fn mermaid_sequence_to_svg(src: &str) -> Result<String, JsError> {

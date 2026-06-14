@@ -33,6 +33,11 @@ const CHAR_W: f64 = 8.0; // ~13px semibold label, with breathing room
 
 /// Real (width, height) of a flowchart node's glyph box, sized to its label.
 /// Boxes stay upright regardless of flow direction.
+/// Public wrapper so the dagre adapter can size nodes identically.
+pub(crate) fn node_size_for(label: &str, shape: Shape, style: FlowStyle) -> (i32, i32) {
+    node_size(label, shape, style)
+}
+
 fn node_size(label: &str, shape: Shape, style: FlowStyle) -> (i32, i32) {
     // Multi-line labels (class / er boxes) size by their widest line and row
     // count; single-line labels keep the original shape-based sizing.
@@ -47,6 +52,27 @@ fn node_size(label: &str, shape: Shape, style: FlowStyle) -> (i32, i32) {
     if lines.len() > 1 {
         let w = (text_w + 24).max(80);
         let h = lines.len() as i32 * 18 + 16;
+        return (w, h);
+    }
+    // Mermaid (16px trebuchet) node sizing, calibrated against mermaid.js 11:
+    // rect ~6.82*chars + 64, height 54; other shapes per-shape padding.
+    if matches!(style, FlowStyle::Mermaid) {
+        let tw = (max_chars as f64 * 6.82) as i32;
+        let (w, h) = match shape {
+            Shape::Circle => {
+                let d = (tw + 24).max(50);
+                (d, d)
+            }
+            Shape::Diamond => {
+                let d = (tw + 63).max(70);
+                (d, d)
+            }
+            Shape::Hex => ((tw + 43).max(60), 39),
+            Shape::Cylinder => ((tw + 40).max(56), 54),
+            Shape::Badge => ((tw + 39).max(56), 54),
+            Shape::Box => ((tw + 39).max(56), 54), // rounded `(...)`
+            _ => ((tw + 64).max(70), 54),          // sharp Rect `[...]` & default
+        };
         return (w, h);
     }
     let (w, h) = match shape {

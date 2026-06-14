@@ -22,8 +22,9 @@ mod state;
 
 use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
 use crate::model::Shape;
-use crate::style::FlowStyle;
+use crate::style::{FlowStyle, NodeStyle};
 use parser::{parse_statement, Item};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MermaidError {
@@ -508,6 +509,110 @@ fn scan_kv(line: &str) -> Option<FlowStyle> {
         Some(FlowStyle::Mermaid)
     } else if val.contains("kymo") {
         Some(FlowStyle::Kymo)
+    } else {
+        None
+    }
+}
+
+/// Scan flowchart source for per-node colours: `classDef`, `class`, inline
+/// `:::class`, `style`, and a `%%{init themeVariables.primaryColor}%%` global
+/// node fill. Returns `(id -> NodeStyle, global_fill)`. Render-time only — does
+/// not touch the IR or kymojson.
+pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<String>) {
+    let mut classdefs: HashMap<String, NodeStyle> = HashMap::new();
+    let mut node_class: HashMap<String, String> = HashMap::new();
+    let mut direct: HashMap<String, NodeStyle> = HashMap::new();
+    let mut global_fill: Option<String> = None;
+
+    for raw in src.lines() {
+        let line = raw.trim();
+        let low = line.to_ascii_lowercase();
+        if low.starts_with("classdef ") {
+            if let Some((name, body)) = line[8..].trim().split_once(char::is_whitespace) {
+                classdefs.insert(name.trim().to_string(), parse_style(body));
+            }
+        } else if low.starts_with("class ") {
+            if let Some((ids, name)) = line[5..].trim().rsplit_once(char::is_whitespace) {
+                for id in ids.split(',') {
+                    node_class.insert(id.trim().to_string(), name.trim().to_string());
+                }
+            }
+        } else if low.starts_with("style ") {
+            if let Some((id, body)) = line[5..].trim().split_once(char::is_whitespace) {
+                direct.insert(id.trim().to_string(), parse_style(body));
+            }
+        }
+        if line.contains(":::") {
+            for tok in line.split_whitespace() {
+                if let Some((id, cls)) = tok.split_once(":::") {
+                    let id = id.trim_matches(|c: char| !c.is_alphanumeric() && c != '_');
+                    let cls = cls.trim_matches(|c: char| !c.is_alphanumeric() && c != '_');
+                    if !id.is_empty() && !cls.is_empty() {
+                        node_class.insert(id.to_string(), cls.to_string());
+                    }
+                }
+            }
+        }
+        if low.contains("primarycolor") {
+            global_fill = grab_hex(&low, "primarycolor").or(global_fill);
+        }
+    }
+
+    let mut out: HashMap<String, NodeStyle> = HashMap::new();
+    let ids: std::collections::HashSet<&String> = node_class.keys().chain(direct.keys()).collect();
+    for id in ids {
+        let mut ns = node_class
+            .get(id)
+            .and_then(|c| classdefs.get(c))
+            .cloned()
+            .unwrap_or_default();
+        if let Some(d) = direct.get(id) {
+            if d.fill.is_some() {
+                ns.fill = d.fill.clone();
+            }
+            if d.stroke.is_some() {
+                ns.stroke = d.stroke.clone();
+            }
+            if d.color.is_some() {
+                ns.color = d.color.clone();
+            }
+            if d.stroke_width.is_some() {
+                ns.stroke_width = d.stroke_width.clone();
+            }
+        }
+        out.insert(id.clone(), ns);
+    }
+    (out, global_fill)
+}
+
+/// Parse a `fill:#f00,stroke:#00f,color:#fff,stroke-width:2px` style list.
+fn parse_style(s: &str) -> NodeStyle {
+    let mut ns = NodeStyle::default();
+    for frag in s.split(',') {
+        if let Some((k, v)) = frag.split_once(':') {
+            let v = v.trim().to_string();
+            match k.trim().to_ascii_lowercase().as_str() {
+                "fill" => ns.fill = Some(v),
+                "stroke" => ns.stroke = Some(v),
+                "color" => ns.color = Some(v),
+                "stroke-width" => ns.stroke_width = Some(v),
+                _ => {}
+            }
+        }
+    }
+    ns
+}
+
+/// Grab the `#rrggbb` (or `#rgb`) following `key` in a (lowercased) line.
+fn grab_hex(low: &str, key: &str) -> Option<String> {
+    let after = &low[low.find(key)? + key.len()..];
+    let h = after.find('#')?;
+    let hex: String = after[h..]
+        .chars()
+        .take_while(|c| *c == '#' || c.is_ascii_hexdigit())
+        .collect();
+    if hex.len() >= 4 {
+        Some(hex)
     } else {
         None
     }

@@ -10,7 +10,8 @@
 //! Python/JS flowchart SVG (independent impls), but the same visual language.
 
 use crate::model::{Anchor, Component, Diagram, Edge, Region, Shape};
-use crate::style::FlowStyle;
+use crate::style::{FlowStyle, NodeStyle};
+use std::collections::HashMap as StyleMap;
 use std::collections::HashMap;
 
 const STYLE: &str = "\
@@ -64,12 +65,26 @@ pub fn render(d: &Diagram) -> String {
 
 /// Render with an explicit [`FlowStyle`] — kymo-native or mermaid-like.
 pub fn render_styled(d: &Diagram, style: FlowStyle) -> String {
+    render_styled_with(d, style, &StyleMap::new(), None)
+}
+
+/// Render with per-node colour overrides + an optional global node fill.
+pub fn render_styled_with(
+    d: &Diagram,
+    style: FlowStyle,
+    styles: &StyleMap<String, NodeStyle>,
+    default_fill: Option<&str>,
+) -> String {
     let by_id: HashMap<&str, &Component> =
         d.components.iter().map(|c| (c.id.as_str(), c)).collect();
 
     let regions: String = d.regions.iter().map(|r| region_rect(r, style)).collect();
     let edges: String = d.edges.iter().map(|e| edge_svg(e, &by_id)).collect();
-    let nodes: String = d.components.iter().map(|c| node_svg(c, style)).collect();
+    let nodes: String = d
+        .components
+        .iter()
+        .map(|c| node_svg(c, style, styles.get(&c.id), default_fill))
+        .collect();
     let region_labels: String = d.regions.iter().map(region_label).collect();
 
     let (css, defs, font) = match style {
@@ -99,9 +114,22 @@ fn half(c: &Component) -> (i32, i32) {
     (w / 2, h / 2)
 }
 
-fn node_svg(c: &Component, style: FlowStyle) -> String {
+fn node_svg(
+    c: &Component,
+    style: FlowStyle,
+    ns: Option<&NodeStyle>,
+    default_fill: Option<&str>,
+) -> String {
     let (cx, cy) = c.pos;
     let (hw, hh) = half(c);
+    // Effective per-node colour override (per-node fill wins over the global).
+    let mut ovr = ns.cloned().unwrap_or_default();
+    if ovr.fill.is_none() {
+        if let Some(g) = default_fill {
+            ovr.fill = Some(g.to_string());
+        }
+    }
+    let shape_css = ovr.shape_css();
     // Sharp `[...]` rect vs rounded box only differ under the mermaid style.
     let box_rx = match (style, c.shape) {
         (FlowStyle::Mermaid, Shape::Rect) => 0,
@@ -153,6 +181,38 @@ fn node_svg(c: &Component, style: FlowStyle) -> String {
                 cx + hw,
             )
         }
+        Shape::Parallelogram | Shape::ParallelogramAlt => {
+            let sk = hh.min(hw / 2);
+            let (x0, x1, x2, x3) = if matches!(c.shape, Shape::Parallelogram) {
+                (cx - hw + sk, cx + hw, cx + hw - sk, cx - hw)
+            } else {
+                (cx - hw, cx + hw - sk, cx + hw, cx - hw + sk)
+            };
+            let pts = format!(
+                "{x0},{} {x1},{} {x2},{} {x3},{}",
+                cy - hh,
+                cy - hh,
+                cy + hh,
+                cy + hh
+            );
+            format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
+        }
+        Shape::Trapezoid | Shape::TrapezoidAlt => {
+            let sk = hh.min(hw / 2);
+            let (x0, x1, x2, x3) = if matches!(c.shape, Shape::Trapezoid) {
+                (cx - hw + sk, cx + hw - sk, cx + hw, cx - hw)
+            } else {
+                (cx - hw, cx + hw, cx + hw - sk, cx - hw + sk)
+            };
+            let pts = format!(
+                "{x0},{} {x1},{} {x2},{} {x3},{}",
+                cy - hh,
+                cy - hh,
+                cy + hh,
+                cy + hh
+            );
+            format!("<polygon class=\"fc-shape\" points=\"{pts}\"/>")
+        }
         Shape::Badge => {
             format!(
             "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{hh}\"/>",
@@ -173,11 +233,24 @@ fn node_svg(c: &Component, style: FlowStyle) -> String {
         )
         }
     };
+    let glyph = if shape_css.is_empty() {
+        glyph
+    } else {
+        glyph.replace(
+            "class=\"fc-shape\"",
+            &format!("class=\"fc-shape\" style=\"{shape_css}\""),
+        )
+    };
     let label = if c.name.is_empty() {
         String::new()
     } else {
+        let cstyle = ovr
+            .color
+            .as_ref()
+            .map(|c| format!(" style=\"fill:{c}\""))
+            .unwrap_or_default();
         format!(
-            "<text class=\"fc-label\" x=\"{cx}\" y=\"{cy}\">{}</text>",
+            "<text class=\"fc-label\" x=\"{cx}\" y=\"{cy}\"{cstyle}>{}</text>",
             esc(&c.name)
         )
     };
@@ -240,7 +313,11 @@ fn edge_svg(e: &Edge, by_id: &HashMap<&str, &Component>) -> String {
     let (sa, da) = resolve_anchors(s, t);
     let sp = anchor_pos(s, sa);
     let dp = anchor_pos(t, da);
-    let path = edge_path(sp, dp, sa);
+    // Prefer dagre waypoints (mermaid-faithful routing) when present.
+    let path = match &e.points {
+        Some(pts) if pts.len() >= 2 => smooth_path(pts),
+        _ => edge_path(sp, dp, sa),
+    };
     let dash = if e.dashed {
         " style=\"stroke-dasharray:6 4\""
     } else {
@@ -253,7 +330,9 @@ fn edge_svg(e: &Edge, by_id: &HashMap<&str, &Component>) -> String {
     };
     let mut out = format!("<path class=\"edge-path\"{dash} d=\"{path}\"{marker}/>\n");
     if !e.label.is_empty() {
-        let (lx, ly) = ((sp.0 + dp.0) / 2, (sp.1 + dp.1) / 2);
+        let (lx, ly) = e
+            .label_pos
+            .unwrap_or(((sp.0 + dp.0) / 2, (sp.1 + dp.1) / 2));
         out.push_str(&format!(
             "<text class=\"edge-label\" x=\"{lx}\" y=\"{ly}\">{}</text>\n",
             esc(&e.label)
@@ -287,6 +366,29 @@ fn region_label(r: &Region) -> String {
         y + 16,
         esc(&r.label)
     )
+}
+
+/// Smooth a polyline (dagre waypoints) into a Catmull-Rom cubic-bezier path so
+/// edges curve like mermaid curveBasis, while still passing through the routed
+/// points.
+fn smooth_path(pts: &[(i32, i32)]) -> String {
+    if pts.len() == 2 {
+        return format!("M{},{} L{},{}", pts[0].0, pts[0].1, pts[1].0, pts[1].1);
+    }
+    let mut d = format!("M{},{}", pts[0].0, pts[0].1);
+    for i in 0..pts.len() - 1 {
+        let p0 = pts[i.saturating_sub(1)];
+        let p1 = pts[i];
+        let p2 = pts[i + 1];
+        let p3 = pts[(i + 2).min(pts.len() - 1)];
+        let c1 = (p1.0 + (p2.0 - p0.0) / 6, p1.1 + (p2.1 - p0.1) / 6);
+        let c2 = (p2.0 - (p3.0 - p1.0) / 6, p2.1 - (p3.1 - p1.1) / 6);
+        d.push_str(&format!(
+            " C{},{} {},{} {},{}",
+            c1.0, c1.1, c2.0, c2.1, p2.0, p2.1
+        ));
+    }
+    d
 }
 
 /// Escape `& < >` for XML text content.
