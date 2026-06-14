@@ -2,10 +2,12 @@
 // Two local engines, picked per source:
 //
 //   - FLOWCHART (the dominant grammar, LLM output especially) renders through
-//     kymo-mermaid: a flowchart-only slice of merman (the Rust port of
-//     mermaid.js, pinned by rev) — ~470 KB brotli wasm with mermaid-11 parity.
+//     kymostudio-core's dagre engine (mermaidToSvgDagre): kymo's OWN raster-safe
+//     renderer — dagre layout + mermaid-faithful style at ~0.2% pixel-overlay vs
+//     mermaid.js — reusing the core wasm already loaded for kymo diagrams (no
+//     extra ~470 KB merman download).
 //   - every other grammar renders through mermaid.js (~760 KB brotli), which
-//     IS the reference implementation. Any kymo-mermaid error falls back here
+//     IS the reference implementation. Any core-engine error falls back here
 //     too, so an unsupported syntax degrades to the slower chunk, never to a
 //     broken diagram.
 //
@@ -16,7 +18,8 @@
 //   - a cache miss, a kroki outage, or any later render (typing) goes local:
 //     no render request per keystroke, immune to kroki, works offline.
 import { earlyResponse } from "./kroki";
-import wasmUrl from "kymo-mermaid/kymo_mermaid_bg.wasm";
+import coreWasmUrl from "kymostudio-core/kymostudio_core_bg.wasm";
+import initCore, { mermaidToSvgDagre } from "kymostudio-core";
 
 // mermaid is pinned ~11.15 to MATCH the merman rev kymo-mermaid is built from
 // (it targets mermaid@11.15): the two render paths must emit the same look.
@@ -42,12 +45,10 @@ async function renderLocal(source: string): Promise<string> {
   return svg;
 }
 
-let fc: Promise<any> | null = null;
-function loadFlowchartWasm(): Promise<any> {
-  return (fc ??= import("kymo-mermaid").then(async (m: any) => {
-    await m.default(wasmUrl as unknown as string); // streaming-compiled, parallel fetch
-    return m;
-  }));
+let core: Promise<void> | null = null;
+function loadCore(): Promise<void> {
+  // streaming-compiled, parallel fetch; idempotent across calls
+  return (core ??= initCore(coreWasmUrl as unknown as string).then(() => undefined));
 }
 
 // Conservative sniff: only route sources we KNOW the slice speaks. Front-matter
@@ -76,10 +77,10 @@ export async function renderMermaid(source: string): Promise<string> {
   if (early && early.ok) return await early.text();
   if (isPlainFlowchart(source)) {
     try {
-      const m = await loadFlowchartWasm();
-      return m.mermaidFlowchartToSvg(source);
+      await loadCore();
+      return mermaidToSvgDagre(source);
     } catch {
-      // not this slice's grammar (or wasm failed to load) — mermaid.js takes it
+      // unsupported syntax (or wasm failed to load) — mermaid.js takes it
     }
   }
   return renderLocal(source);
