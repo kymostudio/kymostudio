@@ -92,6 +92,11 @@ over a ≤50-source sample.
 3. **No diagram type is now lost by every tool.** Every foreignObject-only type
    has a kymo text engine.
 4. **~14 types are 100/100 everywhere** — already raster-safe, no work needed.
+5. **Recall is not correctness.** This table only checks that *labels* survive.
+   A separate visual pass (`2026-06-14-render-correctness.md`) found several
+   types kept every label yet drew the wrong picture — class/er/state edge
+   glyphs were missing. Those are fixed (PR #429); the recall numbers above
+   were already 100 throughout and are unchanged.
 
 ## kymo's own engines — accuracy headline (label recall vs mermaid.js, full corpus)
 
@@ -107,7 +112,9 @@ over a ≤50-source sample.
 | requirement | **100%** | **100%** |
 | state | 88.9% | 78% |
 
-State is lower because its renderer does not draw notes yet. 7 fixtures are
+State recall is lower because its renderer does not draw **notes** yet (its
+initial/final markers, a separate *correctness* issue, are now fixed — see
+`2026-06-14-render-correctness.md`). 7 fixtures are
 marked `known-divergent.json` (4 legacy ambiguous-syntax + 3 exotic: double-escaped
 KaTeX, decimal autonumber, mermaid text-wrapping of very long class names — which
 kymo cannot replicate at mermaid's exact pixel metrics).

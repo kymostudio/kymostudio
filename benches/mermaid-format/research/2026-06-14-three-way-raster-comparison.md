@@ -40,6 +40,9 @@ to merman (mirrors `render-api/engine.ts`). ~50 sources per type per dataset.
    has a kymo text engine (the latest: mindmap, kanban, requirement, all ~100%).
 4. **~14 types are already raster-safe everywhere** — reimplementing them buys
    nothing.
+5. **Raster-safe ≠ correct.** This only measures label survival. A visual
+   correctness pass (`2026-06-14-render-correctness.md`) found class/er/state
+   were raster-safe yet missing their relationship glyphs — now fixed (PR #429).
 
 ## Takeaway
 
