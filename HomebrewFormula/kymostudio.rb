@@ -4,28 +4,28 @@
 class Kymostudio < Formula
   desc "Render SVG diagrams to PNG and PDF (pure-Rust, no system deps)"
   homepage "https://github.com/kymostudio/kymostudio"
-  version "0.4.4"
+  version "0.4.6"
   license "Apache-2.0"
 
   on_macos do
     on_arm do
-      url "https://github.com/kymostudio/kymostudio/releases/download/v0.4.4/kymostudio-aarch64-apple-darwin.tar.xz"
-      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+      url "https://github.com/kymostudio/kymostudio/releases/download/v0.4.6/kymostudio-aarch64-apple-darwin.tar.xz"
+      sha256 "6c4932b209285def4c8fcd8e9d870d1832b7bfcbb35606f774067df3d167a6cc"
     end
     on_intel do
-      url "https://github.com/kymostudio/kymostudio/releases/download/v0.4.4/kymostudio-x86_64-apple-darwin.tar.xz"
-      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+      url "https://github.com/kymostudio/kymostudio/releases/download/v0.4.6/kymostudio-x86_64-apple-darwin.tar.xz"
+      sha256 "b19de30a3155dc03103fae0c89254ec517aa2037876a3490063361a0ae230294"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/kymostudio/kymostudio/releases/download/v0.4.4/kymostudio-aarch64-unknown-linux-gnu.tar.xz"
-      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+      url "https://github.com/kymostudio/kymostudio/releases/download/v0.4.6/kymostudio-aarch64-unknown-linux-gnu.tar.xz"
+      sha256 "65def19790399d7da4c49d16c14a9ad0a47315a3e88297df16075bc60da0e297"
     end
     on_intel do
-      url "https://github.com/kymostudio/kymostudio/releases/download/v0.4.4/kymostudio-x86_64-unknown-linux-gnu.tar.xz"
-      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+      url "https://github.com/kymostudio/kymostudio/releases/download/v0.4.6/kymostudio-x86_64-unknown-linux-gnu.tar.xz"
+      sha256 "59b4795b832b85f471f0899c80e5c7f50bb05b2a1cbd669dc0035245e9fada19"
     end
   end
 
