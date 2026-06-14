@@ -16,7 +16,7 @@ import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } f
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
-import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, HelpCircle, Menu, PanelLeft, SquareCode, Eye } from "lucide-react";
+import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, HelpCircle, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -51,6 +51,7 @@ export default function EditorPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const welcomeDismissed = useRef(false); // set when the user starts a diagram from the Welcome panel
   const [detected, setDetected] = useState<string | null>(null); // kind chosen by paste auto-detect (transient chip)
@@ -285,7 +286,7 @@ export default function EditorPage() {
   }, [source, kind, d]); // eslint-disable-line
 
   useEffect(() => {
-    const h = () => { setMenuOpen(false); setShareOpen(false); };
+    const h = () => { setMenuOpen(false); setShareOpen(false); setExportOpen(false); };
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") h(); };
     document.addEventListener("click", h);
     document.addEventListener("keydown", k);
@@ -554,8 +555,23 @@ export default function EditorPage() {
               Save
             </button>
           )}
-          {/* Share is the only standing action button; export + save-a-copy fold
-              into its popover, and New/Docs/Projects/Trash/Sign-out live on the
+          {/* Export this diagram (SVG / PNG / source) — its own dropdown next to Share */}
+          {!showWelcome && (
+          <div className="account mob-hide" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setExportOpen((o) => !o)} aria-haspopup="menu" aria-expanded={exportOpen} title="Export this diagram">
+              <Download size={16} strokeWidth={2} />Export<ChevronDown size={16} strokeWidth={2.2} className="chev-icon" />
+            </button>
+            {exportOpen && (
+              <div className="acct-menu exp-menu">
+                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}><FileCode2 size={17} strokeWidth={1.9} />To SVG</button>
+                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportPNG(); }}><FileImage size={17} strokeWidth={1.9} />To PNG</button>
+                <div className="menu-sep" />
+                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}><Code2 size={17} strokeWidth={1.9} />Source (.kymo)</button>
+              </div>
+            )}
+          </div>
+          )}
+          {/* Share is the standing CTA; New/Docs/Projects/Trash/Sign-out live on the
               activity-bar rail (hamburger + account). */}
           {!showWelcome && (
           <div className="account" onClick={(e) => e.stopPropagation()}>
@@ -591,13 +607,10 @@ export default function EditorPage() {
                     {copiedKey === "img" ? <Check size={17} strokeWidth={2.2} /> : <FileImage size={17} strokeWidth={1.9} />}
                     {copiedKey === "img" ? "Copied!" : "Copy Markdown image"}
                   </button>
-                  <div className="menu-sep" />
-                  <button className="acct-item exp-item" onClick={() => { setShareOpen(false); download(); }}><FileCode2 size={17} strokeWidth={1.9} />Export SVG</button>
-                  <button className="acct-item exp-item" onClick={() => { setShareOpen(false); exportPNG(); }}><FileImage size={17} strokeWidth={1.9} />Export PNG</button>
-                  <button className="acct-item exp-item" onClick={() => { setShareOpen(false); exportSource(); }}><Code2 size={17} strokeWidth={1.9} />Export source (.kymo)</button>
-                  {shared && claims && (
+                  {shared && claims && (<>
+                    <div className="menu-sep" />
                     <button className="acct-item exp-item" onClick={() => { setShareOpen(false); saveCopy(); }}><Save size={17} strokeWidth={1.9} />Save a copy to my diagrams</button>
-                  )}
+                  </>)}
                 </div>
               );
             })()}
