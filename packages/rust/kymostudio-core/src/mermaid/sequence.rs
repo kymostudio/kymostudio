@@ -117,8 +117,12 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
         // mid-stream changes apply only to subsequent messages.
         if lower == "autonumber" || lower.starts_with("autonumber ") {
             let arg = stmt["autonumber".len()..].trim();
-            let spec = if arg.eq_ignore_ascii_case("off") {
-                None
+            use crate::sequence::AutoNumber;
+            let cmd = if arg.eq_ignore_ascii_case("off") {
+                AutoNumber::Off
+            } else if arg.is_empty() {
+                seq.autonumber = true;
+                AutoNumber::On
             } else {
                 let nums: Vec<i64> = arg
                     .split_whitespace()
@@ -129,13 +133,9 @@ pub fn parse_sequence(stmts: &[(usize, String)]) -> Result<Sequence, MermaidErro
                 seq.autonumber = true;
                 seq.auto_start = start;
                 seq.auto_step = step;
-                Some((start, step))
+                AutoNumber::Set(start, step)
             };
-            push_item(
-                &mut seq,
-                &mut stack,
-                crate::sequence::Item::Autonumber(spec),
-            );
+            push_item(&mut seq, &mut stack, crate::sequence::Item::Autonumber(cmd));
             continue;
         }
 
@@ -560,15 +560,16 @@ mod tests {
         use crate::sequence::Item;
         let s =
             parse("sequenceDiagram\nA->>B: a\nautonumber 10 5\nA->>B: b\nautonumber off\nA->>B: c");
+        use crate::sequence::AutoNumber;
         let autos: Vec<_> = s
             .items
             .iter()
             .filter_map(|i| match i {
-                Item::Autonumber(spec) => Some(*spec),
+                Item::Autonumber(cmd) => Some(*cmd),
                 _ => None,
             })
             .collect();
-        assert_eq!(autos, vec![Some((10, 5)), None]);
+        assert_eq!(autos, vec![AutoNumber::Set(10, 5), AutoNumber::Off]);
     }
 
     #[test]

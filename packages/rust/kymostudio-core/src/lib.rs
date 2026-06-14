@@ -366,6 +366,19 @@ mod tests {
     }
 
     #[test]
+    fn autonumber_off_keeps_counting() {
+        // `off` hides but keeps advancing; bare `autonumber` resumes from the
+        // running count (5,10, hidden 15, then 20) — matching mermaid.
+        let svg = super::mermaid_to_sequence_svg(
+            "sequenceDiagram\nautonumber 5 5\nA->>B: a\nA->>B: b\nautonumber off\nA->>B: c\nautonumber\nA->>B: d",
+        )
+        .unwrap();
+        assert!(svg.contains(">5 a<") && svg.contains(">10 b<"));
+        assert!(svg.contains(">c<") && !svg.contains(">15 c<")); // hidden but counted
+        assert!(svg.contains(">20 d<")); // resumes at 20, not 1
+    }
+
+    #[test]
     fn multiline_node_data_and_continuation() {
         // Multi-line `@{ ... }` node-data block (YAML newline-separated fields).
         let svg = super::mermaid_to_svg(

@@ -68,9 +68,20 @@ pub enum Item {
     Note(Note),
     /// A combined fragment (`loop` / `alt` / `opt` / `par`).
     Fragment(Fragment),
-    /// An `autonumber` directive in the timeline: `Some((start, step))` turns
-    /// numbering on from `start`; `None` is `autonumber off`.
-    Autonumber(Option<(i64, i64)>),
+    /// An `autonumber` directive in the timeline.
+    Autonumber(AutoNumber),
+}
+
+/// An `autonumber` directive. The counter advances per message whenever
+/// numbering has been enabled — `Off` only hides it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AutoNumber {
+    /// `autonumber <start> <step>` — reset the counter to `start`, step `step`.
+    Set(i64, i64),
+    /// bare `autonumber` — show numbering from the current counter.
+    On,
+    /// `autonumber off` — hide numbering (the counter keeps advancing).
+    Off,
 }
 
 /// UML 2.5.1 `MessageSort` — how a message behaves.
