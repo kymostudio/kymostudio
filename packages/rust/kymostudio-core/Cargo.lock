@@ -343,6 +343,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "dagre"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9468ae6a4b98e7102e0e59ba8f9aacd2266cec71817c19b62b2d61ee260524c1"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "data-url"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -586,6 +597,7 @@ dependencies = [
 name = "kymostudio-core"
 version = "0.4.6"
 dependencies = [
+ "dagre",
  "pyo3",
  "regex",
  "resvg 0.47.0",

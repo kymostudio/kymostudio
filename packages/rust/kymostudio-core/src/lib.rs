@@ -20,6 +20,7 @@ pub mod flowchart;
 pub mod flowchart_svg;
 pub mod kymojson;
 pub mod layout;
+pub mod layout_dagre;
 pub mod math;
 pub mod mermaid;
 pub mod model;
@@ -314,9 +315,27 @@ pub fn mermaid_to_svg_styled(
     let (mut fc, src_style) = mermaid::parse_with_config(src)?;
     let resolved = style.or(src_style).unwrap_or_default();
     render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render_styled(
+    let (styles, gfill) = mermaid::extract_node_styles(src);
+    Ok(flowchart_svg::render_styled_with(
         &layout::layout_flowchart_styled(&fc, resolved),
         resolved,
+        &styles,
+        gfill.as_deref(),
+    ))
+}
+
+/// PROTOTYPE: render a Mermaid flowchart using **dagre** layout (mermaid-faithful
+/// positions) + the mermaid render style. kymo's own renderer, raster-safe.
+pub fn mermaid_to_svg_dagre(src: &str) -> Result<String, mermaid::MermaidError> {
+    let (mut fc, _) = mermaid::parse_with_config(src)?;
+    render_flowchart_math(&mut fc);
+    let style = style::FlowStyle::Mermaid;
+    let (styles, gfill) = mermaid::extract_node_styles(src);
+    Ok(flowchart_svg::render_styled_with(
+        &layout_dagre::layout_flowchart_dagre(&fc, style),
+        style,
+        &styles,
+        gfill.as_deref(),
     ))
 }
 

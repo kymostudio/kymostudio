@@ -48,6 +48,7 @@ wasm-bindgen = { version = "0.2", optional = true }
 # canonical model JSON the cross-language conformance suite compares against.
 roxmltree = { version = "0.20", optional = true }
 serde_json = { version = "1", optional = true }
+dagre = "0.1.1"
 
 # `.kymo` DSL front-end dep — pulled in only by the `kymo` feature (native
 # mobile/CLI). The wasm (JS) and Python wheels DON'T enable `kymo`: each has its

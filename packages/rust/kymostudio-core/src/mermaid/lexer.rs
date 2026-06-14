@@ -78,6 +78,28 @@ impl Scanner {
     /// If a shape wrapper follows the cursor, consume it and return
     /// `(shape, label)`. Two-char delimiters are checked before one-char ones.
     pub fn read_shape(&mut self) -> Option<(Shape, String)> {
+        // Parallelogram `[/…/]` `[\\…\\]` and trapezoid `[/…\\]` `[\\…/]`.
+        let lean = if self.starts_with("[/") {
+            Some('/')
+        } else if self.starts_with("[\\") {
+            Some('\\')
+        } else {
+            None
+        };
+        if let Some(open) = lean {
+            self.i += 2;
+            let raw = self.read_until("]");
+            let close = raw.chars().last().filter(|c| matches!(c, '/' | '\\'));
+            let label = raw.trim_end_matches(['/', '\\']).to_string();
+            let shape = match (open, close) {
+                ('/', Some('/')) => Shape::Parallelogram,
+                ('\\', Some('\\')) => Shape::ParallelogramAlt,
+                ('/', Some('\\')) => Shape::Trapezoid,
+                ('\\', Some('/')) => Shape::TrapezoidAlt,
+                _ => Shape::Rect,
+            };
+            return Some((shape, label));
+        }
         // (open, close, shape) — longest openers first.
         const THREE: &[(&str, &str, Shape)] = &[
             ("(((", ")))", Shape::Circle), // double circle

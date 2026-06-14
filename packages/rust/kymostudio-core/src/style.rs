@@ -25,3 +25,30 @@ impl FlowStyle {
         }
     }
 }
+
+/// Per-node colour override (from `classDef` / `class` / `:::` / `style` /
+/// `themeVariables`). Applied as an inline style so it beats the palette CSS.
+#[derive(Debug, Clone, Default)]
+pub struct NodeStyle {
+    pub fill: Option<String>,
+    pub stroke: Option<String>,
+    pub color: Option<String>,
+    pub stroke_width: Option<String>,
+}
+
+impl NodeStyle {
+    /// CSS for the shape element (`fill`/`stroke`/`stroke-width`).
+    pub fn shape_css(&self) -> String {
+        let mut o = String::new();
+        if let Some(f) = &self.fill {
+            o.push_str(&format!("fill:{f};"));
+        }
+        if let Some(k) = &self.stroke {
+            o.push_str(&format!("stroke:{k};"));
+        }
+        if let Some(w) = &self.stroke_width {
+            o.push_str(&format!("stroke-width:{w};"));
+        }
+        o
+    }
+}

@@ -49,6 +49,8 @@ str_enum! {
     Shape {
         Circle => "circle", Cube => "cube", CubeBig => "cube-big", Box => "box",
         Rect => "rect",
+        Parallelogram => "parallelogram", ParallelogramAlt => "parallelogram-alt",
+        Trapezoid => "trapezoid", TrapezoidAlt => "trapezoid-alt",
         Cylinder => "cylinder", Hex => "hex", Diamond => "diamond",
         Annotation => "annotation", AwsTile => "aws-tile", AwsTileHero => "aws-tile-hero",
         Badge => "badge", Image => "image",
@@ -66,7 +68,11 @@ str_enum! {
 impl Shape {
     pub fn kymojson_str(self) -> &'static str {
         match self {
-            Shape::Rect => "box",
+            Shape::Rect
+            | Shape::Parallelogram
+            | Shape::ParallelogramAlt
+            | Shape::Trapezoid
+            | Shape::TrapezoidAlt => "box",
             other => other.as_str(),
         }
     }
