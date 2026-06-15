@@ -364,7 +364,9 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
             w: ln.width,
             h: ln.height,
             icon: icons.get(ln.id.as_str()).cloned(),
-            math: raw_math.get(ln.id.as_str()).and_then(|f| render_math_group(f)),
+            math: raw_math
+                .get(ln.id.as_str())
+                .and_then(|f| render_math_group(f)),
         });
     }
     if geom.nodes.is_empty() {

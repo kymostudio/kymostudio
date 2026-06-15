@@ -188,17 +188,29 @@ grp outer \"G\" {
 a --> b : \"go\"";
         let d = to_diagram(src).unwrap();
         let shapes = diagram_to_shapes(&d);
-        let nodes: Vec<_> = shapes.iter().filter(|s| s.kind == ShapeKind::KymoNode).collect();
-        let regions: Vec<_> = shapes.iter().filter(|s| s.kind == ShapeKind::KymoRegion).collect();
-        let edges: Vec<_> = shapes.iter().filter(|s| s.kind == ShapeKind::KymoEdge).collect();
+        let nodes: Vec<_> = shapes
+            .iter()
+            .filter(|s| s.kind == ShapeKind::KymoNode)
+            .collect();
+        let regions: Vec<_> = shapes
+            .iter()
+            .filter(|s| s.kind == ShapeKind::KymoRegion)
+            .collect();
+        let edges: Vec<_> = shapes
+            .iter()
+            .filter(|s| s.kind == ShapeKind::KymoEdge)
+            .collect();
         assert_eq!(nodes.len(), 2);
         assert_eq!(regions.len(), 1);
         assert_eq!(edges.len(), 1);
         // node x/y is top-left (centre − half).
-        let a = nodes.iter().find(|s| s.kymo_id.as_deref() == Some("a")).unwrap();
+        let a = nodes
+            .iter()
+            .find(|s| s.kymo_id.as_deref() == Some("a"))
+            .unwrap();
         assert!(a.w > 0.0 && a.h > 0.0);
         assert_eq!(a.x, a.x); // finite
-        // edge carries an endpoint + label.
+                              // edge carries an endpoint + label.
         if let ShapeData::Edge { label, .. } = &edges[0].data {
             assert_eq!(label, "go");
         } else {

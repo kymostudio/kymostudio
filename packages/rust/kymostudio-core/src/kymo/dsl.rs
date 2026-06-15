@@ -44,7 +44,10 @@ impl std::fmt::Display for KymoError {
 impl std::error::Error for KymoError {}
 
 fn err(line: usize, msg: impl Into<String>) -> KymoError {
-    KymoError { line, msg: msg.into() }
+    KymoError {
+        line,
+        msg: msg.into(),
+    }
 }
 
 /// `external <id> above <parent> [gap N]` directive payload.
@@ -589,12 +592,7 @@ fn strip_comment(line: &str) -> String {
     out
 }
 
-fn parse_edge_options(
-    re: &Re,
-    s: &str,
-    edge: &mut Edge,
-    line_no: usize,
-) -> Result<(), KymoError> {
+fn parse_edge_options(re: &Re, s: &str, edge: &mut Edge, line_no: usize) -> Result<(), KymoError> {
     for tok in split_outside_parens(s, ',') {
         let tok = tok.trim();
         if tok.is_empty() {
