@@ -62,6 +62,11 @@ pub fn render(s: &str) -> String {
             }
             if let Some(c) = close {
                 let inner: String = chars[i + dlen..c].iter().collect();
+                // Mermaid labels are double-escaped (`\\alpha` in the source is a
+                // real `\alpha` command); mermaid halves them before KaTeX, so do
+                // the same here — otherwise `\\` reads as a break and the command
+                // name leaks as literal text. Mirrors `katex::render`.
+                let inner = inner.replace("\\\\", "\\");
                 out.push_str(&render_tex(&inner));
                 i = c + dlen;
                 continue;
@@ -254,7 +259,7 @@ fn sym(cmd: &str) -> Option<&'static str> {
         "chi" => "χ",
         "psi" => "ψ",
         "omega" => "ω",
-        // uppercase Greek
+        // uppercase Greek — distinct glyphs
         "Gamma" => "Γ",
         "Delta" => "Δ",
         "Theta" => "Θ",
@@ -266,6 +271,21 @@ fn sym(cmd: &str) -> Option<&'static str> {
         "Phi" => "Φ",
         "Psi" => "Ψ",
         "Omega" => "Ω",
+        // uppercase Greek — Latin look-alikes (KaTeX renders these as the upright
+        // Latin glyph; mirror `katex::command_atom` so `\Alpha…` don't leak names)
+        "Alpha" => "A",
+        "Beta" => "B",
+        "Epsilon" => "E",
+        "Zeta" => "Z",
+        "Eta" => "H",
+        "Iota" => "I",
+        "Kappa" => "K",
+        "Mu" => "M",
+        "Nu" => "N",
+        "Omicron" => "O",
+        "Rho" => "P",
+        "Tau" => "T",
+        "Chi" => "X",
         // operators
         "pm" => "±",
         "mp" => "∓",
@@ -399,5 +419,21 @@ mod tests {
         assert!(m.contains('a') && m.contains('b') && m.contains('c') && !m.contains("begin"));
         // function names keep a space before their argument
         assert_eq!(render(r"$\cos t + \sin t$"), "cos t + sin t");
+    }
+
+    #[test]
+    fn double_escaped_and_uppercase_greek() {
+        // Mermaid double-escapes commands: `\\alpha` is a real `\alpha` (was
+        // leaking as the literal word "alpha" with a stray space before the fix).
+        assert_eq!(render(r"$$\\alpha\\beta\\gamma$$"), "αβγ");
+        // full lowercase row from katex_001
+        assert_eq!(
+            render(r"$$\\alpha\\beta\\gamma\\delta\\epsilon\\zeta\\eta\\theta$$"),
+            "αβγδεζηθ"
+        );
+        // uppercase Greek incl. the Latin look-alikes (Alpha/Beta/Eta/… were
+        // missing from the table; KaTeX renders them as upright Latin glyphs)
+        assert_eq!(render(r"$$\\Alpha\\Beta\\Gamma\\Delta\\Epsilon$$"), "ABΓΔE");
+        assert_eq!(render(r"$$\\Eta\\Iota\\Kappa\\Mu\\Nu\\Rho\\Tau\\Chi$$"), "HIKMNPTX");
     }
 }

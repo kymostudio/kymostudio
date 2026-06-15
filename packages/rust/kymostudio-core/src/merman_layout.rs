@@ -213,22 +213,25 @@ fn extract_icon_inners(svg: &str) -> std::collections::HashMap<String, String> {
     out
 }
 
-/// Pixels-per-em for KaTeX math at the 16px flowchart font. mermaid's KaTeX
-/// renders ~5% tighter than RaTeX's raw em (measured: 4-glyph 15.15, 24-glyph
-/// 15.52 px/em), so 15.4 best-fits across formulas.
-const MATH_PX_PER_EM: f64 = 16.0;
+/// Pixels-per-em for KaTeX math. kymo-tex now uses KaTeX's own font metrics, so
+/// the per-glyph em-widths match KaTeX exactly; the only free parameter is the
+/// render scale. mermaid renders the KaTeX label at **18px/em** (observed in the
+/// mmdc SVG: `font-size:18px` on the `.katex` span — KaTeX's 1.21em default off
+/// mermaid's ~14.9px math base), so size + draw math at 18.
+const MATH_PX_PER_EM: f64 = 18.0;
 
-/// kymo-tex layout of one `$$…$$` formula -> (width_em, height_em, inner SVG).
+/// kymo-tex layout of one `$$…$$` formula -> (width_em, height_em, baseline_em, inner SVG).
 /// Uses KaTeX's own fonts so the raster pixel-matches mermaid's KaTeX.
-fn ratex_dims_svg(formula: &str) -> Option<(f64, f64, String)> {
-    crate::katex::render(formula).map(|(inner, w, h)| (w, h, inner))
+fn ratex_dims_svg(formula: &str) -> Option<(f64, f64, f64, String)> {
+    crate::katex::render(formula).map(|(inner, w, h, base)| (w, h, base, inner))
 }
 
-/// Render a `$$…$$` formula to an inline `<g>` of raster-safe glyph paths, centred
-/// at the node origin and scaled em→px to match mermaid's KaTeX. `None` if RaTeX
-/// can't parse it.
+/// Render a `$$…$$` formula to an inline `<g>` of raster-safe glyph paths, scaled
+/// em→px and centred (ink-box midpoint) at the node origin — mermaid centres the
+/// KaTeX element's box, which empirically beats math-axis centring here. `None`
+/// if kymo-tex can't parse it.
 fn render_math_group(formula: &str) -> Option<String> {
-    let (w_em, h_em, inner) = ratex_dims_svg(formula)?;
+    let (w_em, h_em, _base_em, inner) = ratex_dims_svg(formula)?;
     let (wpx, hpx) = (w_em * MATH_PX_PER_EM, h_em * MATH_PX_PER_EM);
     Some(format!(
         "<g transform=\"translate({:.2},{:.2}) scale({:.4})\">{}</g>",
@@ -264,7 +267,7 @@ impl merman_render::math::MathRenderer for KymoMathRenderer {
         _wrap_mode: WrapMode,
     ) -> Option<TextMetrics> {
         let formula = math_only_formula(text)?;
-        let (w_em, h_em, _) = ratex_dims_svg(formula)?;
+        let (w_em, h_em, _, _) = ratex_dims_svg(formula)?;
         let s = style.font_size / 16.0 * MATH_PX_PER_EM;
         Some(TextMetrics {
             width: w_em * s,

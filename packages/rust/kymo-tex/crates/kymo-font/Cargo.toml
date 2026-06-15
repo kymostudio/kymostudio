@@ -1,0 +1,13 @@
+[package]
+name = "kymo-font"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Font metrics and symbol tables for RaTeX"
+
+[dependencies]
+kymo-types = { workspace = true }
+phf = { workspace = true }

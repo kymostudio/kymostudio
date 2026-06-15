@@ -7,6 +7,7 @@
     "accuracy": "node accuracy-mermaidjs.mjs"
   },
   "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.15.0",
     "pixelmatch": "^7.2.0",
     "pngjs": "^7.0.0",
     "puppeteer-core": "^24.0.0"

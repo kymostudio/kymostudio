@@ -1,0 +1,50 @@
+# kymo-tex — kymo's own LaTeX-math → SVG renderer.
+#
+# A pruned fork of RaTeX (https://github.com/erweixin/RaTeX, MIT), vendored as
+# the basis for kymo's pixel-faithful KaTeX renderer. Only the SVG-rendering
+# core is kept (lexer · parser · layout · font · svg + KaTeX font embedding);
+# the upstream cairo/gtk4/ffi/pdf/wasm/render platform crates are dropped — kymo
+# wraps this from `kymostudio-core`. Upstream crates were renamed `ratex-*` →
+# `kymo-*`; see NOTICE for the fork provenance + upstream attribution.
+[workspace]
+resolver = "2"
+members = [
+    "crates/kymo-types",
+    "crates/kymo-font",
+    "crates/kymo-lexer",
+    "crates/kymo-parser",
+    "crates/kymo-layout",
+    "crates/kymo-katex-fonts",
+    "crates/kymo-font-loader",
+    "crates/kymo-unicode-font",
+    "crates/kymo-svg",
+]
+
+[workspace.package]
+version = "0.1.11"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/kymostudio/kymostudio"
+homepage = "https://kymo.studio"
+documentation = "https://github.com/kymostudio/kymostudio"
+
+[workspace.dependencies]
+kymo-types  = { path = "crates/kymo-types", version = "0.1.11" }
+kymo-font   = { path = "crates/kymo-font", version = "0.1.11" }
+kymo-lexer  = { path = "crates/kymo-lexer", version = "0.1.11" }
+kymo-parser = { path = "crates/kymo-parser", version = "0.1.11" }
+kymo-layout = { path = "crates/kymo-layout", version = "0.1.11" }
+kymo-katex-fonts = { path = "crates/kymo-katex-fonts", version = "0.1.11" }
+kymo-font-loader = { path = "crates/kymo-font-loader", version = "0.1.11" }
+kymo-unicode-font = { path = "crates/kymo-unicode-font", version = "0.1.11" }
+kymo-svg    = { path = "crates/kymo-svg", version = "0.1.11" }
+
+phf        = { version = "0.11", features = ["macros"] }
+thiserror  = "1.0"
+serde      = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = "symbols"

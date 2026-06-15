@@ -111,6 +111,10 @@ pub(crate) fn node_size_mermaid_f(label: &str, shape: Shape) -> (f64, f64) {
         .fold(0.0_f64, f64::max);
     // mermaid wrapped-label height: lines * 24 + 30 (1 line = 54, 2 = 78, ...).
     let wrapped_h = lines.len() as f64 * 24.0 + 30.0;
+    // Slanted shapes (hex / parallelogram / trapezoid) sit 15px tighter than a
+    // rect — single line = 39 (= 1*24 + 15) — but must STILL grow with the line
+    // count, else a multi-line `<br/>` label overflows the box (was pinned 39).
+    let slanted_h = wrapped_h - 15.0;
     match shape {
         Shape::Circle => {
             let d = (tw + 16.0).max(50.0);
@@ -120,9 +124,9 @@ pub(crate) fn node_size_mermaid_f(label: &str, shape: Shape) -> (f64, f64) {
             let d = (tw + 54.0).max(70.0);
             (d, d)
         }
-        Shape::Hex => ((tw + 35.0).max(60.0), 39.0),
+        Shape::Hex => ((tw + 35.0).max(60.0), slanted_h),
         Shape::Parallelogram | Shape::ParallelogramAlt | Shape::Trapezoid | Shape::TrapezoidAlt => {
-            ((tw + 55.0).max(70.0), 39.0)
+            ((tw + 55.0).max(70.0), slanted_h)
         }
         Shape::Cylinder | Shape::Badge | Shape::Box => ((tw + 30.0).max(56.0), wrapped_h),
         _ => (tw + 60.0, wrapped_h),

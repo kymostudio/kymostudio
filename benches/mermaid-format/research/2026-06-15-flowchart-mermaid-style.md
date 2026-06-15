@@ -593,20 +593,78 @@ floor (mermaid renders the hinted font; kymo renders unhinted vector paths).
 Full-branch trajectory: **6.14 → 4.59 → 2.58 → 1.61 → 1.30 → 1.11%** mean.
 Median **0.63% beats mermaid's own Rust port** (merman, 1.76%).
 
-### Top 10 worst (production)
+### Top 10 worst (production) — three-engine visual comparison
 
-| file | diff | cause |
-|---|---|---|
-| katex_001 | 6.70% | KaTeX uppercase kerning/italic-correction not yet in kymo-tex |
-| flowchart-v2_050 | 5.46% | literal `[<img>]` — mermaid draws a broken-image box, kymo draws text |
-| flowchart-v2_043 | 5.18% | two text-dense hexagons (`#quot;`) — SVG-vs-HTML text floor |
-| katex_002 | 4.99% | operators/blackboard — Unicode fallback (kymo-tex coverage pending) |
-| flowchart_020 | 3.95% | multi-line label sub-pixel |
-| flowchart-icon_001 | 3.64% | icon glyph + label layout |
-| flowchart_013 | 3.32% | multi-line hexagon sub-pixel |
-| flowchart-icon_004 | 3.13% | icon glyph |
-| flowchart_035 | 3.10% | sub-pixel layout |
-| katex_000 | 3.10% | math (kymo-tex partial) |
+The same worst-10 files, each rendered by **kymo** (production `mermaidToSvgDagre`
++ kymo-tex), **merman** (the in-tree mermaid.js port), and **mermaid.js 11.15**
+itself — the last via the **official `@mermaid-js/mermaid-cli` (`mmdc`)** in real
+Chromium, which is the ground truth all three are scored against. **Δ = mean
+per-channel |Δ| vs the mmdc PNG** (`accuracy.py`'s metric: resize-to-reference,
+luminance of the RGB difference; lower = closer look).
+
+> **Reference correction (2026-06-15).** The earlier worst-10 numbers were
+> measured against a mermaid reference rasterised from a serialised SVG through
+> an `<img>` data-URI — which **silently breaks** on the `<foreignObject>` HTML
+> labels and `<br/>` multi-line text these very fixtures use (blank / broken-image
+> output), deflating their scores. Re-measuring against the **`mmdc`** reference
+> (foreignObject + classDef + multi-line all faithful) is what surfaced the two
+> genuine gaps below — and a real kymo bug, now **fixed**: multi-line `{{ }}`
+> **hexagon** (and parallelogram/trapezoid) nodes were pinned to single-line
+> height, so a wrapped label overflowed the box (`layout.rs`, `node_size_mermaid_f`).
+> `flowchart_013` fell **8.9% → 3.9%** Δ on the fix.
+>
+> **Math fix (`\\`-escaping + uppercase Greek).** A second real bug, now fixed:
+> the shipped wasm renders `$$…$$` via the lightweight `math.rs` Unicode pass
+> (kymo-tex/`katex.rs` glyph paths are behind the unshipped `merman-layout`
+> feature). That pass left `\\alpha` un-halved (`\\` read as a break → the word
+> "alpha" leaked) **and** was missing the uppercase-Greek Latin look-alikes
+> (`\Alpha \Beta \Eta …`). Both fixed in `math.rs` (mirroring `katex::render`):
+> `katex_001` **11.8% → 7.9%** and now renders real `αβγ…/ΑΒΓ…` — *beating merman*.
+> The residual is style only: kymo draws upright in the flowchart font, KaTeX
+> draws italic in its math font (closing that needs the `merman-layout` path).
+>
+> **Icon packs (registered, per mermaid's `registerIconPacks` docs).** `mmdc` is
+> run with the `fa` packs from unpkg (`--iconPacks @iconify-json/fa
+> @iconify-json/fa-solid`) so `fa:fa-bell` draws a real bell (`flowchart-icon_001`).
+> The `aws:arch-amazon-*` icons in `flowchart-icon_004` have **no public Iconify
+> pack** — they're AWS's proprietary set, and this fixture is in fact mermaid's
+> **own cypress test** ("render aws icons with labels and rect elements", issue
+> #7185), which registers a deliberately **simplified** `aws` pack (three colour
+> boxes). We mirror that exact pack in `iconpacks/aws.json` and serve it to `mmdc`
+> via `--iconPacksNamesAndUrls aws#…`, so the reference draws the **same boxes
+> mermaid's test does** — not a `?` placeholder. kymo draws label-only (no icon
+> glyph): that gap is the row's Δ. Icon-glyph rendering is an unimplemented kymo
+> feature.
+
+| file | kymo render · Δ | merman render · Δ | mermaid.js 11 (mmdc, reference) | cause |
+|---|---|---|---|---|
+| katex_001 | <img width="150" src="assets/2026-06-15-worst10/kymo/katex_001.png"><br>**7.87%** | <img width="150" src="assets/2026-06-15-worst10/merman/katex_001.png"><br>8.28% | <img width="150" src="assets/2026-06-15-worst10/mermaidjs/katex_001.png"> | Greek glyphs now render (`\\α…`, `\\Α…` fixed — **beats merman**); residual is KaTeX *italic* math font vs kymo's upright flowchart font |
+| flowchart-icon_004 | <img width="90" src="assets/2026-06-15-worst10/kymo/flowchart-icon_004.png"><br>**11.00%** | <img width="90" src="assets/2026-06-15-worst10/merman/flowchart-icon_004.png"><br>7.49% | <img width="90" src="assets/2026-06-15-worst10/mermaidjs/flowchart-icon_004.png"> | `aws:arch-amazon-*` — reference draws mermaid's simplified test icon boxes (registered pack); kymo draws label-only, no icon glyph |
+| katex_002 | <img width="150" src="assets/2026-06-15-worst10/kymo/katex_002.png"><br>**7.56%** | <img width="150" src="assets/2026-06-15-worst10/merman/katex_002.png"><br>6.22% | <img width="150" src="assets/2026-06-15-worst10/mermaidjs/katex_002.png"> | operators / blackboard — Unicode fallback; some glyphs still unmapped + upright vs KaTeX italic |
+| flowchart-v2_043 | <img width="150" src="assets/2026-06-15-worst10/kymo/flowchart-v2_043.png"><br>**6.22%** | <img width="150" src="assets/2026-06-15-worst10/merman/flowchart-v2_043.png"><br>0.90% | <img width="150" src="assets/2026-06-15-worst10/mermaidjs/flowchart-v2_043.png"> | two text-dense hexagons (`#quot;`) — SVG-`<text>`-vs-HTML floor (hex height now fixed) |
+| flowchart_020 | <img width="120" src="assets/2026-06-15-worst10/kymo/flowchart_020.png"><br>**5.71%** | <img width="120" src="assets/2026-06-15-worst10/merman/flowchart_020.png"><br>1.02% | <img width="120" src="assets/2026-06-15-worst10/mermaidjs/flowchart_020.png"> | multi-line cylinder labels — sub-pixel |
+| flowchart-icon_001 | <img width="110" src="assets/2026-06-15-worst10/kymo/flowchart-icon_001.png"><br>**5.25%** | <img width="110" src="assets/2026-06-15-worst10/merman/flowchart-icon_001.png"><br>2.91% | <img width="110" src="assets/2026-06-15-worst10/mermaidjs/flowchart-icon_001.png"> | `fa:fa-bell` — reference now draws a real bell (fa pack); kymo omits the glyph |
+| katex_000 | <img width="150" src="assets/2026-06-15-worst10/kymo/katex_000.png"><br>**4.14%** | <img width="150" src="assets/2026-06-15-worst10/merman/katex_000.png"><br>6.14% | <img width="150" src="assets/2026-06-15-worst10/mermaidjs/katex_000.png"> | complex math (matrix / cases / nested fractions) — kymo-tex partial; **beats merman** |
+| flowchart_013 | <img width="120" src="assets/2026-06-15-worst10/kymo/flowchart_013.png"><br>**3.87%** | <img width="120" src="assets/2026-06-15-worst10/merman/flowchart_013.png"><br>0.31% | <img width="120" src="assets/2026-06-15-worst10/mermaidjs/flowchart_013.png"> | multi-line `{{ }}` hexagon — **height bug fixed**; residual sub-pixel + classDef fill |
+| flowchart_035 | <img width="120" src="assets/2026-06-15-worst10/kymo/flowchart_035.png"><br>**3.22%** | <img width="120" src="assets/2026-06-15-worst10/merman/flowchart_035.png"><br>0.68% | <img width="120" src="assets/2026-06-15-worst10/mermaidjs/flowchart_035.png"> | `<strong>` bold inline — sub-pixel |
+| flowchart-v2_050 | <img width="90" src="assets/2026-06-15-worst10/kymo/flowchart-v2_050.png"><br>**4.79%** | <img width="90" src="assets/2026-06-15-worst10/merman/flowchart-v2_050.png"><br>0.00% | <img width="90" src="assets/2026-06-15-worst10/mermaidjs/flowchart-v2_050.png"> | literal `[<img>]` — mermaid draws a broken-image box, kymo draws the text |
+
+**Reading the merman column.** merman is a mermaid.js port, so rendered in a
+browser its PNG ≈ mermaid.js (Δ near 0). But merman emits its labels in
+`<foreignObject>` HTML — which **vanishes** under server-side resvg/svg2pdf
+rasterisation (the PNG/PDF render.kymo.studio actually ships). kymo trades a few
+points of in-browser pixel-overlay for labels that survive to raster: that trade
+is the whole point, and is **not** visible in this browser-rendered Δ. Read it
+with the raster-safe recall table (`results/REPORT.md`), where flowchart is 100%
+kymo / 0% merman. Regenerate this table with `node worst10-grid.mjs`.
+
+The remaining gaps are all **feature/style**, not layout: **un-drawn icon glyphs**
+(`flowchart-icon_001` vs a real `fa:` bell; `_004` vs the registered `aws:`
+test-icon boxes — kymo draws neither) and **math font style** (`katex_*` now
+render the correct glyphs but upright in the flowchart font vs KaTeX italic —
+pixel-closing that needs the `merman-layout`/kymo-tex glyph path). Every
+multi-line / wrapped-label case (`flowchart_013/020/035`, `v2_043`) is sub-pixel
+after the hexagon-height fix.
 
 ### Top 10 best (production)
 
