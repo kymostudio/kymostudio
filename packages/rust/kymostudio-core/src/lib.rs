@@ -316,12 +316,13 @@ pub fn mermaid_to_svg_styled(
     let (mut fc, src_style) = mermaid::parse_with_config(src)?;
     let resolved = style.or(src_style).unwrap_or_default();
     render_flowchart_math(&mut fc);
-    let (styles, gfill) = mermaid::extract_node_styles(src);
+    let (styles, default_style) = mermaid::extract_node_styles(src);
+    let gfill = default_style.as_ref().and_then(|d| d.fill.as_deref());
     Ok(flowchart_svg::render_styled_with(
         &layout::layout_flowchart_styled(&fc, resolved),
         resolved,
         &styles,
-        gfill.as_deref(),
+        gfill,
     ))
 }
 
@@ -331,9 +332,14 @@ pub fn mermaid_to_svg_dagre(src: &str) -> Result<String, mermaid::MermaidError> 
     let (mut fc, _) = mermaid::parse_with_config(src)?;
     render_flowchart_math(&mut fc);
     let style = style::FlowStyle::Mermaid;
-    let (styles, gfill) = mermaid::extract_node_styles(src);
+    let (styles, default_style) = mermaid::extract_node_styles(src);
     let geom = layout_dagre::dagre_geom(&fc, style);
-    Ok(dagre_svg::render(&geom, style, &styles, gfill.as_deref()))
+    Ok(dagre_svg::render(
+        &geom,
+        style,
+        &styles,
+        default_style.as_ref(),
+    ))
 }
 
 /// Normalise a Mermaid label for rendering: `<br>` line breaks become spaces,
