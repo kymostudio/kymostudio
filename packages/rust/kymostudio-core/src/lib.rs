@@ -356,7 +356,49 @@ fn clean_label(s: &str) -> String {
     // Render `$…$` math FIRST (so TeX commands like \\text / \\nabla are mapped to
     // Unicode), then collapse `<br>` and literal `\\n` / `\\t` breaks — otherwise
     // the break-stripper would eat the `\\t` in `\\text`, the `\\n` in `\\nabla`, etc.
-    math::strip_br(&math::render(s))
+    // Finally decode mermaid `#…;` char entities (`#quot;` -> `"`, `#35;` -> `#`).
+    decode_mermaid_entities(&math::strip_br(&math::render(s)))
+}
+
+/// Decode mermaid's `#name;` / `#NNN;` label entities to their characters.
+/// Mermaid uses `#` (not `&`) so the source survives its own parser: `#quot;`,
+/// `#amp;`, `#lt;`, `#gt;`, and numeric `#9829;` / `#35;`.
+fn decode_mermaid_entities(s: &str) -> String {
+    if !s.contains('#') {
+        return s.to_string();
+    }
+    let bytes = s.as_bytes();
+    let mut out = String::with_capacity(s.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'#' {
+            if let Some(semi) = s[i + 1..].find(';') {
+                let body = &s[i + 1..i + 1 + semi];
+                let decoded = match body {
+                    "quot" => Some('"'),
+                    "amp" => Some('&'),
+                    "lt" => Some('<'),
+                    "gt" => Some('>'),
+                    "nbsp" => Some('\u{00a0}'),
+                    _ => body
+                        .strip_prefix(|c| c == 'x' || c == 'X')
+                        .and_then(|h| u32::from_str_radix(h, 16).ok())
+                        .or_else(|| body.parse::<u32>().ok())
+                        .and_then(char::from_u32),
+                };
+                if let Some(c) = decoded {
+                    out.push(c);
+                    i += 1 + semi + 1;
+                    continue;
+                }
+            }
+        }
+        // not an entity — copy this byte's char
+        let ch = s[i..].chars().next().unwrap();
+        out.push(ch);
+        i += ch.len_utf8();
+    }
+    out
 }
 
 /// Apply [`clean_label`] to every flowchart label (nodes, edges, subgraph titles).
