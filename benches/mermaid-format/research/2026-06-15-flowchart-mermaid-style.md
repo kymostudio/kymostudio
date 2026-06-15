@@ -389,3 +389,89 @@ So the path keeps converging: icons (done, −0.97%), then stadium/hex shapes +
 `;`-strip, then the wrap detail — each a scoped fix. `mean < 0.5%` ultimately needs
 the median below 0.5% (sub-pixel precision), but the renderer is now at **median
 0.66%, beating mermaid's reference port**, with icons.
+
+## Round 2026-06-15 (late): parse-correctness fixes + a bench-validity bug — mean 1.61% → 1.30%
+
+Three real rendering bugs and one **bench measurement bug** were found by drilling
+into the worst cases (each was visually verified, not just scored).
+
+### Code fixes (rendering correctness)
+
+1. **Trailing `;` on `class` / `classDef`** — `class A,B redBg;` parsed the class
+   name as `"redBg;"` (lookup miss) and `classDef redBg fill:#622;` parsed the
+   colour as `"#622;"` (invalid). Both now strip the statement terminator. Narrowly
+   scoped (class-name token + each `parse_style` value), **not** the global
+   statement-strip that regressed earlier.
+2. **Multiple classes per node** — `class id3 redBg; class id3 whiteTxt;` only kept
+   the *last* class (`node_class` was `HashMap<id, String>`). mermaid merges all
+   classes; kymo now layers every class' style in order. This alone took the single
+   worst case, **`flowchart_029` 20.6% -> 0.27%**.
+3. **`<br>` hard line breaks** — `math::strip_br` collapsed `<br>` to a *space*, so
+   a hexagon/subroutine with a multi-line label (`{{a<br/>b<br/>c}}`) was sized tall
+   by merman but rendered as one overflowing line. `<br>` now becomes `\n`, and
+   `node_lines_mermaid` honours hard breaks for **every** shape (soft-wrap stays
+   rect-only). The big multi-line hexagons (`flowchart_013/015/031`) now render
+   their text inside the shape.
+
+These were coupled: fixes 1+2 correctly *colour* nodes that fix 3 then renders
+correctly — applying colour first (without 3) is what made the earlier `;`-strip
+look net-negative. Together they are net-positive.
+
+### Bench-validity bug: `click` directives blank mermaid's raster
+
+`flowchart_013/015/031` showed a *false* ~21% even after the fixes. Cause: they
+carry `click A "index.html..."` directives. With `securityLevel:loose`, mermaid wraps
+those nodes so the SVG **fails to load as a `data:` `<img>`** -> the rasterised
+"ground truth" is a **blank broken-image**, so any kymo content scores as ~full
+diff. `click` is non-visual interactivity (kymo ignores it). The bench now strips
+`click`/`callback` lines before rasterising **both** sides. Effect:
+
+| file | before (click bug) | after strip | cause |
+|---|---|---|---|
+| flowchart_013 | 20.94% | **4.91%** | real hexagon residual |
+| flowchart_015 | 21.12% | **3.05%** | real |
+| flowchart_031 | 20.00% | **3.59%** | real |
+
+This bug had been *hiding* in every prior number: with click-files uncoloured the
+blank truth scored low (white = blank), so they never surfaced; colouring them flipped
+the same artifact high. Neither reading was real — the click strip gives the first
+valid measurement for those 7 files.
+
+### True production corpus (110 plain files), after this round
+
+| metric | icon round | **this round** |
+|---|---|---|
+| mean | 1.61% | **1.30%** |
+| median | 0.66% | **0.63%** |
+| <=0.5% | 51/110 | **54/110** |
+| <=1% | 72/110 | 73/110 |
+| p90 | 3.45% | **3.09%** |
+
+Trajectory: **6.14% -> 4.59% -> 2.58% -> 1.61% -> 1.30%** mean. Still beating
+mermaid's own Rust port (merman, median 1.76%) on the median.
+
+### Remaining production outliers (the whole tail that matters)
+
+| file | diff | cause | tractable? |
+|---|---|---|---|
+| flowchart-v2_032 | 17.6% | bold node sized narrow (408px vs 492px) — merman doesn't propagate classDef `font-weight:bold` into the layout measurer | needs bold width in merman layout |
+| katex_001/002 | 5.5/5.0% | KaTeX math rendered as Unicode, not laid-out math | own subsystem |
+| flowchart-v2_050 | 5.5% | literal `[<img>]` — mermaid draws a broken-image box, kymo draws the text | edge case |
+| flowchart_013/020/031 | 3.6-4.9% | multi-line hexagon/subroutine — sub-pixel text placement vs mermaid | sub-pixel |
+
+`flowchart-v2_032` alone is 0.16% of the mean; the rest of the worst-list is
+sub-5%. The visual grid (`assets/2026-06-15-worstbest/worst-best-grid.png`) is
+regenerated against this round.
+
+### On `mean < 0.5%` — the arithmetic
+
+Production sum of diffs ~= 110 x 1.30% = **143 percentage-points**. `mean < 0.5%`
+needs that sum **< 55**. Zeroing the *entire* worst-15 (~56 pts) only reaches
+mean ~= 0.79%. The remaining ~95 files sit around the **median 0.63%**, so the
+mean cannot fall below ~0.5% without pushing the *median itself* under ~0.4% — i.e.
+near-pixel-identity on essentially every file. That residual is the shared
+text-metric + edge-curve + anti-aliasing floor of rasterising two independently
+generated SVGs; **mermaid's own reference port (merman) sits at median 1.76%**, so
+kymo at 0.63% is already well past it. `mean < 0.5%` is therefore below the
+practical floor of this comparison, not a scoped feature gap. The honest, defensible
+state this round is **mean 1.30%, median 0.63%, 54/110 pixel-identical (<=0.5%)**.
