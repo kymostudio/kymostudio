@@ -70,16 +70,53 @@ pub(crate) fn node_size_for(label: &str, shape: Shape, style: FlowStyle) -> (i32
 /// box to `measured_text_width + padding` exactly (e.g. "Middle" 47.14 + 60 =
 /// 107.14), and the integer [`node_size`] rounds that 0.14 away — enough to push
 /// the total width across an integer boundary and misalign the whole canvas.
-pub(crate) fn node_size_mermaid_f(label: &str, shape: Shape) -> (f64, f64) {
-    let lines: Vec<&str> = label.split('\n').collect();
-    if lines.len() > 1 {
-        let mw = lines
-            .iter()
-            .map(|l| text_w_mermaid(l))
-            .fold(0.0_f64, f64::max);
-        return ((mw + 24.0).max(80.0), lines.len() as f64 * 18.0 + 16.0);
+/// Greedy word-wrap at mermaid's flowchart wrapping width (~200px of text).
+pub(crate) fn wrap_mermaid(label: &str) -> Vec<String> {
+    const MAX_W: f64 = 200.0;
+    let mut lines: Vec<String> = Vec::new();
+    let mut cur = String::new();
+    for word in label.split_whitespace() {
+        let trial = if cur.is_empty() {
+            word.to_string()
+        } else {
+            format!("{cur} {word}")
+        };
+        if !cur.is_empty() && text_w_mermaid(&trial) > MAX_W {
+            lines.push(std::mem::take(&mut cur));
+            cur = word.to_string();
+        } else {
+            cur = trial;
+        }
     }
-    let tw = text_w_mermaid(label);
+    if !cur.is_empty() || lines.is_empty() {
+        lines.push(cur);
+    }
+    lines
+}
+
+/// Wrapped label lines for sizing + rendering. Rectangle-ish shapes wrap at
+/// mermaid's width; circle/diamond/hex/parallelogram stay single-line.
+pub(crate) fn node_lines_mermaid(label: &str, shape: Shape) -> Vec<String> {
+    match shape {
+        Shape::Circle
+        | Shape::Diamond
+        | Shape::Hex
+        | Shape::Parallelogram
+        | Shape::ParallelogramAlt
+        | Shape::Trapezoid
+        | Shape::TrapezoidAlt => vec![label.to_string()],
+        _ => wrap_mermaid(label),
+    }
+}
+
+pub(crate) fn node_size_mermaid_f(label: &str, shape: Shape) -> (f64, f64) {
+    let lines = node_lines_mermaid(label, shape);
+    let tw = lines
+        .iter()
+        .map(|l| text_w_mermaid(l))
+        .fold(0.0_f64, f64::max);
+    // mermaid wrapped-label height: lines * 24 + 30 (1 line = 54, 2 = 78, ...).
+    let wrapped_h = lines.len() as f64 * 24.0 + 30.0;
     match shape {
         Shape::Circle => {
             let d = (tw + 16.0).max(50.0);
@@ -93,8 +130,8 @@ pub(crate) fn node_size_mermaid_f(label: &str, shape: Shape) -> (f64, f64) {
         Shape::Parallelogram | Shape::ParallelogramAlt | Shape::Trapezoid | Shape::TrapezoidAlt => {
             ((tw + 55.0).max(70.0), 39.0)
         }
-        Shape::Cylinder | Shape::Badge | Shape::Box => ((tw + 30.0).max(56.0), 54.0),
-        _ => (tw + 60.0, 54.0),
+        Shape::Cylinder | Shape::Badge | Shape::Box => ((tw + 30.0).max(56.0), wrapped_h),
+        _ => (tw + 60.0, wrapped_h),
     }
 }
 
