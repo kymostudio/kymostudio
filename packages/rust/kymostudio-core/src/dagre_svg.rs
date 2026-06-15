@@ -30,6 +30,9 @@ pub struct FNode {
     /// node centre), lifted from merman for `@{ icon: … }` nodes. When set, the
     /// node renders this glyph instead of the box+label.
     pub icon: Option<String>,
+    /// Pre-rendered raster-safe math glyph group (`$$…$$` via RaTeX), centred at
+    /// the node origin. When set, it replaces the text label *inside* the shape.
+    pub math: Option<String>,
 }
 
 /// A routed edge in float coordinates.
@@ -306,7 +309,9 @@ fn node_svg(
             &format!("class=\"fc-shape\" style=\"{shape_css}\""),
         )
     };
-    let label = if n.name.is_empty() {
+    let label = if let Some(m) = &n.math {
+        format!("<g transform=\"translate({},{})\">{m}</g>", nf(cx), nf(cy))
+    } else if n.name.is_empty() {
         String::new()
     } else {
         let mut lstyle = String::new();

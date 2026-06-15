@@ -101,6 +101,7 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
                 w: nd.width,
                 h: nd.height,
                 icon: None,
+                math: None,
             });
         }
     }
