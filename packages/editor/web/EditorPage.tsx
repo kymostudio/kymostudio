@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth, GoogleButton, colorFor } from "./auth";
+import { useAuth, GoogleButton, colorFor, isLocalhost } from "./auth";
 import { useRoom } from "./room";
 import { useWorkspace, assignDiagram } from "./workspace";
 import { KINDS, renderKroki, sanitizeSvg } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { Preview } from "./preview";
-import { SAMPLES } from "./samples";
 import { RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
@@ -16,10 +15,10 @@ import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } f
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
-import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2 } from "lucide-react";
+import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X } from "lucide-react";
 
 export default function EditorPage() {
-  const { claims, idToken, signOut } = useAuth();
+  const { claims, idToken, signOut, devSignIn } = useAuth();
   const { currentFolder, currentProject } = useWorkspace();
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -411,6 +410,17 @@ export default function EditorPage() {
       window.history.replaceState(null, "", "/"); // pristine template isn't in the URL yet
     }
   }
+  // Close the open "file" (the VS Code-style tab's ✕). Drops the ?d — a saved
+  // diagram then resets to a fresh draft via the ?d-effect and lands on Welcome;
+  // a guest draft is reset in place. Nothing is deleted: saved diagrams stay in
+  // your Diagrams, and the just-closed draft is still reachable via Back.
+  const closeFile = useCallback(() => {
+    if (d) { navigate("/"); return; }
+    setSource(SAMPLE); setKind("kymo"); setTitle(""); setShareError(null);
+    userEdited.current = false; titleUserSet.current = false; autoTitle.current = "";
+    setWelcomeDismissed(false);
+    window.history.replaceState(null, "", "/");
+  }, [d, navigate]);
   // Pop the Google sign-in prompt (guests can't own server files).
   const promptSignIn = useCallback(() => { (window as any).google?.accounts?.id?.prompt?.(); }, []);
   // Explicit Save: a draft → a real server file. Guests are prompted to sign in
@@ -509,7 +519,11 @@ export default function EditorPage() {
         <Pencil size={12.5} strokeWidth={2.1} className="pencil" />
       </span>
     )
-  ) : <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")} title={diagramLabel}><span className="dn-text">{diagramLabel}</span></span>;
+  ) : shared ? <span className={"diagram-name" + (diagramLabel === "Untitled" ? " untitled" : "")} title={diagramLabel}><span className="dn-text">{diagramLabel}</span></span> : (
+    // Guest draft: no name in the header — they're here to edit one file fast,
+    // the title would just be noise (and there's no Diagrams list to file it under).
+    null
+  );
 
   return (
     <div className="layout">
@@ -535,7 +549,9 @@ export default function EditorPage() {
             Offline
           </span>
         )}
-        {isDraft && !booting && !showWelcome && (
+        {/* the unsaved-draft pill is only meaningful to signed-in users (a guest
+            can't keep drafts in a Diagrams list) — hide it when signed out */}
+        {claims && isDraft && !booting && !showWelcome && (
           <span className="save-ind unsaved" title="Not saved anywhere yet — this draft only lives in this page's URL. Save to keep it in your Diagrams (⌘/Ctrl-S).">
             {savingDraft ? "Saving…" : "Unsaved"}
           </span>
@@ -552,6 +568,13 @@ export default function EditorPage() {
               <button className={"pane-tg" + (panes.source ? " on" : "")} onClick={() => togglePane("source")} title="Toggle Source" aria-pressed={panes.source}><SquareCode size={16} strokeWidth={2} /></button>
               <button className={"pane-tg" + (panes.preview ? " on" : "")} onClick={() => togglePane("preview")} title="Toggle Preview" aria-pressed={panes.preview}><Eye size={16} strokeWidth={2} /></button>
             </div>
+          )}
+          {/* guests have no Explorer/activity-bar rail — surface New here in the header */}
+          {!claims && !showWelcome && (
+            <button className="mob-hide" onClick={() => setGalleryOpen(true)}
+              title="Start a new diagram (a local draft — saved only when you Save)">
+              <FilePlus2 size={16} strokeWidth={2} />New
+            </button>
           )}
           {/* draft Save stays a visible CTA when there's unsaved work to rescue */}
           {isDraft && !booting && !showWelcome && (
@@ -624,6 +647,13 @@ export default function EditorPage() {
         </nav>
         {/* signed-in account lives at the bottom of the activity bar (VSCode-style); guests sign in here */}
         {!claims && <GoogleButton />}
+        {/* localhost only: fake sign-in to preview the signed-in UI without Google OAuth */}
+        {!claims && isLocalhost() && (
+          <button className="dev-login" onClick={devSignIn}
+            title="Local dev only — fake sign-in to preview the signed-in UI (backend calls still need a real Google login)">
+            Dev login
+          </button>
+        )}
       </header>
       {galleryOpen && <TemplateGallery onPick={pickTemplate} onClose={() => setGalleryOpen(false)} />}
       <div className="workarea">
@@ -645,36 +675,24 @@ export default function EditorPage() {
           <>
             {panes.source && (
             <section className="pane" style={panes.preview ? { flex: `0 0 ${split}%` } : undefined}>
+              {/* The editor-tab bar is for signed-in users (it pairs with the
+                  Explorer/Diagrams list). A guest is editing one throwaway draft —
+                  no tab, no close ✕; the pane only surfaces if paste auto-detect
+                  has something to say. */}
+              {(claims || detected) && (
               <div className="pane-bar">
-                {/* Guests have no Explorer, so the New affordance lives here. A fresh
-                    draft only — it never writes the DB (that happens on Save). */}
-                {!claims && (
-                  <button className="newdiag-btn" onClick={() => setGalleryOpen(true)}
-                    title="Start a new diagram (a local draft — saved only when you Save)">
-                    <FilePlus2 size={14} strokeWidth={2} />New
+                {claims && (
+                <div className="file-tab" title={diagramLabel}>
+                  <FileCode2 size={14} className="file-tab-icon" strokeWidth={2} />
+                  <span className="file-tab-name">{diagramLabel}</span>
+                  <button className="file-tab-close" aria-label="Close file" title="Close file" onClick={closeFile}>
+                    <X size={13} strokeWidth={2.4} />
                   </button>
+                </div>
                 )}
-                {/* a visible label so the dropdown reads as a 28-format switcher, not a mystery control */}
-                <label className="kind-label" htmlFor="kind-select">Type</label>
-                <select id="kind-select" className="kind-select" value={kind} title="Diagram type — 28 formats"
-                  onChange={(e) => {
-                    // kroki.io behaviour: switching type loads that type's example. That OVERWRITES
-                    // the buffer, so confirm first when the user has typed something worth keeping.
-                    const k = e.target.value;
-                    const sample = kindRef.current === "kymo" ? SAMPLE : (SAMPLES[kindRef.current] ?? "");
-                    const dirty = source.trim() && source !== sample;
-                    if (dirty && !window.confirm(`Switch to ${KINDS.find((x) => x.value === k)?.label ?? k}?\nThis replaces the current source with a ${KINDS.find((x) => x.value === k)?.label ?? k} starter — your edits will be lost.`)) {
-                      e.target.value = kindRef.current; // revert the select; leave source untouched
-                      return;
-                    }
-                    userEdited.current = true;
-                    setKind(k);
-                    setSource(k === "kymo" ? SAMPLE : (SAMPLES[k] ?? ""));
-                  }}>
-                  {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
-                </select>
                 {detected && <span className="detect-chip">auto-detected {detected}</span>}
               </div>
+              )}
               <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
             )}
