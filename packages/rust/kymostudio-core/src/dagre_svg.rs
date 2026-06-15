@@ -310,18 +310,44 @@ fn node_svg(
         } else {
             format!(" style=\"{lstyle}\"")
         };
-        // Mermaid uses an HTML alphabetic baseline; match it (y = centre + 0.30*16).
-        let ly = if matches!(style, FlowStyle::Mermaid) {
-            cy + 5.0
+        // Mermaid wraps rectangle labels at ~200px and uses an HTML alphabetic
+        // baseline (y = centre + 0.30*16); reproduce both.
+        let lines = if matches!(style, FlowStyle::Mermaid) {
+            crate::layout::node_lines_mermaid(&n.name, n.shape)
         } else {
-            cy
+            vec![n.name.clone()]
         };
-        format!(
-            "<text class=\"fc-label\" x=\"{}\" y=\"{}\"{cstyle}>{}</text>",
-            nf(cx),
-            nf(ly),
-            esc(&n.name)
-        )
+        if lines.len() <= 1 {
+            let ly = if matches!(style, FlowStyle::Mermaid) {
+                cy + 5.0
+            } else {
+                cy
+            };
+            format!(
+                "<text class=\"fc-label\" x=\"{}\" y=\"{}\"{cstyle}>{}</text>",
+                nf(cx),
+                nf(ly),
+                esc(&n.name)
+            )
+        } else {
+            // Centre the block of 24px lines on cy; alphabetic baseline +5.
+            let nl = lines.len() as f64;
+            let first = cy - (nl - 1.0) * 12.0 + 5.0;
+            let tspans: String = lines
+                .iter()
+                .enumerate()
+                .map(|(i, l)| {
+                    let dy = if i == 0 { 0.0 } else { 24.0 };
+                    format!("<tspan x=\"{}\" dy=\"{}\">{}</tspan>", nf(cx), nf(dy), esc(l))
+                })
+                .collect();
+            format!(
+                "<text class=\"fc-label\" x=\"{}\" y=\"{}\"{cstyle}>{}</text>",
+                nf(cx),
+                nf(first),
+                tspans
+            )
+        }
     };
     format!("{glyph}{label}\n")
 }
