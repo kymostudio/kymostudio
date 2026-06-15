@@ -10,6 +10,7 @@ export interface Env {
   DB: D1Database;
   MCP_OBJECT: DurableObjectNamespace;
   EDITOR_ROOM: DurableObjectNamespace;
+  USER_CHANNEL: DurableObjectNamespace;
   OAUTH_PROVIDER: any;
   GOOGLE_CLIENT_ID: string;
   ALLOWED_EMAILS: string;
@@ -442,6 +443,31 @@ export class EditorRoom extends DurableObject<Env> {
   }
 }
 
+// ---- One UserChannel DO per signed-in user (keyed by email). Every open
+// editor tab of that user connects here; it carries no document, only control
+// messages — today just `{type:"open", id}` so the MCP `open_diagram` tool can
+// switch which diagram a tab is showing without knowing which room it has open.
+// Auth + ownership are enforced in the worker before routing here (the DO is
+// only reachable through the email-keyed /userws route), so the DO trusts it. ----
+export class UserChannel extends DurableObject<Env> {
+  async fetch(request: Request): Promise<Response> {
+    const url = new URL(request.url);
+    if (request.headers.get("upgrade") === "websocket") {
+      const pair = new WebSocketPair();
+      const client = pair[0], server = pair[1];
+      this.ctx.acceptWebSocket(server);
+      return new Response(null, { status: 101, webSocket: client });
+    }
+    if (url.pathname.endsWith("/push") && request.method === "POST") {
+      const msg = JSON.stringify(await request.json());
+      let clients = 0;
+      for (const ws of this.ctx.getWebSockets()) { try { ws.send(msg); clients++; } catch {} }
+      return Response.json({ ok: true, clients });
+    }
+    return new Response("not found", { status: 404 });
+  }
+}
+
 // ---- MCP server: per-user multi-diagram tools (owner = props.email). ----
 export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: string }> {
   server = new McpServer({ name: "kymostudio", version: "0.4.1" });
@@ -542,6 +568,27 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         return { content: [{ type: "text", text: `Deleted diagram ${id}.` }] };
       }
     );
+
+    this.server.tool(
+      "open_diagram",
+      "Switch the diagram currently shown in the signed-in user's open editor tab(s) to this one — live navigation in the browser, without changing its content. Pass `id` (from list_diagrams), or omit to use your most recent. Returns how many live tabs were switched (0 = no editor tab open right now).",
+      { id: z.string().optional().describe("Diagram id to open. Omit to use your most recent.") },
+      async ({ id }) => {
+        const did = id ?? (await this.env.OAUTH_KV.get(`last:${me()}`));
+        if (!did) return { content: [{ type: "text", text: "No diagram yet — call new_diagram first (or pass id)." }] };
+        const owned = await this.env.DB.prepare("SELECT 1 FROM diagrams WHERE id = ?1 AND owner = ?2 AND deleted IS NULL")
+          .bind(did, me()).first();
+        if (!owned) return { content: [{ type: "text", text: `Diagram ${did} isn't yours (or is in Trash).` }] };
+        await this.env.OAUTH_KV.put(`last:${me()}`, did);
+        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ type: "open", id: did }),
+        });
+        const j = (await r.json()) as { clients: number };
+        const where = j.clients ? `${j.clients} live tab(s) switched` : "no live editor tab open right now — use the link below";
+        return { content: [{ type: "text", text: `Opened ${did} (${where}). ${link(did)}` }] };
+      }
+    );
   }
 }
 
@@ -624,6 +671,19 @@ export default {
     if (url.pathname === "/ws") {
       const d = url.searchParams.get("d") || "default";
       return roomFor(env, d).fetch(request);
+    }
+    // Per-user control channel: every open editor tab connects here so the MCP
+    // `open_diagram` tool can live-switch which diagram the tab shows. The DO is
+    // keyed by email, so verify + resolve the email BEFORE routing the upgrade.
+    if (url.pathname === "/userws") {
+      const idToken = url.searchParams.get("id_token") || "";
+      let email: string | undefined;
+      try {
+        const p = await verifyGoogleIdToken(idToken, env.GOOGLE_CLIENT_ID);
+        email = p.email;
+        if (!emailAllowed(email, env)) return new Response("forbidden", { status: 403 });
+      } catch { return new Response("unauthorized", { status: 401 }); }
+      return env.USER_CHANNEL.get(env.USER_CHANNEL.idFromName(email!)).fetch(request);
     }
     // Browser-callable APIs for the signed-in user (Google id_token).
     if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/projects" || url.pathname === "/api/trash") {

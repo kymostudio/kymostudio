@@ -10,6 +10,7 @@ import EditorPage from "./EditorPage";
 import TrashPage from "./TrashPage";
 import ProjectsPage from "./ProjectsPage";
 import LoginPage from "./LoginPage";
+import { UserChannel } from "./userchannel";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -18,6 +19,7 @@ createRoot(document.getElementById("root")!).render(
         <ConfirmProvider>
         <ToastProvider>
         <ContextMenuProvider>
+        <UserChannel />
         <Routes>
           <Route path="/" element={<EditorPage />} />
           <Route path="/projects" element={<ProjectsPage />} />

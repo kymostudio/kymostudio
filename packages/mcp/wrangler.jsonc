@@ -6,11 +6,13 @@
   "durable_objects": {
     "bindings": [
       { "class_name": "KymoMCP", "name": "MCP_OBJECT" },
-      { "class_name": "EditorRoom", "name": "EDITOR_ROOM" }
+      { "class_name": "EditorRoom", "name": "EDITOR_ROOM" },
+      { "class_name": "UserChannel", "name": "USER_CHANNEL" }
     ]
   },
   "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["KymoMCP", "EditorRoom"] }
+    { "tag": "v1", "new_sqlite_classes": ["KymoMCP", "EditorRoom"] },
+    { "tag": "v2", "new_classes": ["UserChannel"] }
   ],
   "kv_namespaces": [
     { "binding": "OAUTH_KV", "id": "b0a941d0b5d74c86bebe5a4583fadee8" }
