@@ -112,6 +112,7 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
                 cd.height,
             );
             geom.regions.push(FRegion {
+                id: sg.id.clone(),
                 label: sg.title.clone(),
                 x: x - w / 2.0 + MX,
                 y: y - h / 2.0 + MY,

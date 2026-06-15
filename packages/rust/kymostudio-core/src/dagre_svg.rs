@@ -42,6 +42,7 @@ pub struct FEdge {
 /// A cluster region in float coordinates (top-left + size).
 #[derive(Debug, Clone)]
 pub struct FRegion {
+    pub id: String,
     pub label: String,
     pub x: f64,
     pub y: f64,
@@ -77,19 +78,23 @@ pub fn render(
     geom: &FGeom,
     style: FlowStyle,
     styles: &HashMap<String, NodeStyle>,
-    default_fill: Option<&str>,
+    default_style: Option<&NodeStyle>,
 ) -> String {
-    let regions: String = geom.regions.iter().map(|r| region_rect(r, style)).collect();
+    let regions: String = geom
+        .regions
+        .iter()
+        .map(|r| region_rect(r, style, styles.get(&r.id)))
+        .collect();
     let edges: String = geom.edges.iter().map(|e| edge_svg(e, style)).collect();
     let nodes: String = geom
         .nodes
         .iter()
-        .map(|n| node_svg(n, style, styles.get(&n.id), default_fill))
+        .map(|n| node_svg(n, style, styles.get(&n.id), default_style))
         .collect();
     let region_labels: String = geom
         .regions
         .iter()
-        .map(|r| region_label(r, style))
+        .map(|r| region_label(r, style, styles.get(&r.id)))
         .collect();
 
     let (css, defs, font) = match style {
@@ -119,14 +124,26 @@ fn node_svg(
     n: &FNode,
     style: FlowStyle,
     ns: Option<&NodeStyle>,
-    default_fill: Option<&str>,
+    default_style: Option<&NodeStyle>,
 ) -> String {
     let (cx, cy) = (n.cx, n.cy);
     let (hw, hh) = (n.w / 2.0, n.h / 2.0);
     let mut ovr = ns.cloned().unwrap_or_default();
-    if ovr.fill.is_none() {
-        if let Some(g) = default_fill {
-            ovr.fill = Some(g.to_string());
+    if let Some(d) = default_style {
+        if ovr.fill.is_none() {
+            ovr.fill = d.fill.clone();
+        }
+        if ovr.stroke.is_none() {
+            ovr.stroke = d.stroke.clone();
+        }
+        if ovr.color.is_none() {
+            ovr.color = d.color.clone();
+        }
+        if ovr.stroke_width.is_none() {
+            ovr.stroke_width = d.stroke_width.clone();
+        }
+        if ovr.font_weight.is_none() {
+            ovr.font_weight = d.font_weight.clone();
         }
     }
     let shape_css = ovr.shape_css();
@@ -281,11 +298,18 @@ fn node_svg(
     let label = if n.name.is_empty() {
         String::new()
     } else {
-        let cstyle = ovr
-            .color
-            .as_ref()
-            .map(|c| format!(" style=\"fill:{c}\""))
-            .unwrap_or_default();
+        let mut lstyle = String::new();
+        if let Some(c) = &ovr.color {
+            lstyle.push_str(&format!("fill:{c};"));
+        }
+        if let Some(w) = &ovr.font_weight {
+            lstyle.push_str(&format!("font-weight:{w};"));
+        }
+        let cstyle = if lstyle.is_empty() {
+            String::new()
+        } else {
+            format!(" style=\"{lstyle}\"")
+        };
         // Mermaid uses an HTML alphabetic baseline; match it (y = centre + 0.30*16).
         let ly = if matches!(style, FlowStyle::Mermaid) {
             cy + 5.0
@@ -336,7 +360,7 @@ fn edge_svg(e: &FEdge, style: FlowStyle) -> String {
     out
 }
 
-fn region_rect(r: &FRegion, style: FlowStyle) -> String {
+fn region_rect(r: &FRegion, style: FlowStyle, ns: Option<&NodeStyle>) -> String {
     if !r.visible {
         return String::new();
     }
@@ -344,8 +368,14 @@ fn region_rect(r: &FRegion, style: FlowStyle) -> String {
         FlowStyle::Mermaid => 0.0,
         FlowStyle::Kymo => 12.0,
     };
+    let scss = ns.map(|n| n.shape_css()).unwrap_or_default();
+    let sattr = if scss.is_empty() {
+        String::new()
+    } else {
+        format!(" style=\"{scss}\"")
+    };
     format!(
-        "<rect class=\"region-rect\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{}\"/>\n",
+        "<rect class=\"region-rect\"{sattr} x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{}\"/>\n",
         nf(r.x),
         nf(r.y),
         nf(r.w),
@@ -354,20 +384,24 @@ fn region_rect(r: &FRegion, style: FlowStyle) -> String {
     )
 }
 
-fn region_label(r: &FRegion, style: FlowStyle) -> String {
+fn region_label(r: &FRegion, style: FlowStyle, ns: Option<&NodeStyle>) -> String {
     if !r.visible || r.label.is_empty() {
         return String::new();
     }
+    let cstyle = ns
+        .and_then(|n| n.color.as_ref())
+        .map(|c| format!(" style=\"fill:{c}\""))
+        .unwrap_or_default();
     if matches!(style, FlowStyle::Mermaid) {
         format!(
-            "<text class=\"region-label\" text-anchor=\"middle\" x=\"{}\" y=\"{}\">{}</text>\n",
+            "<text class=\"region-label\" text-anchor=\"middle\" x=\"{}\" y=\"{}\"{cstyle}>{}</text>\n",
             nf(r.x + r.w / 2.0),
             nf(r.y + 16.0),
             esc(&r.label)
         )
     } else {
         format!(
-            "<text class=\"region-label\" text-anchor=\"start\" x=\"{}\" y=\"{}\">{}</text>\n",
+            "<text class=\"region-label\" text-anchor=\"start\" x=\"{}\" y=\"{}\"{cstyle}>{}</text>\n",
             nf(r.x + 12.0),
             nf(r.y + 16.0),
             esc(&r.label)
