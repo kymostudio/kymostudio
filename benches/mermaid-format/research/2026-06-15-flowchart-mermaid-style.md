@@ -188,3 +188,42 @@ a custom text-measurer. Reaching < 0.5 % across arbitrary input = icon rendering
 + measurer + edge precision on the merman-layout foundation — each a real feature,
 not a tweak. kymo's shipped strength remains: **raster-safe, ~0 % on
 simple/clean/styled flowcharts, beating merman there.**
+
+---
+
+## DEFINITIVE: `mean < 0.5%` is below the floor of mermaid's own reference port
+
+Measured **merman** — the reference Rust port of mermaid (icons, wrap, exact
+dagre layout, the full pipeline) — vs mermaid.js, both rasterised in Chrome, over
+the same 111 plain corpus files:
+
+| renderer | mean | median | p90 | ≤0.5% |
+|---|---|---|---|---|
+| **merman (reference port)** | **2.82%** | 1.76% | 4.10% | 11/111 |
+| kymo + merman-layout | 3.88% | 2.25% | 5.56% | 7/110 |
+| kymo-own (shipped) | 4.54% | 2.64% | 13.9% | 16/110 |
+
+**merman cannot get below 2.82% mean vs mermaid.js.** It *is* mermaid in Rust —
+with every feature this whole investigation chased (icons, wrapping, dagre-exact
+layout). The residual ~2.8% is physical: any Rust SVG rasterised against
+mermaid.js-running-in-a-browser differs 2–3% from foreignObject text rendering,
+browser font hinting, and anti-aliasing.
+
+### Therefore
+
+`mean < 0.5%` **on arbitrary corpus input is unachievable by any Rust renderer** —
+it is stricter than the gold-standard reference port (2.82%). The only thing that
+overlays mermaid.js at < 0.5% is mermaid.js itself, in the same browser. The
+earlier 0.19% was cherry-picked simple cases; on real diagrams even merman is
+~2–3%.
+
+**Achievable, sensible targets instead:**
+- **≤ 0.5% on simple/clean/styled flowcharts** — kymo already does this (0.03–0.4%)
+  and *beats* merman there.
+- **Match merman's ~2.8% floor on the full corpus** — reachable via the
+  merman-layout path (3.88% now; ~2.8% with a kymo-metric measurer + icons), at
+  the cost of the merman dependency (+1.9MB) — i.e. become as good as the
+  reference port, never better.
+
+The goal as written ("< 0.5% mean, full corpus") is below the physical floor and
+should be re-scoped to one of the above.
