@@ -546,14 +546,25 @@ pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<Nod
             }
         }
         if line.contains(":::") {
-            for tok in line.split_whitespace() {
-                if let Some((id, cls)) = tok.split_once(":::") {
-                    let id = id.trim_matches(|c: char| !c.is_alphanumeric() && c != '_');
-                    let cls = cls.trim_matches(|c: char| !c.is_alphanumeric() && c != '_');
-                    if !id.is_empty() && !cls.is_empty() {
-                        node_class.insert(id.to_string(), cls.to_string());
+            // For each `:::class`, the node id is the identifier before it —
+            // but a shaped node `CS(multi word label):::cat` puts a whole label
+            // (with spaces) between the id and `:::`, so a naive whitespace split
+            // grabs the wrong token. Scan the text before `:::`, skipping a
+            // trailing balanced shape group, to recover the real id.
+            let mut rest = line;
+            while let Some(pos) = rest.find(":::") {
+                let before = &rest[..pos];
+                let after = &rest[pos + 3..];
+                let cls: String = after
+                    .chars()
+                    .take_while(|c| c.is_alphanumeric() || *c == '_')
+                    .collect();
+                if let Some(id) = id_before_class(before) {
+                    if !cls.is_empty() {
+                        node_class.insert(id, cls.clone());
                     }
                 }
+                rest = &after[cls.len()..];
             }
         }
         if low.contains("primarycolor") {
@@ -599,6 +610,51 @@ pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<Nod
 }
 
 /// Parse a `fill:#f00,stroke:#00f,color:#fff,stroke-width:2px` style list.
+/// The node id immediately preceding a `:::class` marker. Handles a trailing
+/// balanced shape group, e.g. `CS(A long label):::cat` -> `CS`.
+fn id_before_class(prefix: &str) -> Option<String> {
+    let p = prefix.trim_end();
+    let bytes = p.as_bytes();
+    let last = *bytes.last()?;
+    let open = match last {
+        b')' => b'(',
+        b']' => b'[',
+        b'}' => b'{',
+        _ => 0,
+    };
+    let id_end = if open != 0 {
+        let mut depth = 0usize;
+        let mut idx = None;
+        for (i, &c) in bytes.iter().enumerate().rev() {
+            if c == last {
+                depth += 1;
+            } else if c == open {
+                depth -= 1;
+                if depth == 0 {
+                    idx = Some(i);
+                    break;
+                }
+            }
+        }
+        idx?
+    } else {
+        p.len()
+    };
+    let id: String = p[..id_end]
+        .chars()
+        .rev()
+        .take_while(|c| c.is_alphanumeric() || *c == '_' || *c == '-' || *c == '.')
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+        .collect();
+    if id.is_empty() {
+        None
+    } else {
+        Some(id)
+    }
+}
+
 fn parse_style(s: &str) -> NodeStyle {
     let mut ns = NodeStyle::default();
     for frag in s.split(',') {

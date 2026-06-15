@@ -338,7 +338,12 @@ fn node_svg(
                 .enumerate()
                 .map(|(i, l)| {
                     let dy = if i == 0 { 0.0 } else { 24.0 };
-                    format!("<tspan x=\"{}\" dy=\"{}\">{}</tspan>", nf(cx), nf(dy), esc(l))
+                    format!(
+                        "<tspan x=\"{}\" dy=\"{}\">{}</tspan>",
+                        nf(cx),
+                        nf(dy),
+                        esc(l)
+                    )
                 })
                 .collect();
             format!(
