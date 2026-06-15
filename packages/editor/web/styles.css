@@ -492,12 +492,10 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .kind-label { font-size: 11.5px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.05em; }
 .kind-select { border: 1px solid var(--border-strong); border-radius: 8px; padding: 5px 9px; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--bg); cursor: pointer; }
 .kind-select:hover { border-color: var(--dim); }
-/* per-kind syntax help — always an exit when the source won't render */
-.syntax-link { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--dim); text-decoration: none; padding: 4px 7px; border-radius: 7px; }
-.syntax-link svg { flex: none; }
-.syntax-link:hover { color: var(--accent); background: var(--accent-soft); }
-/* honest data-flow note: non-Kymo kinds POST the source to kroki.io */
-.kroki-note { margin-left: auto; font-size: 11.5px; color: var(--dim); cursor: help; }
+/* guest-only New: matches the kind-select chrome, accent-tinted as an action */
+.newdiag-btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border-strong); border-radius: 8px; padding: 5px 11px; font-size: 13px; font-weight: 600; color: var(--accent); background: var(--bg); cursor: pointer; margin-right: 2px; }
+.newdiag-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
+.newdiag-btn svg { flex: none; }
 /* transient confirmation that a paste switched the kind */
 .detect-chip { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2.5px 9px; white-space: nowrap; }
 
