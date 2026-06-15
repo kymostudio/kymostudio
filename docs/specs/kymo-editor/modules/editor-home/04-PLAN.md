@@ -1,7 +1,7 @@
 ---
 title: Editor Home — Implementation Plan
 document_id: PLAN-KHOME-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-15
 status: Implemented
 classification: Internal
@@ -32,7 +32,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `PLAN-KHOME-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented (retrospective) |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KHOME-001` (the *what*), `DESIGN-KHOME-001` (the *how*), `TEST-KHOME-001` (V&V), `PLAN-KEDITOR-001` (the umbrella plan — the Welcome shipped within its second growth pass) |
@@ -76,7 +76,8 @@ Recent index, Open-file → draft, docs link) and owns no data/render/account lo
 | **P2** | "Open file…" → draft with kind auto-detect (`openLocalFile`, `FR-HM-02`, `US-HM-03`). | ✓ Shipped |
 | **P3** | Guest sign-in CTA in Recent + `?s=` bypass + Back-restores-Welcome (`welcomeDismissed` lifecycle, `US-HM-01/04`). | ✓ Shipped |
 | **P4** | **Spec retrofit (this doc-set):** `FEAT-/DESIGN-/TEST-/PLAN-KHOME-001`; reconcile `FR-KE-21` / `FR-LB-02` redirect contradiction; register the sixth module across the umbrella + siblings. | ✓ Done (2026-06-15, docs-only) |
-| **P5** | **Smoke E2E:** `data-testid`s in `welcome.tsx`; Playwright harness for `packages/editor` (`playwright.config.ts` + `e2e/welcome.spec.ts`); `TC-HM-01` (guest) + `TC-HM-04` (`?s=` bypass) automated. Reconcile the redesigned-Welcome drift (R-DRIFT) into the specs. | ✓ Done (2026-06-15, local-green; CI deferred) |
+| **P5** | **Smoke E2E:** `data-testid`s in `welcome.tsx`; Playwright harness for `packages/editor` (`playwright.config.ts` + `e2e/welcome.spec.ts`); `TC-HM-01` (guest) + `TC-HM-04` (`?s=` bypass) automated. Reconcile the redesigned-Welcome drift (R-DRIFT) into the specs. | ✓ Done (2026-06-15, box-green; CI deferred) |
+| **P6** | **Full E2E suite:** `e2e/welcome-full.spec.ts` + `e2e/_fixtures.ts` (GIS stub + mock `kymo_idtoken` + `/api/diagrams`/`/api/workspaces`/`/api/projects` route stubs); `TC-HM-02/03/05/06` automated → **all 6 `TC-HM` green**. Coverage record (§5 Status) all ⚙️. | ✓ Done (2026-06-15, box-green: 6 passed; CI job deferred) |
 
 ## 5. Risk register
 
@@ -101,3 +102,4 @@ Recent index, Open-file → draft, docs link) and owns no data/render/account lo
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-15 | Vũ Anh | Initial retrospective plan for `editor-home`. Records the decision to carve a dedicated, story-augmented module with a full doc-set; the (already-shipped) phases P1–P3 and the P4 spec retrofit; and the risk register (R-HM1 `document.title` gap; R-HM2 over-decomposition; R-HM3 Welcome-vs-redirect resolved; R-HM4 gate coupling). |
 | 0.2     | 2026-06-15 | Vũ Anh | Added **P5 — Playwright smoke harness** (`packages/editor/playwright.config.ts` + `e2e/welcome.spec.ts`; `TC-HM-01`/`TC-HM-04` automated + passing) and **R-DRIFT** (the Welcome's text/DOM drifted within days — mitigated via spec reconcile + `data-testid` selectors). Updated R-HM4 (`welcomeDismissed` is state, not a ref). |
+| 0.3     | 2026-06-15 | Vũ Anh | Added **P6 — full E2E suite** (`welcome-full.spec.ts` + `_fixtures.ts`; auth-mock + REST stubs): `TC-HM-02/03/05/06` automated → all 6 `TC-HM` green on `k2`. Recorded the as-built `pickTemplate` `replaceState` behaviour (in-tab Back does not restore the Welcome; a reload does — `TC-HM-05` asserts the reload path). |
