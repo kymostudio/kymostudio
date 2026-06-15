@@ -1,0 +1,102 @@
+[
+  {
+    "f": "katex_001",
+    "kScore": 0.04523613550972767,
+    "mScore": 0.0792042734440583,
+    "kPixelmatch": 0.0660072244623656,
+    "mPixelmatch": 0.06629547265002655,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "flowchart-v2_050",
+    "kScore": 0.04790199300518322,
+    "mScore": 0,
+    "kPixelmatch": 0.04642830828175656,
+    "mPixelmatch": 0,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "flowchart-v2_043",
+    "kScore": 0.04495383461080851,
+    "mScore": 0.010162756446820902,
+    "kPixelmatch": 0.03877651515151515,
+    "mPixelmatch": 0.002053030303030303,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "katex_002",
+    "kScore": 0.06464290160662643,
+    "mScore": 0.05852932996486548,
+    "kPixelmatch": 0.06593778178539225,
+    "mPixelmatch": 0.046526645608314654,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "flowchart_020",
+    "kScore": 0.04815401430579744,
+    "mScore": 0.010840723859257944,
+    "kPixelmatch": 0.0493376894949197,
+    "mPixelmatch": 0.013620224804435331,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "flowchart-icon_001",
+    "kScore": 0.03429253441161357,
+    "mScore": 0.027520030721966005,
+    "kPixelmatch": 0.045736151603498545,
+    "mPixelmatch": 0.031457431457431455,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "flowchart_013",
+    "kScore": 0.0231157345532603,
+    "mScore": 0.00434863552281366,
+    "kPixelmatch": 0.037467228126234924,
+    "mPixelmatch": 0.0029150203987078674,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "flowchart-icon_004",
+    "kScore": 0.10819967832781052,
+    "mScore": 0.0755779732979631,
+    "kPixelmatch": 0.1938154186795491,
+    "mPixelmatch": 0.16956778096800657,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "flowchart_035",
+    "kScore": 0.0318091002853529,
+    "mScore": 0.0070185081727996085,
+    "kPixelmatch": 0.030566370040786058,
+    "mPixelmatch": 0.004091174751607247,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  },
+  {
+    "f": "katex_000",
+    "kScore": 0.04087027557618698,
+    "mScore": 0.05994219311262454,
+    "kPixelmatch": 0.028578371188868426,
+    "mPixelmatch": 0.04598324343361323,
+    "kErr": null,
+    "mErr": null,
+    "jOk": true
+  }
+]

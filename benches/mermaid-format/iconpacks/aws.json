@@ -1,0 +1,23 @@
+{
+  "prefix": "aws",
+  "lastModified": 0,
+  "width": 80,
+  "height": 80,
+  "icons": {
+    "arch-amazon-cloudwatch": {
+      "body": "<g><rect x=\"0\" y=\"0\" width=\"80\" height=\"80\" fill=\"#FF4F8B\" rx=\"4\"/><path fill=\"#FFFFFF\" d=\"M20 25h40v5H20zm0 10h40v5H20zm0 10h40v5H20z\"/></g>",
+      "width": 80,
+      "height": 80
+    },
+    "arch-amazon-route-53": {
+      "body": "<g><rect x=\"0\" y=\"0\" width=\"80\" height=\"80\" fill=\"#8C4FFF\" rx=\"4\"/><circle cx=\"40\" cy=\"40\" r=\"15\" fill=\"#FFFFFF\"/><circle cx=\"40\" cy=\"40\" r=\"8\" fill=\"#8C4FFF\"/></g>",
+      "width": 80,
+      "height": 80
+    },
+    "arch-amazon-eks-cloud": {
+      "body": "<g><rect x=\"0\" y=\"0\" width=\"80\" height=\"80\" fill=\"#FF9900\" rx=\"4\"/><path fill=\"#FFFFFF\" d=\"M40 20l15 10v20l-15 10-15-10V30z\"/></g>",
+      "width": 80,
+      "height": 80
+    }
+  }
+}

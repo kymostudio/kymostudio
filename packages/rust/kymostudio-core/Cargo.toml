@@ -52,6 +52,13 @@ dagre = "0.1.1"
 merman-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
 ttf-parser = "0.25"
 merman-render = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
+# kymo-tex — kymo's own KaTeX-compatible LaTeX→SVG renderer (fork of RaTeX). The
+# `katex` module renders `$$…$$` math glyphs through this. embed-fonts keeps the
+# KaTeX TTFs in-binary (no fs → wasm-safe); standalone emits outlined glyphs.
+kymo-types = { path = "../kymo-tex/crates/kymo-types", optional = true }
+kymo-parser = { path = "../kymo-tex/crates/kymo-parser", optional = true }
+kymo-layout = { path = "../kymo-tex/crates/kymo-layout", optional = true }
+kymo-svg = { path = "../kymo-tex/crates/kymo-svg", default-features = false, features = ["standalone", "embed-fonts"], optional = true }
 
 # `.kymo` DSL front-end dep — pulled in only by the `kymo` feature (native
 # mobile/CLI). The wasm (JS) and Python wheels DON'T enable `kymo`: each has its
@@ -81,7 +88,7 @@ default = ["system-fonts", "pdf"]
 # Opt-in: route flowchart layout through merman (the mermaid Rust port) sized by
 # kymo's browser-calibrated metrics, rendered raster-safe by kymo. Matches
 # mermaid.js far more tightly (median ~0.7% vs ~2.6%) at the cost of ~1.9 MB wasm.
-merman-layout = ["dep:merman-core", "dep:merman-render", "dep:serde_json"]
+merman-layout = ["dep:merman-core", "dep:merman-render", "dep:serde_json", "dep:kymo-types", "dep:kymo-parser", "dep:kymo-layout", "dep:kymo-svg"]
 system-fonts = ["resvg/system-fonts", "resvg/memmap-fonts"]
 
 # Vector SVG→PDF via svg2pdf (native only — see the dep note above).

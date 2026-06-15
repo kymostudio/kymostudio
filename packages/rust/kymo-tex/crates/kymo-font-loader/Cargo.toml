@@ -1,0 +1,20 @@
+[package]
+name = "kymo-font-loader"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Shared lazy font loading and caching for RaTeX renderers"
+
+[features]
+default = []
+embed-fonts = ["dep:kymo-katex-fonts"]
+
+[dependencies]
+kymo-font = { workspace = true }
+kymo-katex-fonts = { workspace = true, optional = true }
+kymo-types = { workspace = true }
+kymo-unicode-font = { workspace = true }
+ab_glyph = "0.2"
