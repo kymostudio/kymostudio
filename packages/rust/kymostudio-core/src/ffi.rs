@@ -138,7 +138,12 @@ impl From<EditorShape> for FfiShape {
             size: 0.0,
         };
         match s.data {
-            ShapeData::Node { icon, accent, name, subtitle } => {
+            ShapeData::Node {
+                icon,
+                accent,
+                name,
+                subtitle,
+            } => {
                 out.icon = icon;
                 out.accent = accent;
                 out.label = name;
@@ -153,7 +158,11 @@ impl From<EditorShape> for FfiShape {
                 out.y2 = y2;
                 out.label = label;
             }
-            ShapeData::Freedraw { points, color, size } => {
+            ShapeData::Freedraw {
+                points,
+                color,
+                size,
+            } => {
                 out.points = points.into_iter().map(|(x, y)| Point { x, y }).collect();
                 out.color = color;
                 out.size = size;
@@ -221,7 +230,13 @@ impl Session {
     }
 
     pub fn shapes(&self) -> Vec<FfiShape> {
-        self.inner.lock().unwrap().shapes().into_iter().map(Into::into).collect()
+        self.inner
+            .lock()
+            .unwrap()
+            .shapes()
+            .into_iter()
+            .map(Into::into)
+            .collect()
     }
     pub fn hit_test(&self, x: f32, y: f32) -> Option<String> {
         self.inner.lock().unwrap().hit_test(x, y)
@@ -285,10 +300,18 @@ impl Session {
     }
     pub fn camera(&self) -> CameraDto {
         let c = self.inner.lock().unwrap().camera();
-        CameraDto { x: c.x, y: c.y, z: c.z }
+        CameraDto {
+            x: c.x,
+            y: c.y,
+            z: c.z,
+        }
     }
     pub fn set_camera(&self, c: CameraDto) {
-        self.inner.lock().unwrap().set_camera(Camera { x: c.x, y: c.y, z: c.z });
+        self.inner.lock().unwrap().set_camera(Camera {
+            x: c.x,
+            y: c.y,
+            z: c.z,
+        });
     }
     pub fn screen_to_page(&self, sx: f32, sy: f32) -> Point {
         let (x, y) = self.inner.lock().unwrap().screen_to_page(sx, sy);

@@ -87,7 +87,11 @@ impl EditorSession {
             kymo_shapes: Vec::new(),
             freeform: Vec::new(),
             selection: Vec::new(),
-            camera: Camera { x: 0.0, y: 0.0, z: 1.0 },
+            camera: Camera {
+                x: 0.0,
+                y: 0.0,
+                z: 1.0,
+            },
             viewport: (1024.0, 768.0),
             tool: Tool::Select,
             theme: Theme::Light,
@@ -109,8 +113,12 @@ impl EditorSession {
         self.kymo_shapes = diagram_to_shapes(&self.diagram);
         self.source = text.to_string();
         // Drop selection entries that no longer exist.
-        let live: std::collections::HashSet<&str> =
-            self.kymo_shapes.iter().map(|s| s.id.as_str()).chain(self.freeform.iter().map(|s| s.id.as_str())).collect();
+        let live: std::collections::HashSet<&str> = self
+            .kymo_shapes
+            .iter()
+            .map(|s| s.id.as_str())
+            .chain(self.freeform.iter().map(|s| s.id.as_str()))
+            .collect();
         self.selection.retain(|id| live.contains(id.as_str()));
         Ok(())
     }
@@ -241,7 +249,8 @@ impl EditorSession {
 
         // Collect moved kymo-node centres → writeback map.
         let mut moves: HashMap<String, (f32, f32)> = HashMap::new();
-        let sel: std::collections::HashSet<&str> = self.selection.iter().map(|s| s.as_str()).collect();
+        let sel: std::collections::HashSet<&str> =
+            self.selection.iter().map(|s| s.as_str()).collect();
         for s in &self.kymo_shapes {
             if s.kind == ShapeKind::KymoNode && sel.contains(s.id.as_str()) {
                 if let Some(kid) = &s.kymo_id {
@@ -368,7 +377,10 @@ impl EditorSession {
 
     /// Screen → page, inverting `screen = (page + cam) * z`.
     pub fn screen_to_page(&self, sx: f32, sy: f32) -> (f32, f32) {
-        (sx / self.camera.z - self.camera.x, sy / self.camera.z - self.camera.y)
+        (
+            sx / self.camera.z - self.camera.x,
+            sy / self.camera.z - self.camera.y,
+        )
     }
 
     pub fn pan_by(&mut self, dx_screen: f32, dy_screen: f32) {
@@ -569,7 +581,11 @@ a --> b";
     fn hit_test_picks_node() {
         let s = session();
         // node 'a' centred at (100,100) post-snap (snap to grid keeps near).
-        let a = s.shapes().into_iter().find(|s| s.kymo_id.as_deref() == Some("a")).unwrap();
+        let a = s
+            .shapes()
+            .into_iter()
+            .find(|s| s.kymo_id.as_deref() == Some("a"))
+            .unwrap();
         let (cx, cy) = (a.x + a.w / 2.0, a.y + a.h / 2.0);
         assert_eq!(s.hit_test(cx, cy).as_deref(), Some(a.id.as_str()));
     }
@@ -577,14 +593,22 @@ a --> b";
     #[test]
     fn drag_writes_back_position() {
         let mut s = session();
-        let a = s.shapes().into_iter().find(|s| s.kymo_id.as_deref() == Some("a")).unwrap();
+        let a = s
+            .shapes()
+            .into_iter()
+            .find(|s| s.kymo_id.as_deref() == Some("a"))
+            .unwrap();
         let before_center = (a.x + a.w / 2.0, a.y + a.h / 2.0);
         s.select(vec![a.id.clone()]);
         s.begin_drag();
         s.drag_by(40.0, 0.0);
         s.end_drag().unwrap();
         // source rewritten with new x.
-        let a2 = s.shapes().into_iter().find(|sh| sh.kymo_id.as_deref() == Some("a")).unwrap();
+        let a2 = s
+            .shapes()
+            .into_iter()
+            .find(|sh| sh.kymo_id.as_deref() == Some("a"))
+            .unwrap();
         let after_center = (a2.x + a2.w / 2.0, a2.y + a2.h / 2.0);
         assert!(after_center.0 > before_center.0, "node moved right");
         assert!(s.source().contains("@ ("), "leaf got explicit position");
@@ -595,7 +619,11 @@ a --> b";
     fn undo_redo_restores_source() {
         let mut s = session();
         let orig = s.source().to_string();
-        let a = s.shapes().into_iter().find(|sh| sh.kymo_id.as_deref() == Some("a")).unwrap();
+        let a = s
+            .shapes()
+            .into_iter()
+            .find(|sh| sh.kymo_id.as_deref() == Some("a"))
+            .unwrap();
         s.select(vec![a.id]);
         s.begin_drag();
         s.drag_by(80.0, 24.0);

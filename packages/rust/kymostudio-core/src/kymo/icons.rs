@@ -446,7 +446,10 @@ pub fn register_icon(key: &str, bytes: &[u8], is_png: bool) {
 
 /// Register an already-built SVG fragment verbatim for `key`.
 pub fn register_icon_svg(key: &str, fragment: &str) {
-    registry().lock().unwrap().insert(key.to_string(), fragment.to_string());
+    registry()
+        .lock()
+        .unwrap()
+        .insert(key.to_string(), fragment.to_string());
 }
 
 /// Resolve `key` → SVG fragment: built-in → host-registered → `None`. (Python's
@@ -492,7 +495,14 @@ mod tests {
 
     #[test]
     fn builtin_icons_present() {
-        for k in ["user", "hex-agent", "folder", "checklist", "neural-sm", "cylinder"] {
+        for k in [
+            "user",
+            "hex-agent",
+            "folder",
+            "checklist",
+            "neural-sm",
+            "cylinder",
+        ] {
             assert!(builtin_icon(k).is_some(), "missing builtin {k}");
         }
         assert!(builtin_icon("nope-xyz").is_none());
@@ -516,6 +526,9 @@ mod tests {
     #[test]
     fn register_and_get() {
         register_icon_svg("test:custom", "<circle r=\"5\"/>");
-        assert_eq!(get_icon("test:custom").as_deref(), Some("<circle r=\"5\"/>"));
+        assert_eq!(
+            get_icon("test:custom").as_deref(),
+            Some("<circle r=\"5\"/>")
+        );
     }
 }

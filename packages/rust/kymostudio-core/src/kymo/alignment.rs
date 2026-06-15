@@ -69,7 +69,11 @@ fn node_for<'a>(diagram: &'a Diagram, id: &str) -> Option<Node<'a>> {
     if let Some(c) = diagram.components.iter().find(|c| c.id == id) {
         return Some(Node::Component(c));
     }
-    diagram.regions.iter().find(|r| r.id == id).map(Node::Region)
+    diagram
+        .regions
+        .iter()
+        .find(|r| r.id == id)
+        .map(Node::Region)
 }
 
 /// Centre point used for stagger sorting (component centre / region centre).
@@ -98,7 +102,11 @@ fn resolve_auto_layouts(diagram: &mut Diagram) {
         if r.layout.is_none() || r.pos.is_none() || r.contains.is_empty() {
             continue;
         }
-        let children: Vec<usize> = r.contains.iter().filter_map(|cid| idx.get(cid).copied()).collect();
+        let children: Vec<usize> = r
+            .contains
+            .iter()
+            .filter_map(|cid| idx.get(cid).copied())
+            .collect();
         if children.len() != r.contains.len() {
             // Python `diagram.get` would KeyError; here we simply place what we
             // can. (A missing member is a user error surfaced elsewhere.)
@@ -116,8 +124,10 @@ fn resolve_auto_layouts(diagram: &mut Diagram) {
 
         let cursor_x = ox + pad_x;
         let cursor_y = oy + pad_y;
-        let effs: Vec<(i32, i32)> =
-            children.iter().map(|&ci| effective_half(&diagram.components[ci])).collect();
+        let effs: Vec<(i32, i32)> = children
+            .iter()
+            .map(|&ci| effective_half(&diagram.components[ci]))
+            .collect();
 
         if horizontal {
             let max_h = effs.iter().map(|e| e.1).max().unwrap_or(0);
@@ -245,8 +255,11 @@ fn resolve_region_bounds(diagram: &mut Diagram) {
         if r.contains.is_empty() {
             continue;
         }
-        let cells: Vec<&Component> =
-            r.contains.iter().filter_map(|cid| idx.get(cid).map(|&i| &comps[i])).collect();
+        let cells: Vec<&Component> = r
+            .contains
+            .iter()
+            .filter_map(|cid| idx.get(cid).map(|&i| &comps[i]))
+            .collect();
         if cells.is_empty() {
             continue;
         }
@@ -258,14 +271,23 @@ fn resolve_region_bounds(diagram: &mut Diagram) {
 
 /// Bounding box of `cells` (icon + label band), padded. Shared by
 /// [`resolve_region_bounds`] and the grid-snap re-derive.
-fn region_envelope(cells: &[&Component], pad_x: i32, pad_y: i32, pad_b: i32) -> (i32, i32, i32, i32) {
+fn region_envelope(
+    cells: &[&Component],
+    pad_x: i32,
+    pad_y: i32,
+    pad_b: i32,
+) -> (i32, i32, i32, i32) {
     let mut min_left = i32::MAX;
     let mut max_right = i32::MIN;
     let mut min_top = i32::MAX;
     let mut max_bot = i32::MIN;
     for c in cells {
         let ew = c.half().0.max(label_half_width(c));
-        let lh = if has_label(c) { c.shape.label_height() } else { 0 };
+        let lh = if has_label(c) {
+            c.shape.label_height()
+        } else {
+            0
+        };
         min_left = min_left.min(c.pos.0 - ew);
         max_right = max_right.max(c.pos.0 + ew);
         min_top = min_top.min(c.pos.1 - c.half().1);
@@ -333,7 +355,13 @@ fn stagger_fanin_edges(diagram: &mut Diagram) {
 
 /// Stagger `src_offset` (fan-out) or `dst_offset` (fan-in) on edges sharing an
 /// anchor so ports don't pile up. Mirrors the nested `spread` in Python.
-fn spread(diagram: &mut Diagram, geom: &[EdgeGeom], group: &[usize], is_fanout: bool, min_count: usize) {
+fn spread(
+    diagram: &mut Diagram,
+    geom: &[EdgeGeom],
+    group: &[usize],
+    is_fanout: bool,
+    min_count: usize,
+) {
     if group.len() < min_count {
         return;
     }
@@ -354,11 +382,19 @@ fn spread(diagram: &mut Diagram, geom: &[EdgeGeom], group: &[usize], is_fanout: 
     let shared = geom[group[0]];
     let anchor = if is_fanout { shared.sa } else { shared.da };
     let horizontal = matches!(anchor, Anchor::Left | Anchor::Right);
-    let shared_half = if is_fanout { shared.src_half } else { shared.dst_half };
+    let shared_half = if is_fanout {
+        shared.src_half
+    } else {
+        shared.dst_half
+    };
 
     // Sort by the OTHER endpoint's position on the perpendicular axis.
     let other_coord = |g: usize| -> i32 {
-        let oc = if is_fanout { geom[g].dst_center } else { geom[g].src_center };
+        let oc = if is_fanout {
+            geom[g].dst_center
+        } else {
+            geom[g].src_center
+        };
         if horizontal {
             oc.1
         } else {
@@ -367,7 +403,11 @@ fn spread(diagram: &mut Diagram, geom: &[EdgeGeom], group: &[usize], is_fanout: 
     };
     ents.sort_by_key(|&g| other_coord(g));
 
-    let cross_span = if horizontal { shared_half.1 * 2 } else { shared_half.0 * 2 };
+    let cross_span = if horizontal {
+        shared_half.1 * 2
+    } else {
+        shared_half.0 * 2
+    };
     let spread_total = (cross_span - 16).min(STEP * (n as i32 - 1)) as f64;
     let mid = (n as f64 - 1.0) / 2.0;
     for (i, &g) in ents.iter().enumerate() {
@@ -415,10 +455,16 @@ fn stagger_trunk_lanes(diagram: &mut Diagram) {
             continue; // already axis-aligned
         }
         if matches!(sa, Anchor::Left | Anchor::Right) {
-            let key = (py_round(sp.0 as f64 / 8.0) * 8, py_round(dp.0 as f64 / 8.0) * 8);
+            let key = (
+                py_round(sp.0 as f64 / 8.0) * 8,
+                py_round(dp.0 as f64 / 8.0) * 8,
+            );
             horiz.entry(key).or_default().push((i, sp, dp));
         } else {
-            let key = (py_round(sp.1 as f64 / 8.0) * 8, py_round(dp.1 as f64 / 8.0) * 8);
+            let key = (
+                py_round(sp.1 as f64 / 8.0) * 8,
+                py_round(dp.1 as f64 / 8.0) * 8,
+            );
             vert.entry(key).or_default().push((i, sp, dp));
         }
     }
@@ -445,9 +491,7 @@ fn stagger_trunk_lanes(diagram: &mut Diagram) {
             return;
         }
         let step = MIN_STEP.max(MAX_STEP.min(fdiv(channel_width, n + 1)));
-        entries.sort_by(|a, b| {
-            (coord(&a.1), coord(&a.2)).cmp(&(coord(&b.1), coord(&b.2)))
-        });
+        entries.sort_by(|a, b| (coord(&a.1), coord(&a.2)).cmp(&(coord(&b.1), coord(&b.2))));
         let mid = (n - 1) as f64 / 2.0;
         for (i, (ei, _sp, _dp)) in entries.iter().enumerate() {
             diagram.edges[*ei].trunk_offset = py_round((i as f64 - mid) * step as f64);
@@ -480,7 +524,11 @@ fn auto_size_canvas(diagram: &mut Diagram) {
 
     for c in &diagram.components {
         let eff_hw = c.half().0.max(label_half_width(c));
-        let lh = if has_label(c) { c.shape.label_height() } else { 0 };
+        let lh = if has_label(c) {
+            c.shape.label_height()
+        } else {
+            0
+        };
         min_x = min_x.min(c.pos.0 - eff_hw);
         max_x = max_x.max(c.pos.0 + eff_hw);
         min_y = min_y.min(c.pos.1 - c.half().1);
@@ -598,8 +646,11 @@ fn snap_to_grid(diagram: &mut Diagram) {
         if r.bounds == (0, 0, 0, 0) || r.contains.is_empty() {
             continue;
         }
-        let cells: Vec<&Component> =
-            r.contains.iter().filter_map(|cid| idx.get(cid.as_str()).copied()).collect();
+        let cells: Vec<&Component> = r
+            .contains
+            .iter()
+            .filter_map(|cid| idx.get(cid.as_str()).copied())
+            .collect();
         if cells.is_empty() {
             continue;
         }

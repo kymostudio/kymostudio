@@ -35,6 +35,7 @@ macro_rules! str_enum {
                 match self { $(Self::$variant => $s),+ }
             }
             /// Parse the DSL/JSON string token into the enum (`None` if unknown).
+            #[allow(clippy::should_implement_trait)]
             pub fn from_str(s: &str) -> Option<Self> {
                 match s { $($s => Some(Self::$variant),)+ _ => None }
             }
@@ -205,8 +206,13 @@ impl Component {
     pub fn anchor(&self, side: Anchor) -> Point {
         let (cx, cy) = self.pos;
         let (hw, hh) = self.half();
-        let labelled = (!self.name.is_empty() || !self.subtitle.is_empty()) && !self.icon.is_empty();
-        let lh = if labelled { self.shape.label_height() } else { 0 };
+        let labelled =
+            (!self.name.is_empty() || !self.subtitle.is_empty()) && !self.icon.is_empty();
+        let lh = if labelled {
+            self.shape.label_height()
+        } else {
+            0
+        };
         match side {
             Anchor::Top => (cx, cy - hh),
             Anchor::Right => (cx + hw, cy),
@@ -271,7 +277,10 @@ pub fn resolve_anchors(e: &Edge, src: Node, dst: Node) -> (Anchor, Anchor) {
     } else {
         (Anchor::Left, Anchor::Right)
     };
-    (e.src_anchor.unwrap_or(auto_sa), e.dst_anchor.unwrap_or(auto_da))
+    (
+        e.src_anchor.unwrap_or(auto_sa),
+        e.dst_anchor.unwrap_or(auto_da),
+    )
 }
 
 impl Component {

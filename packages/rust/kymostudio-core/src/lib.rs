@@ -19,6 +19,8 @@ pub mod dot;
 pub mod drawio;
 pub mod flowchart;
 pub mod flowchart_svg;
+#[cfg(feature = "merman-layout")]
+mod katex;
 pub mod kymojson;
 pub mod layout;
 pub mod layout_dagre;
@@ -26,8 +28,6 @@ pub mod math;
 pub mod mermaid;
 #[cfg(feature = "merman-layout")]
 pub mod merman_layout;
-#[cfg(feature = "merman-layout")]
-mod katex;
 pub mod model;
 pub mod sequence;
 pub mod style;

@@ -77,8 +77,11 @@ pub fn layout(
     if region_layout.is_empty() {
         return;
     }
-    let sizes: HashMap<String, Cell> =
-        diagram.components.iter().map(|c| (c.id.clone(), cell_size(c))).collect();
+    let sizes: HashMap<String, Cell> = diagram
+        .components
+        .iter()
+        .map(|c| (c.id.clone(), cell_size(c)))
+        .collect();
     let idx: HashMap<String, usize> = diagram
         .components
         .iter()
@@ -87,7 +90,11 @@ pub fn layout(
         .collect();
 
     // Per-row height (across all regions) → consistent Y for cross-region rows.
-    let max_rows = region_layout.iter().map(|(_, rs)| rs.len()).max().unwrap_or(0);
+    let max_rows = region_layout
+        .iter()
+        .map(|(_, rs)| rs.len())
+        .max()
+        .unwrap_or(0);
     let mut row_heights: Vec<i32> = Vec::with_capacity(max_rows);
     for i in 0..max_rows {
         let mut h = 0;
@@ -108,8 +115,8 @@ pub fn layout(
     for (rid, rows) in region_layout {
         let mut w = 0;
         for row in rows {
-            let row_w: i32 = row.iter().map(|cid| sizes[cid].w).sum::<i32>()
-                + (row.len() as i32 - 1) * CELL_GAP;
+            let row_w: i32 =
+                row.iter().map(|cid| sizes[cid].w).sum::<i32>() + (row.len() as i32 - 1) * CELL_GAP;
             w = w.max(row_w);
         }
         region_widths.insert(rid.as_str(), w + REGION_PADDING_X * 2);
@@ -150,8 +157,8 @@ pub fn layout(
         let rx = region_xs[rid.as_str()];
         for (i, row) in rows.iter().enumerate() {
             let ry = row_ys[i];
-            let total_w: i32 = row.iter().map(|cid| sizes[cid].w).sum::<i32>()
-                + (row.len() as i32 - 1) * CELL_GAP;
+            let total_w: i32 =
+                row.iter().map(|cid| sizes[cid].w).sum::<i32>() + (row.len() as i32 - 1) * CELL_GAP;
             let mut cursor = rx - fdiv(total_w, 2);
             for cid in row {
                 let cw = sizes[cid].w;
@@ -230,13 +237,19 @@ fn effective_gap(dir_horizontal: bool, sizes: &[(i32, i32)]) -> i32 {
     TREE_GAP.max(fdiv(cross, 4))
 }
 
-fn tree_measure(by_id: &HashMap<String, usize>, comps: &[Component], node: &LayoutTree) -> (i32, i32) {
+fn tree_measure(
+    by_id: &HashMap<String, usize>,
+    comps: &[Component],
+    node: &LayoutTree,
+) -> (i32, i32) {
     match node {
         LayoutTree::Id(id) => tree_cell(&comps[by_id[id]]),
         LayoutTree::Group { dir, children, .. } => {
             let (px, py) = tree_padding(node);
-            let sizes: Vec<(i32, i32)> =
-                children.iter().map(|ch| tree_measure(by_id, comps, ch)).collect();
+            let sizes: Vec<(i32, i32)> = children
+                .iter()
+                .map(|ch| tree_measure(by_id, comps, ch))
+                .collect();
             let horizontal = *dir == crate::model::AutoLayout::Horizontal;
             let eg = effective_gap(horizontal, &sizes);
             if horizontal {
@@ -346,8 +359,15 @@ pub fn inline_region_leaves(tree: &LayoutTree, diagram: &Diagram) -> LayoutTree 
             }
             tree.clone()
         }
-        LayoutTree::Group { dir, children, padding } => {
-            let new_children = children.iter().map(|c| inline_region_leaves(c, diagram)).collect();
+        LayoutTree::Group {
+            dir,
+            children,
+            padding,
+        } => {
+            let new_children = children
+                .iter()
+                .map(|c| inline_region_leaves(c, diagram))
+                .collect();
             LayoutTree::Group {
                 dir: *dir,
                 children: new_children,
@@ -428,8 +448,11 @@ fn barycenter_reorder(
     }
     let mut fixed_leaves = Vec::new();
     collect_leaves_ordered(&sibs[fixed_idx], &mut fixed_leaves);
-    let fixed_pos: HashMap<&str, usize> =
-        fixed_leaves.iter().enumerate().map(|(i, l)| (l.as_str(), i)).collect();
+    let fixed_pos: HashMap<&str, usize> = fixed_leaves
+        .iter()
+        .enumerate()
+        .map(|(i, l)| (l.as_str(), i))
+        .collect();
 
     let free_children = match &sibs[free_idx] {
         LayoutTree::Group { children, .. } => children,

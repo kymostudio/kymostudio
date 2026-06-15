@@ -22,7 +22,9 @@ fn fdiv(a: i32, b: i32) -> i32 {
 /// Escape `& < >` for XML text content (not quotes). Mirrors Python
 /// `html.escape(text, quote=False)`.
 fn x(text: &str) -> String {
-    text.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+    text.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
 }
 
 /// Collapse whitespace runs (preserving trimmed text content). Port of `_tidy`.
@@ -228,7 +230,15 @@ fn points_to_rounded_path(pts: &[Point]) -> String {
             out.push(format!("L {},{}", curr.0, curr.1));
             continue;
         }
-        let sgn = |v: i32| if v > 0 { 1 } else if v < 0 { -1 } else { 0 };
+        let sgn = |v: i32| {
+            if v > 0 {
+                1
+            } else if v < 0 {
+                -1
+            } else {
+                0
+            }
+        };
         let (ux_in, uy_in) = (sgn(dx_in), sgn(dy_in));
         let (ux_out, uy_out) = (sgn(dx_out), sgn(dy_out));
         let ax = curr.0 - ux_in * rr;
@@ -252,11 +262,13 @@ fn region_label_clearance(r: &Region, side: Anchor) -> i32 {
     if side != Anchor::Top {
         return 0;
     }
-    let pos = r.label_position.unwrap_or(if r.style == RegionStyle::Inner {
-        LabelPosition::Inside
-    } else {
-        LabelPosition::Above
-    });
+    let pos = r
+        .label_position
+        .unwrap_or(if r.style == RegionStyle::Inner {
+            LabelPosition::Inside
+        } else {
+            LabelPosition::Above
+        });
     if pos == LabelPosition::Above {
         10
     } else {
@@ -268,7 +280,12 @@ fn node_for<'a>(d: &'a Diagram, id: &str) -> Node<'a> {
     if let Some(c) = d.components.iter().find(|c| c.id == id) {
         return Node::Component(c);
     }
-    Node::Region(d.regions.iter().find(|r| r.id == id).expect("edge endpoint not found"))
+    Node::Region(
+        d.regions
+            .iter()
+            .find(|r| r.id == id)
+            .expect("edge endpoint not found"),
+    )
 }
 
 fn route_edge(e: &Edge, d: &Diagram) -> Vec<Point> {
@@ -407,7 +424,7 @@ fn render_region_label(r: &Region) -> String {
         anchor = "start";
     } else {
         let a = r.label_anchor.as_str(); // start|middle|end
-        // Resolve label position (local "inside-tl" for cluster).
+                                         // Resolve label position (local "inside-tl" for cluster).
         let pos: &str = match r.label_position {
             Some(LabelPosition::Above) => "above",
             Some(LabelPosition::Inside) => "inside",
@@ -492,7 +509,10 @@ fn render_edge(e: &Edge, d: &Diagram) -> String {
     let label_svg = if e.label.is_empty() {
         String::new()
     } else {
-        format!("<text class=\"{lcls}\" x=\"{lx}\" y=\"{ly}\">{}</text>", x(&e.label))
+        format!(
+            "<text class=\"{lcls}\" x=\"{lx}\" y=\"{ly}\">{}</text>",
+            x(&e.label)
+        )
     };
     format!("<path class=\"{cls}\"{dash_attr} d=\"{path}\"{marker_attr}/>\n{label_svg}")
 }
@@ -501,9 +521,9 @@ fn render_flowchart_node(c: &Component) -> String {
     let (cx, cy) = c.pos;
     let (hw, hh) = c.half();
     let glyph = match c.shape {
-        Shape::Circle => format!(
-            "<ellipse class=\"fc-shape\" cx=\"{cx}\" cy=\"{cy}\" rx=\"{hw}\" ry=\"{hh}\"/>"
-        ),
+        Shape::Circle => {
+            format!("<ellipse class=\"fc-shape\" cx=\"{cx}\" cy=\"{cy}\" rx=\"{hw}\" ry=\"{hh}\"/>")
+        }
         Shape::Diamond => {
             let pts = format!(
                 "{},{} {},{} {},{} {},{}",
@@ -546,23 +566,38 @@ fn render_flowchart_node(c: &Component) -> String {
             );
             let cap = format!(
                 "<path class=\"fc-shape-line\" d=\"M{},{} A{},{} 0 0 0 {},{}\"/>",
-                cx - hw, top, hw, ry, cx + hw, top
+                cx - hw,
+                top,
+                hw,
+                ry,
+                cx + hw,
+                top
             );
             format!("{body}{cap}")
         }
         Shape::Badge => format!(
             "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{}\"/>",
-            cx - hw, cy - hh, 2 * hw, 2 * hh, hh
+            cx - hw,
+            cy - hh,
+            2 * hw,
+            2 * hh,
+            hh
         ),
         _ => format!(
             "<rect class=\"fc-shape\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"6\"/>",
-            cx - hw, cy - hh, 2 * hw, 2 * hh
+            cx - hw,
+            cy - hh,
+            2 * hw,
+            2 * hh
         ),
     };
     let label = if c.name.is_empty() {
         String::new()
     } else {
-        format!("<text class=\"fc-label\" x=\"{cx}\" y=\"{cy}\">{}</text>", x(&c.name))
+        format!(
+            "<text class=\"fc-label\" x=\"{cx}\" y=\"{cy}\">{}</text>",
+            x(&c.name)
+        )
     };
     format!("{glyph}{label}")
 }
@@ -753,8 +788,18 @@ mod tests {
             fn $test() {
                 assert_golden(
                     $name,
-                    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../../samples/", $name, ".kymo")),
-                    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/kymo_golden/", $name, ".svg")),
+                    include_str!(concat!(
+                        env!("CARGO_MANIFEST_DIR"),
+                        "/../../../samples/",
+                        $name,
+                        ".kymo"
+                    )),
+                    include_str!(concat!(
+                        env!("CARGO_MANIFEST_DIR"),
+                        "/tests/kymo_golden/",
+                        $name,
+                        ".svg"
+                    )),
                 );
             }
         };

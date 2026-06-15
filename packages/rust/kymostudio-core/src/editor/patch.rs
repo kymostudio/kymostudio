@@ -99,14 +99,22 @@ fn remove_ids(re: &Re, raw: &str, ids: &HashSet<String>, is_row: bool) -> Option
     let (code, _) = split_comment(raw);
     let tokens: Vec<&str> = code.split_whitespace().collect();
     let start = if is_row { 1 } else { 0 };
-    let kept: Vec<&str> = tokens[start..].iter().copied().filter(|t| !ids.contains(*t)).collect();
+    let kept: Vec<&str> = tokens[start..]
+        .iter()
+        .copied()
+        .filter(|t| !ids.contains(*t))
+        .collect();
     if kept.len() == tokens.len() - start {
         return None; // nothing removed
     }
     if kept.is_empty() {
         return Some(String::new()); // emptied → blank line
     }
-    Some(format!("{indent}{}{}", if is_row { "row " } else { "" }, kept.join(" ")))
+    Some(format!(
+        "{indent}{}{}",
+        if is_row { "row " } else { "" },
+        kept.join(" ")
+    ))
 }
 
 /// Apply position changes to `.kymo` text. `moves` maps a component id to its
@@ -117,7 +125,10 @@ pub fn patch_positions(text: &str, moves: &HashMap<String, (f32, f32)>) -> Strin
     }
     let re = Re::new();
     let nl = if text.contains("\r\n") { "\r\n" } else { "\n" };
-    let mut lines: Vec<String> = text.split('\n').map(|l| l.trim_end_matches('\r').to_string()).collect();
+    let mut lines: Vec<String> = text
+        .split('\n')
+        .map(|l| l.trim_end_matches('\r').to_string())
+        .collect();
     let ids: HashSet<String> = moves.keys().cloned().collect();
     let mut stack: Vec<&str> = Vec::new(); // "layout" | "region" | "other"
 
@@ -146,10 +157,7 @@ pub fn patch_positions(text: &str, moves: &HashMap<String, (f32, f32)>) -> Strin
         let id0 = tokens[0];
 
         // Leaf definition line for a moved component → set its placement.
-        if moves.contains_key(id0)
-            && tokens.len() > 1
-            && re.leaf_triple.is_match(tokens[1])
-        {
+        if moves.contains_key(id0) && tokens.len() > 1 && re.leaf_triple.is_match(tokens[1]) {
             lines[i] = patch_leaf_line(&re, &lines[i], moves[id0]);
             continue;
         }
@@ -195,10 +203,7 @@ mod tests {
 
     #[test]
     fn appends_pos_when_absent() {
-        let out = patch_positions(
-            "c box/gear/orange \"C\" \"\"",
-            &moves(&[("c", (5.0, 6.0))]),
-        );
+        let out = patch_positions("c box/gear/orange \"C\" \"\"", &moves(&[("c", (5.0, 6.0))]));
         assert_eq!(out, "c box/gear/orange \"C\" \"\" @ (5, 6)");
     }
 
