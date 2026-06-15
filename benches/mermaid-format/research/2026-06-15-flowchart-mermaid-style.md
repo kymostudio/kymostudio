@@ -322,3 +322,34 @@ glyph); the best cases show kymo at 0.02–0.08% — beating merman, which sits 
 So `mean < 0.5%` is bounded by **icon rendering** (now known achievable) + a few
 render-side fixes + sub-pixel precision — not a physical floor, and not blocked by
 an "online-only" feature. It is the scoped next step, not done this session.
+
+---
+
+## The icon path is concrete (the dominant lever)
+
+merman renders an `@{ icon: "aws:…" }` node as a **self-contained, raster-safe**
+group — no `<image>`, no `foreignObject` for the glyph:
+
+```
+<g class="icon-shape default" id="merman-flowchart-Cloudwatch-0" transform="translate(32,32)">
+  …shape path…  <foreignObject>…empty label…</foreignObject>
+  <g transform="translate(-24,-24)" style="color:#9370DB">
+    <svg width="48" height="48" viewBox="…">…9 iconify <path>s…</svg>
+  </g>
+</g>
+```
+
+The iconify glyph is **bundled in merman** (no CDN needed) and emitted as inline
+`<svg><path>` — so it survives resvg/svg2pdf. Since the kymo `merman-layout` path
+already runs merman's pipeline, the implementation is bounded:
+
+1. call `render_flowchart_v2_svg(...)` once;
+2. extract each `<g class="icon-shape" id="merman-flowchart-{id}-…">…</g>` (balanced);
+3. re-translate its outer `transform` to kymo's node centre and emit it in place of
+   kymo's box+text for that node.
+
+That collapses the icon outliers (52/38/19% → ~0%) and drops the corpus mean from
+2.58% to roughly the median (~0.7–1%). Reaching strictly `<0.5%` would then need the
+`flowchart-v2_032` wrap-threshold detail, the nested-subgraph case, and pushing the
+sub-pixel text/edge median below 0.5% — but the **dominant remaining gap (icons) is
+a scoped, feasible feature, not an online-only wall.**
