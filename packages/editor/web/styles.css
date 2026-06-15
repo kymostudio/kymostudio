@@ -319,6 +319,101 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .wel-signin { padding: 7px 13px; border: 1px solid var(--border); border-radius: var(--radius-btn); background: var(--bg-soft); color: var(--ink); font: inherit; font-size: 13.5px; cursor: pointer; }
 .wel-signin:hover { background: var(--bg-raise); }
 @media (max-width: 720px) { .wel-cols { grid-template-columns: 1fr; gap: 32px; } .wel-inner { padding: 28px 18px 56px; } .wel-hero { max-width: 100%; } }
+
+/* ============================================================================
+   Logged-out landing (.wlg-*) — a purpose-built welcome for guests, focused on
+   three jobs: understand (hero demo) · create (primary actions) · explore
+   (template grid). Brand pink accent on an off-white blueprint canvas; display
+   type is Bricolage Grotesque, body stays Inter.
+   ============================================================================ */
+.wlg { flex: 1; min-width: 0; overflow: auto; position: relative; background: var(--bg); }
+/* Blueprint backdrop: a faint dotted grid (echoing the diagram canvas) + a soft
+   pink corner glow for depth — purely decorative, sits behind the content. */
+.wlg-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(circle at 1px 1px, rgba(36, 33, 49, 0.05) 1px, transparent 0);
+  background-size: 24px 24px; -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%); mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%); }
+.wlg-bg::after { content: ""; position: absolute; top: -180px; right: -140px; width: 620px; height: 620px; border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-soft), transparent 68%); }
+.wlg-inner { position: relative; z-index: 1; width: min(1100px, 92%); margin: 0 auto; padding: clamp(36px, 6vh, 72px) 0 64px; }
+
+/* Hero — copy on the left, a framed live demo on the right */
+.wlg-hero { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+.wlg-copy { min-width: 0; }
+.wlg-lockup { display: block; height: 34px; width: auto; margin: 0 0 26px; opacity: 0.92; }
+.wlg-eyebrow { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px 5px 9px; border: 1px solid var(--border); border-radius: 999px; background: var(--bg); color: var(--ink); font-size: 12.5px; font-weight: 600; letter-spacing: 0.01em; box-shadow: 0 1px 2px rgba(36, 33, 49, 0.04); }
+.wlg-eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.wlg-title { margin: 20px 0 0; font-family: "Bricolage Grotesque", var(--font); font-weight: 800; font-size: clamp(38px, 5.4vw, 60px); line-height: 1.02; letter-spacing: -0.025em; color: var(--ink); }
+.wlg-title em { font-style: normal; color: var(--accent); }
+.wlg-sub { margin: 22px 0 0; max-width: 46ch; font-size: 16px; line-height: 1.6; color: var(--dim); }
+.wlg-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 30px 0 0; }
+.wlg-btn { display: inline-flex; align-items: center; gap: 9px; padding: 12px 20px; border-radius: 11px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease; }
+.wlg-btn svg { flex: none; }
+.wlg-btn-primary { border: 0; background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(224, 9, 95, 0.28); }
+.wlg-btn-primary:hover { background: var(--accent-deep); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(224, 9, 95, 0.34); }
+.wlg-btn-arrow { margin-left: 1px; transition: transform 0.16s ease; }
+.wlg-btn-primary:hover .wlg-btn-arrow { transform: translateX(3px); }
+.wlg-btn-ghost { border: 1px solid var(--border-strong); background: var(--bg); color: var(--ink); }
+.wlg-btn-ghost:hover { background: var(--bg-soft); border-color: var(--dim); transform: translateY(-1px); }
+.wlg-micro { margin: 22px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--dim); max-width: 42ch; }
+.wlg-inline { padding: 0; border: 0; background: transparent; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; }
+.wlg-inline:hover { color: var(--accent-deep); text-decoration: underline; }
+
+/* Demo — the product showing itself, framed like an editor window */
+.wlg-demo { min-width: 0; }
+.wlg-window { border: 1px solid var(--border); border-radius: 16px; background: var(--bg); overflow: hidden; box-shadow: 0 24px 60px -28px rgba(36, 33, 49, 0.32), 0 4px 14px -6px rgba(36, 33, 49, 0.12); }
+.wlg-window-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; border-bottom: 1px solid var(--border); background: var(--bg-soft); }
+.wlg-window-bar span { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); }
+.wlg-window-bar span:first-child { background: #f0a0b8; }
+.wlg-window-bar b { margin-left: 8px; font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--dim); }
+.wlg-window-body { padding: 18px; background-image: radial-gradient(circle at 1px 1px, rgba(36, 33, 49, 0.045) 1px, transparent 0); background-size: 18px 18px; }
+.wlg-demo-svg { display: block; width: 100%; height: auto; }
+
+/* Templates — explore the diagram types */
+.wlg-templates { margin: clamp(48px, 8vh, 84px) 0 0; }
+.wlg-sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 0 0 18px; }
+.wlg-sec-head h2 { margin: 0; font-family: "Bricolage Grotesque", var(--font); font-weight: 700; font-size: 21px; letter-spacing: -0.02em; color: var(--ink); }
+.wlg-sec-link { display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+.wlg-sec-link:hover { color: var(--accent-deep); }
+.wlg-sec-link svg { transition: transform 0.16s ease; }
+.wlg-sec-link:hover svg { transform: translateX(2px); }
+.wlg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.wlg-card { display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--bg); text-align: left; cursor: pointer; transition: transform 0.13s ease, box-shadow 0.13s ease, border-color 0.13s ease; }
+.wlg-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 14px 30px -16px rgba(224, 9, 95, 0.3); }
+.wlg-card-glyph { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; margin-bottom: 14px; border-radius: 10px; background: var(--bg-soft); color: var(--accent); }
+.wlg-card:hover .wlg-card-glyph { background: var(--accent-soft); }
+.wlg-card-glyph svg { width: 21px; height: 21px; }
+.wlg-card-name { font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.wlg-card-via { margin-top: 2px; font-size: 12px; color: var(--dim); }
+
+/* Footer — docs + positioning line */
+.wlg-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: clamp(40px, 7vh, 72px) 0 0; padding: 22px 0 0; border-top: 1px solid var(--border); }
+.wlg-doc { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 14px; font-weight: 600; text-decoration: none; }
+.wlg-doc:hover { color: var(--accent-deep); }
+.wlg-foot-note { font-size: 13px; color: var(--dim); }
+
+/* Page-load: a single orchestrated rise, staggered down the hero + cards */
+@keyframes wlg-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.wlg-lockup, .wlg-eyebrow, .wlg-title, .wlg-sub, .wlg-actions, .wlg-micro, .wlg-window, .wlg-templates, .wlg-foot { animation: wlg-rise 0.6s cubic-bezier(0.22, 0.7, 0.2, 1) both; }
+.wlg-eyebrow { animation-delay: 0.05s; }
+.wlg-title { animation-delay: 0.1s; }
+.wlg-sub { animation-delay: 0.16s; }
+.wlg-actions { animation-delay: 0.22s; }
+.wlg-micro { animation-delay: 0.28s; }
+.wlg-window { animation-delay: 0.2s; }
+.wlg-templates { animation-delay: 0.3s; }
+.wlg-foot { animation-delay: 0.36s; }
+@media (prefers-reduced-motion: reduce) { .wlg-lockup, .wlg-eyebrow, .wlg-title, .wlg-sub, .wlg-actions, .wlg-micro, .wlg-window, .wlg-templates, .wlg-foot { animation: none; } }
+
+@media (max-width: 880px) {
+  .wlg-hero { grid-template-columns: 1fr; gap: 36px; }
+  .wlg-demo { order: -1; }
+  .wlg-title { font-size: clamp(34px, 9vw, 48px); }
+}
+@media (max-width: 560px) {
+  .wlg-grid { grid-template-columns: repeat(2, 1fr); }
+  .wlg-foot { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .wlg-actions .wlg-btn { flex: 1 1 auto; justify-content: center; }
+}
 /* Miro-style logo loader: the K's three strokes sweep through the brand tile —
    slide in from the left (hard ease-out), hold, accelerate out to the right. */
 .kloader { display: grid; grid-template-rows: 1fr; width: 100px; min-height: 100px; background: var(--accent); border-radius: 18px; overflow: hidden; }
