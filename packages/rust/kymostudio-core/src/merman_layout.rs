@@ -28,8 +28,15 @@ impl KymoTextMeasurer {
         // mermaid wrapped-label rows are ~24px at the 16px flowchart font.
         style.font_size * 1.5
     }
+    fn is_bold(style: &TextStyle) -> bool {
+        style.font_weight.as_deref().is_some_and(|w| {
+            w.eq_ignore_ascii_case("bold") || w.parse::<u32>().is_ok_and(|n| n >= 600)
+        })
+    }
     fn scaled_width(line: &str, style: &TextStyle) -> f64 {
-        text_w_mermaid(line) * (style.font_size / 16.0)
+        // mermaid's trebuchet bold runs ~4.7% wider than regular.
+        let bold = if Self::is_bold(style) { 1.047 } else { 1.0 };
+        text_w_mermaid(line) * (style.font_size / 16.0) * bold
     }
 }
 
@@ -81,7 +88,10 @@ impl TextMeasurer for KymoTextMeasurer {
         let mut lines: Vec<String> = Vec::new();
         for hard in text.split('\n') {
             match max_width {
-                Some(mw) => lines.extend(wrap_at(hard, mw / scale)),
+                Some(mw) => {
+                    let t = mw / scale / if Self::is_bold(style) { 1.047 } else { 1.0 };
+                    lines.extend(wrap_at(hard, t));
+                }
                 None => lines.push(hard.to_string()),
             }
         }
