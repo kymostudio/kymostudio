@@ -1,5 +1,8 @@
 export const GOOGLE_CLIENT_ID = "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com";
 export const MCP_WS = "wss://mcp.kymo.studio/ws";
+// Per-user control channel: every open tab connects so the MCP `open_diagram`
+// tool can live-switch which diagram this tab shows (see userchannel.tsx).
+export const USER_WS = "wss://mcp.kymo.studio/userws";
 export const DIAGRAMS_API = "https://mcp.kymo.studio/api/diagrams";
 export const WORKSPACES_API = "https://mcp.kymo.studio/api/workspaces";
 export const PROJECTS_API = "https://mcp.kymo.studio/api/projects";

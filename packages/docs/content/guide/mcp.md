@@ -94,6 +94,7 @@ session is not used anywhere else.
 | `list_diagrams` | List your diagrams (id, title, kind, URL), most-recent first. | — |
 | `get_diagram` | Fetch a diagram's source. | `id?` (defaults to most recent) |
 | `edit_diagram` | Replace the source and/or rename; pushes the change live to any open editor tab. | `source?`, `title?`, `id?`, `kind?` |
+| `open_diagram` | Switch the diagram your open editor tab is showing to this one (live navigation, no content change). | `id?` (defaults to most recent) |
 | `delete_diagram` | Permanently delete a diagram. **Cannot be undone.** | `id` |
 
 > `delete_diagram` is destructive — if your client supports per-tool
