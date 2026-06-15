@@ -29,12 +29,28 @@ export function Preview({ svg, fitKey }: { svg: string; fitKey: string }) {
   const userAdjusted = useRef(false);
   const fitKeyRef = useRef(fitKey);
 
+  const stageRef = useRef<HTMLDivElement>(null);
+
   const fit = useCallback(() => {
     const vp = vpRef.current; if (!vp) return;
     const size = svgSize(svg); if (!size) return;
     const cw = vp.clientWidth, ch = vp.clientHeight; if (!cw || !ch) return;
     const z = clampZ(Math.min(cw / size.w, ch / size.h) * FIT_PAD);
     setT({ z, x: (cw - size.w * z) / 2, y: (ch - size.h * z) / 2 });
+  }, [svg]);
+
+  // Pin the injected SVG to its intrinsic viewBox pixel size. mermaid.js emits
+  // `width="100%" style="max-width:…"` (useMaxWidth:true), so the SVG otherwise
+  // shrinks to the container BEFORE our transform-scale fit — which assumes the
+  // SVG is at its viewBox px size — runs, double-shrinking big diagrams to a
+  // dot. Forcing explicit width/height (and clearing max-width) makes scale()
+  // the only sizing step. No-op for the core/kroki paths (already fixed-size).
+  useEffect(() => {
+    const el = stageRef.current?.querySelector("svg"); if (!el) return;
+    const size = svgSize(svg); if (!size) return;
+    el.setAttribute("width", String(size.w));
+    el.setAttribute("height", String(size.h));
+    el.style.maxWidth = "none";
   }, [svg]);
 
   // Re-fit on a new diagram identity (clearing manual zoom), and keep the whole
@@ -127,7 +143,7 @@ export function Preview({ svg, fitKey }: { svg: string; fitKey: string }) {
     <div id="preview" ref={vpRef}
       onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
       onDoubleClick={onDblClick}>
-      <div className="pv-stage" style={{ transform: `translate(${t.x}px, ${t.y}px) scale(${t.z})` }} dangerouslySetInnerHTML={{ __html: svg }} />
+      <div className="pv-stage" ref={stageRef} style={{ transform: `translate(${t.x}px, ${t.y}px) scale(${t.z})` }} dangerouslySetInnerHTML={{ __html: svg }} />
       <div className="pv-controls" onPointerDown={(e) => e.stopPropagation()} onDoubleClick={(e) => e.stopPropagation()}>
         <button onClick={() => center(1 / 1.2)} title="Zoom out" aria-label="Zoom out"><Minus size={15} strokeWidth={2.2} /></button>
         <button className="pv-pct" onClick={() => center(1 / tRef.current.z)} title="Reset to 100%">{Math.round(t.z * 100)}%</button>

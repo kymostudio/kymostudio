@@ -33,7 +33,13 @@ function loadMermaid(): Promise<any> {
   // through esbuild — measured at 5–14 s medians on Fast 4G (165 ms RTT per
   // wave). One ~760 KB brotli request beats that by an order of magnitude.
   return (mod ??= import("./vendor/mermaid.bundle.mjs").then((m: any) => {
-    m.default.initialize({ startOnLoad: false, securityLevel: "strict" });
+    // `antiscript` (not `strict`) so `<br/>` in labels renders as a real line
+    // break (strict HTML-encodes it → literal "<br/>"), matching mermaid.live /
+    // mermaid.ai. Safe here because every render is passed through DOMPurify
+    // (sanitizeSvg in kroki.ts) before it reaches the DOM — that, not mermaid's
+    // securityLevel, is the XSS guard for untrusted ?s= shared source: it keeps
+    // <br>/<tspan>/<foreignObject> but strips <script> and on* handlers.
+    m.default.initialize({ startOnLoad: false, securityLevel: "antiscript" });
     return m.default;
   }));
 }
