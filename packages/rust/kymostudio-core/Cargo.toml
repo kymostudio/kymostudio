@@ -50,6 +50,7 @@ roxmltree = { version = "0.20", optional = true }
 serde_json = { version = "1", optional = true }
 dagre = "0.1.1"
 merman-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
+ttf-parser = "0.25"
 merman-render = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
 
 # `.kymo` DSL front-end dep — pulled in only by the `kymo` feature (native

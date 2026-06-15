@@ -213,6 +213,78 @@ fn extract_icon_inners(svg: &str) -> std::collections::HashMap<String, String> {
     out
 }
 
+/// Pixels-per-em for KaTeX math at the 16px flowchart font. mermaid's KaTeX
+/// renders ~5% tighter than RaTeX's raw em (measured: 4-glyph 15.15, 24-glyph
+/// 15.52 px/em), so 15.4 best-fits across formulas.
+const MATH_PX_PER_EM: f64 = 16.0;
+
+/// kymo-tex layout of one `$$…$$` formula -> (width_em, height_em, inner SVG).
+/// Uses KaTeX's own fonts so the raster pixel-matches mermaid's KaTeX.
+fn ratex_dims_svg(formula: &str) -> Option<(f64, f64, String)> {
+    crate::katex::render(formula).map(|(inner, w, h)| (w, h, inner))
+}
+
+/// Render a `$$…$$` formula to an inline `<g>` of raster-safe glyph paths, centred
+/// at the node origin and scaled em→px to match mermaid's KaTeX. `None` if RaTeX
+/// can't parse it.
+fn render_math_group(formula: &str) -> Option<String> {
+    let (w_em, h_em, inner) = ratex_dims_svg(formula)?;
+    let (wpx, hpx) = (w_em * MATH_PX_PER_EM, h_em * MATH_PX_PER_EM);
+    Some(format!(
+        "<g transform=\"translate({:.2},{:.2}) scale({:.4})\">{}</g>",
+        -wpx / 2.0,
+        -hpx / 2.0,
+        MATH_PX_PER_EM,
+        inner
+    ))
+}
+
+/// Math renderer that sizes a `$$…$$` node by RaTeX dimensions at mermaid's KaTeX
+/// scale, so merman's layout box matches what kymo draws via `FNode.math`.
+#[derive(Debug)]
+struct KymoMathRenderer;
+
+impl merman_render::math::MathRenderer for KymoMathRenderer {
+    fn render_html_label(&self, text: &str, _config: &MermaidConfig) -> Option<String> {
+        // Non-empty so merman engages its math sizing path; the HTML itself is
+        // unused (kymo draws the glyphs from FNode.math).
+        if math_only_formula(text).is_some() {
+            Some(String::from("<span class=\"katex\"></span>"))
+        } else {
+            None
+        }
+    }
+
+    fn measure_html_label(
+        &self,
+        text: &str,
+        _config: &MermaidConfig,
+        style: &TextStyle,
+        _max_width_px: Option<f64>,
+        _wrap_mode: WrapMode,
+    ) -> Option<TextMetrics> {
+        let formula = math_only_formula(text)?;
+        let (w_em, h_em, _) = ratex_dims_svg(formula)?;
+        let s = style.font_size / 16.0 * MATH_PX_PER_EM;
+        Some(TextMetrics {
+            width: w_em * s,
+            height: h_em * s,
+            line_count: 1,
+        })
+    }
+}
+
+/// The single `$$…$$` formula in a label, if the whole label is one math span.
+fn math_only_formula(label: &str) -> Option<&str> {
+    let t = label.trim().trim_matches(['"', '\'']).trim();
+    let inner = t.strip_prefix("$$")?.strip_suffix("$$")?;
+    if inner.is_empty() || inner.contains("$$") {
+        None
+    } else {
+        Some(inner)
+    }
+}
+
 /// Build kymo float geometry from merman's mermaid-faithful layout, sized with
 /// kymo's browser-calibrated metrics. `None` on any parse/layout failure.
 pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
@@ -225,7 +297,8 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
     let semantic = parse_flowchart(src, &meta).ok()?;
     let config = MermaidConfig::default();
     let measurer = KymoTextMeasurer;
-    let layout = layout_flowchart_v2(&semantic, &config, &measurer, None).ok()?;
+    let math = KymoMathRenderer;
+    let layout = layout_flowchart_v2(&semantic, &config, &measurer, Some(&math)).ok()?;
     // Lift merman's raster-safe iconify glyphs for @{icon} nodes (best-effort).
     let icons = render_flowchart_v2_svg(
         &layout,
@@ -243,6 +316,18 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
         Some(b) => (MARGIN - b.min_x, MARGIN - b.min_y),
         None => (MARGIN, MARGIN),
     };
+
+    // Raw labels (pre-clean) to detect `$$…$$` math spans before math::render
+    // converts them to Unicode.
+    let raw_math: HashMap<String, String> = crate::mermaid::parse(src)
+        .ok()
+        .map(|f| {
+            f.nodes
+                .iter()
+                .filter_map(|n| math_only_formula(&n.label).map(|m| (n.id.clone(), m.to_string())))
+                .collect()
+        })
+        .unwrap_or_default();
 
     let by_id: HashMap<&str, &crate::flowchart::FlowNode> =
         fc.nodes.iter().map(|n| (n.id.as_str(), n)).collect();
@@ -279,6 +364,7 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
             w: ln.width,
             h: ln.height,
             icon: icons.get(ln.id.as_str()).cloned(),
+            math: raw_math.get(ln.id.as_str()).and_then(|f| render_math_group(f)),
         });
     }
     if geom.nodes.is_empty() {
