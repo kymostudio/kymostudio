@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor } from "./auth";
 import { useRoom } from "./room";
 import { useWorkspace, assignDiagram } from "./workspace";
-import { KINDS, renderKroki, sanitizeSvg, docHref } from "./kroki";
+import { KINDS, renderKroki, sanitizeSvg } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { Preview } from "./preview";
@@ -16,7 +16,7 @@ import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } f
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
-import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, HelpCircle, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown } from "lucide-react";
+import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2 } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut } = useAuth();
@@ -167,7 +167,7 @@ export default function EditorPage() {
       lastSvg.current = out; setSvg(out);
       // Plain-language success — the byte/latency detail is dev-debug, kept only
       // in the tooltip. Errors stay verbose (the catch below), they're useful.
-      setStatus("Rendered"); setStatusTitle(`${out.length.toLocaleString()} bytes · ${Math.round(performance.now() - t0)} ms`); setStatusErr(false);
+      setStatus(""); setStatusTitle(`${out.length.toLocaleString()} bytes · ${Math.round(performance.now() - t0)} ms`); setStatusErr(false);
     } catch (e: any) {
       if (seq !== renderSeq.current) return;
       setStatus(String(e?.message ?? e)); setStatusTitle(""); setStatusErr(true);
@@ -646,6 +646,14 @@ export default function EditorPage() {
             {panes.source && (
             <section className="pane" style={panes.preview ? { flex: `0 0 ${split}%` } : undefined}>
               <div className="pane-bar">
+                {/* Guests have no Explorer, so the New affordance lives here. A fresh
+                    draft only — it never writes the DB (that happens on Save). */}
+                {!claims && (
+                  <button className="newdiag-btn" onClick={() => setGalleryOpen(true)}
+                    title="Start a new diagram (a local draft — saved only when you Save)">
+                    <FilePlus2 size={14} strokeWidth={2} />New
+                  </button>
+                )}
                 {/* a visible label so the dropdown reads as a 28-format switcher, not a mystery control */}
                 <label className="kind-label" htmlFor="kind-select">Type</label>
                 <select id="kind-select" className="kind-select" value={kind} title="Diagram type — 28 formats"
@@ -665,15 +673,7 @@ export default function EditorPage() {
                   }}>
                   {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
                 </select>
-                <a className="syntax-link" href={docHref(kind)} target="_blank" rel="noopener noreferrer" title={`Syntax help for ${KINDS.find((x) => x.value === kind)?.label ?? kind}`}><HelpCircle size={13} strokeWidth={2} />Syntax</a>
                 {detected && <span className="detect-chip">auto-detected {detected}</span>}
-                {kind !== "kymo" && (
-                  <span className="kroki-note" title={kind === "mermaid"
-                    ? "Mermaid renders locally in your browser (mermaid.js). Opening a share link may use the kymo render cache for the first paint."
-                    : "Non-Kymo diagram types are rendered by render.kymo.studio (some are relayed to the public kroki.io service — your source is sent along). Kymo diagrams render locally in your browser."}>
-                    {kind === "mermaid" ? "renders in-browser" : "renders via render.kymo.studio"}
-                  </span>
-                )}
               </div>
               <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
