@@ -353,3 +353,39 @@ That collapses the icon outliers (52/38/19% → ~0%) and drops the corpus mean f
 `flowchart-v2_032` wrap-threshold detail, the nested-subgraph case, and pushing the
 sub-pixel text/edge median below 0.5% — but the **dominant remaining gap (icons) is
 a scoped, feasible feature, not an online-only wall.**
+
+---
+
+## Icon rendering implemented — mean 1.61% (2026-06-15)
+
+Implemented the icon path: the `merman-layout` build now lifts each `@{ icon: }`
+node's raster-safe iconify glyph (inline `<svg><path>`, bundled in merman) from
+merman's render and re-emits it at kymo's node centre (`FNode.icon`; `node_svg`
+short-circuits to the glyph). The icon outliers collapsed:
+
+| stage | mean | median | ≤0.5% |
+|---|---|---|---|
+| kymo-own (start) | 4.54% | 2.64% | 16/110 |
+| + merman-layout (kymo metrics) | 2.58% | 0.69% | 49/110 |
+| **+ icon rendering** | **1.61%** | **0.66%** | **51/110** · 72/110 ≤1% |
+
+`flowchart-icon_002/003/004` (52/38/19%) dropped out of the worst list entirely.
+
+### Remaining tail (mean 1.61% → toward 0.5%)
+
+- **subgraph/style with trailing `;`** — `class A x; classDef x fill:#…;` was
+  parsed with the `;` attached (`"x;"` ≠ `"x"`), dropping the style. A `;`-strip
+  fixes this (and helps the default path) **but exposes** a separate gap: those
+  files also use **stadium `([…])` / hexagon `{{…}}` shapes with multi-line
+  labels** that kymo renders imperfectly — colouring them makes the shape/text
+  mismatch visible (net +0.6% until the shapes are fixed), so the `;`-strip is held
+  pending stadium/hex render support.
+- **`flowchart-v2_032`** (wrap-threshold detail), **KaTeX** math, and
+  **`flowchart_025`** (hard for *both* ports).
+- **sub-pixel median (0.66%)** — per-char text-metric + edge-curve residual, shared
+  with merman; this is the floor for a strictly `<0.5%` *mean*.
+
+So the path keeps converging: icons (done, −0.97%), then stadium/hex shapes +
+`;`-strip, then the wrap detail — each a scoped fix. `mean < 0.5%` ultimately needs
+the median below 0.5% (sub-pixel precision), but the renderer is now at **median
+0.66%, beating mermaid's reference port**, with icons.
