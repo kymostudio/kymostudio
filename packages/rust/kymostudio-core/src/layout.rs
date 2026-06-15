@@ -94,7 +94,7 @@ pub(crate) fn node_size_mermaid_f(label: &str, shape: Shape) -> (f64, f64) {
             ((tw + 55.0).max(70.0), 39.0)
         }
         Shape::Cylinder | Shape::Badge | Shape::Box => ((tw + 30.0).max(56.0), 54.0),
-        _ => ((tw + 60.0).max(70.0), 54.0),
+        _ => (tw + 60.0, 54.0),
     }
 }
 

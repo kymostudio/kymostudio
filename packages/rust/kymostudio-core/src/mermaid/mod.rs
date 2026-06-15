@@ -518,7 +518,7 @@ fn scan_kv(line: &str) -> Option<FlowStyle> {
 /// `:::class`, `style`, and a `%%{init themeVariables.primaryColor}%%` global
 /// node fill. Returns `(id -> NodeStyle, global_fill)`. Render-time only — does
 /// not touch the IR or kymojson.
-pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<String>) {
+pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<NodeStyle>) {
     let mut classdefs: HashMap<String, NodeStyle> = HashMap::new();
     let mut node_class: HashMap<String, String> = HashMap::new();
     let mut direct: HashMap<String, NodeStyle> = HashMap::new();
@@ -528,8 +528,11 @@ pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<Str
         let line = raw.trim();
         let low = line.to_ascii_lowercase();
         if low.starts_with("classdef ") {
-            if let Some((name, body)) = line[8..].trim().split_once(char::is_whitespace) {
-                classdefs.insert(name.trim().to_string(), parse_style(body));
+            if let Some((names, body)) = line[8..].trim().split_once(char::is_whitespace) {
+                let st = parse_style(body);
+                for name in names.split(',') {
+                    classdefs.insert(name.trim().to_string(), st.clone());
+                }
             }
         } else if low.starts_with("class ") {
             if let Some((ids, name)) = line[5..].trim().rsplit_once(char::is_whitespace) {
@@ -582,7 +585,17 @@ pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<Str
         }
         out.insert(id.clone(), ns);
     }
-    (out, global_fill)
+    // The special `default` classDef (and theme primaryColor) apply to every node
+    // with no explicit class — fold them into a base style the renderer layers
+    // under each node.
+    let mut default_style = classdefs.get("default").cloned();
+    if let Some(g) = global_fill {
+        let d = default_style.get_or_insert_with(NodeStyle::default);
+        if d.fill.is_none() {
+            d.fill = Some(g);
+        }
+    }
+    (out, default_style)
 }
 
 /// Parse a `fill:#f00,stroke:#00f,color:#fff,stroke-width:2px` style list.
@@ -596,6 +609,7 @@ fn parse_style(s: &str) -> NodeStyle {
                 "stroke" => ns.stroke = Some(v),
                 "color" => ns.color = Some(v),
                 "stroke-width" => ns.stroke_width = Some(v),
+                "font-weight" => ns.font_weight = Some(v),
                 _ => {}
             }
         }

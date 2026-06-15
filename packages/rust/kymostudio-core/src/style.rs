@@ -34,6 +34,7 @@ pub struct NodeStyle {
     pub stroke: Option<String>,
     pub color: Option<String>,
     pub stroke_width: Option<String>,
+    pub font_weight: Option<String>,
 }
 
 impl NodeStyle {
