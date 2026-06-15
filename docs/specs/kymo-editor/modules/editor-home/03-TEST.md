@@ -1,7 +1,7 @@
 ---
 title: Editor Home — Verification & Validation
 document_id: TEST-KHOME-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-15
 status: Implemented
 classification: Internal
@@ -33,7 +33,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `TEST-KHOME-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KHOME-001` (the requirements verified here, incl. `FR-HM-01/02` and the `US-HM-01..04` stories), `DESIGN-KHOME-001` (the design), `PLAN-KHOME-001` (delivery + risks), `TEST-KEDITOR-001` (the umbrella V&V — `TC-KE-33` is the integration-suite rollup of these cases) |
@@ -60,6 +60,12 @@ navigation), not golden-SVG or unit tests. A **smoke harness** now exists for `p
   `wel-recent-item`, `wel-template`), not CSS classes/text — the guest block has already been reworded
   once (R-DRIFT). The Google CTA's real OAuth flow is **not** driven in CI.
 
+**Reports.** Local runs emit a self-contained **HTML** report (`packages/editor/playwright-report/`,
+**gitignored**); CI additionally emits **JUnit XML** (`results.xml`) + GitHub annotations and uploads
+the HTML as a build artifact. Run results are **never committed** — the durable coverage record is the
+**§5 traceability matrix** (which TC covers which requirement, and whether it is automated); CI is the
+system-of-record for per-run pass/fail.
+
 ## 2. Feature test cases (`TC-HM`)
 
 | ID | Story | Procedure (Given / When / Then) | Realises |
@@ -85,15 +91,25 @@ binding gates remain the umbrella's: the engine/golden render gates and the onli
 
 ## 5. Traceability matrix
 
-| Requirement / story | Test case(s) |
-|---------------------|--------------|
-| `FR-HM-01` (Welcome home) | TC-HM-01, TC-HM-02, TC-HM-04, TC-HM-05, TC-HM-06 |
-| `FR-HM-02` (Open file → draft) | TC-HM-03 |
-| `US-HM-01` (oriented landing, guest) | TC-HM-01, TC-HM-05, TC-HM-06 |
-| `US-HM-02` (resume recent, signed-in) | TC-HM-02, TC-HM-05 |
-| `US-HM-03` (open local file) | TC-HM-03 |
-| `US-HM-04` (share link bypass) | TC-HM-04 |
-| Umbrella rollup | `TC-KE-33` (`TEST-KEDITOR-001`) |
+This matrix is the **durable coverage record** (which requirement/story each TC verifies, and
+whether it is automated). It is the source of truth for "is it covered?" — not any single run's
+report. The **Status** column: ⚙️ *automated* = runs in `e2e/welcome.spec.ts`; ✋ *manual* =
+procedure pending the auth + `/api/diagrams` fixtures (the full suite). Per-run pass/fail is the
+**CI**'s record (JUnit + HTML artifact), never committed here.
+
+| Requirement / story | Test case(s) | Status |
+|---------------------|--------------|--------|
+| `FR-HM-01` (Welcome home) | TC-HM-01, TC-HM-02, TC-HM-04, TC-HM-05, TC-HM-06 | ⚙️ partial (01, 04 automated; 02, 05, 06 manual) |
+| `FR-HM-02` (Open file → draft) | TC-HM-03 | ✋ manual |
+| `US-HM-01` (oriented landing, guest) | TC-HM-01, TC-HM-05, TC-HM-06 | ⚙️ partial (01 automated) |
+| `US-HM-02` (resume recent, signed-in) | TC-HM-02, TC-HM-05 | ✋ manual |
+| `US-HM-03` (open local file) | TC-HM-03 | ✋ manual |
+| `US-HM-04` (share link bypass) | TC-HM-04 | ⚙️ automated |
+| Umbrella rollup | `TC-KE-33` (`TEST-KEDITOR-001`) | ✋ manual |
+
+**Coverage summary:** 6/6 `FR-HM` + `US-HM` items have ≥ 1 TC (100% requirement coverage);
+**2 of 6** TCs are automated (`TC-HM-01`, `TC-HM-04`) — the rest become automated when the full
+suite adds the `kymo_idtoken` + `/api/diagrams` fixtures (`PLAN-KHOME-001` §5).
 
 ## Annex A — Revision History
 
@@ -101,3 +117,4 @@ binding gates remain the umbrella's: the engine/golden render gates and the onli
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-15 | Vũ Anh | Initial V&V for the Welcome home, carved out of `TEST-KEDITOR-001` (`TC-KE-33`) as `editor-home` grew its own doc-set. `TC-HM-01..06` written per user story (`US-HM-01..04`), each pinning its `FR-HM`; full story/FR → TC traceability. Records the `document.title` gap (R-HM1) as a non-blocking note and the Playwright automation candidate. |
 | 0.2     | 2026-06-15 | Vũ Anh | **Smoke harness landed.** Stood up Playwright for `packages/editor` (`playwright.config.ts` + `e2e/welcome.spec.ts`, `npm run test:e2e`); `TC-HM-01` (guest) + `TC-HM-04` (`?s=` bypass) are now **automated** and passing (GIS stubbed; no auth/API mock). Rewrote §1 (automated vs manual split, `data-testid` selectors). Reconciled `TC-HM-01` text to the redesigned guest Welcome (no "Welcome" header). `TC-HM-02/03/05/06` stay manual pending the auth + `/api/diagrams` fixtures. |
+| 0.3     | 2026-06-15 | Vũ Anh | **Coverage-record + report policy.** §5 matrix gained a **Status** column (automated / manual) + a coverage summary (100% requirement coverage; 2/6 TCs automated) — this is the durable coverage record. §1 documents the report policy: HTML report is **gitignored**; CI emits **JUnit XML** + GitHub annotations + HTML artifact; run results are never committed (the config's `reporter` is CI-conditional). Verified green on the cloud box (`k2`): 2 passed. |

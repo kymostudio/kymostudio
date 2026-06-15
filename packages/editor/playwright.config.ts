@@ -15,7 +15,12 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: "list",
+  // Local: console list + a self-contained HTML report (gitignored). CI also
+  // emits GitHub annotations + JUnit XML (results.xml) for the test-report
+  // integration; the HTML report is uploaded as a build artifact, never committed.
+  reporter: process.env.CI
+    ? [["list"], ["github"], ["junit", { outputFile: "results.xml" }], ["html", { open: "never" }]]
+    : [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: "http://127.0.0.1:4318",
     trace: "on-first-retry",
