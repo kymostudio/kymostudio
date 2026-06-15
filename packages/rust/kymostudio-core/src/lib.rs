@@ -24,6 +24,8 @@ pub mod layout;
 pub mod layout_dagre;
 pub mod math;
 pub mod mermaid;
+#[cfg(feature = "merman-layout")]
+pub mod merman_layout;
 pub mod model;
 pub mod sequence;
 pub mod style;
@@ -333,6 +335,12 @@ pub fn mermaid_to_svg_dagre(src: &str) -> Result<String, mermaid::MermaidError> 
     render_flowchart_math(&mut fc);
     let style = style::FlowStyle::Mermaid;
     let (styles, default_style) = mermaid::extract_node_styles(src);
+    // With `merman-layout`, positions come from merman (mermaid-exact) sized by
+    // kymo's browser-calibrated metrics; default uses kymo's own dagre adapter.
+    #[cfg(feature = "merman-layout")]
+    let geom = merman_layout::geom_from_merman(src, &fc)
+        .unwrap_or_else(|| layout_dagre::dagre_geom(&fc, style));
+    #[cfg(not(feature = "merman-layout"))]
     let geom = layout_dagre::dagre_geom(&fc, style);
     Ok(dagre_svg::render(
         &geom,

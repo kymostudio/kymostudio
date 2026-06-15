@@ -227,3 +227,60 @@ earlier 0.19% was cherry-picked simple cases; on real diagrams even merman is
 
 The goal as written ("< 0.5% mean, full corpus") is below the physical floor and
 should be re-scoped to one of the above.
+
+---
+
+## BREAKTHROUGH (2026-06-15): 2.82% was NOT the physical floor — it was merman's *vendored-metric* floor
+
+My earlier "definitive" conclusion was **wrong**. merman scores 2.82% vs mermaid.js
+**because merman measures text with vendored font tables**, which sit ~1px off the
+browser. kymo's `CHAR_W_MERMAID` is calibrated to the *actual browser* (the `w`-glyph
+fix etc.) — which is exactly why kymo beat merman on simple cases (0.19% vs 1.96%).
+
+So I fed kymo's metrics into merman's exact layout: a `KymoTextMeasurer` implementing
+merman's `TextMeasurer` trait (`measure` + `measure_wrapped` backed by `text_w_mermaid`),
+passed to `layout_flowchart_v2`. kymo parses shapes/labels/styles (by node id); merman
+supplies positions; kymo renders raster-safe. Result — **it broke through the "floor":**
+
+| renderer | mean | median | p90 | ≤0.5% | 7-case |
+|---|---|---|---|---|---|
+| kymo-own (shipped) | 4.54% | 2.64% | 13.9% | 16/110 | 0.19% |
+| **merman (reference port)** | **2.82%** | **1.76%** | 4.1% | 11/111 | 1.96% |
+| **kymo-metrics + merman-layout** | 2.61% | **0.69%** | 3.9% | **49/110** | **0.18%** |
+
+**Median 0.69%, 49/110 files ≤0.5%, 70/110 ≤1% — beating mermaid's own reference port
+on the typical case**, while staying raster-safe and keeping simple cases at 0.18%.
+
+### Why the *mean* is still 2.61% (and why it's not <0.5%)
+
+The mean is dragged by a small tail of genuine **feature gaps**, not metric/layout error:
+
+- **Icons** (`flowchart-icon_002/003/004`: 52/38/19%) — mermaid draws the
+  `@{ icon: "aws:…" }` / `fa:` glyph; kymo has no icon renderer, so it draws text/box.
+  ~1% of the mean. **The hard blocker — needs raster-safe icon rendering (a real feature).**
+- **Bold width** (`v2_032`, 20%) — `KymoTextMeasurer` ignores `font-weight:bold`, so a
+  bold node is sized ~5% narrow.
+- **KaTeX math** (`katex_*`, 5%) — kymo renders `$…$` as Unicode; mermaid uses KaTeX.
+- **Subgraph title precision** (`flowchart_029`, 20%).
+
+Two fixes landed this round: an **icon-token strip** (drop the `fa:` text so it doesn't
+overflow) and a **`:::class` parser fix** (it mis-read `CS(multi word):::cat` as id
+`viewed)` instead of `CS`, dropping every shaped-node class — also benefits the default
+path).
+
+### Shipping
+
+Gated behind a **`merman-layout`** cargo feature (default off): it pulls merman
+(~+1.9 MB wasm), so the lean default path (kymo-own, 0.18% simple, already deployed)
+is unchanged. Build `--features merman-layout` to opt into mermaid-faithful layout
+(median 0.69%) where quality outweighs size (e.g. render-api, which already bundles merman).
+
+### Corrected conclusion
+
+`mean < 0.5%` on the full corpus is **not below a physical floor after all** — the
+median is already **0.69%** and beats the reference port. It is bounded by **icon
+rendering** (a distinct major feature: ~1% of the mean) plus a few small fixes (bold
+metric, KaTeX, subgraph). With raster-safe icon rendering added, the mean would approach
+the median (~0.7%); reaching strictly <0.5% would additionally require pushing the
+median (edge/AA precision) below 0.5%. The "physical floor" framing was an artifact of
+merman's vendored metrics, now disproven.
