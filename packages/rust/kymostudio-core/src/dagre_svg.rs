@@ -26,6 +26,10 @@ pub struct FNode {
     pub cy: f64,
     pub w: f64,
     pub h: f64,
+    /// Pre-rendered raster-safe icon group (inner SVG, coords relative to the
+    /// node centre), lifted from merman for `@{ icon: … }` nodes. When set, the
+    /// node renders this glyph instead of the box+label.
+    pub icon: Option<String>,
 }
 
 /// A routed edge in float coordinates.
@@ -127,6 +131,13 @@ fn node_svg(
     default_style: Option<&NodeStyle>,
 ) -> String {
     let (cx, cy) = (n.cx, n.cy);
+    if let Some(icon) = &n.icon {
+        return format!(
+            "<g transform=\"translate({},{})\">{icon}</g>\n",
+            nf(cx),
+            nf(cy)
+        );
+    }
     let (hw, hh) = (n.w / 2.0, n.h / 2.0);
     let mut ovr = ns.cloned().unwrap_or_default();
     if let Some(d) = default_style {

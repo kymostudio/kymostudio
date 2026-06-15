@@ -15,6 +15,7 @@ use crate::layout::text_w_mermaid;
 use merman_core::diagrams::flowchart::parse_flowchart;
 use merman_core::{MermaidConfig, ParseMetadata};
 use merman_render::flowchart::layout_flowchart_v2;
+use merman_render::svg::{render_flowchart_v2_svg, SvgRenderOptions};
 use merman_render::text::{TextMeasurer, TextMetrics, TextStyle, WrapMode};
 use std::collections::HashMap;
 
@@ -129,6 +130,76 @@ fn strip_node_icon(label: &str) -> String {
     }
 }
 
+/// Find the byte index just past the `</g>` matching the `<g` at `start`.
+fn balanced_g_end(b: &[u8], start: usize) -> Option<usize> {
+    let mut depth = 0i32;
+    let mut i = start;
+    while i < b.len() {
+        if i + 2 <= b.len()
+            && &b[i..i + 2] == b"<g"
+            && (i + 2 == b.len() || matches!(b[i + 2], b' ' | b'>' | b'/' | b'\n' | b'\t'))
+        {
+            depth += 1;
+            i += 2;
+        } else if i + 4 <= b.len() && &b[i..i + 4] == b"</g>" {
+            depth -= 1;
+            i += 4;
+            if depth == 0 {
+                return Some(i);
+            }
+        } else {
+            i += 1;
+        }
+    }
+    None
+}
+
+/// Extract each `@{icon}` node's inner SVG from merman's render, keyed by node id.
+/// The inner content has coordinates relative to the node centre, so the caller
+/// re-wraps it in `<g transform="translate(cx,cy)">`.
+fn extract_icon_inners(svg: &str) -> std::collections::HashMap<String, String> {
+    let mut out = std::collections::HashMap::new();
+    let b = svg.as_bytes();
+    let needle = "class=\"icon-shape";
+    let mut from = 0;
+    while let Some(rel) = svg[from..].find(needle) {
+        let cls = from + rel;
+        let gstart = svg[..cls].rfind("<g").unwrap_or(cls);
+        from = cls + needle.len();
+        let Some(end) = balanced_g_end(b, gstart) else {
+            continue;
+        };
+        let group = match std::str::from_utf8(&b[gstart..end]) {
+            Ok(g) => g,
+            Err(_) => continue,
+        };
+        // node id from id="merman-flowchart-{id}-{n}"
+        let pre = "id=\"merman-flowchart-";
+        let Some(ip) = group.find(pre) else { continue };
+        let id_start = ip + pre.len();
+        let Some(iq) = group[id_start..].find('"') else {
+            continue;
+        };
+        let full = &group[id_start..id_start + iq];
+        let id = full
+            .rsplit_once('-')
+            .map(|(a, _)| a)
+            .unwrap_or(full)
+            .to_string();
+        // inner = group minus the outer <g ...> and trailing </g>
+        let Some(open_end) = group.find('>') else {
+            continue;
+        };
+        if group.len() < open_end + 1 + 4 {
+            continue;
+        }
+        let inner = &group[open_end + 1..group.len() - 4];
+        out.insert(id, inner.to_string());
+        from = end;
+    }
+    out
+}
+
 /// Build kymo float geometry from merman's mermaid-faithful layout, sized with
 /// kymo's browser-calibrated metrics. `None` on any parse/layout failure.
 pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
@@ -142,6 +213,18 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
     let config = MermaidConfig::default();
     let measurer = KymoTextMeasurer;
     let layout = layout_flowchart_v2(&semantic, &config, &measurer, None).ok()?;
+    // Lift merman's raster-safe iconify glyphs for @{icon} nodes (best-effort).
+    let icons = render_flowchart_v2_svg(
+        &layout,
+        &semantic,
+        &serde_json::Value::Null,
+        None,
+        &measurer,
+        &SvgRenderOptions::default(),
+    )
+    .ok()
+    .map(|svg| extract_icon_inners(&svg))
+    .unwrap_or_default();
 
     let (ox, oy) = match &layout.bounds {
         Some(b) => (MARGIN - b.min_x, MARGIN - b.min_y),
@@ -182,6 +265,7 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
             cy: ln.y + oy,
             w: ln.width,
             h: ln.height,
+            icon: icons.get(ln.id.as_str()).cloned(),
         });
     }
     if geom.nodes.is_empty() {

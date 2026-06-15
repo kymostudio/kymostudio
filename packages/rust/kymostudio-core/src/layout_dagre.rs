@@ -100,6 +100,7 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
                 cy: nd.y.unwrap_or(0.0) + MY,
                 w: nd.width,
                 h: nd.height,
+                icon: None,
             });
         }
     }
