@@ -87,11 +87,16 @@ impl TextMeasurer for KymoTextMeasurer {
     ) -> TextMetrics {
         let scale = (style.font_size / 16.0).max(0.001);
         let mut lines: Vec<String> = Vec::new();
+        let mut soft_wrapped = false;
         for hard in text.split('\n') {
             match max_width {
                 Some(mw) => {
                     let t = mw / scale / if Self::is_bold(style) { 1.047 } else { 1.0 };
-                    lines.extend(wrap_at(hard, t));
+                    let segs = wrap_at(hard, t);
+                    if segs.len() > 1 {
+                        soft_wrapped = true;
+                    }
+                    lines.extend(segs);
                 }
                 None => lines.push(hard.to_string()),
             }
@@ -99,10 +104,18 @@ impl TextMeasurer for KymoTextMeasurer {
         if lines.is_empty() {
             lines.push(String::new());
         }
-        let width = lines
+        let mut width = lines
             .iter()
             .map(|l| Self::scaled_width(l, style))
             .fold(0.0_f64, f64::max);
+        // mermaid sizes a soft-wrapped node to the *wrapping width*, not its widest
+        // actual line (the foreignObject is fixed to wrappingWidth and the text
+        // reflows inside it). Match that so wrapped nodes aren't sized too narrow.
+        if soft_wrapped {
+            if let Some(mw) = max_width {
+                width = width.max(mw);
+            }
+        }
         let line_count = lines.len();
         TextMetrics {
             width,

@@ -475,3 +475,43 @@ generated SVGs; **mermaid's own reference port (merman) sits at median 1.76%**, 
 kymo at 0.63% is already well past it. `mean < 0.5%` is therefore below the
 practical floor of this comparison, not a scoped feature gap. The honest, defensible
 state this round is **mean 1.30%, median 0.63%, 54/110 pixel-identical (<=0.5%)**.
+
+## Round 2026-06-15 (later): wrap-width cap — mean 1.30% → 1.11%, max 17.6% → 5.6%
+
+The one big remaining outlier was **`flowchart-v2_032`** (17.6%): a bold node
+`CS(A long bold text to be viewed):::cat`. Instrumenting mermaid directly
+(`getBBox` on the node rect across synthetic labels) showed mermaid **caps a
+soft-wrapped node's width at the wrapping width** (~260 SVG units) — the
+`<foreignObject>` is fixed to `wrappingWidth` and the text reflows *inside* it.
+kymo instead sized the node to its **widest wrapped line** (≈204 units vs
+mermaid's 246), so the box was too narrow and every glyph landed off-position.
+
+Fix (`KymoTextMeasurer::measure_wrapped`): when a line actually soft-wraps, report
+the node width as `max(widest_line, wrapping_width)`, matching mermaid's fixed
+foreignObject. One-line change, broad effect:
+
+| file | before | after |
+|---|---|---|
+| flowchart-v2_032 | 17.62% | **2.45%** |
+| flowchart_013 | 4.91% | **3.97%** |
+| (clean files e.g. v2_080, 029) | unchanged | unchanged |
+
+### Production corpus (110 plain files), this round
+
+| metric | prev | **now** |
+|---|---|---|
+| mean | 1.30% | **1.11%** |
+| median | 0.63% | **0.63%** |
+| **max** | 17.62% | **5.56%** |
+| p90 | 3.09% | **3.01%** |
+| ≤0.5% | 54/110 | 54/110 |
+
+The distribution is now **tight**: no production file exceeds 5.6%, and the worst
+list is entirely sub-shape/sub-pixel (KaTeX, literal `[<img>]`, icon glyphs,
+multi-line hexagon residual). Trajectory: **6.14 → 4.59 → 2.58 → 1.61 → 1.30 →
+1.11%** mean.
+
+`mean < 0.5%` still requires the **median (0.63%)** below ~0.4% — the shared
+SVG-rasterisation floor (mermaid's own port sits at median 1.76%) — so it remains
+below the practical floor of the comparison. But the renderer is now within ~1.1%
+of mermaid.js on average with a 5.6% worst case, all raster-safe.
