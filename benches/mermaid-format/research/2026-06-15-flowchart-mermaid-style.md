@@ -515,3 +515,43 @@ multi-line hexagon residual). Trajectory: **6.14 → 4.59 → 2.58 → 1.61 → 
 SVG-rasterisation floor (mermaid's own port sits at median 1.76%) — so it remains
 below the practical floor of the comparison. But the renderer is now within ~1.1%
 of mermaid.js on average with a 5.6% worst case, all raster-safe.
+
+## Round 2026-06-15 (later 2): wrap all shapes + entity decode — mean 1.11% → 1.10%
+
+Worst case was **`flowchart-v2_043`** (5.56%): two hexagons whose long quoted labels
+overflowed the shape, and node `b` showed literal `#quot;` instead of `"`.
+
+1. **Soft-wrap every shape** — `node_lines_mermaid` only soft-wrapped rectangles;
+   hexagons/diamonds/etc. stayed single-line and overflowed. But merman *sizes*
+   all shapes for the wrapped text (the hexagon height already matched mermaid), so
+   the render must wrap to match. Now all shapes wrap at ~200px. Also improved
+   `flowchart_013` 3.97% → 3.32%.
+2. **Decode mermaid `#…;` entities** — `#quot;`→`"`, `#amp;`→`&`, `#lt;`/`#gt;`,
+   numeric `#9829;`/`#35;`. mermaid uses `#` (not `&`) so the source survives its
+   own parser; kymo rendered them literally.
+
+Result: `flowchart-v2_043` 5.56% → 5.18% (residual is dense text hitting the
+SVG-vs-HTML-text floor — both hexagons are nearly all text). Corpus: mean **1.10%**,
+median 0.63%, max 5.53%, no regressions.
+
+## KaTeX: merman *can* render it — but it costs +3.1 MB wasm
+
+The katex cases (`katex_001` 5.5%, `katex_002` 5.0%) are pure `$$\alpha\beta…$$`.
+kymo currently passes **`None`** as merman's `math_renderer`, so these fall back to
+kymo's Unicode approximation (`math::render`) — sized as one giant unstyled line
+(4238px vs mermaid's 1304px).
+
+merman **does** render KaTeX: the `ratex-math` feature (pure-Rust `ratex-parser` →
+`ratex-layout` → `ratex-svg`) emits a standalone `<svg>` with `embed_glyphs:true` —
+raster-safe glyph paths, liftable like icons. **But:**
+
+- Enabling it pulls in `ratex-unicode-font` (embedded math font) → wasm **8.84 MB →
+  11.95 MB (+3.1 MB / +35%)**. Since the editor builds with `merman-layout` for the
+  merman fidelity + icons, that lands in the **browser bundle**.
+- Wiring only the *sizing* (math_renderer in layout) without rendering the math SVG
+  makes it **worse** (10.57%): the node shrinks to the correct math size but still
+  holds Unicode text → overflow. It is all-or-nothing.
+
+For a feature that fixes **2 files** (~0.07% of the mean) at **+3.1 MB browser
+wasm**, this is a product trade-off, not a clear win — deferred for an explicit
+size-vs-fidelity decision.
