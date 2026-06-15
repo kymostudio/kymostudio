@@ -294,35 +294,15 @@ bold-width factor. Full plain corpus (110 files), kymo vs mermaid.js, Chrome bot
 
 **mean 2.58% · median 0.69% · p90 3.93% · ≤0.5%: 49/110 · ≤1%: 70/110**
 
-### Top 10 worst (kymo vs mermaid.js, with merman for contrast)
+### Worst 10 + best 10 — visual comparison
 
-| file | kymo | merman | cause |
-|---|---|---|---|
-| flowchart-icon_002 | **52.62%** | 0.00% | icon glyph — kymo has no icon renderer; **merman renders it (0%)** |
-| flowchart-icon_003 | **38.89%** | 0.00% | icon glyph |
-| flowchart_029 | **20.60%** | 1.92% | nested subgraph title/placement |
-| flowchart-icon_004 | **18.92%** | 1.67% | icon glyph |
-| flowchart-v2_032 | **17.62%** | 0.00% | classDef + bold + wrap detail (render-side wrap threshold) |
-| flowchart_025 | 11.60% | 11.48% | hard for **both** ports (not kymo-specific) |
-| katex_001 | 5.53% | 6.70% | KaTeX math — **kymo's Unicode beats merman here** |
-| flowchart-v2_050 | 5.46% | 7.39% | kymo beats merman |
-| flowchart-v2_043 | 5.31% | 0.00% | icon/style |
-| katex_002 | 4.99% | 4.67% | KaTeX math |
+![worst-10 + best-10 grid: file · kymo-dagre · merman · mermaid.js · cause](assets/2026-06-15-worstbest/worst-best-grid.png)
 
-### Top 10 best (kymo vs mermaid.js)
-
-| file | kymo | merman |
-|---|---|---|
-| flowchart-v2_031 | **0.02%** | 2.79% |
-| flowchart_048 | **0.02%** | 2.90% |
-| flowchart_017 | **0.04%** | 0.11% |
-| flowchart-v2_078 | **0.05%** | 3.57% |
-| flowchart-v2_075 | **0.05%** | 2.81% |
-| flowchart-v2_073 | **0.05%** | 2.81% |
-| flowchart_033 | **0.06%** | 0.70% |
-| flowchart_012 | **0.07%** | 1.00% |
-| flowchart_047 | **0.08%** | 3.50% |
-| flowchart_052 | **0.08%** | 0.07% |
+*Each row: the rendered output of kymo-dagre, merman, and mermaid.js (reference)
+with each renderer's pixel-overlay score vs mermaid.js, plus the cause. The worst
+cases are dominated by icons (kymo draws text/box where mermaid + merman draw the
+glyph); the best cases show kymo at 0.02–0.08% — beating merman, which sits at
+0.7–3.6% on the same diagrams.*
 
 ### Reading the data
 
