@@ -1,7 +1,7 @@
 ---
 title: Mermaid Format — Design (umbrella)
 document_id: DESIGN-MERMAID-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -105,3 +105,106 @@ where the type is node-edge shaped, e.g. state) plus a dispatch arm.
 Mermaid decisions (`{}`) map to a new `Shape::Diamond` (kymo had no diamond). The
 Rust model defines it and its layout footprint; the SVG glyph in Python `to_svg`
 and JS `render` is part of the parity phase (PLAN-MERMAID-001).
+
+## 7. Render pipeline: Mermaid → SVG → PNG
+
+Beyond the `.kymo.json` import contract (§2), the core renders a Mermaid source all
+the way to a raster image **without a browser or Node** — the chain stays inside the
+`kymostudio-core` crate:
+
+```
+.mmd ──parse──▶  IR  ──layout──▶ positioned ──render──▶ SVG ──rasterize──▶ PNG
+      mermaid::*   Flow/Seq/…   layout*.rs    geometry   *_svg.rs   <text>   svg_to_png
+```
+
+1. **Parse** — `mermaid::parse` (flowchart family) or a per-grammar parser
+   (`mermaid/{sequence,state,classdiagram,erdiagram,blockdiagram,mindmap,kanban,
+   requirement}.rs`) → a typed IR (`Flowchart` / `Sequence` / `ClassDiagram` / …).
+2. **Layout** — `layout.rs` (layered / Sugiyama, §4) for the kymo style, or
+   `layout_dagre.rs` (which calls the external **`dagre`** crate, a Rust port of
+   dagre-d3-es) for mermaid-faithful positions; sequence/class carry their own
+   intrinsic layout.
+3. **Render SVG** — `flowchart_svg.rs` / `dagre_svg.rs` / `sequence/svg.rs` /
+   `classdiagram/svg.rs` emit a **self-contained** SVG: a `<style>` block, `<defs>`
+   (arrowhead marker, dot-grid pattern), and the glyphs. Labels are **real `<text>`
+   elements**, never `<foreignObject>`/HTML. Entry points: `mermaid_to_svg`,
+   `mermaid_to_svg_dagre`, `mermaid_<type>_to_svg` (wasm exposes all; PyO3 a flowchart
+   subset).
+4. **Rasterize PNG** — `svg_to_png(svg, scale)` → **resvg** (the crate's bundled
+   rasterizer; `svg_to_pdf` is the vector path). Fonts come from the system on native
+   builds, or via `register_font` on wasm.
+
+**Why `<text>`, not `<foreignObject>` — the design rationale for an own renderer.**
+mermaid.js (and *merman*, its faithful Rust port) place node labels in
+`<foreignObject>` HTML; **resvg does not render foreignObject**, so rasterizing their
+SVG drops every label — a blank PNG/PDF/WebP. kymo's renderers draw plain `<text>`, so
+the **same** `svg_to_png` yields labels-intact rasters. The raster-safe SVG is thus the
+contract that makes Mermaid → PNG/WebP/PDF (and the animated SVG) work end-to-end; it is
+why the core renders Mermaid itself rather than embedding mermaid.js output.
+
+**Pipeline dependencies (Rust crates).** Parse → layout(Sugiyama) → render-SVG are
+**dependency-free pure Rust** (hand-rolled lexer/parser/serializer + the layered
+layout of §4); only the dagre layout path and the raster stage pull external crates:
+
+| Stage | Crate(s) | Notes |
+|---|---|---|
+| Parse | — | hand-rolled lexer/parser; `$…$` in labels is an internal TeX→Unicode pass (no KaTeX dep), wasm-clean |
+| Layout — Sugiyama | — | internal port of `bpmn_layout.py` (§4) |
+| Layout — dagre | **`dagre` 0.1.1** | Rust port of dagre-d3-es for mermaid-faithful positions (`layout_dagre.rs`) |
+| Render SVG | — | SVG assembled as a plain string |
+| Rasterize PNG | **`resvg` 0.47** (`text`, `raster-images`, `default-features=false`) | the SVG→PNG engine; `raster-images` pulls `image` for embedded bitmaps |
+| ↳ fonts | resvg `text` + `system-fonts`/`memmap-fonts` (native) **or** `register_font` (wasm) | `<text>` only paints once a font is available |
+| Rasterize PDF | **`svg2pdf` 0.13** (optional, `pdf` feature) | vector path; ships its **own** usvg/resvg 0.45 — a 2nd SVG engine |
+| Surface bindings | `pyo3` 0.28 (Python) · `wasm-bindgen` 0.2 (JS) | expose `mermaid_*` + `svg_to_png`/`svg_to_pdf` |
+
+**Feature gating (keeps the wasm bundle small).** `default = ["system-fonts", "pdf"]`
+on native (CLI / Python wheel) so labels render and PDF works. The **wasm** build
+enables neither: no `system-fonts` (no fs/mmap on wasm — the host calls
+`register_font` first) and no `pdf` by default (svg2pdf's second usvg ~doubles the
+module). So a browser/edge `.mmd → PNG` is one engine (`resvg`) + a registered font;
+PDF is opt-in. `resvg` is taken `default-features = false` to keep only `text` +
+`raster-images`.
+
+**External fallback renderers (NOT in this pipeline).** Grammars or syntax the core
+can't render fall back to engines that are **not** part of the chain above and not
+deps of `kymostudio-core`:
+
+| Engine | What / where | Raster-safe? |
+|---|---|---|
+| **`merman`** | third-party Rust port of mermaid.js (`github.com/Latias94/merman`, pinned git rev; full build ~5.2 MB wasm), packaged as `packages/rust/kymo-mermaid` and called **only by render-api** (`engine.ts` → `mermaidRenderSvg`) when a per-grammar kymo renderer throws | ✗ `<foreignObject>` |
+| **mermaid.js** | the **editor's** fallback for non-flowchart grammars (~760 KB) | ✗ `<foreignObject>` |
+| **kroki** | the final **remote** fallback (`render.kymo.studio` proxy) | n/a (remote) |
+
+**When each fallback fires (exact triggers).**
+
+- **render-api is tiered** (`engine.ts` → `dispatch.ts`). `mermaidGrammar(src)` reads
+  the header keyword (after stripping `---` front-matter and `%%` comments) and picks a
+  kymo per-grammar renderer. Control falls to **merman** (`mermaidRenderSvg`) when
+  **(a)** the grammar is none of the 9 covered (no arm matches → the trailing
+  `return mermaidRenderSvg(source)`), **or (b)** a covered renderer *throws* on syntax
+  kymo can't parse (e.g. the `A-->B&C` fan) — caught, then merman. If **merman also
+  throws**, `dispatch.ts` routes mermaid (it is in `PROXY_KINDS`, not `AUTHORITATIVE`)
+  to **kroki**. Net chain: **kymo → merman → kroki**.
+- **editor never uses merman** (`mermaid.ts`). A pristine share link may be answered
+  from a **kroki** edge-cache by the warm-up race (≤ 900 ms); otherwise
+  `isPlainFlowchart(src)` (header `flowchart`/`graph`, **no** `%%{init}` directive or
+  `---` front-matter) → core `mermaidToSvgDagre`, and it falls to **mermaid.js** when
+  **(a)** the source isn't a plain flowchart (any other grammar, or a flowchart that
+  carries directives) **or (b)** the core renderer throws. Net chain: **core-flowchart
+  → mermaid.js**.
+- **Python / CLI have no fallback** — only the native renderers (flowchart import via
+  PyO3); unsupported input errors out, it never reaches merman/kroki.
+
+Because merman / mermaid.js emit `<foreignObject>` labels, their PNG/PDF is **not
+raster-safe** — exactly the reason the core `<text>` pipeline above exists. The core
+chain (parse → layout → SVG → PNG) **never loads merman**; editor/Python/CLI don't
+either — only the render-api worker does, as a coverage net for the grammars kymo
+doesn't yet render natively.
+
+> **Ownership boundary.** The SVG renderer (`crate::flowchart_svg`, `mermaid_to_svg`)
+> and the SVG→PNG/PDF rasterizer are **shared engine** parts owned by
+> `FEAT-FLOWCHART-001` / the crate; this section documents how a *Mermaid* source flows
+> through them, not the renderer's internals. The chain runs identically on every
+> surface: editor / render-api do `.mmd → SVG` in wasm then the same `svg_to_png` for
+> raster downloads; the `kymo` CLI does `.mmd → .svg`/`.png` natively. One renderer, one
+> rasterizer, every surface.
