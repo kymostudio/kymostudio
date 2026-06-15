@@ -320,6 +320,47 @@ async function assignProject(env: Env, email: string, diagramId: string, project
   ).bind(diagramId, email, projectId, Date.now()).run();
 }
 
+// Create a project. Names are trimmed + capped at 40 chars (same as the API).
+// Keeps the default "Personal" project as the oldest one (ensureDefaultProject).
+async function createProject(env: Env, email: string, name: string): Promise<Project> {
+  await ensureDefaultProject(env, email);
+  const p: Project = { id: crypto.randomUUID().slice(0, 8), name: name.trim().slice(0, 40), createdAt: Date.now() };
+  await env.DB.prepare("INSERT INTO projects (id, owner, name, created_at) VALUES (?1, ?2, ?3, ?4)")
+    .bind(p.id, email, p.name, p.createdAt).run();
+  return p;
+}
+
+// Rename a live project. Returns false if no such (owned, live) project.
+async function renameProject(env: Env, email: string, id: string, name: string): Promise<boolean> {
+  await ensureProjectColumns(env);
+  const res = await env.DB.prepare("UPDATE projects SET name = ?1 WHERE id = ?2 AND owner = ?3 AND deleted IS NULL")
+    .bind(name.trim().slice(0, 40), id, email).run();
+  return !!res.meta.changes;
+}
+
+// Soft-delete a project AND cascade to its folders + diagrams. Always keep at
+// least one project (can't delete your only one). Mirrors the /api/projects
+// DELETE handler so the MCP and browser paths stay in lockstep.
+async function deleteProjectCascade(env: Env, email: string, id: string): Promise<{ ok: boolean; error?: string }> {
+  const projs = await listProjects(env, email);
+  if (!projs.some((p) => p.id === id)) return { ok: false, error: "not found" };
+  if (projs.length <= 1) return { ok: false, error: "cannot delete your only project" };
+  const now = Date.now();
+  await env.DB.prepare("UPDATE diagrams SET deleted = ?1 WHERE owner = ?2 AND project_id = ?3 AND deleted IS NULL").bind(now, email, id).run();
+  await env.DB.prepare("UPDATE workspaces SET deleted = ?1 WHERE owner = ?2 AND project_id = ?3 AND deleted IS NULL").bind(now, email, id).run();
+  await env.DB.prepare("UPDATE projects SET deleted = ?1 WHERE id = ?2 AND owner = ?3").bind(now, id, email).run();
+  return { ok: true };
+}
+
+// Resolve a user-supplied project reference (id OR name, case-insensitive) to a
+// project. Lets MCP callers say project: "Work" instead of an opaque id.
+async function findProject(env: Env, email: string, ref: string): Promise<Project | null> {
+  const r = ref.trim().toLowerCase();
+  if (!r) return null;
+  const projs = await listProjects(env, email);
+  return projs.find((p) => p.id.toLowerCase() === r) || projs.find((p) => p.name.toLowerCase() === r) || null;
+}
+
 // ---- One diagram = one EditorRoom DO (keyed by diagram id). Owner-scoped. ----
 export class EditorRoom extends DurableObject<Env> {
   source = ""; owner = ""; title = ""; diagramId = ""; kind = ""; // kind "" = kymo (native)
@@ -445,8 +486,10 @@ export class EditorRoom extends DurableObject<Env> {
 
 // ---- One UserChannel DO per signed-in user (keyed by email). Every open
 // editor tab of that user connects here; it carries no document, only control
-// messages — today just `{type:"open", id}` so the MCP `open_diagram` tool can
-// switch which diagram a tab is showing without knowing which room it has open.
+// messages — `{type:"open", id}` so the MCP `open_diagram` tool can switch which
+// diagram a tab is showing, and `{type:"open-project", id}` so `open_project` can
+// switch the active project the tab's explorer is scoped to — without knowing
+// which room/project the tab currently has open.
 // Auth + ownership are enforced in the worker before routing here (the DO is
 // only reachable through the email-keyed /userws route), so the DO trusts it. ----
 export class UserChannel extends DurableObject<Env> {
@@ -483,8 +526,14 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         title: z.string().optional().describe("A short name for the diagram (for list_diagrams)."),
         source: z.string().optional().describe("Optional initial kymo DSL (flowchart TD { ... }). Defaults to a minimal scaffold."),
         kind: z.string().optional().describe("Diagram kind: 'kymo' (default, native DSL) or a kroki.io type (plantuml, c4plantuml, mermaid, graphviz, d2, dbml, ditaa, erd, excalidraw, nomnoml, pikchr, structurizr, svgbob, symbolator, tikz, umlet, vega, vegalite, wavedrom, wireviz, bpmn, bytefield, blockdiag, seqdiag, actdiag, nwdiag, packetdiag, rackdiag)."),
+        project: z.string().optional().describe("Project to file this diagram under — its id or name (from list_projects). Omit to use your default project."),
       },
-      async ({ title, source, kind }) => {
+      async ({ title, source, kind, project }) => {
+        let proj: Project | null = null;
+        if (project) {
+          proj = await findProject(this.env, me(), project);
+          if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects (or new_project).` }] };
+        }
         const id = crypto.randomUUID().slice(0, 8);
         const src = source ?? `flowchart TD {\n  A[${title ?? "Bắt đầu"}]\n}`;
         await roomFor(this.env, id).fetch("https://room/set", {
@@ -492,23 +541,33 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
           body: JSON.stringify({ id, source: src, origin: "mcp", owner: me(), title: title ?? "Untitled", kind: kind && kind !== "kymo" ? kind : undefined }),
         });
         await touchIndex(this.env, me(), id, title ?? "Untitled", kind && kind !== "kymo" ? kind : "kymo");
-        return { content: [{ type: "text", text: `Created ${kind ?? "kymo"} diagram "${title ?? "Untitled"}" (id ${id}). Open: ${link(id)}` }] };
+        if (proj) await assignProject(this.env, me(), id, proj.id);
+        const where = proj ? ` in project "${proj.name}"` : "";
+        return { content: [{ type: "text", text: `Created ${kind ?? "kymo"} diagram "${title ?? "Untitled"}"${where} (id ${id}). Open: ${link(id)}` }] };
       }
     );
 
     this.server.tool(
       "list_diagrams",
-      "List the signed-in user's diagrams (id, title, URL), most-recent first.",
-      {},
-      async () => {
-        const list = await listIndex(this.env, me());
-        if (!list.length) return { content: [{ type: "text", text: "No diagrams yet — use new_diagram." }] };
+      "List the signed-in user's diagrams (id, title, URL), most-recent first. Pass `project` (id or name) to list only that project's diagrams; omit for your default project.",
+      { project: z.string().optional().describe("Project id or name (from list_projects) to scope the list. Omit for your default project.") },
+      async ({ project }) => {
+        let scope: ProjectScope | undefined;
+        let label = "";
+        if (project) {
+          const proj = await findProject(this.env, me(), project);
+          if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects.` }] };
+          const resolved = await resolveProject(this.env, me(), proj.id);
+          if (resolved) { scope = resolved; label = ` in project "${proj.name}"`; }
+        }
+        const list = await listIndex(this.env, me(), scope);
+        if (!list.length) return { content: [{ type: "text", text: `No diagrams${label} yet — use new_diagram.` }] };
         list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
         const lines = list.map((d) => {
           const when = d.updatedAt ? new Date(d.updatedAt).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "";
           return `- ${d.title || "Untitled"} [${d.kind || "kymo"}] — ${link(d.id)} (id ${d.id}${when ? `, updated ${when}` : ""})`;
         });
-        return { content: [{ type: "text", text: `${list.length} diagram(s):\n${lines.join("\n")}` }] };
+        return { content: [{ type: "text", text: `${list.length} diagram(s)${label}:\n${lines.join("\n")}` }] };
       }
     );
 
@@ -587,6 +646,110 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         const j = (await r.json()) as { clients: number };
         const where = j.clients ? `${j.clients} live tab(s) switched` : "no live editor tab open right now — use the link below";
         return { content: [{ type: "text", text: `Opened ${did} (${where}). ${link(did)}` }] };
+      }
+    );
+
+    // ---- Projects: the layer above folders. Each user always has at least one
+    // (a default "Personal"); diagrams can be filed under any project. ----
+    this.server.tool(
+      "list_projects",
+      "List the signed-in user's projects (id, name, created date). Every user has at least one default project ('Personal').",
+      {},
+      async () => {
+        const projs = await listProjects(this.env, me());
+        const def = await ensureDefaultProject(this.env, me());
+        const lines = projs.map((p) => {
+          const when = p.createdAt ? new Date(p.createdAt).toISOString().slice(0, 10) : "";
+          return `- ${p.name} (id ${p.id}${p.id === def ? ", default" : ""}${when ? `, created ${when}` : ""})`;
+        });
+        return { content: [{ type: "text", text: `${projs.length} project(s):\n${lines.join("\n")}` }] };
+      }
+    );
+
+    this.server.tool(
+      "new_project",
+      "Create a NEW project for the signed-in user. Returns its id + name. File diagrams under it via new_diagram's `project` arg or move_diagram.",
+      { name: z.string().describe("A short name for the project (max 40 chars).") },
+      async ({ name }) => {
+        if (!name.trim()) return { content: [{ type: "text", text: "Provide a non-empty project name." }] };
+        const p = await createProject(this.env, me(), name);
+        return { content: [{ type: "text", text: `Created project "${p.name}" (id ${p.id}).` }] };
+      }
+    );
+
+    this.server.tool(
+      "rename_project",
+      "Rename one of your projects. Identify it by id or current name.",
+      {
+        project: z.string().describe("The project to rename — its id or current name (from list_projects)."),
+        name: z.string().describe("The new project name (max 40 chars)."),
+      },
+      async ({ project, name }) => {
+        if (!name.trim()) return { content: [{ type: "text", text: "Provide a non-empty new name." }] };
+        const proj = await findProject(this.env, me(), project);
+        if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects.` }] };
+        await renameProject(this.env, me(), proj.id, name);
+        return { content: [{ type: "text", text: `Renamed project ${proj.id} → "${name.trim().slice(0, 40)}".` }] };
+      }
+    );
+
+    this.server.tool(
+      "delete_project",
+      "Delete one of your projects AND everything inside it (its folders + diagrams move to Trash, recoverable for 30 days). You can't delete your only project.",
+      { project: z.string().describe("The project to delete — its id or name (from list_projects).") },
+      async ({ project }) => {
+        const proj = await findProject(this.env, me(), project);
+        if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects.` }] };
+        const res = await deleteProjectCascade(this.env, me(), proj.id);
+        if (!res.ok) return { content: [{ type: "text", text: res.error === "cannot delete your only project" ? "Can't delete your only project — create another first." : `Project ${proj.id} not found.` }] };
+        return { content: [{ type: "text", text: `Deleted project "${proj.name}" (id ${proj.id}) and moved its contents to Trash.` }] };
+      }
+    );
+
+    this.server.tool(
+      "move_diagram",
+      "Move one of your diagrams into a project. Pass the diagram `id` (from list_diagrams) and the target `project` (id or name). Moving across projects clears its folder (folders are project-local).",
+      {
+        id: z.string().describe("Diagram id to move (from list_diagrams)."),
+        project: z.string().describe("Target project — its id or name (from list_projects)."),
+      },
+      async ({ id, project }) => {
+        const owned = await this.env.DB.prepare("SELECT 1 FROM diagrams WHERE id = ?1 AND owner = ?2 AND deleted IS NULL").bind(id, me()).first();
+        if (!owned) return { content: [{ type: "text", text: `Diagram ${id} isn't yours (or is in Trash).` }] };
+        const proj = await findProject(this.env, me(), project);
+        if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects (or new_project).` }] };
+        await assignProject(this.env, me(), id, proj.id);
+        await this.env.DB.prepare("UPDATE diagrams SET ws = '' WHERE id = ?1 AND owner = ?2").bind(id, me()).run();
+        return { content: [{ type: "text", text: `Moved diagram ${id} to project "${proj.name}".` }] };
+      }
+    );
+
+    this.server.tool(
+      "open_project",
+      "Switch the ACTIVE project in the signed-in user's open editor tab(s) — the project the sidebar/explorer is filtered to — without changing any content (the project sibling of open_diagram). Pass `project` (id or name from list_projects), or omit to use your most recently opened project. Returns how many live tabs were switched (0 = no editor tab open right now).",
+      { project: z.string().optional().describe("Project id or name to switch to. Omit to use your most recently opened project.") },
+      async ({ project }) => {
+        let proj: Project | null = null;
+        if (project) {
+          proj = await findProject(this.env, me(), project);
+          if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects (or new_project).` }] };
+        } else {
+          const lastId = await this.env.OAUTH_KV.get(`lastproj:${me()}`);
+          proj = lastId ? await findProject(this.env, me(), lastId) : null;
+          if (!proj) { // fall back to the default ("Personal") project
+            const defId = await ensureDefaultProject(this.env, me());
+            proj = await findProject(this.env, me(), defId);
+          }
+          if (!proj) return { content: [{ type: "text", text: "No project to open — use new_project first." }] };
+        }
+        await this.env.OAUTH_KV.put(`lastproj:${me()}`, proj.id);
+        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ type: "open-project", id: proj.id }),
+        });
+        const j = (await r.json()) as { clients: number };
+        const where = j.clients ? `${j.clients} live tab(s) switched` : "no live editor tab open right now";
+        return { content: [{ type: "text", text: `Switched active project to "${proj.name}" (id ${proj.id}; ${where}).` }] };
       }
     );
   }
@@ -817,34 +980,22 @@ export default {
           const b = (await request.json().catch(() => ({}))) as { name?: string };
           const name = (b.name || "").trim().slice(0, 40);
           if (!name) return Response.json({ error: "missing name" }, { status: 400, headers: cors });
-          await ensureDefaultProject(env, email); // keep "Personal" as the oldest/default
-          const p: Project = { id: crypto.randomUUID().slice(0, 8), name, createdAt: Date.now() };
-          await env.DB.prepare("INSERT INTO projects (id, owner, name, created_at) VALUES (?1, ?2, ?3, ?4)")
-            .bind(p.id, email, p.name, p.createdAt).run();
-          return Response.json({ ok: true, project: p }, { headers: cors });
+          const project = await createProject(env, email, name);
+          return Response.json({ ok: true, project }, { headers: cors });
         }
         if (request.method === "PATCH") {
           const b = (await request.json().catch(() => ({}))) as { id?: string; name?: string };
           if (!b.id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
           const name = (b.name || "").trim().slice(0, 40);
           if (!name) return Response.json({ error: "missing name" }, { status: 400, headers: cors });
-          const res = await env.DB.prepare("UPDATE projects SET name = ?1 WHERE id = ?2 AND owner = ?3 AND deleted IS NULL")
-            .bind(name, b.id, email).run();
-          if (!res.meta.changes) return Response.json({ error: "not found" }, { status: 404, headers: cors });
+          if (!(await renameProject(env, email, b.id, name))) return Response.json({ error: "not found" }, { status: 404, headers: cors });
           return Response.json({ ok: true }, { headers: cors });
         }
         if (request.method === "DELETE") {
-          // Soft-delete a project AND cascade to its folders + diagrams. Always
-          // keep at least one project (can't delete your last one).
           const id = url.searchParams.get("id") || "";
           if (!id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
-          const projs = await listProjects(env, email);
-          if (!projs.some((p) => p.id === id)) return Response.json({ error: "not found" }, { status: 404, headers: cors });
-          if (projs.length <= 1) return Response.json({ error: "cannot delete your only project" }, { status: 400, headers: cors });
-          const now = Date.now();
-          await env.DB.prepare("UPDATE diagrams SET deleted = ?1 WHERE owner = ?2 AND project_id = ?3 AND deleted IS NULL").bind(now, email, id).run();
-          await env.DB.prepare("UPDATE workspaces SET deleted = ?1 WHERE owner = ?2 AND project_id = ?3 AND deleted IS NULL").bind(now, email, id).run();
-          await env.DB.prepare("UPDATE projects SET deleted = ?1 WHERE id = ?2 AND owner = ?3").bind(now, id, email).run();
+          const res = await deleteProjectCascade(env, email, id);
+          if (!res.ok) return Response.json({ error: res.error }, { status: res.error === "not found" ? 404 : 400, headers: cors });
           return Response.json({ ok: true }, { headers: cors });
         }
         return Response.json({ projects: await listProjects(env, email) }, { headers: cors });
