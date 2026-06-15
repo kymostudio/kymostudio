@@ -90,3 +90,50 @@ The plan, by impact:
 *Bench on the box: `~/mjs-bench/cmpfull.mjs` (full corpus), `cmpcat.mjs` (by
 cause), `cmp7.mjs` (7-case), `grid.mjs` (worst/best grid), `vdiff.mjs` (overlay).
 Ground truth = mermaid.js via Chrome.*
+
+---
+
+## Update (2026-06-15, late): dugong evaluated, and the real cause breakdown
+
+Swapped the layout engine to **dugong** (`layout_dagreish`, the dagre-0.8.x port
+mermaid's `dagre-d3-es` is forked from) and re-measured the full corpus.
+
+**Result: the mean did not move (4.59 % → 4.61 %).** Per-case probing shows why —
+and corrects the earlier breakdown (an icon/wrap mis-classification had inflated
+the "CLEAN" bucket). With `fa:`-icons and foreignObject wrapping detected
+properly:
+
+| group | n | mean | note |
+|---|---|---|---|
+| **wrapped label** | **59** | 6.2 % | **the dominant cause** — mermaid wraps long labels to 2–3 lines (height 78/102) and caps width ~230 px; kymo is single-line → wrong node size → wrong layout |
+| style / classDef | 27 | 9.9 % | extreme cases remain |
+| icon (`@{}` or `fa:`) | 20 | 4.1 % | kymo renders the icon token as text |
+| **true CLEAN** | **22** | **2.4 %** | no wrap/icon/style/subgraph |
+
+What dugong **did** fix: the **rank axis**. `flowchart_005` (clean, 14 nodes) went
+to kymo width 2508 ≈ mermaid 2500 — rank positions now match. What it did **not**
+fix: **cross-axis ordering** (same file's Y spacing still differs), and
+**sibling-subgraph stacking** (`flowchart-v2_034`: kymo side-by-side vs mermaid
+stacked — needs merman's recursive cluster extraction). So dugong is the right
+*engine* but not a standalone fix; reverted for now (heavy git dep, no mean gain
+until sizing + ordering also match).
+
+### The honest conclusion
+
+Reaching **mean < 0.5 % on the full corpus** is **not a tuning problem** — it
+requires reproducing mermaid's full flowchart pipeline:
+
+1. **Text wrapping** — 59 of 110 files. Biggest single lever; fixes node sizes,
+   which in turn feeds correct sizes to the layout. Tractable but non-trivial
+   (mermaid's wrap width + line height + multi-line `<text>` + height growth).
+2. **Icons** — 20 files. Render `fa:` / `@{ icon }` glyphs (needs the icon set).
+3. **Subgraph layout** — merman's recursive per-cluster extraction + title shifts.
+4. **Cross-axis layout parity** — dugong + mermaid's exact graph-feeding/ordering.
+
+That set is, in effect, **merman** (the Rust mermaid port) — and even merman sits
+at 1–3 % because of its foreignObject text. kymo's durable edge is **raster-safe
+rendering of simple/clean flowcharts**, where it is ~0 % and beats merman.
+
+**Recommendation:** treat < 0.5 %-on-arbitrary-input as out of scope for the
+current architecture; pursue **text-wrapping** (the 59-file lever) as the next
+concrete win, then icons, accepting that full parity = a merman-scale effort.
