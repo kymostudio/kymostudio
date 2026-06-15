@@ -555,3 +555,66 @@ raster-safe glyph paths, liftable like icons. **But:**
 For a feature that fixes **2 files** (~0.07% of the mean) at **+3.1 MB browser
 wasm**, this is a product trade-off, not a clear win — deferred for an explicit
 size-vs-fidelity decision.
+
+## Round 2026-06-15 (final): kymo-tex — KaTeX-accurate math; current top-10
+
+The katex cases (`$$\alpha\beta…$$`) were the last production outliers. kymo passed
+`None` as merman's math renderer, so they fell back to a Unicode approximation
+sized as one giant unstyled line.
+
+**Approaches tried:**
+1. **RaTeX (`ratex-math`)** — merman's pure-Rust KaTeX backend. Renders raster-safe
+   SVG, **but** embeds *its own* glyph outlines (≠ KaTeX) → ~5-8% per-glyph edge
+   diff, and costs **+3.1 MB** wasm (embedded Unicode math font). Net: worse on the
+   pixel metric than the Unicode fallback (canvas-dilution artifact) and heavy.
+2. **kymo-tex (`src/katex.rs`, shipped)** — a focused renderer that extracts glyph
+   outlines from **KaTeX's own TTF fonts** (`ttf-parser`) + KaTeX metrics + spacing.
+   Bundles only the 6 KaTeX font subsets it needs (~210 KB). **wasm 11.95 → 9.07 MB**
+   (RaTeX removed). Lowercase Greek renders **near-pixel-perfect** (proves the
+   approach); uppercase is ~7% wide because KaTeX applies **kerning + italic
+   correction** kymo-tex doesn't yet replicate (`katex_001` 6.7%). `katex_002`
+   (operators / `\mathbb` / macros) still uses the Unicode fallback.
+
+The remaining katex residual is a known, scoped metric-model gap (kerning + italic
+corrections + katex_002 symbol coverage), plus a likely sub-percent **font-hinting**
+floor (mermaid renders the hinted font; kymo renders unhinted vector paths).
+
+### Production corpus (110 plain files) vs mermaid.js 11.15
+
+| metric | value |
+|---|---|
+| mean | **1.11%** |
+| median | **0.63%** |
+| ≤0.5% (pixel-identical) | 54/110 |
+| ≤1% | 73/110 |
+| p90 | 3.06% |
+| max | 6.70% (katex_001) |
+
+Full-branch trajectory: **6.14 → 4.59 → 2.58 → 1.61 → 1.30 → 1.11%** mean.
+Median **0.63% beats mermaid's own Rust port** (merman, 1.76%).
+
+### Top 10 worst (production)
+
+| file | diff | cause |
+|---|---|---|
+| katex_001 | 6.70% | KaTeX uppercase kerning/italic-correction not yet in kymo-tex |
+| flowchart-v2_050 | 5.46% | literal `[<img>]` — mermaid draws a broken-image box, kymo draws text |
+| flowchart-v2_043 | 5.18% | two text-dense hexagons (`#quot;`) — SVG-vs-HTML text floor |
+| katex_002 | 4.99% | operators/blackboard — Unicode fallback (kymo-tex coverage pending) |
+| flowchart_020 | 3.95% | multi-line label sub-pixel |
+| flowchart-icon_001 | 3.64% | icon glyph + label layout |
+| flowchart_013 | 3.32% | multi-line hexagon sub-pixel |
+| flowchart-icon_004 | 3.13% | icon glyph |
+| flowchart_035 | 3.10% | sub-pixel layout |
+| katex_000 | 3.10% | math (kymo-tex partial) |
+
+### Top 10 best (production)
+
+All ≤ ~0.1% — clean flowcharts (rect/diamond/subgraph, single-line labels) where
+kymo's dagre layout + merman sizing + raster-safe text overlay mermaid.js almost
+exactly: e.g. `flowchart-v2_080`, `flowchart_029`, `flowchart-v2_017`,
+`flowchart-v2_079/072`, `flowchart_023`, `flowchart_032`. These are pixel-identical
+to mermaid.js (≤0.5%) — 54/110 of the corpus sits here.
+
+Visual grid (worst-10 + best-10, each with kymo / merman / mermaid.js renders +
+scores + cause): `assets/2026-06-15-worstbest/worst-best-grid.png`.
