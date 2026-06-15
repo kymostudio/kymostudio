@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "./build.sh"
+    "build": "./build.sh",
+    "test:e2e": "npm run build && playwright test"
   },
   "dependencies": {
     "@codemirror/lang-json": "^6.0.2",
@@ -22,6 +23,7 @@
     "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "esbuild": "^0.25.0"
   }
 }

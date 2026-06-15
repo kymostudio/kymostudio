@@ -1,7 +1,7 @@
 ---
 title: Kymo Editor (editor.kymo.studio) — Verification & Validation
 document_id: TEST-KEDITOR-001
-version: "0.6"
+version: "0.7"
 issue_date: 2026-06-13
 status: Implemented
 classification: Internal
@@ -36,7 +36,7 @@ keywords:
 | Field             | Value                                                              |
 |-------------------|-------------------------------------------------------------------|
 | Document ID       | `TEST-KEDITOR-001` |
-| Version           | 0.6 |
+| Version           | 0.7 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (requirements), `DESIGN-KEDITOR-001` (design), `PLAN-KEDITOR-001` (plan) |
@@ -90,7 +90,7 @@ keywords:
 | **TC-KE-30** | Library thumbnails | After editing/saving, the `/diagrams` row and the Search panel show an SVG **thumbnail** of the diagram; a brand-new unsaved draft has none; `GET /api/diagrams/thumb?id=` returns the cached SVG. | FR-LB-07 |
 | **TC-KE-31** | Session expiry + /login | With a token ~30 s from `exp`, the watchdog clears it and re-prompts before any call 401s; force a 401 on `/diagrams` → redirect to `/login?next=/diagrams`; signing in returns to `/diagrams`; a draft being edited survives the expiry (still editable). | FR-LV-10, NFR-KE-06 |
 | **TC-KE-32** | Confirm modal | Every destructive action (delete diagram/folder, purge, empty trash, replace-draft) uses the styled `confirm.tsx` modal (not `window.confirm`); Esc cancels, Enter confirms, the danger action is red; cancelling makes no change. | FR-LB-08 |
-| **TC-KE-33** | Welcome home | Guest `/`: the **Welcome** shows Start (New / Open file), a "Sign in to see your diagrams" + Google CTA in Recent, Templates, and Learn — no source/preview panes, header reads "Welcome". Signed-in `/`: Recent lists the ≤ 8 most-recent diagrams, each opening `?d=`. Picking New / a template / **Open file** (a local `.kymo`/`.bpmn`/`.mmd`/`.txt`/`.md`, kind auto-detected) dismisses the Welcome and opens the editor. Opening a `?s=` link bypasses the Welcome entirely. | FR-HM-01, FR-HM-02 (`FEAT-KHOME-001`); US-HM-01..04 |
+| **TC-KE-33** | Welcome home | Guest `/`: the **Welcome** shows Start (New / Open file), a "No sign-in needed" note + inline Sign in link, Templates, and Learn — no source/preview panes (no header title chrome). Signed-in `/`: Recent lists the ≤ 8 most-recent diagrams, each opening `?d=`. Picking New / a template / **Open file** (a local `.kymo`/`.bpmn`/`.mmd`/`.txt`/`.md`, kind auto-detected) dismisses the Welcome and opens the editor. Opening a `?s=` link bypasses the Welcome entirely. | FR-HM-01, FR-HM-02 (`FEAT-KHOME-001`); US-HM-01..04 |
 
 ## 3. Regression gates (must stay green)
 
@@ -176,6 +176,7 @@ If an engine gate moves because of an editor change, the change is **out of scop
 | 0.4     | 2026-06-12 | Vũ Anh | **Folded in the share-link first-load bench** (commit `3785a53`) as **Annex B**: online Playwright harness over the deployed editor + live kroki.io — quality probes (label survival = the FR-RD-09 sanitizer regression probe; engine chunk fetched for kymo only; early kick-off adopted) + Fast-4G perf medians; snapshot, never a gate. §1 strategy row added; §4 NFR-KE-01/03 now cite the bench (2026-06-12 snapshot: Mermaid share link visible ~3.4 s, engine chunk not fetched; content-hash `?v=` + immutable chunk headers per `DESIGN-KEDITOR-001` v0.4 §11). |
 | 0.5     | 2026-06-13 | Vũ Anh | **Re-baseline to the 2026-06-13 product.** Revised `TC-KE-01/02` (status text `Rendered` + hover detail; immediate first render), `TC-KE-06`/`TC-KE-17` (in-browser Mermaid + render.kymo.studio render paths), `TC-KE-13` (`/api/trash` routes; legacy `/api/render` noted), `TC-KE-21`/`TC-KE-22` (thumbnails + Explorer tree; flat workspaces → nested cycle-safe folder tree + drag + subtree delete). Added `TC-KE-25..32` (in-browser Mermaid offline; paste auto-detect; zoom/pan preview; template gallery + draft-first save; soft delete + Trash restore/purge; thumbnails; session expiry + `/login`; confirm modal). Traceability extended to `FR-RD-05/10/11`, `FR-LB-02/04/06/07/08`, `FR-LV-08/09/10`. §4 NFR-KE-01 cites offline Mermaid. The Annex B online bench and the §3 engine/golden gates remain the only hard gates. |
 | 0.6     | 2026-06-15 | Vũ Anh | Added **`TC-KE-33`** (Welcome home) for the new `editor-home` module (`FEAT-KHOME-001`): guest landing with sign-in CTA, signed-in Recent, start-action dismissal + Open-file, and `?s=` bypass — covering `FR-HM-01/02` and the `US-HM-01..04` user-story acceptance. Traceability row added. Part of the guest-flow audit reconciliation (umbrella v0.5). |
+| 0.7     | 2026-06-15 | Vũ Anh | Reconciled `TC-KE-33` (guest Welcome) to the redesigned `welcome.tsx`: **"No sign-in needed"** note + inline Sign in link (not "Sign in to see your diagrams"), and **no header title chrome**. `editor-home` grew its own automated smoke coverage — see `TEST-KHOME-001` (`TC-HM-01`/`TC-HM-04`). |
 
 ## Annex B — Share-link first-load bench (`benches/editor`)
 

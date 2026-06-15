@@ -1,7 +1,7 @@
 ---
 title: Editor Home — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KHOME-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-15
 status: Implemented
 classification: Internal
@@ -44,7 +44,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KHOME-001` |
-| Version           | 0.2 |
+| Version           | 0.3 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `DESIGN-KHOME-001` (the *how*), `TEST-KHOME-001` (V&V), `PLAN-KHOME-001` (delivery + risks), `FEAT-KEDITOR-001` (umbrella), `FEAT-KLIBRARY-001` (Recent list + template gallery it invokes), `FEAT-KRENDER-001` (authoring it hands off to), `FEAT-KLIVE-001` (`FR-LV-02` guest boundary, `FR-LV-08` draft model), `FEAT-KSHARE-001` (sibling — `?s=` links bypass the Welcome), `FEAT-KEMCP-001` (sibling) |
@@ -148,7 +148,7 @@ contract, the stories carry intent and are the acceptance basis.
 
 | ID | Requirement | Source need |
 |----|-------------|-------------|
-| **FR-HM-01** | The editor SHALL present a **Welcome home** at `/` whenever the buffer is an **untouched starter draft** (no `?d`/`?s`, the unedited sample) — replacing the source/preview panes until the user starts a diagram (`web/welcome.tsx`). It SHALL offer **Start** (New diagram → the template gallery of `FR-LB-02`; Open file → `FR-HM-02`), **Recent** (signed-in: the ≤ 8 most-recently-updated diagrams, opening `?d=`; **signed-out: a "Sign in to see your diagrams" prompt with a Google sign-in CTA** — the account boundary of `FR-LV-02`), **Templates** (a quick set of common types), and **Learn** (a docs link). Any start action (New / pick template / Open file) or a navigation to a `?d`/`?s` link SHALL dismiss the Welcome and reveal the editor; the header SHALL read **Welcome** while it shows. | SN-HM-01 |
+| **FR-HM-01** | The editor SHALL present a **Welcome home** at `/` whenever the buffer is an **untouched starter draft** (no `?d`/`?s`, the unedited sample) — replacing the source/preview panes until the user starts a diagram (`web/welcome.tsx`). It SHALL offer **Start** (New diagram → the template gallery of `FR-LB-02`; Open file → `FR-HM-02`), **Recent** (signed-in: the ≤ 8 most-recently-updated diagrams, opening `?d=`; **signed-out: a "No sign-in needed" note with an inline Sign in link** — no account required, the `FR-LV-02` boundary; the guest column also leads with a product tagline + a hero illustration), **Templates** (a quick set of common types), and **Learn** (a docs link). Any start action (New / pick template / Open file) or a navigation to a `?d`/`?s` link SHALL dismiss the Welcome and reveal the editor; while the Welcome shows there is **no document-title chrome** (the brand logo and, for guests, the sign-in button are the only header elements). | SN-HM-01 |
 | **FR-HM-02** | "Open file…" SHALL load a local `.kymo`/`.bpmn`/`.mmd`/`.mermaid`/`.txt`/`.md` into a **draft**, detecting the kind via `sniffKind` (`FR-RD-10`; fallback by extension), resetting the URL to `/` and entering the editor (`openLocalFile`). | SN-HM-01 |
 
 ### C.2 User stories (`US-HM`) — the UI/UX layer
@@ -157,7 +157,7 @@ contract, the stories carry intent and are the acceptance basis.
   to open on a **Welcome** (Start · Recent · Templates · Learn) with a **sign-in invite**,
   so that I'm oriented instead of being dropped into a blank sample.
   - *Given* a fresh `/` signed-out, *Then* the Welcome shows Start / Templates / Learn and a
-    "Sign in to see your diagrams" + Google CTA in Recent (no panes; header reads "Welcome").
+    a "No sign-in needed" note + an inline Sign in link (no source/preview panes).
   - *Given* the Welcome, *When* I pick New / a template / Open file, *Then* it dismisses and
     the editor opens. *(realises `FR-HM-01`)*
 - **US-HM-02 — Resume recent (signed-in).** As a **signed-in author**, I want my **recent
@@ -185,3 +185,4 @@ bundle) and `FR-LV-02`'s signed-out-usable boundary.
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-15 | Vũ Anh | Initial as-built spec for the **Welcome home** landing surface, closing the audit gap (the surface had no owning requirement; umbrella `FR-KE-21` specified a contradictory redirect-to-most-recent, now superseded). Module-native `SN-HM-01`, `FR-HM-01` (Welcome home), `FR-HM-02` (Open file → draft), plus the added user-story layer `US-HM-01..04` (UI/UX convention). Stub doc-set (01 only); design/V&V referenced from `DESIGN-KEDITOR-001` / `TEST-KEDITOR-001`. |
 | 0.2     | 2026-06-15 | Vũ Anh | **Grew the full doc-set** — `editor-home` is now the first module with its own `02-DESIGN` (`DESIGN-KHOME-001`), `03-TEST` (`TEST-KHOME-001`, `TC-HM-01..06`), and `04-PLAN` (`PLAN-KHOME-001`, risk register). Re-pointed the blockquote / §B.2 / §B.4 references from the shared `DESIGN-/TEST-KEDITOR-001` to the module-local docs; added them to `related_documents` and the control table. No requirement content changed. |
+| 0.3     | 2026-06-15 | Vũ Anh | **Reconcile `FR-HM-01` / `US-HM-01` to the redesigned guest Welcome** (the merged `welcome.tsx`): the signed-out Recent block is now a **"No sign-in needed"** value note with an inline **Sign in** link (+ a guest tagline + hero illustration), not "Sign in to see your diagrams"; while the Welcome shows there is **no document-title chrome** (the "Welcome" header label was removed). Added `data-testid`s to `welcome.tsx` and a Playwright **smoke** suite (`TC-HM-01` guest + `TC-HM-04` share-bypass, both passing locally). |

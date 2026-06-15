@@ -1,7 +1,7 @@
 ---
 title: Editor Home — Implementation Plan
 document_id: PLAN-KHOME-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-15
 status: Implemented
 classification: Internal
@@ -32,7 +32,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `PLAN-KHOME-001` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | Implemented (retrospective) |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KHOME-001` (the *what*), `DESIGN-KHOME-001` (the *how*), `TEST-KHOME-001` (V&V), `PLAN-KEDITOR-001` (the umbrella plan — the Welcome shipped within its second growth pass) |
@@ -76,6 +76,7 @@ Recent index, Open-file → draft, docs link) and owns no data/render/account lo
 | **P2** | "Open file…" → draft with kind auto-detect (`openLocalFile`, `FR-HM-02`, `US-HM-03`). | ✓ Shipped |
 | **P3** | Guest sign-in CTA in Recent + `?s=` bypass + Back-restores-Welcome (`welcomeDismissed` lifecycle, `US-HM-01/04`). | ✓ Shipped |
 | **P4** | **Spec retrofit (this doc-set):** `FEAT-/DESIGN-/TEST-/PLAN-KHOME-001`; reconcile `FR-KE-21` / `FR-LB-02` redirect contradiction; register the sixth module across the umbrella + siblings. | ✓ Done (2026-06-15, docs-only) |
+| **P5** | **Smoke E2E:** `data-testid`s in `welcome.tsx`; Playwright harness for `packages/editor` (`playwright.config.ts` + `e2e/welcome.spec.ts`); `TC-HM-01` (guest) + `TC-HM-04` (`?s=` bypass) automated. Reconcile the redesigned-Welcome drift (R-DRIFT) into the specs. | ✓ Done (2026-06-15, local-green; CI deferred) |
 
 ## 5. Risk register
 
@@ -84,7 +85,8 @@ Recent index, Open-file → draft, docs link) and owns no data/render/account lo
 | **R-HM1** | `document.title` reads the sample-derived name (e.g. "Receive order") while the Welcome screen reads "Welcome" — minor inconsistency. | Low | **Open — code follow-up.** One-line fix in `EditorPage` (set `document.title = "Welcome · Kymostudio"` when `showWelcome`). Tracked in `DESIGN-KHOME-001` §4 / `TEST-KHOME-001` TC-HM-06. |
 | **R-HM2** | Over-decomposition — a 2-FR module is small vs siblings (3–11 FR). | Low | **Accepted (deliberate seam).** Revisit after 1–2 quarters: if the home/onboarding surface has not grown, consider folding back into `editor-library`. |
 | **R-HM3** | Welcome-vs-redirect — was the Welcome intended, or a regression of `FR-KE-21`? | — | **Resolved.** Owner confirmed the Welcome is the intended `/` landing; `FR-KE-21`'s redirect clause is superseded (ADR-HM-1). |
-| **R-HM4** | The `showWelcome` gate couples to the `SAMPLE` sentinel + an in-memory `welcomeDismissed` ref (not URL state) — a refactor of either could regress the gate. | Low | Accepted; covered by TC-HM-05 (dismiss + Back-restore). |
+| **R-HM4** | The `showWelcome` gate couples to the `SAMPLE` sentinel + an in-memory `welcomeDismissed` **state flag** (not URL state) — a refactor of either could regress the gate. | Low | Accepted; covered by TC-HM-05 (dismiss + Back-restore). |
+| **R-DRIFT** | The Welcome's text + DOM are volatile — the guest block was reworded ("Sign in to see your diagrams" → "No sign-in needed") and the header "Welcome" label removed within days of the first spec, by an unrelated merge. Class/text selectors would have broken. | Med | **Mitigated:** specs reconciled to as-built; E2E selectors use **`data-testid`** (`welcome`, `wel-new`, `wel-signin`, …) added to `welcome.tsx`, not CSS classes/text. Keep re-grounding the spec on `welcome.tsx` when it changes. |
 
 ## 6. Worklog / timeline
 
@@ -98,3 +100,4 @@ Recent index, Open-file → draft, docs link) and owns no data/render/account lo
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-15 | Vũ Anh | Initial retrospective plan for `editor-home`. Records the decision to carve a dedicated, story-augmented module with a full doc-set; the (already-shipped) phases P1–P3 and the P4 spec retrofit; and the risk register (R-HM1 `document.title` gap; R-HM2 over-decomposition; R-HM3 Welcome-vs-redirect resolved; R-HM4 gate coupling). |
+| 0.2     | 2026-06-15 | Vũ Anh | Added **P5 — Playwright smoke harness** (`packages/editor/playwright.config.ts` + `e2e/welcome.spec.ts`; `TC-HM-01`/`TC-HM-04` automated + passing) and **R-DRIFT** (the Welcome's text/DOM drifted within days — mitigated via spec reconcile + `data-testid` selectors). Updated R-HM4 (`welcomeDismissed` is state, not a ref). |
