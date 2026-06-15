@@ -137,3 +137,54 @@ rendering of simple/clean flowcharts**, where it is ~0 % and beats merman.
 **Recommendation:** treat < 0.5 %-on-arbitrary-input as out of scope for the
 current architecture; pursue **text-wrapping** (the 59-file lever) as the next
 concrete win, then icons, accepting that full parity = a merman-scale effort.
+
+---
+
+## Update (2026-06-15, final): merman-layout prototyped — the floor is icon rendering
+
+Built the genuine "use merman's pipeline" path: kymostudio-core depends on
+`merman-core` + `merman-render`, calls `layout_flowchart_v2` (mermaid-exact
+positions via `VendoredFontMetricsTextMeasurer`), maps the result into kymo's
+`FGeom`, and renders raster-safe with kymo's `<text>` engine. Shapes/labels/styles
+come from kymo's own parse (mapped by node id); merman supplies positions.
+
+**It works** — node positions match mermaid node-for-node (chain centres
+61.6/35,139,243 = mermaid exactly). Full-corpus effect:
+
+| | kymo-own dagre | **kymo + merman layout** |
+|---|---|---|
+| mean | 4.54 % | **3.88 %** |
+| median | 2.64 % | **2.25 %** |
+| **p90** | 13.9 % | **5.56 %** |
+| 7-case (simple) | **0.19 %** | 2.06 % |
+
+So merman-layout is a **net win on complex graphs** (p90 13.9→5.6 %) but
+**regresses simple ones** (0.19→2.06 %) and adds **+1.9 MB wasm** (6.5→8.4 MB).
+
+### Why simple regressed, and the two remaining floors
+
+1. **Text-metric offset (~1 %).** merman sizes nodes with vendored font-metrics;
+   kymo's `CHAR_W_MERMAID` is calibrated to the *actual browser* (the `w`-fix
+   etc.), so it's *closer* to mermaid.js than merman's own metrics. Fixing this
+   means implementing merman's `TextMeasurer` (an 8-method contract incl. wrapping)
+   backed by kymo's metrics — a real reimplementation.
+2. **Icons — the hard floor.** 20 of 110 files use `fa:`/`@{ icon }` nodes.
+   mermaid renders the glyph; kymo draws the icon token as **text**. No layout or
+   metric work fixes this — it needs raster-safe **icon rendering** (load the icon
+   set, embed paths). Until then the corpus mean is floored ~1–2 % by icons alone.
+
+### Decision
+
+merman-layout reverted from the live path (it regresses the editor's common
+simple case + 1.9 MB). The kymo-own path (styling + floor + wrap, 0.19 % simple,
+already deployed) stays default. The merman-layout approach is proven and
+documented as the foundation.
+
+### Definitive conclusion on `mean < 0.5%`
+
+It is **not reachable by layout/metric tuning**. With mermaid-exact layout
+(merman) in hand, the floor is **icon rendering** (a distinct major feature) plus
+a custom text-measurer. Reaching < 0.5 % across arbitrary input = icon rendering
++ measurer + edge precision on the merman-layout foundation — each a real feature,
+not a tweak. kymo's shipped strength remains: **raster-safe, ~0 % on
+simple/clean/styled flowcharts, beating merman there.**
