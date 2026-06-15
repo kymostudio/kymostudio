@@ -80,7 +80,7 @@ default = ["system-fonts", "pdf"]
 # Opt-in: route flowchart layout through merman (the mermaid Rust port) sized by
 # kymo's browser-calibrated metrics, rendered raster-safe by kymo. Matches
 # mermaid.js far more tightly (median ~0.7% vs ~2.6%) at the cost of ~1.9 MB wasm.
-merman-layout = ["dep:merman-core", "dep:merman-render"]
+merman-layout = ["dep:merman-core", "dep:merman-render", "dep:serde_json"]
 system-fonts = ["resvg/system-fonts", "resvg/memmap-fonts"]
 
 # Vector SVG→PDF via svg2pdf (native only — see the dep note above).

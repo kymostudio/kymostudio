@@ -520,7 +520,7 @@ fn scan_kv(line: &str) -> Option<FlowStyle> {
 /// not touch the IR or kymojson.
 pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<NodeStyle>) {
     let mut classdefs: HashMap<String, NodeStyle> = HashMap::new();
-    let mut node_class: HashMap<String, String> = HashMap::new();
+    let mut node_class: HashMap<String, Vec<String>> = HashMap::new();
     let mut direct: HashMap<String, NodeStyle> = HashMap::new();
     let mut global_fill: Option<String> = None;
 
@@ -535,9 +535,15 @@ pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<Nod
                 }
             }
         } else if low.starts_with("class ") {
+            // `class a,b,c name;` — the trailing `;` (statement terminator) would
+            // otherwise become part of the class name and miss the classDef lookup.
             if let Some((ids, name)) = line[5..].trim().rsplit_once(char::is_whitespace) {
+                let name = name.trim().trim_end_matches(';').trim();
                 for id in ids.split(',') {
-                    node_class.insert(id.trim().to_string(), name.trim().to_string());
+                    node_class
+                        .entry(id.trim().to_string())
+                        .or_default()
+                        .push(name.to_string());
                 }
             }
         } else if low.starts_with("style ") {
@@ -561,7 +567,7 @@ pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<Nod
                     .collect();
                 if let Some(id) = id_before_class(before) {
                     if !cls.is_empty() {
-                        node_class.insert(id, cls.clone());
+                        node_class.entry(id).or_default().push(cls.clone());
                     }
                 }
                 rest = &after[cls.len()..];
@@ -575,11 +581,26 @@ pub fn extract_node_styles(src: &str) -> (HashMap<String, NodeStyle>, Option<Nod
     let mut out: HashMap<String, NodeStyle> = HashMap::new();
     let ids: std::collections::HashSet<&String> = node_class.keys().chain(direct.keys()).collect();
     for id in ids {
-        let mut ns = node_class
-            .get(id)
-            .and_then(|c| classdefs.get(c))
-            .cloned()
-            .unwrap_or_default();
+        let mut ns = NodeStyle::default();
+        for cls in node_class.get(id).into_iter().flatten() {
+            if let Some(d) = classdefs.get(cls) {
+                if d.fill.is_some() {
+                    ns.fill = d.fill.clone();
+                }
+                if d.stroke.is_some() {
+                    ns.stroke = d.stroke.clone();
+                }
+                if d.color.is_some() {
+                    ns.color = d.color.clone();
+                }
+                if d.stroke_width.is_some() {
+                    ns.stroke_width = d.stroke_width.clone();
+                }
+                if d.font_weight.is_some() {
+                    ns.font_weight = d.font_weight.clone();
+                }
+            }
+        }
         if let Some(d) = direct.get(id) {
             if d.fill.is_some() {
                 ns.fill = d.fill.clone();
@@ -659,7 +680,8 @@ fn parse_style(s: &str) -> NodeStyle {
     let mut ns = NodeStyle::default();
     for frag in s.split(',') {
         if let Some((k, v)) = frag.split_once(':') {
-            let v = v.trim().to_string();
+            // Values may carry the statement-terminating `;` (`fill:#622;`).
+            let v = v.trim().trim_end_matches(';').trim().to_string();
             match k.trim().to_ascii_lowercase().as_str() {
                 "fill" => ns.fill = Some(v),
                 "stroke" => ns.stroke = Some(v),

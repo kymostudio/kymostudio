@@ -326,7 +326,7 @@ fn node_svg(
         let lines = if matches!(style, FlowStyle::Mermaid) {
             crate::layout::node_lines_mermaid(&n.name, n.shape)
         } else {
-            vec![n.name.clone()]
+            n.name.split('\n').map(|l| l.to_string()).collect()
         };
         if lines.len() <= 1 {
             let ly = if matches!(style, FlowStyle::Mermaid) {

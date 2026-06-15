@@ -97,6 +97,9 @@ pub(crate) fn wrap_mermaid(label: &str) -> Vec<String> {
 /// Wrapped label lines for sizing + rendering. Rectangle-ish shapes wrap at
 /// mermaid's width; circle/diamond/hex/parallelogram stay single-line.
 pub(crate) fn node_lines_mermaid(label: &str, shape: Shape) -> Vec<String> {
+    // Hard `<br>` breaks (now `\n`) split every shape; only rectangle-ish shapes
+    // additionally soft-wrap each segment at mermaid's ~200px width.
+    let hard = label.split('\n');
     match shape {
         Shape::Circle
         | Shape::Diamond
@@ -104,8 +107,8 @@ pub(crate) fn node_lines_mermaid(label: &str, shape: Shape) -> Vec<String> {
         | Shape::Parallelogram
         | Shape::ParallelogramAlt
         | Shape::Trapezoid
-        | Shape::TrapezoidAlt => vec![label.to_string()],
-        _ => wrap_mermaid(label),
+        | Shape::TrapezoidAlt => hard.map(|l| l.to_string()).collect(),
+        _ => hard.flat_map(wrap_mermaid).collect(),
     }
 }
 

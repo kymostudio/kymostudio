@@ -4,11 +4,11 @@
 //! rasterised PNG/PDF shows readable math instead of raw LaTeX. Unknown commands
 //! fall back to their bare name. Text with no matched `$` pair is unchanged.
 
-/// Replace `<br>` / `<br/>` / `<br />` (any case) with a space — Mermaid treats
-/// them as line breaks in labels.
+/// Replace `<br>` / `<br/>` / `<br />` (any case) with a newline — Mermaid treats
+/// them as hard line breaks in labels (the renderer splits on `\n` into tspans).
 pub fn strip_br(s: &str) -> String {
-    // Literal escaped breaks `\n` / `\t` become spaces too.
-    let s = &s.replace("\\n", " ").replace("\\t", " ");
+    // Literal escaped tab `\t` becomes a space; `\n` becomes a hard break.
+    let s = &s.replace("\\n", "\n").replace("\\t", " ");
     let lower = s.to_ascii_lowercase();
     if !lower.contains("<br") {
         return s.to_string();
@@ -25,7 +25,7 @@ pub fn strip_br(s: &str) -> String {
                 j += 1;
             }
             if j < chars.len() {
-                out.push(' ');
+                out.push('\n');
                 i = j + 1;
                 continue;
             }

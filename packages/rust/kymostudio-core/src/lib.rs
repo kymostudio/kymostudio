@@ -350,8 +350,8 @@ pub fn mermaid_to_svg_dagre(src: &str) -> Result<String, mermaid::MermaidError> 
     ))
 }
 
-/// Normalise a Mermaid label for rendering: `<br>` line breaks become spaces,
-/// then `$…$` TeX math is rendered to Unicode.
+/// Normalise a Mermaid label for rendering: `$…$` TeX math is rendered to
+/// Unicode, then `<br>` hard breaks become `\n` (the renderer splits into tspans).
 fn clean_label(s: &str) -> String {
     // Render `$…$` math FIRST (so TeX commands like \\text / \\nabla are mapped to
     // Unicode), then collapse `<br>` and literal `\\n` / `\\t` breaks — otherwise
