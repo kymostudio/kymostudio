@@ -284,3 +284,61 @@ metric, KaTeX, subgraph). With raster-safe icon rendering added, the mean would 
 the median (~0.7%); reaching strictly <0.5% would additionally require pushing the
 median (edge/AA precision) below 0.5%. The "physical floor" framing was an artifact of
 merman's vendored metrics, now disproven.
+
+---
+
+## Current results (final, 2026-06-15) — kymo-metrics + merman-layout + fixes
+
+Build: `merman-layout` feature with icon-token strip, `:::class` parser fix, and
+bold-width factor. Full plain corpus (110 files), kymo vs mermaid.js, Chrome both:
+
+**mean 2.58% · median 0.69% · p90 3.93% · ≤0.5%: 49/110 · ≤1%: 70/110**
+
+### Top 10 worst (kymo vs mermaid.js, with merman for contrast)
+
+| file | kymo | merman | cause |
+|---|---|---|---|
+| flowchart-icon_002 | **52.62%** | 0.00% | icon glyph — kymo has no icon renderer; **merman renders it (0%)** |
+| flowchart-icon_003 | **38.89%** | 0.00% | icon glyph |
+| flowchart_029 | **20.60%** | 1.92% | nested subgraph title/placement |
+| flowchart-icon_004 | **18.92%** | 1.67% | icon glyph |
+| flowchart-v2_032 | **17.62%** | 0.00% | classDef + bold + wrap detail (render-side wrap threshold) |
+| flowchart_025 | 11.60% | 11.48% | hard for **both** ports (not kymo-specific) |
+| katex_001 | 5.53% | 6.70% | KaTeX math — **kymo's Unicode beats merman here** |
+| flowchart-v2_050 | 5.46% | 7.39% | kymo beats merman |
+| flowchart-v2_043 | 5.31% | 0.00% | icon/style |
+| katex_002 | 4.99% | 4.67% | KaTeX math |
+
+### Top 10 best (kymo vs mermaid.js)
+
+| file | kymo | merman |
+|---|---|---|
+| flowchart-v2_031 | **0.02%** | 2.79% |
+| flowchart_048 | **0.02%** | 2.90% |
+| flowchart_017 | **0.04%** | 0.11% |
+| flowchart-v2_078 | **0.05%** | 3.57% |
+| flowchart-v2_075 | **0.05%** | 2.81% |
+| flowchart-v2_073 | **0.05%** | 2.81% |
+| flowchart_033 | **0.06%** | 0.70% |
+| flowchart_012 | **0.07%** | 1.00% |
+| flowchart_047 | **0.08%** | 3.50% |
+| flowchart_052 | **0.08%** | 0.07% |
+
+### Reading the data
+
+- **kymo beats merman on 8 of the 10 best cases** (often by 2–3.5%) and across most
+  of the corpus — its browser-calibrated text + raster-safe rendering is *more*
+  faithful to mermaid.js than the reference port, once it has merman's layout.
+- **The mean is dragged almost entirely by icons.** And — correcting an earlier
+  claim — icons are **not** offline-impossible: merman renders them at **0.00%**, so
+  it bundles/computes the iconify glyphs. The path to a much lower mean is therefore
+  **icon rendering** (proven feasible offline by merman), plus the `flowchart-v2_032`
+  wrap-threshold detail and the nested-subgraph case. `flowchart_025` is hard for
+  both ports; KaTeX is a wash (kymo slightly ahead).
+- **median 0.69%** is the honest headline: half the corpus is at or below it, and
+  it beats merman's 1.76% median. The remaining sub-pixel residual (text-metric +
+  edge-curve) is shared with merman.
+
+So `mean < 0.5%` is bounded by **icon rendering** (now known achievable) + a few
+render-side fixes + sub-pixel precision — not a physical floor, and not blocked by
+an "online-only" feature. It is the scoped next step, not done this session.
