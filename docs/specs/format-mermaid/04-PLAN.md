@@ -1,7 +1,7 @@
 ---
 title: Mermaid Format — Plan (umbrella)
 document_id: PLAN-MERMAID-001
-version: "0.4"
+version: "0.5"
 issue_date: 2026-06-07
 status: Draft
 classification: Internal
@@ -94,6 +94,38 @@ Add modules under `modules/<type>/`, each with its own 4-file set:
 Each new type is a dispatch arm in `mermaid::mod` plus a `mermaid/<type>.rs`
 producing the same resolved `Diagram`.
 
+## North star — own the full render stack (long horizon)
+
+Beyond owning every Mermaid grammar (Phase 3+), the long-term destination of the
+`.mmd → SVG → PNG/PDF` journey is to **own the whole typeset → render → rasterize
+stack** with **zero external rendering dependencies**, gated by a benchmark oracle.
+These pieces are **engine-wide** — the SVG renderer and the rasterizer are owned by
+`FEAT-FLOWCHART-001` / the crate (see DESIGN-MERMAID-001 §7), not the Mermaid
+front-end — and will likely **graduate into their own spec(s)** when work starts;
+they are recorded here as the journey's destination.
+
+- **Benchmark / oracle (the gate — build first).** Promote `benches/mermaid-format/`
+  into a CI regression gate: `accuracy-mermaidjs` (raster-safe **label recall** — the
+  correct metric) as the headline, pixel-diff secondary. Target =
+  **pixel-perfect vs kymo's own canonical spec + deterministic / pixel-stable
+  cross-platform + visually faithful** to mermaid — *not* byte-identical to mermaid.js,
+  whose `<foreignObject>` output is browser-/font-dependent (a moving target).
+- **Focused rasterizer (replace `resvg` for kymo output).** kymo consumes only the
+  SVG-subset it emits, so a rasterizer for that subset is far smaller than general
+  resvg/usvg **and** makes pixel-perfect attainable (own producer *and* consumer). It
+  drops `<foreignObject>`, exotic filters, ambiguous font-fallback; smaller wasm;
+  controlled animation frames.
+- **PDF engine (replace `svg2pdf`).** Same subset → vector PDF; today `svg2pdf` ships a
+  *second* usvg/resvg 0.45 (DESIGN-MERMAID-001 §7) — owning it removes that duplicate engine.
+- **LaTeX math renderer.** Replace the lightweight `$…$`→Unicode pass with a real
+  box-model typesetter (KaTeX-class) emitting `<text>`/paths — needed for raster-safe,
+  pixel-stable math labels.
+- **Markdown renderer.** Inline layout for rich-text labels (mermaid markdown strings).
+
+**Sequencing (risk-ascending):** oracle/benchmark → focused rasterizer → PDF → LaTeX →
+Markdown; the external `dagre` crate's layout fidelity refined in parallel. Each piece
+stands alone with its own gate — **shippable incrementally, never big-bang.**
+
 ## Risks / open items
 
 - **Layout has no external oracle.** Goldens are Rust-authored until a Python
@@ -103,6 +135,10 @@ producing the same resolved `Diagram`.
   if real diagrams look loose.
 - **Conformance suite.** Phase 1 keeps goldens inside the crate; folding Rust into
   the repo-level `conformance/` happens once Python/JS consume the Rust output.
+- **Render-stack rewrites are multi-quarter.** resvg / svg2pdf / KaTeX are mature; the
+  north-star bet only pays off by scoping to kymo's **own SVG subset** (not the full
+  SVG/PDF spec) and gating every step against the benchmark oracle. "Pixel-perfect vs
+  mermaid.js" is asymptotic (browser-dependent) — track against kymo's canonical spec.
 
 ## Doc history
 
@@ -119,3 +155,9 @@ producing the same resolved `Diagram`.
 - 2026-06-13 — folder renamed `mermaid-format/` → `format-mermaid/` (v0.4): adopt the
   `format-<lang>` prefix scheme for format-family spec folders (sibling `format-bpmn/`).
   Titles ("Mermaid Format") and all `*-MERMAID-*-001` document_ids unchanged.
+- 2026-06-15 — added **North star — own the full render stack** (v0.5): the long-horizon
+  destination of the `.mmd → SVG → PNG/PDF` journey — own the typeset→render→rasterize
+  stack (benchmark oracle → focused rasterizer replacing resvg → PDF engine → LaTeX →
+  Markdown) with zero external rendering deps, pixel-perfect against kymo's own canonical
+  spec. Engine-wide pieces (renderer/rasterizer owned by `FEAT-FLOWCHART-001`) to graduate
+  into their own spec(s) when work starts. All `*-MERMAID-*-001` document_ids unchanged.
