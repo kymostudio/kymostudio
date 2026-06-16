@@ -23,7 +23,9 @@ test("TC-HM-03 open file → draft (kind auto-detected)", async ({ page }) => {
     name: "diagram.mmd", mimeType: "text/plain", buffer: Buffer.from("graph TD\n  A-->B"),
   });
   await expect(page.getByTestId("welcome")).toHaveCount(0); // Welcome dismissed
-  await expect(page.locator("#kind-select")).toHaveValue("mermaid");
+  // As-built: the guest editor surfaces no kind selector — the opened .mmd lands
+  // in the draft editor (kind auto-detected to mermaid, then rendered).
+  await expect(page.locator(".cm-content")).toContainText("graph TD");
 });
 
 test("TC-HM-05 template dismisses welcome; a fresh visit restores it", async ({ page }) => {
@@ -32,7 +34,7 @@ test("TC-HM-05 template dismisses welcome; a fresh visit restores it", async ({ 
   // Picking a Templates quick item leaves the Welcome for the editor.
   await page.getByTestId("wel-template").first().click();
   await expect(page.getByTestId("welcome")).toHaveCount(0);
-  await expect(page.locator("#kind-select")).toBeVisible(); // editor pane is up
+  await expect(page.locator(".cm-editor")).toBeVisible(); // editor pane is up
 
   // As-built: pickTemplate uses history.replaceState (no new entry), so in-tab
   // Back does NOT restore the Welcome — a fresh `/` visit (state reset) does.

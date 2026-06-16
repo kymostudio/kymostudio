@@ -29,9 +29,27 @@ function ensureGsiInit(g: any) {
   });
 }
 
+// Dev-only sign-in (localhost): the editor gates its signed-in UI on `claims`,
+// which is just the decoded id_token payload — no signature is checked client
+// side. So on localhost we can mint a FAKE unsigned JWT to preview the signed-in
+// shell (Explorer, account menu, Save flow) without Google OAuth, which can't run
+// on 127.0.0.1 anyway (no authorized JS origin). NB: it's cosmetic — backend
+// APIs (mcp.kymo.studio) verify the token for real, so list/save/etc. still 401.
+export function isLocalhost(): boolean {
+  const h = location.hostname;
+  return h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h.endsWith(".local");
+}
+function devIdToken(): string {
+  const b64 = (o: any) => btoa(JSON.stringify(o)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  // exp at +12h: long enough for a dev session, short enough that the AuthProvider
+  // expiry watchdog's setTimeout(exp-now) stays under the ~24.8-day overflow limit.
+  const payload = { email: "dev@localhost", name: "Local Dev", sub: "dev-local", exp: Math.floor(Date.now() / 1000) + 12 * 3600 };
+  return b64({ alg: "none", typ: "JWT" }) + "." + b64(payload) + ".dev";
+}
+
 type Claims = { email: string; name?: string; sub: string };
-type AuthVal = { idToken: string | null; claims: Claims | null; signOut: () => void; expireSession: () => void };
-const Ctx = createContext<AuthVal>({ idToken: null, claims: null, signOut: () => {}, expireSession: () => {} });
+type AuthVal = { idToken: string | null; claims: Claims | null; signOut: () => void; expireSession: () => void; devSignIn: () => void };
+const Ctx = createContext<AuthVal>({ idToken: null, claims: null, signOut: () => {}, expireSession: () => {}, devSignIn: () => {} });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [idToken, setIdToken] = useState<string | null>(() => {
@@ -65,6 +83,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (window as any).google?.accounts?.id?.disableAutoSelect();
     setIdToken(null); // signing out means OUT — don't immediately re-prompt
   }, []);
+  // Localhost-only fake sign-in (see devIdToken). No-op off localhost.
+  const devSignIn = useCallback(() => {
+    if (!isLocalhost()) return;
+    const t = devIdToken();
+    try { localStorage.setItem("kymo_idtoken", t); } catch {}
+    setIdToken(t);
+  }, []);
   // Session lapsed (token expired, or the server 401'd it): drop the stale
   // claims — unlike signOut, keep auto_select so GIS can renew silently.
   const expireSession = useCallback(() => {
@@ -84,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [idToken, expireSession]);
   const claims = useMemo<Claims | null>(() =>
     idToken ? { email: jwtField(idToken, "email"), name: jwtField(idToken, "name"), sub: jwtField(idToken, "sub") } : null, [idToken]);
-  return <Ctx.Provider value={{ idToken, claims, signOut, expireSession }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ idToken, claims, signOut, expireSession, devSignIn }}>{children}</Ctx.Provider>;
 }
 export const useAuth = () => useContext(Ctx);
 

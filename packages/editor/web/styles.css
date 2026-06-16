@@ -488,14 +488,15 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 
 /* diagram kind selector (kroki-style) */
 .pane-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg); }
-/* a quiet caption so the dropdown reads as a format switcher, not a mystery control */
-.kind-label { font-size: 11.5px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.05em; }
-.kind-select { border: 1px solid var(--border-strong); border-radius: 8px; padding: 5px 9px; font-size: 13px; font-weight: 600; color: var(--ink); background: var(--bg); cursor: pointer; }
-.kind-select:hover { border-color: var(--dim); }
-/* guest-only New: matches the kind-select chrome, accent-tinted as an action */
-.newdiag-btn { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border-strong); border-radius: 8px; padding: 5px 11px; font-size: 13px; font-weight: 600; color: var(--accent); background: var(--bg); cursor: pointer; margin-right: 2px; }
-.newdiag-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
-.newdiag-btn svg { flex: none; }
+/* VS Code-style editor tab: type icon + filename + close (✕). */
+.file-tab { display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 360px; padding: 5px 6px 5px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-soft); font-size: 13px; font-weight: 600; color: var(--ink); }
+.file-tab-icon { flex: none; color: var(--accent); }
+.file-tab-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-tab-close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; padding: 0; border: none; border-radius: 5px; background: transparent; color: var(--dim); cursor: pointer; }
+.file-tab-close:hover { background: var(--border); color: var(--ink); }
+/* localhost-only fake sign-in affordance */
+.dev-login { font-size: 12px; font-weight: 600; color: var(--dim); background: var(--bg); border: 1px dashed var(--border-strong); border-radius: 8px; padding: 6px 11px; cursor: pointer; }
+.dev-login:hover { color: var(--ink); border-color: var(--dim); }
 /* transient confirmation that a paste switched the kind */
 .detect-chip { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2.5px 9px; white-space: nowrap; }
 
