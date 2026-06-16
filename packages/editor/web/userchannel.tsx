@@ -4,6 +4,7 @@ import { useAuth } from "./auth";
 import { useWorkspace } from "./workspace";
 import { USER_WS } from "./const";
 import { LOCAL } from "./localdb";
+import { requestOpen } from "./tabs";
 
 // Connects every signed-in tab to the user's control channel (one DO per email)
 // so the MCP `open_diagram` / `open_project` tools can steer THIS tab. Carries no
@@ -27,8 +28,10 @@ export function UserChannel() {
     catch { return; }
     ws.addEventListener("message", (e) => {
       let data: any; try { data = JSON.parse(e.data); } catch { return; }
-      if (data && data.type === "open" && data.id) navRef.current("/?d=" + encodeURIComponent(String(data.id)));
-      else if (data && data.type === "open-project" && data.id) setProjectRef.current(String(data.id));
+      // open a diagram as a tab in the live editor; if no editor is mounted
+      // (e.g. on /projects), fall back to a ?d= deep-link that the editor adopts.
+      if (data && data.type === "open" && data.id) { if (!requestOpen(String(data.id))) navRef.current("/?d=" + encodeURIComponent(String(data.id))); }
+      else if (data && data.type === "open-project" && data.id) { setProjectRef.current(String(data.id)); navRef.current("/?p=" + encodeURIComponent(String(data.id))); }
     });
     ws.addEventListener("error", () => { try { ws.close(); } catch {} });
     return () => { try { ws.close(); } catch {} };

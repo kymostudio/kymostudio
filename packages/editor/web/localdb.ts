@@ -19,7 +19,8 @@ export const LOCAL = isLocalhost() && !(typeof window !== "undefined" && (window
 type LDiagram = { id: string; title: string; kind: string; source: string; ws: string; project: string; updatedAt: number; deleted?: number };
 type LFolder = { id: string; name: string; parentId: string; project: string; createdAt: number; deleted?: number };
 type LProject = { id: string; name: string; createdAt: number; deleted?: number };
-type Store = { projects: LProject[]; folders: LFolder[]; diagrams: LDiagram[] };
+type LTabs = { tabs: string[]; active: string | null };
+type Store = { projects: LProject[]; folders: LFolder[]; diagrams: LDiagram[]; tabs?: Record<string, LTabs> };
 
 const KEY = "kymo_localdb";
 let SEQ = 0; // monotonic tiebreaker so same-ms writes still order deterministically
@@ -77,6 +78,18 @@ function handle(method: string, u: URL, body: any): Response | null {
 
   // thumbnails aren't generated locally — the Explorer falls back to an icon
   if (path === "/api/diagrams/thumb") return new Response("no thumb", { status: 404 });
+
+  // per-project open-tab state (VS Code window state)
+  if (path === "/api/tabs") {
+    const proj = resolveProject(s, q("project")).id;
+    if (method === "GET") { const t = s.tabs?.[proj]; return json(t ? { tabs: t.tabs, active: t.active } : { tabs: [], active: null }); }
+    if (method === "PUT") {
+      const tabs = Array.isArray(body?.tabs) ? body.tabs.filter((x: any) => typeof x === "string").slice(0, 40) : [];
+      const active = typeof body?.active === "string" ? body.active : null;
+      const pj = resolveProject(s, body?.project ?? q("project")).id;
+      s.tabs = { ...(s.tabs || {}), [pj]: { tabs, active } }; save(s); return json({ ok: true });
+    }
+  }
 
   if (path === "/api/projects") {
     if (method === "GET") { ensureDefaultProject(s); return json({ projects: load().projects.filter((p) => !p.deleted).map((p) => ({ id: p.id, name: p.name, createdAt: p.createdAt })) }); }
@@ -143,7 +156,7 @@ function handle(method: string, u: URL, body: any): Response | null {
   return null;
 }
 
-const DATA_PATH = /^\/api\/(diagrams|workspaces|projects|trash)(\/thumb)?$/;
+const DATA_PATH = /^\/api\/(diagrams|workspaces|projects|trash|tabs)(\/thumb)?$/;
 
 export function installLocalApi() {
   if (!LOCAL) return;

@@ -39,7 +39,7 @@ export default function ProjectsPage() {
     }))) return;
     await deleteProject(id);
   }
-  function open(id: string) { setCurrentProject(id); navigate("/"); }
+  function open(id: string) { setCurrentProject(id); navigate("/?p=" + encodeURIComponent(id)); }
 
   return (
     <main className="scroll" style={{ height: "100%" }}>

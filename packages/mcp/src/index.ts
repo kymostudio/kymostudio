@@ -849,10 +849,10 @@ export default {
       return env.USER_CHANNEL.get(env.USER_CHANNEL.idFromName(email!)).fetch(request);
     }
     // Browser-callable APIs for the signed-in user (Google id_token).
-    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/projects" || url.pathname === "/api/trash") {
+    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/projects" || url.pathname === "/api/trash" || url.pathname === "/api/tabs") {
       const cors: Record<string, string> = {
         "access-control-allow-origin": "*",
-        "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+        "access-control-allow-methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
         "access-control-allow-headers": "authorization, content-type",
       };
       if (request.method === "OPTIONS") return new Response(null, { headers: cors });
@@ -1064,6 +1064,29 @@ export default {
           if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
           return Response.json({ workspaces: await listWorkspaces(env, email, proj) }, { headers: cors });
         }
+      }
+
+      // Per-project open-tab state (VS Code window state) in KV: which diagrams
+      // are open + which is active. Independent of last:/lastproj: (MCP-only).
+      if (url.pathname === "/api/tabs") {
+        if (request.method === "GET") {
+          const proj = await resolveProject(env, email, url.searchParams.get("project"));
+          if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
+          const raw = await env.OAUTH_KV.get(`tabs:${email}:${proj.id}`);
+          let val: { tabs: string[]; active: string | null } = { tabs: [], active: null };
+          if (raw) { try { const j = JSON.parse(raw); if (j && Array.isArray(j.tabs)) val = { tabs: j.tabs.filter((x: any) => typeof x === "string"), active: typeof j.active === "string" ? j.active : null }; } catch {} }
+          return Response.json(val, { headers: cors });
+        }
+        if (request.method === "PUT") {
+          const b = (await request.json().catch(() => ({}))) as { project?: string; tabs?: unknown; active?: unknown };
+          const proj = await resolveProject(env, email, b.project ?? url.searchParams.get("project"));
+          if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
+          const tabs = Array.isArray(b.tabs) ? (b.tabs as any[]).filter((x) => typeof x === "string").slice(0, 40) : [];
+          const active = typeof b.active === "string" ? b.active : null;
+          await env.OAUTH_KV.put(`tabs:${email}:${proj.id}`, JSON.stringify({ tabs, active }));
+          return Response.json({ ok: true }, { headers: cors });
+        }
+        return Response.json({ error: "method not allowed" }, { status: 405, headers: cors });
       }
 
       if (request.method === "DELETE") {
