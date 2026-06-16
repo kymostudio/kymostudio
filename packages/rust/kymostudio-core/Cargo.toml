@@ -48,17 +48,17 @@ wasm-bindgen = { version = "0.2", optional = true }
 # canonical model JSON the cross-language conformance suite compares against.
 roxmltree = { version = "0.20", optional = true }
 serde_json = { version = "1", optional = true }
-dagre = "0.1.1"
-merman-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
-ttf-parser = "0.25"
-merman-render = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
-# kymo-tex — kymo's own KaTeX-compatible LaTeX→SVG renderer (fork of RaTeX). The
-# `katex` module renders `$$…$$` math glyphs through this. embed-fonts keeps the
-# KaTeX TTFs in-binary (no fs → wasm-safe); standalone emits outlined glyphs.
-kymo-types = { path = "../kymo-tex/crates/kymo-types", optional = true }
-kymo-parser = { path = "../kymo-tex/crates/kymo-parser", optional = true }
-kymo-layout = { path = "../kymo-tex/crates/kymo-layout", optional = true }
-kymo-svg = { path = "../kymo-tex/crates/kymo-svg", default-features = false, features = ["standalone", "embed-fonts"], optional = true }
+# Shared diagram substrate: the Flowchart IR, layout (dagre), the raster-safe SVG
+# renderer, and the d2/dot/drawio/kymojson format engines. Re-exported as
+# `kymostudio_core::{model,flowchart,layout,dagre_svg,…}`. `dagre` itself now lives
+# inside this crate. The `bpmn` model fields are gated through to it.
+kymo-graph = { path = "../kymo-graph", version = "0.1.0" }
+# Mermaid front-end (parser + per-grammar renderers + `mermaid_to_*` entry points),
+# re-exported under `kymostudio_core::mermaid` / `::mermaid_to_*`. Default (lean)
+# features: kymo's OWN engine, no merman git dep, no kymo-tex — so the editor wasm
+# stays small. render-api loads kymo-mermaid's own wasm (full/katex-layout) directly
+# for `mermaidRenderSvg`; the high-fidelity `katex-layout` path is opt-in there.
+kymo-mermaid = { path = "../kymo-mermaid", version = "0.1.0" }
 
 # `.kymo` DSL front-end dep — pulled in only by the `kymo` feature (native
 # mobile/CLI). The wasm (JS) and Python wheels DON'T enable `kymo`: each has its
@@ -85,10 +85,6 @@ roxmltree = "0.20"
 # and ship vector PDF output.
 default = ["system-fonts", "pdf"]
 
-# Opt-in: route flowchart layout through merman (the mermaid Rust port) sized by
-# kymo's browser-calibrated metrics, rendered raster-safe by kymo. Matches
-# mermaid.js far more tightly (median ~0.7% vs ~2.6%) at the cost of ~1.9 MB wasm.
-merman-layout = ["dep:merman-core", "dep:merman-render", "dep:serde_json", "dep:kymo-types", "dep:kymo-parser", "dep:kymo-layout", "dep:kymo-svg"]
 system-fonts = ["resvg/system-fonts", "resvg/memmap-fonts"]
 
 # Vector SVG→PDF via svg2pdf (native only — see the dep note above).
@@ -113,7 +109,7 @@ wasm = ["dep:wasm-bindgen", "bpmn"]
 # BPMN import/export/layout/shapes — the single-source-of-truth stack. On for
 # native builds + the Python wheel; validated by tests/bpmn_conformance.rs against
 # the shared conformance/golden/ JSON. Pure Rust (no resvg dependency).
-bpmn = ["dep:roxmltree", "dep:serde_json"]
+bpmn = ["dep:roxmltree", "dep:serde_json", "kymo-graph/bpmn"]
 
 # `.kymo` DSL front-end (parser + layout + alignment + rich SVG renderer) — the
 # Rust port of packages/python/src/kymo. Native/mobile only; NOT enabled for the

@@ -6,8 +6,8 @@
 
 use super::parser::{parse_statement, Item};
 use super::MermaidError;
-use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart};
-use crate::model::Shape;
+use kymo_graph::flowchart::{Direction, FlowEdge, FlowNode, Flowchart};
+use kymo_graph::model::Shape;
 
 /// Parse block-diagram source into a [`Flowchart`].
 pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {

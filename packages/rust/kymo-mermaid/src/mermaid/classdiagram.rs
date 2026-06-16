@@ -8,7 +8,7 @@
 
 use super::MermaidError;
 use crate::classdiagram::{ClassBox, ClassDiagram, ClassNote, Crow, RelKind, Relation};
-use crate::flowchart::Direction;
+use kymo_graph::flowchart::Direction;
 
 /// Parse class-diagram source into a [`ClassDiagram`].
 pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {

@@ -20,9 +20,9 @@ mod requirement;
 mod sequence;
 mod state;
 
-use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
-use crate::model::Shape;
-use crate::style::{FlowStyle, NodeStyle};
+use kymo_graph::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
+use kymo_graph::model::Shape;
+use kymo_graph::style::{FlowStyle, NodeStyle};
 use parser::{parse_statement, Item};
 use std::collections::HashMap;
 

@@ -1,12 +1,12 @@
 //! Render a [`ClassDiagram`] to SVG. Classes become multi-compartment boxes
 //! (name + attributes + methods), positioned by reusing
-//! [`crate::layout::layout_flowchart`]; relationships draw the UML arrowhead for
+//! [`kymo_graph::layout::layout_flowchart`]; relationships draw the UML arrowhead for
 //! their kind. Everything is real `<text>`, so PNG/PDF keep the labels.
 
 use super::{ClassBox, ClassDiagram, Crow, RelKind, Relation};
-use crate::flowchart::{FlowEdge, FlowNode, Flowchart, Subgraph};
-use crate::layout;
-use crate::model::{Component, Shape};
+use kymo_graph::flowchart::{FlowEdge, FlowNode, Flowchart, Subgraph};
+use kymo_graph::layout;
+use kymo_graph::model::{Component, Shape};
 use std::collections::HashMap;
 
 const LINE_H: i32 = 18;

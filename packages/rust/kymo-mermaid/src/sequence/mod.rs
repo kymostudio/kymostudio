@@ -1,4 +1,4 @@
-//! Sequence-diagram IR — the sibling of [`crate::flowchart`] for the Mermaid
+//! Sequence-diagram IR — the sibling of [`kymo_graph::flowchart`] for the Mermaid
 //! `sequenceDiagram` family.
 //!
 //! Positionless and ordered: a list of participants (declaration / first-

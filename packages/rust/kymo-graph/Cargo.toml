@@ -1,0 +1,19 @@
+[package]
+name = "kymo-graph"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Shared diagram substrate for kymostudio: the Flowchart IR, layout, the raster-safe SVG renderer, and the generic format engines (d2/dot/drawio/kymojson). The base both kymostudio-core and kymo-mermaid build on — no mermaid, no resvg, no BPMN importer."
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+dagre = "0.1.1"
+serde_json = { version = "1", optional = true }
+
+[features]
+# Mirror core's `bpmn` flag so the shared model can carry BPMN-only shapes/fields
+# (the kymojson serialiser uses serde_json there). kymostudio-core enables this
+# transitively from its own `bpmn` feature.
+bpmn = ["dep:serde_json"]

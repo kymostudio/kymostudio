@@ -47,7 +47,9 @@ const CHAR_W_MERMAID: [f64; 95] = [
 ];
 
 /// Width of a single-line label in mermaid's 16px font.
-pub(crate) fn text_w_mermaid(s: &str) -> f64 {
+/// `pub` so `kymo-mermaid`'s `katex-layout` measurer can size nodes with kymo's
+/// browser-calibrated metrics (see kymo-mermaid/src/merman_layout.rs).
+pub fn text_w_mermaid(s: &str) -> f64 {
     s.chars()
         .map(|c| {
             let i = c as u32;

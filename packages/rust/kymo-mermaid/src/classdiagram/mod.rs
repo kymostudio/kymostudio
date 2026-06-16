@@ -1,9 +1,9 @@
 //! Class-diagram IR. A `classDiagram` parses to a set of class boxes (name,
 //! stereotype, attribute and method compartments) plus typed relationships.
 //! Rendered by [`svg`] as real `<text>` (raster-safe), positioned by reusing
-//! [`crate::layout::layout_flowchart`].
+//! [`kymo_graph::layout::layout_flowchart`].
 
-use crate::flowchart::Direction;
+use kymo_graph::flowchart::Direction;
 
 pub mod svg;
 

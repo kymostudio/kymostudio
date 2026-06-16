@@ -7,7 +7,7 @@
 
 use super::MermaidError;
 use crate::classdiagram::{ClassBox, ClassDiagram, Crow, RelKind, Relation};
-use crate::flowchart::Direction;
+use kymo_graph::flowchart::Direction;
 
 /// Parse er-diagram source into a [`ClassDiagram`].
 pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {

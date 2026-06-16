@@ -4,8 +4,8 @@
 //! `<text>`.
 
 use super::MermaidError;
-use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart};
-use crate::model::Shape;
+use kymo_graph::flowchart::{Direction, FlowEdge, FlowNode, Flowchart};
+use kymo_graph::model::Shape;
 
 /// Parse kanban source into a [`Flowchart`].
 pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {

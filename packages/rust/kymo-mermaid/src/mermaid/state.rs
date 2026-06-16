@@ -1,6 +1,6 @@
 //! Mermaid state diagrams (`stateDiagram` / `stateDiagram-v2`) → the flowchart
-//! IR, so they reuse [`crate::layout::layout_flowchart`] and the text-based
-//! [`crate::flowchart_svg`] renderer. (merman renders state labels in a
+//! IR, so they reuse [`kymo_graph::layout::layout_flowchart`] and the text-based
+//! [`kymo_graph::flowchart_svg`] renderer. (merman renders state labels in a
 //! `<foreignObject>`, which the rasterizer drops; this keeps PNG/PDF text.)
 //!
 //! Supported: `A --> B : label` transitions, `[*]` initial/final pseudo-states
@@ -10,8 +10,8 @@
 //! accepted and ignored.
 
 use super::MermaidError;
-use crate::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
-use crate::model::Shape;
+use kymo_graph::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
+use kymo_graph::model::Shape;
 
 /// Parse already-split statements (header at index 0) into a [`Flowchart`].
 pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError> {
@@ -250,7 +250,7 @@ fn register_member(fc: &mut Flowchart, sub_stack: &[usize], id: &str) {
 #[cfg(test)]
 mod tests {
     use super::super::parse_state;
-    use crate::flowchart::Direction;
+    use kymo_graph::flowchart::Direction;
 
     #[test]
     fn transitions_and_pseudo_states() {

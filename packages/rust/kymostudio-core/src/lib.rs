@@ -9,28 +9,29 @@
 
 use resvg::{tiny_skia, usvg};
 
-// The shared diagram engine — pure Rust, no SVG deps. Mermaid import parses
-// into [`model::Diagram`], lays it out, and serializes to the `.kymo.json`
-// interchange format the Python/JS front-ends consume.
-pub mod classdiagram;
-pub mod d2;
-pub mod dagre_svg;
-pub mod dot;
-pub mod drawio;
-pub mod flowchart;
-pub mod flowchart_svg;
-#[cfg(feature = "merman-layout")]
-mod katex;
-pub mod kymojson;
-pub mod layout;
-pub mod layout_dagre;
-pub mod math;
-pub mod mermaid;
-#[cfg(feature = "merman-layout")]
-pub mod merman_layout;
-pub mod model;
-pub mod sequence;
-pub mod style;
+// The shared diagram substrate (IR + layout + raster-safe renderer + the generic
+// d2/dot/drawio/kymojson format engines) lives in the `kymo-graph` crate. Re-export
+// it under the same module paths so every `crate::model` / `crate::flowchart` / …
+// inside this crate (and external `kymostudio_core::model::…` users) keep resolving.
+pub use kymo_graph::{
+    d2, dagre_svg, dot, drawio, flowchart, flowchart_svg, kymojson, layout, layout_dagre, math,
+    model, style,
+};
+
+// Mermaid front-end (parser + per-grammar renderers + the `mermaid_to_*` convert
+// / render entry points) lives in the `kymo-mermaid` crate. Re-export its modules
+// and every `pub fn` under the same paths so `crate::mermaid::…` and
+// `crate::mermaid_to_svg(…)` keep resolving — the wasm + Python surfaces (which
+// call these) are unchanged. kymo-mermaid's default build is lean (kymo's own
+// engine, depends only on kymo-graph; no merman).
+pub use kymo_mermaid::{classdiagram, mermaid, sequence};
+pub use kymo_mermaid::{
+    mermaid_to_d2, mermaid_to_drawio, mermaid_to_dot, mermaid_to_gaphor, mermaid_to_kymojson,
+    mermaid_to_mdj, mermaid_to_mermaid, mermaid_to_svg, mermaid_to_svg_dagre, mermaid_to_svg_styled,
+    mermaid_to_xmi, mermaid_block_to_svg, mermaid_class_to_svg, mermaid_er_to_svg,
+    mermaid_kanban_to_svg, mermaid_mindmap_to_svg, mermaid_requirement_to_svg,
+    mermaid_to_sequence_svg, mermaid_state_to_svg, render_flowchart_math,
+};
 
 // The `.kymo` DSL front-end (parser + layout + alignment + rich SVG renderer) —
 // the Rust port of packages/python/src/kymo. Native/mobile only; the wasm and
@@ -203,261 +204,6 @@ pub fn svg_to_pdf(svg: &[u8]) -> Result<Vec<u8>, RenderError> {
         svg2pdf::PageOptions::default(),
     )
     .map_err(|e| RenderError::Pdf(e.to_string()))
-}
-
-/// Parse Mermaid source (flowchart) into the `.kymo.json` interchange string.
-///
-/// The shared engine entry point: parse → layered layout → serialize. Python
-/// (PyO3) and JS (wasm) call this and feed the result to their `from_kymojson`
-/// loaders. Errors describe the unsupported diagram type or the syntax problem.
-pub fn mermaid_to_kymojson(src: &str) -> Result<String, mermaid::MermaidError> {
-    let fc = mermaid::parse(src)?;
-    let diagram = layout::layout_flowchart(&fc);
-    Ok(kymojson::export(&diagram))
-}
-
-/// Convert Mermaid flowchart source to another text DSL via the flowchart IR.
-///
-/// `mmd → {mermaid, d2, dot}` is a parse-then-emit with no layout in between —
-/// the target lays the graph out itself. `to_mermaid` round-trips/normalizes the
-/// source. See [`flowchart::emit`].
-pub fn mermaid_to_d2(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(flowchart::emit::to_d2(&mermaid::parse(src)?))
-}
-
-/// Convert Mermaid flowchart source to Graphviz DOT (via the flowchart IR).
-pub fn mermaid_to_dot(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(flowchart::emit::to_dot(&mermaid::parse(src)?))
-}
-
-/// Round-trip / normalize Mermaid flowchart source through the IR.
-pub fn mermaid_to_mermaid(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(flowchart::emit::to_mermaid(&mermaid::parse(src)?))
-}
-
-/// Convert a Mermaid `sequenceDiagram` to OMG XMI 2.5.1 (a UML 2.5.1
-/// `Interaction` — lifelines, messages, activations, combined fragments, notes).
-///
-/// Parse-then-emit through the [`sequence`] IR; no layout (XMI carries no
-/// geometry). Flowchart sources are rejected with [`mermaid::MermaidError`].
-pub fn mermaid_to_xmi(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(sequence::emit::to_xmi(&mermaid::parse_sequence(src)?))
-}
-
-/// Render a Mermaid `sequenceDiagram` to SVG (kymo own renderer: real
-/// `<text>`, so PNG/PDF keep their labels). Notes/activations not yet drawn.
-pub fn mermaid_to_sequence_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    let mut seq = mermaid::parse_sequence(src)?;
-    for item in &mut seq.items {
-        render_sequence_item_math(item);
-    }
-    Ok(sequence::svg::render(&seq))
-}
-
-/// Render `$…$` TeX math in a sequence item's text (recursing into fragments).
-fn render_sequence_item_math(item: &mut sequence::Item) {
-    match item {
-        sequence::Item::Message(m) => m.text = clean_label(&m.text),
-        sequence::Item::Note(n) => n.text = clean_label(&n.text),
-        sequence::Item::Fragment(f) => {
-            for op in &mut f.operands {
-                op.guard = clean_label(&op.guard);
-                for it in &mut op.items {
-                    render_sequence_item_math(it);
-                }
-            }
-        }
-        sequence::Item::Activate(_)
-        | sequence::Item::Deactivate(_)
-        | sequence::Item::Autonumber(_) => {}
-    }
-}
-
-/// Convert a Mermaid `sequenceDiagram` to a StarUML native `.mdj` (metadata-
-/// JSON) carrying a laid-out sequence diagram.
-///
-/// Unlike [`mermaid_to_xmi`] (model only), the `.mdj` includes the diagram
-/// *views* with geometry, so opening it in StarUML (File → Open) draws the
-/// diagram. See [`sequence::mdj`].
-pub fn mermaid_to_mdj(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(sequence::mdj::to_mdj(&mermaid::parse_sequence(src)?))
-}
-
-/// Convert a Mermaid `sequenceDiagram` to a Gaphor native `.gaphor` file
-/// (XML v3.0) carrying a laid-out sequence diagram.
-///
-/// Like [`mermaid_to_mdj`] but for Gaphor. Note Gaphor cannot represent
-/// combined fragments (alt/loop/opt/par) — they are flattened to their inner
-/// messages. See [`sequence::gaphor`].
-pub fn mermaid_to_gaphor(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(sequence::gaphor::to_gaphor(&mermaid::parse_sequence(src)?))
-}
-
-/// Convert Mermaid flowchart source → draw.io (mxGraph XML).
-///
-/// Unlike the D2/DOT/Mermaid spokes (which emit the positionless IR), draw.io
-/// needs geometry, so this lays the graph out first: parse → `layout_flowchart`
-/// → the [`drawio`] encoder. The encoder itself is source-agnostic — any
-/// resolved [`model::Diagram`] can be encoded.
-pub fn mermaid_to_drawio(src: &str) -> Result<String, mermaid::MermaidError> {
-    let fc = mermaid::parse(src)?;
-    Ok(drawio::to_drawio(&layout::layout_flowchart(&fc)))
-}
-
-/// Render Mermaid flowchart source → SVG (parse → layout → the pure-Rust
-/// [`flowchart_svg`] renderer). The Rust core's own flowchart SVG (its own look,
-/// not byte-identical to the Python/JS renderers).
-pub fn mermaid_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    mermaid_to_svg_styled(src, None)
-}
-
-/// Render a Mermaid flowchart with an explicit [`style::FlowStyle`], falling back
-/// to a style hinted in the source, then to kymo (API param > source > kymo).
-pub fn mermaid_to_svg_styled(
-    src: &str,
-    style: Option<style::FlowStyle>,
-) -> Result<String, mermaid::MermaidError> {
-    let (mut fc, src_style) = mermaid::parse_with_config(src)?;
-    let resolved = style.or(src_style).unwrap_or_default();
-    render_flowchart_math(&mut fc);
-    let (styles, default_style) = mermaid::extract_node_styles(src);
-    let gfill = default_style.as_ref().and_then(|d| d.fill.as_deref());
-    Ok(flowchart_svg::render_styled_with(
-        &layout::layout_flowchart_styled(&fc, resolved),
-        resolved,
-        &styles,
-        gfill,
-    ))
-}
-
-/// PROTOTYPE: render a Mermaid flowchart using **dagre** layout (mermaid-faithful
-/// positions) + the mermaid render style. kymo's own renderer, raster-safe.
-pub fn mermaid_to_svg_dagre(src: &str) -> Result<String, mermaid::MermaidError> {
-    let (mut fc, _) = mermaid::parse_with_config(src)?;
-    render_flowchart_math(&mut fc);
-    let style = style::FlowStyle::Mermaid;
-    let (styles, default_style) = mermaid::extract_node_styles(src);
-    // With `merman-layout`, positions come from merman (mermaid-exact) sized by
-    // kymo's browser-calibrated metrics; default uses kymo's own dagre adapter.
-    #[cfg(feature = "merman-layout")]
-    let geom = merman_layout::geom_from_merman(src, &fc)
-        .unwrap_or_else(|| layout_dagre::dagre_geom(&fc, style));
-    #[cfg(not(feature = "merman-layout"))]
-    let geom = layout_dagre::dagre_geom(&fc, style);
-    Ok(dagre_svg::render(
-        &geom,
-        style,
-        &styles,
-        default_style.as_ref(),
-    ))
-}
-
-/// Normalise a Mermaid label for rendering: `$…$` TeX math is rendered to
-/// Unicode, then `<br>` hard breaks become `\n` (the renderer splits into tspans).
-fn clean_label(s: &str) -> String {
-    // Render `$…$` math FIRST (so TeX commands like \\text / \\nabla are mapped to
-    // Unicode), then collapse `<br>` and literal `\\n` / `\\t` breaks — otherwise
-    // the break-stripper would eat the `\\t` in `\\text`, the `\\n` in `\\nabla`, etc.
-    // Finally decode mermaid `#…;` char entities (`#quot;` -> `"`, `#35;` -> `#`).
-    decode_mermaid_entities(&math::strip_br(&math::render(s)))
-}
-
-/// Decode mermaid's `#name;` / `#NNN;` label entities to their characters.
-/// Mermaid uses `#` (not `&`) so the source survives its own parser: `#quot;`,
-/// `#amp;`, `#lt;`, `#gt;`, and numeric `#9829;` / `#35;`.
-fn decode_mermaid_entities(s: &str) -> String {
-    if !s.contains('#') {
-        return s.to_string();
-    }
-    let bytes = s.as_bytes();
-    let mut out = String::with_capacity(s.len());
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i] == b'#' {
-            if let Some(semi) = s[i + 1..].find(';') {
-                let body = &s[i + 1..i + 1 + semi];
-                let decoded = match body {
-                    "quot" => Some('"'),
-                    "amp" => Some('&'),
-                    "lt" => Some('<'),
-                    "gt" => Some('>'),
-                    "nbsp" => Some('\u{00a0}'),
-                    _ => body
-                        .strip_prefix(|c| c == 'x' || c == 'X')
-                        .and_then(|h| u32::from_str_radix(h, 16).ok())
-                        .or_else(|| body.parse::<u32>().ok())
-                        .and_then(char::from_u32),
-                };
-                if let Some(c) = decoded {
-                    out.push(c);
-                    i += 1 + semi + 1;
-                    continue;
-                }
-            }
-        }
-        // not an entity — copy this byte's char
-        let ch = s[i..].chars().next().unwrap();
-        out.push(ch);
-        i += ch.len_utf8();
-    }
-    out
-}
-
-/// Apply [`clean_label`] to every flowchart label (nodes, edges, subgraph titles).
-fn render_flowchart_math(fc: &mut flowchart::Flowchart) {
-    for n in &mut fc.nodes {
-        n.label = clean_label(&n.label);
-    }
-    for e in &mut fc.edges {
-        e.label = clean_label(&e.label);
-    }
-    for g in &mut fc.subgraphs {
-        g.title = clean_label(&g.title);
-    }
-}
-
-/// Render a Mermaid state diagram → SVG via the flowchart layout + renderer.
-pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    let mut fc = mermaid::parse_state(src)?;
-    render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
-}
-
-/// Render a Mermaid `classDiagram` → SVG (kymo own multi-compartment renderer).
-pub fn mermaid_class_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(classdiagram::svg::render(&mermaid::parse_class(src)?))
-}
-
-/// Render a Mermaid `erDiagram` → SVG (reuses the class-box renderer).
-pub fn mermaid_er_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(classdiagram::svg::render(&mermaid::parse_er(src)?))
-}
-
-/// Render a Mermaid `block` / `block-beta` diagram → SVG (reuses the flowchart
-/// layout + renderer; the column grid is laid out as a graph).
-pub fn mermaid_block_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    let mut fc = mermaid::parse_block(src)?;
-    render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
-}
-
-/// Render a Mermaid `mindmap` → SVG (tree via the flowchart renderer).
-pub fn mermaid_mindmap_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    let mut fc = mermaid::parse_mindmap(src)?;
-    render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
-}
-
-/// Render a Mermaid `kanban` board → SVG (columns via the flowchart renderer).
-pub fn mermaid_kanban_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    let mut fc = mermaid::parse_kanban(src)?;
-    render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
-}
-
-/// Render a Mermaid `requirementDiagram` → SVG (reuses the class-box renderer).
-pub fn mermaid_requirement_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    Ok(classdiagram::svg::render(&mermaid::parse_requirement(src)?))
 }
 
 /// Render D2 flowchart source → SVG, fully in Rust: parse D2 → flowchart IR →

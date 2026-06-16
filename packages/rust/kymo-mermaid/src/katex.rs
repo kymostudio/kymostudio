@@ -4,7 +4,7 @@
 //! full KaTeX coverage (fractions, radicals, scripts, matrices, …) drawn with
 //! KaTeX's own font outlines, so the rasterised output tracks mermaid.js's KaTeX.
 //!
-//! Only compiled under the `merman-layout` feature (see lib.rs); the math `<g>`
+//! Only compiled under the `katex-layout` feature (see lib.rs); the math `<g>`
 //! is sized + centred by [`crate::merman_layout`].
 
 use kymo_layout::{layout, to_display_list, LayoutOptions};
