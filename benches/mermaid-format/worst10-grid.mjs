@@ -4,15 +4,19 @@
 //     (mmdc) in real Chromium → PNG. This is the canonical render: foreignObject
 //     HTML labels, classDef fills, multi-line <br/> all come out faithful (an
 //     <img>-loaded SVG breaks on them; that's why we shell out to mmdc).
-//   - kymo — production dagre engine (mermaidToSvgDagre, + kymo-tex).
+//   - kymo — mermaid-faithful dagre layout + raster-safe KaTeX math
+//     (kymo-mermaid `mermaidToSvgDagre`, feature `katex-layout`).
 //   - merman — mermaidRenderSvg (full engine, render-api's fallback).
+// Both kymo + merman now come from the ONE kymo-mermaid pkg, built
+// `wasm,full,katex-layout` (the merman-layout/kymo-tex bridge moved out of
+// kymostudio-core into kymo-mermaid).
 // kymo/merman emit SVG, rasterized INLINE in the same Chromium DOM (DSF 2).
 // Metric = pixel-overlay vs the mermaid.js PNG (pixelmatch n/(W*H), threshold
 // 0.1, padded to white at max dims) — same as pixel-diff.mjs.
 //
 // Writes:
-//   research/assets/2026-06-15-worst10/{kymo,merman,mermaidjs}/<file>.png
-//   research/assets/2026-06-15-worst10/scores.json
+//   research/assets/2026-06-16-worst10/{kymo,merman,mermaidjs}/<file>.png
+//   research/assets/2026-06-16-worst10/scores.json
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync, spawn } from "node:child_process";
 import { createRequire } from "node:module";
@@ -29,15 +33,15 @@ const { PNG } = require("pngjs");
 const CHROME = process.env.CHROME ||
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const FIXDIR = HERE + "/datasets/mermaid-cypress/flowchart/";
-const OUTDIR = HERE + "/research/assets/2026-06-15-worst10/";
+const OUTDIR = HERE + "/research/assets/2026-06-16-worst10/";
 for (const sub of ["kymo", "merman", "mermaidjs"]) mkdirSync(OUTDIR + sub, { recursive: true });
 
-// the production engine (kymo's own dagre flowchart renderer + kymo-tex)
-const core = await import(ROOT + "/packages/rust/kymostudio-core/pkg/kymostudio_core.js");
-core.initSync({ module: readFileSync(ROOT + "/packages/rust/kymostudio-core/pkg/kymostudio_core_bg.wasm") });
-// merman full engine (render-api's fallback path)
+// One pkg, two exports: mermaidToSvgDagre (kymo, katex-layout) + mermaidRenderSvg
+// (merman full engine). Build: wasm-pack build --target nodejs (or web) with
+// `--features wasm,full,katex-layout`.
 const merman = await import(ROOT + "/packages/rust/kymo-mermaid/pkg/kymo_mermaid.js");
 merman.initSync({ module: readFileSync(ROOT + "/packages/rust/kymo-mermaid/pkg/kymo_mermaid_bg.wasm") });
+const core = merman; // kymo column: merman.mermaidToSvgDagre
 
 const FILES = [
   "katex_001", "flowchart-v2_050", "flowchart-v2_043", "katex_002", "flowchart_020",

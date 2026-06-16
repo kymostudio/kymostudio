@@ -15,8 +15,8 @@ raster-safe `<text>` (merman drops them in `<foreignObject>`). 6 extreme/legacy
 fixtures are marked in `datasets/known-divergent.json` and excluded. State is
 lower because its renderer does not draw notes yet.
 
-See `research/2026-06-14-mermaidjs-truth.md` for method and the per-fix
-breakdown.
+See `research/2026-06-13-to-15-flowchart-bench-research.md` (part "Engine accuracy
+vs mermaid.js 11") for method and the per-fix breakdown.
 
 ---
 
