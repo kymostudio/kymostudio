@@ -35,7 +35,7 @@ body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); -w
 .workarea { flex: 1; display: flex; min-height: 0; }
 
 /* ---- header ---- */
-header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg); }
+header { position: relative; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg); }
 /* padding+negative margin = an invisible ~44px touch target around the 24px mark */
 .brand { display: inline-flex; align-items: center; gap: 8px; padding: 10px; margin: -10px; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
 .brand img { width: 24px; height: 24px; display: block; }
@@ -127,9 +127,12 @@ a.exp-item { text-decoration: none; } /* Docs/Diagrams links inside the ⋯ menu
 .hist-btn { width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--dim); border-radius: 8px; cursor: pointer; }
 .hist-btn:hover { background: var(--bg-soft); color: var(--ink); transform: none; box-shadow: none; }
 
-.addrbar { position: relative; flex: 1 1 auto; min-width: 0; max-width: 720px; }
-.addr-crumbs { display: flex; align-items: center; gap: 1px; min-width: 0; height: 34px; padding: 0 4px 0 6px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; }
-.addr-crumbs:hover { background: var(--bg-raise); }
+/* Centered in the header (project name only) — absolute so it sits at the true
+   header centre regardless of the brand/nav widths on either side. */
+.addrbar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5; }
+/* VS Code Command Center: a wide centred bar (project switcher · search). */
+.addr-crumbs { display: flex; align-items: center; gap: 4px; width: clamp(280px, 34vw, 460px); height: 32px; padding: 0 4px 0 7px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: background-color 0.14s ease, border-color 0.14s ease; }
+.addr-crumbs:hover { background: var(--bg-raise); border-color: var(--border-strong); }
 .crumb { display: inline-flex; align-items: center; gap: 5px; max-width: 220px; min-width: 0; padding: 4px 7px; border: 0; background: transparent; color: var(--ink); font-size: 13.5px; font-weight: 550; border-radius: 6px; cursor: pointer; }
 .crumb:hover { background: var(--bg); }
 .crumb svg { flex: none; color: var(--dim); }
@@ -147,7 +150,7 @@ a.exp-item { text-decoration: none; } /* Docs/Diagrams links inside the ⋯ menu
 .addr-jump:hover { background: var(--bg); color: var(--accent); }
 
 /* address bar in search / jump-palette mode */
-.addr-search { position: relative; display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px; background: var(--bg); border: 1px solid var(--accent); border-radius: 9px; box-shadow: 0 0 0 3px var(--accent-soft); }
+.addr-search { position: relative; display: flex; align-items: center; gap: 7px; width: clamp(280px, 34vw, 460px); height: 32px; padding: 0 10px; background: var(--bg); border: 1px solid var(--accent); border-radius: 8px; box-shadow: 0 0 0 3px var(--accent-soft); }
 .addr-search-icon { flex: none; color: var(--dim); }
 .addr-input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 13.5px; }
 .addr-results { position: absolute; left: 0; right: 0; top: calc(100% + 6px); max-height: 60vh; overflow: auto; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px; box-shadow: 0 12px 32px rgba(36, 33, 49, 0.16); z-index: 30; }
@@ -641,6 +644,9 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
    low-traffic actions collapse into the ⋯ menu instead — see .mob-more. */
 @media (max-width: 1000px) {
   header { flex-wrap: wrap; row-gap: 8px; padding: 10px 12px; }
+  /* the centered address bar returns to normal flow once the header wraps, so it
+     doesn't float over the brand / action rows */
+  .addrbar { position: static; transform: none; }
   /* designed rows: 1 = identity (brand · title · avatar), 2 = the action cluster */
   .nav-group { order: 10; flex-basis: 100%; justify-content: flex-end; }
   /* a wrapping flex line packs items at their CONTENT width before any shrink,

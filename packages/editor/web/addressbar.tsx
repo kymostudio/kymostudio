@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
-import { useWorkspace, folderPath } from "./workspace";
+import { useWorkspace } from "./workspace";
 import { DIAGRAMS_API } from "./const";
 import { KindIcon } from "./sidebar";
 import { extFor } from "./kroki";
-import { ChevronRight, ChevronDown, Search, FolderPlus, Check, FolderOpen, Boxes } from "lucide-react";
+import { ChevronDown, Search, FolderPlus, Check, FolderOpen, Boxes } from "lucide-react";
 
 type Hit = { id: string; title: string; kind: string };
 
@@ -18,7 +18,6 @@ export function AddressBar({ titleNode }: { titleNode: React.ReactNode }) {
   const { idToken } = useAuth();
   const {
     projects, currentProject, currentProjectName, setCurrentProject, createProject,
-    folders, currentFolder, setCurrentFolder,
   } = useWorkspace();
 
   const [projOpen, setProjOpen] = useState(false);
@@ -66,7 +65,6 @@ export function AddressBar({ titleNode }: { titleNode: React.ReactNode }) {
   const projHits = q.trim()
     ? projects.filter((p) => p.name.toLowerCase().includes(q.trim().toLowerCase()))
     : [];
-  const crumbs = folderPath(folders, currentFolder);
 
   async function onNewProject() {
     const name = (window.prompt("Project name") || "").trim();
@@ -104,10 +102,15 @@ export function AddressBar({ titleNode }: { titleNode: React.ReactNode }) {
           )}
         </div>
       ) : (
-        <div className="addr-crumbs">
-          {/* project crumb — a switcher dropdown */}
+        // VS Code "Command Center": a wide centred bar — the project switcher on
+        // the left, a search affordance on the right; clicking the bar opens the
+        // jump palette.
+        <div className="addr-crumbs" role="button" tabIndex={0} onClick={openSearch}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openSearch(); } }}
+          title="Search projects + diagrams (⌘K)">
+          {/* project crumb — a switcher dropdown (its own click, not the search) */}
           <div className="addr-proj">
-            <button className="crumb crumb-proj" onClick={() => setProjOpen((o) => !o)} title="Switch project"
+            <button className="crumb crumb-proj" onClick={(e) => { e.stopPropagation(); setProjOpen((o) => !o); }} title="Switch project"
               aria-haspopup="menu" aria-expanded={projOpen}>
               <Boxes size={14} strokeWidth={2} />
               <span className="crumb-text">{currentProjectName}</span>
@@ -134,18 +137,8 @@ export function AddressBar({ titleNode }: { titleNode: React.ReactNode }) {
               </div>
             )}
           </div>
-          {/* folder path crumbs (where new diagrams save) */}
-          {crumbs.map((f) => (
-            <React.Fragment key={f.id}>
-              <ChevronRight size={13} strokeWidth={2.2} className="crumb-sep" />
-              <button className="crumb" onClick={() => setCurrentFolder(f.id)} title={`Folder: ${f.name}`}>
-                <span className="crumb-text">{f.name}</span>
-              </button>
-            </React.Fragment>
-          ))}
-          {/* the open diagram's editable title (rename lives in EditorPage) */}
-          <ChevronRight size={13} strokeWidth={2.2} className="crumb-sep" />
-          <div className="crumb crumb-file">{titleNode}</div>
+          {/* Only the project name is shown here (folder path + diagram title are
+              dropped — the title is editable from the file-tab/preview instead). */}
           {/* affordance to open the jump palette */}
           <button className="addr-jump" onClick={openSearch} title="Search projects + diagrams (⌘K)" aria-label="Search">
             <Search size={14} strokeWidth={2} />
