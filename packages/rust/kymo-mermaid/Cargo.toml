@@ -17,19 +17,39 @@ crate-type = ["cdylib", "rlib"]
 # the editor sanitizes all SVG client-side with DOMPurify anyway.
 # Measured 2026-06-12: 1.49 MB raw / 473 KB brotli vs mermaid.js 760 KB brotli.
 [dependencies]
-merman-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false }
-merman-render = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false }
-# The FULL engine — every grammar through merman's own dispatch. Only the
-# render-api worker builds this (wasm,full); the editor keeps the lean
-# flowchart slice, so its wire cost is unchanged.
+# The shared diagram substrate (Flowchart IR + layout + raster-safe SVG renderer
+# + d2/dot/drawio/kymojson). kymo's OWN mermaid engine (default) builds on this
+# alone — no merman, no git dep — so the lean editor path stays small.
+kymo-graph = { path = "../kymo-graph", version = "0.1.0" }
+
+# merman (the headless Rust port of mermaid.js), pinned by rev. Optional: only the
+# merman-backed paths (`merman`/`full`/`katex-layout`) pull it in.
+merman-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
+merman-render = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
+# The FULL engine — every grammar through merman's own dispatch (render-api worker).
 merman-bindings-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, features = ["core-full", "render"], optional = true }
-serde_json = "1"
+serde_json = { version = "1", optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
+
+# `katex-layout` only: kymo-tex draws `$$…$$` as KaTeX glyph outlines (ttf-parser
+# reads KaTeX's own fonts via kymo-svg). Optional so the lean default never builds them.
+kymo-types = { path = "../kymo-tex/crates/kymo-types", optional = true }
+kymo-parser = { path = "../kymo-tex/crates/kymo-parser", optional = true }
+kymo-layout = { path = "../kymo-tex/crates/kymo-layout", optional = true }
+kymo-svg = { path = "../kymo-tex/crates/kymo-svg", default-features = false, features = ["standalone", "embed-fonts"], optional = true }
 
 [features]
 default = []
 wasm = ["dep:wasm-bindgen"]
-full = ["dep:merman-bindings-core"]
+
+# merman-backed flowchart slice (the editor's lazy in-browser path).
+merman = ["dep:merman-core", "dep:merman-render", "dep:serde_json"]
+# All-grammar render via merman's own dispatch (render-api worker).
+full = ["merman", "dep:merman-bindings-core"]
+# mermaid-faithful layout (merman) + raster-safe KaTeX math (kymo-tex). Selects
+# mermaid_to_svg_dagre's high-fidelity geometry. Matches mermaid.js to ~0.7%
+# median at ~1.9 MB wasm. Moved here (with merman) from kymostudio-core.
+katex-layout = ["merman", "dep:kymo-types", "dep:kymo-parser", "dep:kymo-layout", "dep:kymo-svg"]
 
 [profile.release]
 opt-level = "z"

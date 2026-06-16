@@ -5,7 +5,7 @@
 //! operator (`-->`, `-.->`, `==>`, `-->|label|`, …). The grammar lives in
 //! `parser.rs`; this module only tokenizes.
 
-use crate::model::Shape;
+use kymo_graph::model::Shape;
 
 /// A parsed edge operator with the flags it implies on `model::Edge`.
 #[derive(Debug, Clone, PartialEq, Eq)]

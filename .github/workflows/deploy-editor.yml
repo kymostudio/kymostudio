@@ -53,7 +53,9 @@ jobs:
         working-directory: packages/rust/kymo-mermaid
         # Flowchart-only slice (~470 KB brotli): merman pinned by rev, the other
         # 22 grammars stripped by LTO because nothing references their dispatch.
-        run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm
+        # `merman` feature = the merman-backed slice (kymo's own engine is now the
+        # crate default; LTO strips it here since the editor only loads the slice).
+        run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm,merman
       - name: Build packages/js with the fresh core
         working-directory: packages/js
         run: |

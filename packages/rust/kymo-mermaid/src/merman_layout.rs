@@ -3,15 +3,15 @@
 //!
 //! merman's own `VendoredFontMetricsTextMeasurer` measures text from vendored
 //! font tables, which sit ~1px off the browser — that's the ~2.8% merman floor.
-//! kymo's [`text_w_mermaid`](crate::layout::text_w_mermaid) is calibrated to the
+//! kymo's [`text_w_mermaid`](kymo_graph::layout::text_w_mermaid) is calibrated to the
 //! *actual browser* (the `w`-glyph fix etc.), so feeding it into merman's exact
 //! dagre layout sizes nodes the way mermaid.js does. Positions then match
 //! mermaid.js more tightly than merman itself. Shapes/labels/styles come from
 //! kymo's own parse (mapped by node id); merman supplies positions.
 
-use crate::dagre_svg::{FEdge, FGeom, FNode, FRegion};
-use crate::flowchart::Flowchart;
-use crate::layout::text_w_mermaid;
+use kymo_graph::dagre_svg::{FEdge, FGeom, FNode, FRegion};
+use kymo_graph::flowchart::Flowchart;
+use kymo_graph::layout::text_w_mermaid;
 use merman_core::diagrams::flowchart::parse_flowchart;
 use merman_core::{MermaidConfig, ParseMetadata};
 use merman_render::flowchart::layout_flowchart_v2;
@@ -332,7 +332,7 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
         })
         .unwrap_or_default();
 
-    let by_id: HashMap<&str, &crate::flowchart::FlowNode> =
+    let by_id: HashMap<&str, &kymo_graph::flowchart::FlowNode> =
         fc.nodes.iter().map(|n| (n.id.as_str(), n)).collect();
     let sg_title: HashMap<&str, &str> = fc
         .subgraphs

@@ -5,7 +5,7 @@
 
 use super::MermaidError;
 use crate::classdiagram::{ClassBox, ClassDiagram, Crow, RelKind, Relation};
-use crate::flowchart::Direction;
+use kymo_graph::flowchart::Direction;
 
 const KINDS: &[&str] = &[
     "requirement",

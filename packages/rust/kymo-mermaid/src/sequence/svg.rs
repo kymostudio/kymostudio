@@ -1,5 +1,5 @@
 //! Pure-Rust sequence-diagram **SVG renderer** — the sequence counterpart to
-//! [`crate::flowchart_svg`]. Consumes the shared [`super::layout`] (lifeline
+//! [`kymo_graph::flowchart_svg`]. Consumes the shared [`super::layout`] (lifeline
 //! centres, message rows, fragment boxes) and draws everything as SVG
 //! `<rect>`/`<line>`/`<text>` — real text, so PNG/PDF keep their labels.
 //!

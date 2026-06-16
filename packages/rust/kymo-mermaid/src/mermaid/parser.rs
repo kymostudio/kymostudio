@@ -5,7 +5,7 @@
 //! edge operators; `mod.rs` stitches those into the node registry and edge list.
 
 use super::lexer::{EdgeTok, Scanner};
-use crate::model::Shape;
+use kymo_graph::model::Shape;
 
 /// A node reference within a statement. `label`/`shape` are `Some` only when the
 /// statement spelled out a wrapper (e.g. `A[Start]`), so a bare `A` later does
