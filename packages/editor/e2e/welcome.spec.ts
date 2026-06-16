@@ -38,7 +38,9 @@ test("TC-HM-01 guest landing", async ({ page }) => {
   // Inline Sign-in CTA: assert it is wired to GIS prompt (stubbed), not the
   // real OAuth flow.
   await page.getByTestId("wel-signin").click();
-  expect(await page.evaluate(() => (window as any).__signin)).toBe(true);
+  // expect.poll, not a one-shot evaluate: the click→onClick→GIS-prompt hop can
+  // lag a tick under parallel load (the source of TC-HM-01's flake).
+  await expect.poll(() => page.evaluate(() => (window as any).__signin)).toBe(true);
 });
 
 test("TC-HM-04 share link bypasses the Welcome", async ({ page }) => {

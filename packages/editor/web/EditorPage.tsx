@@ -145,6 +145,7 @@ export default function EditorPage() {
   const fresh = useRef(false);      // room exists on the server but has no document yet
   const userEdited = useRef(false); // the user actually typed in this room
   const pendingImport = useRef<{ source: string; kind: string; title?: string } | null>(null); // carry draft/shared content into a new room
+  const closedAll = useRef(false); // last tab was just closed → reset to an empty buffer (no-file state), not the sample
   const pendingSave = useRef(false); // guest hit Save → sign in, then auto-save once the token lands
   // Auto-title tracks the source (titleFrom) until the user renames by hand; then
   // it locks. `autoTitle` is the last value we derived, so we can tell an
@@ -213,7 +214,10 @@ export default function EditorPage() {
   useEffect(() => {
     if (shared) return; // ?s= state is seeded at mount and owned by the decode effect below
     const imp = pendingImport.current ?? takePendingTemplate(); pendingImport.current = null;
-    setSource(imp ? imp.source : SAMPLE); setKind(imp ? imp.kind : "kymo");
+    // After closing the last tab there's no file to show — reset to an EMPTY
+    // buffer (→ "no file open" empty state), not the SAMPLE (→ Welcome home).
+    const emptied = closedAll.current; closedAll.current = false;
+    setSource(imp ? imp.source : emptied ? "" : SAMPLE); setKind(imp ? imp.kind : "kymo");
     setTitle(imp?.title || ""); setEditingName(false); setShareError(null);
     // A manually-named draft carries its title into the new room; otherwise the
     // name auto-tracks the source until the user renames.
@@ -336,6 +340,10 @@ export default function EditorPage() {
   // instead of the editor. Any in-place action (pick template / open file) arms
   // `welcomeDismissed`; navigating to a real route re-arms it (effect below).
   const showWelcome = isDraft && source === SAMPLE && !welcomeDismissed;
+  // Signed-in, nothing open: no active tab and an empty draft buffer (e.g. after
+  // closing the last tab). Keep the Command Center, but show a "no file open"
+  // placeholder instead of empty editor panes. Guests always have their draft.
+  const noFileOpen = !!claims && isDraft && !source.trim() && !userEdited.current;
 
   useEffect(() => {
     document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
@@ -385,7 +393,15 @@ export default function EditorPage() {
     // VS Code rule: closing the active tab activates the right neighbour, else left.
     const nextActive = activeTab === id ? (next[i] ?? next[i - 1] ?? null) : activeTab;
     setOpenTabs(next); setActiveTab(nextActive); persistTabs(next, nextActive);
-    if (nextActive === null) setWelcomeDismissed(false); // closed the last tab → project home
+    if (nextActive === null) {
+      // Closed the last tab → no file open. Flag it so the per-room reset effect
+      // (keyed on the active tab) clears the buffer to EMPTY instead of seeding
+      // the SAMPLE — the latter would trip showWelcome and show the Welcome home;
+      // we want the lightweight "no file open" empty state with the Command Center.
+      closedAll.current = true;
+      setWelcomeDismissed(true); setSource(""); setTitle(""); setShareError(null);
+      userEdited.current = false;
+    }
   }, [openTabs, activeTab, persistTabs]);
 
   // Publish openDiagram/closeTab so the sibling UserChannel (MCP ui_open_diagram /
@@ -670,7 +686,7 @@ export default function EditorPage() {
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
           {/* three-region toggles (VS Code-style): Explorer · Source · Preview */}
-          {!showWelcome && !booting && (
+          {!showWelcome && !noFileOpen && !booting && (
             <div className="pane-toggles mob-hide" role="group" aria-label="Panels">
               {claims && !shared && (
                 <button className={"pane-tg" + (activePanel ? " on" : "")} onClick={toggleExplorer} title="Toggle Explorer" aria-pressed={!!activePanel}><PanelLeft size={16} strokeWidth={2} /></button>
@@ -687,7 +703,7 @@ export default function EditorPage() {
             </button>
           )}
           {/* draft Save stays a visible CTA when there's unsaved work to rescue */}
-          {isDraft && !booting && !showWelcome && (
+          {isDraft && !booting && !showWelcome && !noFileOpen && (
             <button className="btn-primary mob-hide" onClick={save} title="Save to your Diagrams (⌘/Ctrl-S)">
               <Save size={16} strokeWidth={2} />
               Save
@@ -722,6 +738,15 @@ export default function EditorPage() {
           <div className="boot"><KLoader /></div>
         ) : showWelcome ? (
           <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} onTemplate={pickTemplate} onOpen={openDiagram} />
+        ) : noFileOpen ? (
+          <div className="nofile" data-testid="nofile">
+            <FilePlus2 size={40} strokeWidth={1.4} className="nofile-icon" />
+            <h2>No file open</h2>
+            <p>Open a diagram from the Explorer{claims ? " or search with ⌘K" : ""}, or start a new one.</p>
+            <button className="btn-primary" onClick={() => setGalleryOpen(true)}>
+              <FilePlus2 size={16} strokeWidth={2} />New diagram
+            </button>
+          </div>
         ) : (
           <>
             {panes.source && (
@@ -835,7 +860,7 @@ export default function EditorPage() {
         )}
         </main>
       </div>
-      {!showWelcome && <div className={"status" + (statusErr ? " error" : "")} title={statusTitle}>{status}</div>}
+      {!showWelcome && !noFileOpen && <div className={"status" + (statusErr ? " error" : "")} title={statusTitle}>{status}</div>}
     </div>
   );
 }
