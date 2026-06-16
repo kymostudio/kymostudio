@@ -15,7 +15,7 @@ import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, useDiagrams, K
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
-import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener } from "./tabs";
+import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
 import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X } from "lucide-react";
 
 export default function EditorPage() {
@@ -388,8 +388,10 @@ export default function EditorPage() {
     if (nextActive === null) setWelcomeDismissed(false); // closed the last tab → project home
   }, [openTabs, activeTab, persistTabs]);
 
-  // Publish openDiagram so the sibling UserChannel (MCP open_diagram) can drive it.
+  // Publish openDiagram/closeTab so the sibling UserChannel (MCP ui_open_diagram /
+  // ui_close_file) can drive this tab.
   useEffect(() => registerOpener(openDiagram), [openDiagram]);
+  useEffect(() => registerCloser(closeTab), [closeTab]);
 
   // Deep-link ?d=<id> (old bookmarks / MCP fallback): open it as a tab, then
   // normalize the URL to ?p=<project>. Waits for the project so the tab set merges.

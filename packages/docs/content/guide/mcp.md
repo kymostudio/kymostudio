@@ -94,11 +94,23 @@ session is not used anywhere else.
 | `list_diagrams` | List your diagrams (id, title, kind, URL), most-recent first. | — |
 | `get_diagram` | Fetch a diagram's source. | `id?` (defaults to most recent) |
 | `edit_diagram` | Replace the source and/or rename; pushes the change live to any open editor tab. | `source?`, `title?`, `id?`, `kind?` |
-| `open_diagram` | Switch the diagram your open editor tab is showing to this one (live navigation, no content change). | `id?` (defaults to most recent) |
 | `delete_diagram` | Permanently delete a diagram. **Cannot be undone.** | `id` |
 
 > `delete_diagram` is destructive — if your client supports per-tool
 > confirmation, keep it on.
+
+### Editor control (`ui_*`)
+
+Tools prefixed `ui_` steer your **open editor tab(s)** live — they change what
+the browser shows, not stored content, and report how many live tabs they
+reached (0 = no editor open right now).
+
+| Tool | What it does | Inputs |
+|------|--------------|--------|
+| `ui_open_diagram` | Open a diagram as a tab / switch the editor to it (live navigation). | `id?` (defaults to most recent) |
+| `ui_open_project` | Switch the active project the explorer is scoped to; returns a `?p=` editor link. | `project?` (id or name) |
+| `ui_list_open_files` | List the diagrams open as tabs in a project, marking the active one. | `project?` (id or name) |
+| `ui_close_file` | Close an open diagram tab (does not delete the diagram). | `id` |
 
 ## Diagram kinds
 

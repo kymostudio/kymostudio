@@ -361,6 +361,36 @@ async function findProject(env: Env, email: string, ref: string): Promise<Projec
   return projs.find((p) => p.id.toLowerCase() === r) || projs.find((p) => p.name.toLowerCase() === r) || null;
 }
 
+// ---- Open-tab state (VS Code window state): which diagrams are open in a
+// project + which is active. Stored per project in KV (`tabs:<email>:<id>`),
+// the same store the `/api/tabs` route and the editor read/write. The MCP
+// `ui_list_open_files` / `ui_close_file` tools read/mutate it here so they stay in
+// lockstep with the live editor (which re-persists on the next change). ----
+type TabState = { tabs: string[]; active: string | null };
+async function readTabs(env: Env, email: string, projectId: string): Promise<TabState> {
+  const raw = await env.OAUTH_KV.get(`tabs:${email}:${projectId}`);
+  if (raw) {
+    try {
+      const j = JSON.parse(raw);
+      if (j && Array.isArray(j.tabs)) return { tabs: j.tabs.filter((x: any) => typeof x === "string"), active: typeof j.active === "string" ? j.active : null };
+    } catch {}
+  }
+  return { tabs: [], active: null };
+}
+async function writeTabs(env: Env, email: string, projectId: string, state: TabState) {
+  await env.OAUTH_KV.put(`tabs:${email}:${projectId}`, JSON.stringify({ tabs: state.tabs.slice(0, 40), active: state.active }));
+}
+// Remove a diagram from a project's open-tab set. VS Code rule for the active
+// tab: closing it activates the right neighbour, else the left. Returns whether
+// the tab was actually open (so the caller can report a no-op cleanly).
+function closeTabState(state: TabState, id: string): { next: TabState; wasOpen: boolean } {
+  const i = state.tabs.indexOf(id);
+  if (i < 0) return { next: state, wasOpen: false };
+  const tabs = state.tabs.filter((x) => x !== id);
+  const active = state.active === id ? (tabs[i] ?? tabs[i - 1] ?? null) : state.active;
+  return { next: { tabs, active }, wasOpen: true };
+}
+
 // ---- One diagram = one EditorRoom DO (keyed by diagram id). Owner-scoped. ----
 export class EditorRoom extends DurableObject<Env> {
   source = ""; owner = ""; title = ""; diagramId = ""; kind = ""; // kind "" = kymo (native)
@@ -486,10 +516,11 @@ export class EditorRoom extends DurableObject<Env> {
 
 // ---- One UserChannel DO per signed-in user (keyed by email). Every open
 // editor tab of that user connects here; it carries no document, only control
-// messages — `{type:"open", id}` so the MCP `open_diagram` tool can switch which
-// diagram a tab is showing, and `{type:"open-project", id}` so `open_project` can
-// switch the active project the tab's explorer is scoped to — without knowing
-// which room/project the tab currently has open.
+// messages — `{type:"open", id}` so the MCP `ui_open_diagram` tool can switch
+// which diagram a tab is showing, `{type:"open-project", id}` so `ui_open_project`
+// can switch the active project the tab's explorer is scoped to, and
+// `{type:"close", id}` so `ui_close_file` can close a tab — without knowing which
+// room/project the tab currently has open.
 // Auth + ownership are enforced in the worker before routing here (the DO is
 // only reachable through the email-keyed /userws route), so the DO trusts it. ----
 export class UserChannel extends DurableObject<Env> {
@@ -518,6 +549,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
   async init() {
     const me = () => this.props.email;
     const link = (id: string) => `${EDITOR_URL}/?d=${id}`;
+    const projLink = (id: string) => `${EDITOR_URL}/?p=${id}`;
 
     this.server.tool(
       "new_diagram",
@@ -629,7 +661,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
     );
 
     this.server.tool(
-      "open_diagram",
+      "ui_open_diagram",
       "Switch the diagram currently shown in the signed-in user's open editor tab(s) to this one — live navigation in the browser, without changing its content. Pass `id` (from list_diagrams), or omit to use your most recent. Returns how many live tabs were switched (0 = no editor tab open right now).",
       { id: z.string().optional().describe("Diagram id to open. Omit to use your most recent.") },
       async ({ id }) => {
@@ -725,8 +757,8 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
     );
 
     this.server.tool(
-      "open_project",
-      "Switch the ACTIVE project in the signed-in user's open editor tab(s) — the project the sidebar/explorer is filtered to — without changing any content (the project sibling of open_diagram). Pass `project` (id or name from list_projects), or omit to use your most recently opened project. Returns how many live tabs were switched (0 = no editor tab open right now).",
+      "ui_open_project",
+      "Switch the ACTIVE project in the signed-in user's open editor tab(s) — the project the sidebar/explorer is filtered to — without changing any content (the project sibling of ui_open_diagram). Pass `project` (id or name from list_projects), or omit to use your most recently opened project. Returns how many live tabs were switched (0 = no editor tab open right now).",
       { project: z.string().optional().describe("Project id or name to switch to. Omit to use your most recently opened project.") },
       async ({ project }) => {
         let proj: Project | null = null;
@@ -748,8 +780,68 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
           body: JSON.stringify({ type: "open-project", id: proj.id }),
         });
         const j = (await r.json()) as { clients: number };
-        const where = j.clients ? `${j.clients} live tab(s) switched` : "no live editor tab open right now";
-        return { content: [{ type: "text", text: `Switched active project to "${proj.name}" (id ${proj.id}; ${where}).` }] };
+        const where = j.clients ? `${j.clients} live tab(s) switched` : "no live editor tab open right now — use the link below";
+        return { content: [{ type: "text", text: `Switched active project to "${proj.name}" (id ${proj.id}; ${where}). Open: ${projLink(proj.id)}` }] };
+      }
+    );
+
+    // ---- Open files (tabs): the diagrams currently open in a project's editor,
+    // VS Code-style. Mirrors the live editor's tab strip and the `/api/tabs`
+    // store, so list/close stay in lockstep with the browser. ----
+    this.server.tool(
+      "ui_list_open_files",
+      "List the diagrams currently OPEN as tabs in a project's editor (VS Code-style window state), marking the active one. Pass `project` (id or name); omit to use your most recently opened project (or your default).",
+      { project: z.string().optional().describe("Project id or name (from list_projects). Omit to use your most recently opened project.") },
+      async ({ project }) => {
+        let proj: Project | null = null;
+        if (project) {
+          proj = await findProject(this.env, me(), project);
+          if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects.` }] };
+        } else {
+          const lastId = await this.env.OAUTH_KV.get(`lastproj:${me()}`);
+          proj = lastId ? await findProject(this.env, me(), lastId) : null;
+          if (!proj) { const defId = await ensureDefaultProject(this.env, me()); proj = await findProject(this.env, me(), defId); }
+          if (!proj) return { content: [{ type: "text", text: "No project yet — use new_project first." }] };
+        }
+        const state = await readTabs(this.env, me(), proj.id);
+        if (!state.tabs.length) return { content: [{ type: "text", text: `No open files in project "${proj.name}" (id ${proj.id}).` }] };
+        // Resolve titles for the open ids (skip ones since deleted).
+        const ph = state.tabs.map((_, i) => `?${i + 2}`).join(",");
+        const rs = await this.env.DB.prepare(`SELECT id, title, kind FROM diagrams WHERE owner = ?1 AND deleted IS NULL AND id IN (${ph})`)
+          .bind(me(), ...state.tabs).all<{ id: string; title: string; kind: string }>();
+        const byId = new Map((rs.results ?? []).map((r) => [r.id, r]));
+        const lines = state.tabs.map((id) => {
+          const row = byId.get(id);
+          const star = id === state.active ? "● " : "  ";
+          const title = row ? (row.title || "Untitled") : "(deleted)";
+          return `${star}${title} [${row?.kind || "kymo"}] — ${link(id)} (id ${id})`;
+        });
+        return { content: [{ type: "text", text: `${state.tabs.length} open file(s) in project "${proj.name}" (● = active):\n${lines.join("\n")}` }] };
+      }
+    );
+
+    this.server.tool(
+      "ui_close_file",
+      "Close an open diagram tab in the editor (VS Code-style) — removes it from the project's open-files set and live-closes it in any open editor tab(s), without deleting the diagram. Pass the diagram `id` (from ui_list_open_files / list_diagrams).",
+      { id: z.string().describe("Diagram id of the open tab to close (from ui_list_open_files).") },
+      async ({ id }) => {
+        const row = await this.env.DB.prepare("SELECT project_id FROM diagrams WHERE id = ?1 AND owner = ?2 AND deleted IS NULL")
+          .bind(id, me()).first<{ project_id: string | null }>();
+        if (!row) return { content: [{ type: "text", text: `Diagram ${id} isn't yours (or is in Trash).` }] };
+        const def = await ensureDefaultProject(this.env, me());
+        const projectId = row.project_id || def;
+        const state = await readTabs(this.env, me(), projectId);
+        const { next, wasOpen } = closeTabState(state, id);
+        if (!wasOpen) return { content: [{ type: "text", text: `Diagram ${id} isn't open as a tab — nothing to close.` }] };
+        await writeTabs(this.env, me(), projectId, next);
+        // Live-close it in any editor tab showing this project.
+        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ type: "close", id }),
+        });
+        const j = (await r.json()) as { clients: number };
+        const where = j.clients ? `${j.clients} live tab(s) notified` : "no live editor tab open right now";
+        return { content: [{ type: "text", text: `Closed tab ${id} (${next.tabs.length} file(s) still open; ${where}).` }] };
       }
     );
   }
@@ -836,7 +928,7 @@ export default {
       return roomFor(env, d).fetch(request);
     }
     // Per-user control channel: every open editor tab connects here so the MCP
-    // `open_diagram` tool can live-switch which diagram the tab shows. The DO is
+    // `ui_open_diagram` tool can live-switch which diagram the tab shows. The DO is
     // keyed by email, so verify + resolve the email BEFORE routing the upgrade.
     if (url.pathname === "/userws") {
       const idToken = url.searchParams.get("id_token") || "";
@@ -1072,18 +1164,15 @@ export default {
         if (request.method === "GET") {
           const proj = await resolveProject(env, email, url.searchParams.get("project"));
           if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
-          const raw = await env.OAUTH_KV.get(`tabs:${email}:${proj.id}`);
-          let val: { tabs: string[]; active: string | null } = { tabs: [], active: null };
-          if (raw) { try { const j = JSON.parse(raw); if (j && Array.isArray(j.tabs)) val = { tabs: j.tabs.filter((x: any) => typeof x === "string"), active: typeof j.active === "string" ? j.active : null }; } catch {} }
-          return Response.json(val, { headers: cors });
+          return Response.json(await readTabs(env, email, proj.id), { headers: cors });
         }
         if (request.method === "PUT") {
           const b = (await request.json().catch(() => ({}))) as { project?: string; tabs?: unknown; active?: unknown };
           const proj = await resolveProject(env, email, b.project ?? url.searchParams.get("project"));
           if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
-          const tabs = Array.isArray(b.tabs) ? (b.tabs as any[]).filter((x) => typeof x === "string").slice(0, 40) : [];
+          const tabs = Array.isArray(b.tabs) ? (b.tabs as any[]).filter((x) => typeof x === "string") : [];
           const active = typeof b.active === "string" ? b.active : null;
-          await env.OAUTH_KV.put(`tabs:${email}:${proj.id}`, JSON.stringify({ tabs, active }));
+          await writeTabs(env, email, proj.id, { tabs, active });
           return Response.json({ ok: true }, { headers: cors });
         }
         return Response.json({ error: "method not allowed" }, { status: 405, headers: cors });
