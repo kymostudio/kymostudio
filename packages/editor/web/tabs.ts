@@ -32,7 +32,7 @@ export async function fetchTabsRemote(idToken: string, projectId: string): Promi
 }
 
 // EditorPage registers its `openDiagram` here so the sibling UserChannel (MCP
-// `open_diagram`) can open a tab in the live editor without lifting tab state
+// `ui_open_diagram`) can open a tab in the live editor without lifting tab state
 // into a provider. Returns true if an editor was mounted to handle it.
 let _opener: ((id: string) => void) | null = null;
 export function registerOpener(fn: (id: string) => void): () => void {
@@ -41,6 +41,18 @@ export function registerOpener(fn: (id: string) => void): () => void {
 }
 export function requestOpen(id: string): boolean {
   if (_opener) { _opener(id); return true; }
+  return false;
+}
+
+// Sibling of the opener: lets the UserChannel (MCP `ui_close_file`) close a tab in
+// the live editor. Returns true if an editor was mounted to handle it.
+let _closer: ((id: string) => void) | null = null;
+export function registerCloser(fn: (id: string) => void): () => void {
+  _closer = fn;
+  return () => { if (_closer === fn) _closer = null; };
+}
+export function requestClose(id: string): boolean {
+  if (_closer) { _closer(id); return true; }
   return false;
 }
 
