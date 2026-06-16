@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { MCP_WS } from "./const";
+import { LOCAL, localGetDoc, localSetSource, localSetTitle } from "./localdb";
 
 type Handlers = {
   onDoc?: (source: string, title: string | undefined, fromSelf: boolean, kind?: string) => void;
@@ -14,6 +15,15 @@ export function useRoom(roomId: string | null, idToken: string | null, handlers:
 
   useEffect(() => {
     if (!roomId || !idToken) return;
+    // Local dev: no WebSocket server — the document lives in localStorage. Report
+    // "live", then deliver the stored doc (empty for a just-created room, which
+    // makes the editor persist the in-buffer source on the next tick, like prod).
+    if (LOCAL) {
+      hRef.current.onLive?.(true);
+      const doc = localGetDoc(roomId);
+      const t = setTimeout(() => hRef.current.onDoc?.(doc?.source ?? "", doc?.title, false, doc?.kind), 0);
+      return () => clearTimeout(t);
+    }
     let ws: WebSocket;
     try { ws = new WebSocket(MCP_WS + "?id_token=" + encodeURIComponent(idToken) + "&d=" + encodeURIComponent(roomId)); }
     catch { return; }
@@ -32,10 +42,12 @@ export function useRoom(roomId: string | null, idToken: string | null, handlers:
   }, [roomId, idToken, myId]);
 
   const sendSource = useCallback((source: string, kind?: string) => {
+    if (LOCAL) { if (roomId) localSetSource(roomId, source, kind); return; }
     const ws = wsRef.current; if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: "set", source, kind, origin: myId }));
-  }, [myId]);
+  }, [myId, roomId]);
   const sendRename = useCallback((title: string) => {
+    if (LOCAL) { if (roomId) localSetTitle(roomId, title); return; }
     const ws = wsRef.current; if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: "rename", title, origin: myId }));
-  }, [myId]);
+  }, [myId, roomId]);
   return { sendSource, sendRename };
 }

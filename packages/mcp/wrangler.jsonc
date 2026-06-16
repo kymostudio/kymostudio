@@ -25,7 +25,10 @@
     "ALLOWED_EMAILS": ""
   },
   "routes": [
-    { "pattern": "mcp.kymo.studio", "custom_domain": true }
+    { "pattern": "mcp.kymo.studio", "custom_domain": true },
+    // api.kymo.studio is the SAME worker — the editor's data/room surface
+    // (/api/*, /ws, /userws). mcp.kymo.studio stays for the MCP agent endpoints.
+    { "pattern": "api.kymo.studio", "custom_domain": true }
   ],
   "triggers": { "crons": ["0 3 * * *"] },
   "observability": { "enabled": true }
