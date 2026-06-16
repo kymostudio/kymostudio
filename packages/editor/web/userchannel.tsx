@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
 import { useWorkspace } from "./workspace";
 import { USER_WS } from "./const";
+import { LOCAL } from "./localdb";
 
 // Connects every signed-in tab to the user's control channel (one DO per email)
 // so the MCP `open_diagram` / `open_project` tools can steer THIS tab. Carries no
@@ -20,6 +21,7 @@ export function UserChannel() {
 
   useEffect(() => {
     if (!idToken) return;
+    if (LOCAL) return; // no control channel locally (MCP live-switch is a server feature)
     let ws: WebSocket;
     try { ws = new WebSocket(USER_WS + "?id_token=" + encodeURIComponent(idToken)); }
     catch { return; }

@@ -11,6 +11,11 @@ import TrashPage from "./TrashPage";
 import ProjectsPage from "./ProjectsPage";
 import LoginPage from "./LoginPage";
 import { UserChannel } from "./userchannel";
+import { installLocalApi } from "./localdb";
+
+// Local dev has no kymo-mcp backend — back the data API + rooms with localStorage
+// so save / list / reopen work. No-op off localhost (production is untouched).
+installLocalApi();
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>

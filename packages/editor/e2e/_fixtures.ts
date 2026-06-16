@@ -16,6 +16,9 @@ export const test = base.extend<{ signIn: () => Promise<void> }>({
   // observable without driving the real third-party OAuth prompt.
   page: async ({ page }, use) => {
     await page.addInitScript(() => {
+      // Tests run on 127.0.0.1, which would otherwise activate the localStorage
+      // dev-DB (localdb.ts) and shadow the page.route API stubs below. Opt out.
+      (window as any).__kymoNoLocalDb = true;
       (window as any).google = { accounts: { id: {
         initialize() {}, renderButton() {}, disableAutoSelect() {},
         prompt: () => { (window as any).__signin = true; },
