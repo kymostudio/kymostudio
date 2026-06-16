@@ -34,13 +34,18 @@ npx esbuild web/main.tsx --bundle --format=esm --splitting --outdir=dist \
 # only discovers them after downloading+parsing main.js (an extra serial network
 # hop on the critical path). The engine-*.js chunk is a dynamic import — never
 # preload it; share links rendered via kroki must not pay for the wasm.
+# In-place edits use perl, not `sed -i`: GNU `sed -i` (CI/Linux) and BSD `sed -i`
+# (macOS) disagree on the backup-suffix argument, so a bare `sed -i` breaks local
+# macOS builds. `perl -i -pe` behaves identically on both.
 for c in $(grep -o 'chunks/chunk-[A-Za-z0-9]*\.js' dist/main.js | sort -u); do
-  sed -i "s|</head>|<link rel=\"modulepreload\" href=\"/$c\" />\n  </head>|" dist/index.html dist/trash.html dist/login.html
+  perl -i -pe "s|</head>|<link rel=\"modulepreload\" href=\"/$c\" />\n  </head>|" dist/index.html dist/trash.html dist/login.html
 done
 # Cache-bust: Pages serves assets with max-age=14400, so version the URLs by
 # CONTENT hash — browsers refetch right after a deploy that actually changed a
-# file, and keep their cache across deploys that didn't.
-V=$(cat dist/main.js dist/styles.css | md5sum | cut -c1-8)
-sed -i "s|/styles.css|/styles.css?v=$V|g; s|/main.js|/main.js?v=$V|g" dist/index.html dist/trash.html dist/login.html
+# file, and keep their cache across deploys that didn't. md5sum (GNU/Linux) vs
+# md5 (macOS): take the 8-hex prefix of whichever is present.
+if command -v md5sum >/dev/null 2>&1; then md5cmd() { md5sum; }; else md5cmd() { md5 -q; }; fi
+V=$(cat dist/main.js dist/styles.css | md5cmd | cut -c1-8)
+perl -i -pe "s|/styles.css|/styles.css?v=$V|g; s|/main.js|/main.js?v=$V|g" dist/index.html dist/trash.html dist/login.html
 
 echo "✓ built dist/ ($(du -sh dist | cut -f1))"

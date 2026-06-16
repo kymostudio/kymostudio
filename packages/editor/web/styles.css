@@ -279,6 +279,13 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .name-skel { width: 110px; height: 14px; vertical-align: middle; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 .boot { flex: 1; display: grid; place-items: center; background: var(--bg-soft); }
+/* "No file open" empty state — shown (signed-in) when all tabs are closed; the
+   Command Center stays, this replaces the empty editor panes. */
+.nofile { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; background: var(--bg-soft); }
+.nofile-icon { color: var(--border-strong); }
+.nofile h2 { margin: 4px 0 0; font-size: 16px; font-weight: 700; color: var(--ink); }
+.nofile p { margin: 0 0 8px; max-width: 380px; color: var(--dim); font-size: 13px; line-height: 1.5; }
+.nofile .btn-primary { display: inline-flex; align-items: center; gap: 6px; }
 /* VS Code-style Welcome home: brand top-left, two columns (Start+Recent | Templates+Learn) */
 .welcome { flex: 1; min-width: 0; overflow: auto; display: flex; background: var(--bg); }
 .wel-inner { margin: auto; width: min(1000px, 92%); padding: 48px 32px 64px; }
