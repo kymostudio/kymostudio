@@ -13,6 +13,9 @@ export const DIAGRAMS_API = `${API_HTTP}/api/diagrams`;
 export const WORKSPACES_API = `${API_HTTP}/api/workspaces`;
 export const PROJECTS_API = `${API_HTTP}/api/projects`;
 export const TRASH_API = `${API_HTTP}/api/trash`;
+// Per-project open-tab set (which diagrams are open + which is active) — VS
+// Code-style window state, persisted server-side for cross-device restore.
+export const TABS_API = `${API_HTTP}/api/tabs`;
 // Kroki-compatible render API (packages/render-api): kymo/mermaid/d2/graphviz/
 // bpmn render in the worker itself, every other kind is proxied to kroki.io —
 // all edge-cached by content hash, so repeat loads of a share link skip the

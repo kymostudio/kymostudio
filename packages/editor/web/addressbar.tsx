@@ -13,7 +13,7 @@ type Hit = { id: string; title: string; kind: string };
 // doubles as a jump palette. Click the project crumb to switch project; click a
 // folder crumb to scope new diagrams there; focus the bar (or hit ⌘/Ctrl-K) to
 // search across projects + diagrams and jump to one.
-export function AddressBar({ titleNode }: { titleNode: React.ReactNode }) {
+export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.ReactNode; onOpenDiagram: (id: string) => void }) {
   const navigate = useNavigate();
   const { idToken } = useAuth();
   const {
@@ -86,14 +86,14 @@ export function AddressBar({ titleNode }: { titleNode: React.ReactNode }) {
             <div className="addr-results">
               {projHits.length > 0 && <div className="addr-group">Projects</div>}
               {projHits.map((p) => (
-                <button key={p.id} className="addr-hit" onClick={() => { setCurrentProject(p.id); closeSearch(); }}>
+                <button key={p.id} className="addr-hit" onClick={() => { setCurrentProject(p.id); closeSearch(); navigate("/?p=" + encodeURIComponent(p.id)); }}>
                   <Boxes size={15} strokeWidth={2} className="addr-hit-icon" />
                   <span className="addr-hit-name">{p.name}</span>
                 </button>
               ))}
               {hits.length > 0 && <div className="addr-group">Diagrams</div>}
               {hits.map((h) => (
-                <button key={h.id} className="addr-hit" onClick={() => { closeSearch(); navigate("/?d=" + encodeURIComponent(h.id)); }}>
+                <button key={h.id} className="addr-hit" onClick={() => { closeSearch(); onOpenDiagram(h.id); }}>
                   <KindIcon kind={h.kind} />
                   <span className="addr-hit-name">{h.title || "Untitled"}<span className="addr-hit-ext">.{extFor(h.kind)}</span></span>
                 </button>
@@ -120,7 +120,7 @@ export function AddressBar({ titleNode }: { titleNode: React.ReactNode }) {
               <div className="acct-menu addr-proj-menu">
                 <div className="ws-head">Projects</div>
                 {projects.map((p) => (
-                  <button key={p.id} className="acct-item ws-item" onClick={() => { setCurrentProject(p.id); setProjOpen(false); }}>
+                  <button key={p.id} className="acct-item ws-item" onClick={() => { setCurrentProject(p.id); setProjOpen(false); navigate("/?p=" + encodeURIComponent(p.id)); }}>
                     <span className="ws-check">{p.id === currentProject && <Check size={15} strokeWidth={2.4} />}</span>
                     {p.name}
                   </button>

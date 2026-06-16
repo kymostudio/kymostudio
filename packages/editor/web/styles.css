@@ -497,13 +497,18 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .pane-bar-actions button { height: 32px; padding: 0 12px; font-size: 13px; }
 .pane-bar-actions .chev-icon { margin-left: -2px; }
 /* VS Code-style editor-tab strip: the bar is a tinted track, the active tab a
-   flush, square card that connects to the editor below (no rounded pill). */
-.tabs-bar { padding: 0; gap: 0; align-items: stretch; background: var(--bg-soft); }
-.tabs-bar .detect-chip { align-self: center; margin-left: 10px; }
-/* the active editor tab: type icon + filename + close (✕). */
-.file-tab { display: inline-flex; align-items: center; gap: 7px; position: relative; min-width: 0; max-width: 360px; padding: 0 8px 0 14px; margin-bottom: -1px; border: 0; border-right: 1px solid var(--border); border-bottom: 1px solid var(--bg); background: var(--bg); font-size: 13px; font-weight: 600; color: var(--ink); }
-.file-tab::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); } /* active-tab top accent */
-.file-tab-icon { flex: none; color: var(--accent); }
+   flush, square card that connects to the editor below; many tabs scroll. */
+.tabs-bar { padding: 0; gap: 0; align-items: stretch; background: var(--bg-soft); overflow-x: auto; scrollbar-width: thin; }
+.tabs-bar::-webkit-scrollbar { height: 0; }
+.tabs-bar .detect-chip { align-self: center; margin-left: 10px; flex: none; }
+/* an editor tab: type icon + filename + close (✕). Inactive = muted; active =
+   opaque card with the top accent, connecting to the editor below. */
+.file-tab { display: inline-flex; align-items: center; gap: 7px; position: relative; flex: 0 0 auto; min-width: 0; max-width: 360px; padding: 0 8px 0 14px; margin-bottom: -1px; border: 0; border-right: 1px solid var(--border); border-bottom: 1px solid transparent; background: var(--bg-soft); color: var(--dim); font-size: 13px; font-weight: 600; cursor: pointer; }
+.file-tab:hover { background: var(--bg-raise); }
+.file-tab.active { background: var(--bg); color: var(--ink); border-bottom-color: var(--bg); }
+.file-tab.active::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); } /* active-tab top accent */
+.file-tab-icon { flex: none; display: inline-flex; color: var(--accent); }
+.file-tab.active .file-tab-icon { color: var(--accent); }
 .file-tab-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .file-tab-close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: none; border-radius: 5px; background: transparent; color: var(--dim); cursor: pointer; }
 .file-tab-close:hover { background: var(--bg-raise); color: var(--ink); }

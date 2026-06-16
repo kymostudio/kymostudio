@@ -37,6 +37,15 @@ export const test = base.extend<{ signIn: () => Promise<void> }>({
         { id: "abc123", title: "My flow", kind: "kymo",    updatedAt: Date.now() },
         { id: "def456", title: "Seq",     kind: "mermaid", updatedAt: Date.now() - 1000 },
       ] } }));
+      // per-project open-tab state: start empty, accept writes
+      await page.route("**/api/tabs*", (r) => r.request().method() === "PUT"
+        ? r.fulfill({ json: { ok: true } })
+        : r.fulfill({ json: { tabs: [], active: null } }));
+      // mock the editor-room WebSocket so an opened tab leaves the "booting" state
+      // (it delivers a doc snapshot, the same shape the real worker sends).
+      await page.routeWebSocket(/\/ws\?/, (ws) => {
+        ws.send(JSON.stringify({ type: "doc", source: "flowchart TD {\n  A[x] --> B[y]\n}", title: "", origin: "srv", kind: "kymo" }));
+      });
     });
   },
 });

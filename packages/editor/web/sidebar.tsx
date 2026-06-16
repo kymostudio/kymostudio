@@ -48,21 +48,24 @@ export function useDiagrams() {
   const { idToken } = useAuth();
   const { currentProject } = useWorkspace();
   const [items, setItems] = useState<Item[]>([]);
+  const [loaded, setLoaded] = useState(false); // a list fetch has completed at least once
   const projectQuery = currentProject ? "&project=" + encodeURIComponent(currentProject) : "";
   const reload = useCallback(async () => {
     if (!idToken) return;
     try {
       const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken) + projectQuery, { cache: "no-store" });
-      if (r.ok) setItems(((await r.json()).diagrams) || []);
+      if (r.ok) { setItems(((await r.json()).diagrams) || []); setLoaded(true); }
     } catch {}
   }, [idToken, projectQuery]);
+  // a project switch invalidates "loaded" until the new project's list arrives
+  useEffect(() => { setLoaded(false); }, [projectQuery]);
   useEffect(() => { reload(); }, [reload]);
   useEffect(() => {
     const f = () => { if (!document.hidden) reload(); };
     window.addEventListener("focus", reload); document.addEventListener("visibilitychange", f);
     return () => { window.removeEventListener("focus", reload); document.removeEventListener("visibilitychange", f); };
   }, [reload]);
-  return { items, reload };
+  return { items, reload, loaded };
 }
 
 // ============================ Explorer (file tree) ============================
@@ -72,8 +75,8 @@ type Row =
   | { kind: "folder"; id: string; depth: number; ancestors: string[]; name: string; open: boolean }
   | { kind: "file"; id: string; depth: number; ancestors: string[]; it: Item };
 
-export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }: {
-  currentId: string | null; currentTitle: string; onNewDiagram: () => void; onClose: () => void;
+export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, onClose }: {
+  currentId: string | null; currentTitle: string; onOpen: (id: string) => void; onNewDiagram: () => void; onClose: () => void;
 }) {
   const { idToken } = useAuth();
   const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder, projects, currentProject } = useWorkspace();
@@ -147,18 +150,18 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
       title: hasContents ? `Delete folder “${f.name}” and its contents?` : `Delete folder “${f.name}”?`,
       detail: hasContents ? "All diagrams and subfolders inside will be deleted too." : undefined,
     }))) return;
-    if (currentId && items.some((i) => i.id === currentId && sub.has(effFolder(i)))) navigate("/"); // the open file was inside
+    // the open file may have been inside — the prune effect closes its tab on reload
     await deleteFolder(f.id); reload();
     toast({ message: `Deleted folder “${f.name}”`, actionLabel: "Undo", onAction: () => { restoreItem(idToken, "folder", f.id); setTimeout(reload, 250); } });
   }
   async function onDeleteFile(it: Item) {
     if (!(await confirm({ title: `Delete “${it.title || "Untitled"}”?` }))) return;
     if (await deleteDiagram(idToken, it.id)) {
-      if (it.id === currentId) navigate("/"); reload();
+      reload(); // the prune effect closes its tab if it was open (URL stays ?p=)
       toast({ message: `Deleted “${it.title || "Untitled"}”`, actionLabel: "Undo", onAction: () => { restoreItem(idToken, "diagram", it.id); setTimeout(reload, 250); } });
     }
   }
-  function openFile(id: string) { navigate("/?d=" + encodeURIComponent(id)); onClose(); }
+  function openFile(id: string) { onOpen(id); onClose(); }
   function newDiagramIn(folderId: string) { setCurrentFolder(folderId); onNewDiagram(); }
 
   function dragStart(e: React.DragEvent, kind: "diagram" | "folder", id: string) {
@@ -333,7 +336,7 @@ export function ExplorerPanel({ currentId, currentTitle, onNewDiagram, onClose }
 }
 
 // ================================ Search panel ================================
-export function SearchPanel({ currentId, onClose }: { currentId: string | null; onClose: () => void }) {
+export function SearchPanel({ currentId, onOpen, onClose }: { currentId: string | null; onOpen: (id: string) => void; onClose: () => void }) {
   const { idToken } = useAuth();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -352,7 +355,7 @@ export function SearchPanel({ currentId, onClose }: { currentId: string | null; 
     }, 250);
     return () => clearTimeout(t);
   }, [q, idToken]);
-  function openFile(id: string) { navigate("/?d=" + encodeURIComponent(id)); onClose(); }
+  function openFile(id: string) { onOpen(id); onClose(); }
   const needle = q.trim();
   return (
     <aside className="sidebar">

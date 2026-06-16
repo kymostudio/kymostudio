@@ -11,23 +11,49 @@ import { RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
-import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, type Panel } from "./sidebar";
+import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
+import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener } from "./tabs";
 import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, idToken, signOut, devSignIn } = useAuth();
-  const { currentFolder, currentProject } = useWorkspace();
+  const { currentFolder, currentProject, projects, setCurrentProject } = useWorkspace();
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const d = params.get("d");
-  const roomId = d;
+  // Signed-in users browse by PROJECT: the home URL is ?p=<projectId> (not a
+  // file). ?d= / ?s= are read only at mount (deep-link / share); steady state is ?p=.
+  const urlD = params.get("d");
+  const p = params.get("p");
   // ?s= carries the whole diagram in the URL (kroki-style share link, no room/account).
   const sharedSrc = params.get("s");
   const sharedKind = params.get("k");
-  const shared = !!sharedSrc && !d;
+
+  // Open editor tabs (VS Code-style): the ordered set of open diagrams + the
+  // active one, per project. Persisted (localStorage + backend). The single live
+  // room follows the active tab; everything below keys on `activeTab` (aliased to
+  // `d` so the room/draft/autosave logic is unchanged).
+  const projAtMount = () => { try { return localStorage.getItem("kymo_project") || ""; } catch { return ""; } };
+  const [openTabs, setOpenTabs] = useState<string[]>(() => {
+    if (urlD) return [urlD];
+    if (sharedSrc || !claims) return [];
+    const mp = currentProject || projAtMount();
+    return mp ? (readTabsLocal(mp)?.tabs ?? []) : [];
+  });
+  const [activeTab, setActiveTab] = useState<string | null>(() => {
+    if (urlD) return urlD;
+    if (sharedSrc || !claims) return null;
+    const mp = currentProject || projAtMount();
+    return mp ? (readTabsLocal(mp)?.active ?? null) : null;
+  });
+  const d = activeTab;          // alias — the open diagram is the active tab
+  const roomId = activeTab;
+  const shared = !!sharedSrc && !activeTab;
+  // The project's diagram list — drives tab titles + prunes tabs whose diagram
+  // was deleted elsewhere. (Same hook the Explorer/Search use.)
+  const { items, loaded: itemsLoaded } = useDiagrams();
 
   // Save model is two-state: a no-?d buffer is always a DRAFT that lives only in
   // the URL (?s=) — nothing on the server until the explicit Save (button /
@@ -279,12 +305,14 @@ export default function EditorPage() {
   // URL in sync so the address bar is always a working share link. Only after a
   // real local edit — never rewrite a pristine share URL (Back must keep it intact).
   useEffect(() => {
-    if (d || !userEdited.current || !source.trim()) return;
+    // Signed-in drafts live under ?p= (saved via Save), so never rewrite the URL
+    // to ?s= for them — that would clobber the project URL. Guests still sync.
+    if (d || claims || !userEdited.current || !source.trim()) return;
     const t = setTimeout(async () => {
       window.history.replaceState(null, "", shareUrl(kind, await encodeShare(source)));
     }, 300);
     return () => clearTimeout(t);
-  }, [source, kind, d]); // eslint-disable-line
+  }, [source, kind, d, claims]); // eslint-disable-line
 
   useEffect(() => {
     const h = () => { setMenuOpen(false); setShareOpen(false); setExportOpen(false); };
@@ -312,6 +340,102 @@ export default function EditorPage() {
   useEffect(() => {
     document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
   }, [diagramLabel]);
+
+  // Project-as-URL (signed-in only). The project home is ?p=<projectId> showing
+  // the Welcome scoped to that project; a bare "/" redirects to the active
+  // project, and ?p= in the URL adopts that project. (?d= editing is unaffected.)
+  useEffect(() => {
+    if (!claims || shared || d) return;
+    if (p) {
+      if (currentProject && p !== currentProject && projects.some((x) => x.id === p)) setCurrentProject(p);
+      return; // an unknown ?p simply shows the (default-scoped) home until projects load
+    }
+    if (currentProject) navigate("/?p=" + encodeURIComponent(currentProject), { replace: true });
+  }, [claims, shared, d, p, currentProject, projects, setCurrentProject, navigate]);
+
+  // ---- Open-tab persistence (per project): localStorage now + debounced PUT ----
+  const putTimer = useRef<number | undefined>(undefined);
+  const putPending = useRef<{ proj: string; tabs: string[]; active: string | null } | null>(null);
+  const flushTabs = useCallback(() => {
+    if (putTimer.current) { clearTimeout(putTimer.current); putTimer.current = undefined; }
+    const pend = putPending.current; putPending.current = null;
+    if (pend && idToken) putTabsRemote(idToken, pend.proj, { tabs: pend.tabs, active: pend.active });
+  }, [idToken]);
+  const persistTabs = useCallback((tabs: string[], active: string | null) => {
+    if (!currentProject) return;
+    writeTabsLocal(currentProject, { tabs, active });
+    putPending.current = { proj: currentProject, tabs, active };
+    if (putTimer.current) clearTimeout(putTimer.current);
+    putTimer.current = window.setTimeout(flushTabs, 600);
+  }, [currentProject, flushTabs]);
+
+  // Tab operations — never navigate; the URL stays ?p=<project>.
+  const openDiagram = useCallback((id: string) => {
+    const next = openTabs.includes(id) ? openTabs : [...openTabs, id];
+    setOpenTabs(next); setActiveTab(id); persistTabs(next, id);
+    setWelcomeDismissed(true);
+  }, [openTabs, persistTabs]);
+  const activateTab = useCallback((id: string) => {
+    if (id === activeTab) return;
+    setActiveTab(id); persistTabs(openTabs, id);
+  }, [activeTab, openTabs, persistTabs]);
+  const closeTab = useCallback((id: string) => {
+    const i = openTabs.indexOf(id);
+    const next = openTabs.filter((x) => x !== id);
+    // VS Code rule: closing the active tab activates the right neighbour, else left.
+    const nextActive = activeTab === id ? (next[i] ?? next[i - 1] ?? null) : activeTab;
+    setOpenTabs(next); setActiveTab(nextActive); persistTabs(next, nextActive);
+    if (nextActive === null) setWelcomeDismissed(false); // closed the last tab → project home
+  }, [openTabs, activeTab, persistTabs]);
+
+  // Publish openDiagram so the sibling UserChannel (MCP open_diagram) can drive it.
+  useEffect(() => registerOpener(openDiagram), [openDiagram]);
+
+  // Deep-link ?d=<id> (old bookmarks / MCP fallback): open it as a tab, then
+  // normalize the URL to ?p=<project>. Waits for the project so the tab set merges.
+  const bootedDeepLink = useRef(false);
+  useEffect(() => {
+    if (!urlD || !claims || !currentProject) return;
+    if (!bootedDeepLink.current) { bootedDeepLink.current = true; openDiagram(urlD); }
+    navigate("/?p=" + encodeURIComponent(currentProject), { replace: true });
+  }, [urlD, claims, currentProject, openDiagram, navigate]);
+
+  // Restore the project's tab set on project change (localStorage instant, then
+  // backend reconcile — backend wins). Skips while a ?d/?s URL is being consumed.
+  const prevProj = useRef<string | null>(null);
+  useEffect(() => {
+    if (!claims || !currentProject || prevProj.current === currentProject) return;
+    prevProj.current = currentProject;
+    if (params.get("d") || params.get("s")) return; // bootstrap / share own the state
+    const local = readTabsLocal(currentProject);
+    setOpenTabs(local?.tabs ?? []); setActiveTab(local?.active ?? null);
+    if (!idToken) return;
+    let stale = false;
+    fetchTabsRemote(idToken, currentProject).then((remote) => {
+      // Adopt the server set only if it actually has tabs — an empty server blob
+      // (never-written, or this device is ahead) must not wipe the local tabs.
+      if (stale || prevProj.current !== currentProject || !remote || remote.tabs.length === 0) return;
+      setOpenTabs(remote.tabs); setActiveTab(remote.active); writeTabsLocal(currentProject, remote);
+    });
+    return () => { stale = true; };
+  }, [claims, currentProject, idToken]); // eslint-disable-line
+
+  // Drop tabs whose diagram was deleted elsewhere (once the list has loaded).
+  useEffect(() => {
+    if (!claims || !currentProject || !itemsLoaded) return;
+    const valid = openTabs.filter((id) => items.some((it) => it.id === id));
+    if (valid.length === openTabs.length) return;
+    const nextActive = activeTab && valid.includes(activeTab) ? activeTab : (valid[valid.length - 1] ?? null);
+    setOpenTabs(valid); setActiveTab(nextActive); persistTabs(valid, nextActive);
+  }, [items, itemsLoaded]); // eslint-disable-line
+
+  // Flush a pending tab PUT when the tab is backgrounded / closed.
+  useEffect(() => {
+    const onHide = () => { if (document.visibilityState === "hidden") flushTabs(); };
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", flushTabs);
+    return () => { document.removeEventListener("visibilitychange", onHide); window.removeEventListener("pagehide", flushTabs); flushTabs(); };
+  }, [flushTabs]);
 
   function saveBlob(blob: Blob, name: string) {
     const a = document.createElement("a");
@@ -396,43 +520,35 @@ export default function EditorPage() {
   function pickTemplate(t: Template) {
     setGalleryOpen(false);
     setWelcomeDismissed(true); // leaving the Welcome panel for a real diagram
-    // No room = the only copy of edited content is this tab/URL. Ask first.
-    if (!d && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
+    // A draft is the only copy in this tab/URL — ask before replacing it.
+    if (!activeTab && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
     titleUserSet.current = false; autoTitle.current = "";
-    if (d) {
-      pendingImport.current = { source: t.source, kind: t.kind }; // consumed by the ?d-change effect → lands as a draft
-      navigate("/");
+    if (activeTab) {
+      // a file is open → New opens a fresh DRAFT (deactivate the tab; the reset
+      // effect consumes the seeded template). The other tabs stay open.
+      pendingImport.current = { source: t.source, kind: t.kind };
+      persistTabs(openTabs, null);
+      setActiveTab(null);
     } else {
-      // already on a no-room buffer (draft/share view): seed in place
+      // already on a draft/share buffer: seed in place
       setSource(t.source); setKind(t.kind); setTitle(""); setShareError(null);
       userEdited.current = false;
-      window.history.replaceState(null, "", "/"); // pristine template isn't in the URL yet
+      if (!claims) window.history.replaceState(null, "", "/"); // guest draft isn't in the URL yet
     }
   }
-  // Close the open "file" (the VS Code-style tab's ✕). Drops the ?d — a saved
-  // diagram then resets to a fresh draft via the ?d-effect and lands on Welcome;
-  // a guest draft is reset in place. Nothing is deleted: saved diagrams stay in
-  // your Diagrams, and the just-closed draft is still reachable via Back.
-  const closeFile = useCallback(() => {
-    if (d) { navigate("/"); return; }
-    setSource(SAMPLE); setKind("kymo"); setTitle(""); setShareError(null);
-    userEdited.current = false; titleUserSet.current = false; autoTitle.current = "";
-    setWelcomeDismissed(false);
-    window.history.replaceState(null, "", "/");
-  }, [d, navigate]);
   // Pop the Google sign-in prompt (guests can't own server files).
   const promptSignIn = useCallback(() => { (window as any).google?.accounts?.id?.prompt?.(); }, []);
-  // Explicit Save: a draft → a real server file. Guests are prompted to sign in
-  // first, then the save replays once the token lands (pendingSave).
+  // Explicit Save: a draft → a real server file, opened as a tab. Guests are
+  // prompted to sign in first, then the save replays once the token lands.
   const save = useCallback(() => {
-    if (d) return; // already a saved room
+    if (activeTab) return; // already a saved, autosaving tab
     if (!sourceRef.current.trim()) return;
     if (!idToken) { pendingSave.current = true; promptSignIn(); return; }
     const id = newId();
     pendingImport.current = { source: sourceRef.current, kind: kindRef.current, title: titleUserSet.current ? titleRef.current : undefined };
     assignDiagram(idToken, id, currentFolder, currentProject || undefined); // lands in the folder you're saving into
-    navigate("/?d=" + id);
-  }, [d, idToken, currentFolder, currentProject, navigate, promptSignIn]);
+    openDiagram(id); // adds the new diagram as a tab + activates it; URL stays ?p=
+  }, [activeTab, idToken, currentFolder, currentProject, openDiagram, promptSignIn]);
   const saveRef = useRef(save); saveRef.current = save;
   // Guest hit Save → signed in → finish the save now that we have a token.
   useEffect(() => {
@@ -463,7 +579,7 @@ export default function EditorPage() {
     const id = newId();
     pendingImport.current = { source, kind };
     assignDiagram(idToken, id, currentFolder, currentProject || undefined);
-    navigate("/?d=" + id);
+    openDiagram(id);
   }
   function commitRename(v: string) {
     const t = v.trim();
@@ -533,12 +649,12 @@ export default function EditorPage() {
         {/* identity & document: logo → your Diagrams when signed in (the natural
             "home"), else the product site */}
         {claims
-          ? <Link className="brand" to="/" title="Home" aria-label="Home"><img src="/logo.svg" alt="" /></Link>
+          ? <Link className="brand" to={currentProject ? "/?p=" + encodeURIComponent(currentProject) : "/"} title="Home" aria-label="Home"><img src="/logo.svg" alt="" /></Link>
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
         {/* address bar (breadcrumb + ⌘K jump) wraps the editable title when signed in;
             guests / welcome / share links show the bare title */}
         {claims && !shared && !showWelcome
-          ? <AddressBar titleNode={titleEl} />
+          ? <AddressBar titleNode={titleEl} onOpenDiagram={openDiagram} />
           : titleEl}
         {/* the steady "Saved" pill is dropped (saving is silent + automatic); the
             unsaved-draft pill is dropped too (the draft Save button already signals
@@ -593,8 +709,8 @@ export default function EditorPage() {
         {claims && !shared && (
           <>
             <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} />
-            {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onNewDiagram={() => setGalleryOpen(true)} onClose={closePanelOnPhone} />}
-            {activePanel === "search" && <SearchPanel currentId={d} onClose={closePanelOnPhone} />}
+            {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onOpen={openDiagram} onNewDiagram={() => setGalleryOpen(true)} onClose={closePanelOnPhone} />}
+            {activePanel === "search" && <SearchPanel currentId={d} onOpen={openDiagram} onClose={closePanelOnPhone} />}
             {activePanel === "templates" && <TemplatesPanel onPick={pickTemplate} onClose={closePanelOnPhone} />}
             {activePanel && <div className="sb-backdrop" onClick={closePanelOnPhone} />}
           </>
@@ -603,7 +719,7 @@ export default function EditorPage() {
         {booting ? (
           <div className="boot"><KLoader /></div>
         ) : showWelcome ? (
-          <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} onTemplate={pickTemplate} />
+          <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} onTemplate={pickTemplate} onOpen={openDiagram} />
         ) : (
           <>
             {panes.source && (
@@ -612,17 +728,27 @@ export default function EditorPage() {
                   Explorer/Diagrams list). A guest is editing one throwaway draft —
                   no tab, no close ✕; the pane only surfaces if paste auto-detect
                   has something to say. */}
-              {(claims || detected) && (
+              {/* VS Code-style editor tabs: one per open diagram (signed-in only),
+                  the active one highlighted; the pane also surfaces for a guest if
+                  paste auto-detect has something to say. */}
+              {((claims && openTabs.length > 0) || detected) && (
               <div className="pane-bar tabs-bar">
-                {claims && (
-                <div className="file-tab" title={diagramLabel}>
-                  <FileCode2 size={14} className="file-tab-icon" strokeWidth={2} />
-                  <span className="file-tab-name">{diagramLabel}</span>
-                  <button className="file-tab-close" aria-label="Close file" title="Close file" onClick={closeFile}>
-                    <X size={13} strokeWidth={2.4} />
-                  </button>
-                </div>
-                )}
+                {openTabs.map((id) => {
+                  const isActive = id === activeTab;
+                  const name = isActive && diagramLabel !== "Untitled" ? diagramLabel : (items.find((i) => i.id === id)?.title || "Untitled");
+                  const k = items.find((i) => i.id === id)?.kind || "kymo";
+                  return (
+                    <div key={id} className={"file-tab" + (isActive ? " active" : "")} title={name}
+                      role="tab" aria-selected={isActive} onClick={() => activateTab(id)}>
+                      <span className="file-tab-icon"><KindIcon kind={k} /></span>
+                      <span className="file-tab-name">{name}</span>
+                      <button className="file-tab-close" aria-label="Close tab" title="Close tab"
+                        onClick={(e) => { e.stopPropagation(); closeTab(id); }}>
+                        <X size={13} strokeWidth={2.4} />
+                      </button>
+                    </div>
+                  );
+                })}
                 {detected && <span className="detect-chip">auto-detected {detected}</span>}
               </div>
               )}
