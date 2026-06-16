@@ -17,6 +17,7 @@
   --error: #b42318;
   --radius: 14px;
   --radius-btn: 9px;
+  --pane-head-h: 45px;     /* shared height: Explorer head · Source bar · Preview bar */
   --font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
@@ -87,9 +88,6 @@ button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft);
 .save-ind::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #34a853; }
 .save-ind.off { color: #8a6116; background: #fdf6e7; border-color: #f0dfb6; }
 .save-ind.off::before { background: #e6a23c; }
-/* a draft that isn't on the server yet — the visible Save button does the saving */
-.save-ind.unsaved { color: #8a6116; background: #fdf6e7; border-color: #f0dfb6; }
-.save-ind.unsaved::before { background: #e6a23c; }
 .diagram-input { font: inherit; font-size: 14px; font-weight: 600; background: var(--bg); border: 1px solid var(--accent); border-radius: 7px; color: var(--ink); padding: 3px 8px; outline: none; min-width: 160px; }
 
 .account { position: relative; }
@@ -217,7 +215,7 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-tpl-glyph { flex: none; width: 18px; height: 18px; display: inline-flex; color: var(--dim); }
 .sb-tpl:hover .sb-tpl-glyph { color: var(--accent); }
 .sb-tpl-glyph svg { width: 18px; height: 18px; }
-.sb-head { display: flex; align-items: center; gap: 2px; padding: 8px 8px 8px 12px; border-bottom: 1px solid var(--border); }
+.sb-head { display: flex; align-items: center; gap: 2px; min-height: var(--pane-head-h); padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--border); }
 .sb-title { flex: 1; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
 .sb-head button { flex: none; padding: 5px; border: 1px solid transparent; background: transparent; color: var(--dim); border-radius: 7px; }
 .sb-head button:hover { background: var(--bg-raise); border-color: transparent; color: var(--accent); transform: none; box-shadow: none; }
@@ -487,13 +485,25 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .rrow:hover .rmove, .rmove:focus { opacity: 1; }
 
 /* diagram kind selector (kroki-style) */
-.pane-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg); }
-/* VS Code-style editor tab: type icon + filename + close (✕). */
-.file-tab { display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 360px; padding: 5px 6px 5px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-soft); font-size: 13px; font-weight: 600; color: var(--ink); }
+.pane-bar { display: flex; align-items: center; gap: 8px; min-height: var(--pane-head-h); padding: 6px 12px; border-bottom: 1px solid var(--border); background: var(--bg); }
+/* Preview header: a quiet caption on the left, the output actions (Export · Share)
+   pushed to the right, sized to keep the bar the same height as the others. */
+.preview-bar { padding: 6px 10px 6px 14px; }
+.pane-bar-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+.pane-bar-actions { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+.pane-bar-actions button { height: 32px; padding: 0 12px; font-size: 13px; }
+.pane-bar-actions .chev-icon { margin-left: -2px; }
+/* VS Code-style editor-tab strip: the bar is a tinted track, the active tab a
+   flush, square card that connects to the editor below (no rounded pill). */
+.tabs-bar { padding: 0; gap: 0; align-items: stretch; background: var(--bg-soft); }
+.tabs-bar .detect-chip { align-self: center; margin-left: 10px; }
+/* the active editor tab: type icon + filename + close (✕). */
+.file-tab { display: inline-flex; align-items: center; gap: 7px; position: relative; min-width: 0; max-width: 360px; padding: 0 8px 0 14px; margin-bottom: -1px; border: 0; border-right: 1px solid var(--border); border-bottom: 1px solid var(--bg); background: var(--bg); font-size: 13px; font-weight: 600; color: var(--ink); }
+.file-tab::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); } /* active-tab top accent */
 .file-tab-icon { flex: none; color: var(--accent); }
 .file-tab-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-tab-close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; padding: 0; border: none; border-radius: 5px; background: transparent; color: var(--dim); cursor: pointer; }
-.file-tab-close:hover { background: var(--border); color: var(--ink); }
+.file-tab-close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: none; border-radius: 5px; background: transparent; color: var(--dim); cursor: pointer; }
+.file-tab-close:hover { background: var(--bg-raise); color: var(--ink); }
 /* localhost-only fake sign-in affordance */
 .dev-login { font-size: 12px; font-weight: 600; color: var(--dim); background: var(--bg); border: 1px dashed var(--border-strong); border-radius: 8px; padding: 6px 11px; cursor: pointer; }
 .dev-login:hover { color: var(--ink); border-color: var(--dim); }
@@ -649,8 +659,7 @@ body.splitting .cm-editor, body.splitting #preview { pointer-events: none; }
   /* status text stays readable when it carries a warning ("Offline") or the
      unsaved-draft state; only the steady-state "Saved" shrinks to its dot.
      Tooltips don't exist on touch. */
-  .save-ind:not(.off):not(.unsaved) { font-size: 0; gap: 0; padding: 5px; }
-  .save-ind.off, .save-ind.unsaved { font-size: 11px; padding: 2.5px 9px; }
+  .save-ind.off { font-size: 11px; padding: 2.5px 9px; }
   /* comfortable touch targets (44px) for the two-control action row */
   .nav-group button { padding: 12px 16px; }
   /* row 1 must hold brand · (workspace) · title · status · auth control */

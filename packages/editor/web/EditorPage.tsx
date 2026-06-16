@@ -63,7 +63,6 @@ export default function EditorPage() {
   const [shareError, setShareError] = useState<string | null>(null);
   const [renderReady, setRenderReady] = useState(false); // wasm engine loaded
   const [editingName, setEditingName] = useState(false);
-  const [savingDraft, setSavingDraft] = useState(false); // explicit Save in flight (draft → room)
   // split = width of the source pane in % (dbdiagram-style draggable divider)
   const [split, setSplit] = useState(() => {
     const v = parseFloat(localStorage.getItem("kymo_split") || "");
@@ -189,7 +188,7 @@ export default function EditorPage() {
     if (shared) return; // ?s= state is seeded at mount and owned by the decode effect below
     const imp = pendingImport.current ?? takePendingTemplate(); pendingImport.current = null;
     setSource(imp ? imp.source : SAMPLE); setKind(imp ? imp.kind : "kymo");
-    setTitle(imp?.title || ""); setEditingName(false); setShareError(null); setSavingDraft(false);
+    setTitle(imp?.title || ""); setEditingName(false); setShareError(null);
     // A manually-named draft carries its title into the new room; otherwise the
     // name auto-tracks the source until the user renames.
     titleUserSet.current = !!imp?.title; autoTitle.current = "";
@@ -429,7 +428,6 @@ export default function EditorPage() {
     if (d) return; // already a saved room
     if (!sourceRef.current.trim()) return;
     if (!idToken) { pendingSave.current = true; promptSignIn(); return; }
-    setSavingDraft(true);
     const id = newId();
     pendingImport.current = { source: sourceRef.current, kind: kindRef.current, title: titleUserSet.current ? titleRef.current : undefined };
     assignDiagram(idToken, id, currentFolder, currentProject || undefined); // lands in the folder you're saving into
@@ -542,18 +540,12 @@ export default function EditorPage() {
         {claims && !shared && !showWelcome
           ? <AddressBar titleNode={titleEl} />
           : titleEl}
-        {/* the steady "Saved" pill is dropped (saving is silent + automatic); only
-            surface the disconnection warning, and the unsaved-draft state below */}
+        {/* the steady "Saved" pill is dropped (saving is silent + automatic); the
+            unsaved-draft pill is dropped too (the draft Save button already signals
+            it). Only the disconnection warning still surfaces. */}
         {claims && d && !booting && !live && (
           <span className="save-ind off" title="Disconnected — changes are not being saved">
             Offline
-          </span>
-        )}
-        {/* the unsaved-draft pill is only meaningful to signed-in users (a guest
-            can't keep drafts in a Diagrams list) — hide it when signed out */}
-        {claims && isDraft && !booting && !showWelcome && (
-          <span className="save-ind unsaved" title="Not saved anywhere yet — this draft only lives in this page's URL. Save to keep it in your Diagrams (⌘/Ctrl-S).">
-            {savingDraft ? "Saving…" : "Unsaved"}
           </span>
         )}
         <div className="spacer" />
@@ -583,67 +575,8 @@ export default function EditorPage() {
               Save
             </button>
           )}
-          {/* Export this diagram (SVG / PNG / source) — its own dropdown next to Share */}
-          {!showWelcome && (
-          <div className="account mob-hide" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setExportOpen((o) => !o)} aria-haspopup="menu" aria-expanded={exportOpen} title="Export this diagram">
-              <Download size={16} strokeWidth={2} />Export<ChevronDown size={16} strokeWidth={2.2} className="chev-icon" />
-            </button>
-            {exportOpen && (
-              <div className="acct-menu exp-menu">
-                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}><FileCode2 size={17} strokeWidth={1.9} />To SVG</button>
-                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportPNG(); }}><FileImage size={17} strokeWidth={1.9} />To PNG</button>
-                <div className="menu-sep" />
-                <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}><Code2 size={17} strokeWidth={1.9} />Source (.kymo)</button>
-              </div>
-            )}
-          </div>
-          )}
-          {/* Share is the standing CTA; New/Docs/Projects/Trash/Sign-out live on the
-              activity-bar rail (hamburger + account). */}
-          {!showWelcome && (
-          <div className="account" onClick={(e) => e.stopPropagation()}>
-            {/* Share is the standing CTA, but a draft's Save outranks it — demote Share to secondary then */}
-            <button className={isDraft && !booting ? "" : "btn-primary"} onClick={openShare} title="Share this diagram — the entire content lives in the link">
-              <Link2 size={16} strokeWidth={2} />
-              Share
-            </button>
-            {shareOpen && (() => {
-              const link = sharePayload ? shareUrl(kind, sharePayload) : "";
-              const tooLong = link.length > 2000;
-              return (
-                <div className="acct-menu share-menu">
-                  <div className="share-head">Share diagram</div>
-                  <p className="share-desc">The entire diagram lives in the link — anyone with it can open and edit their own copy, no sign-in needed.</p>
-                  <div className="share-row">
-                    <input className="share-url" readOnly spellCheck={false} value={link || "Generating link…"}
-                      onFocus={(e) => e.currentTarget.select()} onClick={(e) => (e.currentTarget as HTMLInputElement).select()} />
-                    <button className="btn-primary share-copy" disabled={!link} onClick={() => copyText("link", link)}>
-                      {copiedKey === "link" ? <Check size={15} strokeWidth={2.2} /> : <Copy size={15} strokeWidth={2} />}
-                      {copiedKey === "link" ? "Copied" : "Copy"}
-                    </button>
-                  </div>
-                  {tooLong && <div className="share-warn">This link is {link.length.toLocaleString()} characters — some chat apps may truncate it. Consider exporting SVG/PNG instead.</div>}
-                  <div className="menu-sep" />
-                  <button className="acct-item exp-item" disabled={!link} onClick={() => copyText("md", `[${diagramLabel}](${link})`)}>
-                    {copiedKey === "md" ? <Check size={17} strokeWidth={2.2} /> : <Code2 size={17} strokeWidth={1.9} />}
-                    {copiedKey === "md" ? "Copied!" : "Copy Markdown link"}
-                  </button>
-                  <button className="acct-item exp-item" disabled={!link}
-                    title="SVG image rendered by render.kymo.studio — paste straight into a GitHub README"
-                    onClick={() => copyText("img", `![${diagramLabel}](https://render.kymo.studio/${encodeURIComponent(kind)}/svg/${sharePayload})`)}>
-                    {copiedKey === "img" ? <Check size={17} strokeWidth={2.2} /> : <FileImage size={17} strokeWidth={1.9} />}
-                    {copiedKey === "img" ? "Copied!" : "Copy Markdown image"}
-                  </button>
-                  {shared && claims && (<>
-                    <div className="menu-sep" />
-                    <button className="acct-item exp-item" onClick={() => { setShareOpen(false); saveCopy(); }}><Save size={17} strokeWidth={1.9} />Save a copy to my diagrams</button>
-                  </>)}
-                </div>
-              );
-            })()}
-          </div>
-          )}
+          {/* Export + Share now live in the Preview pane header (next to the diagram
+              they act on), not in the top navbar — see the preview pane-bar below. */}
         </nav>
         {/* signed-in account lives at the bottom of the activity bar (VSCode-style); guests sign in here */}
         {!claims && <GoogleButton />}
@@ -680,7 +613,7 @@ export default function EditorPage() {
                   no tab, no close ✕; the pane only surfaces if paste auto-detect
                   has something to say. */}
               {(claims || detected) && (
-              <div className="pane-bar">
+              <div className="pane-bar tabs-bar">
                 {claims && (
                 <div className="file-tab" title={diagramLabel}>
                   <FileCode2 size={14} className="file-tab-icon" strokeWidth={2} />
@@ -702,6 +635,68 @@ export default function EditorPage() {
             )}
             {panes.preview && (
             <section className="pane">
+              {/* Preview header — same height as the Explorer / Source bars; holds the
+                  output actions (Export · Share) right by the diagram they act on. */}
+              <div className="pane-bar preview-bar">
+                <span className="pane-bar-label">Preview</span>
+                <div className="pane-bar-actions" onClick={(e) => e.stopPropagation()}>
+                  {/* Export this diagram (SVG / PNG / source) */}
+                  <div className="account" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => setExportOpen((o) => !o)} aria-haspopup="menu" aria-expanded={exportOpen} title="Export this diagram">
+                      <Download size={16} strokeWidth={2} />Export<ChevronDown size={16} strokeWidth={2.2} className="chev-icon" />
+                    </button>
+                    {exportOpen && (
+                      <div className="acct-menu exp-menu">
+                        <button className="acct-item exp-item" onClick={() => { setExportOpen(false); download(); }}><FileCode2 size={17} strokeWidth={1.9} />To SVG</button>
+                        <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportPNG(); }}><FileImage size={17} strokeWidth={1.9} />To PNG</button>
+                        <div className="menu-sep" />
+                        <button className="acct-item exp-item" onClick={() => { setExportOpen(false); exportSource(); }}><Code2 size={17} strokeWidth={1.9} />Source (.kymo)</button>
+                      </div>
+                    )}
+                  </div>
+                  {/* Share — the entire diagram lives in the link */}
+                  <div className="account" onClick={(e) => e.stopPropagation()}>
+                    <button className="btn-primary" onClick={openShare} title="Share this diagram — the entire content lives in the link">
+                      <Link2 size={16} strokeWidth={2} />
+                      Share
+                    </button>
+                    {shareOpen && (() => {
+                      const link = sharePayload ? shareUrl(kind, sharePayload) : "";
+                      const tooLong = link.length > 2000;
+                      return (
+                        <div className="acct-menu share-menu">
+                          <div className="share-head">Share diagram</div>
+                          <p className="share-desc">The entire diagram lives in the link — anyone with it can open and edit their own copy, no sign-in needed.</p>
+                          <div className="share-row">
+                            <input className="share-url" readOnly spellCheck={false} value={link || "Generating link…"}
+                              onFocus={(e) => e.currentTarget.select()} onClick={(e) => (e.currentTarget as HTMLInputElement).select()} />
+                            <button className="btn-primary share-copy" disabled={!link} onClick={() => copyText("link", link)}>
+                              {copiedKey === "link" ? <Check size={15} strokeWidth={2.2} /> : <Copy size={15} strokeWidth={2} />}
+                              {copiedKey === "link" ? "Copied" : "Copy"}
+                            </button>
+                          </div>
+                          {tooLong && <div className="share-warn">This link is {link.length.toLocaleString()} characters — some chat apps may truncate it. Consider exporting SVG/PNG instead.</div>}
+                          <div className="menu-sep" />
+                          <button className="acct-item exp-item" disabled={!link} onClick={() => copyText("md", `[${diagramLabel}](${link})`)}>
+                            {copiedKey === "md" ? <Check size={17} strokeWidth={2.2} /> : <Code2 size={17} strokeWidth={1.9} />}
+                            {copiedKey === "md" ? "Copied!" : "Copy Markdown link"}
+                          </button>
+                          <button className="acct-item exp-item" disabled={!link}
+                            title="SVG image rendered by render.kymo.studio — paste straight into a GitHub README"
+                            onClick={() => copyText("img", `![${diagramLabel}](https://render.kymo.studio/${encodeURIComponent(kind)}/svg/${sharePayload})`)}>
+                            {copiedKey === "img" ? <Check size={17} strokeWidth={2.2} /> : <FileImage size={17} strokeWidth={1.9} />}
+                            {copiedKey === "img" ? "Copied!" : "Copy Markdown image"}
+                          </button>
+                          {shared && claims && (<>
+                            <div className="menu-sep" />
+                            <button className="acct-item exp-item" onClick={() => { setShareOpen(false); saveCopy(); }}><Save size={17} strokeWidth={1.9} />Save a copy to my diagrams</button>
+                          </>)}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
               {shareError && <div className="share-error">{shareError}</div>}
               {kind === "kymo" && !renderReady && !shareError
                 ? <div className="boot"><KLoader /></div>
