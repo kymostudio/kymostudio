@@ -10,10 +10,200 @@
 //! kymo's own parse (mapped by node id); merman supplies positions.
 
 use kymo_graph::dagre_svg::{FEdge, FGeom, FNode, FRegion};
-use kymo_graph::flowchart::Flowchart;
+use kymo_graph::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
 use kymo_graph::layout::text_w_mermaid;
-use merman_core::diagrams::flowchart::parse_flowchart;
+use kymo_graph::model::Shape;
+use merman_core::diagrams::flowchart::{parse_flowchart, parse_flowchart_model_for_render};
 use merman_core::{MermaidConfig, ParseMetadata};
+
+/// Map a merman/mermaid `layoutShape` name to one of kymo's shapes — the same
+/// vocabulary kymo's own `mermaid::lexer::map_shape` uses, so the two parsers agree.
+fn map_merman_shape(name: Option<&str>) -> Shape {
+    match name.unwrap_or("").trim().to_ascii_lowercase().as_str() {
+        "circle" | "circ" | "dbl-circ" | "fr-circ" | "doublecircle" => Shape::Circle,
+        "diam" | "diamond" | "decision" | "fork" | "join" => Shape::Diamond,
+        "hex" | "hexagon" | "prepare" => Shape::Hex,
+        "cyl" | "cylinder" | "db" | "das" | "database" | "disk" | "lin-cyl" => Shape::Cylinder,
+        "stadium" | "pill" | "term" | "terminal" | "rounded" => Shape::Badge,
+        _ => Shape::Box,
+    }
+}
+
+/// merman's flowchart parser/grammar does NOT strip preprocessing — a leading
+/// `%%{init}%%` directive or `%%` comment line makes it reject the source (it expects
+/// `flowchart`/`graph` first). Drop `%%` lines so both the model parse and the layout
+/// parse succeed (otherwise layout falls back to kymo's own dagre, diverging).
+fn strip_directives(src: &str) -> String {
+    src.lines()
+        .filter(|l| !l.trim_start().starts_with("%%"))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+/// Read a CSS property value from a `{…}` block, matching `prop:` exactly (so
+/// `stroke` doesn't match `stroke-width`). Returns the value up to `;`/`}`.
+fn css_prop(block: &str, prop: &str) -> Option<String> {
+    let mut from = 0;
+    while let Some(rel) = block[from..].find(prop) {
+        let at = from + rel;
+        let after = &block[at + prop.len()..];
+        if after.starts_with(':') {
+            let val: String = after[1..].chars().take_while(|c| *c != ';' && *c != '}').collect();
+            let v = val.trim();
+            if !v.is_empty() {
+                return Some(v.to_string());
+            }
+        }
+        from = at + prop.len();
+    }
+    None
+}
+
+/// Lift the computed theme palette from merman's themed render (merman already runs
+/// mermaid's khroma-based theme engine, so its CSS carries the *exact* derived
+/// colours — no need to port the color math). Maps merman's selectors to kymo's.
+/// `%%{init: {"look":"neo"}}%%` — the neo node look (gradient stroke + drop-shadow).
+#[cfg(feature = "full")]
+fn is_neo_look(src: &str) -> bool {
+    let low = src.to_ascii_lowercase();
+    low.contains("%%{init") && low.contains("look") && low.contains("neo")
+}
+
+/// Lift merman's `<linearGradient>` def (theme-derived stops, byte-identical to
+/// mermaid's), re-id'd to `fc-theme-gradient` for kymo's neo gradient stroke.
+#[cfg(feature = "full")]
+fn lift_gradient_def(svg: &str) -> Option<String> {
+    let i = svg.find("<linearGradient")?;
+    let end = svg[i..].find("</linearGradient>")? + i + "</linearGradient>".len();
+    let def = &svg[i..end];
+    // rename the first id="…" to a stable kymo id
+    let s = def.find("id=\"")?;
+    let vs = s + 4;
+    let e = def[vs..].find('"')?;
+    Some(format!("{}id=\"fc-theme-gradient\"{}", &def[..s], &def[vs + e + 1..]))
+}
+
+#[cfg(feature = "full")]
+fn extract_theme_colors(svg: &str, neo: bool) -> kymo_graph::dagre_svg::ThemeColors {
+    let block = |sel: &str| -> Option<&str> {
+        let i = svg.find(sel)?;
+        let open = svg[i..].find('{')? + i;
+        let close = svg[open..].find('}')? + open;
+        Some(&svg[open + 1..close])
+    };
+    let p = |sel: &str, prop: &str| block(sel).and_then(|b| css_prop(b, prop));
+    kymo_graph::dagre_svg::ThemeColors {
+        node_fill: p(".node rect", "fill"),
+        node_stroke: p(".node rect", "stroke"),
+        line: p(".flowchart-link", "stroke"),
+        text: p(".label text", "fill").or_else(|| p("#merman", "fill")),
+        cluster_fill: p(".cluster rect", "fill"),
+        cluster_stroke: p(".cluster rect", "stroke"),
+        background: None, // mermaid base keeps a light bg even in darkMode; kymo's ~matches
+        // neo look: gradient node stroke (only when a theme-derived gradient exists) +
+        // drop-shadow. merman defines the gradient but flat-fills — kymo applies it.
+        gradient: if neo { lift_gradient_def(svg) } else { None },
+        drop_shadow: neo,
+    }
+}
+
+/// A subgraph id can be an edge endpoint (`A --> B` between two subgraphs). mermaid
+/// draws a cluster-to-cluster edge; kymo has no cluster-edge, so resolve the subgraph
+/// to a representative member node — keeping node + edge counts correct (no phantom
+/// node). Returns `id` unchanged when it is already a real node.
+fn resolve_subgraph_endpoint(id: &str, sub_members: &HashMap<&str, &Vec<String>>, depth: u8) -> String {
+    if depth > 8 {
+        return id.to_string();
+    }
+    match sub_members.get(id) {
+        None => id.to_string(), // a real node, not a subgraph
+        Some(members) => members
+            .iter()
+            .map(|m| resolve_subgraph_endpoint(m, sub_members, depth + 1))
+            .find(|r| !sub_members.contains_key(r.as_str()))
+            .unwrap_or_else(|| id.to_string()),
+    }
+}
+
+/// Build kymo's `Flowchart` IR from **merman's** parser (a faithful LALRPOP port of
+/// mermaid.js's grammar) instead of kymo's own hand-written parser, translating
+/// merman's render model into kymo structs. Gives kymo merman's 100%-topology parse —
+/// fixing kymo-parser divergences (multi-line `["…"]` labels, `.`-in-ids, subgraph
+/// member counts). `None` on parse failure (caller falls back to kymo's parser).
+pub fn flowchart_from_merman(src: &str) -> Option<Flowchart> {
+    let meta = ParseMetadata {
+        diagram_type: "flowchart-v2".to_string(),
+        config: MermaidConfig::default(),
+        effective_config: MermaidConfig::default(),
+        title: None,
+    };
+    let model = parse_flowchart_model_for_render(&strip_directives(src), &meta).ok()?;
+    let direction = match model
+        .direction
+        .as_deref()
+        .unwrap_or("TB")
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "LR" => Direction::Lr,
+        "RL" => Direction::Rl,
+        "BT" => Direction::Bt,
+        _ => Direction::Tb,
+    };
+    let sub_members: HashMap<&str, &Vec<String>> = model
+        .subgraphs
+        .iter()
+        .map(|s| (s.id.as_str(), &s.nodes))
+        .collect();
+    // merman lists a subgraph id as a node too (it can be an edge endpoint); mermaid
+    // draws those as clusters, not nodes — exclude them so node counts match.
+    let nodes = model
+        .nodes
+        .iter()
+        .filter(|n| !sub_members.contains_key(n.id.as_str()))
+        .map(|n| FlowNode {
+            id: n.id.clone(),
+            label: n.label.clone().unwrap_or_else(|| n.id.clone()),
+            shape: map_merman_shape(n.layout_shape.as_deref()),
+        })
+        .collect();
+    let edges = model
+        .edges
+        .iter()
+        .map(|e| FlowEdge {
+            src: resolve_subgraph_endpoint(&e.from, &sub_members, 0),
+            dst: resolve_subgraph_endpoint(&e.to, &sub_members, 0),
+            label: e.label.clone().unwrap_or_default(),
+            dashed: e.stroke.as_deref() == Some("dotted"),
+            no_arrow: e.edge_type.as_deref() == Some("arrow_open"),
+        })
+        .collect();
+    let sub_ids: Vec<&str> = model.subgraphs.iter().map(|s| s.id.as_str()).collect();
+    let subgraphs = model
+        .subgraphs
+        .iter()
+        .map(|s| Subgraph {
+            id: s.id.clone(),
+            title: s.title.clone(),
+            members: s
+                .nodes
+                .iter()
+                .filter(|m| !sub_ids.contains(&m.as_str()))
+                .cloned()
+                .collect(),
+            parent: model
+                .subgraphs
+                .iter()
+                .position(|p| p.id != s.id && p.nodes.iter().any(|m| m == &s.id)),
+        })
+        .collect();
+    Some(Flowchart {
+        direction,
+        nodes,
+        edges,
+        subgraphs,
+    })
+}
 use merman_render::flowchart::layout_flowchart_v2;
 use merman_render::svg::{render_flowchart_v2_svg, SvgRenderOptions};
 use merman_render::text::{TextMeasurer, TextMetrics, TextStyle, WrapMode};
@@ -382,7 +572,7 @@ pub fn build_geom(src: &str, fc: &Flowchart) -> Option<FGeom> {
     // `\\` (matrices, cases, `\\,` spacing, double-escaped commands). Protect
     // `\\` inside `$$…$$` with a placeholder; `measure_html_label` restores it
     // before kymo-tex measures, so nodes get their true KaTeX size.
-    let protected = protect_math_double_backslash(src);
+    let protected = protect_math_double_backslash(&strip_directives(src));
     let semantic = parse_flowchart(&protected, &meta).ok()?;
     let config = MermaidConfig::default();
     let measurer = KymoTextMeasurer;
@@ -529,6 +719,20 @@ pub fn build_geom(src: &str, fc: &Flowchart) -> Option<FGeom> {
                 .map(|n| n.cy + n.h / 2.0)
                 .fold(40.0_f64, f64::max)
                 + MARGIN;
+        }
+    }
+    // Theme: when the source carries `themeVariables`, lift merman's computed palette
+    // (exact mermaid colours) onto kymo's raster-safe shapes. Gated to `full` (needs
+    // merman's binding render). Un-themed files: `geom.theme` stays None (no change).
+    #[cfg(feature = "full")]
+    {
+        let neo = is_neo_look(src);
+        if neo || src.to_ascii_lowercase().contains("themevariables") {
+            if let Ok(bytes) = merman_bindings_core::render_svg(src.as_bytes(), b"{}") {
+                if let Ok(svg) = std::str::from_utf8(&bytes) {
+                    geom.theme = Some(extract_theme_colors(svg, neo));
+                }
+            }
         }
     }
     Some(geom)

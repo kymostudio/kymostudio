@@ -14,7 +14,7 @@
 //
 // Run:  node layout-accuracy.mjs [file1 file2 ...]   (from benches/mermaid-format)
 
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -24,14 +24,26 @@ const ROOT = resolve(HERE, "../..");
 const FIXDIR = HERE + "/datasets/mermaid-cypress/flowchart/";
 const TMP = "/tmp/layout-acc/";
 mkdirSync(TMP, { recursive: true });
-const FILES = process.argv.slice(2).length
-  ? process.argv.slice(2)
-  : ["flowchart_023", "flowchart_029", "flowchart_025", "flowchart_027", "flowchart-v2_079", "flowchart-v2_072", "flowchart-v2_080"];
+const argv = process.argv.slice(2);
+const FILES = argv.includes("--all")
+  ? readdirSync(FIXDIR).filter((f) => /^flowchart(-v2)?_\d+\.mmd$/.test(f)).map((f) => f.replace(/\.mmd$/, "")).sort()
+  : argv.length
+    ? argv
+    : ["flowchart_023", "flowchart_029", "flowchart_025", "flowchart_027", "flowchart-v2_079", "flowchart-v2_072", "flowchart-v2_080"];
 
 const m = await import(ROOT + "/packages/rust/kymo-mermaid/pkg/kymo_mermaid.js");
 m.initSync({ module: readFileSync(ROOT + "/packages/rust/kymo-mermaid/pkg/kymo_mermaid_bg.wasm") });
 
-writeFileSync(TMP + "conf.json", JSON.stringify({ securityLevel: "loose", flowchart: { useMaxWidth: false } }));
+// pixel-Δ (the 2026-06-16 metric): rasterise BOTH SVGs the same way + mean per-channel |Δ|
+const require = (await import("node:module")).createRequire(import.meta.url);
+const puppeteer = (await import("puppeteer-core")).default;
+const { PNG } = require("pngjs");
+const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const RENDER_FLAGS = ["--no-sandbox", "--disable-gpu", "--font-render-hinting=none", "--force-color-profile=srgb"];
+const browser = await puppeteer.launch({ executablePath: CHROME, headless: "new", args: RENDER_FLAGS });
+
+// reproducible reference config (matches 2026-06-16): forceLegacyMathML + zeroed display margin
+writeFileSync(TMP + "conf.json", JSON.stringify({ securityLevel: "loose", forceLegacyMathML: true, themeCSS: ".katex-display{margin:0 !important}", flowchart: { useMaxWidth: false } }));
 writeFileSync(TMP + "pptr.json", JSON.stringify({ args: ["--no-sandbox", "--disable-gpu"] }));
 function mermaidSvg(file) {
   const out = TMP + "mm_" + file + ".svg";
@@ -40,33 +52,91 @@ function mermaidSvg(file) {
   return readFileSync(out, "utf8");
 }
 
+// ── pixel-Δ: rasterise an SVG inline in Chromium, mean per-channel |Δ| ────────
+function svgDims(svg) {
+  const vb = svg.match(/viewBox="([\d.\- ]+)"/);
+  if (vb) { const a = vb[1].trim().split(/\s+/).map(Number); if (a.length === 4) return { W: Math.max(1, Math.ceil(a[2])), H: Math.max(1, Math.ceil(a[3])) }; }
+  const w = svg.match(/\bwidth="(\d+)/), h = svg.match(/\bheight="(\d+)/);
+  return w && h ? { W: +w[1], H: +h[1] } : { W: 800, H: 600 };
+}
+function pinSvgSize(svg, W, H) {
+  const open = svg.match(/<svg\b[^>]*>/); if (!open) return svg;
+  const tag = open[0].replace(/\s(width|height)="[^"]*"/g, "").replace(/\sstyle="[^"]*"/g, "").replace(/<svg\b/, `<svg width="${W}" height="${H}"`);
+  return svg.replace(open[0], tag);
+}
+async function svgToPng(svg) {
+  const { W, H } = svgDims(svg);
+  const p = await browser.newPage();
+  await p.setViewport({ width: Math.min(W, 5000) + 8, height: Math.min(H, 9000) + 8, deviceScaleFactor: 2 });
+  await p.setContent(`<!DOCTYPE html><html><head><meta charset="utf-8"><style>.katex,.katex *,foreignObject,foreignObject *{text-rendering:geometricPrecision !important}</style></head>` +
+    `<body style="margin:0;background:#fff;display:inline-block">` + pinSvgSize(svg, W, H) + `</body></html>`, { waitUntil: "load" });
+  const el = await p.$("svg");
+  await p.evaluate(async () => { if (document.fonts?.ready) await document.fonts.ready; });
+  const buf = await el.screenshot({ type: "png" });
+  await p.close();
+  return PNG.sync.read(buf);
+}
+function padToWhite(png, W, H) {
+  const out = Buffer.alloc(W * H * 4, 255);
+  for (let y = 0; y < png.height; y++) for (let x = 0; x < png.width; x++) {
+    const si = (y * png.width + x) * 4, di = (y * W + x) * 4, a = png.data[si + 3] / 255;
+    out[di] = Math.round(png.data[si] * a + 255 * (1 - a));
+    out[di + 1] = Math.round(png.data[si + 1] * a + 255 * (1 - a));
+    out[di + 2] = Math.round(png.data[si + 2] * a + 255 * (1 - a));
+  }
+  return out;
+}
+function resizeWhite(buf, srcW, srcH, dstW, dstH) {
+  const out = Buffer.alloc(dstW * dstH * 4, 255), sx = srcW / dstW, sy = srcH / dstH;
+  for (let y = 0; y < dstH; y++) { const fy = (y + 0.5) * sy - 0.5, y0 = Math.max(0, Math.floor(fy)), y1 = Math.min(srcH - 1, y0 + 1), wy = fy - y0;
+    for (let x = 0; x < dstW; x++) { const fx = (x + 0.5) * sx - 0.5, x0 = Math.max(0, Math.floor(fx)), x1 = Math.min(srcW - 1, x0 + 1), wx = fx - x0, di = (y * dstW + x) * 4;
+      for (let c = 0; c < 3; c++) { const p00 = buf[(y0 * srcW + x0) * 4 + c], p01 = buf[(y0 * srcW + x1) * 4 + c], p10 = buf[(y1 * srcW + x0) * 4 + c], p11 = buf[(y1 * srcW + x1) * 4 + c];
+        const top = p00 + (p01 - p00) * wx, bot = p10 + (p11 - p10) * wx; out[di + c] = Math.round(top + (bot - top) * wy); } } }
+  return out;
+}
+function diffMeanAbs(aPng, refPng) {
+  const W = refPng.width, H = refPng.height, ref = padToWhite(refPng, W, H);
+  let oth = padToWhite(aPng, aPng.width, aPng.height);
+  if (aPng.width !== W || aPng.height !== H) oth = resizeWhite(oth, aPng.width, aPng.height, W, H);
+  let sum = 0;
+  for (let i = 0; i < W * H; i++) { const j = i * 4; sum += 0.299 * Math.abs(ref[j] - oth[j]) + 0.587 * Math.abs(ref[j + 1] - oth[j + 1]) + 0.114 * Math.abs(ref[j + 2] - oth[j + 2]); }
+  return sum / (W * H) / 255;
+}
+
 // ── geometry extraction ──────────────────────────────────────────────────────
 const num = (s) => parseFloat(s);
 
 // mermaid: node center = <g class="node" transform="translate(x,y)">; size from the
 // first shape in that group's slice. id parsed from `flowchart-<ID>-<n>`.
+// Count node groups by id (every node has one). Transform sits on the <g>, or — for
+// clickable nodes — on a wrapping <a>; else fall back to the inner shape's center.
 function mermaidNodes(svg) {
-  const nodesSec = svg.slice(svg.indexOf('class="nodes"'));
-  const starts = [...nodesSec.matchAll(/<g class="[^"]*\bnode\b[^"]*"[^>]*id="([^"]*)"[^>]*transform="translate\(([-\d.]+),\s*([-\d.]+)\)"/g)];
+  const sec = svg.slice(svg.indexOf('class="nodes"'));
+  const starts = [...sec.matchAll(/<g class="[^"]*\bnode\b[^"]*"[^>]*\bid="([^"]*flowchart-[^"]*)"[^>]*>/g)];
   const nodes = [];
   for (let i = 0; i < starts.length; i++) {
     const mm = starts[i];
-    const idRaw = mm[1];
-    const idm = idRaw.match(/flowchart-(.+)-\d+$/);
-    const id = idm ? idm[1] : idRaw;
-    const cx = num(mm[2]), cy = num(mm[3]);
-    const chunk = nodesSec.slice(mm.index, i + 1 < starts.length ? starts[i + 1].index : undefined);
-    nodes.push({ id, cx, cy, ...shapeSize(chunk) });
+    const idm = mm[1].match(/flowchart-(.+)-\d+$/);
+    const id = idm ? idm[1] : mm[1];
+    const chunk = sec.slice(mm.index, i + 1 < starts.length ? starts[i + 1].index : undefined);
+    let tr = mm[0].match(/transform="translate\(([-\d.]+),\s*([-\d.]+)\)"/);
+    if (!tr) tr = [...sec.slice(Math.max(0, mm.index - 240), mm.index).matchAll(/<a[^>]*transform="translate\(([-\d.]+),\s*([-\d.]+)\)"/g)].pop();
+    const sz = shapeSize(chunk);
+    if (tr) { nodes.push({ id, cx: num(tr[1]), cy: num(tr[2]), ...sz }); }
+    else { const b = shapeBoxFromChunk(chunk); nodes.push({ id, cx: b ? b.cx : NaN, cy: b ? b.cy : NaN, ...sz }); }
   }
   return nodes;
 }
-// kymo: each fc-shape element is a node, absolute coords, source order.
+function shapeBoxFromChunk(chunk) { for (const t of ["circle", "ellipse", "rect", "polygon", "path"]) { const e = chunk.match(new RegExp(`<${t}\\b[^>]*>`)); if (e) { const b = elemBox(t, e[0]); if (b) return b; } } return null; }
+// kymo wraps each node in <g class="fc-node" data-id="X"> — one per node (robust to
+// multi-shape/empty-label nodes); center from its first shape.
 function kymoNodes(svg) {
   const nodes = [];
-  for (const mm of svg.matchAll(/<(ellipse|rect|polygon|path)\b[^>]*class="fc-shape[^"]*"[^>]*>/g)) {
-    const el = mm[0];
-    const g = elemBox(mm[1], el);
-    if (g) nodes.push({ id: null, cx: g.cx, cy: g.cy, w: g.w, h: g.h });
+  for (const mm of svg.matchAll(/<g class="fc-node" data-id="([^"]*)">/g)) {
+    const chunk = svg.slice(mm.index, svg.indexOf("</g>", mm.index));
+    const sm = chunk.match(/<(ellipse|rect|polygon|path)\b[^>]*class="fc-shape[^"]*"[^>]*>/);
+    const g = sm ? elemBox(sm[1], sm[0]) : null;
+    nodes.push(g ? { id: mm[1], cx: g.cx, cy: g.cy, w: g.w, h: g.h } : { id: mm[1], cx: NaN, cy: NaN, w: NaN, h: NaN });
   }
   return nodes;
 }
@@ -102,7 +172,7 @@ function edges(svg, kymo) {
     const d = tag.match(/\bd="([^"]*)"/)?.[1];
     if (d && /^\s*M/.test(d)) out.push(flatten(d));
   }
-  return out.filter((p) => p.length > 1);
+  return out;
 }
 function flatten(d) {
   const toks = d.match(/[MLCZ]|-?\d+\.?\d*/gi) || [];
@@ -133,6 +203,15 @@ function greedyMatch(A, B) { // pair A[i]→B[j] by nearest, bijective
   }
   return pairs;
 }
+// Pair by id when both sides have one (kymo data-id ↔ mermaid flowchart-<id>); removes
+// the subgraph mispairing that inflated NN position errors. Falls back to NN otherwise.
+function matchNodes(A, B) {
+  if (A.length && B.length && A.every((n) => n.id != null) && B.every((n) => n.id != null)) {
+    const byId = new Map(B.map((n) => [n.id, n]));
+    return A.map((a) => { const b = byId.get(a.id); return b ? [a, b, dist([a.cx, a.cy], [b.cx, b.cy])] : null; }).filter(Boolean);
+  }
+  return greedyMatch(A, B);
+}
 function sampleDist(p, q) { // symmetric mean & max nearest-point between polylines
   const near = (pt, poly) => Math.min(...poly.map((x) => dist(pt, x)));
   const ds = [...p.map((x) => near(x, q)), ...q.map((x) => near(x, p))];
@@ -144,8 +223,8 @@ const stats = (xs) => xs.length ? {
   max: Math.max(...xs),
 } : { mean: NaN, median: NaN, max: NaN };
 
-console.log("\nfile               topo   pos(px) med/p90/max   size Δw/Δh med   edge px mean/max   (norm % of diag)");
-console.log("-".repeat(104));
+console.log("\nfile               topo   pos(px) med/p90/max   sizeΔw/Δh   edge m/max   pixel-Δ");
+console.log("-".repeat(96));
 const all = [];
 for (const f of FILES) {
   let mm, ky;
@@ -161,7 +240,7 @@ for (const f of FILES) {
   const kNa = kN.map((n) => ({ ...n, cx: n.cx + t[0], cy: n.cy + t[1] }));
   const diag = (() => { const vb = mm.match(/viewBox="[\d.\- ]*?\s([\d.]+)\s([\d.]+)"/); return vb ? Math.hypot(+vb[1], +vb[2]) : 1; })();
 
-  const pairs = greedyMatch(kNa, mN);
+  const pairs = matchNodes(kNa, mN);
   const posErr = pairs.map((p) => p[2]);
   const dW = pairs.map((p) => Math.abs(p[0].w - p[1].w)).filter((x) => !isNaN(x));
   const dH = pairs.map((p) => Math.abs(p[0].h - p[1].h)).filter((x) => !isNaN(x));
@@ -176,15 +255,22 @@ for (const f of FILES) {
   }
   const eMean = stats(edgeErr.map((e) => e.mean)), eMax = stats(edgeErr.map((e) => e.max));
   const ps = stats(posErr), p90 = posErr.slice().sort((a, b) => a - b)[Math.floor(posErr.length * 0.9)] ?? ps.max;
+
+  // pixel-Δ (the 2026-06-16 metric): rasterise both SVGs the same way, mean per-channel |Δ|
+  let pixel = null;
+  try { pixel = diffMeanAbs(await svgToPng(ky), await svgToPng(mm)); } catch { /* leave null */ }
+
   const f2 = (x) => isNaN(x) ? "–" : x.toFixed(1);
   const pc = (x) => isNaN(x) ? "" : (100 * x / diag).toFixed(1) + "%";
   console.log(
-    `${f.padEnd(18)} ${topo.padEnd(11)} ${f2(ps.median)}/${f2(p90)}/${f2(ps.max)}`.padEnd(52) +
-    `  ${f2(stats(dW).median)}/${f2(stats(dH).median)}`.padEnd(16) +
-    `  ${f2(eMean.mean)}/${f2(eMax.max)}   (pos ${pc(ps.median)}, edge ${pc(eMean.mean)})`
+    `${f.padEnd(18)} ${topo.padEnd(11)} ${f2(ps.median)}/${f2(p90)}/${f2(ps.max)}`.padEnd(50) +
+    `  ${f2(stats(dW).median)}/${f2(stats(dH).median)}`.padEnd(14) +
+    `  ${f2(eMean.mean)}/${f2(eMax.max)}`.padEnd(12) +
+    `  px ${pixel == null ? "–" : (pixel * 100).toFixed(2) + "%"}`
   );
-  all.push({ f, pos: ps, p90, dW: stats(dW), dH: stats(dH), edgeMean: eMean, edgeMax: eMax, diag, topoOk: topo.includes("✓") });
+  all.push({ f, pos: ps, p90, dW: stats(dW), dH: stats(dH), edgeMean: eMean, edgeMax: eMax, pixel, diag, topoOk: topo.includes("✓") });
 }
+await browser.close();
 writeFileSync(TMP + "layout-accuracy.json", JSON.stringify(all, null, 2));
 console.log("\nnodes paired by nearest-neighbour after centroid-translation align (kymo has no ids).");
 console.log("pos = node-center error (dagre/dugong fidelity) · size = w/h error (text-measure fidelity) · edge = routing polyline distance.");
