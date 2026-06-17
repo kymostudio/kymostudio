@@ -108,6 +108,11 @@ a.exp-item { text-decoration: none; } /* Docs/Diagrams links inside the ⋯ menu
 .exp-item svg { flex: none; color: var(--dim); }
 .exp-item:hover svg { color: var(--accent); }
 .menu-sep { height: 1px; background: var(--border); margin: 4px 6px; }
+/* Right-click tab context menu: an .acct-menu pinned at the cursor (fixed). */
+.tab-menu { position: fixed; right: auto; top: auto; min-width: 180px; }
+.tab-menu .acct-item:first-child { margin-top: 0; }
+.acct-item[disabled] { opacity: 0.4; cursor: default; }
+.acct-item[disabled]:hover { background: transparent; }
 
 /* share popover (Figma-style panel under the Share CTA) */
 .share-menu { width: min(380px, calc(100vw - 20px)); padding: 12px; cursor: default; }
