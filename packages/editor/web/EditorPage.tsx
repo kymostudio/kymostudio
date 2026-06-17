@@ -858,8 +858,6 @@ export default function EditorPage() {
                     <button className="acct-item" role="menuitem" disabled={!others.length} onClick={() => act(() => closeTabs(others))}>Close Others</button>
                     <button className="acct-item" role="menuitem" disabled={!right.length} onClick={() => act(() => closeTabs(right))}>Close to the Right</button>
                     <div className="menu-sep" />
-                    {/* Every open tab is a server file that autosaves — "saved" === all of them. */}
-                    <button className="acct-item" role="menuitem" onClick={() => act(() => closeTabs([...openTabs]))}>Close Saved</button>
                     <button className="acct-item" role="menuitem" onClick={() => act(() => closeTabs([...openTabs]))}>Close All</button>
                   </div>
                 );
