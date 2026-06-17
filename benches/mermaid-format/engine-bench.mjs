@@ -23,7 +23,7 @@ mkdirSync(TMP, { recursive: true });
 const MMDR = process.env.MMDR || (process.env.HOME + "/.cargo/bin/mmdr");
 const argv = process.argv.slice(2);
 const FILES = argv.includes("--all")
-  ? readdirSync(FIXDIR).filter((f) => /^flowchart(-v2)?_\d+\.mmd$/.test(f)).map((f) => f.replace(/\.mmd$/, "")).sort()
+  ? readdirSync(FIXDIR).filter((f) => (process.argv.includes("--corpus") ? /\.mmd$/ : /^flowchart(-v2)?_\d+\.mmd$/).test(f)).map((f) => f.replace(/\.mmd$/, "")).sort()
   : argv.length ? argv.filter((a) => !a.startsWith("--")) : ["flowchart_023", "flowchart_029", "flowchart-v2_080"];
 
 const require = (await import("node:module")).createRequire(import.meta.url);

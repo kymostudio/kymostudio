@@ -39,12 +39,26 @@ Two build paths exist:
 
 ## The honest headline
 
-Production corpus = the **110 plain** flowchart files kymo serves (`isPlainFlowchart`;
-the other 26 carry `%%{init}` config and fall back to mermaid.js / merman). The
-full-corpus distribution (prior bench): **mean 1.11% · median 0.63% · ≤0.5% 54/110
-· ≤1% 73/110 · p90 ~3%**. The **median (0.63%) beats mermaid's own Rust port**
-(merman, 1.76%). `mean < 0.5%` remains below the shared SVG-rasterisation floor —
-not a scoped feature, see the 06-15 log's arithmetic.
+Production corpus = the plain flowchart files kymo serves (`isPlainFlowchart`).
+
+> **Validated full-corpus distribution (2026-06-17, reproducible reference).** The
+> prior headline (mean 1.11% / median 0.63%) came from the old img-data-URI reference
+> (silently broke on foreignObject/`<br/>`). Re-measured against the **reproducible
+> KaTeX-HTML reference** (`forceLegacyMathML`, both SVGs rasterised the same way —
+> `engine-bench.mjs --all --corpus`, `2026-06-17-engine-comparison.md`):
+>
+> | category | n | pixel-Δ med / p90 / max | topology |
+> |---|---|---|---|
+> | **plain flowchart** | 102 | **1.12% / 3.18% / 6.32%** | **102/102 (100%)** |
+> | conf/theme (`%%{init}`) | 9 | 1.48% / 3.98% / 3.98% | 9/9 |
+> | icon | 5 | 2.02% / 3.99% / 3.99% | 2/5 |
+> | katex (math) | 3 | 5.52% / 7.02% / 7.02% | 3/3 |
+> | **all** | **121** | **1.21% / 3.27%** | **118/121 (98%)** |
+>
+> This is the first end-to-end-valid, OS-independent distribution. The plain median
+> (1.12%) is the honest pixel-Δ vs mermaid.js; topology is **100% on plain** (parser
+> via merman). The 1.12% > the old 0.63% because the old reference was flawed, not a
+> regression — kymo beats merman on raster-safety (merman labels vanish server-side).
 
 ## Worst 10 (production) — three-engine, re-measured today
 
