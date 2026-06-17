@@ -72,6 +72,6 @@ fn layout(_src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
 /// lay the graph out.
 #[cfg(feature = "katex-layout")]
 fn layout(src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
-    crate::merman_layout::geom_from_merman(src, fc)
+    crate::katex_layout::build_geom(src, fc)
         .unwrap_or_else(|| kymo_graph::layout_dagre::dagre_geom(fc, style))
 }

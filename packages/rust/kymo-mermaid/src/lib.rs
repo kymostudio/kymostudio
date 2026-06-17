@@ -172,12 +172,12 @@ mod wasm_full {
 
 // ── katex-layout: mermaid-exact layout (merman) + raster-safe KaTeX math ──────
 // Selects `engine::mermaid_to_svg_dagre`'s high-fidelity geometry branch.
-// `merman_layout` borrows kymo-graph's flowchart model + float `<text>` renderer;
+// `katex_layout` borrows kymo-graph's flowchart model + float `<text>` renderer;
 // `katex` draws `$$…$$` as KaTeX glyph outlines via the kymo-tex crates.
 #[cfg(feature = "katex-layout")]
 mod katex;
 #[cfg(feature = "katex-layout")]
-mod merman_layout;
+mod katex_layout;
 
 #[cfg(all(feature = "wasm", feature = "katex-layout"))]
 mod wasm_katex {

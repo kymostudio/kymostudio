@@ -5,12 +5,13 @@
 //! KaTeX's own font outlines, so the rasterised output tracks mermaid.js's KaTeX.
 //!
 //! Only compiled under the `katex-layout` feature (see lib.rs); the math `<g>`
-//! is sized + centred by [`crate::merman_layout`].
+//! is sized + centred by [`crate::katex_layout`].
 
 use kymo_layout::{layout, to_display_list, LayoutOptions};
 use kymo_parser::parser::parse;
 use kymo_svg::{render_to_svg, SvgOptions};
 use kymo_types::color::Color;
+use kymo_types::math_style::MathStyle;
 
 /// mermaid's default-theme node label colour (`nodeTextColor`). kymo-tex defaults
 /// to pure black; mermaid draws labels (and KaTeX math) in `#333333`, so without
@@ -24,9 +25,18 @@ const MERMAID_TEXT_COLOR: &str = "#333333";
 pub fn render(formula: &str) -> Option<(String, f64, f64, f64)> {
     // Mermaid double-escapes commands (`\\alpha` is a real `\alpha`).
     let normalized = formula.replace("\\\\", "\\");
+    // Keep `\phase`: the calibration target is mermaid `forceLegacyMathML` (KaTeX HTML +
+    // bundled webfonts — the OS-reproducible reference), which renders the ∠ phasor. The
+    // default `output:"mathml"` path drops it, but that render is OS-font-dependent and
+    // breaks on Linux — see benches/mermaid-format/research/2026-06-16-flowchart-mermaid-style.md.
     let ast = parse(&normalized).ok()?;
-    let layout_opts =
-        LayoutOptions::default().with_color(Color::parse(MERMAID_TEXT_COLOR).unwrap_or(Color::BLACK));
+    // Lay out in DISPLAY style to match KaTeX-HTML (mermaid's `displayMode:true`). Against
+    // the reproducible KaTeX-HTML reference katex_000 reaches 2.44% (≈ the raster floor);
+    // an earlier TEXT-style choice was overfit to macOS-Chrome-MathML/STIX (OS-dependent)
+    // and is reverted. The residual is now path-fill-vs-font-render edge AA × glyph density.
+    let layout_opts = LayoutOptions::default()
+        .with_style(MathStyle::Display)
+        .with_color(Color::parse(MERMAID_TEXT_COLOR).unwrap_or(Color::BLACK));
     let lbox = layout(&ast, &layout_opts);
     let dl = to_display_list(&lbox);
     let (w_em, h_em, baseline_em) = (dl.width, dl.height + dl.depth, dl.height);

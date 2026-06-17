@@ -1,0 +1,299 @@
+{
+  "S": 19.298874628656726,
+  "rows": [
+    {
+      "file": "katex_000",
+      "idx": 0,
+      "latex": "f(\\relax{x}) = \\int_{-\\infty}^\\infty \\hat{f}(\\xi)\\,e^{2 \\pi i \\xi x}\\,d\\xi",
+      "short": "f(\\relax{x}) = \\int_{-\\infty}^\\inf",
+      "kymo": {
+        "w": 10.76185,
+        "h": 2.3845799999999997
+      },
+      "ref": {
+        "w": 211.921875,
+        "h": 50.015625,
+        "census": {
+          "mover": 1
+        }
+      },
+      "wPct": 98.00384878739366,
+      "hPct": 92.01066759038251,
+      "aKymo": 4.513100839560846,
+      "aRef": 4.237113402061856,
+      "refW": 211.921875,
+      "refH": 50.015625,
+      "census": {
+        "mover": 1
+      }
+    },
+    {
+      "file": "katex_000",
+      "idx": 1,
+      "latex": "\\Bigg(\\bigg(\\Big(\\big((\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a})\\big)\\Big)\\bigg)\\Bigg)",
+      "short": "\\Bigg(\\bigg(\\Big(\\big((\\frac{-b\\pm",
+      "kymo": {
+        "w": 12.95972,
+        "h": 3.0000299999999998
+      },
+      "ref": {
+        "w": 251.9375,
+        "h": 60,
+        "census": {
+          "mfrac": 1,
+          "msqrt": 1,
+          "stretchy": [
+            "3em",
+            "2.4em",
+            "1.8em",
+            "1.2em",
+            "1.2em",
+            "1.8em",
+            "2.4em",
+            "3em"
+          ]
+        }
+      },
+      "wPct": 99.27383239989885,
+      "hPct": 96.49533808701504,
+      "aKymo": 4.319863468031987,
+      "aRef": 4.198958333333334,
+      "refW": 251.9375,
+      "refH": 60,
+      "census": {
+        "mfrac": 1,
+        "msqrt": 1,
+        "stretchy": [
+          "3em",
+          "2.4em",
+          "1.8em",
+          "1.2em",
+          "1.2em",
+          "1.8em",
+          "2.4em",
+          "3em"
+        ]
+      }
+    },
+    {
+      "file": "katex_000",
+      "idx": 2,
+      "latex": "1+\\frac{e^{-2\\pi}} {1+\\frac{e^{-4\\pi}} {1+\\frac{e^{-6\\pi}} {1+\\frac{e^{-8\\pi}} {1+\\cdots}}}}",
+      "short": "1+\\frac{e^{-2\\pi}} {1+\\frac{e^{-4\\",
+      "kymo": {
+        "w": 6.97067,
+        "h": 3.69239
+      },
+      "ref": {
+        "w": 136.890625,
+        "h": 76.734375,
+        "census": {
+          "mfrac": 4
+        }
+      },
+      "wPct": 98.27268040286803,
+      "hPct": 92.86447135342642,
+      "aKymo": 1.8878477083948337,
+      "aRef": 1.7839543881083282,
+      "refW": 136.890625,
+      "refH": 76.734375,
+      "census": {
+        "mfrac": 4
+      }
+    },
+    {
+      "file": "katex_000",
+      "idx": 3,
+      "latex": "\\overbrace{a+b+c}^{\\text{note}}",
+      "short": "\\overbrace{a+b+c}^{\\text{note}}",
+      "kymo": {
+        "w": 3.83497,
+        "h": 2.05633
+      },
+      "ref": {
+        "w": 73.578125,
+        "h": 37.953125,
+        "census": {
+          "mover": 2,
+          "stretchy": [
+            "auto"
+          ]
+        }
+      },
+      "wPct": 100.5877837124277,
+      "hPct": 104.5628123247972,
+      "aKymo": 1.8649584453857115,
+      "aRef": 1.9386578839028408,
+      "refW": 73.578125,
+      "refH": 37.953125,
+      "census": {
+        "mover": 2,
+        "stretchy": [
+          "auto"
+        ]
+      }
+    },
+    {
+      "file": "katex_000",
+      "idx": 4,
+      "latex": "\\phase{-78^\\circ}",
+      "short": "\\phase{-78^\\circ}",
+      "kymo": {
+        "w": 2.74693,
+        "h": 1.0183
+      },
+      "ref": {
+        "w": 39.8125,
+        "h": 14.09375,
+        "census": {}
+      },
+      "wPct": 133.15581207835734,
+      "hPct": 139.43800645222984,
+      "aKymo": 2.697564568398311,
+      "aRef": 2.8248337028824833,
+      "refW": 39.8125,
+      "refH": 14.09375,
+      "census": {}
+    },
+    {
+      "file": "katex_000",
+      "idx": 5,
+      "latex": "x = \\begin{cases} a &\\text{if } b \\\\ c &\\text{if } d \\end{cases}",
+      "short": "x = \\begin{cases} a &\\text{if } b ",
+      "kymo": {
+        "w": 5.59285,
+        "h": 3.0000299999999998
+      },
+      "ref": {
+        "w": 115.390625,
+        "h": 50.8125,
+        "census": {
+          "mtable": 1
+        }
+      },
+      "wPct": 93.53941099364249,
+      "hPct": 113.94283464149379,
+      "aKymo": 1.8642646906864266,
+      "aRef": 2.270910209102091,
+      "refW": 115.390625,
+      "refH": 50.8125,
+      "census": {
+        "mtable": 1
+      }
+    },
+    {
+      "file": "katex_000",
+      "idx": 6,
+      "latex": "x(t)=c_1\\begin{bmatrix}-\\cos{t}+\\sin{t}\\\\ 2\\cos{t} \\end{bmatrix}e^{2t}",
+      "short": "x(t)=c_1\\begin{bmatrix}-\\cos{t}+\\s",
+      "kymo": {
+        "w": 12.17273,
+        "h": 2.40003
+      },
+      "ref": {
+        "w": 229.6875,
+        "h": 46.15625,
+        "census": {
+          "mtable": 1
+        }
+      },
+      "wPct": 102.27809095335557,
+      "hPct": 100.35017592420313,
+      "aKymo": 5.071907434490401,
+      "aRef": 4.976303317535545,
+      "refW": 229.6875,
+      "refH": 46.15625,
+      "census": {
+        "mtable": 1
+      }
+    },
+    {
+      "file": "katex_001",
+      "idx": 0,
+      "latex": "\\alpha\\beta\\gamma\\delta\\epsilon\\zeta\\eta\\theta\\iota\\kappa\\lambda\\mu\\nu\\xi\\omicron\\pi\\rho\\sigma\\tau\\upsilon\\phi\\chi\\psi\\omega",
+      "short": "\\alpha\\beta\\gamma\\delta\\epsilon\\ze",
+      "kymo": {
+        "w": 13.32991,
+        "h": 0.8888799999999999
+      },
+      "ref": {
+        "w": 244.71875,
+        "h": 19.03125,
+        "census": {}
+      },
+      "wPct": 105.12159852944556,
+      "hPct": 90.13797664325985,
+      "aKymo": 14.996298712987132,
+      "aRef": 12.858784893267652,
+      "refW": 244.71875,
+      "refH": 19.03125,
+      "census": {}
+    },
+    {
+      "file": "katex_001",
+      "idx": 1,
+      "latex": "\\Alpha\\Beta\\Gamma\\Delta\\Epsilon\\Zeta\\Eta\\Theta\\Iota\\Kappa\\Lambda\\Mu\\Nu\\Xi\\Omicron\\Pi\\Rho\\Sigma\\Tau\\Upsilon\\Phi\\Chi\\Psi\\Omega",
+      "short": "\\Alpha\\Beta\\Gamma\\Delta\\Epsilon\\Ze",
+      "kymo": {
+        "w": 17.30559,
+        "h": 0.68333
+      },
+      "ref": {
+        "w": 313.03125,
+        "h": 13.1875,
+        "census": {}
+      },
+      "wPct": 106.69171585422718,
+      "hPct": 100,
+      "aKymo": 25.325377196961934,
+      "aRef": 23.73696682464455,
+      "refW": 313.03125,
+      "refH": 13.1875,
+      "census": {}
+    },
+    {
+      "file": "katex_002",
+      "idx": 0,
+      "latex": "\\forall\\complement\\therefore\\emptyset\\exists\\subset\\because\\empty\\exist\\supset\\mapsto\\varnothing\\nexists\\mid\\to\\implies\\in\\land\\gets\\impliedby\\isin\\lor\\leftrightarrow\\iff\\notin\\ni\\notni\\lnot",
+      "short": "\\forall\\complement\\therefore\\empty",
+      "kymo": {
+        "w": 27.10506,
+        "h": 1.075
+      },
+      "ref": {
+        "w": 643.25,
+        "h": 19.09375,
+        "census": {}
+      },
+      "wPct": 81.32097236567716,
+      "hPct": 108.65487515970398,
+      "aKymo": 25.214009302325586,
+      "aRef": 33.689034369885434,
+      "refW": 643.25,
+      "refH": 19.09375,
+      "census": {}
+    },
+    {
+      "file": "katex_002",
+      "idx": 1,
+      "latex": "\\nabla\\Im\\Reals\\jmath\\partial\\image\\wp\\aleph\\Game\\weierp\\alef\\Finv\\N\\Z\\alefsym\\cnums\\natnums\\beth\\Complex\\R\\gimel\\ell\\Re\\daleth\\hbar\\real\\eth\\hslash\\reals",
+      "short": "\\nabla\\Im\\Reals\\jmath\\partial\\imag",
+      "kymo": {
+        "w": 18.5462,
+        "h": 0.8888799999999999
+      },
+      "ref": {
+        "w": 361.546875,
+        "h": 18.34375,
+        "census": {}
+      },
+      "wPct": 98.99706328204148,
+      "hPct": 93.51623130450639,
+      "aKymo": 20.86468364683647,
+      "aRef": 19.70954003407155,
+      "refW": 361.546875,
+      "refH": 18.34375,
+      "census": {}
+    }
+  ]
+}

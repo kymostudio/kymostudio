@@ -44,6 +44,9 @@ pub struct FEdge {
     pub points: Vec<(f64, f64)>,
     /// Label anchor (mermaid: destination-node centre x, dagre label y).
     pub label_pt: Option<(f64, f64)>,
+    /// Pre-rendered raster-safe math glyph group for a `$$…$$` edge label
+    /// (self-centred), emitted in place of the `<text>` label when `Some`.
+    pub math: Option<String>,
 }
 
 /// A cluster region in float coordinates (top-left + size).
@@ -389,8 +392,16 @@ fn edge_svg(e: &FEdge, style: FlowStyle) -> String {
         " marker-end=\"url(#arrow)\""
     };
     let mut out = format!("<path class=\"edge-path\"{dash} d=\"{path}\"{marker}/>\n");
-    if !e.label.is_empty() {
-        if let Some((lx, ly)) = e.label_pt {
+    if let Some((lx, ly)) = e.label_pt {
+        if let Some(m) = &e.math {
+            // KaTeX edge label: emit the self-centred glyph group at the anchor
+            // (no baseline shift — the group is centred like a node's math).
+            out.push_str(&format!(
+                "<g transform=\"translate({},{})\">{m}</g>\n",
+                nf(lx),
+                nf(ly)
+            ));
+        } else if !e.label.is_empty() {
             let ly = if matches!(style, FlowStyle::Mermaid) {
                 ly + 5.0
             } else {

@@ -143,6 +143,8 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
                 no_arrow: e.no_arrow,
                 points,
                 label_pt,
+                // Lean path renders edge math as Unicode in the label text.
+                math: None,
             });
         }
     }
