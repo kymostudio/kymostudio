@@ -53,8 +53,10 @@ async function renderLocal(source: string): Promise<string> {
 
 let core: Promise<void> | null = null;
 function loadCore(): Promise<void> {
-  // streaming-compiled, parallel fetch; idempotent across calls
-  return (core ??= initCore(coreWasmUrl as unknown as string).then(() => undefined));
+  // streaming-compiled, parallel fetch; idempotent across calls. wasm-bindgen
+  // wants the URL via the object form ({ module_or_path }) — the positional-arg
+  // form still works but logs a deprecation warning.
+  return (core ??= initCore({ module_or_path: coreWasmUrl as unknown as string }).then(() => undefined));
 }
 
 // Conservative sniff: only route sources we KNOW the slice speaks. Front-matter
