@@ -556,9 +556,15 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .tpl-sub { margin: 0; font-size: 12.5px; color: var(--dim); max-width: 520px; }
 .tpl-close { position: absolute; top: 14px; right: 14px; border: none; background: transparent; color: var(--dim); font-size: 14px; padding: 6px 9px; border-radius: 8px; }
 .tpl-close:hover { background: var(--bg-soft); color: var(--ink); transform: none; box-shadow: none; }
-.tpl-search { display: block; width: 100%; margin-top: 12px; padding: 8px 12px; font: inherit; font-size: 13.5px; color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; outline: none; }
+.tpl-fields { display: flex; gap: 8px; margin-top: 12px; }
+.tpl-search { display: block; flex: 1 1 auto; min-width: 0; padding: 8px 12px; font: inherit; font-size: 13.5px; color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; outline: none; }
 .tpl-search:focus { border-color: var(--accent); background: var(--bg); }
 .tpl-search::placeholder { color: var(--dim); }
+/* "File name" input in the New-diagram gallery (defaults to Untitled). */
+.tpl-nameinput { flex: 0 0 38%; min-width: 0; padding: 8px 12px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; outline: none; }
+.tpl-nameinput:focus { border-color: var(--accent); background: var(--bg); }
+.tpl-nameinput::placeholder { color: var(--dim); font-weight: 400; }
+@media (max-width: 560px) { .tpl-fields { flex-direction: column; } .tpl-nameinput { flex: none; } }
 .tpl-empty { grid-column: 1 / -1; margin: 18px 0 26px; text-align: center; font-size: 13px; color: var(--dim); }
 .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px; padding: 16px 24px 22px; overflow-y: auto; }
 .tpl-card { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 14px 8px 11px; border: 1px solid var(--border); border-radius: 11px; background: var(--bg); color: var(--ink); }
