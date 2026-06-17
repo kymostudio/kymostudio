@@ -141,6 +141,48 @@ pub fn mermaid_to_svg_dagre(src: &str) -> Result<String, mermaid::MermaidError> 
     Ok(crate::MermaidFlowchart::parse(src)?.render())
 }
 
+/// The Mermaid diagram type, from the first non-blank, non-directive line's
+/// leading keyword. Unknown / `flowchart` / `graph` → `"flowchart"`.
+pub fn diagram_kind(src: &str) -> &'static str {
+    for line in src.lines() {
+        let l = line.trim();
+        if l.is_empty() || l.starts_with("%%") {
+            continue;
+        }
+        return match l.split_whitespace().next().unwrap_or("") {
+            "sequenceDiagram" => "sequence",
+            "classDiagram" | "classDiagram-v2" => "class",
+            "stateDiagram" | "stateDiagram-v2" => "state",
+            "erDiagram" => "er",
+            "block" | "block-beta" => "block",
+            "mindmap" => "mindmap",
+            "kanban" => "kanban",
+            "requirementDiagram" => "requirement",
+            _ => "flowchart",
+        };
+    }
+    "flowchart"
+}
+
+/// Render ANY kymo-supported Mermaid grammar to **raster-safe** SVG (real
+/// `<text>`/`<path>`, so PNG/PDF keep their labels), dispatching by
+/// [`diagram_kind`] to the matching native renderer. Flowchart / unknown types
+/// fall back to [`mermaid_to_svg`]. This is the entry point CLIs use for
+/// `*.mmd → *.svg`, so every supported type renders, not just flowchart.
+pub fn mermaid_to_svg_auto(src: &str) -> Result<String, mermaid::MermaidError> {
+    match diagram_kind(src) {
+        "sequence" => mermaid_to_sequence_svg(src),
+        "class" => mermaid_class_to_svg(src),
+        "state" => mermaid_state_to_svg(src),
+        "er" => mermaid_er_to_svg(src),
+        "block" => mermaid_block_to_svg(src),
+        "mindmap" => mermaid_mindmap_to_svg(src),
+        "kanban" => mermaid_kanban_to_svg(src),
+        "requirement" => mermaid_requirement_to_svg(src),
+        _ => mermaid_to_svg(src),
+    }
+}
+
 /// Normalise a Mermaid label for rendering: `$…$` TeX math is rendered to
 /// Unicode, then `<br>` hard breaks become `\n` (the renderer splits into tspans).
 fn clean_label(s: &str) -> String {
@@ -247,4 +289,31 @@ pub fn mermaid_kanban_to_svg(src: &str) -> Result<String, mermaid::MermaidError>
 /// Render a Mermaid `requirementDiagram` → SVG (reuses the class-box renderer).
 pub fn mermaid_requirement_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
     Ok(classdiagram::svg::render(&mermaid::parse_requirement(src)?))
+}
+
+#[cfg(test)]
+mod auto_tests {
+    use super::{diagram_kind, mermaid_to_svg_auto};
+
+    #[test]
+    fn kind_detection_skips_directives() {
+        assert_eq!(diagram_kind("%%{init:{}}%%\nsequenceDiagram\nA->>B: hi"), "sequence");
+        assert_eq!(diagram_kind("classDiagram\nclass A"), "class");
+        assert_eq!(diagram_kind("stateDiagram-v2\n[*] --> A"), "state");
+        assert_eq!(diagram_kind("erDiagram\nA ||--o{ B : has"), "er");
+        assert_eq!(diagram_kind("mindmap\n  root"), "mindmap");
+        assert_eq!(diagram_kind("requirementDiagram\n"), "requirement");
+        assert_eq!(diagram_kind("flowchart TD\nA-->B"), "flowchart");
+        assert_eq!(diagram_kind("graph LR\nA-->B"), "flowchart");
+    }
+
+    #[test]
+    fn auto_dispatches_to_native_renderer() {
+        // sequence → real <text>, not the flowchart fallback (which would error/garble)
+        let svg = mermaid_to_svg_auto("sequenceDiagram\nAlice->>Bob: hi").unwrap();
+        assert!(svg.contains("seq-arrow"), "sequence should use the sequence renderer");
+        // class → mermaid palette from the class-box renderer
+        let svg = mermaid_to_svg_auto("classDiagram\nclass A {\n  +int x\n}").unwrap();
+        assert!(svg.contains("ECECFF"), "class should use the class-box renderer");
+    }
 }

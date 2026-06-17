@@ -8,7 +8,7 @@
 //!     kymo flow.mmd flow.dot        # -> Graphviz DOT
 //!     kymo flow.mmd norm.mmd        # -> Mermaid (round-trip / normalize)
 //!     kymo flow.mmd flow.drawio     # -> draw.io (mxGraph XML)
-//!     kymo flow.mmd flow.svg        # -> SVG (pure-Rust flowchart renderer)
+//!     kymo flow.mmd flow.svg        # -> SVG (raster-safe; any supported type)
 //!     kymo flow.d2                  # -> flow.svg (D2 -> SVG, pure Rust)
 //!     kymo flow.dot                 # -> flow.svg (Graphviz DOT -> SVG, pure Rust)
 //!     kymo flow.d2 flow.kymo.json   # -> import D2 to the kymo model
@@ -63,7 +63,7 @@ EXAMPLES:
     kymo flow.mmd flow.dot              # -> Graphviz DOT
     kymo flow.mmd norm.mmd              # -> Mermaid (round-trip / normalize)
     kymo flow.mmd flow.drawio           # -> draw.io (mxGraph XML)
-    kymo flow.mmd flow.svg              # -> SVG (pure-Rust flowchart renderer)
+    kymo flow.mmd flow.svg              # -> SVG (raster-safe; any supported type)
     kymo flow.d2                        # -> flow.svg (D2 -> SVG, pure Rust)
     kymo seq.mmd  seq.xmi               # -> XMI 2.5.1 (UML sequenceDiagram)
     kymo seq.mmd  seq.mdj               # -> StarUML .mdj (sequence diagram + layout)
@@ -179,7 +179,7 @@ fn run(args: Args) -> Result<(), String> {
         // The `.xmi`/`.mdj`/`.gaphor` targets require a `sequenceDiagram` source.
         type Conv = fn(&str) -> Result<String, kymostudio_core::mermaid::MermaidError>;
         const CONVERTERS: &[(&str, Conv)] = &[
-            ("svg", kymostudio_core::mermaid_to_svg),
+            ("svg", kymostudio_core::mermaid_to_svg_auto),
             ("d2", kymostudio_core::mermaid_to_d2),
             ("dot", kymostudio_core::mermaid_to_dot),
             ("gv", kymostudio_core::mermaid_to_dot),
