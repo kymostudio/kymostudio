@@ -8,3 +8,4 @@ clauses → acceptance → record), citing other docs by `document_id`. Log each
 | CR | Title | Target baseline | Status | Date |
 |----|-------|-----------------|--------|------|
 | `CR-KEDITOR-001` | Per-file open latency vs a native (VS Code) editor — diagnosis & optimization plan | `FEAT-KRENDER-001`, `FEAT-KLIVE-001` | Open | 2026-06-14 |
+| `CR-KEDITOR-002` | Session lifetime — replace the raw Google ID token with a Worker-issued httpOnly session cookie (sliding 14d / absolute 30d) | `FEAT-KLIVE-001` | Open | 2026-06-17 |
