@@ -61,6 +61,27 @@ layout. Unlike flowchart (a deep merman-parser + dagre-exact + theme-lift pipeli
 renderers mostly reuse the class-box / flowchart layout — the gap is expected and maps
 cleanly to per-type work.
 
+### Update — class-box family palette + generics (ROI pass #1)
+
+The class-box renderer (`classdiagram::svg`) is **shared by class + er + requirement
+(167 files)**, so one change moves all three. The dominant Δ was a **palette mismatch** —
+kymo drew white boxes (`#ffffff`/`#334155`) where mermaid's default theme uses light-purple
+(`fill #ECECFF`, `stroke/divider #9370DB`, white background). Lifting that palette, plus two
+text-correctness fixes — generics `List~int~` → `List<int>` and the method return separator
+`name(params) : Return` — gives:
+
+| type | before | after | Δ |
+|---|---|---|---|
+| class | 9.43% | **8.25%** | −1.18 |
+| er | 7.42% | **6.84%** | −0.58 |
+| requirement | 10.81% | **8.49%** | −2.32 |
+
+Real but modest: `#ECECFF` is near-white in **luminance**, so the fill change only shifts
+box-interior pixels ~7% each — the remaining gap is **box-sizing + font-size** (mermaid
+uses larger text + more padding) and **layout** (kymo spreads horizontally where mermaid
+stacks), plus **ER's structural 2-column attribute table** (kymo renders ER as a one-column
+class box). Those are the next, higher-effort levers.
+
 ## What each gap is (visual gauge)
 
 *(Comparison images below are rasterised with **rsvg-convert**, not Chromium — deliberately:
@@ -91,7 +112,8 @@ numbers above use the fair Chromium reference where mmdc keeps its text.)*
    Correctness wins even though Δ is mid-pack.
 3. **sequence** (largest corpus, 140) — spacing + title + note placement to close ~6% → flowchart-class fidelity.
 4. **state** — fix the viewBox-clips-title bug (cheap).
-5. class / er / requirement — already good; box-sizing polish only.
+5. class / er / requirement — palette + generics done (see Update above); remaining =
+   box/font-sizing calibration + ER's 2-column attribute table.
 
 *Bench: `type-bench.mjs` (pixel-Δ + success-rate across 8 native renderers), reference =
 mermaid.js 11 via `mmdc`, Chromium-rasterised both sides. Data snapshot:
