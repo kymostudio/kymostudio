@@ -549,34 +549,54 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .detect-chip { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2.5px 9px; white-space: nowrap; }
 
 /* ---- "New diagram" template gallery: pick a diagram TYPE, the kind follows ---- */
-.tpl-overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(36, 33, 49, 0.35); backdrop-filter: blur(2px); }
-.tpl-modal { width: min(720px, 100%); max-height: min(640px, 100%); display: flex; flex-direction: column; background: var(--bg); border-radius: var(--radius); box-shadow: 0 24px 64px rgba(36, 33, 49, 0.28); overflow: hidden; }
-.tpl-head { position: relative; padding: 20px 24px 14px; border-bottom: 1px solid var(--border); }
-.tpl-head h2 { margin: 0 0 4px; font-size: 17px; letter-spacing: -0.01em; }
-.tpl-sub { margin: 0; font-size: 12.5px; color: var(--dim); max-width: 520px; }
-.tpl-close { position: absolute; top: 14px; right: 14px; border: none; background: transparent; color: var(--dim); font-size: 14px; padding: 6px 9px; border-radius: 8px; }
+.tpl-overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px; background: rgba(36, 33, 49, 0.42); backdrop-filter: blur(3px); }
+.tpl-modal { width: min(760px, 100%); max-height: min(680px, 100%); display: flex; flex-direction: column; background: var(--bg); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 30px 80px rgba(36, 33, 49, 0.32); overflow: hidden; }
+/* Header: title + a soft branded gradient wash, then the name + search fields. */
+.tpl-head { position: relative; padding: 18px 22px 16px; border-bottom: 1px solid var(--border); background:
+  radial-gradient(120% 140% at 0% 0%, var(--accent-soft) 0%, transparent 55%), var(--bg); }
+.tpl-head-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.tpl-head h2 { margin: 0 0 3px; font-size: 18px; letter-spacing: -0.015em; }
+.tpl-sub { margin: 0; font-size: 12.5px; color: var(--dim); max-width: 540px; }
+.tpl-close { flex: none; border: none; background: transparent; color: var(--dim); font-size: 14px; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; }
 .tpl-close:hover { background: var(--bg-soft); color: var(--ink); transform: none; box-shadow: none; }
-.tpl-fields { display: flex; gap: 8px; margin-top: 12px; }
-.tpl-search { display: block; flex: 1 1 auto; min-width: 0; padding: 8px 12px; font: inherit; font-size: 13.5px; color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; outline: none; }
-.tpl-search:focus { border-color: var(--accent); background: var(--bg); }
-.tpl-search::placeholder { color: var(--dim); }
-/* "File name" input in the New-diagram gallery (defaults to Untitled). */
-.tpl-nameinput { flex: 0 0 38%; min-width: 0; padding: 8px 12px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; outline: none; }
-.tpl-nameinput:focus { border-color: var(--accent); background: var(--bg); }
-.tpl-nameinput::placeholder { color: var(--dim); font-weight: 400; }
-@media (max-width: 560px) { .tpl-fields { flex-direction: column; } .tpl-nameinput { flex: none; } }
-.tpl-empty { grid-column: 1 / -1; margin: 18px 0 26px; text-align: center; font-size: 13px; color: var(--dim); }
-.tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 8px; padding: 16px 24px 22px; overflow-y: auto; }
-.tpl-card { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 14px 8px 11px; border: 1px solid var(--border); border-radius: 11px; background: var(--bg); color: var(--ink); }
-.tpl-card svg { width: 26px; height: 26px; color: var(--dim); transition: color 0.15s ease; }
-.tpl-card:hover { border-color: var(--accent); background: var(--bg); box-shadow: 0 4px 14px rgba(224, 9, 95, 0.12); }
-.tpl-card:hover svg { color: var(--accent); }
-.tpl-name { font-size: 13px; font-weight: 600; }
+.tpl-fields { display: flex; gap: 8px; margin-top: 14px; }
+.tpl-field { display: flex; align-items: center; gap: 8px; padding: 0 11px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px; transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease; }
+.tpl-field svg { flex: none; color: var(--dim); transition: color 0.15s ease; }
+.tpl-field input { flex: 1 1 auto; min-width: 0; padding: 9px 0; font: inherit; font-size: 13.5px; color: var(--ink); background: transparent; border: none; outline: none; }
+.tpl-field input::placeholder { color: var(--dim); }
+.tpl-field:focus-within { border-color: var(--accent); background: var(--bg); box-shadow: 0 0 0 3px var(--accent-soft); }
+.tpl-field:focus-within svg { color: var(--accent); }
+.tpl-field-name { flex: 0 0 36%; }
+.tpl-field-name input { font-weight: 650; }
+.tpl-field-search { flex: 1 1 auto; }
+@media (max-width: 560px) { .tpl-fields { flex-direction: column; } .tpl-field-name { flex: none; } }
+/* Body: grouped sections by source tool, each a colourful grid of type cards. */
+.tpl-body { padding: 6px 22px 22px; overflow-y: auto; }
+.tpl-group { margin-top: 14px; }
+.tpl-grouplabel { display: flex; align-items: center; gap: 7px; margin: 0 0 9px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+.tpl-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.tpl-empty { margin: 22px 0 14px; text-align: center; font-size: 13px; color: var(--dim); }
+.tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 9px; }
+.tpl-card { display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 15px 8px 12px; border: 1px solid var(--border); border-radius: 13px; background: var(--bg); color: var(--ink); transition: transform 0.13s ease, border-color 0.13s ease, box-shadow 0.13s ease; }
+.tpl-ic { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; color: var(--k); background: color-mix(in srgb, var(--k) 11%, transparent); transition: background-color 0.13s ease, transform 0.13s ease; }
+.tpl-ic svg { width: 23px; height: 23px; }
+.tpl-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--k) 55%, var(--border)); box-shadow: 0 10px 22px color-mix(in srgb, var(--k) 20%, transparent); }
+.tpl-card:hover .tpl-ic { background: color-mix(in srgb, var(--k) 18%, transparent); transform: scale(1.06); }
+.tpl-card:focus-visible { outline: 2px solid var(--k); outline-offset: 2px; }
+.tpl-card.selected { border-color: var(--k); box-shadow: 0 0 0 2px color-mix(in srgb, var(--k) 38%, transparent); }
+.tpl-card.selected .tpl-ic { background: color-mix(in srgb, var(--k) 18%, transparent); }
+/* Footer with the primary Create action. */
+.tpl-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 22px; border-top: 1px solid var(--border); background: var(--bg); }
+.tpl-foot-hint { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tpl-foot-hint b { color: var(--ink); font-weight: 650; }
+.tpl-create { flex: none; padding: 9px 22px; font-size: 14px; }
+.tpl-name { font-size: 13px; font-weight: 650; }
 .tpl-via { font-size: 10.5px; color: var(--dim); }
 @media (max-width: 720px) {
   .tpl-overlay { padding: 0; }
-  .tpl-modal { width: 100%; height: 100%; max-height: none; border-radius: 0; }
-  .tpl-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); padding: 14px 14px 28px; }
+  .tpl-modal { width: 100%; height: 100%; max-height: none; border-radius: 0; border: 0; }
+  .tpl-body { padding: 6px 14px 28px; }
+  .tpl-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
 }
 
 /* ---- hover polish ----
