@@ -173,7 +173,7 @@ a.exp-item { text-decoration: none; } /* Docs/Diagrams links inside the ⋯ menu
 .projects-rows .rdel[disabled] { opacity: 0.35; cursor: default; }
 
 /* ---- editor panes ---- */
-main { flex: 1; display: flex; min-height: 0; }
+main { flex: 1; display: flex; min-height: 0; min-width: 0; } /* min-width:0 lets the panes shrink to the viewport instead of overflowing (flex item default min-width:auto = content size) */
 main.scroll { display: block; overflow: auto; }
 .pane { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .pane + .pane { border-left: 1px solid var(--border); }
