@@ -82,6 +82,25 @@ uses larger text + more padding) and **layout** (kymo spreads horizontally where
 stacks), plus **ER's structural 2-column attribute table** (kymo renders ER as a one-column
 class box). Those are the next, higher-effort levers.
 
+### Update — sequence palette + `<br/>` actor names (ROI pass #2)
+
+Same playbook on `sequence` (140 files, the largest corpus). The actor head boxes drew
+kymo blue (`#eef2ff`/`#6366f1`) where mermaid uses the purple actor palette
+(`#ECECFF`/`#9370DB`); the lifelines were dashed grey where mermaid's `.actor-line` is
+**solid grey**; message lines/markers were slate where mermaid uses `#333`. Lifting that
+palette (+ white background) plus rendering `<br/>` hard-breaks in actor names as real
+line-broken tspans (was: literal `John<br/>Second Line`, 17 files):
+
+| type | before | after | Δ |
+|---|---|---|---|
+| sequence | 6.94% | **5.92%** | −1.02 |
+
+Same shape as the class pass — a ~1pt median drop (luminance-bounded). The tail is
+unmoved (max ~29%) because it's **dark-theme** files (`%%{init: theme: dark}%%`, 3 files),
+which kymo renders light — a cross-cutting theme feature, not a sequence-layout gap. The
+remaining plain-file gap is **dynamic actor spacing** (kymo's `LL_GAP` is fixed at 150;
+mermaid sizes gaps to the widest message label) and the **self-message loop** glyph.
+
 ## What each gap is (visual gauge)
 
 *(Comparison images below are rasterised with **rsvg-convert**, not Chromium — deliberately:

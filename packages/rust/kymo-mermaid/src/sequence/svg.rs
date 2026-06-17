@@ -17,14 +17,14 @@ const FONT: &str =
     "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
 
 const DEFS: &str = "<marker id=\"seq-arrow\" markerWidth=\"12\" markerHeight=\"10\" refX=\"9\" refY=\"5\" \
-orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9 Z\" fill=\"#475569\"/></marker>\
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9 Z\" fill=\"#333333\"/></marker>\
 <marker id=\"seq-open\" markerWidth=\"12\" markerHeight=\"10\" refX=\"9\" refY=\"5\" \
-orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9\" fill=\"none\" stroke=\"#475569\" \
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9\" fill=\"none\" stroke=\"#333333\" \
 stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></marker>\
 <marker id=\"seq-arrow-start\" markerWidth=\"12\" markerHeight=\"10\" refX=\"1\" refY=\"5\" \
-orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M10,1 L1,5 L10,9 Z\" fill=\"#475569\"/></marker>\
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M10,1 L1,5 L10,9 Z\" fill=\"#333333\"/></marker>\
 <marker id=\"seq-open-start\" markerWidth=\"12\" markerHeight=\"10\" refX=\"1\" refY=\"5\" \
-orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M10,1 L1,5 L10,9\" fill=\"none\" stroke=\"#475569\" \
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M10,1 L1,5 L10,9\" fill=\"none\" stroke=\"#333333\" \
 stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></marker>";
 
 /// Render a parsed [`Sequence`] to a self-contained SVG document.
@@ -69,7 +69,7 @@ pub fn render(seq: &Sequence) -> String {
         );
         if !b.label.is_empty() {
             body += &format!(
-                "<text x=\"{}\" y=\"{}\" fill=\"#475569\" font-size=\"12\" font-weight=\"600\">{}</text>",
+                "<text x=\"{}\" y=\"{}\" fill=\"#333333\" font-size=\"12\" font-weight=\"600\">{}</text>",
                 lo + 6,
                 top + 14,
                 esc(&b.label),
@@ -77,11 +77,12 @@ pub fn render(seq: &Sequence) -> String {
         }
     }
 
-    // Lifelines: dashed verticals from below the head box to the foot box.
+    // Lifelines: solid grey verticals from below the head box to the foot box
+    // (mermaid's `.actor-line` is a solid grey line, not dashed).
     for &cx in &lay.centers {
         body += &format!(
             "<line x1=\"{cx}\" y1=\"{LINE_TOP}\" x2=\"{cx}\" y2=\"{foot_top}\" \
-             stroke=\"#94a3b8\" stroke-width=\"1\" stroke-dasharray=\"4 4\"/>"
+             stroke=\"#999999\" stroke-width=\"1\"/>"
         );
     }
 
@@ -121,20 +122,48 @@ pub fn render(seq: &Sequence) -> String {
          <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width} {height}\" \
          width=\"{width}\" height=\"{height}\" style=\"max-width:100%;height:auto\" \
          font-family=\"{FONT}\" font-size=\"14\">\n<defs>{DEFS}</defs>\n\
-         <rect width=\"{width}\" height=\"{height}\" fill=\"#fafafa\"/>\n{body}</svg>\n"
+         <rect width=\"{width}\" height=\"{height}\" fill=\"#ffffff\"/>\n{body}</svg>\n"
     )
 }
 
 fn head_box(cx: i64, top: i64, label: &str) -> String {
     let x = cx - HEAD_W / 2;
-    let ty = top + HEAD_H / 2;
+    // `<br/>` hard-breaks split the actor name across lines (mermaid does the
+    // same); render each as a centred tspan rather than the literal tag.
+    let lines: Vec<&str> = split_br(label);
+    let line_h = 16;
+    let y0 = top + HEAD_H / 2 - (lines.len() as i64 - 1) * line_h / 2;
+    let mut text = String::new();
+    for (i, l) in lines.iter().enumerate() {
+        text += &format!(
+            "<text x=\"{cx}\" y=\"{}\" text-anchor=\"middle\" dominant-baseline=\"central\" \
+             fill=\"#333333\" font-weight=\"600\">{}</text>",
+            y0 + i as i64 * line_h,
+            esc(l)
+        );
+    }
     format!(
-        "<rect x=\"{x}\" y=\"{top}\" width=\"{HEAD_W}\" height=\"{HEAD_H}\" rx=\"6\" \
-         fill=\"#eef2ff\" stroke=\"#6366f1\" stroke-width=\"1.5\"/>\
-         <text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" dominant-baseline=\"central\" \
-         fill=\"#1e293b\" font-weight=\"600\">{}</text>",
-        esc(label)
+        "<rect x=\"{x}\" y=\"{top}\" width=\"{HEAD_W}\" height=\"{HEAD_H}\" rx=\"3\" \
+         fill=\"#ECECFF\" stroke=\"#9370DB\" stroke-width=\"1.5\"/>{text}"
     )
+}
+
+/// Split a label on `<br>` / `<br/>` / `<br />` hard-breaks (mermaid's line break).
+fn split_br(s: &str) -> Vec<&str> {
+    let mut out = Vec::new();
+    let mut rest = s;
+    while let Some(p) = rest.find("<br") {
+        out.push(&rest[..p]);
+        match rest[p..].find('>') {
+            Some(q) => rest = &rest[p + q + 1..],
+            None => {
+                rest = "";
+                break;
+            }
+        }
+    }
+    out.push(rest);
+    out
 }
 
 fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
@@ -163,14 +192,14 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
         let r = x1 + 60;
         let y2 = y + 24;
         let path = format!(
-            "<path d=\"M{x1},{y} H{r} V{y2} H{x1}\" fill=\"none\" stroke=\"#475569\" \
+            "<path d=\"M{x1},{y} H{r} V{y2} H{x1}\" fill=\"none\" stroke=\"#333333\" \
              stroke-width=\"1.4\"{dash}{start_marker} marker-end=\"url(#{head})\"/>"
         );
         let label = if m.text.is_empty() {
             String::new()
         } else {
             format!(
-                "<text x=\"{}\" y=\"{}\" fill=\"#334155\">{}</text>",
+                "<text x=\"{}\" y=\"{}\" fill=\"#333333\">{}</text>",
                 r + 6,
                 y + 14,
                 esc(&m.text)
@@ -180,7 +209,7 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
     }
 
     let line = format!(
-        "<line x1=\"{x1}\" y1=\"{y}\" x2=\"{x2}\" y2=\"{y}\" stroke=\"#475569\" \
+        "<line x1=\"{x1}\" y1=\"{y}\" x2=\"{x2}\" y2=\"{y}\" stroke=\"#333333\" \
          stroke-width=\"1.4\"{dash}{start_marker} marker-end=\"url(#{head})\"/>"
     );
     let label = if m.text.is_empty() {
@@ -188,7 +217,7 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
     } else {
         let mid = (x1 + x2) / 2;
         format!(
-            "<text x=\"{mid}\" y=\"{}\" text-anchor=\"middle\" fill=\"#334155\">{}</text>",
+            "<text x=\"{mid}\" y=\"{}\" text-anchor=\"middle\" fill=\"#333333\">{}</text>",
             y - 6,
             esc(&m.text)
         )
@@ -220,7 +249,7 @@ fn frag_svg(f: &PFrag) -> String {
     let tab_w = 12 + op.len() as i64 * 8;
     out += &format!(
         "<path d=\"M{l},{t} h{tw} v14 l-8,8 h-{tw2} z\" fill=\"#e2e8f0\" stroke=\"#94a3b8\" stroke-width=\"1\"/>\
-         <text x=\"{tx}\" y=\"{ty}\" fill=\"#334155\" font-weight=\"700\" font-size=\"12\">{op}</text>",
+         <text x=\"{tx}\" y=\"{ty}\" fill=\"#333333\" font-weight=\"700\" font-size=\"12\">{op}</text>",
         l = f.left,
         t = f.top,
         tw = tab_w,
@@ -246,7 +275,7 @@ fn frag_svg(f: &PFrag) -> String {
                 f.left + 8
             };
             out += &format!(
-                "<text x=\"{gx}\" y=\"{gy}\" fill=\"#475569\" font-size=\"12\">[{}]</text>",
+                "<text x=\"{gx}\" y=\"{gy}\" fill=\"#333333\" font-size=\"12\">[{}]</text>",
                 esc(guard)
             );
         }
