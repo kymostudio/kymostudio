@@ -359,7 +359,7 @@ export default function EditorPage() {
   }, [source, kind, d, claims]); // eslint-disable-line
 
   useEffect(() => {
-    const h = () => { setMenuOpen(false); setShareOpen(false); setExportOpen(false); };
+    const h = () => { setMenuOpen(false); setShareOpen(false); setExportOpen(false); setTabMenu(null); };
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") h(); };
     document.addEventListener("click", h);
     document.addEventListener("keydown", k);
@@ -444,6 +444,28 @@ export default function EditorPage() {
       userEdited.current = false;
     }
   }, [openTabs, activeTab, persistTabs]);
+
+  // Close a set of tabs in one shot (Close Others / to the Right / All). Keeps the
+  // active tab if it survives, else picks the nearest survivor to its right.
+  const closeTabs = useCallback((ids: string[]) => {
+    const kill = new Set(ids);
+    if (!kill.size) return;
+    const next = openTabs.filter((x) => !kill.has(x));
+    let nextActive = activeTab;
+    if (activeTab && kill.has(activeTab)) {
+      const oi = openTabs.indexOf(activeTab);
+      nextActive = next.find((x) => openTabs.indexOf(x) > oi) ?? next[next.length - 1] ?? null;
+    }
+    setOpenTabs(next); setActiveTab(nextActive); persistTabs(next, nextActive);
+    if (nextActive === null) {
+      closedAll.current = true;
+      setWelcomeDismissed(true); setSource(""); setTitle(""); setShareError(null);
+      userEdited.current = false;
+    }
+  }, [openTabs, activeTab, persistTabs]);
+
+  // Right-click tab context menu (VS Code-style close actions).
+  const [tabMenu, setTabMenu] = useState<{ x: number; y: number; id: string } | null>(null);
 
   // Publish openDiagram/closeTab so the sibling UserChannel (MCP ui_open_diagram /
   // ui_close_file) can drive this tab.
@@ -811,7 +833,8 @@ export default function EditorPage() {
                   const ext = extFor(k);
                   return (
                     <div key={id} className={"file-tab" + (isActive ? " active" : "")} title={`${name}.${ext}`}
-                      role="tab" aria-selected={isActive} onClick={() => activateTab(id)}>
+                      role="tab" aria-selected={isActive} onClick={() => activateTab(id)}
+                      onContextMenu={(e) => { e.preventDefault(); setMenuOpen(false); setShareOpen(false); setExportOpen(false); setTabMenu({ x: e.clientX, y: e.clientY, id }); }}>
                       <span className="file-tab-icon"><KindIcon kind={k} /></span>
                       <span className="file-tab-name">{name}<span className="sb-ext">.{ext}</span></span>
                       <button className="file-tab-close" aria-label="Close tab" title="Close tab"
@@ -824,6 +847,23 @@ export default function EditorPage() {
                 {detected && <span className="detect-chip">auto-detected {detected}</span>}
               </div>
               )}
+              {tabMenu && (() => {
+                const idx = openTabs.indexOf(tabMenu.id);
+                const right = openTabs.slice(idx + 1);
+                const others = openTabs.filter((x) => x !== tabMenu.id);
+                const act = (fn: () => void) => { fn(); setTabMenu(null); };
+                return (
+                  <div className="acct-menu tab-menu" style={{ left: tabMenu.x, top: tabMenu.y }} onClick={(e) => e.stopPropagation()} role="menu">
+                    <button className="acct-item" role="menuitem" onClick={() => act(() => closeTab(tabMenu.id))}>Close</button>
+                    <button className="acct-item" role="menuitem" disabled={!others.length} onClick={() => act(() => closeTabs(others))}>Close Others</button>
+                    <button className="acct-item" role="menuitem" disabled={!right.length} onClick={() => act(() => closeTabs(right))}>Close to the Right</button>
+                    <div className="menu-sep" />
+                    {/* Every open tab is a server file that autosaves — "saved" === all of them. */}
+                    <button className="acct-item" role="menuitem" onClick={() => act(() => closeTabs([...openTabs]))}>Close Saved</button>
+                    <button className="acct-item" role="menuitem" onClick={() => act(() => closeTabs([...openTabs]))}>Close All</button>
+                  </div>
+                );
+              })()}
               <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
             </section>
             )}
