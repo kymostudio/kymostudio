@@ -79,11 +79,12 @@ export default function EditorPage() {
   const [statusErr, setStatusErr] = useState(false);
   const [live, setLive] = useState(false);
   const [title, setTitle] = useState(seed ? seed.title : "");
-  // First-paint ready: we have a rendered SVG to show for this tab (seeded from
-  // cache or produced by a completed render). Until then the content area shows
-  // ONE loader, so code + preview reveal together instead of code-first-then-
-  // preview-loader (two decoupled loading steps).
-  const [firstReady, setFirstReady] = useState(!!(seed && seed.svg));
+  // Source ready: the code we're showing is the confirmed doc (seeded from cache,
+  // a draft/import, or delivered by the room) rather than the pre-sync SAMPLE
+  // placeholder. Gates the CODE pane loader; the PREVIEW pane has its own loader
+  // keyed on the rendered SVG, so the two panes load independently while the tab
+  // bar stays put.
+  const [sourceReady, setSourceReady] = useState(activeTab && !shared ? !!seed : true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -183,10 +184,7 @@ export default function EditorPage() {
 
   const doRender = useCallback(async (src: string, k: string) => {
     const seq = ++renderSeq.current;
-    // Reveal the panes once the *real* doc has resolved — never the SAMPLE
-    // placeholder shown before a fresh room's first sync (that would flash).
-    const reveal = () => { if (synced.current || userEdited.current || !dRef.current) setFirstReady(true); };
-    if (!src.trim()) { setSvg(""); setStatus("Enter diagram source…"); setStatusErr(false); reveal(); return; }
+    if (!src.trim()) { setSvg(""); setStatus("Enter diagram source…"); setStatusErr(false); return; }
     const t0 = performance.now();
     try {
       let out: string;
@@ -215,11 +213,9 @@ export default function EditorPage() {
       // Plain-language success — the byte/latency detail is dev-debug, kept only
       // in the tooltip. Errors stay verbose (the catch below), they're useful.
       setStatus(""); setStatusTitle(`${out.length.toLocaleString()} bytes · ${Math.round(performance.now() - t0)} ms`); setStatusErr(false);
-      reveal();
     } catch (e: any) {
       if (seq !== renderSeq.current) return;
       setStatus(String(e?.message ?? e)); setStatusTitle(""); setStatusErr(true);
-      reveal(); // an error is a resolved first paint too — show the message, not a spinner
     }
   }, [loadEngine]);
 
@@ -229,7 +225,7 @@ export default function EditorPage() {
     if (d && signedIn) {
       setSyncing(true);
       // Failsafe: never wedge on the loader if the room or render never resolves.
-      const t = setTimeout(() => { setSyncing(false); setFirstReady(true); }, 5000);
+      const t = setTimeout(() => { setSyncing(false); setSourceReady(true); }, 5000);
       return () => clearTimeout(t);
     }
     setSyncing(false);
@@ -245,7 +241,10 @@ export default function EditorPage() {
     // Switching to a saved tab: paint its cached doc immediately (no loader) and
     // let the room sync reconcile. An import (template/copy) overrides the cache.
     const cached = imp ? null : readDoc(d);
-    setFirstReady(!!(cached && cached.svg)); // a cached SVG paints instantly; otherwise wait for the first render
+    // Code is ready when we already have its real text: an import, a cached doc,
+    // or no room at all. A freshly-opened (uncached) tab shows SAMPLE as a
+    // placeholder, so the code pane stays in its loader until the room answers.
+    setSourceReady(!!imp || !!cached || !d);
     setSource(imp ? imp.source : cached ? cached.source : emptied ? "" : SAMPLE);
     setKind(imp ? imp.kind : cached ? cached.kind : "kymo");
     setSvg(cached ? cached.svg : ""); lastSvg.current = cached ? cached.svg : "";
@@ -293,7 +292,8 @@ export default function EditorPage() {
       setSyncing(false);
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
       synced.current = true;
-      if (fromSelf) { setFirstReady(true); return; } // our own content is already on screen
+      setSourceReady(true); // the room has answered — the code pane shows the real doc now
+      if (fromSelf) return; // our own content is already on screen
       // adopt the snapshot's kind only when it carries a real document — a fresh
       // room's empty snapshot reports the server default ("kymo"), which must not
       // override the kind a template/"Save a copy" just seeded into the editor
@@ -309,19 +309,19 @@ export default function EditorPage() {
           const t2 = titleUserSet.current ? titleRef.current : titleFrom(source, kind);
           if (t2 && t2 !== "Untitled") { autoTitle.current = titleUserSet.current ? autoTitle.current : t2; setTitle(t2); room.sendRename(t2); }
         }
-        setFirstReady(true); // empty room: no render is coming — reveal what we have
         return;
       }
       // A stored title that no longer matches its source was typed by a human → lock it.
       autoTitle.current = titleFrom(src, k || kind);
       titleUserSet.current = !!(t && t !== "Untitled" && t !== autoTitle.current);
       fresh.current = false;
+      // The synced doc differs from the SAMPLE placeholder we may have rendered
+      // while booting — drop that stale SVG so the preview pane shows its loader
+      // (not a flash of the sample) until the real content renders.
+      if (src !== sourceRef.current) { setSvg(""); lastSvg.current = ""; }
       applyingRemote.current = true;
       setSource(src);
-      // Synced content identical to what's already shown → setSource is a no-op,
-      // so no render fires to flip firstReady. Reveal now (and release the
-      // applyingRemote latch the skipped render would have cleared).
-      if (src === sourceRef.current) { applyingRemote.current = false; setFirstReady(true); }
+      if (src === sourceRef.current) applyingRemote.current = false; // no-op setSource → release the latch the skipped render would have cleared
     },
   });
 
@@ -370,10 +370,15 @@ export default function EditorPage() {
   // links and the guest editor aren't a blank "/" in the header (kymo kind only).
   const localTitle = !d ? titleFrom(source, kind) : "Untitled";
   const diagramLabel = title || (localTitle !== "Untitled" ? localTitle : "Untitled");
-  // A room shows ONE loader until its first paint is ready (code + preview
-  // together); a cached SVG makes that instant. A draft lives at "/" with no
-  // room, so it renders immediately.
-  const booting = !!d && !shared && !firstReady;
+  // `booting` = the CODE pane is still waiting for its real text (a room that
+  // hasn't answered yet). The tab bar + pane chrome stay mounted; only the pane
+  // bodies show loaders. A cached doc / draft is never booting.
+  const booting = !!d && !shared && !sourceReady;
+  // The PREVIEW pane loads independently of the code pane: a loader until the
+  // first SVG for the real content exists. Hidden while booting (so the SAMPLE
+  // placeholder's render never flashes); for an empty doc there's nothing to
+  // render, so no loader. Errors fall through to the Preview (message shown).
+  const previewLoading = !shareError && (booting || (!svg && !!source.trim()));
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
   // A draft (no room, not a pristine share view) is unsaved until the explicit Save.
   const isDraft = !d && !shared;
@@ -800,9 +805,9 @@ export default function EditorPage() {
           </>
         )}
         <main ref={mainRef}>
-        {booting ? (
-          <div className="boot"><KLoader /></div>
-        ) : showWelcome ? (
+        {/* The tab bar + pane chrome stay mounted while a tab loads; only the pane
+            bodies below swap in a loader (code vs preview, independently). */}
+        {showWelcome ? (
           <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} onTemplate={pickTemplate} onOpen={openDiagram} />
         ) : noFileOpen ? (
           <div className="nofile" data-testid="nofile">
@@ -862,7 +867,9 @@ export default function EditorPage() {
                   </div>
                 );
               })()}
-              <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />
+              {booting
+                ? <div className="boot"><KLoader /></div>
+                : <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />}
             </section>
             )}
             {panes.source && panes.preview && (
@@ -934,7 +941,7 @@ export default function EditorPage() {
                 </div>
               </div>
               {shareError && <div className="share-error">{shareError}</div>}
-              {kind === "kymo" && !renderReady && !shareError && !svg
+              {previewLoading
                 ? <div className="boot"><KLoader /></div>
                 : <Preview svg={svg} fitKey={(d || "shared") + ":" + kind} />}
             </section>
