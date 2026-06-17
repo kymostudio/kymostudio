@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, colorFor } from "./auth";
 import { useWorkspace, assignDiagram, deleteDiagram, renameDiagram, moveDiagramToProject, withQuery, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
@@ -41,31 +41,59 @@ function restoreItem(signedIn: boolean, kind: "diagram" | "folder", id: string) 
   }).catch(() => {});
 }
 
-// Shared diagram-list fetch for the Explorer + Search panels (only one panel is
-// mounted at a time, so this never double-fetches).
-export function useDiagrams() {
+// ONE shared diagram-list store for the Explorer, Search, Welcome and the editor
+// tab bar — so a saved/new/renamed diagram updates everywhere at once instead of
+// each consumer holding its own (out-of-sync) copy. `addLocal` inserts a diagram
+// optimistically so it appears the instant you Save, before the server round-trip;
+// the next reload reconciles it (and the server's stored title takes over once set).
+type DiagramsVal = { items: Item[]; reload: () => Promise<void>; loaded: boolean; addLocal: (it: Item) => void };
+const DiagramsCtx = createContext<DiagramsVal>({ items: [], reload: async () => {}, loaded: false, addLocal: () => {} });
+
+export function DiagramsProvider({ children }: { children: React.ReactNode }) {
   const { signedIn } = useAuth();
   const { currentProject } = useWorkspace();
   const [items, setItems] = useState<Item[]>([]);
   const [loaded, setLoaded] = useState(false); // a list fetch has completed at least once
   const projectQuery = currentProject ? "&project=" + encodeURIComponent(currentProject) : "";
+  // Optimistically-added diagrams (id → item), kept until the server reports a
+  // real title for them so an early reload can't blank a just-created file.
+  const optimistic = useRef<Map<string, Item>>(new Map());
+  const merge = useCallback((server: Item[]) => {
+    const opt = optimistic.current;
+    if (!opt.size) return server;
+    const out = server.map((s) => {
+      const o = opt.get(s.id);
+      if (!o) return s;
+      if ((!s.title || s.title === "Untitled") && o.title && o.title !== "Untitled") return { ...s, title: o.title, kind: s.kind || o.kind };
+      opt.delete(s.id); // server has caught up → stop overriding
+      return s;
+    });
+    for (const [id, o] of opt) if (!out.some((s) => s.id === id)) out.unshift(o); // server hasn't indexed it yet
+    return out;
+  }, []);
   const reload = useCallback(async () => {
     if (!signedIn) return;
     try {
       const r = await apiFetch(withQuery(DIAGRAMS_API, projectQuery), { cache: "no-store" });
-      if (r.ok) { setItems(((await r.json()).diagrams) || []); setLoaded(true); }
+      if (r.ok) { setItems(merge(((await r.json()).diagrams) || [])); setLoaded(true); }
     } catch {}
-  }, [signedIn, projectQuery]);
-  // a project switch invalidates "loaded" until the new project's list arrives
-  useEffect(() => { setLoaded(false); }, [projectQuery]);
+  }, [signedIn, projectQuery, merge]);
+  const addLocal = useCallback((it: Item) => {
+    optimistic.current.set(it.id, { ...it });
+    setItems((prev) => [{ ...it }, ...prev.filter((x) => x.id !== it.id)]);
+  }, []);
+  // a project switch invalidates "loaded" (and any stale optimistic) until the new list arrives
+  useEffect(() => { setLoaded(false); optimistic.current.clear(); }, [projectQuery]);
   useEffect(() => { reload(); }, [reload]);
   useEffect(() => {
     const f = () => { if (!document.hidden) reload(); };
     window.addEventListener("focus", reload); document.addEventListener("visibilitychange", f);
     return () => { window.removeEventListener("focus", reload); document.removeEventListener("visibilitychange", f); };
   }, [reload]);
-  return { items, reload, loaded };
+  return <DiagramsCtx.Provider value={{ items, reload, loaded, addLocal }}>{children}</DiagramsCtx.Provider>;
 }
+
+export function useDiagrams() { return useContext(DiagramsCtx); }
 
 // ============================ Explorer (file tree) ============================
 // One flat row of the rendered tree. The same ordered list drives the DOM and the

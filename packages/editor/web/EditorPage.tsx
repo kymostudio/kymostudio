@@ -55,7 +55,7 @@ export default function EditorPage() {
   const shared = !!sharedSrc && !activeTab;
   // The project's diagram list — drives tab titles + prunes tabs whose diagram
   // was deleted elsewhere. (Same hook the Explorer/Search use.)
-  const { items, loaded: itemsLoaded } = useDiagrams();
+  const { items, loaded: itemsLoaded, reload: reloadDiagrams, addLocal: addLocalDiagram } = useDiagrams();
 
   // Save model is two-state: a no-?d buffer is always a DRAFT that lives only in
   // the URL (?s=) — nothing on the server until the explicit Save (button /
@@ -661,10 +661,15 @@ export default function EditorPage() {
     if (!sourceRef.current.trim()) return;
     if (!signedIn) { pendingSave.current = true; promptSignIn(); return; }
     const id = newId();
+    const title = (titleUserSet.current ? titleRef.current.trim() : titleFrom(sourceRef.current, kindRef.current)) || "Untitled";
     pendingImport.current = { source: sourceRef.current, kind: kindRef.current, title: titleUserSet.current ? titleRef.current : undefined };
     assignDiagram(signedIn, id, currentFolder, currentProject || undefined); // lands in the folder you're saving into
+    // Surface the new file in the Explorer + tab bar immediately (optimistic), then
+    // reconcile once the room has stored its title server-side.
+    addLocalDiagram({ id, title, kind: kindRef.current, ws: currentFolder, updatedAt: Date.now() });
     openDiagram(id); // adds the new diagram as a tab + activates it; URL stays ?p=
-  }, [activeTab, signedIn, currentFolder, currentProject, openDiagram, promptSignIn]);
+    setTimeout(() => reloadDiagrams(), 1800);
+  }, [activeTab, signedIn, currentFolder, currentProject, openDiagram, promptSignIn, addLocalDiagram, reloadDiagrams]);
   const saveRef = useRef(save); saveRef.current = save;
   // Guest hit Save → signed in → finish the save now that we have a token.
   useEffect(() => {
@@ -695,7 +700,9 @@ export default function EditorPage() {
     const id = newId();
     pendingImport.current = { source, kind };
     assignDiagram(signedIn, id, currentFolder, currentProject || undefined);
+    addLocalDiagram({ id, title: titleFrom(source, kind) || "Untitled", kind, ws: currentFolder, updatedAt: Date.now() });
     openDiagram(id);
+    setTimeout(() => reloadDiagrams(), 1800);
   }
   function commitRename(v: string) {
     const t = v.trim();
