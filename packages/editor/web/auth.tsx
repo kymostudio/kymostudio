@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setClaims = useCallback((c: Claims | null) => { writeClaims(c); setClaimsState(c); }, []);
   useEffect(() => {
     let stop = false;
+    try { localStorage.removeItem("kymo_idtoken"); } catch {} // one-time: drop the legacy pre-cookie token
     // GIS hands back a Google credential → exchange it for our session cookie.
     gsiCallback = async (resp: any) => {
       try {

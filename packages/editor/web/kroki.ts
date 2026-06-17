@@ -119,12 +119,13 @@ export async function earlyResponse(kind: string, source: string): Promise<Respo
 
 function postRender(base: string, kind: string, source: string): Promise<Response> {
   const headers: Record<string, string> = { "content-type": "text/plain" };
-  // The signed-in higher-rate-limit tier used to ride a Bearer id_token from
-  // localStorage; the session is now an httpOnly cookie (CR-KEDITOR-002) so the
-  // editor holds no token. Restoring the tier is a follow-up — render.kymo.studio
-  // must read the session cookie (credentials:"include" is unsafe while that
-  // worker answers CORS "*"). Anonymous tier for now; render still works for all.
-  return fetch(`${base}/${encodeURIComponent(kind)}/svg`, { method: "POST", headers, body: source });
+  // Signed-in callers get the higher rate-limit tier via the session cookie
+  // (CR-KEDITOR-002) — only ever to our own render API (same-site kymo.studio),
+  // never the kroki.io fallback. The render output is identical for everyone, so
+  // a missing/anonymous cookie just falls back to the per-IP tier.
+  const init: RequestInit = { method: "POST", headers, body: source };
+  if (base === RENDER_API) init.credentials = "include";
+  return fetch(`${base}/${encodeURIComponent(kind)}/svg`, init);
 }
 
 export async function renderKroki(kind: string, source: string): Promise<string> {
