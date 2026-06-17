@@ -8,7 +8,7 @@ import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { Preview } from "./preview";
 import { RENDER_API, SAMPLE } from "./const";
-import { newId, titleFrom } from "./util";
+import { newId } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
 import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
@@ -163,10 +163,8 @@ export default function EditorPage() {
   const pendingImport = useRef<{ source: string; kind: string; title?: string } | null>(null); // carry draft/shared content into a new room
   const closedAll = useRef(false); // last tab was just closed → reset to an empty buffer (no-file state), not the sample
   const pendingSave = useRef(false); // guest hit Save → sign in, then auto-save once the token lands
-  // Auto-title tracks the source (titleFrom) until the user renames by hand; then
-  // it locks. `autoTitle` is the last value we derived, so we can tell an
-  // untouched auto name from one the user typed.
-  const autoTitle = useRef("");
+  // A diagram is "Untitled" until the user renames it by hand — no auto-naming
+  // from the source. `titleUserSet` tracks whether a real (hand-typed) name exists.
   const titleUserSet = useRef(false);
   const titleRef = useRef(title);
   titleRef.current = title;
@@ -277,9 +275,8 @@ export default function EditorPage() {
     setKind(imp ? imp.kind : cached ? cached.kind : "kymo");
     setSvg(cached ? cached.svg : ""); lastSvg.current = cached ? cached.svg : "";
     setTitle(imp?.title || cached?.title || ""); setEditingName(false); setShareError(null);
-    // A manually-named draft carries its title into the new room; otherwise the
-    // name auto-tracks the source until the user renames.
-    titleUserSet.current = !!imp?.title; autoTitle.current = "";
+    // A manually-named draft carries its title into the new room; otherwise it's Untitled.
+    titleUserSet.current = !!imp?.title;
     // userEdited only matters when there's a room to push into (an explicit Save /
     // "Save a copy"); imported content with no ?d is a draft — keep pristine.
     synced.current = false; fresh.current = false; userEdited.current = !!imp && !!d;
@@ -299,7 +296,7 @@ export default function EditorPage() {
         if (stop) return;
         if (sharedKind && KINDS.some((k) => k.value === sharedKind)) setKind(sharedKind);
         userEdited.current = false; // pristine shared content — leave the URL alone until they type
-        titleUserSet.current = false; autoTitle.current = "";
+        titleUserSet.current = false;
         setShareError(null);
         setSource(src);
       })
@@ -313,9 +310,8 @@ export default function EditorPage() {
 
   const room = useRoom(roomId, signedIn, {
     onLive: setLive, // not cleared here: the OLD socket closing on room switch would kill the boot state
-    // A rename event locks auto-title — unless it's the echo of our OWN auto-rename
-    // (title === the value we just derived), which must keep tracking the source.
-    onMeta: (t) => { if (t && t !== autoTitle.current) titleUserSet.current = true; setTitle(t && t !== "Untitled" ? t : ""); },
+    // Any stored non-"Untitled" title is a hand-typed name (no auto-naming).
+    onMeta: (t) => { if (t && t !== "Untitled") titleUserSet.current = true; setTitle(t && t !== "Untitled" ? t : ""); },
     onDoc: (src, t, fromSelf, k) => {
       setSyncing(false);
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
@@ -334,14 +330,13 @@ export default function EditorPage() {
         if (userEdited.current) {
           fresh.current = false;
           room.sendSource(source, kind);
-          const t2 = titleUserSet.current ? titleRef.current : titleFrom(source, kind);
-          if (t2 && t2 !== "Untitled") { autoTitle.current = titleUserSet.current ? autoTitle.current : t2; setTitle(t2); room.sendRename(t2); }
+          // only push a real, hand-typed name (no auto-title from content)
+          if (titleUserSet.current && titleRef.current && titleRef.current !== "Untitled") room.sendRename(titleRef.current);
         }
         return;
       }
-      // A stored title that no longer matches its source was typed by a human → lock it.
-      autoTitle.current = titleFrom(src, k || kind);
-      titleUserSet.current = !!(t && t !== "Untitled" && t !== autoTitle.current);
+      // Any stored non-"Untitled" title is a hand-typed name.
+      titleUserSet.current = !!(t && t !== "Untitled");
       fresh.current = false;
       // The synced doc differs from the SAMPLE placeholder we may have rendered
       // while booting — drop that stale SVG so the preview pane shows its loader
@@ -362,13 +357,7 @@ export default function EditorPage() {
       if (fresh.current && !userEdited.current) return; // untouched sample: nothing worth persisting
       room.sendSource(source, kind);
       fresh.current = false;
-      // Auto-title: keep the saved name in step with the source until the user
-      // renames by hand (titleUserSet locks it).
-      if (!titleUserSet.current) {
-        const t = titleFrom(source, kind);
-        const nt = t !== "Untitled" ? t : "";
-        if (nt && nt !== titleRef.current) { autoTitle.current = nt; setTitle(nt); room.sendRename(nt); }
-      }
+      // No auto-titling: the name stays whatever the user set (or "Untitled").
     }, lastSvg.current ? (kind === "kymo" ? 120 : 450) : 0); // debounce typing, but never the very first render
     return () => clearTimeout(id);
   }, [source, kind]); // eslint-disable-line
@@ -394,10 +383,8 @@ export default function EditorPage() {
     return () => { document.removeEventListener("click", h); document.removeEventListener("keydown", k); };
   }, []);
 
-  // Without a room there's no stored title — derive one from the source so share
-  // links and the guest editor aren't a blank "/" in the header (kymo kind only).
-  const localTitle = !d ? titleFrom(source, kind) : "Untitled";
-  const diagramLabel = title || (localTitle !== "Untitled" ? localTitle : "Untitled");
+  // No auto-naming: a diagram is whatever the user titled it, else "Untitled".
+  const diagramLabel = title || "Untitled";
   // `booting` = the CODE pane is still waiting for its real text (a room that
   // hasn't answered yet). The tab bar + pane chrome stay mounted; only the pane
   // bodies show loaders. A cached doc / draft is never booting.
@@ -627,7 +614,7 @@ export default function EditorPage() {
       const byExt = ext === "bpmn" ? "bpmn" : ext === "mmd" || ext === "mermaid" ? "mermaid" : "kymo";
       const k = sniffKind(txt) || byExt;
       setWelcomeDismissed(true);
-      userEdited.current = true; titleUserSet.current = false; autoTitle.current = "";
+      userEdited.current = true; titleUserSet.current = false;
       setTitle(""); setShareError(null);
       setKind(KINDS.some((x) => x.value === k) ? k : "kymo");
       setSource(txt);
@@ -640,7 +627,7 @@ export default function EditorPage() {
     setWelcomeDismissed(true); // leaving the Welcome panel for a real diagram
     // A draft is the only copy in this tab/URL — ask before replacing it.
     if (!activeTab && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
-    titleUserSet.current = false; autoTitle.current = "";
+    titleUserSet.current = false;
     if (activeTab) {
       // a file is open → New opens a fresh DRAFT (deactivate the tab; the reset
       // effect consumes the seeded template). The other tabs stay open.
@@ -663,7 +650,7 @@ export default function EditorPage() {
     if (!sourceRef.current.trim()) return;
     if (!signedIn) { pendingSave.current = true; promptSignIn(); return; }
     const id = newId();
-    const title = (titleUserSet.current ? titleRef.current.trim() : titleFrom(sourceRef.current, kindRef.current)) || "Untitled";
+    const title = (titleUserSet.current && titleRef.current.trim()) || "Untitled";
     pendingImport.current = { source: sourceRef.current, kind: kindRef.current, title: titleUserSet.current ? titleRef.current : undefined };
     // Persist the content with the create so it's durable immediately (a quick
     // follow-up "New diagram" can't abandon the room before it flushed).
@@ -702,7 +689,7 @@ export default function EditorPage() {
   // Signed-in user viewing a share link: import the shared content into a real room.
   function saveCopy() {
     const id = newId();
-    const title = titleFrom(source, kind) || "Untitled";
+    const title = "Untitled";
     pendingImport.current = { source, kind };
     assignDiagram(signedIn, id, currentFolder, currentProject || undefined, { source, title, kind });
     addLocalDiagram({ id, title, kind, ws: currentFolder, updatedAt: Date.now() });
