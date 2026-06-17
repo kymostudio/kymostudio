@@ -10,7 +10,9 @@ import wasmUrl from "kymostudio-core/kymostudio_core_bg.wasm";
 
 let ready: Promise<void> | null = null;
 function ensure(): Promise<void> {
-  return (ready ??= init(wasmUrl as unknown as string).then(() => {
+  // wasm-bindgen wants the URL via the object form ({ module_or_path }); the
+  // positional-arg form still works but logs a deprecation warning.
+  return (ready ??= init({ module_or_path: wasmUrl } as unknown as Parameters<typeof init>[0]).then(() => {
     setManifest(manifest as any);
     setIconBaseURL("https://cdn.jsdelivr.net/gh/kymostudio/kymostudio@main/packages/icons");
   }));
