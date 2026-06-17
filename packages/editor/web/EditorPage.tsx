@@ -225,6 +225,10 @@ export default function EditorPage() {
     // userEdited only matters when there's a room to push into (an explicit Save /
     // "Save a copy"); imported content with no ?d is a draft — keep pristine.
     synced.current = false; fresh.current = false; userEdited.current = !!imp && !!d;
+    // A seeded import (template pick / "Save a copy") is a real draft → keep the
+    // Welcome home hidden even though the Flowchart template's source is byte-
+    // identical to SAMPLE. A bare reset (no import) re-arms Welcome for a fresh "/".
+    setWelcomeDismissed(!!imp);
   }, [d]);
 
   // Shared link: inflate the ?s= payload into the editor. Re-runs on history
@@ -517,8 +521,10 @@ export default function EditorPage() {
   // Nothing is created server-side here: the pick seeds a DRAFT (URL-only). It
   // becomes a room only via the explicit Save — abandoned templates never litter
   // the Diagrams list.
-  // Re-arm the Welcome panel whenever the route changes (back to a fresh "/").
-  useEffect(() => { setWelcomeDismissed(false); }, [d, shared]);
+  // Re-arm the Welcome panel when leaving a share view back to a fresh "/". The
+  // per-room reset effect above owns the d-change case so it can honour a pending
+  // template pick (which seeds SAMPLE and must NOT re-show the Welcome home).
+  useEffect(() => { if (!shared) setWelcomeDismissed(false); }, [shared]);
 
   // "Open file…" on the Welcome panel: load a local diagram source into the draft.
   function openLocalFile(file: File) {
