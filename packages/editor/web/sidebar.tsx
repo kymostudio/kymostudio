@@ -120,6 +120,7 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
   const [dragOver, setDragOver] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ kind: "file" | "folder"; id: string } | null>(null);
   const [focusKey, setFocusKey] = useState<string | null>(null);
+  const [flashId, setFlashId] = useState<string | null>(null); // briefly highlight the file just opened/created
   const treeRef = useRef<HTMLDivElement>(null);
   useEffect(() => { reload(); }, [currentId]); // a save/new file shows up // eslint-disable-line
 
@@ -287,6 +288,17 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
     if (!focusKey) return;
     treeRef.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(focusKey)}"]`)?.scrollIntoView({ block: "nearest" });
   }, [focusKey]);
+  // When the active diagram changes (a new diagram, or switching tabs), bring its
+  // row into view and flash it so the focus is obvious in both Explorer and tab.
+  useEffect(() => {
+    if (!currentId) { setFlashId(null); return; }
+    const t = setTimeout(() => {
+      treeRef.current?.querySelector<HTMLElement>(`[data-id="${CSS.escape(currentId)}"]`)?.scrollIntoView({ block: "nearest" });
+    }, 30); // let an optimistic/new row mount first
+    setFlashId(currentId);
+    const clr = setTimeout(() => setFlashId(null), 1000);
+    return () => { clearTimeout(t); clearTimeout(clr); };
+  }, [currentId]);
 
   // Autofocus + select-all the inline rename input when it mounts.
   const editRef = useCallback((el: HTMLInputElement | null) => { if (el) { el.focus(); el.select(); } }, []);
@@ -334,7 +346,7 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
     const label = (active && currentTitle && currentTitle !== "Untitled" ? currentTitle : it.title) || "Untitled";
     const isEditing = editing?.kind === "file" && editing.id === r.id;
     return (
-      <div key={"d" + r.id} data-key={k} className={"sb-row sb-file" + (active ? " active" : "") + (focused ? " kbd" : "")}
+      <div key={"d" + r.id} data-key={k} data-id={it.id} className={"sb-row sb-file" + (active ? " active" : "") + (focused ? " kbd" : "") + (flashId === it.id ? " flash" : "")}
         draggable={!isEditing} onDragStart={(e) => { e.stopPropagation(); dragStart(e, "diagram", r.id); }}
         onClick={() => { setFocusKey(k); openFile(r.id); }}
         onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setFocusKey(k); fileMenu(e, it); }}
