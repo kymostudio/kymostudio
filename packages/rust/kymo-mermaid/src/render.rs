@@ -37,7 +37,7 @@ impl MermaidFlowchart {
     /// the labels first; geometry uses the dagre adapter (or merman under
     /// `katex-layout`).
     pub fn parse(src: &str) -> Result<Self, MermaidError> {
-        let (mut fc, _) = mermaid::parse_with_config(src)?;
+        let mut fc = parse_flowchart_ir(src)?;
         crate::render_flowchart_math(&mut fc);
         let style = FlowStyle::Mermaid;
         let (node_styles, default_style) = mermaid::extract_node_styles(src);
@@ -59,6 +59,21 @@ impl MermaidFlowchart {
             self.default_style.as_ref(),
         )
     }
+}
+
+/// Parse mermaid source to kymo's `Flowchart` IR. Under `katex-layout`, use
+/// **merman's** grammar-faithful parser (translated to kymo structs) for 100%
+/// topology parity, falling back to kymo's own parser if merman can't parse it.
+#[cfg(feature = "katex-layout")]
+fn parse_flowchart_ir(src: &str) -> Result<Flowchart, MermaidError> {
+    if let Some(fc) = crate::katex_layout::flowchart_from_merman(src) {
+        return Ok(fc);
+    }
+    Ok(mermaid::parse_with_config(src)?.0)
+}
+#[cfg(not(feature = "katex-layout"))]
+fn parse_flowchart_ir(src: &str) -> Result<Flowchart, MermaidError> {
+    Ok(mermaid::parse_with_config(src)?.0)
 }
 
 /// Default geometry: kymo's OWN dagre adapter (lean, Unicode math, raster-safe).

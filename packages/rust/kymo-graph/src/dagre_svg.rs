@@ -69,6 +69,59 @@ pub struct FGeom {
     pub nodes: Vec<FNode>,
     pub edges: Vec<FEdge>,
     pub regions: Vec<FRegion>,
+    /// Theme palette (from a `%%{init themeVariables}%%` directive), lifted from
+    /// merman's already-computed theme. `None` = the default mermaid palette.
+    pub theme: Option<ThemeColors>,
+}
+
+/// Resolved theme colours (mermaid's computed palette), applied as a CSS override on
+/// top of the default palette. Per-node `classDef`/`style` (inline) still win over it.
+#[derive(Debug, Clone, Default)]
+pub struct ThemeColors {
+    pub node_fill: Option<String>,
+    pub node_stroke: Option<String>,
+    pub text: Option<String>,
+    pub line: Option<String>,
+    pub cluster_fill: Option<String>,
+    pub cluster_stroke: Option<String>,
+    pub background: Option<String>,
+    /// `<linearGradient>` def (id `fc-theme-gradient`) for the **neo** look's gradient
+    /// node stroke (mermaid `look:neo` + a custom theme). `None` = flat stroke.
+    pub gradient: Option<String>,
+    /// neo look: a drop-shadow filter on node shapes.
+    pub drop_shadow: bool,
+}
+
+impl ThemeColors {
+    /// CSS rules overriding the default-palette selectors (cascade: later wins).
+    fn css_override(&self) -> String {
+        let mut s = String::new();
+        if let Some(c) = &self.node_fill {
+            s.push_str(&format!(".fc-shape{{fill:{c}}}"));
+        }
+        if let Some(c) = &self.node_stroke {
+            s.push_str(&format!(".fc-shape{{stroke:{c}}}.fc-shape-line{{stroke:{c}}}"));
+        }
+        if let Some(c) = &self.text {
+            s.push_str(&format!("text{{fill:{c}}}.fc-label{{fill:{c}}}"));
+        }
+        if let Some(c) = &self.line {
+            s.push_str(&format!(".edge-path{{stroke:{c}}}"));
+        }
+        if let Some(c) = &self.cluster_fill {
+            s.push_str(&format!(".region-rect{{fill:{c}}}"));
+        }
+        if let Some(c) = &self.cluster_stroke {
+            s.push_str(&format!(".region-rect{{stroke:{c}}}"));
+        }
+        if self.gradient.is_some() {
+            s.push_str(".fc-shape{stroke:url(#fc-theme-gradient)}");
+        }
+        if self.drop_shadow {
+            s.push_str(".fc-shape{filter:drop-shadow(1px 2px 2px rgba(185,185,185,1))}");
+        }
+        s
+    }
 }
 
 /// Format a coordinate with up to 2 decimals, trimming trailing zeros so whole
@@ -96,10 +149,19 @@ pub fn render(
         .map(|r| region_rect(r, style, styles.get(&r.id)))
         .collect();
     let edges: String = geom.edges.iter().map(|e| edge_svg(e, style)).collect();
+    // Wrap each node in `<g class="fc-node" data-id>` — one group per node, so the
+    // node is identifiable regardless of how many shapes it draws (cylinders = 2) or
+    // whether its label is empty. Enables exact node counting/matching by id.
     let nodes: String = geom
         .nodes
         .iter()
-        .map(|n| node_svg(n, style, styles.get(&n.id), default_style))
+        .map(|n| {
+            format!(
+                "<g class=\"fc-node\" data-id=\"{}\">{}</g>\n",
+                attr_escape(&n.id),
+                node_svg(n, style, styles.get(&n.id), default_style)
+            )
+        })
         .collect();
     let region_labels: String = geom
         .regions
@@ -115,19 +177,34 @@ pub fn render(
     // that fits the SVG into an integer pixel box scales kymo and mermaid the
     // same way — an integer-ceil envelope would scale only one of them.
     let (w, h) = (nf(geom.w), nf(geom.h));
-    let bg = match style {
+    let mut bg = match style {
         FlowStyle::Kymo => format!(
             "<rect width=\"{w}\" height=\"{h}\" fill=\"#fafafa\"/>\n<rect width=\"{w}\" height=\"{h}\" class=\"bg-grid\"/>\n"
         ),
         FlowStyle::Mermaid => String::new(),
     };
+    // Theme (from `%%{init themeVariables}%%`): a CSS override on the default palette
+    // + a background fill rect. None on un-themed diagrams (byte-identical to before).
+    let theme_css = geom.theme.as_ref().map(ThemeColors::css_override).unwrap_or_default();
+    let theme_defs = geom.theme.as_ref().and_then(|t| t.gradient.clone()).unwrap_or_default();
+    if let Some(b) = geom.theme.as_ref().and_then(|t| t.background.as_ref()) {
+        bg = format!("<rect width=\"{w}\" height=\"{h}\" fill=\"{b}\"/>\n{bg}");
+    }
     format!(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
          <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {w} {h}\" width=\"{w}\" height=\"{h}\" \
          style=\"max-width:100%;height:auto\" font-family=\"{font}\">\n\
-         <style>{css}</style>\n<defs>{defs}</defs>\n\
+         <style>{css}{theme_css}</style>\n<defs>{defs}{theme_defs}</defs>\n\
          {bg}{regions}{edges}{nodes}{region_labels}</svg>\n"
     )
+}
+
+/// Escape a string for use in an XML attribute value (node ids in `data-id`).
+fn attr_escape(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('"', "&quot;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
 }
 
 fn node_svg(
