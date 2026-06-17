@@ -11,7 +11,7 @@ import { RENDER_API, SAMPLE } from "./const";
 import { newId, titleFrom } from "./util";
 import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
-import { ActivityBar, ExplorerPanel, SearchPanel, TemplatesPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
+import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
@@ -118,7 +118,7 @@ export default function EditorPage() {
   const isPhone = () => typeof matchMedia !== "undefined" && matchMedia("(max-width: 720px)").matches;
   const [activePanel, setActivePanel] = useState<Panel | null>(() => {
     const v = localStorage.getItem("kymo_panel");
-    if (v === "explorer" || v === "search" || v === "templates") return v;
+    if (v === "explorer" || v === "search") return v;
     if (v === "none") return null;
     return isPhone() ? null : "explorer";
   });
@@ -830,7 +830,6 @@ export default function EditorPage() {
             <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} />
             {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onOpen={openDiagram} onNewDiagram={() => setGalleryOpen(true)} onClose={closePanelOnPhone} />}
             {activePanel === "search" && <SearchPanel currentId={d} onOpen={openDiagram} onClose={closePanelOnPhone} />}
-            {activePanel === "templates" && <TemplatesPanel onPick={pickTemplate} onClose={closePanelOnPhone} />}
             {activePanel && <div className="sb-backdrop" onClick={closePanelOnPhone} />}
           </>
         )}
