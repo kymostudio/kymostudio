@@ -109,7 +109,7 @@ pub fn render(cd: &ClassDiagram) -> String {
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
          <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {w} {h}\" width=\"{w}\" height=\"{h}\" \
          style=\"max-width:100%;height:auto\" font-family=\"{FONT}\" font-size=\"13\">\n\
-         <defs>{DEFS}</defs>\n<rect width=\"{w}\" height=\"{h}\" fill=\"#fafafa\"/>\n{body}</svg>\n"
+         <defs>{DEFS}</defs>\n<rect width=\"{w}\" height=\"{h}\" fill=\"#ffffff\"/>\n{body}</svg>\n"
     )
 }
 
@@ -121,12 +121,44 @@ fn box_label(c: &ClassBox) -> String {
     }
     lines.push(c.name.clone());
     for a in &c.attributes {
-        lines.push(a.clone());
+        lines.push(generics(a));
     }
     for m in &c.methods {
-        lines.push(m.clone());
+        lines.push(method_label(m));
     }
     lines.join("\n")
+}
+
+/// Mermaid generics markup: `List~int~` → `List<int>` (toggle `~` to `<` / `>`).
+fn generics(s: &str) -> String {
+    if !s.contains('~') {
+        return s.to_string();
+    }
+    let mut o = String::with_capacity(s.len());
+    let mut open = true;
+    for c in s.chars() {
+        if c == '~' {
+            o.push(if open { '<' } else { '>' });
+            open = !open;
+        } else {
+            o.push(c);
+        }
+    }
+    o
+}
+
+/// A method row as mermaid prints it: `name(params) : ReturnType` (insert the
+/// ` : ` return separator), with generics resolved.
+fn method_label(s: &str) -> String {
+    let g = generics(s);
+    if let Some(p) = g.find(')') {
+        let (head, tail) = g.split_at(p + 1);
+        let tail = tail.trim_start();
+        if !tail.is_empty() && !tail.starts_with(':') {
+            return format!("{head} : {tail}");
+        }
+    }
+    g
 }
 
 fn box_svg(c: &ClassBox, comp: &Component) -> String {
@@ -134,27 +166,27 @@ fn box_svg(c: &ClassBox, comp: &Component) -> String {
     let (w, h) = comp.size.unwrap_or((120, 60));
     let (x, y) = (cx - w / 2, cy - h / 2);
     let mut out = format!(
-        "<rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"2\" fill=\"#ffffff\" \
-         stroke=\"#334155\" stroke-width=\"1.2\"/>"
+        "<rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"2\" fill=\"#ECECFF\" \
+         stroke=\"#9370DB\" stroke-width=\"1.2\"/>"
     );
     let mut ty = y + 4;
     if !c.stereotype.is_empty() {
         ty += LINE_H - 4;
         out += &format!(
-            "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-size=\"11\" fill=\"#64748b\">{}</text>",
+            "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-size=\"11\" fill=\"#333333\">{}</text>",
             esc(&format!("«{}»", c.stereotype))
         );
         ty += 4;
     }
     ty += LINE_H - 4;
     out += &format!(
-        "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-weight=\"700\" fill=\"#1e293b\">{}</text>",
+        "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-weight=\"700\" fill=\"#131300\">{}</text>",
         esc(&c.name)
     );
     ty += 6;
     let row = |ty: i32, t: &str| {
         format!(
-            "<text x=\"{}\" y=\"{ty}\" fill=\"#334155\">{}</text>",
+            "<text x=\"{}\" y=\"{ty}\" fill=\"#131300\">{}</text>",
             x + 6,
             esc(t)
         )
@@ -162,12 +194,12 @@ fn box_svg(c: &ClassBox, comp: &Component) -> String {
     out += &divider(x, ty, w);
     for a in &c.attributes {
         ty += LINE_H;
-        out += &row(ty, a);
+        out += &row(ty, &generics(a));
     }
     out += &divider(x, ty + 6, w);
     for m in &c.methods {
         ty += LINE_H;
-        out += &row(ty, m);
+        out += &row(ty, &method_label(m));
     }
     out
 }
@@ -192,7 +224,7 @@ fn note_box(text: &str, comp: &Component) -> String {
 
 fn divider(x: i32, ty: i32, w: i32) -> String {
     format!(
-        "<line x1=\"{x}\" y1=\"{ty}\" x2=\"{}\" y2=\"{ty}\" stroke=\"#cbd5e1\" stroke-width=\"1\"/>",
+        "<line x1=\"{x}\" y1=\"{ty}\" x2=\"{}\" y2=\"{ty}\" stroke=\"#9370DB\" stroke-width=\"1\"/>",
         x + w
     )
 }
