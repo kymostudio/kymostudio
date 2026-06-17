@@ -17,6 +17,7 @@ import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
 import { readDoc, writeDoc, dropDoc } from "./doccache";
+import { KLoader } from "./kloader";
 import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X } from "lucide-react";
 
 export default function EditorPage() {
@@ -79,6 +80,7 @@ export default function EditorPage() {
   const [statusErr, setStatusErr] = useState(false);
   const [live, setLive] = useState(false);
   const [showOffline, setShowOffline] = useState(false);
+  const [booted, setBooted] = useState(false); // first-load full-screen splash until the project's data is in
   const [title, setTitle] = useState(seed ? seed.title : "");
   // Source ready: the code we're showing is the confirmed doc (seeded from cache,
   // a draft/import, or delivered by the room) rather than the pre-sync SAMPLE
@@ -231,6 +233,19 @@ export default function EditorPage() {
     }
     setSyncing(false);
   }, [d, signedIn]);
+
+  // First-load boot splash: a full-screen KLoader until the project's data is in.
+  // Guests / share links have nothing to fetch → reveal immediately; signed-in
+  // users wait for the diagrams list (+ projects) so the shell doesn't flash empty.
+  useEffect(() => {
+    if (booted) return;
+    if (!claims || shared || (itemsLoaded && projects.length > 0)) setBooted(true);
+  }, [booted, claims, shared, itemsLoaded, projects.length]);
+  useEffect(() => {
+    if (booted) return;
+    const t = setTimeout(() => setBooted(true), 5000); // failsafe — never wedge on the splash
+    return () => clearTimeout(t);
+  }, [booted]);
 
   // "Offline" is for a genuine, sustained disconnection — not the momentary socket
   // drop while switching tabs (old room's WS closes before the new one opens) or
@@ -742,6 +757,8 @@ export default function EditorPage() {
 
   return (
     <div className="layout">
+      {/* Full-screen brand splash over everything until the first load settles. */}
+      {!booted && <div className="boot-splash"><KLoader /></div>}
       <header>
         {/* phones have no activity-bar rail → a hamburger opens the file drawer */}
         {claims && !shared && (
