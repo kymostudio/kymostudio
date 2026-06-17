@@ -35,6 +35,118 @@ function roomFor(env: Env, id: string) {
   return env.EDITOR_ROOM.get(env.EDITOR_ROOM.idFromName(id));
 }
 
+// ---- Browser session: a Worker-issued opaque httpOnly cookie (CR-KEDITOR-002). ----
+// The Google ID token is verified ONCE at /api/session login; the long-lived
+// session of record is this cookie, backed by the `sessions` D1 table. Sliding
+// idle window + a hard absolute cap; ids are stored HASHED so a DB leak is not a
+// session leak. This replaces "the raw 1h Google ID token as the per-call
+// credential" — the legacy token is still accepted during migration (see the
+// fallback in resolveAuth). editor.kymo.studio and mcp.kymo.studio share the
+// registrable domain kymo.studio, so one Domain=kymo.studio cookie spans both.
+const SESSION_COOKIE = "__Secure-kymo_sess";
+const SESSION_IDLE_MS = 14 * 24 * 60 * 60 * 1000; // sliding renewal window
+const SESSION_ABS_MS = 30 * 24 * 60 * 60 * 1000;  // absolute cap → re-auth via Google
+const SESSION_RENEW_MS = 24 * 60 * 60 * 1000;     // throttle the sliding write to ≤1/day
+const COOKIE_DOMAIN = "kymo.studio";
+const ALLOWED_ORIGINS = new Set([EDITOR_URL, "http://localhost:8231", "http://127.0.0.1:8231"]);
+
+let sessionsTableReady = false;
+async function ensureSessionsTable(env: Env) {
+  if (sessionsTableReady) return;
+  try { await env.DB.prepare("CREATE TABLE IF NOT EXISTS sessions (id_hash TEXT PRIMARY KEY, email TEXT, name TEXT, created_at INTEGER, last_seen INTEGER, expires_at INTEGER, ua TEXT, revoked INTEGER)").run(); } catch {}
+  sessionsTableReady = true;
+}
+
+function randomToken(): string {
+  const b = new Uint8Array(32);
+  crypto.getRandomValues(b);
+  return btoa(String.fromCharCode(...b)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+async function sha256hex(s: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+function getCookie(request: Request, name: string): string | null {
+  for (const part of (request.headers.get("cookie") || "").split(/;\s*/)) {
+    const i = part.indexOf("=");
+    if (i > 0 && part.slice(0, i) === name) return decodeURIComponent(part.slice(i + 1));
+  }
+  return null;
+}
+function sessionCookie(value: string, maxAgeSec: number): string {
+  return `${SESSION_COOKIE}=${value}; Domain=${COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAgeSec}`;
+}
+function clearSessionCookie(): string {
+  return `${SESSION_COOKIE}=; Domain=${COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+function corsFor(request: Request, methods: string): Record<string, string> {
+  const origin = request.headers.get("Origin") || "";
+  return {
+    "access-control-allow-origin": ALLOWED_ORIGINS.has(origin) ? origin : EDITOR_URL,
+    "access-control-allow-methods": methods,
+    "access-control-allow-headers": "authorization, content-type",
+    "access-control-allow-credentials": "true",
+    "vary": "Origin",
+  };
+}
+
+async function createSession(env: Env, email: string, name: string, ua: string): Promise<string> {
+  await ensureSessionsTable(env);
+  const raw = randomToken();
+  const now = Date.now();
+  await env.DB.prepare("INSERT INTO sessions (id_hash, email, name, created_at, last_seen, expires_at, ua, revoked) VALUES (?,?,?,?,?,?,?,0)")
+    .bind(await sha256hex(raw), email, (name || "").slice(0, 200), now, now, now + SESSION_IDLE_MS, (ua || "").slice(0, 200)).run();
+  return raw;
+}
+async function revokeSession(env: Env, request: Request, all: boolean) {
+  const raw = getCookie(request, SESSION_COOKIE);
+  if (!raw) return;
+  await ensureSessionsTable(env);
+  const h = await sha256hex(raw);
+  if (all) {
+    const row = await env.DB.prepare("SELECT email FROM sessions WHERE id_hash=?").bind(h).first<{ email: string }>();
+    if (row?.email) { try { await env.DB.prepare("DELETE FROM sessions WHERE email=?").bind(row.email).run(); } catch {} return; }
+  }
+  try { await env.DB.prepare("DELETE FROM sessions WHERE id_hash=?").bind(h).run(); } catch {}
+}
+
+type AuthOk = { email: string; name?: string; setCookie?: string };
+type AuthErr = { error: "unauthorized" | "forbidden"; email?: string };
+// Resolve the caller's identity from (1) the session cookie [preferred], else
+// (2) a legacy Google id_token in ?id_token= / Authorization: Bearer [migration].
+// `renew` performs the throttled sliding-window write (REST only — skip for WS
+// upgrades, where attaching Set-Cookie to a 101 is awkward and a REST call renews
+// soon enough anyway). Returns the email (+ a Set-Cookie value when it renewed).
+async function resolveAuth(request: Request, env: Env, renew = true): Promise<AuthOk | AuthErr> {
+  const raw = getCookie(request, SESSION_COOKIE);
+  if (raw) {
+    await ensureSessionsTable(env);
+    const h = await sha256hex(raw);
+    const row = await env.DB.prepare("SELECT email, name, created_at, last_seen, expires_at, revoked FROM sessions WHERE id_hash=?").bind(h).first<any>();
+    const now = Date.now();
+    if (row && !row.revoked && now < row.expires_at && now < row.created_at + SESSION_ABS_MS) {
+      if (!emailAllowed(row.email, env)) return { error: "forbidden", email: row.email };
+      let setCookie: string | undefined;
+      if (renew && now - row.last_seen > SESSION_RENEW_MS) {
+        const newExp = Math.min(now + SESSION_IDLE_MS, row.created_at + SESSION_ABS_MS);
+        try { await env.DB.prepare("UPDATE sessions SET last_seen=?, expires_at=? WHERE id_hash=?").bind(now, newExp, h).run(); } catch {}
+        setCookie = sessionCookie(raw, Math.floor((newExp - now) / 1000));
+      }
+      return { email: row.email, name: row.name, setCookie };
+    }
+    // stale/revoked cookie → fall through to the legacy token (migration grace)
+  }
+  const idToken = new URL(request.url).searchParams.get("id_token") || (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  if (idToken) {
+    try {
+      const p = await verifyGoogleIdToken(idToken, env.GOOGLE_CLIENT_ID);
+      if (!emailAllowed(p.email, env)) return { error: "forbidden", email: p.email };
+      return { email: p.email!, name: p.name };
+    } catch { /* fall through to unauthorized */ }
+  }
+  return { error: "unauthorized" };
+}
+
 // ---- Diagram + workspace persistence: Cloudflare D1 (database of record). ----
 // The EditorRoom DO holds the live document; D1 keeps the queryable copy:
 // metadata always, plus a source snapshot (refreshed on rename/kind change,
@@ -410,13 +522,11 @@ export class EditorRoom extends DurableObject<Env> {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname.endsWith("/ws")) {
-      const idToken = url.searchParams.get("id_token") ?? "";
-      let email: string | undefined;
-      try {
-        const p = await verifyGoogleIdToken(idToken, this.env.GOOGLE_CLIENT_ID);
-        email = p.email;
-        if (!emailAllowed(email, this.env)) return new Response("forbidden", { status: 403 });
-      } catch { return new Response("unauthorized", { status: 401 }); }
+      // Session cookie [preferred] or legacy ?id_token= [migration] — the WS
+      // handshake carries the Domain=kymo.studio cookie. No sliding renewal here.
+      const auth = await resolveAuth(request, this.env, false);
+      if ("error" in auth) return new Response(auth.error, { status: auth.error === "forbidden" ? 403 : 401 });
+      const email: string | undefined = auth.email;
       const dParam = url.searchParams.get("d");
       if (dParam && this.diagramId !== dParam) { this.diagramId = dParam; await this.ctx.storage.put("diagramId", dParam); }
       if (!this.owner) { this.owner = email!; await this.ctx.storage.put("owner", email!); } // index happens on first write, not on connect
@@ -931,32 +1041,48 @@ export default {
     // `ui_open_diagram` tool can live-switch which diagram the tab shows. The DO is
     // keyed by email, so verify + resolve the email BEFORE routing the upgrade.
     if (url.pathname === "/userws") {
-      const idToken = url.searchParams.get("id_token") || "";
-      let email: string | undefined;
-      try {
-        const p = await verifyGoogleIdToken(idToken, env.GOOGLE_CLIENT_ID);
-        email = p.email;
-        if (!emailAllowed(email, env)) return new Response("forbidden", { status: 403 });
-      } catch { return new Response("unauthorized", { status: 401 }); }
-      return env.USER_CHANNEL.get(env.USER_CHANNEL.idFromName(email!)).fetch(request);
+      // Session cookie [preferred] or legacy ?id_token= [migration]. No renewal on WS.
+      const auth = await resolveAuth(request, env, false);
+      if ("error" in auth) return new Response(auth.error, { status: auth.error === "forbidden" ? 403 : 401 });
+      return env.USER_CHANNEL.get(env.USER_CHANNEL.idFromName(auth.email)).fetch(request);
     }
-    // Browser-callable APIs for the signed-in user (Google id_token).
-    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/projects" || url.pathname === "/api/trash" || url.pathname === "/api/tabs") {
-      const cors: Record<string, string> = {
-        "access-control-allow-origin": "*",
-        "access-control-allow-methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-        "access-control-allow-headers": "authorization, content-type",
-      };
+    // Browser session (CR-KEDITOR-002): POST {credential} → verify Google once →
+    // set the httpOnly session cookie; DELETE → revoke (?all=1 = sign out everywhere);
+    // GET /api/me → resolve the cookie back to {email,name} on load.
+    if (url.pathname === "/api/session") {
+      const cors = corsFor(request, "POST, DELETE, OPTIONS");
       if (request.method === "OPTIONS") return new Response(null, { headers: cors });
-      const idToken = url.searchParams.get("id_token") || (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-      let email: string;
-      try {
-        const pl = await verifyGoogleIdToken(idToken, env.GOOGLE_CLIENT_ID);
-        if (!emailAllowed(pl.email, env)) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
-        email = pl.email!;
-      } catch {
-        return Response.json({ error: "unauthorized" }, { status: 401, headers: cors });
+      if (request.method === "POST") {
+        let body: any; try { body = await request.json(); } catch { body = {}; }
+        let p: { email?: string; name?: string };
+        try { p = await verifyGoogleIdToken(String(body?.credential || ""), env.GOOGLE_CLIENT_ID); }
+        catch { return Response.json({ error: "invalid_token" }, { status: 401, headers: cors }); }
+        if (!emailAllowed(p.email, env)) return Response.json({ error: "forbidden", email: p.email }, { status: 403, headers: cors });
+        const raw = await createSession(env, p.email!, p.name || "", request.headers.get("user-agent") || "");
+        return Response.json({ email: p.email, name: p.name }, { headers: { ...cors, "set-cookie": sessionCookie(raw, Math.floor(SESSION_IDLE_MS / 1000)) } });
       }
+      if (request.method === "DELETE") {
+        await revokeSession(env, request, url.searchParams.get("all") === "1");
+        return Response.json({ ok: true }, { headers: { ...cors, "set-cookie": clearSessionCookie() } });
+      }
+      return new Response("method not allowed", { status: 405, headers: cors });
+    }
+    if (url.pathname === "/api/me") {
+      const cors = corsFor(request, "GET, OPTIONS");
+      if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+      const auth = await resolveAuth(request, env);
+      if ("error" in auth) return Response.json({ error: auth.error }, { status: auth.error === "forbidden" ? 403 : 401, headers: cors });
+      const headers = auth.setCookie ? { ...cors, "set-cookie": auth.setCookie } : cors;
+      return Response.json({ email: auth.email, name: auth.name }, { headers });
+    }
+    // Browser-callable APIs for the signed-in user (session cookie or legacy token).
+    if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/projects" || url.pathname === "/api/trash" || url.pathname === "/api/tabs") {
+      const cors: Record<string, string> = corsFor(request, "GET, POST, PATCH, PUT, DELETE, OPTIONS");
+      if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+      const auth = await resolveAuth(request, env);
+      if ("error" in auth) return Response.json({ error: auth.error }, { status: auth.error === "forbidden" ? 403 : 401, headers: cors });
+      const email: string = auth.email;
+      if (auth.setCookie) cors["set-cookie"] = auth.setCookie; // propagates to all responses built with `headers: cors`
 
       // Per-diagram thumbnail SVG for the Diagrams list — separate route so the
       // list JSON stays small and the browser lazy-loads + caches each <img>.
