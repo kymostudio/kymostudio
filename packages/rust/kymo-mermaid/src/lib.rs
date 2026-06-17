@@ -149,6 +149,22 @@ mod wasm_slice {
     }
 }
 
+// ── native multi-grammar dispatch (raster-safe, no merman; feature `wasm`) ────
+#[cfg(feature = "wasm")]
+mod wasm_native {
+    use wasm_bindgen::prelude::*;
+
+    /// JS surface: mermaidToSvgAuto(src) -> raster-safe SVG for ANY kymo-supported
+    /// grammar (flowchart/sequence/class/state/er/block/mindmap/kanban/requirement),
+    /// dispatched by diagram type. Unlike `mermaidRenderSvg` (merman, foreignObject
+    /// HTML labels that vanish under server-side rasterisers) this emits real
+    /// `<text>`/`<path>`, so PNG/PDF/WebP export keeps the labels. Throws on parse error.
+    #[wasm_bindgen(js_name = mermaidToSvgAuto)]
+    pub fn mermaid_to_svg_auto(source: &str) -> Result<String, JsError> {
+        crate::mermaid_to_svg_auto(source).map_err(|e| JsError::new(&e.to_string()))
+    }
+}
+
 // ── full engine: any grammar via merman's own dispatch (feature `full`) ───────
 /// Render ANY mermaid grammar to SVG via merman's full engine (render-api
 /// worker — 5.2 MB raw vs the slice's 1.5 MB).
