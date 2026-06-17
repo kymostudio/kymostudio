@@ -79,9 +79,11 @@ export default function EditorPage() {
   const [statusErr, setStatusErr] = useState(false);
   const [live, setLive] = useState(false);
   const [title, setTitle] = useState(seed ? seed.title : "");
-  // Whether the current tab was painted from cache — when true we skip the boot
-  // loader and show that content immediately while the room reconciles silently.
-  const [seeded, setSeeded] = useState(!!seed);
+  // First-paint ready: we have a rendered SVG to show for this tab (seeded from
+  // cache or produced by a completed render). Until then the content area shows
+  // ONE loader, so code + preview reveal together instead of code-first-then-
+  // preview-loader (two decoupled loading steps).
+  const [firstReady, setFirstReady] = useState(!!(seed && seed.svg));
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -181,7 +183,10 @@ export default function EditorPage() {
 
   const doRender = useCallback(async (src: string, k: string) => {
     const seq = ++renderSeq.current;
-    if (!src.trim()) { setSvg(""); setStatus("Enter diagram source…"); setStatusErr(false); return; }
+    // Reveal the panes once the *real* doc has resolved — never the SAMPLE
+    // placeholder shown before a fresh room's first sync (that would flash).
+    const reveal = () => { if (synced.current || userEdited.current || !dRef.current) setFirstReady(true); };
+    if (!src.trim()) { setSvg(""); setStatus("Enter diagram source…"); setStatusErr(false); reveal(); return; }
     const t0 = performance.now();
     try {
       let out: string;
@@ -210,9 +215,11 @@ export default function EditorPage() {
       // Plain-language success — the byte/latency detail is dev-debug, kept only
       // in the tooltip. Errors stay verbose (the catch below), they're useful.
       setStatus(""); setStatusTitle(`${out.length.toLocaleString()} bytes · ${Math.round(performance.now() - t0)} ms`); setStatusErr(false);
+      reveal();
     } catch (e: any) {
       if (seq !== renderSeq.current) return;
       setStatus(String(e?.message ?? e)); setStatusTitle(""); setStatusErr(true);
+      reveal(); // an error is a resolved first paint too — show the message, not a spinner
     }
   }, [loadEngine]);
 
@@ -221,7 +228,8 @@ export default function EditorPage() {
   useEffect(() => {
     if (d && signedIn) {
       setSyncing(true);
-      const t = setTimeout(() => setSyncing(false), 5000);
+      // Failsafe: never wedge on the loader if the room or render never resolves.
+      const t = setTimeout(() => { setSyncing(false); setFirstReady(true); }, 5000);
       return () => clearTimeout(t);
     }
     setSyncing(false);
@@ -237,7 +245,7 @@ export default function EditorPage() {
     // Switching to a saved tab: paint its cached doc immediately (no loader) and
     // let the room sync reconcile. An import (template/copy) overrides the cache.
     const cached = imp ? null : readDoc(d);
-    setSeeded(!!cached);
+    setFirstReady(!!(cached && cached.svg)); // a cached SVG paints instantly; otherwise wait for the first render
     setSource(imp ? imp.source : cached ? cached.source : emptied ? "" : SAMPLE);
     setKind(imp ? imp.kind : cached ? cached.kind : "kymo");
     setSvg(cached ? cached.svg : ""); lastSvg.current = cached ? cached.svg : "";
@@ -357,10 +365,10 @@ export default function EditorPage() {
   // links and the guest editor aren't a blank "/" in the header (kymo kind only).
   const localTitle = !d ? titleFrom(source, kind) : "Untitled";
   const diagramLabel = title || (localTitle !== "Untitled" ? localTitle : "Untitled");
-  // Only a room waiting for its first doc "boots"; a draft lives at "/" with no
-  // room, so it renders immediately. A tab painted from cache (`seeded`) also
-  // skips the loader — its content is already on screen while the room syncs.
-  const booting = syncing && !seeded;
+  // A room shows ONE loader until its first paint is ready (code + preview
+  // together); a cached SVG makes that instant. A draft lives at "/" with no
+  // room, so it renders immediately.
+  const booting = !!d && !shared && !firstReady;
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
   // A draft (no room, not a pristine share view) is unsaved until the explicit Save.
   const isDraft = !d && !shared;
