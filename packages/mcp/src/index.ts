@@ -1328,8 +1328,12 @@ export default {
           // moving across projects also clears the folder (folders are project-local)
           const proj = await resolveProject(env, email, b.project);
           if (!proj) return Response.json({ error: "project not found" }, { status: 400, headers: cors });
-          const owned = await env.DB.prepare("SELECT 1 FROM diagrams WHERE id = ?1 AND owner = ?2").bind(b.id, email).first();
-          if (!owned) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
+          // a brand-new diagram isn't indexed until its room first autosaves — let
+          // assignProject create the row (it's INSERT-OR-UPDATE) so saving into a
+          // non-default project doesn't 403. Only reject when a row already exists
+          // and belongs to someone else, so this can't hijack another owner's id.
+          const existing = await env.DB.prepare("SELECT owner FROM diagrams WHERE id = ?1").bind(b.id).first<{ owner: string }>();
+          if (existing && existing.owner !== email) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
           await assignProject(env, email, b.id, proj.id);
           if (b.ws === undefined) await env.DB.prepare("UPDATE diagrams SET ws = '' WHERE id = ?1 AND owner = ?2").bind(b.id, email).run();
         }
