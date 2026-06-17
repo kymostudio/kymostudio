@@ -78,6 +78,7 @@ export default function EditorPage() {
   const [statusTitle, setStatusTitle] = useState(""); // dev detail (bytes · ms), shown only on hover
   const [statusErr, setStatusErr] = useState(false);
   const [live, setLive] = useState(false);
+  const [showOffline, setShowOffline] = useState(false);
   const [title, setTitle] = useState(seed ? seed.title : "");
   // Source ready: the code we're showing is the confirmed doc (seeded from cache,
   // a draft/import, or delivered by the room) rather than the pre-sync SAMPLE
@@ -230,6 +231,17 @@ export default function EditorPage() {
     }
     setSyncing(false);
   }, [d, signedIn]);
+
+  // "Offline" is for a genuine, sustained disconnection — not the momentary socket
+  // drop while switching tabs (old room's WS closes before the new one opens) or
+  // the initial connect. Only surface it after `live` stays false past a grace
+  // window; switching rooms (`d`) re-arms it so a tab change never flashes it.
+  useEffect(() => {
+    if (live) { setShowOffline(false); return; }
+    setShowOffline(false);
+    const t = setTimeout(() => setShowOffline(true), 2500);
+    return () => clearTimeout(t);
+  }, [live, d]);
 
   // Rooms are switched client-side (+ New uses navigate()), so reset per-room state on ?d change.
   useEffect(() => {
@@ -748,7 +760,7 @@ export default function EditorPage() {
         {/* the steady "Saved" pill is dropped (saving is silent + automatic); the
             unsaved-draft pill is dropped too (the draft Save button already signals
             it). Only the disconnection warning still surfaces. */}
-        {claims && d && !booting && !live && (
+        {claims && d && !booting && showOffline && (
           <span className="save-ind off" title="Disconnected — changes are not being saved">
             Offline
           </span>
