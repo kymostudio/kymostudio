@@ -117,10 +117,18 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
               <ChevronDown size={13} strokeWidth={2.2} className="crumb-chev" />
             </button>
             {projOpen && (
-              <div className="acct-menu addr-proj-menu">
+              // stop clicks here from bubbling to the crumb bar (whose onClick opens
+              // the search palette) — picking a project should just switch, not search.
+              <div className="acct-menu addr-proj-menu" onClick={(e) => e.stopPropagation()}>
                 <div className="ws-head">Projects</div>
                 {projects.map((p) => (
-                  <button key={p.id} className="acct-item ws-item" onClick={() => { setCurrentProject(p.id); setProjOpen(false); navigate("/?p=" + encodeURIComponent(p.id)); }}>
+                  <button key={p.id} className="acct-item ws-item" onClick={() => {
+                    if (p.id === currentProject) { setProjOpen(false); return; }
+                    // Switch project = reload into it (fresh tabs/scope), not the SPA
+                    // jump palette. setCurrentProject persists it before the reload.
+                    setCurrentProject(p.id);
+                    window.location.assign("/?p=" + encodeURIComponent(p.id));
+                  }}>
                     <span className="ws-check">{p.id === currentProject && <Check size={15} strokeWidth={2.4} />}</span>
                     {p.name}
                   </button>
