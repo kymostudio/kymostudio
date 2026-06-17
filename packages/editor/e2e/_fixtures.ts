@@ -1,14 +1,11 @@
 import { test as base, expect } from "@playwright/test";
 
-// A throwaway, non-expired Google ID token (header.payload.sig). `auth.tsx`
-// only reads the base64url payload's exp/email/name/sub — signature is never
-// verified client-side — so this is enough to drive the signed-in UI.
-function fakeToken(): string {
-  const payload = Buffer.from(JSON.stringify({
-    email: "tester@example.com", name: "Tester", sub: "u1",
-    exp: Math.floor(Date.now() / 1000) + 3600,
-  })).toString("base64url");
-  return `eyJhbGciOiJub25lIn0.${payload}.sig`;
+// Display claims for the signed-in UI. The session of record is the httpOnly
+// cookie (CR-KEDITOR-002); `auth.tsx` caches {email,name,sub} in localStorage
+// (`kymo_claims`) for an instant signed-in paint, and on 127.0.0.1 skips the
+// /api/me revalidation — so seeding this is enough to drive the signed-in shell.
+function fakeClaims(): string {
+  return JSON.stringify({ email: "tester@example.com", name: "Tester", sub: "u1" });
 }
 
 export const test = base.extend<{ signIn: () => Promise<void> }>({
@@ -30,7 +27,7 @@ export const test = base.extend<{ signIn: () => Promise<void> }>({
   // endpoints (no real backend). Call BEFORE page.goto().
   signIn: async ({ page }, use) => {
     await use(async () => {
-      await page.addInitScript((t) => localStorage.setItem("kymo_idtoken", t as string), fakeToken());
+      await page.addInitScript((c) => localStorage.setItem("kymo_claims", c as string), fakeClaims());
       await page.route("**/api/projects*",   (r) => r.fulfill({ json: { projects: [{ id: "p1", name: "Personal" }] } }));
       await page.route("**/api/workspaces*", (r) => r.fulfill({ json: { workspaces: [] } }));
       await page.route("**/api/diagrams*",   (r) => r.fulfill({ json: { diagrams: [

@@ -8,13 +8,13 @@ type Handlers = {
   onLive?: (live: boolean) => void;
 };
 
-export function useRoom(roomId: string | null, idToken: string | null, handlers: Handlers) {
+export function useRoom(roomId: string | null, signedIn: boolean, handlers: Handlers) {
   const wsRef = useRef<WebSocket | null>(null);
   const myId = useMemo(() => Math.random().toString(36).slice(2), []);
   const hRef = useRef(handlers); hRef.current = handlers;
 
   useEffect(() => {
-    if (!roomId || !idToken) return;
+    if (!roomId || !signedIn) return;
     // Local dev: no WebSocket server — the document lives in localStorage. Report
     // "live", then deliver the stored doc (empty for a just-created room, which
     // makes the editor persist the in-buffer source on the next tick, like prod).
@@ -25,7 +25,8 @@ export function useRoom(roomId: string | null, idToken: string | null, handlers:
       return () => clearTimeout(t);
     }
     let ws: WebSocket;
-    try { ws = new WebSocket(MCP_WS + "?id_token=" + encodeURIComponent(idToken) + "&d=" + encodeURIComponent(roomId)); }
+    // The session cookie (Domain=kymo.studio) rides the WS handshake — no token in the URL.
+    try { ws = new WebSocket(MCP_WS + "?d=" + encodeURIComponent(roomId)); }
     catch { return; }
     wsRef.current = ws;
     ws.addEventListener("open", () => hRef.current.onLive?.(true));
@@ -39,7 +40,7 @@ export function useRoom(roomId: string | null, idToken: string | null, handlers:
       hRef.current.onDoc?.(String(data.source ?? ""), data.title, data.origin === myId, data.kind);
     });
     return () => { try { ws.close(); } catch {} wsRef.current = null; };
-  }, [roomId, idToken, myId]);
+  }, [roomId, signedIn, myId]);
 
   const sendSource = useCallback((source: string, kind?: string) => {
     if (LOCAL) { if (roomId) localSetSource(roomId, source, kind); return; }

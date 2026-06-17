@@ -19,7 +19,7 @@ import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, register
 import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X } from "lucide-react";
 
 export default function EditorPage() {
-  const { claims, idToken, signOut, devSignIn } = useAuth();
+  const { claims, signedIn, signOut, devSignIn } = useAuth();
   const { currentFolder, currentProject, projects, setCurrentProject } = useWorkspace();
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -202,13 +202,13 @@ export default function EditorPage() {
   // Hold a loading state from "room requested" to "first doc received" so the
   // header/title and source don't render a placeholder and then flip (5s failsafe).
   useEffect(() => {
-    if (d && idToken) {
+    if (d && signedIn) {
       setSyncing(true);
       const t = setTimeout(() => setSyncing(false), 5000);
       return () => clearTimeout(t);
     }
     setSyncing(false);
-  }, [d, idToken]);
+  }, [d, signedIn]);
 
   // Rooms are switched client-side (+ New uses navigate()), so reset per-room state on ?d change.
   useEffect(() => {
@@ -249,7 +249,7 @@ export default function EditorPage() {
     return () => { stop = true; };
   }, [d, sharedSrc, sharedKind]); // eslint-disable-line
 
-  const room = useRoom(roomId, idToken, {
+  const room = useRoom(roomId, signedIn, {
     onLive: setLive, // not cleared here: the OLD socket closing on room switch would kill the boot state
     // A rename event locks auto-title — unless it's the echo of our OWN auto-rename
     // (title === the value we just derived), which must keep tracking the source.
@@ -367,8 +367,8 @@ export default function EditorPage() {
   const flushTabs = useCallback(() => {
     if (putTimer.current) { clearTimeout(putTimer.current); putTimer.current = undefined; }
     const pend = putPending.current; putPending.current = null;
-    if (pend && idToken) putTabsRemote(idToken, pend.proj, { tabs: pend.tabs, active: pend.active });
-  }, [idToken]);
+    if (pend && signedIn) putTabsRemote(pend.proj, { tabs: pend.tabs, active: pend.active });
+  }, [signedIn]);
   const persistTabs = useCallback((tabs: string[], active: string | null) => {
     if (!currentProject) return;
     writeTabsLocal(currentProject, { tabs, active });
@@ -427,16 +427,16 @@ export default function EditorPage() {
     if (params.get("d") || params.get("s")) return; // bootstrap / share own the state
     const local = readTabsLocal(currentProject);
     setOpenTabs(local?.tabs ?? []); setActiveTab(local?.active ?? null);
-    if (!idToken) return;
+    if (!signedIn) return;
     let stale = false;
-    fetchTabsRemote(idToken, currentProject).then((remote) => {
+    fetchTabsRemote(currentProject).then((remote) => {
       // Adopt the server set only if it actually has tabs — an empty server blob
       // (never-written, or this device is ahead) must not wipe the local tabs.
       if (stale || prevProj.current !== currentProject || !remote || remote.tabs.length === 0) return;
       setOpenTabs(remote.tabs); setActiveTab(remote.active); writeTabsLocal(currentProject, remote);
     });
     return () => { stale = true; };
-  }, [claims, currentProject, idToken]); // eslint-disable-line
+  }, [claims, currentProject, signedIn]); // eslint-disable-line
 
   // Drop tabs whose diagram was deleted elsewhere (once the list has loaded).
   useEffect(() => {
@@ -561,17 +561,17 @@ export default function EditorPage() {
   const save = useCallback(() => {
     if (activeTab) return; // already a saved, autosaving tab
     if (!sourceRef.current.trim()) return;
-    if (!idToken) { pendingSave.current = true; promptSignIn(); return; }
+    if (!signedIn) { pendingSave.current = true; promptSignIn(); return; }
     const id = newId();
     pendingImport.current = { source: sourceRef.current, kind: kindRef.current, title: titleUserSet.current ? titleRef.current : undefined };
-    assignDiagram(idToken, id, currentFolder, currentProject || undefined); // lands in the folder you're saving into
+    assignDiagram(signedIn, id, currentFolder, currentProject || undefined); // lands in the folder you're saving into
     openDiagram(id); // adds the new diagram as a tab + activates it; URL stays ?p=
-  }, [activeTab, idToken, currentFolder, currentProject, openDiagram, promptSignIn]);
+  }, [activeTab, signedIn, currentFolder, currentProject, openDiagram, promptSignIn]);
   const saveRef = useRef(save); saveRef.current = save;
   // Guest hit Save → signed in → finish the save now that we have a token.
   useEffect(() => {
-    if (idToken && pendingSave.current) { pendingSave.current = false; saveRef.current(); }
-  }, [idToken]);
+    if (signedIn && pendingSave.current) { pendingSave.current = false; saveRef.current(); }
+  }, [signedIn]);
   // Cmd/Ctrl-S saves a draft (no-op once it's a room — it autosaves).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -596,7 +596,7 @@ export default function EditorPage() {
   function saveCopy() {
     const id = newId();
     pendingImport.current = { source, kind };
-    assignDiagram(idToken, id, currentFolder, currentProject || undefined);
+    assignDiagram(signedIn, id, currentFolder, currentProject || undefined);
     openDiagram(id);
   }
   function commitRename(v: string) {

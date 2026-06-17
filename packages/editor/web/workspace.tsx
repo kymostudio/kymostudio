@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
-import { WORKSPACES_API, DIAGRAMS_API, PROJECTS_API } from "./const";
+import { WORKSPACES_API, DIAGRAMS_API, PROJECTS_API, apiFetch } from "./const";
 import { newId } from "./util";
 import { Check, ChevronDown, FolderPlus, Folder as FolderIcon } from "lucide-react";
 
@@ -83,9 +83,9 @@ const Ctx = createContext<WsVal>({
 // Fire-and-forget: put a (possibly not-yet-indexed) diagram into a folder ("" =
 // root), optionally also stamping the project it belongs to (for new diagrams
 // created while a non-default project is current).
-export function assignDiagram(idToken: string | null, id: string, folderId: string, projectId?: string) {
-  if (!idToken) return;
-  fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
+export function assignDiagram(signedIn: boolean, id: string, folderId: string, projectId?: string) {
+  if (!signedIn) return;
+  apiFetch(DIAGRAMS_API, {
     method: "PATCH", headers: { "content-type": "application/json" },
     body: JSON.stringify(projectId ? { id, ws: folderId, project: projectId } : { id, ws: folderId }),
   }).catch(() => {});
@@ -93,10 +93,10 @@ export function assignDiagram(idToken: string | null, id: string, folderId: stri
 
 // Move a diagram to another project (clears its folder — folders are project-local).
 // Resolves true on success so callers can refresh their lists.
-export async function moveDiagramToProject(idToken: string | null, id: string, projectId: string): Promise<boolean> {
-  if (!idToken) return false;
+export async function moveDiagramToProject(signedIn: boolean, id: string, projectId: string): Promise<boolean> {
+  if (!signedIn) return false;
   try {
-    const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
+    const r = await apiFetch(DIAGRAMS_API, {
       method: "PATCH", headers: { "content-type": "application/json" },
       body: JSON.stringify({ id, project: projectId }),
     });
@@ -105,25 +105,29 @@ export async function moveDiagramToProject(idToken: string | null, id: string, p
 }
 
 // Rename a diagram (routes through the room so the DO/D1/live editors stay in sync).
-export function renameDiagram(idToken: string | null, id: string, title: string) {
-  if (!idToken) return;
-  fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken), {
+export function renameDiagram(signedIn: boolean, id: string, title: string) {
+  if (!signedIn) return;
+  apiFetch(DIAGRAMS_API, {
     method: "PATCH", headers: { "content-type": "application/json" },
     body: JSON.stringify({ id, title }),
   }).catch(() => {});
 }
 
 // Delete a diagram. Resolves true on success so callers can refresh their list.
-export async function deleteDiagram(idToken: string | null, id: string): Promise<boolean> {
-  if (!idToken) return false;
+export async function deleteDiagram(signedIn: boolean, id: string): Promise<boolean> {
+  if (!signedIn) return false;
   try {
-    const r = await fetch(`${DIAGRAMS_API}?id=${encodeURIComponent(id)}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" });
+    const r = await apiFetch(`${DIAGRAMS_API}?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     return r.ok;
   } catch { return false; }
 }
 
+// Compose an api.kymo.studio URL from a base + a query fragment whose params are
+// written with leading "&" (e.g. "&project=…&id=…"); the first becomes "?".
+export const withQuery = (base: string, q = "") => base + (q ? "?" + q.replace(/^&/, "") : "");
+
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
-  const { idToken } = useAuth();
+  const { signedIn } = useAuth();
   const [folders, setFolders] = useState<Folder[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -152,18 +156,17 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const projectQuery = currentProject ? "&project=" + encodeURIComponent(currentProject) : "";
 
   const refresh = useCallback(async () => {
-    if (!idToken) return;
-    const tok = encodeURIComponent(idToken);
+    if (!signedIn) return;
     try {
       const [pr, wr] = await Promise.all([
-        fetch(PROJECTS_API + "?id_token=" + tok, { cache: "no-store" }),
-        fetch(WORKSPACES_API + "?id_token=" + tok + projectQuery, { cache: "no-store" }),
+        apiFetch(PROJECTS_API, { cache: "no-store" }),
+        apiFetch(withQuery(WORKSPACES_API, projectQuery), { cache: "no-store" }),
       ]);
       if (pr.ok) setProjects(((await pr.json()).projects) || []);
       if (wr.ok) setFolders(((await wr.json()).workspaces) || []);
       setLoaded(true);
     } catch {}
-  }, [idToken, projectQuery]);
+  }, [signedIn, projectQuery]);
   useEffect(() => { refresh(); }, [refresh]);
 
   // Once projects load, pin currentProject to a real id: keep the stored one if
@@ -179,13 +182,13 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   }, [loaded, folders, currentFolder, setCurrentFolder]);
 
   const api = useCallback(async (method: string, body?: any, query = "") => {
-    if (!idToken) return null;
-    const r = await fetch(WORKSPACES_API + "?id_token=" + encodeURIComponent(idToken) + query, {
+    if (!signedIn) return null;
+    const r = await apiFetch(withQuery(WORKSPACES_API, query), {
       method, headers: body ? { "content-type": "application/json" } : undefined,
       body: body ? JSON.stringify(body) : undefined,
     });
     return r.ok ? r.json() : null;
-  }, [idToken]);
+  }, [signedIn]);
 
   const createFolder = useCallback(async (name: string, parentId: string) => {
     const j = await api("POST", { name, parentId }, projectQuery); // new folder lands in the current project
@@ -208,13 +211,13 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
   // ---- project CRUD (PROJECTS_API) ----
   const projApi = useCallback(async (method: string, body?: any, query = "") => {
-    if (!idToken) return null;
-    const r = await fetch(PROJECTS_API + "?id_token=" + encodeURIComponent(idToken) + query, {
+    if (!signedIn) return null;
+    const r = await apiFetch(withQuery(PROJECTS_API, query), {
       method, headers: body ? { "content-type": "application/json" } : undefined,
       body: body ? JSON.stringify(body) : undefined,
     });
     return r.ok ? (await r.json().catch(() => ({}))) : null;
-  }, [idToken]);
+  }, [signedIn]);
   const createProject = useCallback(async (name: string) => {
     const j = await projApi("POST", { name });
     await refresh();
@@ -244,7 +247,7 @@ export const useWorkspace = () => useContext(Ctx);
 // Header control next to the brand: shows the current folder (where new diagrams
 // land) and a menu to switch folder, create one, or jump to the Diagrams tree.
 export function WorkspaceSwitcher() {
-  const { idToken, claims } = useAuth();
+  const { signedIn, claims } = useAuth();
   const { folders, currentFolder, currentName, setCurrentFolder, createFolder, refresh, currentProject } = useWorkspace();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -267,7 +270,7 @@ export function WorkspaceSwitcher() {
   }
   function newDiagram() {
     const id = newId();
-    assignDiagram(idToken, id, currentFolder, currentProject || undefined);
+    assignDiagram(signedIn, id, currentFolder, currentProject || undefined);
     setOpen(false);
     navigate("/?d=" + id);
   }
