@@ -64,7 +64,9 @@ export function DiagramsProvider({ children }: { children: React.ReactNode }) {
     const out = server.map((s) => {
       const o = opt.get(s.id);
       if (!o) return s;
-      if ((!s.title || s.title === "Untitled") && o.title && o.title !== "Untitled") return { ...s, title: o.title, kind: s.kind || o.kind };
+      // Server row exists but isn't indexed yet (no real title → kind defaults to
+      // "kymo"): keep BOTH the optimistic title and kind so the file/ext don't flip.
+      if ((!s.title || s.title === "Untitled") && o.title && o.title !== "Untitled") return { ...s, title: o.title, kind: o.kind || s.kind };
       opt.delete(s.id); // server has caught up → stop overriding
       return s;
     });
