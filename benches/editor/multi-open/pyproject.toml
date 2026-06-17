@@ -1,0 +1,13 @@
+[project]
+# Standalone uv project — run from this folder: `uv run python bench.py`.
+name = "kymo-bench-editor-multi-open"
+version = "0.0.0"
+description = "Editor multi-open bench: cost of opening N files at once (Playwright, deployed editor)."
+requires-python = ">=3.10"
+dependencies = [
+    "playwright>=1.45",
+]
+
+[tool.setuptools]
+# No package to build — this project only pins the bench's runtime env.
+py-modules = []

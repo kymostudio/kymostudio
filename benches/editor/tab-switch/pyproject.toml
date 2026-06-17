@@ -1,0 +1,13 @@
+[project]
+# Standalone uv project — run from this folder: `uv run python run.py`.
+name = "kymo-bench-editor-tab-switch"
+version = "0.0.0"
+description = "Editor tab-switch load+render bench (Playwright, local build)."
+requires-python = ">=3.10"
+dependencies = [
+    "playwright>=1.45",
+]
+
+[tool.setuptools]
+# No package to build — this project only pins the bench's runtime env.
+py-modules = []

@@ -1,0 +1,5 @@
+# Captured auth (Playwright storageState — holds a real Google id_token). NEVER commit.
+.auth/
+# Run outputs are dated snapshots, regenerated on demand.
+results/
+.venv/
