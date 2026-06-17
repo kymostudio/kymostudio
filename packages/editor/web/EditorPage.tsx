@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor, isLocalhost } from "./auth";
 import { useRoom } from "./room";
@@ -16,6 +16,7 @@ import { WelcomeView } from "./welcome";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
+import { readDoc, writeDoc, dropDoc } from "./doccache";
 import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X } from "lucide-react";
 
 export default function EditorPage() {
@@ -65,14 +66,22 @@ export default function EditorPage() {
   // render cycle never runs against the kymo sample (which would pull the 2.5 MB
   // wasm engine chunk that a kroki-rendered share link never uses).
   const initialKind = shared && sharedKind && KINDS.some((x) => x.value === sharedKind) ? sharedKind : "kymo";
-  const [source, setSource] = useState(shared ? "" : SAMPLE);
-  const [kind, setKind] = useState(initialKind);
-  const [svg, setSvg] = useState("");
+  // Optimistic paint: the last doc we showed for the tab being restored. Seeding
+  // source/kind/title/svg from it makes the first frame the real diagram instead
+  // of a loader (then a re-render) while the room syncs over the WebSocket.
+  // Read once at mount (the initializers below consume it) — not every render.
+  const seed = useMemo(() => (!shared && activeTab ? readDoc(activeTab) : null), []); // eslint-disable-line
+  const [source, setSource] = useState(shared ? "" : seed ? seed.source : SAMPLE);
+  const [kind, setKind] = useState(!shared && seed ? seed.kind : initialKind);
+  const [svg, setSvg] = useState(seed ? seed.svg : "");
   const [status, setStatus] = useState(initialKind === "kymo" ? "Loading engine…" : "Rendering…");
   const [statusTitle, setStatusTitle] = useState(""); // dev detail (bytes · ms), shown only on hover
   const [statusErr, setStatusErr] = useState(false);
   const [live, setLive] = useState(false);
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(seed ? seed.title : "");
+  // Whether the current tab was painted from cache — when true we skip the boot
+  // loader and show that content immediately while the room reconciles silently.
+  const [seeded, setSeeded] = useState(!!seed);
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -141,7 +150,7 @@ export default function EditorPage() {
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
   const synced = useRef(false);
-  const lastSvg = useRef("");
+  const lastSvg = useRef(seed ? seed.svg : "");
   const fresh = useRef(false);      // room exists on the server but has no document yet
   const userEdited = useRef(false); // the user actually typed in this room
   const pendingImport = useRef<{ source: string; kind: string; title?: string } | null>(null); // carry draft/shared content into a new room
@@ -158,6 +167,8 @@ export default function EditorPage() {
   kindRef.current = kind;
   const sourceRef = useRef(source);
   sourceRef.current = source;
+  const dRef = useRef(d); // current room id, readable from the stable doRender callback
+  dRef.current = d;
   const renderSeq = useRef(0); // kroki renders are async fetches — drop stale responses
 
   // The wasm engine chunk is ~2.5 MB on the wire: load it on first kymo render,
@@ -190,6 +201,12 @@ export default function EditorPage() {
       }
       if (seq !== renderSeq.current) return;
       lastSvg.current = out; setSvg(out);
+      // Cache the doc we just painted so the next load is instant. Gate on
+      // synced/edited so the SAMPLE placeholder shown before a fresh tab's first
+      // sync never gets cached as if it were the real document.
+      if (dRef.current && src.trim() && (synced.current || userEdited.current)) {
+        writeDoc(dRef.current, { source: src, kind: k, title: titleRef.current || "", svg: out });
+      }
       // Plain-language success — the byte/latency detail is dev-debug, kept only
       // in the tooltip. Errors stay verbose (the catch below), they're useful.
       setStatus(""); setStatusTitle(`${out.length.toLocaleString()} bytes · ${Math.round(performance.now() - t0)} ms`); setStatusErr(false);
@@ -217,8 +234,14 @@ export default function EditorPage() {
     // After closing the last tab there's no file to show — reset to an EMPTY
     // buffer (→ "no file open" empty state), not the SAMPLE (→ Welcome home).
     const emptied = closedAll.current; closedAll.current = false;
-    setSource(imp ? imp.source : emptied ? "" : SAMPLE); setKind(imp ? imp.kind : "kymo");
-    setTitle(imp?.title || ""); setEditingName(false); setShareError(null);
+    // Switching to a saved tab: paint its cached doc immediately (no loader) and
+    // let the room sync reconcile. An import (template/copy) overrides the cache.
+    const cached = imp ? null : readDoc(d);
+    setSeeded(!!cached);
+    setSource(imp ? imp.source : cached ? cached.source : emptied ? "" : SAMPLE);
+    setKind(imp ? imp.kind : cached ? cached.kind : "kymo");
+    setSvg(cached ? cached.svg : ""); lastSvg.current = cached ? cached.svg : "";
+    setTitle(imp?.title || cached?.title || ""); setEditingName(false); setShareError(null);
     // A manually-named draft carries its title into the new room; otherwise the
     // name auto-tracks the source until the user renames.
     titleUserSet.current = !!imp?.title; autoTitle.current = "";
@@ -335,8 +358,9 @@ export default function EditorPage() {
   const localTitle = !d ? titleFrom(source, kind) : "Untitled";
   const diagramLabel = title || (localTitle !== "Untitled" ? localTitle : "Untitled");
   // Only a room waiting for its first doc "boots"; a draft lives at "/" with no
-  // room, so it renders immediately.
-  const booting = syncing;
+  // room, so it renders immediately. A tab painted from cache (`seeded`) also
+  // skips the loader — its content is already on screen while the room syncs.
+  const booting = syncing && !seeded;
   const initial = ((claims?.email || claims?.name || "?").trim()[0] || "?").toUpperCase();
   // A draft (no room, not a pristine share view) is unsaved until the explicit Save.
   const isDraft = !d && !shared;
@@ -447,6 +471,7 @@ export default function EditorPage() {
     if (!claims || !currentProject || !itemsLoaded) return;
     const valid = openTabs.filter((id) => items.some((it) => it.id === id));
     if (valid.length === openTabs.length) return;
+    openTabs.filter((id) => !valid.includes(id)).forEach(dropDoc); // forget cached snapshots of deleted diagrams
     const nextActive = activeTab && valid.includes(activeTab) ? activeTab : (valid[valid.length - 1] ?? null);
     setOpenTabs(valid); setActiveTab(nextActive); persistTabs(valid, nextActive);
   }, [items, itemsLoaded]); // eslint-disable-line
@@ -858,7 +883,7 @@ export default function EditorPage() {
                 </div>
               </div>
               {shareError && <div className="share-error">{shareError}</div>}
-              {kind === "kymo" && !renderReady && !shareError
+              {kind === "kymo" && !renderReady && !shareError && !svg
                 ? <div className="boot"><KLoader /></div>
                 : <Preview svg={svg} fitKey={(d || "shared") + ":" + kind} />}
             </section>
