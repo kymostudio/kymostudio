@@ -6,6 +6,7 @@ import { WorkspaceProvider } from "./workspace";
 import { ConfirmProvider } from "./confirm";
 import { ContextMenuProvider } from "./context-menu";
 import { ToastProvider } from "./toast";
+import { DiagramsProvider } from "./sidebar";
 import EditorPage from "./EditorPage";
 import TrashPage from "./TrashPage";
 import ProjectsPage from "./ProjectsPage";
@@ -21,6 +22,7 @@ createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <AuthProvider>
       <WorkspaceProvider>
+        <DiagramsProvider>
         <ConfirmProvider>
         <ToastProvider>
         <ContextMenuProvider>
@@ -36,6 +38,7 @@ createRoot(document.getElementById("root")!).render(
         </ContextMenuProvider>
         </ToastProvider>
         </ConfirmProvider>
+        </DiagramsProvider>
       </WorkspaceProvider>
     </AuthProvider>
   </BrowserRouter>
