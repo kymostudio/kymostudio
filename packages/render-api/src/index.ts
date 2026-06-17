@@ -14,7 +14,7 @@
 // the edge by content hash (x-render-cache: hit|miss).
 import { cacheKey, cacheable } from "./cache.js";
 import { render, SELF_KINDS } from "./dispatch.js";
-import { CORS, HttpError } from "./http.js";
+import { corsHeaders, HttpError } from "./http.js";
 import { decodeRequest } from "./kroki.js";
 import { identify } from "./auth.js";
 import { API_VERSION, VERSION_INFO } from "./version.js";
@@ -27,6 +27,7 @@ interface Env {
   GOOGLE_CLIENT_ID: string;
   ANON_LIMITER: RateLimiter;
   USER_LIMITER: RateLimiter;
+  DB?: D1Database; // shared kymo-editor DB (sessions table) — cookie rate-limit tier
 }
 
 const RATE_ANON = "60 requests/minute (anonymous, by IP)";
@@ -46,21 +47,23 @@ const USAGE = {
   options: { scale: "PNG raster scale 1-4 (?scale=2)" },
   rate_limit: {
     anonymous: RATE_ANON,
-    authenticated: RATE_USER + " — send Authorization: Bearer <google id_token>",
+    authenticated: RATE_USER + " — the editor's session cookie (or Authorization: Bearer <google id_token>)",
   },
   self_rendered: SELF_KINDS,
   proxied: "all other kroki.io diagram types",
 };
 
-function withCors(res: Response): Response {
-  for (const [k, v] of Object.entries(CORS)) res.headers.set(k, v);
-  res.headers.set("x-render-api-version", API_VERSION);
-  return res;
-}
-
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
+    // CORS is per-request: the editor's credentialed (cookie) calls get an echoed
+    // origin + allow-credentials, everyone else gets "*" (see http.ts).
+    const cors = corsHeaders(request);
+    const withCors = (res: Response): Response => {
+      for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
+      res.headers.set("x-render-api-version", API_VERSION);
+      return res;
+    };
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
 
     const url = new URL(request.url);
 
@@ -89,7 +92,7 @@ export default {
     // token) raises the limit and keys on the user instead of the IP, so people
     // behind a shared NAT/proxy don't collide. No/invalid token → anonymous,
     // keyed on the connecting IP. Verification only runs when a token is present.
-    const caller = await identify(request, url, env.GOOGLE_CLIENT_ID);
+    const caller = await identify(request, url, env);
     const tier = caller ? "user" : "anon";
     const limiter = caller ? env.USER_LIMITER : env.ANON_LIMITER;
     const limitKey = caller ? `user:${caller.sub}` : (request.headers.get("cf-connecting-ip") ?? "unknown");

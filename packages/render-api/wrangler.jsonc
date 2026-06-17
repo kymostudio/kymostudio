@@ -15,8 +15,13 @@
   // dbml-renderer's own svg path requires the legacy viz.js (1.9 MB, runtime
   // wasm compile — unusable here); we only use its "dot" output.
   "alias": { "@aduh95/viz.js/sync": "./src/graphviz/viz-sync-stub.ts" },
-  // Verify the editor's Google id_token to pick the rate-limit tier (auth.ts).
+  // Verify the editor's session cookie / Google id_token to pick the rate-limit tier (auth.ts).
   "vars": { "GOOGLE_CLIENT_ID": "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com" },
+  // Shared kymo-editor DB (the mcp worker owns it) — read-only here, to resolve
+  // the editor's session cookie to a user for the signed-in rate-limit tier.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "kymo-editor", "database_id": "ad04fd23-3c19-4327-ab2e-d0e307f84a8d" }
+  ],
   // Native rate limiting, two tiers (index.ts): anonymous keyed on IP, signed-in
   // keyed on the Google `sub` with a higher ceiling.
   "ratelimits": [
