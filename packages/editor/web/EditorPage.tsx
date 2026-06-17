@@ -643,6 +643,21 @@ export default function EditorPage() {
       if (!claims) window.history.replaceState(null, "", "/"); // guest draft isn't in the URL yet
     }
   }
+  // Gallery "Create": skip the draft+Save dance — make a real, saved diagram now,
+  // open it as a focused tab. Guests can't own server files, so they fall back to
+  // a seeded draft (the visible Save button then prompts sign-in).
+  function createDiagram(t: Template, name: string) {
+    if (!signedIn) { pickTemplate(t, name); return; }
+    setGalleryOpen(false); setWelcomeDismissed(true);
+    const id = newId();
+    const title = name && name.trim() && name.trim() !== "Untitled" ? name.trim().slice(0, 60) : "Untitled";
+    titleUserSet.current = title !== "Untitled";
+    pendingImport.current = { source: t.source, kind: t.kind, title: titleUserSet.current ? title : undefined };
+    assignDiagram(signedIn, id, currentFolder, currentProject || undefined, { source: t.source, title, kind: t.kind });
+    addLocalDiagram({ id, title, kind: t.kind, ws: currentFolder, updatedAt: Date.now() });
+    openDiagram(id); // adds + activates the tab (focus pulse), Explorer focuses the row
+    window.setTimeout(() => reloadDiagrams(), 1800);
+  }
   // Pop the Google sign-in prompt (guests can't own server files).
   const promptSignIn = useCallback(() => { (window as any).google?.accounts?.id?.prompt?.(); }, []);
   // Explicit Save: a draft → a real server file, opened as a tab. Guests are
@@ -824,7 +839,7 @@ export default function EditorPage() {
           </button>
         )}
       </header>
-      {galleryOpen && <TemplateGallery onPick={pickTemplate} onClose={() => setGalleryOpen(false)} />}
+      {galleryOpen && <TemplateGallery onPick={createDiagram} onClose={() => setGalleryOpen(false)} />}
       <div className="workarea">
         {claims && !shared && (
           <>

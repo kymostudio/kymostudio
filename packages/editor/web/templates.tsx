@@ -4,7 +4,15 @@
 // override). Glyphs + sources mirror the landing page's "Every diagram, one
 // studio" strip (packages/website/src/landing/main.tsx), where every example
 // was render-verified.
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { FilePlus2, Search } from "lucide-react";
+
+// One hue per source tool — the gallery tints each type's icon by it, so the grid
+// reads as a colourful, organised palette instead of a flat grey list.
+const VIA_HUE: Record<string, string> = {
+  Kymo: "#db2777", Mermaid: "#0d9488", "BPMN XML": "#4f46e5",
+  PlantUML: "#7c3aed", D2: "#b45309", GraphViz: "#15803d", WaveDrom: "#0284c7",
+};
 
 const G = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 
@@ -371,52 +379,94 @@ export function peekPendingTemplate(): boolean {
   return pendingTemplate !== null;
 }
 
+const keyOf = (t: Template) => `${t.name}-${t.via}`;
+
 export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template, name: string) => void; onClose: () => void }) {
   const [q, setQ] = useState("");
   const [name, setName] = useState("Untitled");
-  const pick = (t: Template) => onPick(t, name.trim() || "Untitled");
+  const [selKey, setSelKey] = useState<string>(keyOf(TEMPLATES[0]));
   const needle = q.trim().toLowerCase();
   const shown = needle
     ? TEMPLATES.filter((t) => `${t.name} ${t.via} ${t.kind}`.toLowerCase().includes(needle))
     : TEMPLATES;
+  // The committed selection (falls back to the first visible when filtering away the old one).
+  const selected = shown.find((t) => keyOf(t) === selKey) ?? shown[0] ?? null;
+  const create = () => { if (selected) onPick(selected, name.trim() || "Untitled"); };
+  // Group by source tool (first-appearance order) when browsing; flat while filtering.
+  const groups = useMemo(() => {
+    const m = new Map<string, Template[]>();
+    for (const t of shown) { if (!m.has(t.via)) m.set(t.via, []); m.get(t.via)!.push(t); }
+    return [...m.entries()];
+  }, [shown]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", k);
     return () => document.removeEventListener("keydown", k);
   }, [onClose]);
+
+  const card = (t: Template) => {
+    const k = keyOf(t);
+    const isSel = selected != null && keyOf(selected) === k;
+    return (
+      <button key={k} className={"tpl-card" + (isSel ? " selected" : "")} style={{ ["--k" as any]: VIA_HUE[t.via] || "var(--accent)" }}
+        aria-pressed={isSel}
+        onClick={() => setSelKey(k)}                              // single click selects
+        onDoubleClick={() => onPick(t, name.trim() || "Untitled")}> {/* double-click = create */}
+        <span className="tpl-ic">{t.glyph}</span>
+        <span className="tpl-name">{t.name}</span>
+        <span className="tpl-via">{t.via}</span>
+      </button>
+    );
+  };
+
   return (
     <div className="tpl-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="New diagram">
       <div className="tpl-modal" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-head">
-          <h2>New diagram</h2>
-          <p className="tpl-sub">Name it, then pick a diagram type — you get a working starter to edit. Or paste any source into the editor; the language is detected automatically.</p>
-          <button className="tpl-close" onClick={onClose} aria-label="Close">✕</button>
+          <div className="tpl-head-top">
+            <div>
+              <h2>New diagram</h2>
+              <p className="tpl-sub">Name it, pick a type, hit Create — you get a working starter. Or just paste any source; the language is auto-detected.</p>
+            </div>
+            <button className="tpl-close" onClick={onClose} aria-label="Close">✕</button>
+          </div>
           <div className="tpl-fields">
-            <input
-              className="tpl-nameinput" type="text" placeholder="File name" aria-label="File name"
-              value={name} onChange={(e) => setName(e.target.value)} onFocus={(e) => e.currentTarget.select()}
-              onKeyDown={(e) => { if (e.key === "Enter" && shown.length) pick(shown[0]); }}
-            />
-            <input
-              className="tpl-search" autoFocus type="search" placeholder="Filter types — try “sequence” or “plantuml”"
-              value={q} aria-label="Filter diagram types"
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && shown.length) pick(shown[0]); // quick flow: type "seq" ⏎
-                else if (e.key === "Escape" && q) { e.stopPropagation(); setQ(""); } // 1st Esc clears, 2nd closes
-              }}
-            />
+            <label className="tpl-field tpl-field-name">
+              <FilePlus2 size={15} strokeWidth={2} />
+              <input
+                type="text" placeholder="File name" aria-label="File name"
+                value={name} onChange={(e) => setName(e.target.value)} onFocus={(e) => e.currentTarget.select()}
+                onKeyDown={(e) => { if (e.key === "Enter") create(); }}
+              />
+            </label>
+            <label className="tpl-field tpl-field-search">
+              <Search size={15} strokeWidth={2} />
+              <input
+                autoFocus type="search" placeholder="Search 20+ types — try “sequence” or “plantuml”"
+                value={q} aria-label="Filter diagram types"
+                onChange={(e) => { setQ(e.target.value); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") create(); // quick flow: type "seq" ⏎
+                  else if (e.key === "Escape" && q) { e.stopPropagation(); setQ(""); } // 1st Esc clears, 2nd closes
+                }}
+              />
+            </label>
           </div>
         </div>
-        <div className="tpl-grid">
-          {shown.map((t) => (
-            <button key={t.name} className="tpl-card" onClick={() => pick(t)}>
-              {t.glyph}
-              <span className="tpl-name">{t.name}</span>
-              <span className="tpl-via">{t.via}</span>
-            </button>
-          ))}
+        <div className="tpl-body">
           {!shown.length && <p className="tpl-empty">No diagram type matches “{q.trim()}”.</p>}
+          {needle
+            ? <div className="tpl-grid">{shown.map((t) => card(t))}</div>
+            : groups.map(([via, items]) => (
+                <section className="tpl-group" key={via}>
+                  <h3 className="tpl-grouplabel"><i className="tpl-dot" style={{ background: VIA_HUE[via] || "var(--accent)" }} />{via}</h3>
+                  <div className="tpl-grid">{items.map((t) => card(t))}</div>
+                </section>
+              ))}
+        </div>
+        <div className="tpl-foot">
+          <span className="tpl-foot-hint">{selected ? <>Create <b>{(name.trim() || "Untitled")}</b> · {selected.name} ({selected.via})</> : "Pick a diagram type"}</span>
+          <button className="btn-primary tpl-create" disabled={!selected} onClick={create}>Create</button>
         </div>
       </div>
     </div>
