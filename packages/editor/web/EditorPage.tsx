@@ -293,7 +293,7 @@ export default function EditorPage() {
       setSyncing(false);
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
       synced.current = true;
-      if (fromSelf) return;
+      if (fromSelf) { setFirstReady(true); return; } // our own content is already on screen
       // adopt the snapshot's kind only when it carries a real document — a fresh
       // room's empty snapshot reports the server default ("kymo"), which must not
       // override the kind a template/"Save a copy" just seeded into the editor
@@ -309,6 +309,7 @@ export default function EditorPage() {
           const t2 = titleUserSet.current ? titleRef.current : titleFrom(source, kind);
           if (t2 && t2 !== "Untitled") { autoTitle.current = titleUserSet.current ? autoTitle.current : t2; setTitle(t2); room.sendRename(t2); }
         }
+        setFirstReady(true); // empty room: no render is coming — reveal what we have
         return;
       }
       // A stored title that no longer matches its source was typed by a human → lock it.
@@ -317,6 +318,10 @@ export default function EditorPage() {
       fresh.current = false;
       applyingRemote.current = true;
       setSource(src);
+      // Synced content identical to what's already shown → setSource is a no-op,
+      // so no render fires to flip firstReady. Reveal now (and release the
+      // applyingRemote latch the skipped render would have cleared).
+      if (src === sourceRef.current) { applyingRemote.current = false; setFirstReady(true); }
     },
   });
 
