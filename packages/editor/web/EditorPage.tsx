@@ -663,7 +663,9 @@ export default function EditorPage() {
     const id = newId();
     const title = (titleUserSet.current ? titleRef.current.trim() : titleFrom(sourceRef.current, kindRef.current)) || "Untitled";
     pendingImport.current = { source: sourceRef.current, kind: kindRef.current, title: titleUserSet.current ? titleRef.current : undefined };
-    assignDiagram(signedIn, id, currentFolder, currentProject || undefined); // lands in the folder you're saving into
+    // Persist the content with the create so it's durable immediately (a quick
+    // follow-up "New diagram" can't abandon the room before it flushed).
+    assignDiagram(signedIn, id, currentFolder, currentProject || undefined, { source: sourceRef.current, title, kind: kindRef.current });
     // Surface the new file in the Explorer + tab bar immediately (optimistic), then
     // reconcile once the room has stored its title server-side.
     addLocalDiagram({ id, title, kind: kindRef.current, ws: currentFolder, updatedAt: Date.now() });
@@ -698,9 +700,10 @@ export default function EditorPage() {
   // Signed-in user viewing a share link: import the shared content into a real room.
   function saveCopy() {
     const id = newId();
+    const title = titleFrom(source, kind) || "Untitled";
     pendingImport.current = { source, kind };
-    assignDiagram(signedIn, id, currentFolder, currentProject || undefined);
-    addLocalDiagram({ id, title: titleFrom(source, kind) || "Untitled", kind, ws: currentFolder, updatedAt: Date.now() });
+    assignDiagram(signedIn, id, currentFolder, currentProject || undefined, { source, title, kind });
+    addLocalDiagram({ id, title, kind, ws: currentFolder, updatedAt: Date.now() });
     openDiagram(id);
     setTimeout(() => reloadDiagrams(), 1800);
   }

@@ -82,12 +82,16 @@ const Ctx = createContext<WsVal>({
 
 // Fire-and-forget: put a (possibly not-yet-indexed) diagram into a folder ("" =
 // root), optionally also stamping the project it belongs to (for new diagrams
-// created while a non-default project is current).
-export function assignDiagram(signedIn: boolean, id: string, folderId: string, projectId?: string) {
+// created while a non-default project is current). Passing `doc` seeds the new
+// diagram's content (source/title/kind) server-side immediately, so it's durable
+// the instant you Save — independent of the editor room's WebSocket lifecycle.
+export function assignDiagram(signedIn: boolean, id: string, folderId: string, projectId?: string, doc?: { source: string; title?: string; kind?: string }) {
   if (!signedIn) return;
+  const body: Record<string, unknown> = projectId ? { id, ws: folderId, project: projectId } : { id, ws: folderId };
+  if (doc) { body.source = doc.source; if (doc.title) body.title = doc.title; if (doc.kind) body.kind = doc.kind; }
   apiFetch(DIAGRAMS_API, {
     method: "PATCH", headers: { "content-type": "application/json" },
-    body: JSON.stringify(projectId ? { id, ws: folderId, project: projectId } : { id, ws: folderId }),
+    body: JSON.stringify(body),
   }).catch(() => {});
 }
 

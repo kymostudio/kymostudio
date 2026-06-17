@@ -1312,10 +1312,14 @@ export default {
         return Response.json({ ok: true }, { headers: cors });
       }
       if (request.method === "PATCH") {
-        // move a diagram to a folder ("" = root) and/or another project and/or rename it
-        const b = (await request.json().catch(() => ({}))) as { id?: string; ws?: string; title?: string; project?: string };
+        // move a diagram to a folder ("" = root) and/or another project, rename it,
+        // and/or seed a brand-new diagram's content (source/kind) on Save.
+        const b = (await request.json().catch(() => ({}))) as { id?: string; ws?: string; title?: string; project?: string; source?: string; kind?: string };
         if (!b.id) return Response.json({ error: "missing id" }, { status: 400, headers: cors });
-        if (b.title !== undefined) {
+        // Rename-only (existing diagram). When `source` is present this is a brand-new
+        // diagram whose title rides along with the content write below, so skip here
+        // (its row doesn't exist yet → the ownership check would 403).
+        if (b.title !== undefined && b.source === undefined) {
           const title = (b.title || "").trim().slice(0, 60) || "Untitled";
           const owned = await env.DB.prepare("SELECT 1 FROM diagrams WHERE id = ?1 AND owner = ?2").bind(b.id, email).first();
           if (!owned) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
@@ -1338,6 +1342,19 @@ export default {
           if (b.ws === undefined) await env.DB.prepare("UPDATE diagrams SET ws = '' WHERE id = ?1 AND owner = ?2").bind(b.id, email).run();
         }
         if (b.ws !== undefined) await assignWorkspace(env, email, b.id, b.ws || "");
+        // Seed a new diagram's content into its room on Save. Writing through the DO
+        // (which stores the doc AND indexes it to D1) makes the diagram durable
+        // immediately — no dependence on the editor's WebSocket staying open, so a
+        // quick "New diagram → New diagram" can't lose the first one's content.
+        if (b.source !== undefined) {
+          const existing = await env.DB.prepare("SELECT owner FROM diagrams WHERE id = ?1").bind(b.id).first<{ owner: string }>();
+          if (existing && existing.owner !== email) return Response.json({ error: "forbidden" }, { status: 403, headers: cors });
+          const title = (b.title || "").trim().slice(0, 60);
+          await roomFor(env, b.id).fetch("https://room/set", {
+            method: "POST", headers: { "content-type": "application/json" },
+            body: JSON.stringify({ owner: email, id: b.id, source: b.source, kind: b.kind, ...(title ? { title } : {}), origin: "create" }),
+          }).catch(() => {});
+        }
         return Response.json({ ok: true }, { headers: cors });
       }
       // Search across title + source + kind (content search — titles are often "Untitled").
