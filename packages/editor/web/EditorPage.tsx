@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor, isLocalhost } from "./auth";
 import { useRoom } from "./room";
 import { useWorkspace, assignDiagram } from "./workspace";
-import { KINDS, renderKroki, sanitizeSvg } from "./kroki";
+import { KINDS, renderKroki, sanitizeSvg, extFor } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { Preview } from "./preview";
@@ -770,11 +770,12 @@ export default function EditorPage() {
                   const isActive = id === activeTab;
                   const name = isActive && diagramLabel !== "Untitled" ? diagramLabel : (items.find((i) => i.id === id)?.title || "Untitled");
                   const k = items.find((i) => i.id === id)?.kind || "kymo";
+                  const ext = extFor(k);
                   return (
-                    <div key={id} className={"file-tab" + (isActive ? " active" : "")} title={name}
+                    <div key={id} className={"file-tab" + (isActive ? " active" : "")} title={`${name}.${ext}`}
                       role="tab" aria-selected={isActive} onClick={() => activateTab(id)}>
                       <span className="file-tab-icon"><KindIcon kind={k} /></span>
-                      <span className="file-tab-name">{name}</span>
+                      <span className="file-tab-name">{name}<span className="sb-ext">.{ext}</span></span>
                       <button className="file-tab-close" aria-label="Close tab" title="Close tab"
                         onClick={(e) => { e.stopPropagation(); closeTab(id); }}>
                         <X size={13} strokeWidth={2.4} />
