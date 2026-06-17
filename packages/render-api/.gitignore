@@ -1,2 +1,4 @@
 node_modules/
 .wrangler/
+# render-api installs fresh in CI (npm install --no-package-lock); don't track a lockfile.
+package-lock.json
