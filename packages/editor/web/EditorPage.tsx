@@ -820,17 +820,9 @@ export default function EditorPage() {
         <main ref={mainRef}>
         {/* The tab bar + pane chrome stay mounted while a tab loads; only the pane
             bodies below swap in a loader (code vs preview, independently). */}
-        {showWelcome ? (
+        {showWelcome || noFileOpen ? (
+          // Nothing open (fresh draft OR all tabs closed) → the full Welcome home.
           <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} onTemplate={pickTemplate} onOpen={openDiagram} />
-        ) : noFileOpen ? (
-          <div className="nofile" data-testid="nofile">
-            <FilePlus2 size={40} strokeWidth={1.4} className="nofile-icon" />
-            <h2>No file open</h2>
-            <p>Open a diagram from the Explorer{claims ? " or search with ⌘K" : ""}, or start a new one.</p>
-            <button className="btn-primary" onClick={() => setGalleryOpen(true)}>
-              <FilePlus2 size={16} strokeWidth={2} />New diagram
-            </button>
-          </div>
         ) : (
           <>
             {panes.source && (

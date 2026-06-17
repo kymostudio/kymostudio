@@ -38,11 +38,10 @@ test("TC-HM-07 multiple tabs: open, switch, close → neighbour, close last → 
   await page.getByRole("tab", { name: /My flow/ }).getByRole("button", { name: "Close tab" }).click();
   await expect(page.getByRole("tab")).toHaveCount(1);
 
-  // close the last tab → the lightweight "No file open" empty state (NOT the
-  // Welcome home): the Command Center stays mounted, URL still ?p=.
+  // close the last tab → the Welcome home (the empty state is merged into it);
+  // the Command Center stays mounted, URL still ?p=.
   await page.getByRole("tab").getByRole("button", { name: "Close tab" }).click();
-  await expect(page.getByTestId("nofile")).toBeVisible();
-  await expect(page.getByTestId("welcome")).toHaveCount(0);
+  await expect(page.getByTestId("welcome")).toBeVisible();
   await expect(page.getByTitle("Switch project")).toBeVisible(); // Command Center persists
   await expect(page).toHaveURL(/[?&]p=/);
 });

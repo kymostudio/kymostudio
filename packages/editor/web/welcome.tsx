@@ -4,7 +4,6 @@ import { useAuth } from "./auth";
 import { useDiagrams, KindIcon } from "./sidebar";
 import { TEMPLATES, type Template } from "./templates";
 import { docHref, extFor } from "./kroki";
-import { KLoader } from "./kloader";
 import { Plus, FolderOpen, BookOpen, ArrowRight } from "lucide-react";
 
 // Six common starters surfaced on the welcome screen (rest live in the gallery).
@@ -16,7 +15,7 @@ export function WelcomeView({ onNew, onOpenFile, onTemplate, onOpen }: {
   onNew: () => void; onOpenFile: (f: File) => void; onTemplate: (t: Template) => void; onOpen: (id: string) => void;
 }) {
   const { claims } = useAuth();
-  const { items, loaded } = useDiagrams();
+  const { items } = useDiagrams();
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
   const recent = [...items].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)).slice(0, 8);
@@ -94,9 +93,7 @@ export function WelcomeView({ onNew, onOpenFile, onTemplate, onOpen }: {
           <div className="wel-col">
             <section className="wel-block">
               <h2 className="wel-h">Recent</h2>
-              {!loaded ? (
-                <div className="wel-loading"><KLoader /></div>
-              ) : recent.length ? (
+              {recent.length ? (
                 recent.map((it) => (
                   <button key={it.id} className="wel-recent" data-testid="wel-recent-item" title={it.title || "Untitled"} onClick={() => onOpen(it.id)}>
                     <KindIcon kind={it.kind} /><span className="wel-recent-name">{it.title || "Untitled"}<span className="wel-ext">.{extFor(it.kind)}</span></span>
