@@ -126,11 +126,14 @@ function handle(method: string, u: URL, body: any): Response | null {
   if (path === "/api/diagrams") {
     if (method === "DELETE") { const id = q("id") || ""; const d = s.diagrams.find((x) => x.id === id); if (d) { d.deleted = stamp(); save(s); } return json({ ok: true }); }
     if (method === "PATCH") {
-      const { id, ws, title, project } = body || {};
+      const { id, ws, title, project, source, kind } = body || {};
       if (!id) return json({ error: "missing id" }, 400);
       let d = s.diagrams.find((x) => x.id === id);
       if (!d) { d = { id, title: "Untitled", kind: "kymo", source: "", ws: "", project: ensureDefaultProject(s).id, updatedAt: stamp() }; s.diagrams.push(d); }
       if (title !== undefined) d.title = (title || "").trim().slice(0, 60) || "Untitled";
+      // a new diagram's content rides along on the create PATCH (mirrors the worker)
+      if (typeof source === "string") d.source = source;
+      if (kind) d.kind = kind;
       if (project !== undefined && project) { d.project = resolveProject(s, project).id; if (ws === undefined) d.ws = ""; }
       if (ws !== undefined) d.ws = ws || "";
       d.updatedAt = stamp(); save(s); return json({ ok: true });
