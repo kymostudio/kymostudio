@@ -868,7 +868,7 @@ export default function EditorPage() {
                 );
               })()}
               {booting
-                ? <div className="boot"><KLoader /></div>
+                ? <PaneLoading />
                 : <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />}
             </section>
             )}
@@ -942,7 +942,7 @@ export default function EditorPage() {
               </div>
               {shareError && <div className="share-error">{shareError}</div>}
               {previewLoading
-                ? <div className="boot"><KLoader /></div>
+                ? <PaneLoading />
                 : <Preview svg={svg} fitKey={(d || "shared") + ":" + kind} />}
             </section>
             )}
@@ -955,31 +955,12 @@ export default function EditorPage() {
   );
 }
 
-// Miro-style brand loader (full-page boot + wasm engine load in the preview pane).
-function KLoader() {
+// VS Code-style pane loading: a thin indeterminate progress bar sweeping across
+// the top of the pane (instead of a centered spinner), over an empty body.
+function PaneLoading() {
   return (
-    <div className="kloader" role="img" aria-label="Loading">
-      <div className="k1">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
-          <circle cx="33" cy="26.5" r="5.8" fill="#fff" /><circle cx="33" cy="26.5" r="2.44" fill="#e0095f" />
-          <circle cx="33" cy="73.5" r="5.8" fill="#fff" /><circle cx="33" cy="73.5" r="2.44" fill="#e0095f" />
-        </svg>
-      </div>
-      <div className="k2">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
-          <circle cx="65.5" cy="27" r="5.8" fill="#fff" /><circle cx="65.5" cy="27" r="2.44" fill="#e0095f" />
-          <circle cx="34" cy="58.5" r="5.8" fill="#fff" /><circle cx="34" cy="58.5" r="2.44" fill="#e0095f" />
-        </svg>
-      </div>
-      <div className="k3">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
-          <circle cx="48" cy="49.5" r="5.8" fill="#fff" /><circle cx="48" cy="49.5" r="2.44" fill="#e0095f" />
-          <circle cx="67" cy="73" r="5.8" fill="#fff" /><circle cx="67" cy="73" r="2.44" fill="#e0095f" />
-        </svg>
-      </div>
+    <div className="pane-loading" role="img" aria-label="Loading">
+      <div className="pane-progress"><div className="pane-progress-bit" /></div>
     </div>
   );
 }
