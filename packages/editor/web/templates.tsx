@@ -371,8 +371,10 @@ export function peekPendingTemplate(): boolean {
   return pendingTemplate !== null;
 }
 
-export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template) => void; onClose: () => void }) {
+export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template, name: string) => void; onClose: () => void }) {
   const [q, setQ] = useState("");
+  const [name, setName] = useState("Untitled");
+  const pick = (t: Template) => onPick(t, name.trim() || "Untitled");
   const needle = q.trim().toLowerCase();
   const shown = needle
     ? TEMPLATES.filter((t) => `${t.name} ${t.via} ${t.kind}`.toLowerCase().includes(needle))
@@ -387,21 +389,28 @@ export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template) => 
       <div className="tpl-modal" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-head">
           <h2>New diagram</h2>
-          <p className="tpl-sub">Pick a diagram type — you get a working starter to edit. Or paste any source into the editor; the language is detected automatically.</p>
+          <p className="tpl-sub">Name it, then pick a diagram type — you get a working starter to edit. Or paste any source into the editor; the language is detected automatically.</p>
           <button className="tpl-close" onClick={onClose} aria-label="Close">✕</button>
-          <input
-            className="tpl-search" autoFocus type="search" placeholder="Filter types — try “sequence” or “plantuml”"
-            value={q} aria-label="Filter diagram types"
-            onChange={(e) => setQ(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && shown.length) onPick(shown[0]); // quick flow: type "seq" ⏎
-              else if (e.key === "Escape" && q) { e.stopPropagation(); setQ(""); } // 1st Esc clears, 2nd closes
-            }}
-          />
+          <div className="tpl-fields">
+            <input
+              className="tpl-nameinput" type="text" placeholder="File name" aria-label="File name"
+              value={name} onChange={(e) => setName(e.target.value)} onFocus={(e) => e.currentTarget.select()}
+              onKeyDown={(e) => { if (e.key === "Enter" && shown.length) pick(shown[0]); }}
+            />
+            <input
+              className="tpl-search" autoFocus type="search" placeholder="Filter types — try “sequence” or “plantuml”"
+              value={q} aria-label="Filter diagram types"
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && shown.length) pick(shown[0]); // quick flow: type "seq" ⏎
+                else if (e.key === "Escape" && q) { e.stopPropagation(); setQ(""); } // 1st Esc clears, 2nd closes
+              }}
+            />
+          </div>
         </div>
         <div className="tpl-grid">
           {shown.map((t) => (
-            <button key={t.name} className="tpl-card" onClick={() => onPick(t)}>
+            <button key={t.name} className="tpl-card" onClick={() => pick(t)}>
               {t.glyph}
               <span className="tpl-name">{t.name}</span>
               <span className="tpl-via">{t.via}</span>

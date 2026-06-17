@@ -622,21 +622,23 @@ export default function EditorPage() {
     }).catch(() => {});
   }
 
-  function pickTemplate(t: Template) {
+  function pickTemplate(t: Template, name?: string) {
     setGalleryOpen(false);
     setWelcomeDismissed(true); // leaving the Welcome panel for a real diagram
     // A draft is the only copy in this tab/URL — ask before replacing it.
     if (!activeTab && userEdited.current && !window.confirm("Replace the current diagram with a fresh one?\nYour current version stays reachable via the Back button.")) return;
-    titleUserSet.current = false;
+    // The name typed in the gallery becomes the file's title ("Untitled" = leave unset).
+    const wantTitle = name && name.trim() && name.trim() !== "Untitled" ? name.trim().slice(0, 60) : "";
+    titleUserSet.current = !!wantTitle;
     if (activeTab) {
       // a file is open → New opens a fresh DRAFT (deactivate the tab; the reset
       // effect consumes the seeded template). The other tabs stay open.
-      pendingImport.current = { source: t.source, kind: t.kind };
+      pendingImport.current = { source: t.source, kind: t.kind, title: wantTitle || undefined };
       persistTabs(openTabs, null);
       setActiveTab(null);
     } else {
       // already on a draft/share buffer: seed in place
-      setSource(t.source); setKind(t.kind); setTitle(""); setShareError(null);
+      setSource(t.source); setKind(t.kind); setTitle(wantTitle); setShareError(null);
       userEdited.current = false;
       if (!claims) window.history.replaceState(null, "", "/"); // guest draft isn't in the URL yet
     }
