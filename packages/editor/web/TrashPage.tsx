@@ -3,14 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
 import { useConfirm } from "./confirm";
 import { kindLabel } from "./kroki";
-import { TRASH_API } from "./const";
+import { TRASH_API, apiFetch } from "./const";
 import { timeAgo } from "./util";
 import { Folder as FolderIcon, FileText, RotateCcw, Trash2, ArrowLeft } from "lucide-react";
 
 type TItem = { type: "folder" | "diagram"; id: string; name: string; kind?: string; deletedAt: number };
 
 export default function TrashPage() {
-  const { idToken, claims, signOut, expireSession } = useAuth();
+  const { signedIn, claims, signOut, expireSession } = useAuth();
   const confirm = useConfirm();
   const navigate = useNavigate();
   const [items, setItems] = useState<TItem[]>([]);
@@ -21,9 +21,9 @@ export default function TrashPage() {
   useEffect(() => { if (!claims) navigate("/login?next=/trash", { replace: true }); }, [claims, navigate]);
 
   const load = useCallback(async () => {
-    if (!idToken) return;
+    if (!signedIn) return;
     try {
-      const r = await fetch(TRASH_API + "?id_token=" + encodeURIComponent(idToken), { cache: "no-store" });
+      const r = await apiFetch(TRASH_API, { cache: "no-store" });
       if (r.status === 401) { expireSession(); return; }
       if (!r.ok) { setError("Error " + r.status); return; }
       const j = await r.json();
@@ -34,29 +34,29 @@ export default function TrashPage() {
       setItems(merged); setError("");
     } catch (e: any) { setError("Error: " + e.message); }
     setLoaded(true);
-  }, [idToken, expireSession]);
+  }, [signedIn, expireSession]);
   useEffect(() => { load(); }, [load]);
 
   async function restore(it: TItem) {
-    if (!idToken) return;
-    await fetch(TRASH_API + "?id_token=" + encodeURIComponent(idToken), {
+    if (!signedIn) return;
+    await apiFetch(TRASH_API, {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind: it.type, id: it.id }),
     }).catch(() => {});
     load();
   }
   async function purge(it: TItem) {
-    if (!idToken) return;
+    if (!signedIn) return;
     if (!(await confirm({
       title: it.type === "folder" ? `Permanently delete folder “${it.name}” and its contents?` : `Permanently delete “${it.name}”?`,
       detail: "This can’t be undone.",
     }))) return;
-    await fetch(`${TRASH_API}?id=${encodeURIComponent(it.id)}&kind=${it.type}&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" }).catch(() => {});
+    await apiFetch(`${TRASH_API}?id=${encodeURIComponent(it.id)}&kind=${it.type}`, { method: "DELETE" }).catch(() => {});
     load();
   }
   async function emptyTrash() {
-    if (!idToken || !items.length) return;
+    if (!signedIn || !items.length) return;
     if (!(await confirm({ title: "Empty trash?", detail: "Everything in the trash will be permanently deleted." }))) return;
-    await fetch(`${TRASH_API}?all=1&id_token=${encodeURIComponent(idToken)}`, { method: "DELETE" }).catch(() => {});
+    await apiFetch(`${TRASH_API}?all=1`, { method: "DELETE" }).catch(() => {});
     load();
   }
 

@@ -9,6 +9,16 @@ export const MCP_WS = `${API_WS}/ws`;
 // Per-user control channel: every open tab connects so the MCP `ui_open_diagram`
 // tool can live-switch which diagram this tab shows (see userchannel.tsx).
 export const USER_WS = `${API_WS}/userws`;
+// Browser session (CR-KEDITOR-002): POST a Google credential to establish the
+// httpOnly session cookie, GET /api/me to resolve it back to {email,name}.
+export const SESSION_API = `${API_HTTP}/api/session`;
+export const ME_API = `${API_HTTP}/api/me`;
+// Every authenticated call sends the session cookie. It is Domain=kymo.studio
+// (api.kymo.studio + editor.kymo.studio are same-site), so `credentials:"include"`
+// carries it cross-subdomain; the worker echoes the allow-listed Origin + allow-credentials.
+export function apiFetch(url: string, init?: RequestInit): Promise<Response> {
+  return fetch(url, { ...init, credentials: "include" });
+}
 export const DIAGRAMS_API = `${API_HTTP}/api/diagrams`;
 export const WORKSPACES_API = `${API_HTTP}/api/workspaces`;
 export const PROJECTS_API = `${API_HTTP}/api/projects`;

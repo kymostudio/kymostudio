@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth";
 import { useWorkspace } from "./workspace";
-import { DIAGRAMS_API } from "./const";
+import { DIAGRAMS_API, apiFetch } from "./const";
 import { KindIcon } from "./sidebar";
 import { extFor } from "./kroki";
 import { ChevronDown, Search, FolderPlus, Check, FolderOpen, Boxes } from "lucide-react";
@@ -15,7 +15,7 @@ type Hit = { id: string; title: string; kind: string };
 // search across projects + diagrams and jump to one.
 export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.ReactNode; onOpenDiagram: (id: string) => void }) {
   const navigate = useNavigate();
-  const { idToken } = useAuth();
+  const { signedIn } = useAuth();
   const {
     projects, currentProject, currentProjectName, setCurrentProject, createProject,
   } = useWorkspace();
@@ -52,12 +52,12 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
     if (!needle) { setHits([]); return; }
     const t = setTimeout(async () => {
       try {
-        const r = await fetch(`${DIAGRAMS_API}?q=${encodeURIComponent(needle)}&id_token=${encodeURIComponent(idToken || "")}`, { cache: "no-store" });
+        const r = await apiFetch(`${DIAGRAMS_API}?q=${encodeURIComponent(needle)}`, { cache: "no-store" });
         if (r.ok) setHits(((await r.json()).diagrams) || []);
       } catch {}
     }, 160);
     return () => clearTimeout(t);
-  }, [q, searching, idToken]);
+  }, [q, searching, signedIn]);
 
   function openSearch() { setProjOpen(false); setSearching(true); setQ(""); setHits([]); setTimeout(() => inputRef.current?.focus(), 0); }
   function closeSearch() { setSearching(false); setQ(""); setHits([]); }

@@ -15,17 +15,18 @@ import { requestOpen, requestClose } from "./tabs";
 // Renders nothing. Like useRoom, a dropped socket is not auto-reconnected (parity
 // with the live gap R10) — a reload re-establishes it.
 export function UserChannel() {
-  const { idToken } = useAuth();
+  const { signedIn } = useAuth();
   const navigate = useNavigate();
   const navRef = useRef(navigate); navRef.current = navigate;
   const { setCurrentProject } = useWorkspace();
   const setProjectRef = useRef(setCurrentProject); setProjectRef.current = setCurrentProject;
 
   useEffect(() => {
-    if (!idToken) return;
+    if (!signedIn) return;
     if (LOCAL) return; // no control channel locally (MCP live-switch is a server feature)
     let ws: WebSocket;
-    try { ws = new WebSocket(USER_WS + "?id_token=" + encodeURIComponent(idToken)); }
+    // The session cookie (Domain=kymo.studio) rides the WS handshake — no token in the URL.
+    try { ws = new WebSocket(USER_WS); }
     catch { return; }
     ws.addEventListener("message", (e) => {
       let data: any; try { data = JSON.parse(e.data); } catch { return; }
@@ -37,7 +38,7 @@ export function UserChannel() {
     });
     ws.addEventListener("error", () => { try { ws.close(); } catch {} });
     return () => { try { ws.close(); } catch {} };
-  }, [idToken]);
+  }, [signedIn]);
 
   return null;
 }

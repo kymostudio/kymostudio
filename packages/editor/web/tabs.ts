@@ -3,7 +3,7 @@
 // cache (read synchronously on load, written on every change), the backend
 // (/api/tabs) is the cross-device source of truth (reconciled on project load,
 // written debounced). On localhost the localdb.ts interceptor serves /api/tabs.
-import { TABS_API } from "./const";
+import { TABS_API, apiFetch } from "./const";
 
 export type TabState = { tabs: string[]; active: string | null };
 
@@ -21,9 +21,9 @@ export function writeTabsLocal(projectId: string, state: TabState) {
   try { localStorage.setItem(localKey(projectId), JSON.stringify(state)); } catch {}
 }
 
-export async function fetchTabsRemote(idToken: string, projectId: string): Promise<TabState | null> {
+export async function fetchTabsRemote(projectId: string): Promise<TabState | null> {
   try {
-    const r = await fetch(`${TABS_API}?id_token=${encodeURIComponent(idToken)}&project=${encodeURIComponent(projectId)}`, { cache: "no-store" });
+    const r = await apiFetch(`${TABS_API}?project=${encodeURIComponent(projectId)}`, { cache: "no-store" });
     if (!r.ok) return null;
     const j = await r.json();
     if (j && Array.isArray(j.tabs)) return { tabs: j.tabs.filter((x: any) => typeof x === "string"), active: typeof j.active === "string" ? j.active : null };
@@ -56,11 +56,11 @@ export function requestClose(id: string): boolean {
   return false;
 }
 
-export function putTabsRemote(idToken: string, projectId: string, state: TabState) {
+export function putTabsRemote(projectId: string, state: TabState) {
   // fire-and-forget; a failure (offline / not-yet-deployed endpoint) just means
   // cross-device sync is skipped — localStorage already holds the truth.
   try {
-    fetch(`${TABS_API}?id_token=${encodeURIComponent(idToken)}`, {
+    apiFetch(TABS_API, {
       method: "PUT", headers: { "content-type": "application/json" },
       body: JSON.stringify({ project: projectId, tabs: state.tabs, active: state.active }),
       keepalive: true,

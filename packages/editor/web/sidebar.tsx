@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, colorFor } from "./auth";
-import { useWorkspace, assignDiagram, deleteDiagram, renameDiagram, moveDiagramToProject, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
+import { useWorkspace, assignDiagram, deleteDiagram, renameDiagram, moveDiagramToProject, withQuery, childFoldersOf, descendantFolderIds, type Folder } from "./workspace";
 import { useConfirm } from "./confirm";
 import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
-import { DIAGRAMS_API, TRASH_API } from "./const";
+import { DIAGRAMS_API, TRASH_API, apiFetch } from "./const";
 import { kindLabel, docHref, extFor } from "./kroki";
 import { TEMPLATES, type Template } from "./templates";
 import {
@@ -35,9 +35,9 @@ export function KindIcon({ kind }: { kind?: string }) {
 }
 
 // Restore a soft-deleted item (used by the Undo toast after a delete).
-function restoreItem(idToken: string | null, kind: "diagram" | "folder", id: string) {
-  if (!idToken) return;
-  fetch(TRASH_API + "?id_token=" + encodeURIComponent(idToken), {
+function restoreItem(signedIn: boolean, kind: "diagram" | "folder", id: string) {
+  if (!signedIn) return;
+  apiFetch(TRASH_API, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind, id }),
   }).catch(() => {});
 }
@@ -45,18 +45,18 @@ function restoreItem(idToken: string | null, kind: "diagram" | "folder", id: str
 // Shared diagram-list fetch for the Explorer + Search panels (only one panel is
 // mounted at a time, so this never double-fetches).
 export function useDiagrams() {
-  const { idToken } = useAuth();
+  const { signedIn } = useAuth();
   const { currentProject } = useWorkspace();
   const [items, setItems] = useState<Item[]>([]);
   const [loaded, setLoaded] = useState(false); // a list fetch has completed at least once
   const projectQuery = currentProject ? "&project=" + encodeURIComponent(currentProject) : "";
   const reload = useCallback(async () => {
-    if (!idToken) return;
+    if (!signedIn) return;
     try {
-      const r = await fetch(DIAGRAMS_API + "?id_token=" + encodeURIComponent(idToken) + projectQuery, { cache: "no-store" });
+      const r = await apiFetch(withQuery(DIAGRAMS_API, projectQuery), { cache: "no-store" });
       if (r.ok) { setItems(((await r.json()).diagrams) || []); setLoaded(true); }
     } catch {}
-  }, [idToken, projectQuery]);
+  }, [signedIn, projectQuery]);
   // a project switch invalidates "loaded" until the new project's list arrives
   useEffect(() => { setLoaded(false); }, [projectQuery]);
   useEffect(() => { reload(); }, [reload]);
@@ -78,7 +78,7 @@ type Row =
 export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, onClose }: {
   currentId: string | null; currentTitle: string; onOpen: (id: string) => void; onNewDiagram: () => void; onClose: () => void;
 }) {
-  const { idToken } = useAuth();
+  const { signedIn } = useAuth();
   const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder, projects, currentProject } = useWorkspace();
   const { items, reload } = useDiagrams();
   const confirm = useConfirm();
@@ -140,7 +140,7 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
       if (f && name && name !== f.name) renameFolder(id, name);
     } else {
       const it = items.find((x) => x.id === id);
-      if (it && name && name !== (it.title || "")) { renameDiagram(idToken, id, name); setTimeout(reload, 200); }
+      if (it && name && name !== (it.title || "")) { renameDiagram(signedIn, id, name); setTimeout(reload, 200); }
     }
   }
   async function onDeleteFolder(f: Folder) {
@@ -152,13 +152,13 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
     }))) return;
     // the open file may have been inside — the prune effect closes its tab on reload
     await deleteFolder(f.id); reload();
-    toast({ message: `Deleted folder “${f.name}”`, actionLabel: "Undo", onAction: () => { restoreItem(idToken, "folder", f.id); setTimeout(reload, 250); } });
+    toast({ message: `Deleted folder “${f.name}”`, actionLabel: "Undo", onAction: () => { restoreItem(signedIn, "folder", f.id); setTimeout(reload, 250); } });
   }
   async function onDeleteFile(it: Item) {
     if (!(await confirm({ title: `Delete “${it.title || "Untitled"}”?` }))) return;
-    if (await deleteDiagram(idToken, it.id)) {
+    if (await deleteDiagram(signedIn, it.id)) {
       reload(); // the prune effect closes its tab if it was open (URL stays ?p=)
-      toast({ message: `Deleted “${it.title || "Untitled"}”`, actionLabel: "Undo", onAction: () => { restoreItem(idToken, "diagram", it.id); setTimeout(reload, 250); } });
+      toast({ message: `Deleted “${it.title || "Untitled"}”`, actionLabel: "Undo", onAction: () => { restoreItem(signedIn, "diagram", it.id); setTimeout(reload, 250); } });
     }
   }
   function openFile(id: string) { onOpen(id); onClose(); }
@@ -173,7 +173,7 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
   async function dropOn(e: React.DragEvent, targetFolderId: string) {
     e.preventDefault(); e.stopPropagation(); setDragOver(null);
     const [kind, id] = (e.dataTransfer.getData("text/plain") || "").split(":");
-    if (kind === "diagram" && id) { assignDiagram(idToken, id, targetFolderId); setTimeout(reload, 150); }
+    if (kind === "diagram" && id) { assignDiagram(signedIn, id, targetFolderId); setTimeout(reload, 150); }
     else if (kind === "folder" && id && id !== targetFolderId) { await moveFolder(id, targetFolderId); }
   }
 
@@ -207,7 +207,7 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
       .filter((p) => p.id !== currentProject)
       .map((p) => ({
         label: p.name, icon: <Boxes size={14} />,
-        onClick: async () => { await moveDiagramToProject(idToken, it.id, p.id); reload(); toast({ message: `Moved “${it.title || "Untitled"}” to ${p.name}` }); },
+        onClick: async () => { await moveDiagramToProject(signedIn, it.id, p.id); reload(); toast({ message: `Moved “${it.title || "Untitled"}” to ${p.name}` }); },
       }));
     openMenu(at, items);
   }
@@ -337,7 +337,7 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
 
 // ================================ Search panel ================================
 export function SearchPanel({ currentId, onOpen, onClose }: { currentId: string | null; onOpen: (id: string) => void; onClose: () => void }) {
-  const { idToken } = useAuth();
+  const { signedIn } = useAuth();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Item[]>([]);
@@ -349,12 +349,12 @@ export function SearchPanel({ currentId, onOpen, onClose }: { currentId: string 
     setLoading(true);
     const t = setTimeout(async () => {
       try {
-        const r = await fetch(`${DIAGRAMS_API}?q=${encodeURIComponent(needle)}&id_token=${encodeURIComponent(idToken || "")}`, { cache: "no-store" });
+        const r = await apiFetch(`${DIAGRAMS_API}?q=${encodeURIComponent(needle)}`, { cache: "no-store" });
         if (r.ok) setResults((await r.json()).diagrams || []);
       } catch {} finally { setLoading(false); }
     }, 250);
     return () => clearTimeout(t);
-  }, [q, idToken]);
+  }, [q, signedIn]);
   function openFile(id: string) { onOpen(id); onClose(); }
   const needle = q.trim();
   return (
