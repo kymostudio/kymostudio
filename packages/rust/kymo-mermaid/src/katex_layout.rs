@@ -267,7 +267,11 @@ impl merman_render::math::MathRenderer for KymoMathRenderer {
         _wrap_mode: WrapMode,
     ) -> Option<TextMetrics> {
         let formula = math_only_formula(text)?;
-        let (w_em, h_em, _, _) = ratex_dims_svg(formula)?;
+        // merman HTML-encodes label chars (e.g. `=` -> `&#61;`) and we protected
+        // `\\` as MATH_BS — undo both so kymo-tex sees the real TeX, else parse
+        // fails and the node falls back to OVERSIZED plain text.
+        let restored = decode_html_entities(&formula.replace(MATH_BS, "\\\\"));
+        let (w_em, h_em, _, _) = ratex_dims_svg(&restored)?;
         let s = style.font_size / 16.0 * MATH_PX_PER_EM;
         Some(TextMetrics {
             width: w_em * s,
@@ -275,6 +279,79 @@ impl merman_render::math::MathRenderer for KymoMathRenderer {
             line_count: 1,
         })
     }
+}
+
+/// Decode the HTML entities merman emits in label text (`&#61;` for `=`,
+/// `&amp;`/`&lt;`/`&gt;`/`&quot;`/`&#39;`, plus numeric `&#NN;` / `&#xHH;`) back
+/// to their characters, so kymo-tex parses the real TeX. Without this, any math
+/// label containing `=` (etc.) fails to parse and the node is mis-sized.
+fn decode_html_entities(s: &str) -> String {
+    if !s.contains('&') {
+        return s.to_string();
+    }
+    let mut out = String::with_capacity(s.len());
+    let b = s.as_bytes();
+    let mut i = 0;
+    while i < b.len() {
+        if b[i] == b'&' {
+            if let Some(semi_rel) = s[i + 1..].find(';') {
+                let body = &s[i + 1..i + 1 + semi_rel];
+                let decoded = match body {
+                    "amp" => Some('&'),
+                    "lt" => Some('<'),
+                    "gt" => Some('>'),
+                    "quot" => Some('"'),
+                    "apos" | "#39" => Some('\''),
+                    "nbsp" => Some('\u{a0}'),
+                    _ => body
+                        .strip_prefix('#')
+                        .map(|n| n.strip_prefix(['x', 'X']))
+                        .and_then(|hex| match hex {
+                            Some(h) => u32::from_str_radix(h, 16).ok(),
+                            None => body[1..].parse::<u32>().ok(),
+                        })
+                        .and_then(char::from_u32),
+                };
+                if let Some(c) = decoded {
+                    out.push(c);
+                    i += 1 + semi_rel + 1;
+                    continue;
+                }
+            }
+        }
+        let ch = s[i..].chars().next().unwrap();
+        out.push(ch);
+        i += ch.len_utf8();
+    }
+    out
+}
+
+/// Placeholder swapped in for `\\` inside `$$…$$` so merman's line-splitter
+/// leaves the math intact; restored to `\\` in `measure_html_label`.
+const MATH_BS: char = '\u{1}';
+
+/// Replace `\\` with [`MATH_BS`] inside every `$$…$$` span of `src`, leaving
+/// text outside math untouched (where `\\` may be a real mermaid line break).
+fn protect_math_double_backslash(src: &str) -> String {
+    let mut out = String::with_capacity(src.len());
+    let b = src.as_bytes();
+    let mut i = 0;
+    let mut in_math = false;
+    while i < b.len() {
+        if b[i] == b'$' && i + 1 < b.len() && b[i + 1] == b'$' {
+            out.push_str("$$");
+            in_math = !in_math;
+            i += 2;
+        } else if in_math && b[i] == b'\\' && i + 1 < b.len() && b[i + 1] == b'\\' {
+            out.push(MATH_BS);
+            i += 2;
+        } else {
+            let ch = src[i..].chars().next().unwrap();
+            out.push(ch);
+            i += ch.len_utf8();
+        }
+    }
+    out
 }
 
 /// The single `$$…$$` formula in a label, if the whole label is one math span.
@@ -290,14 +367,23 @@ fn math_only_formula(label: &str) -> Option<&str> {
 
 /// Build kymo float geometry from merman's mermaid-faithful layout, sized with
 /// kymo's browser-calibrated metrics. `None` on any parse/layout failure.
-pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
+pub fn build_geom(src: &str, fc: &Flowchart) -> Option<FGeom> {
     let meta = ParseMetadata {
         diagram_type: "flowchart-v2".to_string(),
         config: MermaidConfig::default(),
         effective_config: MermaidConfig::default(),
         title: None,
     };
-    let semantic = parse_flowchart(src, &meta).ok()?;
+    // merman splits flowchart labels on `\\` as line breaks — even inside
+    // `$$…$$`, where mermaid.js does NOT (there `\\` is a KaTeX row separator,
+    // and `\\command` is an escape). That split unbalances the `$$` per line, so
+    // merman can't math-measure the node and falls back to OVERSIZED plain
+    // multi-line text — wrecking the layout of any node/edge whose math contains
+    // `\\` (matrices, cases, `\\,` spacing, double-escaped commands). Protect
+    // `\\` inside `$$…$$` with a placeholder; `measure_html_label` restores it
+    // before kymo-tex measures, so nodes get their true KaTeX size.
+    let protected = protect_math_double_backslash(src);
+    let semantic = parse_flowchart(&protected, &meta).ok()?;
     let config = MermaidConfig::default();
     let measurer = KymoTextMeasurer;
     let math = KymoMathRenderer;
@@ -321,13 +407,26 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
     };
 
     // Raw labels (pre-clean) to detect `$$…$$` math spans before math::render
-    // converts them to Unicode.
-    let raw_math: HashMap<String, String> = crate::mermaid::parse(src)
-        .ok()
+    // converts them to Unicode — for both node labels and edge labels.
+    let raw_parse = crate::mermaid::parse(src).ok();
+    let raw_math: HashMap<String, String> = raw_parse
+        .as_ref()
         .map(|f| {
             f.nodes
                 .iter()
                 .filter_map(|n| math_only_formula(&n.label).map(|m| (n.id.clone(), m.to_string())))
+                .collect()
+        })
+        .unwrap_or_default();
+    let raw_edge_math: HashMap<(String, String), String> = raw_parse
+        .as_ref()
+        .map(|f| {
+            f.edges
+                .iter()
+                .filter_map(|e| {
+                    math_only_formula(&e.label)
+                        .map(|m| ((e.src.clone(), e.dst.clone()), m.to_string()))
+                })
                 .collect()
         })
         .unwrap_or_default();
@@ -398,12 +497,18 @@ pub fn geom_from_merman(src: &str, fc: &Flowchart) -> Option<FGeom> {
             .unwrap_or(("", false, false));
         let points: Vec<(f64, f64)> = le.points.iter().map(|p| (p.x + ox, p.y + oy)).collect();
         let label_pt = le.label.as_ref().map(|l| (l.x + ox, l.y + oy));
+        // merman already sized the edge-label box for the KaTeX dims, so drawing
+        // the glyphs (instead of the Unicode fallback text) fits that box.
+        let math = raw_edge_math
+            .get(&(le.from.clone(), le.to.clone()))
+            .and_then(|f| render_math_group(f));
         geom.edges.push(FEdge {
             label: label.to_string(),
             dashed,
             no_arrow,
             points,
             label_pt,
+            math,
         });
     }
     match &layout.bounds {

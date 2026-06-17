@@ -4,3 +4,6 @@ results/raw/
 results/kroki-cache/
 results/mermaidjs-all-cache/
 results/mjs-vr-cache/
+research/assets/*/_mmdc.json
+research/assets/*/_pptr.json
+research/assets/*/_ref.css

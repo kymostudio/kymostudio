@@ -51,7 +51,15 @@ const FILES = [
 // mmdc reference: official mermaid-cli, white bg, scale 2 (matches DSF 2),
 // securityLevel loose (honours click/classDef/html labels like the editor).
 const MMDC_CONF = OUTDIR + "_mmdc.json", PPTR_CONF = OUTDIR + "_pptr.json", CSS_CONF = OUTDIR + "_ref.css";
-writeFileSync(MMDC_CONF, JSON.stringify({ securityLevel: "loose", flowchart: { useMaxWidth: false } }));
+// `forceLegacyMathML` makes mermaid render math via KaTeX's own HTML + bundled
+// webfonts (output:"htmlAndMathml") instead of the default native MathML. This is
+// the ONLY reproducible math reference: the MathML path resolves `font-family:math`
+// to whatever the OS ships (macOS→STIX Two Math; Linux→Liberation Serif → ALL
+// italic variables vanish), so the same .mmd renders differently per machine — and
+// kymo (KaTeX glyph paths) is the same engine as KaTeX-HTML, making this an
+// apples-to-apples target. `themeCSS` zeroes the `.katex-display` 1em margin BEFORE
+// mermaid measures the label, else it bakes ~2× node-rect height (an HTML artifact).
+writeFileSync(MMDC_CONF, JSON.stringify({ securityLevel: "loose", forceLegacyMathML: true, themeCSS: ".katex-display{margin:0 !important}", flowchart: { useMaxWidth: false } }));
 // Rasterise the reference the SAME way kymo's raster-safe paths are: NO font
 // hinting (`--font-render-hinting=none`), CPU rasterisation (`--disable-gpu`,
 // fixed-point → deterministic glyph positions), fixed colour profile. Otherwise

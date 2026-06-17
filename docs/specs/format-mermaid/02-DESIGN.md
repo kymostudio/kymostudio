@@ -1,8 +1,8 @@
 ---
 title: Mermaid Format — Design (umbrella)
 document_id: DESIGN-MERMAID-001
-version: "0.4"
-issue_date: 2026-06-07
+version: "0.5"
+issue_date: 2026-06-17
 status: Draft
 classification: Internal
 owner: packages/rust/kymostudio-core (shared engine)
@@ -208,3 +208,58 @@ doesn't yet render natively.
 > surface: editor / render-api do `.mmd → SVG` in wasm then the same `svg_to_png` for
 > raster downloads; the `kymo` CLI does `.mmd → .svg`/`.png` natively. One renderer, one
 > rasterizer, every surface.
+
+## 8. Dependency map (which lib does each stage of each path use)
+
+Since the `e5cebae3` refactor the Mermaid code lives in **two Rust crates over one
+shared substrate** — `kymo-graph` (the IR + Sugiyama layout + the raster-safe `<text>`
+SVG renderer + the format engines, the base both crates build on). The parser and the
+raster-safe renderer are **kymo's own**; the only thing that varies between paths is the
+**layout** dependency.
+
+```
+                         kymo-graph  (shared substrate)
+                         · mermaid parser  (hand-rolled lexer/parser — kymo's own)
+                         · Sugiyama layout (layout.rs, internal)  +  layout_dagre.rs
+                         · raster-safe SVG (<text>, flowchart_svg/dagre_svg)
+                              │
+        ┌─────────────────────┴───────────────────────────┐
+   kymostudio-core                                    kymo-mermaid
+   (editor wasm · Python · CLI)                       (render-api worker · the bench)
+   parse  = kymo own                                  parse  = kymo own
+   layout = Sugiyama  OR  `dagre` crate               layout = `dagre` crate (default, lean)
+   math   = TeX→Unicode (math.rs, no KaTeX)                    OR  merman → dugong  (feature katex-layout)
+   render = kymo <text> SVG                           math   = kymo-tex KaTeX → <path> outlines
+   raster = resvg                                     render = kymo <text> SVG (+ kymo-tex math paths)
+```
+
+**The bench (`worst10-grid.mjs`) builds `kymo-mermaid` with `katex-layout`**, so its
+geometry comes from **merman → dugong** and its math from **kymo-tex** — that is why the
+layout-accuracy harness measures node positions ~0.1–5 px from mermaid.js (dugong is a
+faithful dagre port).
+
+**External crates, by identity (the dependency lineage).**
+
+| Dependency | Version / pin | What it is | Used by (path) |
+|---|---|---|---|
+| **`dagre`** | 0.1.1 (crates.io) | `github.com/kookyleo/dagre-rs` — independent Rust port of dagre (Sugiyama) | both crates' *default* `layout_dagre.rs` |
+| **`merman`** (`merman-core` / `-render` / `-bindings-core`) | git `Latias94/merman`, pinned rev `89641493` | faithful Rust **port of mermaid.js** (full engine) | `kymo-mermaid` features `merman` / `full` / `katex-layout` |
+| ↳ **`dugong`** | inside merman (also on crates.io) | *"Dagre-compatible graph layout (port of dagrejs/dagre)"* | merman's `layout_flowchart_v2` → kymo `katex-layout` |
+| ↳ **`dugong-graphlib`** | inside merman | *"graph data-structure APIs (port of dagrejs/graphlib)"* | used by dugong |
+| **`kymo-tex`** (`kymo-types` / `-parser` / `-layout` / `-svg`, of 9 crates) | path `../kymo-tex` | kymo's own **KaTeX engine** (fork of RaTeX); renders `$$…$$` as `<path>` outlines | `kymo-mermaid` feature `katex-layout` |
+| **`resvg`** | 0.47 (`text`,`raster-images`) | SVG→PNG rasteriser | `kymostudio-core` (`svg_to_png`) |
+| **`svg2pdf`** | 0.13 (opt, `pdf`) | SVG→PDF (ships its own usvg/resvg 0.45) | `kymostudio-core` (`svg_to_pdf`) |
+
+**Three different "dagre" implementations are in play** — don't conflate them:
+
+| dagre | implementation | who uses it |
+|---|---|---|
+| `dagre` 0.1.1 crate | `kookyleo/dagre-rs` (independent) | kymo's **default** lean path |
+| **dugong** | merman's own port of dagrejs/dagre (+ dugong-graphlib) | kymo's **katex-layout** path (via merman) |
+| dagre-d3-es (JS) | mermaid.js's bundled fork | mermaid.js itself (the reference) |
+
+So kymo does **not** write its own dagre — it borrows one (`kookyleo/dagre-rs` for the
+lean build, or `dugong` via merman for fidelity). Everything else in the Mermaid path —
+the parser, the raster-safe `<text>` renderer, and the KaTeX math (`kymo-tex`) — is
+kymo's own code. Cross-engine context for these external renderers lives in the research
+note `docs/research/mermaid-tools/`.
