@@ -7,15 +7,14 @@ import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
 import { DIAGRAMS_API, TRASH_API, apiFetch } from "./const";
 import { kindLabel, docHref, extFor } from "./kroki";
-import { TEMPLATES, type Template } from "./templates";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
-  Files, Search, Shapes, BookOpen, LogOut, Menu, ExternalLink,
+  Files, Search, BookOpen, LogOut, Menu, ExternalLink,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
 export type Item = { id: string; title: string; kind?: string; ws?: string; updatedAt?: number };
-export type Panel = "explorer" | "search" | "templates";
+export type Panel = "explorer" | "search";
 
 // A distinct icon per diagram type so files aren't an undifferentiated "📄 Untitled" pile.
 const KIND_ICON: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string; color?: string }>> = {
@@ -380,31 +379,6 @@ export function SearchPanel({ currentId, onOpen, onClose }: { currentId: string 
   );
 }
 
-// ============================== Templates panel ==============================
-export function TemplatesPanel({ onPick, onClose }: { onPick: (t: Template) => void; onClose: () => void }) {
-  const [q, setQ] = useState("");
-  const needle = q.trim().toLowerCase();
-  const shown = needle ? TEMPLATES.filter((t) => `${t.name} ${t.via} ${t.kind}`.toLowerCase().includes(needle)) : TEMPLATES;
-  return (
-    <aside className="sidebar">
-      <div className="sb-head"><span className="sb-title">Templates</span></div>
-      <div className="sb-search"><Search size={14} strokeWidth={2} />
-        <input placeholder="Filter types…" value={q} onChange={(e) => setQ(e.target.value)} />
-      </div>
-      <div className="sb-tree">
-        {shown.map((t) => (
-          <div key={t.name} className="sb-tpl" onClick={() => { onPick(t); onClose(); }} title={`New ${t.name} (${t.via})`}>
-            <span className="sb-tpl-glyph">{t.glyph}</span>
-            <span className="sb-name">{t.name}</span>
-            <span className="sb-kind">{t.via}</span>
-          </div>
-        ))}
-        {!shown.length && <div className="sb-empty">No type matches “{q.trim()}”.</div>}
-      </div>
-    </aside>
-  );
-}
-
 // =============================== Activity bar ================================
 export function ActivityBar({ active, onSelect, onNewDiagram }: { active: Panel | null; onSelect: (p: Panel) => void; onNewDiagram: () => void }) {
   const { claims, signOut } = useAuth();
@@ -445,7 +419,6 @@ export function ActivityBar({ active, onSelect, onNewDiagram }: { active: Panel 
         </div>
         <Btn id="explorer" label="Explorer"><Files size={22} strokeWidth={1.7} /></Btn>
         <Btn id="search" label="Search"><Search size={22} strokeWidth={1.9} /></Btn>
-        <Btn id="templates" label="Templates"><Shapes size={22} strokeWidth={1.8} /></Btn>
       </div>
       <div className="act-group">
         <div className="act-pop-wrap">
