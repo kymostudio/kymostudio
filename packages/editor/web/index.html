@@ -34,11 +34,11 @@
             // render entirely, and misses self-render right on the worker for the
             // kinds it covers. If this fails, renderKroki() falls back to a fresh
             // request (render API, then kroki.io direct).
-            // (Signed-in render rate-limit tier is a follow-up: render.kymo.studio
-            // must read the session cookie — credentials:"include" is unsafe here
-            // while that worker still answers CORS "*". Anonymous tier for now.)
+            // credentials:"include" sends the session cookie so a signed-in user
+            // gets the higher render rate-limit tier (CR-KEDITOR-002); anonymous
+            // callers just fall back to the per-IP tier.
             var hdr = { "content-type": "text/plain" };
-            var res = fetch("https://render.kymo.studio/" + encodeURIComponent(k) + "/svg", { method: "POST", headers: hdr, body: src });
+            var res = fetch("https://render.kymo.studio/" + encodeURIComponent(k) + "/svg", { method: "POST", headers: hdr, body: src, credentials: "include" });
             res.catch(function () {});
             return { kind: k, src: src, res: res };
           })();
