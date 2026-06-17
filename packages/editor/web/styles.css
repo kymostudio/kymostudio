@@ -535,6 +535,11 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .file-tab-icon { flex: none; display: inline-flex; color: var(--accent); }
 .file-tab.active .file-tab-icon { color: var(--accent); }
 .file-tab-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Focus pulse on a just-opened/created file — in the tab bar and the Explorer. */
+@keyframes focus-pulse { 0% { background: color-mix(in srgb, var(--accent) 28%, transparent); } 100% { background: transparent; } }
+.file-tab.flash { animation: focus-pulse 1s ease-out; }
+.sb-row.flash { animation: focus-pulse 1s ease-out; }
+@media (prefers-reduced-motion: reduce) { .file-tab.flash, .sb-row.flash { animation: none; } }
 .file-tab-close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: none; border-radius: 5px; background: transparent; color: var(--dim); cursor: pointer; }
 .file-tab-close:hover { background: var(--bg-raise); color: var(--ink); }
 /* localhost-only fake sign-in affordance */

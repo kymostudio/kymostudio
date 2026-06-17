@@ -81,6 +81,7 @@ export default function EditorPage() {
   const [live, setLive] = useState(false);
   const [showOffline, setShowOffline] = useState(false);
   const [booted, setBooted] = useState(false); // first-load full-screen splash until the project's data is in
+  const [flashTab, setFlashTab] = useState<string | null>(null); // briefly highlight a just-opened/created tab
   const [title, setTitle] = useState(seed ? seed.title : "");
   // Source ready: the code we're showing is the confirmed doc (seeded from cache,
   // a draft/import, or delivered by the room) rather than the pre-sync SAMPLE
@@ -455,6 +456,7 @@ export default function EditorPage() {
     const next = openTabs.includes(id) ? openTabs : [...openTabs, id];
     setOpenTabs(next); setActiveTab(id); persistTabs(next, id);
     setWelcomeDismissed(true);
+    setFlashTab(id); window.setTimeout(() => setFlashTab((f) => (f === id ? null : f)), 1000); // focus pulse on the new/opened tab
   }, [openTabs, persistTabs]);
   const activateTab = useCallback((id: string) => {
     if (id === activeTab) return;
@@ -868,7 +870,7 @@ export default function EditorPage() {
                   const k = items.find((i) => i.id === id)?.kind || "kymo";
                   const ext = extFor(k);
                   return (
-                    <div key={id} className={"file-tab" + (isActive ? " active" : "")} title={`${name}.${ext}`}
+                    <div key={id} className={"file-tab" + (isActive ? " active" : "") + (flashTab === id ? " flash" : "")} title={`${name}.${ext}`}
                       role="tab" aria-selected={isActive} onClick={() => activateTab(id)}
                       onContextMenu={(e) => { e.preventDefault(); setMenuOpen(false); setShareOpen(false); setExportOpen(false); setTabMenu({ x: e.clientX, y: e.clientY, id }); }}>
                       <span className="file-tab-icon"><KindIcon kind={k} /></span>
