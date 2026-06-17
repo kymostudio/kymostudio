@@ -113,6 +113,7 @@ export default function EditorPage() {
   const splitRef = useRef(split);
   splitRef.current = split;
   const mainRef = useRef<HTMLElement>(null);
+  const tabsBarRef = useRef<HTMLDivElement>(null);
   const draggingSplit = useRef(false);
   // VSCode-style activity bar: which side panel is open (null = collapsed).
   // Explorer open by default on desktop, collapsed on phones.
@@ -439,6 +440,16 @@ export default function EditorPage() {
   }, [currentProject, flushTabs]);
 
   // Tab operations — never navigate; the URL stays ?p=<project>.
+  // Scroll the tab bar so the active tab is visible — a newly-created tab is
+  // appended at the end and can be off-screen when the bar overflows.
+  useEffect(() => {
+    if (!activeTab) return;
+    const t = setTimeout(() => {
+      tabsBarRef.current?.querySelector<HTMLElement>(`[data-tab-id="${CSS.escape(activeTab)}"]`)?.scrollIntoView({ inline: "nearest", block: "nearest" });
+    }, 40); // let a just-added tab mount first
+    return () => clearTimeout(t);
+  }, [activeTab]);
+
   const openDiagram = useCallback((id: string) => {
     const next = openTabs.includes(id) ? openTabs : [...openTabs, id];
     setOpenTabs(next); setActiveTab(id); persistTabs(next, id);
@@ -867,14 +878,14 @@ export default function EditorPage() {
                   the active one highlighted; the pane also surfaces for a guest if
                   paste auto-detect has something to say. */}
               {((claims && openTabs.length > 0) || detected) && (
-              <div className="pane-bar tabs-bar">
+              <div className="pane-bar tabs-bar" ref={tabsBarRef}>
                 {openTabs.map((id) => {
                   const isActive = id === activeTab;
                   const name = isActive && diagramLabel !== "Untitled" ? diagramLabel : (items.find((i) => i.id === id)?.title || "Untitled");
                   const k = items.find((i) => i.id === id)?.kind || "kymo";
                   const ext = extFor(k);
                   return (
-                    <div key={id} className={"file-tab" + (isActive ? " active" : "") + (flashTab === id ? " flash" : "")} title={`${name}.${ext}`}
+                    <div key={id} data-tab-id={id} className={"file-tab" + (isActive ? " active" : "") + (flashTab === id ? " flash" : "")} title={`${name}.${ext}`}
                       role="tab" aria-selected={isActive} onClick={() => activateTab(id)}
                       onContextMenu={(e) => { e.preventDefault(); setMenuOpen(false); setShareOpen(false); setExportOpen(false); setTabMenu({ x: e.clientX, y: e.clientY, id }); }}>
                       <span className="file-tab-icon"><KindIcon kind={k} /></span>
