@@ -752,9 +752,10 @@ export default function EditorPage() {
         {claims
           ? <Link className="brand" to={currentProject ? "/?p=" + encodeURIComponent(currentProject) : "/"} title="Home" aria-label="Home"><img src="/logo.svg" alt="" /></Link>
           : <a className="brand" href="https://kymo.studio" target="_blank" rel="noopener" title="Kymo Studio" aria-label="Kymo Studio"><img src="/logo.svg" alt="" /></a>}
-        {/* address bar (breadcrumb + ⌘K jump) wraps the editable title when signed in;
-            guests / welcome / share links show the bare title */}
-        {claims && !shared && !showWelcome
+        {/* address bar (project switcher + ⌘K jump) shows for any signed-in view —
+            including the Welcome home, so the project/search bar is always there.
+            Guests / share links show the bare title. */}
+        {claims && !shared
           ? <AddressBar titleNode={titleEl} onOpenDiagram={openDiagram} />
           : titleEl}
         {/* the steady "Saved" pill is dropped (saving is silent + automatic); the
