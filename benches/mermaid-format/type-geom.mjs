@@ -85,10 +85,15 @@ function walk(svg) {
       const b = elemBox(name, "<" + name + attrs + ">");
       if (b && !isNaN(b.cx)) { b.cx += ox; b.cy += oy; if (!big(b) && !tiny(b)) shapes.push(b); }
     } else if (name === "path") {
-      const filled = /\bfill="(?!none)/.test(attrs) || /fill:(?!none)/.test(attrs);
+      const d = attrs.match(/\bd="([^"]*)"/)?.[1] || "";
+      // A node-background path: inline-filled, OR class says node/section/bkg/
+      // cluster (mermaid fills those via CSS, not an attribute), OR a closed (Z)
+      // shape. Everything else (open stroked path) is an edge connector.
+      const nodeish = /\bfill="(?!none)/.test(attrs) || /fill:(?!none)/.test(attrs)
+        || /class="[^"]*(node|section|bkg|cluster|entity|state)/.test(attrs) || /[zZ]\s*"?\s*$/.test(d.trim());
       const b = elemBox("path", "<path" + attrs + ">");
-      if (filled) { if (b && !isNaN(b.cx)) { b.cx += ox; b.cy += oy; if (!big(b) && !tiny(b)) shapes.push(b); } }
-      else { const d = attrs.match(/\bd="([^"]*)"/)?.[1]; if (d && /^\s*M/.test(d)) { const pts = flatten(d).map((p) => [p[0] + ox, p[1] + oy]); if (pts.length >= 2) eds.push(pts); } }
+      if (nodeish) { if (b && !isNaN(b.cx)) { b.cx += ox; b.cy += oy; if (!big(b) && !tiny(b)) shapes.push(b); } }
+      else if (d && /^\s*M/.test(d)) { const pts = flatten(d).map((p) => [p[0] + ox, p[1] + oy]); if (pts.length >= 2) eds.push(pts); }
     } else if (name === "line") {
       const x1 = attrN(attrs, "x1") + ox, y1 = attrN(attrs, "y1") + oy, x2 = attrN(attrs, "x2") + ox, y2 = attrN(attrs, "y2") + oy;
       if (![x1, y1, x2, y2].some(isNaN) && Math.hypot(x2 - x1, y2 - y1) >= 6) eds.push([[x1, y1], [x2, y2]]);
@@ -152,16 +157,32 @@ function geom(kSvg, rSvg) {
     : [0, 0];
   const pos = med(pairs.map((p) => dist([p[0].cx + t[0], p[0].cy + t[1]], [p[1].cx, p[1].cy])));
   const size = med(pairs.map((p) => (Math.abs(p[0].w - p[1].w) + Math.abs(p[0].h - p[1].h)) / 2));
-  let edge = NaN;
-  if (ke.length && re.length) {
-    // Same total alignment as nodes: rough centroid shift + pair residual.
-    const t2 = [(cr[0] - ck[0]) + t[0], (cr[1] - ck[1]) + t[1]];
-    const kes = ke.map((p) => p.map((q) => [q[0] + t2[0], q[1] + t2[1]]));
-    const used = new Set(), ed = [];
-    for (const e of kes) { let bi = -1, bd = Infinity; re.forEach((me, j) => { if (!used.has(j)) { const d = dist(centroid(e), centroid(me)); if (d < bd) { bd = d; bi = j; } } }); if (bi >= 0) { used.add(bi); ed.push(sampleDist(e, re[bi])); } }
-    edge = med(ed);
+  // Edges keyed by their endpoint NODES' labels (the cross-renderer analogue of
+  // flowchart's id-matched edges). This removes the nearest-neighbour mis-pairing
+  // and the crow's-foot / divider ticks that otherwise dominate the raw number:
+  // an edge is dropped unless both ends land on a labelled node and the two are
+  // distinct (so ticks, self-segments and dividers are filtered out).
+  const t2 = [(cr[0] - ck[0]) + t[0], (cr[1] - ck[1]) + t[1]];
+  const keyOf = (poly, nodeset) => {
+    const near = (pt) => { let b = null, bd = Infinity; for (const n of nodeset) { const d = dist(pt, [n.cx, n.cy]); if (d < bd) { bd = d; b = n; } } return b; };
+    const a = near(poly[0]), b = near(poly[poly.length - 1]);
+    if (!a || !b || a.label === b.label) return null;
+    return [a.label, b.label].sort().join("");
+  };
+  const knAbs = kn.map((n) => ({ ...n, cx: n.cx + t2[0], cy: n.cy + t2[1] }));
+  const kmap = new Map(), rmap = new Map();
+  for (const e of ke) { const poly = e.map((q) => [q[0] + t2[0], q[1] + t2[1]]); const k = keyOf(poly, knAbs); if (k) (kmap.get(k) || kmap.set(k, []).get(k)).push(poly); }
+  for (const e of re) { const k = keyOf(e, rn); if (k) (rmap.get(k) || rmap.set(k, []).get(k)).push(e); }
+  const ed = [];
+  for (const [k, kpolys] of kmap) {
+    const rpolys = rmap.get(k); if (!rpolys) continue;
+    const used = new Set();
+    for (const kp of kpolys) { let bi = -1, bd = Infinity; rpolys.forEach((rp, j) => { if (!used.has(j)) { const d = dist(centroid(kp), centroid(rp)); if (d < bd) { bd = d; bi = j; } } }); if (bi >= 0) { used.add(bi); ed.push(sampleDist(kp, rpolys[bi])); } }
   }
-  return { topo, diag, kn: kn.length, rn: rn.length, ke: ke.length, re: re.length, pos, size, edge };
+  const edge = ed.length ? med(ed) : NaN;
+  const keMatch = [...kmap.values()].reduce((a, v) => a + v.length, 0);
+  const reMatch = [...rmap.values()].reduce((a, v) => a + v.length, 0);
+  return { topo, diag, kn: kn.length, rn: rn.length, ke: keMatch, re: reMatch, pos, size, edge };
 }
 
 // ── run ───────────────────────────────────────────────────────────────────────
