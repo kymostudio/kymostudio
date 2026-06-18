@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Sparkles, Copy, Check } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
+import { useMcpActive } from "./mcpstatus";
 
 // "Connect AI": kymo already runs a remote MCP server (mcp.kymo.studio) — this
 // panel just tells the user how to wire it into their AI client. Once connected,
@@ -53,6 +54,7 @@ const CLIENTS: { name: string; steps: React.ReactNode; url?: string }[] = [
 ];
 
 export function ConnectAI({ onClose }: { onClose: () => void }) {
+  const live = useMcpActive();
   useEffect(() => {
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", k);
@@ -72,6 +74,10 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         <div className="cn-body">
+          <div className={"cn-status" + (live ? " live" : "")}>
+            <span className="cn-status-dot" />
+            {live ? "Connected — an AI client is driving this editor right now." : "Waiting for an AI client to connect…"}
+          </div>
           <label className="cn-urllabel">MCP server URL</label>
           <div className="cn-url">
             <code>{MCP_HTTP}</code>

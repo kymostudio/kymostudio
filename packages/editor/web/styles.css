@@ -617,9 +617,22 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-toggle:hover { background: transparent; box-shadow: none; transform: none; text-decoration: underline; }
 .cn-try { margin: 16px 0 0; font-size: 12.5px; color: var(--dim); }
 .cn-try i { color: var(--ink); font-style: italic; }
-/* The Connect-AI icon button in the activity bar. */
-.act-ai { color: var(--dim); }
+/* The Connect-AI icon button in the activity bar (+ a live dot when an AI is active). */
+.act-ai { color: var(--dim); position: relative; }
 .act-ai:hover { color: var(--accent); background: var(--bg-soft); }
+.act-ai.live { color: #16a34a; }
+.act-ai.live::after { content: ""; position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 2px var(--bg); animation: mcp-pulse 1.8s ease-in-out infinite; }
+@keyframes mcp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .act-ai.live::after { animation: none; } }
+/* AI badge on the active tab while an MCP client drives it. */
+.file-tab-ai { display: inline-flex; align-items: center; color: #16a34a; margin: 0 1px; }
+.file-tab-ai svg { animation: mcp-pulse 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .file-tab-ai svg { animation: none; } }
+/* Connect-AI modal status line. */
+.cn-status { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 8px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 600; color: var(--dim); background: var(--bg-soft); border: 1px solid var(--border); }
+.cn-status-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--border-strong); }
+.cn-status.live { color: #15803d; background: color-mix(in srgb, #16a34a 9%, transparent); border-color: color-mix(in srgb, #16a34a 35%, var(--border)); }
+.cn-status.live .cn-status-dot { background: #16a34a; animation: mcp-pulse 1.8s ease-in-out infinite; }
 .tpl-name { font-size: 13px; font-weight: 650; }
 .tpl-via { font-size: 10.5px; color: var(--dim); }
 @media (max-width: 720px) {
