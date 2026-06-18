@@ -617,11 +617,14 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-toggle:hover { background: transparent; box-shadow: none; transform: none; text-decoration: underline; }
 .cn-try { margin: 16px 0 0; font-size: 12.5px; color: var(--dim); }
 .cn-try i { color: var(--ink); font-style: italic; }
-/* The Connect-AI icon button in the activity bar (+ a live dot when an AI is active). */
+/* The ✨ activity-bar button doubles as the AI-target pin: `.target` = this window
+   is the pinned AI target (solid green dot, persistent); `.live` = MCP just acted
+   (the dot pulses). Either state shows the dot; only `.live` animates it. */
 .act-ai { color: var(--dim); position: relative; }
 .act-ai:hover { color: var(--accent); background: var(--bg-soft); }
-.act-ai.live { color: #16a34a; }
-.act-ai.live::after { content: ""; position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 2px var(--bg); animation: mcp-pulse 1.8s ease-in-out infinite; }
+.act-ai.target, .act-ai.live { color: #16a34a; }
+.act-ai.target::after, .act-ai.live::after { content: ""; position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 2px var(--bg); }
+.act-ai.live::after { animation: mcp-pulse 1.8s ease-in-out infinite; }
 @keyframes mcp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 @media (prefers-reduced-motion: reduce) { .act-ai.live::after { animation: none; } }
 /* AI badge on the active tab while an MCP client drives it. */

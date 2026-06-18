@@ -31,3 +31,32 @@ export function useMcpActive(): boolean {
   }, []);
   return mcpActive();
 }
+
+// ---- AI-target pin: which open editor WINDOW receives MCP control messages
+// (ui_open_diagram / ui_open_project / ui_close_file). The user clicks the ✨
+// activity-bar button to pin THIS window; the server (UserChannel DO) enforces a
+// single target and echoes `{type:"ai-target", pinned}` back, which sets `pinned`
+// here. Before any pin the server falls back to the most-recently-focused window. ----
+
+let pinned = false;
+let pinSender: ((on: boolean) => void) | null = null;
+const pinSubs = new Set<() => void>();
+const notifyPin = () => pinSubs.forEach((f) => f());
+
+// userchannel.tsx registers the WS sender (and clears it on unmount).
+export function registerPinSender(fn: ((on: boolean) => void) | null) { pinSender = fn; }
+
+// Server told us whether this window is the pinned target — reconcile local state.
+export function setPinned(on: boolean) { if (pinned !== on) { pinned = on; notifyPin(); } }
+
+// ✨ button toggles: optimistic local flip + ask the server to (re)assign the target.
+export function requestPin(on: boolean) {
+  if (pinned !== on) { pinned = on; notifyPin(); }
+  pinSender?.(on);
+}
+
+export function useAiTarget(): boolean {
+  const [, bump] = useReducer((c: number) => c + 1, 0);
+  useEffect(() => { pinSubs.add(bump); return () => { pinSubs.delete(bump); }; }, []);
+  return pinned;
+}
