@@ -32,7 +32,7 @@ body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); -w
 .layout { height: 100%; display: flex; flex-direction: column; }
 /* editor body: file sidebar + the source/preview panes. main keeps its own flex
    geometry so the source/preview split math is unaffected by the sidebar. */
-.workarea { flex: 1; display: flex; min-height: 0; }
+.workarea { flex: 1; display: flex; min-height: 0; position: relative; }
 
 /* ---- header ---- */
 header { position: relative; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg); }
@@ -625,8 +625,37 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .act-ai.target, .act-ai.live { color: #16a34a; }
 .act-ai.target::after, .act-ai.live::after { content: ""; position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 2px var(--bg); }
 .act-ai.live::after { animation: mcp-pulse 1.8s ease-in-out infinite; }
+.act-ai.active { color: var(--accent); background: var(--bg-soft); } /* panel open */
 @keyframes mcp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 @media (prefers-reduced-motion: reduce) { .act-ai.live::after { animation: none; } }
+
+/* Connect-AI right sidebar (VS Code Copilot-style dock). Sits as the last flex
+   child of .workarea so it lands on the right; the editor panes shrink to fit. */
+.aiside { flex: 0 0 340px; width: 340px; display: flex; flex-direction: column; min-height: 0; background: var(--bg); border-left: 1px solid var(--border); }
+.aiside-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px 10px 14px; border-bottom: 1px solid var(--border); }
+.aiside-head h2 { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 13.5px; font-weight: 700; }
+.aiside-head .cn-title-ic { color: var(--accent); }
+.aiside-close { border: 0; background: none; cursor: pointer; color: var(--dim); font-size: 15px; line-height: 1; padding: 4px 6px; border-radius: 7px; }
+.aiside-close:hover { color: var(--ink); background: var(--bg-soft); }
+.aiside-body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px; }
+.aiside-sub { margin: 0 0 14px; font-size: 12px; line-height: 1.55; color: var(--dim); }
+.aiside-sub b { color: var(--ink); font-weight: 650; }
+
+/* The "make AI control this window" pin toggle inside the panel. */
+.cn-target { width: 100%; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 9px 11px; border-radius: 10px; cursor: pointer; font-size: 12.5px; font-weight: 600; text-align: left; color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); }
+.cn-target:hover { border-color: var(--border-strong); }
+.cn-target svg { flex: none; color: var(--dim); }
+.cn-target-txt { flex: 1; }
+.cn-target-state { flex: none; font-size: 11px; font-weight: 700; color: var(--dim); padding: 1px 7px; border-radius: 999px; background: var(--bg); border: 1px solid var(--border); }
+.cn-target.on { color: #15803d; background: color-mix(in srgb, #16a34a 9%, transparent); border-color: color-mix(in srgb, #16a34a 40%, var(--border)); }
+.cn-target.on svg { color: #16a34a; }
+.cn-target.on .cn-target-state { color: #fff; background: #16a34a; border-color: #16a34a; }
+.cn-target-hint { margin: 0 0 14px; font-size: 11px; line-height: 1.5; color: var(--dim); }
+
+/* On phones the dock overlays the panes (full-height, right) instead of squeezing them. */
+@media (max-width: 720px) {
+  .aiside { position: absolute; top: 0; right: 0; bottom: 0; width: min(360px, 92vw); flex-basis: auto; z-index: 40; box-shadow: -8px 0 24px rgba(0,0,0,0.18); }
+}
 /* AI badge on the active tab while an MCP client drives it. */
 .file-tab-ai { display: inline-flex; align-items: center; color: #16a34a; margin: 0 1px; }
 .file-tab-ai svg { animation: mcp-pulse 1.8s ease-in-out infinite; }

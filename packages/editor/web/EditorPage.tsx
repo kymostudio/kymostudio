@@ -855,11 +855,10 @@ export default function EditorPage() {
         )}
       </header>
       {galleryOpen && <TemplateGallery onPick={createDiagram} onClose={() => setGalleryOpen(false)} />}
-      {connectOpen && <ConnectAI onClose={() => setConnectOpen(false)} />}
       <div className="workarea">
         {claims && !shared && (
           <>
-            <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} onConnectAI={() => setConnectOpen(true)} />
+            <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} onConnectAI={() => setConnectOpen((o) => !o)} aiOpen={connectOpen} />
             {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onOpen={openDiagram} onNewDiagram={() => setGalleryOpen(true)} onClose={closePanelOnPhone} />}
             {activePanel === "search" && <SearchPanel currentId={d} onOpen={openDiagram} onClose={closePanelOnPhone} />}
             {activePanel && <div className="sb-backdrop" onClick={closePanelOnPhone} />}
@@ -1003,6 +1002,7 @@ export default function EditorPage() {
           </>
         )}
         </main>
+        {connectOpen && claims && !shared && <ConnectAI onClose={() => setConnectOpen(false)} />}
       </div>
       {!showWelcome && !noFileOpen && <div className={"status" + (statusErr ? " error" : "")} title={statusTitle}>{status}</div>}
     </div>
