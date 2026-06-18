@@ -5,7 +5,7 @@ import { useWorkspace } from "./workspace";
 import { USER_WS } from "./const";
 import { LOCAL } from "./localdb";
 import { requestOpen, requestClose } from "./tabs";
-import { pingMcp, registerPinSender, setPinned } from "./mcpstatus";
+import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx } from "./mcpstatus";
 
 // Connects every signed-in tab to the user's control channel (one DO per email)
 // so the MCP `ui_open_diagram` / `ui_open_project` tools can steer THIS tab. Carries no
@@ -32,11 +32,14 @@ export function UserChannel() {
     // Report focus so the server routes MCP control messages (open / open-project /
     // close) to the window the user is actually using, not every open editor window.
     const reportFocus = () => { try { if (ws.readyState === 1 && document.visibilityState === "visible") ws.send(JSON.stringify({ type: "focus" })); } catch {} };
-    ws.addEventListener("open", reportFocus);
+    // Announce this window's session id + current project/diagram so MCP can list it.
+    ws.addEventListener("open", () => { try { ws.send(JSON.stringify({ type: "hello", session: sessionIdValue(), ...sessionCtx() })); } catch {} reportFocus(); });
     window.addEventListener("focus", reportFocus);
     document.addEventListener("visibilitychange", reportFocus);
     // Let the ✨ button pin/unpin THIS window as the AI target over this socket.
     registerPinSender((on) => { try { if (ws.readyState === 1) ws.send(JSON.stringify({ type: on ? "pin" : "unpin" })); } catch {} });
+    // Push project/diagram changes so ui_list_sessions stays current.
+    registerCtxSender((c) => { try { if (ws.readyState === 1) ws.send(JSON.stringify({ type: "ctx", session: sessionIdValue(), ...c })); } catch {} });
     ws.addEventListener("message", (e) => {
       let data: any; try { data = JSON.parse(e.data); } catch { return; }
       if (data && data.type === "ai-target") { setPinned(!!data.pinned); return; } // server: am I the target?
@@ -52,6 +55,7 @@ export function UserChannel() {
       window.removeEventListener("focus", reportFocus);
       document.removeEventListener("visibilitychange", reportFocus);
       registerPinSender(null);
+      registerCtxSender(null);
       try { ws.close(); } catch {}
     };
   }, [signedIn]);

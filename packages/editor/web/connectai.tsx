@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Sparkles, Copy, Check } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
-import { useMcpActive, useAiTarget, requestPin } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin, sessionIdValue } from "./mcpstatus";
 
 // "Connect AI": kymo already runs a remote MCP server (mcp.kymo.studio) — this
 // panel just tells the user how to wire it into their AI client, shows whether an
@@ -81,7 +81,8 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
           <span className="cn-target-txt">{target ? "AI is controlling THIS window" : "Make AI control this window"}</span>
           <span className="cn-target-state">{target ? "On" : "Off"}</span>
         </button>
-        <p className="cn-target-hint">With the editor open in several windows, AI commands act only on the chosen window. None chosen → the window you used most recently.</p>
+        <p className="cn-target-hint">With the editor open in several windows, AI commands act only on the chosen window. None chosen → the window you used most recently. From an AI client: <code>ui_list_sessions</code> then <code>ui_switch_session</code>.</p>
+        <p className="cn-session">This window · session <code>{sessionIdValue()}</code></p>
 
         <label className="cn-urllabel">MCP server URL</label>
         <div className="cn-url">
