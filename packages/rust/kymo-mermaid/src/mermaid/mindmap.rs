@@ -23,10 +23,36 @@ pub fn parse(src: &str) -> Result<Flowchart, MermaidError> {
         return Err(MermaidError::Unsupported(header.trim().to_string()));
     }
 
-    let mut stack: Vec<(usize, String)> = Vec::new(); // (indent, node id)
-    let mut counter = 0usize;
+    // Merge multi-line bracket labels (`root[\n  text\n]`) into one logical line,
+    // keeping the indent of the opening line so the tree depth is unchanged.
+    let mut logical: Vec<String> = Vec::new();
+    let mut buf = String::new();
+    let mut bal = 0i32;
     for raw in lines {
         let line = strip_comment(raw);
+        if bal == 0 {
+            if line.trim().is_empty() {
+                continue;
+            }
+            buf = line.to_string();
+        } else {
+            buf.push(' ');
+            buf.push_str(line.trim());
+        }
+        bal = bracket_balance(&buf);
+        if bal <= 0 {
+            logical.push(std::mem::take(&mut buf));
+            bal = 0;
+        }
+    }
+    if !buf.trim().is_empty() {
+        logical.push(buf);
+    }
+
+    let mut stack: Vec<(usize, String)> = Vec::new(); // (indent, node id)
+    let mut counter = 0usize;
+    for line in &logical {
+        let line = line.as_str();
         if line.trim().is_empty() {
             continue;
         }
@@ -75,6 +101,19 @@ fn strip_comment(line: &str) -> &str {
         Some(i) => &line[..i],
         None => line,
     }
+}
+
+/// Net bracket balance (`[({` minus `])}`) — >0 means a label spans more lines.
+fn bracket_balance(s: &str) -> i32 {
+    let mut b = 0i32;
+    for c in s.chars() {
+        match c {
+            '[' | '(' | '{' => b += 1,
+            ']' | ')' | '}' => b -= 1,
+            _ => {}
+        }
+    }
+    b
 }
 
 /// Extract a mindmap node's label + shape. A bracketed label is taken whole
