@@ -170,37 +170,60 @@ pub fn render(fc: &Flowchart) -> String {
         cy += h;
     }
 
-    // Compute extent.
-    let (mut minx, mut miny, mut maxx, mut maxy) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
+    // Hand off to the shared drawer (edges = parent→child centre pairs).
+    let pnodes: Vec<PNode> = nodes
+        .iter()
+        .map(|n| PNode { label: n.label.clone(), shape: n.shape, branch: n.branch, cx: n.x, cy: n.y, w: n.w, h: n.h })
+        .collect();
+    let mut pedges = Vec::new();
     for n in &nodes {
-        minx = minx.min(n.x - n.w / 2.0);
-        miny = miny.min(n.y - n.h / 2.0);
-        maxx = maxx.max(n.x + n.w / 2.0);
-        maxy = maxy.max(n.y + n.h / 2.0);
+        for &c in &n.children {
+            pedges.push(PEdge { branch: nodes[c].branch, pts: vec![(n.x, n.y), (nodes[c].x, nodes[c].y)] });
+        }
     }
+    render_positioned(&pnodes, &pedges)
+}
+
+/// A positioned mindmap node (absolute centre). `branch` < 0 = root.
+pub struct PNode { pub label: String, pub shape: Shape, pub branch: i32, pub cx: f64, pub cy: f64, pub w: f64, pub h: f64 }
+/// A positioned mindmap edge: a polyline (2 pts → smooth bezier; more → polyline).
+pub struct PEdge { pub branch: i32, pub pts: Vec<(f64, f64)> }
+
+/// Draw positioned nodes + edges to a self-contained SVG. Shared by the native
+/// tidy-tree layout and the merman (cose-bilkent) layout so both render identically.
+pub fn render_positioned(nodes: &[PNode], edges: &[PEdge]) -> String {
+    if nodes.is_empty() {
+        return empty_svg();
+    }
+    let (mut minx, mut miny, mut maxx, mut maxy) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
+    for n in nodes {
+        minx = minx.min(n.cx - n.w / 2.0);
+        miny = miny.min(n.cy - n.h / 2.0);
+        maxx = maxx.max(n.cx + n.w / 2.0);
+        maxy = maxy.max(n.cy + n.h / 2.0);
+    }
+    for e in edges { for p in &e.pts { minx = minx.min(p.0); miny = miny.min(p.1); maxx = maxx.max(p.0); maxy = maxy.max(p.1); } }
     let (ox, oy) = (minx - 12.0, miny - 12.0);
     let width = (maxx - minx + 24.0).max(40.0);
     let height = (maxy - miny + 24.0).max(40.0);
 
     let mut body = String::new();
-    // Edges first: cubic-bezier curves (mermaid mindmap draws curved branches,
-    // not straight lines) — horizontal-tangent control points, coloured by branch.
-    for n in nodes.iter() {
-        for &c in &n.children {
-            let (col, _, _) = section_color(nodes[c].branch);
-            let (x1, y1) = (n.x - ox, n.y - oy);
-            let (x2, y2) = (nodes[c].x - ox, nodes[c].y - oy);
-            let mx = (x1 + x2) / 2.0;
-            body += &format!(
-                "<path d=\"M{x1:.1},{y1:.1} C{mx:.1},{y1:.1} {mx:.1},{y2:.1} {x2:.1},{y2:.1}\" \
-                 fill=\"none\" stroke=\"{col}\" stroke-width=\"2\"/>"
-            );
-        }
+    for e in edges {
+        let (col, _, _) = section_color(e.branch);
+        let p: Vec<(f64, f64)> = e.pts.iter().map(|q| (q.0 - ox, q.1 - oy)).collect();
+        let d = if p.len() == 2 {
+            let mx = (p[0].0 + p[1].0) / 2.0;
+            format!("M{:.1},{:.1} C{mx:.1},{:.1} {mx:.1},{:.1} {:.1},{:.1}", p[0].0, p[0].1, p[0].1, p[1].1, p[1].0, p[1].1)
+        } else {
+            let mut s = format!("M{:.1},{:.1}", p[0].0, p[0].1);
+            for q in &p[1..] { s += &format!(" L{:.1},{:.1}", q.0, q.1); }
+            s
+        };
+        body += &format!("<path d=\"{d}\" fill=\"none\" stroke=\"{col}\" stroke-width=\"2\"/>");
     }
-    for n in &nodes {
-        body += &node_svg(n, ox, oy);
+    for n in nodes {
+        body += &draw_node(n, ox, oy);
     }
-
     format!(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
          <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width:.0} {height:.0}\" \
@@ -248,9 +271,9 @@ fn place_dir(nodes: &mut [Node], i: usize, x: f64, top: f64, dir: f64) {
     }
 }
 
-fn node_svg(n: &Node, ox: f64, oy: f64) -> String {
-    let cx = n.x - ox;
-    let cy = n.y - oy;
+fn draw_node(n: &PNode, ox: f64, oy: f64) -> String {
+    let cx = n.cx - ox;
+    let cy = n.cy - oy;
     let (x, y) = (cx - n.w / 2.0, cy - n.h / 2.0);
     let (fill, stroke, text_col) = section_color(n.branch);
     let shape = match n.shape {

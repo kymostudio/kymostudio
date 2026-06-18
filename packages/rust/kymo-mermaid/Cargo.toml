@@ -49,7 +49,7 @@ full = ["merman", "dep:merman-bindings-core"]
 # mermaid-faithful layout (merman) + raster-safe KaTeX math (kymo-tex). Selects
 # mermaid_to_svg_dagre's high-fidelity geometry. Matches mermaid.js to ~0.7%
 # median at ~1.9 MB wasm. Moved here (with merman) from kymostudio-core.
-katex-layout = ["merman", "dep:kymo-types", "dep:kymo-parser", "dep:kymo-layout", "dep:kymo-svg"]
+katex-layout = ["merman", "merman-render/cytoscape-layout", "dep:kymo-types", "dep:kymo-parser", "dep:kymo-layout", "dep:kymo-svg"]
 
 [profile.release]
 opt-level = "z"

@@ -171,11 +171,14 @@ detected by CSS class / closed-Z (mermaid fills them via CSS, not an attribute).
 **pixel-Δ and size% are < 10% for every type; 4 of 8 pass all four coordinate metrics.** The
 remainder split into improvable gaps and one hard impossibility:
 
-- **mindmap (pos 37.5% / size 17.3% / edge 40.2%) is fundamentally unmatchable.** mermaid
-  renders mindmaps with a **force-directed layout** (Cytoscape `cose-bilkent`) whose node
-  positions are non-deterministic and not reproducible by any deterministic renderer — a single
-  child lands left in one file and right in another (§ earlier). No renderer change can drive
-  its coordinate metrics < 10%; the **pixel-Δ (9.30%) is the fidelity proof** the look matches.
+- **mindmap — solved by using mermaid's own layout algorithm.** mermaid renders mindmaps with
+  a force-directed layout (Cytoscape `cose-bilkent`). This was *first* called unmatchable — but
+  force-directed ≠ random: mermaid fixes the seed/iterations, so the same input gives the same
+  output, and **merman ports cose-bilkent** (`manatee`). Routing the mindmap through merman's
+  `layout_mindmap_diagram` (mermaid-exact positions) + kymo's raster-safe styling drops
+  **pos 37.5% → 0.3% and edge 40.2% → 8.7%** (both now < 10%). The residual **size 13.8%** is a
+  node-sizing calibration gap (kymo's text-measurer vs mermaid.js's DOM measurement + spiky/cloud
+  shape bboxes), not a layout impossibility. (Same pattern as flowchart: merman layout → kymo render.)
 - **block (pos 55% / edge 42%) is a real layout gap** — the parser flattens the `columns` grid
   to a graph. Closing it needs a correct recursive grid engine (columns + nested `block…end` +
   `:span` + `space`); pixel is 8.73% because boards are small, but the geometry is wrong.
