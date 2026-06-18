@@ -227,3 +227,26 @@ mermaid.js 11 via `mmdc`, Chromium-rasterised both sides. Data snapshot:
 `assets/2026-06-17-cross-type/type-bench.json`. Sister notes:
 `2026-06-17-engine-comparison.md` (flowchart, 3 engines),
 `2026-06-16-flowchart-mermaid-style.md` (flowchart pixel-Δ deep-dive).*
+
+### Update — merman layout for er/block (the user's insight, generalised)
+
+The same approach that cracked mindmap (use mermaid's *own* layout algorithm via merman,
+render raster-safe in kymo) applies to every type whose geometry diverged. After routing
+**block** and **er** through merman's `layout_block_diagram` / `layout_er_diagram`:
+
+| type | pos% | size% | edge% | all 4 < 10% |
+|---|---|---|---|---|
+| er | **1.7%** | 6.4% | **5.9%** | ✅ |
+| state | 2.8% | 4.4% | 9.0% | ✅ |
+| class | 0.0% | 9.3% | 9.1% | ✅ |
+| requirement | 0.0% | 9.0% | 5.6% | ✅ |
+| kanban | 0.5% | 1.7% | – | ✅ |
+| block | 0.3% | 0.0% | **13.9%** | edge (8/36 curved arrows) |
+| mindmap | 0.3% | **13.8%** | 8.7% | size (node-sizing calib) |
+| sequence | 8.0% | 5.2% | **11.3%** | edge (own layout) |
+
+**5 of 8 types now pass all four coordinate metrics < 10%** (and pixel-Δ < 10% on all 8).
+The three holdouts are each a single metric, 11–14%: block's sparse curved arrows, mindmap's
+node-size calibration, and sequence's message Y (still kymo's own layout — the one type not
+yet on merman). The lesson: **kymo = raster-safe renderer over merman's mermaid-exact layout**
+is the path to geometry parity; types still on kymo's own layout are the ones that diverge.
