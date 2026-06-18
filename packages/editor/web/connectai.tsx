@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Sparkles, Copy, Check } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
-import { useMcpActive } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin } from "./mcpstatus";
 
 // "Connect AI": kymo already runs a remote MCP server (mcp.kymo.studio) — this
-// panel just tells the user how to wire it into their AI client. Once connected,
-// the agent's create/edit/open calls show up live in this editor (UserChannel +
-// EditorRoom). Nothing is set up here; it's pure how-to + copy-to-clipboard.
+// panel just tells the user how to wire it into their AI client, shows whether an
+// AI is connected, and lets them pin WHICH window the AI acts in. It docks on the
+// right like VS Code's Copilot sidebar (toggled by the ✨ activity-bar button).
 
 const CONFIG_JSON = `{
   "mcpServers": {
@@ -55,6 +55,7 @@ const CLIENTS: { name: string; steps: React.ReactNode; url?: string }[] = [
 
 export function ConnectAI({ onClose }: { onClose: () => void }) {
   const live = useMcpActive();
+  const target = useAiTarget();
   useEffect(() => {
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", k);
@@ -62,55 +63,58 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   }, [onClose]);
   const [showBridge, setShowBridge] = useState(false);
   return (
-    <div className="tpl-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Connect AI">
-      <div className="tpl-modal cn-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="tpl-head">
-          <div className="tpl-head-top">
-            <div>
-              <h2><Sparkles size={18} strokeWidth={2} className="cn-title-ic" /> Connect AI</h2>
-              <p className="tpl-sub">Drive kymo from Claude, Cursor, or any MCP client — create &amp; edit diagrams by chatting; the changes appear <b>live in this editor</b>.</p>
-            </div>
-            <button className="tpl-close" onClick={onClose} aria-label="Close">✕</button>
-          </div>
-        </div>
-        <div className="cn-body">
-          <div className={"cn-status" + (live ? " live" : "")}>
-            <span className="cn-status-dot" />
-            {live ? "Connected — an AI client is driving this editor right now." : "Waiting for an AI client to connect…"}
-          </div>
-          <label className="cn-urllabel">MCP server URL</label>
-          <div className="cn-url">
-            <code>{MCP_HTTP}</code>
-            <CopyBtn text={MCP_HTTP} label="Copy server URL" />
-          </div>
-          <p className="cn-hint">When your client asks, <b>sign in with Google</b> — that links it to this account, so the agent edits your diagrams (and only yours).</p>
-
-          <div className="cn-clients">
-            {CLIENTS.map((c) => (
-              <div className="cn-client" key={c.name}>
-                <div className="cn-client-head">
-                  <span className="cn-client-name">{c.name}</span>
-                  {c.url && <CopyBtn text={c.url} label={`Copy ${c.name} URL`} />}
-                </div>
-                <p className="cn-client-steps">{c.steps}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="cn-config">
-            <div className="cn-config-head">
-              <span>Or drop this into a config file <span className="cn-dim">(<code>claude_desktop_config.json</code>, <code>mcp.json</code>)</span></span>
-              <CopyBtn text={showBridge ? CONFIG_BRIDGE : CONFIG_JSON} label="Copy config" />
-            </div>
-            <pre className="cn-pre"><code>{showBridge ? CONFIG_BRIDGE : CONFIG_JSON}</code></pre>
-            <button className="cn-toggle" onClick={() => setShowBridge((b) => !b)}>
-              {showBridge ? "← Remote URL works in most clients" : "Older client? Use the npx mcp-remote bridge →"}
-            </button>
-          </div>
-
-          <p className="cn-try">Then try: <i>“Create a sequence diagram for checkout”</i> · <i>“Rename this to Payments”</i> · <i>“List my diagrams”</i> — and watch them show up here.</p>
-        </div>
+    <aside className="aiside" aria-label="Connect AI">
+      <div className="aiside-head">
+        <h2><Sparkles size={17} strokeWidth={2} className="cn-title-ic" /> Connect AI</h2>
+        <button className="aiside-close" onClick={onClose} aria-label="Close panel" title="Close">✕</button>
       </div>
-    </div>
+      <div className="aiside-body">
+        <p className="aiside-sub">Drive kymo from Claude, Cursor, or any MCP client — create &amp; edit diagrams by chatting; the changes appear <b>live in this editor</b>.</p>
+
+        <div className={"cn-status" + (live ? " live" : "")}>
+          <span className="cn-status-dot" />
+          {live ? "Connected — an AI client is driving this editor right now." : "Waiting for an AI client to connect…"}
+        </div>
+
+        <button className={"cn-target" + (target ? " on" : "")} onClick={() => requestPin(!target)} aria-pressed={target}>
+          <Sparkles size={15} strokeWidth={2} />
+          <span className="cn-target-txt">{target ? "AI is controlling THIS window" : "Make AI control this window"}</span>
+          <span className="cn-target-state">{target ? "On" : "Off"}</span>
+        </button>
+        <p className="cn-target-hint">With the editor open in several windows, AI commands act only on the chosen window. None chosen → the window you used most recently.</p>
+
+        <label className="cn-urllabel">MCP server URL</label>
+        <div className="cn-url">
+          <code>{MCP_HTTP}</code>
+          <CopyBtn text={MCP_HTTP} label="Copy server URL" />
+        </div>
+        <p className="cn-hint">When your client asks, <b>sign in with Google</b> — that links it to this account, so the agent edits your diagrams (and only yours).</p>
+
+        <div className="cn-clients">
+          {CLIENTS.map((c) => (
+            <div className="cn-client" key={c.name}>
+              <div className="cn-client-head">
+                <span className="cn-client-name">{c.name}</span>
+                {c.url && <CopyBtn text={c.url} label={`Copy ${c.name} URL`} />}
+              </div>
+              <p className="cn-client-steps">{c.steps}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="cn-config">
+          <div className="cn-config-head">
+            <span>Or drop this into a config file <span className="cn-dim">(<code>claude_desktop_config.json</code>, <code>mcp.json</code>)</span></span>
+            <CopyBtn text={showBridge ? CONFIG_BRIDGE : CONFIG_JSON} label="Copy config" />
+          </div>
+          <pre className="cn-pre"><code>{showBridge ? CONFIG_BRIDGE : CONFIG_JSON}</code></pre>
+          <button className="cn-toggle" onClick={() => setShowBridge((b) => !b)}>
+            {showBridge ? "← Remote URL works in most clients" : "Older client? Use the npx mcp-remote bridge →"}
+          </button>
+        </div>
+
+        <p className="cn-try">Then try: <i>“Create a sequence diagram for checkout”</i> · <i>“Rename this to Payments”</i> · <i>“List my diagrams”</i> — and watch them show up here.</p>
+      </div>
+    </aside>
   );
 }

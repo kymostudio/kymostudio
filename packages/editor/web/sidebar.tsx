@@ -7,7 +7,7 @@ import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
 import { DIAGRAMS_API, TRASH_API, apiFetch } from "./const";
 import { kindLabel, docHref, extFor } from "./kroki";
-import { useMcpActive, useAiTarget, requestPin } from "./mcpstatus";
+import { useMcpActive, useAiTarget } from "./mcpstatus";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
   Files, Search, BookOpen, LogOut, Menu, ExternalLink, Sparkles,
@@ -423,7 +423,7 @@ export function SearchPanel({ currentId, onOpen, onClose }: { currentId: string 
 }
 
 // =============================== Activity bar ================================
-export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI }: { active: Panel | null; onSelect: (p: Panel) => void; onNewDiagram: () => void; onConnectAI: () => void }) {
+export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI, aiOpen }: { active: Panel | null; onSelect: (p: Panel) => void; onNewDiagram: () => void; onConnectAI: () => void; aiOpen?: boolean }) {
   const { claims, signOut } = useAuth();
   const mcpLive = useMcpActive();
   const aiTarget = useAiTarget();
@@ -465,10 +465,9 @@ export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI }: { a
         </div>
         <Btn id="explorer" label="Explorer"><Files size={22} strokeWidth={1.7} /></Btn>
         <Btn id="search" label="Search"><Search size={22} strokeWidth={1.9} /></Btn>
-        <button className={"act-btn act-ai" + (aiTarget ? " target" : "") + (mcpLive ? " live" : "")} aria-pressed={aiTarget}
-          title={aiTarget ? "AI is targeting THIS window — click to release (How-to: menu → Connect AI)" : "Click to make AI act in THIS window (How-to: menu → Connect AI)"}
-          aria-label={aiTarget ? "AI targeting this window — click to release" : "Make this window the AI target"}
-          onClick={() => requestPin(!aiTarget)}><Sparkles size={21} strokeWidth={1.9} /></button>
+        <button className={"act-btn act-ai" + (aiOpen ? " active" : "") + (aiTarget ? " target" : "") + (mcpLive ? " live" : "")}
+          title={aiTarget ? "AI targets THIS window — toggle Connect AI panel" : mcpLive ? "AI is active — toggle Connect AI panel" : "Connect AI — drive kymo from Claude / Cursor"}
+          aria-label="Connect AI" aria-pressed={aiOpen} onClick={onConnectAI}><Sparkles size={21} strokeWidth={1.9} /></button>
       </div>
       <div className="act-group">
         <div className="act-pop-wrap">
