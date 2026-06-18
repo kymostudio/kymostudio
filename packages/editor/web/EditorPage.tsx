@@ -13,6 +13,7 @@ import { encodeShare, decodeShare, shareUrl } from "./share";
 import { TemplateGallery, takePendingTemplate, type Template } from "./templates";
 import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
+import { ConnectAI } from "./connectai";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
@@ -94,6 +95,7 @@ export default function EditorPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [connectOpen, setConnectOpen] = useState(false);
   // Set when the user starts a diagram from the Welcome panel. State, not a ref:
   // picking the Flowchart template seeds the editor with SAMPLE (its source is
   // byte-identical), so source never changes — only a re-render hides Welcome.
@@ -851,10 +853,11 @@ export default function EditorPage() {
         )}
       </header>
       {galleryOpen && <TemplateGallery onPick={createDiagram} onClose={() => setGalleryOpen(false)} />}
+      {connectOpen && <ConnectAI onClose={() => setConnectOpen(false)} />}
       <div className="workarea">
         {claims && !shared && (
           <>
-            <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} />
+            <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} onConnectAI={() => setConnectOpen(true)} />
             {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onOpen={openDiagram} onNewDiagram={() => setGalleryOpen(true)} onClose={closePanelOnPhone} />}
             {activePanel === "search" && <SearchPanel currentId={d} onOpen={openDiagram} onClose={closePanelOnPhone} />}
             {activePanel && <div className="sb-backdrop" onClick={closePanelOnPhone} />}
