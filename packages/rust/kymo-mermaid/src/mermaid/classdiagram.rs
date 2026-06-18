@@ -35,6 +35,7 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         relations: Vec::new(),
         notes: Vec::new(),
         namespaces: Vec::new(),
+        er: false,
     };
     let mut cur: Option<usize> = None; // open `class X { … }` block
     let mut ns_stack: Vec<usize> = Vec::new(); // open (nestable) namespaces
