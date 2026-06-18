@@ -261,6 +261,12 @@ pub fn mermaid_class_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
 
 /// Render a Mermaid `erDiagram` → SVG (reuses the class-box renderer).
 pub fn mermaid_er_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
+    #[cfg(feature = "katex-layout")]
+    {
+        if let Some(svg) = crate::katex_layout::er_to_svg_merman(src) {
+            return Ok(svg);
+        }
+    }
     Ok(classdiagram::svg::render(&mermaid::parse_er(src)?))
 }
 

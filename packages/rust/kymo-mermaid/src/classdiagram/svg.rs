@@ -117,6 +117,58 @@ pub fn render(cd: &ClassDiagram) -> String {
     )
 }
 
+/// Render an `erDiagram` at externally-supplied entity positions (from merman's
+/// mermaid-exact ER layout) — reuses the 2-column table + relationship drawing,
+/// so entity boxes land where mermaid.js puts them. `pos`: id → (cx, cy, w, h).
+pub fn render_er_positioned(cd: &ClassDiagram, pos: &HashMap<String, (i32, i32, i32, i32)>) -> String {
+    use kymo_graph::model::Accent;
+    let mk = |id: &str| -> Option<Component> {
+        pos.get(id).map(|&(cx, cy, w, h)| Component {
+            id: id.to_string(),
+            name: String::new(),
+            subtitle: String::new(),
+            icon: String::new(),
+            shape: Shape::Box,
+            accent: Accent::Blue,
+            pos: (cx, cy),
+            size: Some((w, h)),
+            parent: None,
+            align: None,
+            align_gap: 0,
+            align_offset: (0, 0),
+            label_box: None,
+        })
+    };
+    let comps: HashMap<&str, Component> = cd
+        .classes
+        .iter()
+        .filter_map(|c| mk(&c.id).map(|cc| (c.id.as_str(), cc)))
+        .collect();
+    let mut body = String::new();
+    for c in &cd.classes {
+        if let Some(cc) = comps.get(c.id.as_str()) {
+            body += &er_box_svg(c, cc);
+        }
+    }
+    for r in &cd.relations {
+        if let (Some(a), Some(b)) = (comps.get(r.from.as_str()), comps.get(r.to.as_str())) {
+            body += &edge_svg(r, a, b);
+        }
+    }
+    let (mut w, mut h) = (40, 40);
+    for cc in comps.values() {
+        let (cw, ch) = cc.size.unwrap_or((120, 60));
+        w = w.max(cc.pos.0 + cw / 2 + 8);
+        h = h.max(cc.pos.1 + ch / 2 + 8);
+    }
+    format!(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+         <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {w} {h}\" width=\"{w}\" height=\"{h}\" \
+         style=\"max-width:100%;height:auto\" font-family=\"{FONT}\" font-size=\"13\">\n\
+         <defs>{DEFS}</defs>\n<rect width=\"{w}\" height=\"{h}\" fill=\"#ffffff\"/>\n{body}</svg>\n"
+    )
+}
+
 /// The multi-line text used only to size the box (one line per rendered row).
 fn box_label(c: &ClassBox) -> String {
     let mut lines = Vec::new();
