@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { MCP_WS } from "./const";
 import { LOCAL, localGetDoc, localSetSource, localSetTitle } from "./localdb";
+import { pingMcp } from "./mcpstatus";
 
 type Handlers = {
   onDoc?: (source: string, title: string | undefined, fromSelf: boolean, kind?: string) => void;
@@ -35,6 +36,7 @@ export function useRoom(roomId: string | null, signedIn: boolean, handlers: Hand
     ws.addEventListener("message", (e) => {
       let data: any; try { data = JSON.parse(e.data); } catch { return; }
       if (!data) return;
+      if (data.origin === "mcp") pingMcp(); // edit_diagram pushed this → AI is active
       if (data.type === "meta") { hRef.current.onMeta?.(data.title); return; }
       if (data.type !== "doc") return;
       hRef.current.onDoc?.(String(data.source ?? ""), data.title, data.origin === myId, data.kind);

@@ -7,6 +7,7 @@ import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
 import { DIAGRAMS_API, TRASH_API, apiFetch } from "./const";
 import { kindLabel, docHref, extFor } from "./kroki";
+import { useMcpActive } from "./mcpstatus";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
   Files, Search, BookOpen, LogOut, Menu, ExternalLink, Sparkles,
@@ -424,6 +425,7 @@ export function SearchPanel({ currentId, onOpen, onClose }: { currentId: string 
 // =============================== Activity bar ================================
 export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI }: { active: Panel | null; onSelect: (p: Panel) => void; onNewDiagram: () => void; onConnectAI: () => void }) {
   const { claims, signOut } = useAuth();
+  const mcpLive = useMcpActive();
   const { createFolder } = useWorkspace();
   const [menu, setMenu] = useState<"main" | "account" | null>(null);
   useEffect(() => {
@@ -462,7 +464,7 @@ export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI }: { a
         </div>
         <Btn id="explorer" label="Explorer"><Files size={22} strokeWidth={1.7} /></Btn>
         <Btn id="search" label="Search"><Search size={22} strokeWidth={1.9} /></Btn>
-        <button className="act-btn act-ai" title="Connect AI — drive kymo from Claude / Cursor" aria-label="Connect AI" onClick={onConnectAI}><Sparkles size={21} strokeWidth={1.9} /></button>
+        <button className={"act-btn act-ai" + (mcpLive ? " live" : "")} title={mcpLive ? "AI connected — an MCP client is driving the editor" : "Connect AI — drive kymo from Claude / Cursor"} aria-label="Connect AI" onClick={onConnectAI}><Sparkles size={21} strokeWidth={1.9} /></button>
       </div>
       <div className="act-group">
         <div className="act-pop-wrap">

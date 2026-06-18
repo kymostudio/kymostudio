@@ -14,12 +14,13 @@ import { TemplateGallery, takePendingTemplate, type Template } from "./templates
 import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { ConnectAI } from "./connectai";
+import { useMcpActive } from "./mcpstatus";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
 import { readDoc, writeDoc, dropDoc } from "./doccache";
 import { KLoader } from "./kloader";
-import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X } from "lucide-react";
+import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X, Sparkles } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, signedIn, signOut, devSignIn } = useAuth();
@@ -96,6 +97,7 @@ export default function EditorPage() {
   const [exportOpen, setExportOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
+  const mcpLive = useMcpActive(); // an AI client (MCP) is actively driving this editor
   // Set when the user starts a diagram from the Welcome panel. State, not a ref:
   // picking the Flowchart template seeds the editor with SAMPLE (its source is
   // byte-identical), so source never changes — only a re-render hides Welcome.
@@ -893,6 +895,7 @@ export default function EditorPage() {
                       onContextMenu={(e) => { e.preventDefault(); setMenuOpen(false); setShareOpen(false); setExportOpen(false); setTabMenu({ x: e.clientX, y: e.clientY, id }); }}>
                       <span className="file-tab-icon"><KindIcon kind={k} /></span>
                       <span className="file-tab-name">{name}<span className="sb-ext">.{ext}</span></span>
+                      {isActive && mcpLive && <span className="file-tab-ai" title="An AI client (MCP) is driving this diagram"><Sparkles size={11} strokeWidth={2.4} /></span>}
                       <button className="file-tab-close" aria-label="Close tab" title="Close tab"
                         onClick={(e) => { e.stopPropagation(); closeTab(id); }}>
                         <X size={13} strokeWidth={2.4} />
