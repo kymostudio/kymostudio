@@ -183,20 +183,18 @@ pub fn render(fc: &Flowchart) -> String {
     let height = (maxy - miny + 24.0).max(40.0);
 
     let mut body = String::new();
-    // Edges first (curved-ish straight lines, coloured by child branch).
-    for (i, n) in nodes.iter().enumerate() {
+    // Edges first: cubic-bezier curves (mermaid mindmap draws curved branches,
+    // not straight lines) — horizontal-tangent control points, coloured by branch.
+    for n in nodes.iter() {
         for &c in &n.children {
             let (col, _, _) = section_color(nodes[c].branch);
+            let (x1, y1) = (n.x - ox, n.y - oy);
+            let (x2, y2) = (nodes[c].x - ox, nodes[c].y - oy);
+            let mx = (x1 + x2) / 2.0;
             body += &format!(
-                "<line x1=\"{:.1}\" y1=\"{:.1}\" x2=\"{:.1}\" y2=\"{:.1}\" stroke=\"{}\" \
-                 stroke-width=\"2\" fill=\"none\"/>",
-                n.x - ox,
-                n.y - oy,
-                nodes[c].x - ox,
-                nodes[c].y - oy,
-                col
+                "<path d=\"M{x1:.1},{y1:.1} C{mx:.1},{y1:.1} {mx:.1},{y2:.1} {x2:.1},{y2:.1}\" \
+                 fill=\"none\" stroke=\"{col}\" stroke-width=\"2\"/>"
             );
-            let _ = i;
         }
     }
     for n in &nodes {

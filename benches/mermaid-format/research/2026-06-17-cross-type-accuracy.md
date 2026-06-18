@@ -153,33 +153,38 @@ and size are right.
 aligns by the **median matched-pair offset** (Procrustes) before measuring. pos/size/edge are
 medians of `px / reference-diagonal`.
 
-| type | pixel-Δ | pos% | size% | edge% |
-|---|---|---|---|---|
-| sequence | 5.92% | 8.0% | 5.2% | 15.4% |
-| class | 8.25% | 0.0% | 9.3% | 16.2% |
-| state | 7.37% | 2.8% | 4.4% | 8.5% |
-| er | 6.32% | 13.6% | 6.6% | 22.6% |
-| block | 8.73% | 55.4% | 9.6% | 42.5% |
-| mindmap | 9.30% | 0.0% | 5.1% | 10.5% |
-| kanban | 8.48% | 0.5% | 1.7% | – |
-| requirement | 8.49% | 0.0% | 9.0% | 20.8% |
+Edges are keyed by their **endpoint nodes' labels** (the cross-renderer analogue of
+flowchart's id-matched edges), filtering crow's-foot/divider ticks; node-background paths are
+detected by CSS class / closed-Z (mermaid fills them via CSS, not an attribute).
 
-**pixel-Δ and size% are < 10% for every type; pos% for 6 of 8.** The two that aren't tell a
-real story, not a tooling one:
+| type | pixel-Δ | pos% | size% | edge% | all < 10% |
+|---|---|---|---|---|---|
+| class | 8.25% | 0.0% | 9.3% | 9.1% | ✅ |
+| state | 7.37% | 2.8% | 4.4% | 9.0% | ✅ |
+| requirement | 8.49% | 0.0% | 9.0% | 5.6% | ✅ |
+| kanban | 8.48% | 0.5% | 1.7% | – | ✅ (no edges) |
+| sequence | 5.92% | 8.0% | 5.2% | 11.3% | edge marginal |
+| er | 6.32% | 13.6% | 6.6% | 14.3% | pos + edge |
+| block | 8.73% | 55.4% | 9.6% | 42.5% | grid gap |
+| mindmap | 9.30% | 37.5% | 17.3% | 40.2% | **force layout** |
 
-- **block pos 55% / edge 42%** is a *genuine layout gap* — the block parser flattens the
-  `columns` grid to a graph, so blocks are laid out as a flowchart row, not a grid. Fixing it
-  needs a real recursive grid engine (columns + nested `block…end` + `:span` + `space`); pixel
-  is already 8.73% because block boards are small, but the geometry is wrong.
-- **edge% (15–42%)** is largely a *measurement* limit, not a fidelity gap: kymo draws
-  connectors as **multiple straight `<line>`s** (ER crow's-foot ticks, class/mindmap straight
-  links) where mermaid uses a **single curved/orthogonal `<path>`** — so edge count mismatches
-  and a straight-vs-curve sampled distance over-reports. The pixel-Δ (< 10%) is the trustworthy
-  proof the connectors land visually right. edge% would only drop by re-implementing mermaid's
-  per-type edge routing (bezier/orthogonal) — high effort, low real-fidelity ROI.
+**pixel-Δ and size% are < 10% for every type; 4 of 8 pass all four coordinate metrics.** The
+remainder split into improvable gaps and one hard impossibility:
 
-So **pixel-Δ is the reliable cross-type fidelity metric** (< 10% on all 8); the coordinate
-metrics confirm it for pos/size, and flag block's layout as the one remaining real gap.
+- **mindmap (pos 37.5% / size 17.3% / edge 40.2%) is fundamentally unmatchable.** mermaid
+  renders mindmaps with a **force-directed layout** (Cytoscape `cose-bilkent`) whose node
+  positions are non-deterministic and not reproducible by any deterministic renderer — a single
+  child lands left in one file and right in another (§ earlier). No renderer change can drive
+  its coordinate metrics < 10%; the **pixel-Δ (9.30%) is the fidelity proof** the look matches.
+- **block (pos 55% / edge 42%) is a real layout gap** — the parser flattens the `columns` grid
+  to a graph. Closing it needs a correct recursive grid engine (columns + nested `block…end` +
+  `:span` + `space`); pixel is 8.73% because boards are small, but the geometry is wrong.
+- **er / sequence edge (11–14%)** are near the line — straight-vs-curve / activation-offset
+  routing differences, partly improvable by curving the connectors.
+
+So **pixel-Δ is the reliable cross-type fidelity metric (< 10% on all 8)**; the coordinate
+metrics fully confirm it for 4 types, are marginal for 2, flag block's layout as a real gap,
+and are inherently bounded for mindmap by mermaid's force-directed engine.
 
 ## What each gap is (visual gauge)
 
