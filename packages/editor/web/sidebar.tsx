@@ -7,7 +7,7 @@ import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
 import { DIAGRAMS_API, TRASH_API, apiFetch } from "./const";
 import { kindLabel, docHref, extFor } from "./kroki";
-import { useMcpActive } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin } from "./mcpstatus";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
   Files, Search, BookOpen, LogOut, Menu, ExternalLink, Sparkles,
@@ -426,6 +426,7 @@ export function SearchPanel({ currentId, onOpen, onClose }: { currentId: string 
 export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI }: { active: Panel | null; onSelect: (p: Panel) => void; onNewDiagram: () => void; onConnectAI: () => void }) {
   const { claims, signOut } = useAuth();
   const mcpLive = useMcpActive();
+  const aiTarget = useAiTarget();
   const { createFolder } = useWorkspace();
   const [menu, setMenu] = useState<"main" | "account" | null>(null);
   useEffect(() => {
@@ -464,7 +465,10 @@ export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI }: { a
         </div>
         <Btn id="explorer" label="Explorer"><Files size={22} strokeWidth={1.7} /></Btn>
         <Btn id="search" label="Search"><Search size={22} strokeWidth={1.9} /></Btn>
-        <button className={"act-btn act-ai" + (mcpLive ? " live" : "")} title={mcpLive ? "AI connected — an MCP client is driving the editor" : "Connect AI — drive kymo from Claude / Cursor"} aria-label="Connect AI" onClick={onConnectAI}><Sparkles size={21} strokeWidth={1.9} /></button>
+        <button className={"act-btn act-ai" + (aiTarget ? " target" : "") + (mcpLive ? " live" : "")} aria-pressed={aiTarget}
+          title={aiTarget ? "AI is targeting THIS window — click to release (How-to: menu → Connect AI)" : "Click to make AI act in THIS window (How-to: menu → Connect AI)"}
+          aria-label={aiTarget ? "AI targeting this window — click to release" : "Make this window the AI target"}
+          onClick={() => requestPin(!aiTarget)}><Sparkles size={21} strokeWidth={1.9} /></button>
       </div>
       <div className="act-group">
         <div className="act-pop-wrap">

@@ -633,6 +633,12 @@ export class EditorRoom extends DurableObject<Env> {
 // room/project the tab currently has open.
 // Auth + ownership are enforced in the worker before routing here (the DO is
 // only reachable through the email-keyed /userws route), so the DO trusts it. ----
+type SockMeta = { focusedAt: number; pinned: boolean; pinnedAt: number };
+const sockMeta = (ws: WebSocket): SockMeta => {
+  const m = ws.deserializeAttachment() as Partial<SockMeta> | null;
+  return { focusedAt: m?.focusedAt ?? 0, pinned: m?.pinned ?? false, pinnedAt: m?.pinnedAt ?? 0 };
+};
+
 export class UserChannel extends DurableObject<Env> {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
@@ -640,15 +646,67 @@ export class UserChannel extends DurableObject<Env> {
       const pair = new WebSocketPair();
       const client = pair[0], server = pair[1];
       this.ctx.acceptWebSocket(server);
+      server.serializeAttachment({ focusedAt: 0, pinned: false, pinnedAt: 0 });
+      // Tell the newcomer it isn't the pinned AI target (another window may be).
+      try { server.send(JSON.stringify({ type: "ai-target", pinned: false })); } catch {}
       return new Response(null, { status: 101, webSocket: client });
     }
     if (url.pathname.endsWith("/push") && request.method === "POST") {
       const msg = JSON.stringify(await request.json());
+      // Deliver control messages (open / open-project / close) to the ONE editor
+      // window the user wants: the explicitly PINNED window, else the most-recently
+      // FOCUSED one, else broadcast (no window has reported anything yet) so the
+      // message is never silently dropped.
+      const target = this.pickTarget();
+      const dests = target ? [target] : this.ctx.getWebSockets();
       let clients = 0;
-      for (const ws of this.ctx.getWebSockets()) { try { ws.send(msg); clients++; } catch {} }
+      for (const ws of dests) { try { ws.send(msg); clients++; } catch {} }
       return Response.json({ ok: true, clients });
     }
     return new Response("not found", { status: 404 });
+  }
+
+  // Which socket should receive a control push: pinned wins (most-recent pin),
+  // then most-recently-focused, else null → caller broadcasts.
+  private pickTarget(): WebSocket | null {
+    let pinned: WebSocket | null = null, pinnedAt = 0;
+    let focused: WebSocket | null = null, focusedAt = 0;
+    for (const ws of this.ctx.getWebSockets()) {
+      const m = sockMeta(ws);
+      if (m.pinned && m.pinnedAt >= pinnedAt) { pinnedAt = m.pinnedAt; pinned = ws; }
+      if (m.focusedAt > focusedAt) { focusedAt = m.focusedAt; focused = ws; }
+    }
+    return pinned ?? focused;
+  }
+
+  // After a pin/unpin, tell every window whether IT is now the pinned AI target
+  // so each ✨ button reflects the single active window.
+  private notifyTarget() {
+    let pinned: WebSocket | null = null, pinnedAt = 0;
+    const all = this.ctx.getWebSockets();
+    for (const ws of all) { const m = sockMeta(ws); if (m.pinned && m.pinnedAt >= pinnedAt) { pinnedAt = m.pinnedAt; pinned = ws; } }
+    for (const ws of all) { try { ws.send(JSON.stringify({ type: "ai-target", pinned: ws === pinned })); } catch {} }
+  }
+
+  // The editor reports `{type:"focus"}` (window gained focus) and `{type:"pin"|"unpin"}`
+  // (user clicked ✨ to claim/release this window as the AI target).
+  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) {
+    if (typeof message !== "string") return;
+    let data: any; try { data = JSON.parse(message); } catch { return; }
+    if (!data) return;
+    if (data.type === "focus") {
+      ws.serializeAttachment({ ...sockMeta(ws), focusedAt: Date.now() });
+    } else if (data.type === "pin") {
+      // Exclusive: this window becomes the target, clear every other window's pin.
+      for (const other of this.ctx.getWebSockets()) {
+        if (other !== ws) { const m = sockMeta(other); if (m.pinned) other.serializeAttachment({ ...m, pinned: false }); }
+      }
+      ws.serializeAttachment({ ...sockMeta(ws), pinned: true, pinnedAt: Date.now() });
+      this.notifyTarget();
+    } else if (data.type === "unpin") {
+      ws.serializeAttachment({ ...sockMeta(ws), pinned: false });
+      this.notifyTarget();
+    }
   }
 }
 
