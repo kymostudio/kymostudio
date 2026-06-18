@@ -144,6 +144,43 @@ and size are right.
 | state | 7.37% | block | 8.73% |
 | | | **mindmap** | **9.30%** |
 
+## All 5 metrics per type (the coordinate metrics, honestly)
+
+`type-geom.mjs` adds the 4 coordinate metrics to the pixel-Δ above. It is **transform-aware**
+(resolves nested `<g translate>` to absolute coords — mermaid nests a node's shape and its
+`<foreignObject>` label under different translated groups), pairs nodes **by label text**
+(id-free but exact, the cross-renderer analogue of flowchart's `data-id` matching), and
+aligns by the **median matched-pair offset** (Procrustes) before measuring. pos/size/edge are
+medians of `px / reference-diagonal`.
+
+| type | pixel-Δ | pos% | size% | edge% |
+|---|---|---|---|---|
+| sequence | 5.92% | 8.0% | 5.2% | 15.4% |
+| class | 8.25% | 0.0% | 9.3% | 16.2% |
+| state | 7.37% | 2.8% | 4.4% | 8.5% |
+| er | 6.32% | 13.6% | 6.6% | 22.6% |
+| block | 8.73% | 55.4% | 9.6% | 42.5% |
+| mindmap | 9.30% | 0.0% | 5.1% | 10.5% |
+| kanban | 8.48% | 0.5% | 1.7% | – |
+| requirement | 8.49% | 0.0% | 9.0% | 20.8% |
+
+**pixel-Δ and size% are < 10% for every type; pos% for 6 of 8.** The two that aren't tell a
+real story, not a tooling one:
+
+- **block pos 55% / edge 42%** is a *genuine layout gap* — the block parser flattens the
+  `columns` grid to a graph, so blocks are laid out as a flowchart row, not a grid. Fixing it
+  needs a real recursive grid engine (columns + nested `block…end` + `:span` + `space`); pixel
+  is already 8.73% because block boards are small, but the geometry is wrong.
+- **edge% (15–42%)** is largely a *measurement* limit, not a fidelity gap: kymo draws
+  connectors as **multiple straight `<line>`s** (ER crow's-foot ticks, class/mindmap straight
+  links) where mermaid uses a **single curved/orthogonal `<path>`** — so edge count mismatches
+  and a straight-vs-curve sampled distance over-reports. The pixel-Δ (< 10%) is the trustworthy
+  proof the connectors land visually right. edge% would only drop by re-implementing mermaid's
+  per-type edge routing (bezier/orthogonal) — high effort, low real-fidelity ROI.
+
+So **pixel-Δ is the reliable cross-type fidelity metric** (< 10% on all 8); the coordinate
+metrics confirm it for pos/size, and flag block's layout as the one remaining real gap.
+
 ## What each gap is (visual gauge)
 
 *(Comparison images below are rasterised with **rsvg-convert**, not Chromium — deliberately:
