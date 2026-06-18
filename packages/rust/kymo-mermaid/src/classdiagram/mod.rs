@@ -91,4 +91,7 @@ pub struct ClassDiagram {
     pub notes: Vec<ClassNote>,
     /// `namespace X { … }` groupings: (name, member class ids).
     pub namespaces: Vec<(String, Vec<String>)>,
+    /// True when this came from an `erDiagram` — the renderer then draws each
+    /// entity as a 2-column attribute table (type | name) instead of a class box.
+    pub er: bool,
 }

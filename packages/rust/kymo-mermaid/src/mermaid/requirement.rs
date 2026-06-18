@@ -34,6 +34,7 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         relations: Vec::new(),
         notes: Vec::new(),
         namespaces: Vec::new(),
+        er: false,
     };
     let mut cur: Option<usize> = None;
     let mut started = false;

@@ -89,7 +89,11 @@ pub fn render(cd: &ClassDiagram) -> String {
     }
     for c in &cd.classes {
         if let Some(comp) = by_id.get(c.id.as_str()) {
-            body += &box_svg(c, comp);
+            body += &if cd.er {
+                er_box_svg(c, comp)
+            } else {
+                box_svg(c, comp)
+            };
         }
     }
     for (i, n) in cd.notes.iter().enumerate() {
@@ -201,6 +205,63 @@ fn box_svg(c: &ClassBox, comp: &Component) -> String {
         ty += LINE_H;
         out += &row(ty, &method_label(m));
     }
+    out
+}
+
+/// Render an `erDiagram` entity: a purple title band over a 2-column attribute
+/// table (type | name), with a row divider per attribute and a vertical column
+/// divider — the mermaid ER look, not the single-column class box.
+fn er_box_svg(c: &ClassBox, comp: &Component) -> String {
+    let (cx, cy) = comp.pos;
+    let (w, h) = comp.size.unwrap_or((120, 60));
+    let (x, y) = (cx - w / 2, cy - h / 2);
+    let header_h = 24;
+    let mut out = format!(
+        "<rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" fill=\"#ffffff\" \
+         stroke=\"#9370DB\" stroke-width=\"1\"/>\
+         <rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{header_h}\" fill=\"#ECECFF\" \
+         stroke=\"#9370DB\" stroke-width=\"1\"/>\
+         <text x=\"{cx}\" y=\"{}\" text-anchor=\"middle\" dominant-baseline=\"central\" \
+         font-weight=\"700\" fill=\"#333333\">{}</text>",
+        y + header_h / 2,
+        esc(&c.name)
+    );
+    let n = c.attributes.len() as i32;
+    if n == 0 {
+        return out;
+    }
+    // Each attribute is "type name [keys] [comment]" → col1 = type, col2 = rest.
+    let rows: Vec<(&str, &str)> = c
+        .attributes
+        .iter()
+        .map(|a| match a.trim().split_once(char::is_whitespace) {
+            Some((t, r)) => (t, r.trim()),
+            None => (a.trim(), ""),
+        })
+        .collect();
+    let typew = rows.iter().map(|(t, _)| t.chars().count()).max().unwrap_or(4) as i32;
+    let col_x = (x + typew * 7 + 12).clamp(x + 30, x + w - 30);
+    let avail = h - header_h;
+    let row_h = (avail / n).max(1);
+    for (i, (t, r)) in rows.iter().enumerate() {
+        let ry = y + header_h + i as i32 * row_h;
+        let mid = ry + row_h / 2;
+        out += &format!(
+            "<line x1=\"{x}\" y1=\"{ry}\" x2=\"{}\" y2=\"{ry}\" stroke=\"#9370DB\" stroke-width=\"1\"/>\
+             <text x=\"{}\" y=\"{mid}\" dominant-baseline=\"central\" fill=\"#333333\">{}</text>\
+             <text x=\"{}\" y=\"{mid}\" dominant-baseline=\"central\" fill=\"#333333\">{}</text>",
+            x + w,
+            x + 6,
+            esc(t),
+            col_x + 6,
+            esc(r)
+        );
+    }
+    out += &format!(
+        "<line x1=\"{col_x}\" y1=\"{}\" x2=\"{col_x}\" y2=\"{}\" stroke=\"#9370DB\" stroke-width=\"1\"/>",
+        y + header_h,
+        y + h
+    );
     out
 }
 

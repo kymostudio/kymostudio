@@ -101,6 +101,21 @@ which kymo renders light — a cross-cutting theme feature, not a sequence-layou
 remaining plain-file gap is **dynamic actor spacing** (kymo's `LL_GAP` is fixed at 150;
 mermaid sizes gaps to the widest message label) and the **self-message loop** glyph.
 
+### Update — ER 2-column attribute table (ROI pass #3, structural)
+
+ER entities reused the single-column class box (`varchar(12) jobId` on one line) where
+mermaid draws a **2-column table** (type | name) with a purple title band, a row divider
+per attribute and a vertical column divider. Added an `er` flag to the shared model and an
+`er_box_svg` renderer that draws the real table:
+
+| type | before (palette) | after (table) | total Δ from baseline |
+|---|---|---|---|
+| er | 6.84% | **6.32%** | 7.42% → 6.32% (−1.10) |
+
+The pixel drop is modest (−0.52) but the **structural correctness** is the real win — ER
+now renders as a table, not a mislabelled class box. The residual is box/font-sizing
+(mermaid's cells are larger) — the same sizing lever flagged for the whole class-box family.
+
 ## What each gap is (visual gauge)
 
 *(Comparison images below are rasterised with **rsvg-convert**, not Chromium — deliberately:
