@@ -276,7 +276,7 @@ pub fn mermaid_block_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
 pub fn mermaid_mindmap_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
     let mut fc = mermaid::parse_mindmap(src)?;
     render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+    Ok(crate::mindmap_svg::render(&fc))
 }
 
 /// Render a Mermaid `kanban` board → SVG (columns via the flowchart renderer).

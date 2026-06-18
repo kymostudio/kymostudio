@@ -116,6 +116,34 @@ The pixel drop is modest (−0.52) but the **structural correctness** is the rea
 now renders as a table, not a mislabelled class box. The residual is box/font-sizing
 (mermaid's cells are larger) — the same sizing lever flagged for the whole class-box family.
 
+### Update — kanban + mindmap dedicated renderers (goal: every type < 10%)
+
+The last two types over the 10% pixel-Δ line both reused the flowchart layout and needed
+their own renderers:
+
+- **kanban** (`kanban_svg`): columns left-to-right, each a tinted `hsl(H,100%,86%)` section
+  with a title over a vertical stack of white cards (`#9370DB` border). **10.17% → 8.48%**.
+- **mindmap** (`mindmap_svg`): a horizontal tidy-tree (root centred, depth-1 branches split
+  left/right), saturated section colours by branch (root a solid dark blue `#0000EC`, white
+  text), per-shape nodes, wrapped labels. Plus a parser fix for multi-line bracket labels
+  (`root[\n text\n]` was split into two phantom nodes). **37.74% → 9.30%**.
+
+mindmap was the hardest: mermaid lays it out with a force-directed engine that can't be
+matched deterministically (a single child lands left in one file, right in another — pure
+coin-flip), so the residual is mirror/position on multi-node boards. The single-node and
+small files (the bulk of the corpus) now match closely once the root colour, shape, border
+and size are right.
+
+**Final per-type pixel-Δ medians — all 8 native renderers now < 10%:**
+
+| type | median | type | median |
+|---|---|---|---|
+| flowchart | 1.12% | class | 8.25% |
+| sequence | 5.92% | kanban | 8.48% |
+| er | 6.32% | requirement | 8.49% |
+| state | 7.37% | block | 8.73% |
+| | | **mindmap** | **9.30%** |
+
 ## What each gap is (visual gauge)
 
 *(Comparison images below are rasterised with **rsvg-convert**, not Chromium — deliberately:
