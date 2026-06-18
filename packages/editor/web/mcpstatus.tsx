@@ -60,3 +60,36 @@ export function useAiTarget(): boolean {
   useEffect(() => { pinSubs.add(bump); return () => { pinSubs.delete(bump); }; }, []);
   return pinned;
 }
+
+// ---- Session identity: each open editor WINDOW (browser tab) gets a short,
+// stable id (kept in sessionStorage so a reload keeps it). The editor reports it
+// + its current project/diagram over the UserChannel; the MCP `ui_list_sessions`
+// tool enumerates windows and `ui_switch_session` makes one the AI target. ----
+
+let sessionId = "";
+export function sessionIdValue(): string {
+  if (sessionId) return sessionId;
+  try {
+    sessionId = sessionStorage.getItem("kymo_session_id") || "";
+    if (!sessionId) {
+      const raw = (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+      sessionId = raw.replace(/-/g, "").slice(0, 6);
+      sessionStorage.setItem("kymo_session_id", sessionId);
+    }
+  } catch { sessionId = sessionId || Math.random().toString(36).slice(2, 8); }
+  return sessionId;
+}
+
+export type SessionCtx = { project?: string; projectName?: string; diagram?: string; title?: string };
+let ctx: SessionCtx = {};
+let ctxSender: ((c: SessionCtx) => void) | null = null;
+
+// userchannel.tsx registers the WS sender; pushing the current ctx immediately so
+// a freshly-connected socket carries project/diagram from the start.
+export function registerCtxSender(fn: ((c: SessionCtx) => void) | null) { ctxSender = fn; if (fn) fn(ctx); }
+export function sessionCtx(): SessionCtx { return ctx; }
+export function setSessionCtx(next: SessionCtx) {
+  const merged = { ...ctx, ...next };
+  if (JSON.stringify(merged) === JSON.stringify(ctx)) return;
+  ctx = merged; ctxSender?.(ctx);
+}

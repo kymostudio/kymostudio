@@ -633,10 +633,11 @@ export class EditorRoom extends DurableObject<Env> {
 // room/project the tab currently has open.
 // Auth + ownership are enforced in the worker before routing here (the DO is
 // only reachable through the email-keyed /userws route), so the DO trusts it. ----
-type SockMeta = { focusedAt: number; pinned: boolean; pinnedAt: number };
+type SockMeta = { focusedAt: number; pinned: boolean; pinnedAt: number; session?: string; project?: string | null; projectName?: string | null; diagram?: string | null; title?: string | null };
 const sockMeta = (ws: WebSocket): SockMeta => {
   const m = ws.deserializeAttachment() as Partial<SockMeta> | null;
-  return { focusedAt: m?.focusedAt ?? 0, pinned: m?.pinned ?? false, pinnedAt: m?.pinnedAt ?? 0 };
+  return { focusedAt: m?.focusedAt ?? 0, pinned: m?.pinned ?? false, pinnedAt: m?.pinnedAt ?? 0,
+    session: m?.session, project: m?.project ?? null, projectName: m?.projectName ?? null, diagram: m?.diagram ?? null, title: m?.title ?? null };
 };
 
 export class UserChannel extends DurableObject<Env> {
@@ -662,6 +663,29 @@ export class UserChannel extends DurableObject<Env> {
       let clients = 0;
       for (const ws of dests) { try { ws.send(msg); clients++; } catch {} }
       return Response.json({ ok: true, clients });
+    }
+    // List open editor windows (sessions) with what each is showing + which is the target.
+    if (url.pathname.endsWith("/sessions") && request.method === "GET") {
+      const target = this.pickTarget();
+      let focused: WebSocket | null = null, fAt = 0;
+      for (const ws of this.ctx.getWebSockets()) { const m = sockMeta(ws); if (m.focusedAt > fAt) { fAt = m.focusedAt; focused = ws; } }
+      const sessions = this.ctx.getWebSockets().map((ws) => {
+        const m = sockMeta(ws);
+        return { session: m.session || "?", project: m.project, projectName: m.projectName, diagram: m.diagram, title: m.title, focused: ws === focused, pinned: m.pinned, target: ws === target };
+      });
+      return Response.json({ sessions });
+    }
+    // Make a specific session the pinned AI target (clears any other pin).
+    if (url.pathname.endsWith("/target") && request.method === "POST") {
+      const { session } = (await request.json()) as { session?: string };
+      let found = false;
+      for (const ws of this.ctx.getWebSockets()) {
+        const m = sockMeta(ws);
+        if (session && m.session === session) { ws.serializeAttachment({ ...m, pinned: true, pinnedAt: Date.now() }); found = true; }
+        else if (m.pinned) { ws.serializeAttachment({ ...m, pinned: false }); }
+      }
+      if (found) this.notifyTarget();
+      return Response.json({ ok: found });
     }
     return new Response("not found", { status: 404 });
   }
@@ -696,6 +720,10 @@ export class UserChannel extends DurableObject<Env> {
     if (!data) return;
     if (data.type === "focus") {
       ws.serializeAttachment({ ...sockMeta(ws), focusedAt: Date.now() });
+    } else if (data.type === "hello" || data.type === "ctx") {
+      // Window announced its session id + current project/diagram (for ui_list_sessions).
+      const m = sockMeta(ws);
+      ws.serializeAttachment({ ...m, session: data.session ?? m.session, project: data.project ?? null, projectName: data.projectName ?? null, diagram: data.diagram ?? null, title: data.title ?? null });
     } else if (data.type === "pin") {
       // Exclusive: this window becomes the target, clear every other window's pin.
       for (const other of this.ctx.getWebSockets()) {
@@ -1010,6 +1038,40 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         const j = (await r.json()) as { clients: number };
         const where = j.clients ? `${j.clients} live tab(s) notified` : "no live editor tab open right now";
         return { content: [{ type: "text", text: `Closed tab ${id} (${next.tabs.length} file(s) still open; ${where}).` }] };
+      }
+    );
+
+    // ---- Sessions (windows): each OPEN editor window has a short session id.
+    // List them, then switch which one AI commands target. ----
+    this.server.tool(
+      "ui_list_sessions",
+      "List the user's OPEN editor windows ('sessions'). Each has a short session id and shows its project + active diagram; the one AI control commands (ui_open_diagram / ui_open_project / ui_close_file) currently act on is marked '← AI target'. Use ui_switch_session to change it. Returns nothing open if no editor window is connected.",
+      {},
+      async () => {
+        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/sessions");
+        const { sessions } = (await r.json()) as { sessions: Array<{ session: string; project: string | null; projectName: string | null; diagram: string | null; title: string | null; focused: boolean; pinned: boolean; target: boolean }> };
+        if (!sessions.length) return { content: [{ type: "text", text: "No editor windows are open right now." }] };
+        const lines = sessions.map((s) => {
+          const where = s.projectName ? `project "${s.projectName}"` : s.project ? `project ${s.project}` : "no project";
+          const doc = s.title ? ` · ${s.title}` : "";
+          const flags = [s.target ? "← AI target" : "", s.pinned ? "pinned" : (s.focused ? "focused" : "")].filter(Boolean).join(", ");
+          return `- ${s.session} — ${where}${doc}${flags ? `  (${flags})` : ""}`;
+        });
+        return { content: [{ type: "text", text: `${sessions.length} open window(s):\n${lines.join("\n")}\n\nSwitch the target with ui_switch_session(session).` }] };
+      }
+    );
+
+    this.server.tool(
+      "ui_switch_session",
+      "Make a specific open editor window the AI target — subsequent ui_open_diagram / ui_open_project / ui_close_file act on THAT window. Pass the `session` id from ui_list_sessions. The window's ✨ Connect-AI toggle flips on to confirm.",
+      { session: z.string().describe("Session id of the window to target (from ui_list_sessions).") },
+      async ({ session }) => {
+        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/target", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ session }),
+        });
+        const { ok } = (await r.json()) as { ok: boolean };
+        return { content: [{ type: "text", text: ok ? `AI target switched to window ${session}. Control commands now act there.` : `No open window with session "${session}" — run ui_list_sessions for current ids.` }] };
       }
     );
   }

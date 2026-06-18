@@ -650,7 +650,10 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-target.on { color: #15803d; background: color-mix(in srgb, #16a34a 9%, transparent); border-color: color-mix(in srgb, #16a34a 40%, var(--border)); }
 .cn-target.on svg { color: #16a34a; }
 .cn-target.on .cn-target-state { color: #fff; background: #16a34a; border-color: #16a34a; }
-.cn-target-hint { margin: 0 0 14px; font-size: 11px; line-height: 1.5; color: var(--dim); }
+.cn-target-hint { margin: 0 0 8px; font-size: 11px; line-height: 1.5; color: var(--dim); }
+.cn-target-hint code, .cn-session code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 5px; padding: 0 4px; }
+.cn-session { margin: 0 0 14px; font-size: 11px; color: var(--dim); }
+.cn-session code { color: var(--ink); font-weight: 600; }
 
 /* On phones the dock overlays the panes (full-height, right) instead of squeezing them. */
 @media (max-width: 720px) {

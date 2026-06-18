@@ -14,7 +14,7 @@ import { TemplateGallery, takePendingTemplate, type Template } from "./templates
 import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { ConnectAI } from "./connectai";
-import { useMcpActive } from "./mcpstatus";
+import { useMcpActive, setSessionCtx } from "./mcpstatus";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
@@ -414,6 +414,13 @@ export default function EditorPage() {
   useEffect(() => {
     document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
   }, [diagramLabel]);
+
+  // Report this window's project + active diagram to the control channel so the
+  // MCP `ui_list_sessions` tool can show which window is showing what.
+  useEffect(() => {
+    const projectName = projects.find((x) => x.id === currentProject)?.name;
+    setSessionCtx({ project: currentProject || undefined, projectName, diagram: d || undefined, title: diagramLabel });
+  }, [currentProject, projects, d, diagramLabel]);
 
   // Project-as-URL (signed-in only). The project home is ?p=<projectId> showing
   // the Welcome scoped to that project; a bare "/" redirects to the active
