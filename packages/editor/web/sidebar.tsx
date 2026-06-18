@@ -9,7 +9,7 @@ import { DIAGRAMS_API, TRASH_API, apiFetch } from "./const";
 import { kindLabel, docHref, extFor } from "./kroki";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
-  Files, Search, BookOpen, LogOut, Menu, ExternalLink,
+  Files, Search, BookOpen, LogOut, Menu, ExternalLink, Sparkles,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
@@ -422,7 +422,7 @@ export function SearchPanel({ currentId, onOpen, onClose }: { currentId: string 
 }
 
 // =============================== Activity bar ================================
-export function ActivityBar({ active, onSelect, onNewDiagram }: { active: Panel | null; onSelect: (p: Panel) => void; onNewDiagram: () => void }) {
+export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI }: { active: Panel | null; onSelect: (p: Panel) => void; onNewDiagram: () => void; onConnectAI: () => void }) {
   const { claims, signOut } = useAuth();
   const { createFolder } = useWorkspace();
   const [menu, setMenu] = useState<"main" | "account" | null>(null);
@@ -453,6 +453,7 @@ export function ActivityBar({ active, onSelect, onNewDiagram }: { active: Panel 
               <button className="acct-item exp-item" onClick={() => { setMenu(null); onNewDiagram(); }}><FilePlus2 size={16} strokeWidth={1.9} />New diagram</button>
               <button className="acct-item exp-item" onClick={newFolder}><FolderPlus size={16} strokeWidth={1.9} />New folder</button>
               <div className="menu-sep" />
+              <button className="acct-item exp-item" onClick={() => { setMenu(null); onConnectAI(); }}><Sparkles size={16} strokeWidth={1.9} />Connect AI</button>
               <Link className="acct-item exp-item" to="/projects" onClick={() => setMenu(null)}><Boxes size={16} strokeWidth={1.9} />Projects</Link>
               <Link className="acct-item exp-item" to="/trash" onClick={() => setMenu(null)}><Trash2 size={16} strokeWidth={1.9} />Trash</Link>
               <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
@@ -461,6 +462,7 @@ export function ActivityBar({ active, onSelect, onNewDiagram }: { active: Panel 
         </div>
         <Btn id="explorer" label="Explorer"><Files size={22} strokeWidth={1.7} /></Btn>
         <Btn id="search" label="Search"><Search size={22} strokeWidth={1.9} /></Btn>
+        <button className="act-btn act-ai" title="Connect AI — drive kymo from Claude / Cursor" aria-label="Connect AI" onClick={onConnectAI}><Sparkles size={21} strokeWidth={1.9} /></button>
       </div>
       <div className="act-group">
         <div className="act-pop-wrap">

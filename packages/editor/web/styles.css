@@ -590,6 +590,36 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .tpl-foot-hint { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tpl-foot-hint b { color: var(--ink); font-weight: 650; }
 .tpl-create { flex: none; padding: 9px 22px; font-size: 14px; }
+/* Connect AI modal (reuses the .tpl-overlay/.tpl-modal shell). */
+.cn-modal { width: min(620px, 100%); }
+.cn-modal h2 { display: inline-flex; align-items: center; gap: 8px; }
+.cn-title-ic { color: var(--accent); }
+.cn-body { padding: 16px 22px 20px; overflow-y: auto; }
+.cn-urllabel { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); margin-bottom: 7px; }
+.cn-url { display: flex; align-items: center; gap: 8px; padding: 9px 9px 9px 13px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 11px; }
+.cn-url code { flex: 1 1 auto; min-width: 0; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13.5px; color: var(--ink); white-space: nowrap; }
+.cn-copy { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; font-size: 12.5px; font-weight: 650; color: var(--ink); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+.cn-copy:hover { background: var(--bg-soft); transform: none; box-shadow: none; }
+.cn-hint { margin: 9px 2px 0; font-size: 12.5px; color: var(--dim); }
+.cn-hint b, .cn-client-steps b { color: var(--ink); font-weight: 650; }
+.cn-clients { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 16px 0; }
+.cn-client { padding: 11px 13px; border: 1px solid var(--border); border-radius: 11px; background: var(--bg); }
+.cn-client-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 3px; }
+.cn-client-name { font-size: 13.5px; font-weight: 650; }
+.cn-client-steps { margin: 0; font-size: 12.5px; color: var(--dim); }
+.cn-config { margin-top: 4px; }
+.cn-config-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--dim); margin-bottom: 7px; }
+.cn-config-head code { font-family: ui-monospace, monospace; font-size: 11.5px; }
+.cn-dim { color: var(--border-strong); }
+.cn-pre { margin: 0; padding: 12px 14px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 11px; overflow-x: auto; }
+.cn-pre code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; line-height: 1.55; color: var(--ink); white-space: pre; }
+.cn-toggle { margin-top: 8px; padding: 0; background: transparent; border: 0; color: var(--accent); font-size: 12px; font-weight: 600; }
+.cn-toggle:hover { background: transparent; box-shadow: none; transform: none; text-decoration: underline; }
+.cn-try { margin: 16px 0 0; font-size: 12.5px; color: var(--dim); }
+.cn-try i { color: var(--ink); font-style: italic; }
+/* The Connect-AI icon button in the activity bar. */
+.act-ai { color: var(--dim); }
+.act-ai:hover { color: var(--accent); background: var(--bg-soft); }
 .tpl-name { font-size: 13px; font-weight: 650; }
 .tpl-via { font-size: 10.5px; color: var(--dim); }
 @media (max-width: 720px) {

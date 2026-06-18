@@ -5,6 +5,10 @@ export const GOOGLE_CLIENT_ID = "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.a
 // On localhost these are never hit: localdb.ts intercepts /api/* and the room.
 const API_HTTP = "https://api.kymo.studio";
 const API_WS = "wss://api.kymo.studio";
+// Remote MCP server (Streamable HTTP at /mcp, legacy SSE at /sse) — what users
+// paste into Claude / Cursor / ChatGPT to drive this editor by chat (Connect AI).
+export const MCP_HTTP = "https://mcp.kymo.studio/mcp";
+export const MCP_SSE = "https://mcp.kymo.studio/sse";
 export const MCP_WS = `${API_WS}/ws`;
 // Per-user control channel: every open tab connects so the MCP `ui_open_diagram`
 // tool can live-switch which diagram this tab shows (see userchannel.tsx).
