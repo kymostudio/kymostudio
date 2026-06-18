@@ -283,7 +283,7 @@ pub fn mermaid_mindmap_to_svg(src: &str) -> Result<String, mermaid::MermaidError
 pub fn mermaid_kanban_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
     let mut fc = mermaid::parse_kanban(src)?;
     render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+    Ok(crate::kanban_svg::render(&fc))
 }
 
 /// Render a Mermaid `requirementDiagram` → SVG (reuses the class-box renderer).
