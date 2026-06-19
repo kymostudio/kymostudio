@@ -30,7 +30,8 @@ const FRAG_GAP: i64 = 12; // gap after a fragment box
 const FRAG_MARGIN: i64 = 30; // horizontal overhang past spanned lifelines
 const NOTE_LINE: i64 = 16; // text line height inside a note box
 const NOTE_PAD: i64 = 8; // inner padding of a note box
-const NOTE_GAP: i64 = 14; // vertical gap a note occupies past its box
+const NOTE_GAP: i64 = 32; // gap past a note box — clears the next message's
+                          // label (drawn ~21px above its arrow), avoiding overlap
 const NOTE_CHAR_W: i64 = 7; // approx glyph advance at 14px
 
 /// A placed message (one diagram row).
