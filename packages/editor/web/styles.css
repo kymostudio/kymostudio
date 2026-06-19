@@ -638,6 +638,13 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .aiside-close { border: 0; background: none; cursor: pointer; color: var(--dim); font-size: 15px; line-height: 1; padding: 4px 6px; border-radius: 7px; }
 .aiside-close:hover { color: var(--ink); background: var(--bg-soft); }
 .aiside-body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px; }
+/* Tab bar: Chat · Connection · Setup. */
+.aiside-tabs { flex: none; display: flex; gap: 2px; padding: 0 10px; border-bottom: 1px solid var(--border); }
+.aiside-tab { position: relative; appearance: none; border: 0; background: none; cursor: pointer; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--dim); padding: 10px 12px; border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; gap: 5px; }
+.aiside-tab:hover { color: var(--ink); }
+.aiside-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.aiside-tab-dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; }
+.cn-empty { margin: 4px 2px; font-size: 12px; line-height: 1.55; color: var(--dim); }
 .aiside-sub { margin: 0 0 14px; font-size: 12px; line-height: 1.55; color: var(--dim); }
 .aiside-sub b { color: var(--ink); font-weight: 650; }
 
