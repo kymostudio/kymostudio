@@ -28,6 +28,8 @@ const CONFIG_BRIDGE = `{
     }
   }
 }`;
+// Claude Code (the CLI) adds a remote MCP server with one command.
+const CLAUDE_CODE_CMD = `claude mcp add --transport http kymostudio ${MCP_HTTP}`;
 
 function CopyBtn({ text, label }: { text: string; label?: string }) {
   const [done, setDone] = useState(false);
@@ -156,6 +158,13 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
               <CopyBtn text={MCP_HTTP} label="Copy server URL" />
             </div>
             <p className="cn-hint">When your client asks, <b>sign in with Google</b> — that links it to this account, so the agent edits your diagrams (and only yours).</p>
+
+            <label className="cn-urllabel">Claude Code (CLI)</label>
+            <div className="cn-url">
+              <code>{CLAUDE_CODE_CMD}</code>
+              <CopyBtn text={CLAUDE_CODE_CMD} label="Copy command" />
+            </div>
+            <p className="cn-hint">Run it in your terminal, then type <code>/mcp</code> inside Claude Code → pick <b>kymostudio</b> → <b>Authenticate</b> → sign in with Google.</p>
 
             <div className="cn-clients">
               {CLIENTS.map((c) => (
