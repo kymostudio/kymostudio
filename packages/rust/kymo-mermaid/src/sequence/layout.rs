@@ -126,6 +126,7 @@ pub(crate) fn layout(seq: &Sequence) -> Layout {
     let mut lay = Layout::new(seq);
     lay.walk(&seq.items);
     lay.close_all_acts();
+    lay.shift_into_frame();
     lay
 }
 
@@ -285,8 +286,9 @@ impl Layout {
     fn place_note(&self, n: &Note) -> PNote {
         let lines: Vec<String> = n
             .text
-            .split("<br>")
+            .split('\n')
             .flat_map(|s| s.split("<br/>"))
+            .flat_map(|s| s.split("<br>"))
             .map(|s| s.trim().to_string())
             .filter(|s| !s.is_empty())
             .collect();
@@ -331,11 +333,39 @@ impl Layout {
             }
         };
         PNote {
-            left: left.max(FRAME_LEFT),
+            // May be negative for a `left of` the first actor; a post-pass shifts
+            // the whole diagram right so the leftmost note lands at FRAME_LEFT.
+            left,
             top: self.y,
             width,
             height,
             lines,
+        }
+    }
+
+    /// Shift the whole diagram right when a `left of` note (or anything) pokes
+    /// past the left frame edge, so the leftmost element lands at FRAME_LEFT.
+    fn shift_into_frame(&mut self) {
+        let min_left = self
+            .notes
+            .iter()
+            .map(|n| n.left)
+            .chain(self.frags.iter().map(|f| f.left))
+            .chain(self.centers.iter().map(|&c| c - HEAD_W / 2))
+            .min()
+            .unwrap_or(FRAME_LEFT);
+        if min_left >= FRAME_LEFT {
+            return;
+        }
+        let dx = FRAME_LEFT - min_left;
+        for c in &mut self.centers {
+            *c += dx;
+        }
+        for n in &mut self.notes {
+            n.left += dx;
+        }
+        for f in &mut self.frags {
+            f.left += dx;
         }
     }
 
