@@ -62,11 +62,22 @@ impl Scanner {
             .all(|(k, c)| self.peek_at(k) == Some(c))
     }
 
-    /// Read a node identifier: `[A-Za-z0-9_]+` (kept deliberately conservative).
+    /// Read a node identifier: `[A-Za-z0-9_]+`, plus `.`/`-` when they sit
+    /// *between* identifier chars (`default-index.js`) — mermaid allows them in
+    /// ids; an edge `-->` / `-.-` stops the scan because `-`/`.` is then followed
+    /// by `-`/`.`/`>`/space, not an id char.
     pub fn read_id(&mut self) -> Option<String> {
         let start = self.i;
-        while matches!(self.peek(), Some(c) if c.is_ascii_alphanumeric() || c == '_') {
-            self.i += 1;
+        while let Some(c) = self.peek() {
+            if c.is_ascii_alphanumeric() || c == '_' {
+                self.i += 1;
+            } else if (c == '.' || c == '-')
+                && matches!(self.peek_at(1), Some(n) if n.is_ascii_alphanumeric() || n == '_')
+            {
+                self.i += 1;
+            } else {
+                break;
+            }
         }
         if self.i == start {
             None
