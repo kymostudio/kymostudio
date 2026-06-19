@@ -62,6 +62,15 @@ pub struct Relation {
     pub to_crow: Crow,
 }
 
+/// Resolved visual style for a class box (from `classDef` + `:::`/`cssClass`).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ClassStyle {
+    pub fill: Option<String>,
+    pub stroke: Option<String>,
+    pub stroke_width: Option<String>,
+    pub color: Option<String>,
+}
+
 /// One class box with its three compartments.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ClassBox {
@@ -72,6 +81,8 @@ pub struct ClassBox {
     pub stereotype: String,
     pub attributes: Vec<String>,
     pub methods: Vec<String>,
+    /// Visual style from `classDef` applied via `:::name` / `cssClass`.
+    pub style: ClassStyle,
 }
 
 /// A free or attached note.
