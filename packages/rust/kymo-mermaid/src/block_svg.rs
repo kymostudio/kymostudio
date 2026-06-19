@@ -41,13 +41,26 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
         if low.starts_with("style ") || low.starts_with("classdef ") || low.starts_with("class ") || low.starts_with("click ") {
             continue;
         }
-        if low == "block" || low.starts_with("block:") {
-            let label = line
+        if low == "block" || low.starts_with("block:") || low.starts_with("block ") {
+            let colon = low.starts_with("block:");
+            let rest = line
                 .strip_prefix("block:")
-                .or_else(|| line.strip_prefix("BLOCK:"))
-                .and_then(|r| tokenize(r).into_iter().next().map(|(_, l, _, _)| l))
-                .unwrap_or_default();
+                .or_else(|| line.strip_prefix("block "))
+                .or_else(|| line.strip_prefix("BLOCK "))
+                .unwrap_or("");
+            // `block:id` → the id labels the group; `block id …` → id and any
+            // trailing tokens are cells inside the new (anonymous) block.
+            let label = if colon {
+                tokenize(rest).into_iter().next().map(|(_, l, _, _)| l).unwrap_or_default()
+            } else {
+                String::new()
+            };
             stack.push(Grid { columns: 0, items: Vec::new(), label });
+            if !colon {
+                for (id, l, span, shape) in tokenize(rest) {
+                    push_token(stack.last_mut().unwrap(), id, l, span, shape);
+                }
+            }
             continue;
         }
         if is_arrow(line) {
@@ -57,9 +70,7 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
             continue;
         }
         for (id, label, span, shape) in tokenize(line) {
-            // A bare id (no `["label"]`) displays the id itself.
-            let label = if label.is_empty() { id.clone() } else { label };
-            stack.last_mut().unwrap().items.push(Item::Cell(Cell { id, label, span, shape }));
+            push_token(stack.last_mut().unwrap(), id, label, span, shape);
         }
     }
     while stack.len() > 1 {
@@ -150,6 +161,17 @@ fn rect(p: &Placed, fill: &str, stroke: &str, container: bool) -> String {
         );
     }
     s
+}
+
+/// Push one tokenized item into a grid: `space` → a gap, else a cell (a bare id
+/// shows its own id as the label).
+fn push_token(g: &mut Grid, id: String, label: String, span: usize, shape: String) {
+    if id == "space" {
+        g.items.push(Item::Space(span));
+        return;
+    }
+    let label = if label.is_empty() { id.clone() } else { label };
+    g.items.push(Item::Cell(Cell { id, label, span, shape }));
 }
 
 fn strip(l: &str) -> &str {
