@@ -113,8 +113,8 @@ pub fn render(seq: &Sequence) -> String {
     // Head + foot boxes for every participant.
     for (i, p) in seq.participants.iter().enumerate() {
         let cx = lay.centers.get(i).copied().unwrap_or(0);
-        body += &head_box(cx, HEAD_TOP, &p.label);
-        body += &head_box(cx, foot_top, &p.label);
+        body += &head_box(cx, HEAD_TOP, &p.label, &p.kind);
+        body += &head_box(cx, foot_top, &p.label, &p.kind);
     }
 
     format!(
@@ -126,7 +126,20 @@ pub fn render(seq: &Sequence) -> String {
     )
 }
 
-fn head_box(cx: i64, top: i64, label: &str) -> String {
+fn head_box(cx: i64, top: i64, label: &str, kind: &str) -> String {
+    // A typed participant (`@{type:…}`) draws its UML glyph + the name below it,
+    // rather than a plain box (mirrors mermaid 11).
+    if !kind.is_empty() && kind != "participant" {
+        if let Some(glyph) = actor_glyph(kind, cx, top) {
+            let name = format!(
+                "<text x=\"{cx}\" y=\"{}\" text-anchor=\"middle\" dominant-baseline=\"central\" \
+                 fill=\"#333333\" font-weight=\"600\">{}</text>",
+                top + HEAD_H - 5,
+                esc(label)
+            );
+            return format!("{glyph}{name}");
+        }
+    }
     let x = cx - HEAD_W / 2;
     // `<br/>` hard-breaks split the actor name across lines (mermaid does the
     // same); render each as a centred tspan rather than the literal tag.
@@ -146,6 +159,65 @@ fn head_box(cx: i64, top: i64, label: &str) -> String {
         "<rect x=\"{x}\" y=\"{top}\" width=\"{HEAD_W}\" height=\"{HEAD_H}\" rx=\"3\" \
          fill=\"#ECECFF\" stroke=\"#9370DB\" stroke-width=\"1.5\"/>{text}"
     )
+}
+
+/// A small UML actor glyph for a `@{type:…}` participant, centred on `cx` in the
+/// band `top..top+HEAD_H`. `None` for an unknown type (caller draws a box).
+fn actor_glyph(kind: &str, cx: i64, top: i64) -> Option<String> {
+    let f = "#ECECFF";
+    let s = "#9370DB";
+    let pen = format!("fill=\"none\" stroke=\"{s}\" stroke-width=\"1.5\"");
+    let fill = format!("fill=\"{f}\" stroke=\"{s}\" stroke-width=\"1.5\"");
+    let gy = top + 13; // glyph vertical centre
+    let g = match kind {
+        "actor" => format!(
+            "<circle cx=\"{cx}\" cy=\"{}\" r=\"4\" {fill}/>\
+             <line x1=\"{cx}\" y1=\"{}\" x2=\"{cx}\" y2=\"{}\" {pen}/>\
+             <line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>\
+             <line x1=\"{cx}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>\
+             <line x1=\"{cx}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>",
+            top + 5,
+            top + 9, top + 20,
+            cx - 8, top + 13, cx + 8, top + 13,
+            top + 20, cx - 6, top + 28,
+            top + 20, cx + 6, top + 28,
+        ),
+        "database" | "queue" => {
+            // cylinder
+            let (w, t, b) = (12i64, top + 4, top + 24);
+            format!(
+                "<path d=\"M {l} {t} A {w} 3 0 0 0 {r} {t} L {r} {b} A {w} 3 0 0 1 {l} {b} Z\" {fill}/>\
+                 <path d=\"M {l} {t} A {w} 3 0 0 0 {r} {t}\" {pen}/>",
+                l = cx - w, r = cx + w, t = t, b = b, w = w,
+            )
+        }
+        "control" => format!(
+            "<circle cx=\"{cx}\" cy=\"{gy}\" r=\"9\" {fill}/>\
+             <path d=\"M {} {} l 5 -3 l 0 6 Z\" fill=\"{s}\"/>",
+            cx - 4, top + 5,
+        ),
+        "boundary" => format!(
+            "<circle cx=\"{}\" cy=\"{gy}\" r=\"8\" {fill}/>\
+             <line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>\
+             <line x1=\"{}\" y1=\"{gy}\" x2=\"{}\" y2=\"{gy}\" {pen}/>",
+            cx + 4,
+            cx - 11, top + 5, cx - 11, top + 21,
+            cx - 11, cx - 4,
+        ),
+        "entity" => format!(
+            "<circle cx=\"{cx}\" cy=\"{}\" r=\"8\" {fill}/>\
+             <line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>",
+            top + 11,
+            cx - 8, top + 23, cx + 8, top + 23,
+        ),
+        "collections" => format!(
+            "<rect x=\"{}\" y=\"{}\" width=\"18\" height=\"14\" rx=\"2\" {fill}/>\
+             <rect x=\"{}\" y=\"{}\" width=\"18\" height=\"14\" rx=\"2\" {fill}/>",
+            cx - 10, top + 4, cx - 4, top + 9,
+        ),
+        _ => return None,
+    };
+    Some(g)
 }
 
 /// Split a label on `<br>` / `<br/>` / `<br />` hard-breaks (mermaid's line break).

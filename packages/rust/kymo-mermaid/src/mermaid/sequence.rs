@@ -305,20 +305,43 @@ fn ensure_decl(seq: &mut Sequence, rest: &str, is_actor: bool) {
     if rest.is_empty() {
         return;
     }
-    let (id, label) = match split_as(rest) {
+    // Strip a Mermaid 11 `@{ "type": X }` metadata block off the declaration.
+    let (decl, mut kind) = match rest.find("@{") {
+        Some(at) => {
+            let body = &rest[at + 2..];
+            let end = body.find('}').unwrap_or(body.len());
+            (rest[..at].trim(), meta_type(&body[..end]))
+        }
+        None => (rest, String::new()),
+    };
+    if is_actor && kind.is_empty() {
+        kind = "actor".to_string();
+    }
+    let (id, label) = match split_as(decl) {
         Some((l, r)) => (l.trim().to_string(), r.trim().to_string()),
-        None => (rest.to_string(), rest.to_string()),
+        None => (decl.to_string(), decl.to_string()),
     };
     if let Some(p) = seq.participants.iter_mut().find(|p| p.id == id) {
         p.label = label;
         p.is_actor = p.is_actor || is_actor;
+        if !kind.is_empty() {
+            p.kind = kind;
+        }
     } else {
-        seq.participants.push(Participant {
-            id,
-            label,
-            is_actor,
-        });
+        seq.participants.push(Participant { id, label, is_actor, kind });
     }
+}
+
+/// Extract the `type` value from a `@{ "type": "X" }` / `@{ type: X }` body.
+fn meta_type(body: &str) -> String {
+    let Some(i) = body.find("type") else {
+        return String::new();
+    };
+    body[i + 4..]
+        .trim_start_matches(|c: char| c == ':' || c == '"' || c == '\'' || c.is_whitespace())
+        .chars()
+        .take_while(|c| c.is_ascii_alphanumeric() || *c == '_' || *c == '-')
+        .collect()
 }
 
 /// Create a participant on first reference if it was never declared.
@@ -328,6 +351,7 @@ fn ensure_participant(seq: &mut Sequence, id: &str) {
             id: id.to_string(),
             label: id.to_string(),
             is_actor: false,
+            kind: String::new(),
         });
     }
 }

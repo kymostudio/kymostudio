@@ -53,6 +53,10 @@ pub struct Participant {
     pub label: String,
     /// Declared with `actor` rather than `participant`.
     pub is_actor: bool,
+    /// Mermaid 11 `@{ "type": X }` actor type: `actor`/`control`/`boundary`/
+    /// `entity`/`database`/`collections`/`queue` — drawn as its UML icon.
+    /// Empty = a plain box.
+    pub kind: String,
 }
 
 /// One ordered element of an interaction body (or a fragment operand body).
