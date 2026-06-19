@@ -17,6 +17,7 @@
 
 // ── kymo's OWN mermaid engine — always compiled, depends only on kymo-graph ───
 pub mod classdiagram;
+pub mod block_svg;
 pub mod kanban_svg;
 pub mod mindmap_svg;
 pub mod mermaid;

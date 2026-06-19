@@ -273,17 +273,8 @@ pub fn mermaid_er_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
 /// Render a Mermaid `block` / `block-beta` diagram → SVG (reuses the flowchart
 /// layout + renderer; the column grid is laid out as a graph).
 pub fn mermaid_block_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    // Under `katex-layout`, use merman's block layout (mermaid-exact column grid);
-    // fall back to the flowchart-graph layout.
-    #[cfg(feature = "katex-layout")]
-    {
-        if let Some(svg) = crate::katex_layout::block_to_svg_merman(src) {
-            return Ok(svg);
-        }
-    }
-    let mut fc = mermaid::parse_block(src)?;
-    render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+    mermaid::parse_block(src)?; // validate (errors on non-block sources)
+    Ok(crate::block_svg::render(src))
 }
 
 /// Render a Mermaid `mindmap` → SVG (tree via the flowchart renderer).

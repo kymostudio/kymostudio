@@ -21,6 +21,7 @@ crate-type = ["cdylib", "rlib"]
 # + d2/dot/drawio/kymojson). kymo's OWN mermaid engine (default) builds on this
 # alone — no merman, no git dep — so the lean editor path stays small.
 kymo-graph = { path = "../kymo-graph", version = "0.1.0" }
+kymo-layout-graph = { path = "../kymo-layout", version = "0.1.0" }
 
 # merman (the headless Rust port of mermaid.js), pinned by rev. Optional: only the
 # merman-backed paths (`merman`/`full`/`katex-layout`) pull it in.

@@ -1,0 +1,281 @@
+//! Render a Mermaid `block` / `block-beta` diagram as its real column grid,
+//! using kymo's own [`kymo_layout_graph::grid`] layout (pure Rust, no merman):
+//! parse → grid tree → layout → raster-safe SVG.
+
+use kymo_layout_graph::grid::{layout, Cell, Grid, Item, Placed};
+use std::collections::HashMap;
+
+/// Parse block source → a kymo-layout grid tree + edge list.
+fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
+    let lines: Vec<String> = src.lines().map(|l| strip(l).trim().to_string()).collect();
+    let mut edges = Vec::new();
+    let mut stack: Vec<Grid> = vec![Grid { columns: 0, items: Vec::new(), label: String::new() }];
+    let mut started = false;
+    for line in &lines {
+        if line.is_empty() {
+            continue;
+        }
+        if !started {
+            started = true;
+            continue;
+        }
+        let low = line.to_ascii_lowercase();
+        if let Some(rest) = low.strip_prefix("columns") {
+            if let Ok(c) = rest.trim().parse::<usize>() {
+                stack.last_mut().unwrap().columns = c;
+            }
+            continue;
+        }
+        if low == "end" {
+            if stack.len() > 1 {
+                let g = stack.pop().unwrap();
+                stack.last_mut().unwrap().items.push(Item::Grid(g));
+            }
+            continue;
+        }
+        if low == "space" || low.starts_with("space:") {
+            let sp = low.strip_prefix("space:").and_then(|s| s.trim().parse().ok()).unwrap_or(1);
+            stack.last_mut().unwrap().items.push(Item::Space(sp));
+            continue;
+        }
+        if low.starts_with("style ") || low.starts_with("classdef ") || low.starts_with("class ") || low.starts_with("click ") {
+            continue;
+        }
+        if low == "block" || low.starts_with("block:") {
+            let label = line
+                .strip_prefix("block:")
+                .or_else(|| line.strip_prefix("BLOCK:"))
+                .and_then(|r| tokenize(r).into_iter().next().map(|(_, l, _)| l))
+                .unwrap_or_default();
+            stack.push(Grid { columns: 0, items: Vec::new(), label });
+            continue;
+        }
+        if is_arrow(line) {
+            if let Some(e) = parse_edge(line) {
+                edges.push(e);
+            }
+            continue;
+        }
+        for (id, label, span) in tokenize(line) {
+            stack.last_mut().unwrap().items.push(Item::Cell(Cell { id, label, span }));
+        }
+    }
+    while stack.len() > 1 {
+        let g = stack.pop().unwrap();
+        stack.last_mut().unwrap().items.push(Item::Grid(g));
+    }
+    (stack.pop().unwrap(), edges)
+}
+
+pub fn render(src: &str) -> String {
+    let (grid, edges) = parse(src);
+    let (placed, w, h) = layout(&grid);
+    let width = w.max(40.0);
+    let height = h.max(40.0);
+    let mut pos: HashMap<String, (f64, f64)> = HashMap::new();
+    let mut body = String::new();
+    for p in placed.iter().filter(|p| p.container) {
+        body += &rect(p, "#ffffff", "#9370DB", true);
+    }
+    for p in placed.iter().filter(|p| !p.container) {
+        if !p.id.is_empty() {
+            pos.insert(p.id.clone(), (p.x + p.w / 2.0, p.y + p.h / 2.0));
+        }
+        body += &rect(p, "#ECECFF", "#9370DB", false);
+    }
+    for (s, d, lbl) in &edges {
+        if let (Some(&(x1, y1)), Some(&(x2, y2))) = (pos.get(s), pos.get(d)) {
+            body += &format!("<line x1=\"{x1:.1}\" y1=\"{y1:.1}\" x2=\"{x2:.1}\" y2=\"{y2:.1}\" stroke=\"#333333\" stroke-width=\"1.4\"/>");
+            if !lbl.is_empty() {
+                body += &format!("<text x=\"{:.1}\" y=\"{:.1}\" text-anchor=\"middle\" font-size=\"12\" fill=\"#333\">{}</text>", (x1 + x2) / 2.0, (y1 + y2) / 2.0 - 4.0, esc(lbl));
+            }
+        }
+    }
+    format!(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+         <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width:.0} {height:.0}\" width=\"{width:.0}\" height=\"{height:.0}\" \
+         style=\"max-width:100%;height:auto\" font-family=\"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif\" font-size=\"14\">\n\
+         <rect width=\"{width:.0}\" height=\"{height:.0}\" fill=\"#ffffff\"/>\n{body}</svg>\n"
+    )
+}
+
+fn rect(p: &Placed, fill: &str, stroke: &str, container: bool) -> String {
+    let mut s = format!(
+        "<rect x=\"{:.1}\" y=\"{:.1}\" width=\"{:.1}\" height=\"{:.1}\" rx=\"3\" fill=\"{fill}\" stroke=\"{stroke}\" stroke-width=\"1\"/>",
+        p.x, p.y, p.w, p.h
+    );
+    if !p.label.is_empty() {
+        let (ty, base) = if container {
+            (p.y + 14.0, "")
+        } else {
+            (p.y + p.h / 2.0, " dominant-baseline=\"central\"")
+        };
+        s += &format!(
+            "<text x=\"{:.1}\" y=\"{ty:.1}\" text-anchor=\"middle\"{base} fill=\"#131300\">{}</text>",
+            p.x + p.w / 2.0,
+            esc(&p.label)
+        );
+    }
+    s
+}
+
+fn strip(l: &str) -> &str {
+    match l.find("%%") {
+        Some(i) => &l[..i],
+        None => l,
+    }
+}
+fn is_arrow(line: &str) -> bool {
+    let m = mask(line);
+    let c: Vec<char> = m.chars().collect();
+    let mut i = 0;
+    while i < c.len() {
+        if matches!(c[i], '-' | '=' | '.' | '<' | '>') {
+            let mut j = i;
+            while j < c.len() && matches!(c[j], '-' | '=' | '.' | '<' | '>') {
+                j += 1;
+            }
+            let r: String = c[i..j].iter().collect();
+            if r.len() >= 2 && (r.contains('-') || r.contains('=') || r.contains('.')) {
+                return true;
+            }
+            i = j;
+        } else {
+            i += 1;
+        }
+    }
+    false
+}
+fn mask(line: &str) -> String {
+    let mut o = String::new();
+    let mut d = 0i32;
+    let mut q = false;
+    for c in line.chars() {
+        match c {
+            '"' => {
+                q = !q;
+                o.push(' ');
+            }
+            _ if q => o.push(' '),
+            '[' | '(' | '{' => {
+                d += 1;
+                o.push(' ');
+            }
+            ']' | ')' | '}' => {
+                d = (d - 1).max(0);
+                o.push(' ');
+            }
+            _ if d > 0 => o.push(' '),
+            _ => o.push(c),
+        }
+    }
+    o
+}
+fn parse_edge(line: &str) -> Option<(String, String, String)> {
+    let masked = mask(line);
+    let pos = masked.find(['-', '=', '.'])?;
+    let c: Vec<char> = masked.chars().collect();
+    let mut end = pos;
+    while end < c.len() && matches!(c[end], '-' | '=' | '.' | '<' | '>') {
+        end += 1;
+    }
+    let label = {
+        let mut it = line.match_indices('"');
+        match (it.next(), it.next()) {
+            (Some((a, _)), Some((b, _))) => line[a + 1..b].to_string(),
+            _ => String::new(),
+        }
+    };
+    let src = tokenize(&line[..pos]).into_iter().last().map(|(id, _, _)| id)?;
+    let dst = tokenize(&line[end..]).into_iter().next().map(|(id, _, _)| id)?;
+    if src.is_empty() || dst.is_empty() {
+        return None;
+    }
+    Some((src, dst, label))
+}
+fn tokenize(line: &str) -> Vec<(String, String, usize)> {
+    let chars: Vec<char> = line.chars().collect();
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < chars.len() {
+        if chars[i].is_whitespace() {
+            i += 1;
+            continue;
+        }
+        let s = i;
+        while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_' || chars[i] == '-' || chars[i] == '.') {
+            i += 1;
+        }
+        let id: String = chars[s..i].iter().collect();
+        let mut label = String::new();
+        if i < chars.len() && matches!(chars[i], '[' | '(' | '{') {
+            let mut d = 0i32;
+            let st = i;
+            while i < chars.len() {
+                match chars[i] {
+                    '[' | '(' | '{' => d += 1,
+                    ']' | ')' | '}' => {
+                        d -= 1;
+                        if d == 0 {
+                            i += 1;
+                            break;
+                        }
+                    }
+                    _ => {}
+                }
+                i += 1;
+            }
+            label = chars[st..i]
+                .iter()
+                .collect::<String>()
+                .trim_matches(|c| matches!(c, '[' | ']' | '(' | ')' | '{' | '}'))
+                .trim()
+                .trim_matches('"')
+                .to_string();
+        }
+        if i < chars.len() && chars[i] == '<' {
+            while i < chars.len() && chars[i] != '>' {
+                i += 1;
+            }
+            if i < chars.len() {
+                i += 1;
+            }
+        }
+        if i < chars.len() && chars[i] == '(' {
+            while i < chars.len() && chars[i] != ')' {
+                i += 1;
+            }
+            if i < chars.len() {
+                i += 1;
+            }
+        }
+        let mut span = 1usize;
+        if i < chars.len() && chars[i] == ':' {
+            i += 1;
+            let ds = i;
+            while i < chars.len() && chars[i].is_ascii_digit() {
+                i += 1;
+            }
+            span = chars[ds..i].iter().collect::<String>().parse().unwrap_or(1);
+        }
+        if !id.is_empty() {
+            out.push((id, label, span));
+        } else {
+            i += 1;
+        }
+    }
+    out
+}
+fn esc(s: &str) -> String {
+    let mut o = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '&' => o.push_str("&amp;"),
+            '<' => o.push_str("&lt;"),
+            '>' => o.push_str("&gt;"),
+            '"' => o.push_str("&quot;"),
+            _ => o.push(c),
+        }
+    }
+    o
+}

@@ -1,0 +1,10 @@
+[package]
+name = "kymo-layout-graph"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Pure-Rust graph/diagram layout algorithms for kymo's mermaid renderers (grid, force-directed) — no merman dependency."
+
+[lib]
+name = "kymo_layout_graph"
+path = "src/lib.rs"
