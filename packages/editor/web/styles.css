@@ -212,7 +212,7 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .act-pop-wrap { position: relative; width: 100%; display: flex; justify-content: center; }
 .act-popover { right: auto; top: auto; left: calc(100% + 6px); bottom: 0; min-width: 210px; }
 .act-popover.act-popover-top { top: 0; bottom: auto; }
-.act-popover .acct-item { display: flex; align-items: center; gap: 9px; }
+.act-popover .acct-item { display: flex; align-items: center; justify-content: flex-start; gap: 9px; }
 
 /* ---- file sidebar / panels (VSCode-style explorer in the editor) ---- */
 .sidebar { flex: none; width: 240px; display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--border); background: var(--bg-soft); }
@@ -739,6 +739,23 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .pm-del:hover { color: var(--error); }
 .pm-icon:disabled { opacity: 0.4; cursor: default; }
 .pm-empty { padding: 20px; text-align: center; color: var(--dim); font-size: 13px; }
+
+/* Keyboard Shortcuts modal */
+.ks-overlay { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(36, 33, 49, 0.4); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+.ks-modal { width: min(460px, 100%); max-height: min(76vh, 600px); display: flex; flex-direction: column; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 24px 60px rgba(0,0,0,0.28); overflow: hidden; }
+.ks-modal svg { flex: none; }
+.ks-head { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.ks-head h2 { margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.ks-close { border: 0; background: none; cursor: pointer; color: var(--dim); font-size: 15px; padding: 4px 6px; border-radius: 7px; }
+.ks-close:hover { color: var(--ink); background: var(--bg-soft); }
+.ks-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 16px 4px; }
+.ks-group { margin-bottom: 12px; }
+.ks-group-title { margin: 8px 0 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--dim); }
+.ks-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 2px; }
+.ks-desc { font-size: 13.5px; color: var(--ink); }
+.ks-keys { flex: none; display: flex; gap: 4px; }
+.ks-key { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; font: inherit; font-size: 12px; font-weight: 600; color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; }
+.ks-foot { flex: none; margin: 0; padding: 10px 16px 14px; font-size: 11.5px; color: var(--dim); border-top: 1px solid var(--border); }
 .cn-ask-input { flex: 1; min-width: 0; font: inherit; font-size: 12.5px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--ink); outline: none; }
 .cn-ask-input:focus { border-color: var(--accent); background: var(--bg); }
 .cn-ask-send { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; cursor: pointer; }

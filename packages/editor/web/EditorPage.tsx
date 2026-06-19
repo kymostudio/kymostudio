@@ -14,7 +14,7 @@ import { TemplateGallery, takePendingTemplate, type Template } from "./templates
 import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { ConnectAI } from "./connectai";
-import { useMcpActive, setSessionCtx } from "./mcpstatus";
+import { useMcpActive, setSessionCtx, registerConnectToggle } from "./mcpstatus";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
@@ -97,6 +97,8 @@ export default function EditorPage() {
   const [exportOpen, setExportOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
+  // Let the ⌘/Ctrl+⇧+A shortcut (handled globally) toggle the Connect AI panel.
+  useEffect(() => { registerConnectToggle(() => setConnectOpen((o) => !o)); return () => registerConnectToggle(null); }, []);
   const mcpLive = useMcpActive(); // an AI client (MCP) is actively driving this editor
   // Set when the user starts a diagram from the Welcome panel. State, not a ref:
   // picking the Flowchart template seeds the editor with SAMPLE (its source is
