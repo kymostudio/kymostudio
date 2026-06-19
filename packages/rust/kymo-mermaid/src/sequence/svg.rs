@@ -214,13 +214,17 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
                 lbl = glyph_label(cx, t + 68.5, label),
             )
         }
-        // Control: circle r=22 with a small rotating arrowhead at the top.
+        // Control: circle r=22 with a dark rotation arrowhead at its top-left
+        // (mermaid's marker defaults to a black fill, pointing tangentially).
         "control" => {
             let cy = t + 32.0;
+            let top = cy - 22.0; // circle top
             format!(
                 "<circle cx=\"{c}\" cy=\"{cy}\" r=\"22\" {fill}/>\
-                 <path d=\"M {ax:.1} {ay:.1} l 8 4 l -8 4 Z\" fill=\"{s}\"/>{lbl}",
-                ax = c - 4.0, ay = cy - 26.0,
+                 <path d=\"M {x1:.1} {y1:.1} L {x2:.1} {y2:.1} L {x3:.1} {y3:.1} Z\" fill=\"#333333\"/>{lbl}",
+                x1 = c - 10.0, y1 = top + 1.0,
+                x2 = c + 1.0, y2 = top - 3.0,
+                x3 = c + 1.0, y3 = top + 6.0,
                 lbl = glyph_label(cx, t + 66.5, label),
             )
         }
