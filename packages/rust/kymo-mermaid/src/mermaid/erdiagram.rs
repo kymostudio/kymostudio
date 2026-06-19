@@ -46,12 +46,12 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             if stmt == "}" || stmt.ends_with('}') {
                 let inner = stmt.trim_end_matches('}').trim();
                 if !inner.is_empty() {
-                    cd.classes[ci].attributes.push(inner.to_string());
+                    cd.classes[ci].attributes.push(attr_text(inner));
                 }
                 cur = None;
                 continue;
             }
-            cd.classes[ci].attributes.push(stmt.to_string());
+            cd.classes[ci].attributes.push(attr_text(stmt));
             continue;
         }
 
@@ -75,7 +75,7 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
                 let ci = decl_entity(&mut cd.classes, head);
                 let inner = stmt[pos + 1..].trim_end_matches('}').trim();
                 if !inner.is_empty() {
-                    cd.classes[ci].attributes.push(inner.to_string());
+                    cd.classes[ci].attributes.push(attr_text(inner));
                 }
                 if !stmt.trim_end().ends_with('}') {
                     cur = Some(ci);
@@ -213,6 +213,34 @@ fn crow_of(tok: &str) -> Crow {
         (false, true) => Crow::ZeroOne,
         (false, false) => Crow::One,
     }
+}
+
+
+/// Decode entities + convert generics (`type~T~`→`type<T>`) in attribute text.
+fn attr_text(s: &str) -> String {
+    subst_generics(&super::decode_entities(s))
+}
+
+/// `~`-delimited generics → angle brackets: opening `~` (next char is a name
+/// char) becomes `<`, a closing `~` becomes `>` (`List~List~int~~`→`List<List<int>>`).
+fn subst_generics(s: &str) -> String {
+    if !s.contains('~') {
+        return s.to_string();
+    }
+    let chars: Vec<char> = s.chars().collect();
+    let mut out = String::with_capacity(s.len());
+    for (i, &c) in chars.iter().enumerate() {
+        if c == '~' {
+            let open = chars
+                .get(i + 1)
+                .map(|n| n.is_alphanumeric() || *n == '_')
+                .unwrap_or(false);
+            out.push(if open { '<' } else { '>' });
+        } else {
+            out.push(c);
+        }
+    }
+    out
 }
 
 #[cfg(test)]
