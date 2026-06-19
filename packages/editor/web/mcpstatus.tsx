@@ -115,6 +115,24 @@ export function sendPrompt(text: string): boolean { return promptSender ? prompt
 let newProjectSim: ((name: string) => void) | null = null;
 export function registerNewProjectSimulator(fn: ((name: string) => void) | null) { newProjectSim = fn; }
 export function runNewProjectSim(name: string): boolean { if (newProjectSim) { newProjectSim(name); return true; } return false; }
+
+// "Simulate UI" preference (a toggle under the chat input). When on, prompts the user
+// sends carry simulate:true → the agent calls MCP new_project with simulate:true so
+// the editor animates the real New-project UI. Persisted across reloads.
+let simulatePref = (() => { try { return localStorage.getItem("kymo_ai_simulate") === "1"; } catch { return false; } })();
+const simSubs = new Set<() => void>();
+export function simulateValue(): boolean { return simulatePref; }
+export function setSimulate(on: boolean) {
+  if (simulatePref === on) return;
+  simulatePref = on;
+  try { localStorage.setItem("kymo_ai_simulate", on ? "1" : "0"); } catch {}
+  simSubs.forEach((f) => f());
+}
+export function useSimulate(): boolean {
+  const [, bump] = useReducer((c: number) => c + 1, 0);
+  useEffect(() => { simSubs.add(bump); return () => { simSubs.delete(bump); }; }, []);
+  return simulatePref;
+}
 export function useStatusFeed(): StatusItem[] {
   const [, bump] = useReducer((c: number) => c + 1, 0);
   useEffect(() => { feedSubs.add(bump); return () => { feedSubs.delete(bump); }; }, []);
