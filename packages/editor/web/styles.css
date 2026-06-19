@@ -699,9 +699,9 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
    via the MCP wait_for_user_message tool (web → session). */
 /* Chat composer (Claude-style card): full-width textarea on top, a toolbar row
    beneath it inside the same rounded box — Simulate toggle left, Send right. */
-.cn-ask-foot { flex: none; border-top: 1px solid var(--border); background: var(--bg); padding: 10px 12px; }
-.cn-composer { display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-soft); padding: 9px 10px 8px; transition: border-color 0.15s, background 0.15s; }
-.cn-composer:focus-within { border-color: var(--accent); background: var(--bg); }
+.cn-ask-foot { flex: none; border-top: 1px solid var(--border); background: var(--bg); padding: 0; }
+.cn-composer { display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--bg-soft); padding: 10px 12px; transition: background 0.15s; }
+.cn-composer:focus-within { background: var(--bg); }
 .cn-composer-input { width: 100%; min-height: 36px; max-height: 140px; resize: none; border: 0; background: none; outline: none; font: inherit; font-size: 13px; line-height: 1.45; color: var(--ink); }
 .cn-composer-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .cn-composer-send { display: inline-flex; align-items: center; gap: 6px; flex: none; font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 12px; border: 0; border-radius: 9px; background: var(--accent); color: #fff; cursor: pointer; }
