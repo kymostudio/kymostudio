@@ -129,7 +129,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
             <button className={"aiside-gear" + (simulate ? " on" : "")} onClick={() => setSettingsOpen((o) => !o)}
               aria-label="Settings" aria-haspopup="menu" aria-expanded={settingsOpen} title={simulate ? "Settings — Simulate UI is on" : "Settings"}>
               <Settings size={16} strokeWidth={2} />
-              {simulate && <span className="aiside-gear-badge" aria-hidden="true" />}
+              {simulate && <span className="aiside-gear-badge" aria-hidden="true">UI</span>}
             </button>
             {settingsOpen && (
               <div className="aiside-settings" role="menu">
