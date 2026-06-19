@@ -77,7 +77,37 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
         let g = stack.pop().unwrap();
         stack.last_mut().unwrap().items.push(Item::Grid(g));
     }
-    (stack.pop().unwrap(), edges)
+    let mut root = stack.pop().unwrap();
+    // Auto-create a cell for any edge endpoint that was never declared (mermaid
+    // does this for `A --> C` where C only appears in the edge).
+    let mut ids = std::collections::HashSet::new();
+    collect_ids(&root, &mut ids);
+    for (s, d, _) in &edges {
+        for id in [s, d] {
+            if !id.is_empty() && ids.insert(id.clone()) {
+                root.items.push(Item::Cell(Cell {
+                    id: id.clone(),
+                    label: id.clone(),
+                    span: 1,
+                    shape: String::new(),
+                }));
+            }
+        }
+    }
+    (root, edges)
+}
+
+/// Collect every cell id in a grid tree.
+fn collect_ids(g: &Grid, out: &mut std::collections::HashSet<String>) {
+    for it in &g.items {
+        match it {
+            Item::Cell(c) => {
+                out.insert(c.id.clone());
+            }
+            Item::Grid(sub) => collect_ids(sub, out),
+            Item::Space(_) => {}
+        }
+    }
 }
 
 pub fn render(src: &str) -> String {
@@ -256,6 +286,16 @@ fn parse_edge(line: &str) -> Option<(String, String, String)> {
     while end < c.len() && matches!(c[end], '-' | '=' | '.' | '<' | '>') {
         end += 1;
     }
+    // Block edge-end markers `--o` (circle) / `--x` (cross): the o/x is part of
+    // the arrow, not the destination node.
+    if end < c.len() && matches!(c[end], 'o' | 'x') && (end + 1 >= c.len() || c[end + 1] == ' ') {
+        end += 1;
+    }
+    // A matching start marker (`o--` / `x--`) on the source side.
+    let mut start = pos;
+    if start > 0 && matches!(c[start - 1], 'o' | 'x') && (start < 2 || c[start - 2] == ' ') {
+        start -= 1;
+    }
     let label = {
         let mut it = line.match_indices('"');
         match (it.next(), it.next()) {
@@ -263,7 +303,7 @@ fn parse_edge(line: &str) -> Option<(String, String, String)> {
             _ => String::new(),
         }
     };
-    let src = tokenize(&line[..pos]).into_iter().last().map(|(id, _, _, _)| id)?;
+    let src = tokenize(&line[..start]).into_iter().last().map(|(id, _, _, _)| id)?;
     let dst = tokenize(&line[end..]).into_iter().next().map(|(id, _, _, _)| id)?;
     if src.is_empty() || dst.is_empty() {
         return None;
