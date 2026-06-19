@@ -188,6 +188,7 @@ pub fn parse(src: &str) -> Result<Flowchart, DotError> {
             let idx = b.fc.subgraphs.len();
             b.fc.subgraphs.push(Subgraph {
                 parent: None,
+                direction: None,
                 id: id.to_string(),
                 title: id.to_string(),
                 members: Vec::new(),

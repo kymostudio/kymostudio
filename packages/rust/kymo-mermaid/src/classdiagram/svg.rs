@@ -52,6 +52,7 @@ pub fn render(cd: &ClassDiagram) -> String {
             title: name.clone(),
             members: members.clone(),
             parent: None,
+            direction: None,
         });
     }
     // Notes become extra layout nodes (so they don't overlap) and draw as

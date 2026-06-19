@@ -337,6 +337,7 @@ mod tests {
             vec![],
             vec![Subgraph {
                 parent: None,
+                direction: None,
                 id: "G".into(),
                 title: "Grp".into(),
                 members: vec!["A".into()],
@@ -385,6 +386,7 @@ mod tests {
             vec![e("A", "B", "", false, false)],
             vec![Subgraph {
                 parent: None,
+                direction: None,
                 id: "G".into(),
                 title: "T".into(),
                 members: vec!["B".into()],
@@ -426,6 +428,7 @@ mod tests {
             vec![],
             vec![Subgraph {
                 parent: None,
+                direction: None,
                 id: "G".into(),
                 title: "T".into(),
                 members: vec!["A".into()],

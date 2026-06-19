@@ -61,12 +61,324 @@ fn region_bounds(
     res
 }
 
+fn dir_to_rankdir(d: Direction) -> RankDir {
+    match d {
+        Direction::Tb => RankDir::TB,
+        Direction::Bt => RankDir::BT,
+        Direction::Lr => RankDir::LR,
+        Direction::Rl => RankDir::RL,
+    }
+}
+
+/// A laid-out container (root or one subgraph): everything in coords relative to
+/// the container box's top-left, with the box size.
+#[derive(Default)]
+struct CL {
+    w: f64,
+    h: f64,
+    nodes: Vec<(String, f64, f64, f64, f64)>,      // id, cx, cy, w, h
+    regions: Vec<(String, String, f64, f64, f64, f64)>, // id, label, x, y, w, h
+    edges: Vec<(usize, Vec<(f64, f64)>)>,          // edge index, points
+}
+
+/// True when the flowchart needs the recursive (per-subgraph-direction /
+/// nested-cluster) layout. Flat single-level subgraphs stay on the fast path.
+fn needs_nested(fc: &Flowchart) -> bool {
+    fc.subgraphs
+        .iter()
+        .any(|s| s.direction.is_some() || s.parent.is_some())
+}
+
+/// Recursive flowchart layout (mermaid-faithful for nested subgraphs + per-
+/// subgraph `direction`): each subgraph is laid out in its own direction and
+/// becomes a composite node in its parent; cluster edges connect composites.
+fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
+    use std::collections::HashMap;
+    let n_sg = fc.subgraphs.len();
+    let sg_ids: std::collections::HashSet<&str> =
+        fc.subgraphs.iter().map(|s| s.id.as_str()).collect();
+
+    let size_of = |label: &str, shape| -> (f64, f64) {
+        if matches!(style, FlowStyle::Mermaid) {
+            node_size_mermaid_f(label, shape)
+        } else {
+            let (a, b) = node_size_for(label, shape, style);
+            (a as f64, b as f64)
+        }
+    };
+    let mut node_size: HashMap<&str, (f64, f64)> = HashMap::new();
+    let mut node_meta: HashMap<&str, (&str, crate::model::Shape)> = HashMap::new();
+    for n in &fc.nodes {
+        if sg_ids.contains(n.id.as_str()) {
+            continue;
+        }
+        node_size.insert(n.id.as_str(), size_of(&n.label, n.shape));
+        node_meta.insert(n.id.as_str(), (n.label.as_str(), n.shape));
+    }
+
+    // Direct membership.
+    let mut node_container: HashMap<&str, usize> = HashMap::new();
+    let mut child_nodes: Vec<Vec<&str>> = vec![Vec::new(); n_sg];
+    for (i, sg) in fc.subgraphs.iter().enumerate() {
+        for m in &sg.members {
+            if node_size.contains_key(m.as_str()) && !node_container.contains_key(m.as_str()) {
+                node_container.insert(m.as_str(), i);
+                child_nodes[i].push(m.as_str());
+            }
+        }
+    }
+    let mut child_sgs: Vec<Vec<usize>> = vec![Vec::new(); n_sg];
+    let mut root_sgs: Vec<usize> = Vec::new();
+    for (i, sg) in fc.subgraphs.iter().enumerate() {
+        match sg.parent {
+            Some(p) if p < n_sg && p != i => child_sgs[p].push(i),
+            _ => root_sgs.push(i),
+        }
+    }
+    let mut root_nodes: Vec<&str> = Vec::new();
+    for n in &fc.nodes {
+        if !sg_ids.contains(n.id.as_str()) && !node_container.contains_key(n.id.as_str()) {
+            root_nodes.push(n.id.as_str());
+        }
+    }
+
+    // Container of any element id (node → its subgraph; subgraph → its parent).
+    let container_of = |id: &str| -> Option<usize> {
+        if let Some(&c) = node_container.get(id) {
+            return Some(c);
+        }
+        fc.subgraphs.iter().position(|s| s.id == id).and_then(|i| fc.subgraphs[i].parent)
+    };
+    // Chain of (container, element-id) from the element up to the root.
+    let chain = |id: &str| -> Vec<(Option<usize>, String)> {
+        let mut out = Vec::new();
+        let mut cur = id.to_string();
+        let mut guard = 0;
+        loop {
+            let c = container_of(&cur);
+            out.push((c, cur.clone()));
+            guard += 1;
+            match c {
+                Some(ci) if guard < 64 => cur = fc.subgraphs[ci].id.clone(),
+                _ => break,
+            }
+        }
+        out
+    };
+
+    // Assign each edge to its lowest common container, with the representative
+    // direct-child id of that container on each side.
+    let mut edges_at: HashMap<Option<usize>, Vec<(String, String, usize)>> = HashMap::new();
+    for (ei, e) in fc.edges.iter().enumerate() {
+        let ca = chain(&e.src);
+        let cb = chain(&e.dst);
+        let b_conts: Vec<Option<usize>> = cb.iter().map(|(c, _)| *c).collect();
+        let lca = ca
+            .iter()
+            .map(|(c, _)| *c)
+            .find(|c| b_conts.contains(c))
+            .unwrap_or(None);
+        let ra = ca.iter().find(|(c, _)| *c == lca).map(|(_, id)| id.clone());
+        let rb = cb.iter().find(|(c, _)| *c == lca).map(|(_, id)| id.clone());
+        if let (Some(ra), Some(rb)) = (ra, rb) {
+            if ra != rb {
+                edges_at.entry(lca).or_default().push((ra, rb, ei));
+            }
+        }
+    }
+
+    // Lay out one container; child subgraphs must already be in `done`.
+    let layout_one = |container: Option<usize>, done: &HashMap<usize, CL>| -> CL {
+        let dir = match container {
+            Some(i) => fc.subgraphs[i].direction.unwrap_or(fc.direction),
+            None => fc.direction,
+        };
+        let nodes_here: &[&str] = match container {
+            Some(i) => &child_nodes[i],
+            None => &root_nodes,
+        };
+        let sgs_here: &[usize] = match container {
+            Some(i) => &child_sgs[i],
+            None => &root_sgs,
+        };
+        if nodes_here.is_empty() && sgs_here.is_empty() {
+            return CL::default();
+        }
+        let mut g: Graph<NodeLabel, EdgeLabel> = Graph::with_options(GraphOptions::default());
+        for &nid in nodes_here {
+            let (w, h) = node_size[nid];
+            g.set_node(nid.to_string(), Some(NodeLabel { width: w, height: h, ..Default::default() }));
+        }
+        for &si in sgs_here {
+            let cl = &done[&si];
+            g.set_node(
+                fc.subgraphs[si].id.clone(),
+                Some(NodeLabel { width: cl.w.max(1.0), height: cl.h.max(1.0), ..Default::default() }),
+            );
+        }
+        if let Some(es) = edges_at.get(&container) {
+            for (ra, rb, ei) in es {
+                let lw = fc.edges[*ei].label.chars().count() as f64 * 7.0;
+                let lh = if fc.edges[*ei].label.is_empty() { 0.0 } else { 16.0 };
+                g.set_edge(
+                    ra.clone(),
+                    rb.clone(),
+                    Some(EdgeLabel { width: lw, height: lh, ..Default::default() }),
+                    None,
+                );
+            }
+        }
+        layout(&mut g, Some(LayoutOptions { rankdir: dir_to_rankdir(dir), ..Default::default() }));
+
+        // bbox of placed elements
+        let (mut minx, mut miny, mut maxx, mut maxy) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
+        let mut acc = |x: f64, y: f64, w: f64, h: f64| {
+            minx = minx.min(x - w / 2.0);
+            miny = miny.min(y - h / 2.0);
+            maxx = maxx.max(x + w / 2.0);
+            maxy = maxy.max(y + h / 2.0);
+        };
+        for &nid in nodes_here {
+            if let Some(nd) = g.node(nid) {
+                acc(nd.x.unwrap_or(0.0), nd.y.unwrap_or(0.0), nd.width, nd.height);
+            }
+        }
+        for &si in sgs_here {
+            if let Some(nd) = g.node(&fc.subgraphs[si].id) {
+                acc(nd.x.unwrap_or(0.0), nd.y.unwrap_or(0.0), nd.width, nd.height);
+            }
+        }
+        if minx > maxx {
+            return CL::default();
+        }
+        let titled = container.map(|i| !fc.subgraphs[i].title.is_empty()).unwrap_or(false);
+        let (padl, padr, padt, padb) = match container {
+            Some(_) => (8.0, 8.0, if titled { 25.0 } else { 8.0 }, 8.0),
+            None => (MX, MX, MY, MY),
+        };
+        let (sx, sy) = (-minx + padl, -miny + padt);
+        let mut cl = CL {
+            w: (maxx - minx) + padl + padr,
+            h: (maxy - miny) + padt + padb,
+            ..Default::default()
+        };
+        for &nid in nodes_here {
+            if let Some(nd) = g.node(nid) {
+                cl.nodes.push((nid.to_string(), nd.x.unwrap_or(0.0) + sx, nd.y.unwrap_or(0.0) + sy, nd.width, nd.height));
+            }
+        }
+        for &si in sgs_here {
+            let nd = match g.node(&fc.subgraphs[si].id) {
+                Some(n) => n,
+                None => continue,
+            };
+            let sub = &done[&si];
+            let ox = nd.x.unwrap_or(0.0) - sub.w / 2.0 + sx;
+            let oy = nd.y.unwrap_or(0.0) - sub.h / 2.0 + sy;
+            cl.regions.push((fc.subgraphs[si].id.clone(), fc.subgraphs[si].title.clone(), ox, oy, sub.w, sub.h));
+            for (id, cx, cy, w, h) in &sub.nodes {
+                cl.nodes.push((id.clone(), ox + cx, oy + cy, *w, *h));
+            }
+            for (id, lbl, rx, ry, rw, rh) in &sub.regions {
+                cl.regions.push((id.clone(), lbl.clone(), ox + rx, oy + ry, *rw, *rh));
+            }
+            for (ei, pts) in &sub.edges {
+                cl.edges.push((*ei, pts.iter().map(|(px, py)| (ox + px, oy + py)).collect()));
+            }
+        }
+        if let Some(es) = edges_at.get(&container) {
+            for (ra, rb, ei) in es {
+                if let Some(ed) = g.edge(ra, rb, None) {
+                    cl.edges.push((*ei, ed.points.iter().map(|p| (p.x + sx, p.y + sy)).collect()));
+                }
+            }
+        }
+        cl
+    };
+
+    // Bottom-up: deepest subgraphs first (by chain depth).
+    let depth = |mut i: usize| -> usize {
+        let mut d = 0;
+        let mut guard = 0;
+        while let Some(p) = fc.subgraphs[i].parent {
+            if p >= n_sg || p == i || guard > 64 {
+                break;
+            }
+            i = p;
+            d += 1;
+            guard += 1;
+        }
+        d
+    };
+    let mut order: Vec<usize> = (0..n_sg).collect();
+    order.sort_by(|&a, &b| depth(b).cmp(&depth(a)));
+    let mut done: HashMap<usize, CL> = HashMap::new();
+    for i in order {
+        let cl = layout_one(Some(i), &done);
+        done.insert(i, cl);
+    }
+    let root = layout_one(None, &done);
+
+    // Assemble FGeom.
+    let mut geom = FGeom::default();
+    geom.w = root.w;
+    geom.h = root.h;
+    for (id, cx, cy, w, h) in &root.nodes {
+        let (name, shape) = node_meta.get(id.as_str()).copied().unwrap_or((id.as_str(), crate::model::Shape::Box));
+        geom.nodes.push(FNode {
+            id: id.clone(),
+            name: name.to_string(),
+            shape,
+            cx: *cx,
+            cy: *cy,
+            w: *w,
+            h: *h,
+            icon: None,
+            math: None,
+        });
+    }
+    for (id, label, x, y, w, h) in &root.regions {
+        geom.regions.push(FRegion {
+            id: id.clone(),
+            label: label.clone(),
+            x: *x,
+            y: *y,
+            w: *w,
+            h: *h,
+            visible: true,
+        });
+    }
+    for (ei, pts) in &root.edges {
+        let e = &fc.edges[*ei];
+        let label_pt = if e.label.is_empty() || pts.is_empty() {
+            None
+        } else {
+            Some(pts[pts.len() / 2])
+        };
+        geom.edges.push(FEdge {
+            label: e.label.clone(),
+            dashed: e.dashed,
+            no_arrow: e.no_arrow,
+            points: pts.clone(),
+            label_pt,
+            math: None,
+        });
+    }
+    geom
+}
+
 pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
     let mut geom = FGeom::default();
     if fc.nodes.is_empty() {
         geom.w = 40.0;
         geom.h = 40.0;
         return geom;
+    }
+    if needs_nested(fc) {
+        let g = dagre_geom_nested(fc, style);
+        if !g.nodes.is_empty() {
+            return g;
+        }
     }
 
     let mut g: Graph<NodeLabel, EdgeLabel> = Graph::with_options(GraphOptions {

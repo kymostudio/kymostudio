@@ -286,8 +286,11 @@ fn handle_statement(
 ) -> Result<(), MermaidError> {
     let lower = stmt.to_ascii_lowercase();
 
-    // `direction XX` inside a subgraph — accepted and ignored (Phase 1).
+    // `direction XX` inside a subgraph sets that subgraph's layout direction.
     if lower.starts_with("direction ") {
+        if let Some(&sub_idx) = sub_stack.last() {
+            fc.subgraphs[sub_idx].direction = Some(parse_direction(stmt[10..].trim()));
+        }
         return Ok(());
     }
 
@@ -302,6 +305,7 @@ fn handle_statement(
             title,
             members: Vec::new(),
             parent,
+            direction: None,
         });
         sub_stack.push(sub_idx);
         return Ok(());
