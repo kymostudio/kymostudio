@@ -55,10 +55,33 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
         );
     }
     // Compound clusters: a sizeless parent node; members re-parented to it.
+    // Guard against cycles/self-parent/double-parent — the `dagre` crate panics
+    // on "subcontainer as parent of subcontainer" (nested subgraphs whose member
+    // lists would otherwise form a parent loop). First-parent wins.
     for sg in &fc.subgraphs {
         g.set_node(sg.id.clone(), Some(NodeLabel::default()));
+    }
+    let mut parent_of: std::collections::HashMap<&str, &str> = std::collections::HashMap::new();
+    for sg in &fc.subgraphs {
         for m in &sg.members {
+            if m == &sg.id || parent_of.contains_key(m.as_str()) {
+                continue; // self-parent, or already parented
+            }
+            // would setting m's parent = sg create a cycle? (sg already under m)
+            let mut cur = Some(sg.id.as_str());
+            let mut cycle = false;
+            while let Some(c) = cur {
+                if c == m.as_str() {
+                    cycle = true;
+                    break;
+                }
+                cur = parent_of.get(c).copied();
+            }
+            if cycle {
+                continue;
+            }
             g.set_parent(m, Some(&sg.id));
+            parent_of.insert(m.as_str(), sg.id.as_str());
         }
     }
     // Reverse insertion order so the dagre crate's order phase breaks ties
