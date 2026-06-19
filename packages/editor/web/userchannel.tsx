@@ -5,7 +5,7 @@ import { useWorkspace } from "./workspace";
 import { USER_WS } from "./const";
 import { LOCAL } from "./localdb";
 import { requestOpen, requestClose } from "./tabs";
-import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx, pushStatus, registerPromptSender, runNewProjectSim } from "./mcpstatus";
+import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx, pushStatus, registerPromptSender, runNewProjectSim, simulateValue } from "./mcpstatus";
 
 // Connects every signed-in tab to the user's control channel (one DO per email)
 // so the MCP `ui_open_diagram` / `ui_open_project` tools can steer THIS tab. Carries no
@@ -42,7 +42,7 @@ export function UserChannel() {
     // Push project/diagram changes so ui_list_sessions stays current.
     registerCtxSender((c) => { try { if (ws.readyState === 1) ws.send(JSON.stringify({ type: "ctx", session: sessionIdValue(), ...c })); } catch {} });
     // Send prompts the user types in the panel → agent's wait_for_user_message.
-    registerPromptSender((text) => { try { if (ws.readyState === 1) { ws.send(JSON.stringify({ type: "prompt", text })); return true; } } catch {} return false; });
+    registerPromptSender((text) => { try { if (ws.readyState === 1) { ws.send(JSON.stringify({ type: "prompt", text, simulate: simulateValue() })); return true; } } catch {} return false; });
     ws.addEventListener("message", (e) => {
       let data: any; try { data = JSON.parse(e.data); } catch { return; }
       if (data && data.type === "ai-target") { setPinned(!!data.pinned); return; } // server: am I the target?

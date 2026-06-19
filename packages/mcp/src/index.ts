@@ -691,7 +691,7 @@ export class UserChannel extends DurableObject<Env> {
     // Drains the durable inbox; waits up to ~25s for a new one, else returns empty.
     if (url.pathname.endsWith("/inbox-wait") && request.method === "POST") {
       for (let i = 0; i < 32; i++) {
-        const inbox = ((await this.ctx.storage.get<string[]>("inbox")) || []);
+        const inbox = ((await this.ctx.storage.get<any[]>("inbox")) || []);
         if (inbox.length) { await this.ctx.storage.delete("inbox"); return Response.json({ messages: inbox }); }
         await new Promise((r) => setTimeout(r, 800));
       }
@@ -746,8 +746,9 @@ export class UserChannel extends DurableObject<Env> {
       this.notifyTarget();
     } else if (data.type === "prompt" && typeof data.text === "string" && data.text.trim()) {
       // User typed in the editor panel → queue it for the agent's wait_for_user_message.
-      const inbox = ((await this.ctx.storage.get<string[]>("inbox")) || []);
-      inbox.push(data.text.trim().slice(0, 4000));
+      // Carry the panel's "Simulate UI" toggle so the agent knows to pass simulate:true.
+      const inbox = ((await this.ctx.storage.get<any[]>("inbox")) || []);
+      inbox.push({ text: data.text.trim().slice(0, 4000), simulate: !!data.simulate });
       await this.ctx.storage.put("inbox", inbox.slice(-50));
     }
   }
@@ -926,26 +927,38 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "new_project",
-      "Create a NEW project for the signed-in user. Returns its id + name. File diagrams under it via new_diagram's `project` arg or move_diagram." + NARRATE,
-      { name: z.string().describe("A short name for the project (max 40 chars).") },
-      async ({ name }) => {
+      "Create a NEW project for the signed-in user. Returns its id + name. File diagrams under it via new_diagram's `project` arg or move_diagram. Set `simulate:true` to create by animating the editor's real New-project UI instead (only when the user asks for it / the panel's Simulate toggle is on)." + NARRATE,
+      {
+        name: z.string().describe("A short name for the project (max 40 chars)."),
+        simulate: z.boolean().optional().describe("Default false. false = create server-side, return the id, and live-switch the editor (no reload). true = drive the editor's real New-project UI (open switcher → type name → submit; no reload) — use only when the user opted into UI simulation (e.g. the panel's Simulate toggle); returns no id."),
+      },
+      async ({ name, simulate }) => {
         const n = name.trim();
         if (!n) return { content: [{ type: "text", text: "Provide a non-empty project name." }] };
-        // Prefer simulating the REAL New-project UI in the editor (open switcher →
+        // simulate=true: drive the REAL New-project UI in the editor (open switcher →
         // fill name input → submit; no reload). If a live window receives it, the
-        // editor's own createProject does the actual create + switch. Fall back to a
-        // server-side create only when no editor window is connected.
-        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
-          method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ type: "ui-new-project", name: n }),
-        }).catch(() => null);
-        const clients = r ? (((await r.json().catch(() => ({}))) as { clients?: number }).clients ?? 0) : 0;
-        if (clients > 0) {
-          await feed("action", `Tạo project "${n}" (mô phỏng UI trong editor)…`);
-          return { content: [{ type: "text", text: `Triggered the editor to create project "${n}" by simulating the New-project UI (no reload); it will switch to the new project.` }] };
+        // editor's own createProject does the create + switch. Falls back to a
+        // server-side create when no editor window is connected.
+        if (simulate) {
+          const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+            method: "POST", headers: { "content-type": "application/json" },
+            body: JSON.stringify({ type: "ui-new-project", name: n }),
+          }).catch(() => null);
+          const clients = r ? (((await r.json().catch(() => ({}))) as { clients?: number }).clients ?? 0) : 0;
+          if (clients > 0) {
+            await feed("action", `Tạo project "${n}" (mô phỏng UI trong editor)…`);
+            return { content: [{ type: "text", text: `Triggered the editor to create project "${n}" by simulating the New-project UI (no reload); it will switch to the new project.` }] };
+          }
+          // no live window → fall through to the plain create below
         }
+        // Default: create server-side (returns the id) and live-switch the editor —
+        // it refetches the project list first, so no page reload.
         const p = await createProject(this.env, me(), n);
         await feed("action", `Created project "${p.name}"`);
+        await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ type: "open-project", id: p.id }),
+        }).then(() => {}).catch(() => {});
         return { content: [{ type: "text", text: `Created project "${p.name}" (id ${p.id}). Open: ${projLink(p.id)}` }] };
       }
     );
@@ -1151,9 +1164,13 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       {},
       async () => {
         const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/inbox-wait", { method: "POST" });
-        const { messages } = (await r.json()) as { messages: string[] };
+        const { messages } = (await r.json()) as { messages: any[] };
         if (!messages || !messages.length) return { content: [{ type: "text", text: "(no message yet — timed out. Call wait_for_user_message again to keep listening.)" }] };
-        return { content: [{ type: "text", text: `The user typed in the editor panel:\n${messages.map((m) => "• " + m).join("\n")}` }] };
+        // Back-compat: older entries were bare strings; normalize to {text, simulate}.
+        const items = messages.map((m) => (typeof m === "string" ? { text: m, simulate: false } : { text: String(m?.text ?? ""), simulate: !!m?.simulate }));
+        const anySim = items.some((it) => it.simulate);
+        const hint = anySim ? "\n\n[Simulate UI = ON] If this leads to creating a project, call new_project with simulate:true so the editor animates the real New-project UI (open switcher → type name → submit; no reload)." : "";
+        return { content: [{ type: "text", text: `The user typed in the editor panel:\n${items.map((it) => "• " + it.text).join("\n")}${hint}` }] };
       }
     );
   }

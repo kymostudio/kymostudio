@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send } from "lucide-react";
+import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send, Wand2 } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
-import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, type StatusKind } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, type StatusKind } from "./mcpstatus";
 
 const FEED_ICON: Record<StatusKind, React.ReactNode> = {
   user: <User size={13} strokeWidth={2} />,
@@ -65,6 +65,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   const live = useMcpActive();
   const target = useAiTarget();
   const feed = useStatusFeed();
+  const simulate = useSimulate();
   const [tab, setTab] = useState<Tab>("chat");
   const feedRef = useRef<HTMLDivElement>(null);
   // Scroll the body (the feed has no frame/own scroll now) to the latest message.
@@ -181,11 +182,22 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
       </div>
 
       {tab === "chat" && (
-        <form className="cn-ask" onSubmit={submitAsk}>
-          <input className="cn-ask-input" value={ask} onChange={(e) => setAsk(e.target.value)}
-            placeholder="Message the AI…  (received via wait_for_user_message)" aria-label="Message the AI" />
-          <button className="cn-ask-send" type="submit" disabled={!ask.trim()} aria-label="Send"><Send size={15} strokeWidth={2.2} /></button>
-        </form>
+        <div className="cn-ask-foot">
+          <form className="cn-ask" onSubmit={submitAsk}>
+            <input className="cn-ask-input" value={ask} onChange={(e) => setAsk(e.target.value)}
+              placeholder="Message the AI…  (received via wait_for_user_message)" aria-label="Message the AI" />
+            <button className="cn-ask-send" type="submit" disabled={!ask.trim()} aria-label="Send"><Send size={15} strokeWidth={2.2} /></button>
+          </form>
+          <div className="cn-ask-tools">
+            <button className={"cn-ask-tool" + (simulate ? " on" : "")} onClick={() => setSimulate(!simulate)}
+              role="switch" aria-checked={simulate}
+              title="When on, the AI creates projects by animating the real New-project UI (open switcher → type name → submit; no reload), i.e. it calls new_project with simulate:true.">
+              <Wand2 size={13} strokeWidth={2} />
+              Simulate UI
+              <span className="cn-ask-switch" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
       )}
     </aside>
   );
