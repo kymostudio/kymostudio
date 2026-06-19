@@ -32,6 +32,10 @@ body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); -w
 .layout { height: 100%; display: flex; flex-direction: column; }
 /* editor body: file sidebar + the source/preview panes. main keeps its own flex
    geometry so the source/preview split math is unaffected by the sidebar. */
+/* Row below the header: editor column (panes + status bar) on the left, the AI dock
+   on the right spanning full height — so the status bar never runs under the panel. */
+.workrow { flex: 1; display: flex; min-height: 0; position: relative; }
+.workcol { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 .workarea { flex: 1; display: flex; min-height: 0; position: relative; }
 
 /* ---- header ---- */
@@ -668,11 +672,15 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-feed-clear { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; cursor: pointer; color: var(--dim); font-size: 10.5px; padding: 2px 6px; border-radius: 6px; text-transform: none; letter-spacing: 0; }
 .cn-feed-clear:hover { color: var(--ink); background: var(--bg); }
 .cn-feed { max-height: 320px; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; scroll-behavior: smooth; }
-.cn-msg { display: flex; gap: 7px; align-items: flex-start; padding: 7px 9px; border-radius: 9px; font-size: 12px; line-height: 1.45; background: var(--bg); border: 1px solid var(--border); }
+/* Chat bubbles: the user's messages hug the RIGHT (solid accent, no icon), the bot's
+   activity (thinking/action/result) hugs the LEFT with its icon. */
+.cn-msg { display: flex; gap: 7px; align-items: flex-start; padding: 7px 9px; border-radius: 12px; font-size: 12px; line-height: 1.45; background: var(--bg); border: 1px solid var(--border); max-width: 90%; width: fit-content; }
 .cn-msg-ic { flex: none; margin-top: 1px; color: var(--dim); }
-.cn-msg-text { flex: 1; white-space: pre-wrap; word-break: break-word; color: var(--ink); }
-.cn-msg-user { background: color-mix(in srgb, var(--accent) 8%, transparent); border-color: color-mix(in srgb, var(--accent) 28%, var(--border)); }
-.cn-msg-user .cn-msg-ic { color: var(--accent); }
+.cn-msg-text { white-space: pre-wrap; word-break: break-word; color: var(--ink); }
+.cn-msg-user { align-self: flex-end; max-width: 85%; background: var(--accent); border-color: var(--accent); border-bottom-right-radius: 4px; }
+.cn-msg-user .cn-msg-ic { display: none; }
+.cn-msg-user .cn-msg-text { color: #fff; }
+.cn-msg-thinking, .cn-msg-action, .cn-msg-result { align-self: flex-start; border-bottom-left-radius: 4px; }
 .cn-msg-thinking { font-style: italic; }
 .cn-msg-thinking .cn-msg-text { color: var(--dim); }
 .cn-msg-thinking .cn-msg-ic { color: #7c6cf0; }
