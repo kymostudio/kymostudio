@@ -14,7 +14,7 @@ import { TemplateGallery, takePendingTemplate, type Template } from "./templates
 import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { ConnectAI } from "./connectai";
-import { useMcpActive, setSessionCtx, registerConnectToggle } from "./mcpstatus";
+import { useMcpActive, setSessionCtx, registerConnectToggle, registerSidebarToggle } from "./mcpstatus";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
@@ -160,6 +160,8 @@ export default function EditorPage() {
   const toggleExplorer = useCallback(() => {
     setActivePanel((cur) => { const next = cur ? null : "explorer"; try { localStorage.setItem("kymo_panel", next ?? "none"); } catch {} return next; });
   }, []);
+  // Let the ⌘/Ctrl+B shortcut (handled globally) toggle the primary sidebar.
+  useEffect(() => { registerSidebarToggle(() => toggleExplorer()); return () => registerSidebarToggle(null); }, [toggleExplorer]);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
