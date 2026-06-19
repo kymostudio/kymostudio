@@ -7,10 +7,10 @@ import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
 import { DIAGRAMS_API, TRASH_API, apiFetch } from "./const";
 import { kindLabel, docHref, extFor } from "./kroki";
-import { useMcpActive, useAiTarget } from "./mcpstatus";
+import { useMcpActive, useAiTarget, openShortcuts } from "./mcpstatus";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
-  Files, Search, BookOpen, LogOut, Menu, ExternalLink, Sparkles,
+  Files, Search, BookOpen, LogOut, Menu, ExternalLink, Sparkles, Settings, Keyboard,
   Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
 } from "lucide-react";
 
@@ -428,7 +428,7 @@ export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI, aiOpe
   const mcpLive = useMcpActive();
   const aiTarget = useAiTarget();
   const { createFolder } = useWorkspace();
-  const [menu, setMenu] = useState<"main" | "account" | null>(null);
+  const [menu, setMenu] = useState<"main" | "account" | "settings" | null>(null);
   useEffect(() => {
     if (!menu) return;
     const h = () => setMenu(null);
@@ -457,7 +457,6 @@ export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI, aiOpe
               <button className="acct-item exp-item" onClick={newFolder}><FolderPlus size={16} strokeWidth={1.9} />New folder</button>
               <div className="menu-sep" />
               <Link className="acct-item exp-item" to="/trash" onClick={() => setMenu(null)}><Trash2 size={16} strokeWidth={1.9} />Trash</Link>
-              <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
             </div>
           )}
         </div>
@@ -477,6 +476,16 @@ export function ActivityBar({ active, onSelect, onNewDiagram, onConnectAI, aiOpe
             <div className="acct-menu act-popover">
               <div className="acct-head">Signed in as<b>{claims?.email}</b></div>
               <button className="acct-item" onClick={() => { setMenu(null); signOut(); }}><LogOut size={15} strokeWidth={2} />Sign out</button>
+            </div>
+          )}
+        </div>
+        <div className="act-pop-wrap">
+          <button className="act-btn act-settings" title="Settings" aria-label="Settings" aria-haspopup="menu"
+            onClick={() => setMenu((m) => (m === "settings" ? null : "settings"))}><Settings size={21} strokeWidth={1.9} /></button>
+          {menu === "settings" && (
+            <div className="acct-menu act-popover">
+              <button className="acct-item exp-item" onClick={() => { setMenu(null); openShortcuts(); }}><Keyboard size={16} strokeWidth={1.9} />Keyboard shortcuts</button>
+              <a className="acct-item exp-item" href={docHref("kymo")} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}><BookOpen size={16} strokeWidth={1.9} />Docs</a>
             </div>
           )}
         </div>

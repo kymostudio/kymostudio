@@ -122,6 +122,16 @@ let projectsModalOpener: (() => void) | null = null;
 export function registerProjectsModalOpener(fn: (() => void) | null) { projectsModalOpener = fn; }
 export function openProjectsModal(): boolean { if (projectsModalOpener) { projectsModalOpener(); return true; } return false; }
 
+// Keyboard Shortcuts modal: opened from Settings → Keyboard Shortcuts and the "?" key.
+let shortcutsOpener: (() => void) | null = null;
+export function registerShortcutsOpener(fn: (() => void) | null) { shortcutsOpener = fn; }
+export function openShortcuts(): boolean { if (shortcutsOpener) { shortcutsOpener(); return true; } return false; }
+
+// Connect AI panel toggle (EditorPage registers it) — used by the ⌘/Ctrl+⇧+A shortcut.
+let connectToggle: (() => void) | null = null;
+export function registerConnectToggle(fn: (() => void) | null) { connectToggle = fn; }
+export function toggleConnect(): boolean { if (connectToggle) { connectToggle(); return true; } return false; }
+
 // MCP-driven "delete project by simulating the real UI" (open Manage-projects modal →
 // filter to the project → click delete → confirm). ProjectsModal registers it;
 // userchannel calls it when the worker pushes {type:"ui-delete-project", id}.
