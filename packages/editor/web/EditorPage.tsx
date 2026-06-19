@@ -14,7 +14,7 @@ import { TemplateGallery, takePendingTemplate, type Template } from "./templates
 import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { ConnectAI } from "./connectai";
-import { useMcpActive, setSessionCtx, registerConnectToggle, registerSidebarToggle } from "./mcpstatus";
+import { useMcpActive, setSessionCtx, registerConnectToggle, registerSidebarToggle, registerPaneToggle, registerNewDiagram, registerFindOpen } from "./mcpstatus";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
@@ -162,6 +162,11 @@ export default function EditorPage() {
   }, []);
   // Let the ⌘/Ctrl+B shortcut (handled globally) toggle the primary sidebar.
   useEffect(() => { registerSidebarToggle(() => toggleExplorer()); return () => registerSidebarToggle(null); }, [toggleExplorer]);
+  // ⌘/Ctrl+⇧+E / ⌘/Ctrl+⇧+P toggle the Source / Preview panes; "N" opens New diagram.
+  useEffect(() => { registerPaneToggle((k) => togglePane(k)); return () => registerPaneToggle(null); }, [togglePane]);
+  useEffect(() => { registerNewDiagram(() => setGalleryOpen(true)); return () => registerNewDiagram(null); }, []);
+  // ⌘/Ctrl+F opens the Search panel (the "Find" menu) — its box auto-focuses.
+  useEffect(() => { registerFindOpen(() => { setActivePanel("search"); try { localStorage.setItem("kymo_panel", "search"); } catch {} }); return () => registerFindOpen(null); }, []);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
