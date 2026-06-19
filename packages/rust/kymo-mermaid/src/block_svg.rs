@@ -57,6 +57,8 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
             continue;
         }
         for (id, label, span) in tokenize(line) {
+            // A bare id (no `["label"]`) displays the id itself.
+            let label = if label.is_empty() { id.clone() } else { label };
             stack.last_mut().unwrap().items.push(Item::Cell(Cell { id, label, span }));
         }
     }
