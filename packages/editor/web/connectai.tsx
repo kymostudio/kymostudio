@@ -129,7 +129,15 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
               ))}
             </div>
           ) : (
-            <p className="cn-empty">No activity yet. Type below to message the AI, or drive kymo from a connected client (Claude / Cursor) — its requests &amp; reasoning show up here.</p>
+            <div className="cn-empty">
+              <p className="cn-empty-lead">Drive kymo by chat — its requests, reasoning &amp; actions show up here.</p>
+              <ol className="cn-empty-steps">
+                <li>Connect an AI client in <button type="button" className="cn-empty-link" onClick={() => setTab("setup")}>Setup</button> — Claude Code, Cursor, or ChatGPT.</li>
+                <li>Ask it to <b>listen for your messages</b> (it calls <code>wait_for_user_message</code>).</li>
+                <li>Type below — your message reaches the agent and it edits this diagram live.</li>
+              </ol>
+              <p className="cn-empty-note">No client connected? You can still drive kymo by chatting <i>inside</i> Claude / Cursor directly.</p>
+            </div>
           )
         )}
 
