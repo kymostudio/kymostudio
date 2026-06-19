@@ -929,14 +929,23 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       "Create a NEW project for the signed-in user. Returns its id + name. File diagrams under it via new_diagram's `project` arg or move_diagram." + NARRATE,
       { name: z.string().describe("A short name for the project (max 40 chars).") },
       async ({ name }) => {
-        if (!name.trim()) return { content: [{ type: "text", text: "Provide a non-empty project name." }] };
-        const p = await createProject(this.env, me(), name);
-        await feed("action", `Created project "${p.name}"`);
-        // Live-switch the editor to the new project (it refetches its project list first).
-        await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+        const n = name.trim();
+        if (!n) return { content: [{ type: "text", text: "Provide a non-empty project name." }] };
+        // Prefer simulating the REAL New-project UI in the editor (open switcher →
+        // fill name input → submit; no reload). If a live window receives it, the
+        // editor's own createProject does the actual create + switch. Fall back to a
+        // server-side create only when no editor window is connected.
+        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
           method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ type: "open-project", id: p.id }),
-        }).then(() => {}).catch(() => {});
+          body: JSON.stringify({ type: "ui-new-project", name: n }),
+        }).catch(() => null);
+        const clients = r ? (((await r.json().catch(() => ({}))) as { clients?: number }).clients ?? 0) : 0;
+        if (clients > 0) {
+          await feed("action", `Tạo project "${n}" (mô phỏng UI trong editor)…`);
+          return { content: [{ type: "text", text: `Triggered the editor to create project "${n}" by simulating the New-project UI (no reload); it will switch to the new project.` }] };
+        }
+        const p = await createProject(this.env, me(), n);
+        await feed("action", `Created project "${p.name}"`);
         return { content: [{ type: "text", text: `Created project "${p.name}" (id ${p.id}). Open: ${projLink(p.id)}` }] };
       }
     );

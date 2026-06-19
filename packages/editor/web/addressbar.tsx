@@ -6,6 +6,9 @@ import { DIAGRAMS_API, apiFetch } from "./const";
 import { KindIcon } from "./sidebar";
 import { extFor } from "./kroki";
 import { ChevronDown, Search, FolderPlus, Check, FolderOpen, Boxes } from "lucide-react";
+import { registerNewProjectSimulator } from "./mcpstatus";
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 type Hit = { id: string; title: string; kind: string };
 
@@ -24,7 +27,11 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
   const [searching, setSearching] = useState(false);
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
+  const [newMode, setNewMode] = useState(false);   // inline "new project" name input is showing
+  const [newName, setNewName] = useState("");
+  const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const newInputRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   // ⌘/Ctrl-K opens the jump palette from anywhere.
@@ -66,13 +73,40 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
     ? projects.filter((p) => p.name.toLowerCase().includes(q.trim().toLowerCase()))
     : [];
 
-  async function onNewProject() {
-    const name = (window.prompt("Project name") || "").trim();
-    if (!name) return;
-    const p = await createProject(name);
-    if (p) setCurrentProject(p.id);
-    setProjOpen(false);
+  // Show the inline name input (replaces window.prompt so it's fillable + visible).
+  function onNewProject() { setNewMode(true); setNewName(""); setTimeout(() => newInputRef.current?.focus(), 0); }
+
+  // Actually create — runs the REAL flow: createProject (refetches the list) then
+  // switch via SPA navigation (NO page reload). Used by both the manual click and
+  // the MCP-driven simulation.
+  async function submitNewProject(name?: string) {
+    const n = (name ?? newName).trim();
+    if (!n || busy) return;
+    setBusy(true);
+    try {
+      const p = await createProject(n);
+      if (p) { setCurrentProject(p.id); navigate("/?p=" + encodeURIComponent(p.id)); }
+    } finally {
+      setBusy(false); setNewMode(false); setNewName(""); setProjOpen(false);
+    }
   }
+
+  // MCP-driven "simulation": play the real UI flow — open the switcher, reveal the
+  // name input, type the name, submit — so it looks like a user did it (no reload).
+  const simulateNewProject = async (name: string) => {
+    const n = (name || "").trim();
+    if (!n) return;
+    setProjOpen(true);
+    await sleep(380);
+    setNewMode(true);
+    await sleep(180);
+    newInputRef.current?.focus();
+    for (let i = 1; i <= n.length; i++) { setNewName(n.slice(0, i)); await sleep(34); }
+    await sleep(320);
+    await submitNewProject(n);
+  };
+  const simRef = useRef(simulateNewProject); simRef.current = simulateNewProject;
+  useEffect(() => { registerNewProjectSimulator((name) => simRef.current(name)); return () => registerNewProjectSimulator(null); }, []);
 
   return (
     <div className="addrbar" ref={rootRef} onClick={(e) => e.stopPropagation()}>
@@ -133,10 +167,20 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
                     {p.name}
                   </button>
                 ))}
-                <button className="acct-item ws-item ws-new" onClick={onNewProject}>
-                  <span className="ws-check"><FolderPlus size={15} strokeWidth={2.2} /></span>
-                  New project
-                </button>
+                {newMode ? (
+                  <form className="ws-new-form" onSubmit={(e) => { e.preventDefault(); submitNewProject(); }}>
+                    <FolderPlus size={15} strokeWidth={2.2} className="ws-new-ic" />
+                    <input ref={newInputRef} className="ws-new-input" value={newName} placeholder="Project name…" spellCheck={false}
+                      onChange={(e) => setNewName(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Escape") { setNewMode(false); setNewName(""); } }} />
+                    <button className="ws-new-ok" type="submit" disabled={!newName.trim() || busy}>Create</button>
+                  </form>
+                ) : (
+                  <button className="acct-item ws-item ws-new" onClick={onNewProject}>
+                    <span className="ws-check"><FolderPlus size={15} strokeWidth={2.2} /></span>
+                    New project
+                  </button>
+                )}
                 <div className="menu-sep" />
                 <button className="acct-item ws-item" onClick={() => { setProjOpen(false); navigate("/projects"); }}>
                   <span className="ws-check"><FolderOpen size={15} strokeWidth={2} /></span>

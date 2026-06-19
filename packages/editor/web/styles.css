@@ -507,6 +507,13 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .ws-item { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; text-decoration: none; font-size: 14px; }
 .ws-check { width: 16px; display: inline-flex; justify-content: center; flex: none; color: var(--accent); }
 .ws-new { color: var(--dim); }
+/* Inline "new project" name input inside the switcher dropdown (replaces window.prompt). */
+.ws-new-form { display: flex; align-items: center; gap: 7px; padding: 6px 8px; }
+.ws-new-ic { flex: none; color: var(--accent); }
+.ws-new-input { flex: 1; min-width: 0; font: inherit; font-size: 13.5px; padding: 6px 9px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--ink); outline: none; }
+.ws-new-input:focus { border-color: var(--accent); background: var(--bg); }
+.ws-new-ok { flex: none; font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 10px; border-radius: 8px; border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+.ws-new-ok:disabled { opacity: 0.45; cursor: default; }
 .ws-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 14px 0 4px; }
 .ws-pill { border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; background: var(--bg); border: 1px solid var(--border-strong); color: var(--ink); cursor: pointer; }
 .ws-pill:hover { border-color: var(--dim); background: var(--bg-soft); }
