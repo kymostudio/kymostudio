@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send, Wand2 } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
-import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, useListening, type StatusKind } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, useListening, feedLength, type StatusKind } from "./mcpstatus";
 
 const FEED_ICON: Record<StatusKind, React.ReactNode> = {
   user: <User size={13} strokeWidth={2} />,
@@ -84,14 +84,23 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   // after which it scrolls). Runs on every value change incl. send-clear + tab show.
   const askRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { const el = askRef.current; if (!el) return; el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }, [ask, tab]);
+  const replyWatch = useRef<number | undefined>(undefined);
+  useEffect(() => () => { if (replyWatch.current) clearTimeout(replyWatch.current); }, []);
   const submitAsk = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const t = ask.trim();
     if (!t || !listening) return;
     const ok = sendPrompt(t);
     pushStatus({ kind: "user", text: t });
-    if (!ok) pushStatus({ kind: "result", text: "⚠ Not delivered (offline) — reload & retry." });
     setAsk("");
+    if (!ok) { pushStatus({ kind: "result", text: "⚠ Not delivered (offline) — reload & retry." }); return; }
+    // No-response watchdog: if nothing comes back in ~20s, the message likely wasn't
+    // picked up (the listener stopped). Warn so the user isn't left guessing.
+    const snap = feedLength();
+    if (replyWatch.current) clearTimeout(replyWatch.current);
+    replyWatch.current = window.setTimeout(() => {
+      if (feedLength() <= snap) pushStatus({ kind: "result", text: "⚠ No response yet — your message may not have been picked up. Make sure a client is connected and listening (see Setup)." });
+    }, 20000);
   };
 
   const TabBtn = ({ id, label, dot }: { id: Tab; label: string; dot?: boolean }) => (

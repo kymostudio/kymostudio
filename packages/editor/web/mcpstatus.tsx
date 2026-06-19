@@ -101,6 +101,7 @@ export function pushStatus(it: { kind?: string; text?: string; ts?: number }) {
   feedSubs.forEach((f) => f());
 }
 export function clearStatus() { feed = []; feedSubs.forEach((f) => f()); }
+export function feedLength(): number { return feed.length; }
 
 // Send a prompt the user typed in the panel up to the control channel → the agent
 // receives it via the MCP `wait_for_user_message` tool (web → session). Returns
