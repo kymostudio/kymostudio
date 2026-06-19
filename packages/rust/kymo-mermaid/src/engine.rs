@@ -270,6 +270,15 @@ pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
             );
         }
     }
+    // State composites are light lavender (the dagre default `#ffffde` is the
+    // flowchart subgraph yellow, wrong for state).
+    for sg in &fc.subgraphs {
+        node_styles.entry(sg.id.clone()).or_insert_with(|| style::NodeStyle {
+            fill: Some("#ECECFF".into()),
+            stroke: Some("#9370DB".into()),
+            ..Default::default()
+        });
+    }
     let geom = kymo_graph::layout_dagre::dagre_geom(&fc, style::FlowStyle::Mermaid);
     Ok(kymo_graph::dagre_svg::render(
         &geom,
