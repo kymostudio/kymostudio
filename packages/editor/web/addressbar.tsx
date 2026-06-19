@@ -6,7 +6,7 @@ import { DIAGRAMS_API, apiFetch } from "./const";
 import { KindIcon } from "./sidebar";
 import { extFor } from "./kroki";
 import { ChevronDown, Search, FolderPlus, Check, FolderOpen, Boxes } from "lucide-react";
-import { registerNewProjectSimulator } from "./mcpstatus";
+import { registerNewProjectSimulator, openProjectsModal } from "./mcpstatus";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -182,7 +182,7 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
                   </button>
                 )}
                 <div className="menu-sep" />
-                <button className="acct-item ws-item" onClick={() => { setProjOpen(false); navigate("/projects"); }}>
+                <button className="acct-item ws-item" onClick={() => { setProjOpen(false); openProjectsModal(); }}>
                   <span className="ws-check"><FolderOpen size={15} strokeWidth={2} /></span>
                   Manage projects…
                 </button>

@@ -116,6 +116,19 @@ let newProjectSim: ((name: string) => void) | null = null;
 export function registerNewProjectSimulator(fn: ((name: string) => void) | null) { newProjectSim = fn; }
 export function runNewProjectSim(name: string): boolean { if (newProjectSim) { newProjectSim(name); return true; } return false; }
 
+// Projects management modal: the addressbar ("Manage projects…") and the
+// delete-project simulator open it via this opener (registered by ProjectsModal).
+let projectsModalOpener: (() => void) | null = null;
+export function registerProjectsModalOpener(fn: (() => void) | null) { projectsModalOpener = fn; }
+export function openProjectsModal(): boolean { if (projectsModalOpener) { projectsModalOpener(); return true; } return false; }
+
+// MCP-driven "delete project by simulating the real UI" (open Manage-projects modal →
+// filter to the project → click delete → confirm). ProjectsModal registers it;
+// userchannel calls it when the worker pushes {type:"ui-delete-project", id}.
+let deleteProjectSim: ((id: string) => void) | null = null;
+export function registerDeleteProjectSimulator(fn: ((id: string) => void) | null) { deleteProjectSim = fn; }
+export function runDeleteProjectSim(id: string): boolean { if (deleteProjectSim) { deleteProjectSim(id); return true; } return false; }
+
 // "Simulate UI" preference (a toggle under the chat input). When on, prompts the user
 // sends carry simulate:true → the agent calls MCP new_project with simulate:true so
 // the editor animates the real New-project UI. Persisted across reloads.
