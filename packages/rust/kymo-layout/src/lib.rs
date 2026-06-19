@@ -9,3 +9,5 @@
 //! default build needs no merman feature.
 
 pub mod grid;
+
+pub mod cose;

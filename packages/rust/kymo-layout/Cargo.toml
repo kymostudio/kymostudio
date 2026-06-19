@@ -8,3 +8,6 @@ description = "Pure-Rust graph/diagram layout algorithms for kymo's mermaid rend
 [lib]
 name = "kymo_layout_graph"
 path = "src/lib.rs"
+
+[dependencies]
+kymo-manatee = { path = "../kymo-manatee", version = "0.1.0" }
