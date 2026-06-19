@@ -27,6 +27,24 @@ pub enum Item {
 /// Parse one statement into `Node (Edge Node)*`. Returns an error string on a
 /// malformed statement (e.g. an edge not followed by a node).
 pub fn parse_statement(s: &str) -> Result<Vec<Item>, String> {
+    // `edgeId@{ curve: …, animation: … }` is EDGE metadata (mermaid 11), not a
+    // node — skip it so an edge id doesn't become a phantom node. Only a bare
+    // `id@{…}` (no edge operator in the head) with edge-only keys is dropped.
+    let t = s.trim();
+    if let Some(at) = t.find("@{") {
+        let head = &t[..at];
+        if !head.is_empty()
+            && head
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-' || c == '.')
+        {
+            let body = t[at + 2..].to_ascii_lowercase();
+            if body.contains("curve") || body.contains("animation") || body.contains("animate") {
+                return Ok(Vec::new());
+            }
+        }
+    }
+
     let mut sc = Scanner::new(s);
     let mut items: Vec<Item> = Vec::new();
 
