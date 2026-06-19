@@ -181,7 +181,10 @@ fn handle_decl(
     }
 
     let mut shape = None;
-    if let Some(p) = rest.find("<<") {
+    // Pseudo-state markers: `<<choice|fork|join>>` or the `[[choice|fork|join]]`
+    // double-bracket form.
+    let marker = rest.find("<<").or_else(|| rest.find("[["));
+    if let Some(p) = marker {
         let kind = &rest[p..];
         shape = Some(if kind.contains("choice") {
             Shape::Diamond
