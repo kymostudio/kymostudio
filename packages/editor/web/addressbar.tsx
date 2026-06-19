@@ -153,7 +153,9 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
             {projOpen && (
               // stop clicks here from bubbling to the crumb bar (whose onClick opens
               // the search palette) — picking a project should just switch, not search.
-              <div className="acct-menu addr-proj-menu" onClick={(e) => e.stopPropagation()}>
+              <div className="acct-menu addr-proj-menu" onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()} /* keep keys (esp. Space) inside the new-project input — don't bubble to the crumb bar's Space→search handler */>
+
                 <div className="ws-head">Projects</div>
                 {projects.map((p) => (
                   <button key={p.id} className="acct-item ws-item" onClick={() => {
