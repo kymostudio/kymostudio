@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser } from "lucide-react";
+import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
-import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, type StatusKind } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, type StatusKind } from "./mcpstatus";
 
 const FEED_ICON: Record<StatusKind, React.ReactNode> = {
   user: <User size={13} strokeWidth={2} />,
@@ -72,6 +72,16 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", k);
   }, [onClose]);
   const [showBridge, setShowBridge] = useState(false);
+  const [ask, setAsk] = useState("");
+  const submitAsk = (e: React.FormEvent) => {
+    e.preventDefault();
+    const t = ask.trim();
+    if (!t) return;
+    const ok = sendPrompt(t);
+    pushStatus({ kind: "user", text: t });
+    if (!ok) pushStatus({ kind: "result", text: "⚠ Not delivered (offline) — reload & retry." });
+    setAsk("");
+  };
   return (
     <aside className="aiside" aria-label="Connect AI">
       <div className="aiside-head">
@@ -142,6 +152,11 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
 
         <p className="cn-try">Then try: <i>“Create a sequence diagram for checkout”</i> · <i>“Rename this to Payments”</i> · <i>“List my diagrams”</i> — and watch them show up here.</p>
       </div>
+      <form className="cn-ask" onSubmit={submitAsk}>
+        <input className="cn-ask-input" value={ask} onChange={(e) => setAsk(e.target.value)}
+          placeholder="Message the AI…  (it receives this via wait_for_user_message)" aria-label="Message the AI" />
+        <button className="cn-ask-send" type="submit" disabled={!ask.trim()} aria-label="Send"><Send size={15} strokeWidth={2.2} /></button>
+      </form>
     </aside>
   );
 }

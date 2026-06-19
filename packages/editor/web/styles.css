@@ -673,6 +673,15 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-msg-result { background: color-mix(in srgb, #16a34a 8%, transparent); border-color: color-mix(in srgb, #16a34a 30%, var(--border)); }
 .cn-msg-result .cn-msg-ic { color: #16a34a; }
 
+/* Chat input pinned at the bottom of the panel — user types here → the AI receives it
+   via the MCP wait_for_user_message tool (web → session). */
+.cn-ask { flex: none; display: flex; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--border); background: var(--bg); }
+.cn-ask-input { flex: 1; min-width: 0; font: inherit; font-size: 12.5px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--ink); outline: none; }
+.cn-ask-input:focus { border-color: var(--accent); background: var(--bg); }
+.cn-ask-send { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; cursor: pointer; }
+.cn-ask-send:disabled { opacity: 0.45; cursor: default; }
+.cn-ask-send:not(:disabled):hover { filter: brightness(1.05); }
+
 /* On phones the dock overlays the panes (full-height, right) instead of squeezing them. */
 @media (max-width: 720px) {
   .aiside { position: absolute; top: 0; right: 0; bottom: 0; width: min(360px, 92vw); flex-basis: auto; z-index: 40; box-shadow: -8px 0 24px rgba(0,0,0,0.18); }

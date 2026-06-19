@@ -96,6 +96,13 @@ export function pushStatus(it: { kind?: string; text?: string; ts?: number }) {
   feedSubs.forEach((f) => f());
 }
 export function clearStatus() { feed = []; feedSubs.forEach((f) => f()); }
+
+// Send a prompt the user typed in the panel up to the control channel → the agent
+// receives it via the MCP `wait_for_user_message` tool (web → session). Returns
+// whether it was sent (socket connected).
+let promptSender: ((text: string) => boolean) | null = null;
+export function registerPromptSender(fn: ((text: string) => boolean) | null) { promptSender = fn; }
+export function sendPrompt(text: string): boolean { return promptSender ? promptSender(text) : false; }
 export function useStatusFeed(): StatusItem[] {
   const [, bump] = useReducer((c: number) => c + 1, 0);
   useEffect(() => { feedSubs.add(bump); return () => { feedSubs.delete(bump); }; }, []);
