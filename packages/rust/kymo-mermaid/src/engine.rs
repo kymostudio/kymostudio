@@ -179,7 +179,9 @@ pub fn mermaid_to_svg_auto(src: &str) -> Result<String, mermaid::MermaidError> {
         "mindmap" => mermaid_mindmap_to_svg(src),
         "kanban" => mermaid_kanban_to_svg(src),
         "requirement" => mermaid_requirement_to_svg(src),
-        _ => mermaid_to_svg(src),
+        // flowchart: kymo's dagre path (layout_dagre — robust since the cycle
+        // guard) gives mermaid-faithful positions; raster-safe, pure kymo.
+        _ => mermaid_to_svg_dagre(src),
     }
 }
 
