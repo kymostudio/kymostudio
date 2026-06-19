@@ -51,6 +51,9 @@ pub struct Subgraph {
     pub members: Vec<String>,
     /// Index of the enclosing subgraph, if this one is nested.
     pub parent: Option<usize>,
+    /// A `direction XX` override inside this subgraph (mermaid lays each subgraph
+    /// out in its own direction). `None` = inherit the diagram direction.
+    pub direction: Option<Direction>,
 }
 
 /// A parsed flowchart, ready for [`crate::layout::layout_flowchart`] or [`emit`].

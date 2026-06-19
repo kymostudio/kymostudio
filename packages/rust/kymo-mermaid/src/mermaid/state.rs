@@ -196,6 +196,7 @@ fn handle_decl(
             title,
             members: Vec::new(),
             parent,
+            direction: None,
         });
         sub_stack.push(sub_idx);
     } else {

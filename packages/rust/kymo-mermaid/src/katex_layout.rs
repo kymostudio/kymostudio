@@ -195,6 +195,7 @@ pub fn flowchart_from_merman(src: &str) -> Option<Flowchart> {
                 .subgraphs
                 .iter()
                 .position(|p| p.id != s.id && p.nodes.iter().any(|m| m == &s.id)),
+            direction: None,
         })
         .collect();
     Some(Flowchart {
