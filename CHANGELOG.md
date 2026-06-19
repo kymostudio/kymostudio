@@ -9,6 +9,26 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.7] - 2026-06-20
+
+### Fixed
+
+- **Mermaid renderer parity sweep** — many fidelity fixes across the native
+  (pure-Rust, raster-safe) Mermaid renderers so output matches mermaid.js:
+  - sequence: participant `@{type}` UML actor icons + `as` aliases, dark control
+    arrow, `autonumber` badges, `<br>`/newline wrapping (messages + notes), note
+    `left/right/over` placement + `:wrap:`/`:nowrap:` directives + spacing.
+  - flowchart: nested subgraphs with per-subgraph `direction`, cluster edges,
+    HTML-label stripping.
+  - class: bracket labels, entity decoding, `<<stereotype>>`,
+    `classDef`/`cssClass`/`:::` styling, standalone annotations.
+  - state: composite-state nesting + lavender clusters, `<<fork>>`/`<<join>>`
+    bars, `[[choice]]`, notes.
+  - block: bare-id labels, shapes (diamond/hexagon/circle/…), nested blocks,
+    `space`, edge clipping + `--o`/`--x`/`-->` end markers, auto-created edge nodes.
+  - parse: an HTML entity's `;` (e.g. `&lt;`) no longer splits a statement;
+    shared entity decoding.
+
 ## [0.4.6] - 2026-06-14
 
 ### Fixed
