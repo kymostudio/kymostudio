@@ -708,15 +708,14 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-composer-send svg { flex: none; }
 .cn-composer-send:disabled { opacity: 0.45; cursor: default; }
 .cn-composer-send:not(:disabled):hover { filter: brightness(1.05); }
-/* Neutral, low-key option toggle (YouTube-settings style): gray text + a small gray
-   switch — no accent fill, so it doesn't compete with the chat. */
-.cn-ask-tool { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 11.5px; font-weight: 500; color: var(--dim); background: none; border: 0; border-radius: 8px; padding: 3px 6px; cursor: pointer; }
+/* Option toggle: muted when off, kymo-accent when on (clearly "active"). */
+.cn-ask-tool { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 11.5px; font-weight: 500; color: var(--dim); background: none; border: 0; border-radius: 8px; padding: 3px 6px; cursor: pointer; transition: color 0.15s; }
 .cn-ask-tool:hover { color: var(--ink); }
-.cn-ask-tool.on { color: var(--ink); }
-.cn-ask-switch { position: relative; width: 26px; height: 15px; flex: none; border-radius: 999px; background: color-mix(in srgb, var(--ink) 22%, transparent); transition: background 0.15s; }
-.cn-ask-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.3); transition: transform 0.15s; }
-.cn-ask-tool.on .cn-ask-switch { background: color-mix(in srgb, var(--ink) 55%, transparent); }
-.cn-ask-tool.on .cn-ask-switch::after { transform: translateX(11px); }
+.cn-ask-tool.on { color: var(--accent); font-weight: 600; }
+.cn-ask-switch { position: relative; width: 28px; height: 16px; flex: none; border-radius: 999px; background: color-mix(in srgb, var(--ink) 22%, transparent); transition: background 0.18s; }
+.cn-ask-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.35); transition: transform 0.18s; }
+.cn-ask-tool.on .cn-ask-switch { background: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.cn-ask-tool.on .cn-ask-switch::after { transform: translateX(12px); }
 
 /* Manage-projects modal (was the /projects route) — filter + list + delete. */
 .pm-overlay { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(36, 33, 49, 0.4); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
