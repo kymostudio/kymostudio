@@ -1,0 +1,16 @@
+[package]
+name = "kymo-manatee"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Vendored compound-graph layout (COSE/FCoSE) from merman's manatee (MIT OR Apache-2.0), for kymo's pure-Rust mindmap layout — no merman dependency."
+
+[lib]
+name = "kymo_manatee"
+path = "src/lib.rs"
+
+[dependencies]
+indexmap = { version = "2", features = ["serde"] }
+nalgebra = { version = "0.34", default-features = false, features = ["std"] }
+thiserror = "2"
+rustc-hash = "2"

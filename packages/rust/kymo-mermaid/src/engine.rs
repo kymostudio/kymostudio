@@ -276,17 +276,10 @@ pub fn mermaid_block_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
 
 /// Render a Mermaid `mindmap` → SVG (tree via the flowchart renderer).
 pub fn mermaid_mindmap_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
-    // Under `katex-layout`, use merman's cose-bilkent layout (mermaid's own
-    // algorithm → mermaid-exact positions); fall back to the native tidy-tree.
-    #[cfg(feature = "katex-layout")]
-    {
-        if let Some(svg) = crate::katex_layout::mindmap_to_svg_merman(src) {
-            return Ok(svg);
-        }
-    }
+    // kymo's own cose-bilkent layout (vendored kymo-manatee, pure Rust — no merman).
     let mut fc = mermaid::parse_mindmap(src)?;
     render_flowchart_math(&mut fc);
-    Ok(crate::mindmap_svg::render(&fc))
+    Ok(crate::mindmap_svg::render_cose(&fc))
 }
 
 /// Render a Mermaid `kanban` board → SVG (columns via the flowchart renderer).

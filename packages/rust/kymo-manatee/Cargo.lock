@@ -156,13 +156,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kymo-layout-graph"
-version = "0.1.0"
-dependencies = [
- "kymo-manatee",
-]
-
-[[package]]
 name = "kymo-manatee"
 version = "0.1.0"
 dependencies = [

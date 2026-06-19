@@ -928,6 +928,9 @@ dependencies = [
 [[package]]
 name = "kymo-layout-graph"
 version = "0.1.0"
+dependencies = [
+ "kymo-manatee",
+]
 
 [[package]]
 name = "kymo-lexer"
@@ -936,6 +939,16 @@ dependencies = [
  "kymo-types",
  "serde",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "kymo-manatee"
+version = "0.1.0"
+dependencies = [
+ "indexmap",
+ "nalgebra",
+ "rustc-hash",
+ "thiserror 2.0.18",
 ]
 
 [[package]]

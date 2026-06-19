@@ -100,6 +100,60 @@ fn node_size(label: &str, shape: Shape) -> (f64, f64) {
     }
 }
 
+/// Render a mindmap with kymo's own **cose-bilkent** layout (vendored
+/// `kymo-manatee`, mermaid's algorithm — pure Rust, no merman): size nodes,
+/// lay out with cose-bilkent, draw shapes/colours via [`render_positioned`].
+pub fn render_cose(fc: &Flowchart) -> String {
+    if fc.nodes.is_empty() {
+        return empty_svg();
+    }
+    let idx: HashMap<&str, usize> = fc
+        .nodes
+        .iter()
+        .enumerate()
+        .map(|(i, n)| (n.id.as_str(), i))
+        .collect();
+    let mut nodes: Vec<Node> = fc
+        .nodes
+        .iter()
+        .map(|n| {
+            let (w, h) = node_size(&n.label, n.shape);
+            Node { label: n.label.clone(), shape: n.shape, children: Vec::new(), depth: 0, branch: -1, w, h, x: 0.0, y: 0.0 }
+        })
+        .collect();
+    let mut has_parent = vec![false; nodes.len()];
+    for e in &fc.edges {
+        if let (Some(&p), Some(&c)) = (idx.get(e.src.as_str()), idx.get(e.dst.as_str())) {
+            nodes[p].children.push(c);
+            has_parent[c] = true;
+        }
+    }
+    let root = (0..nodes.len()).find(|&i| !has_parent[i]).unwrap_or(0);
+    assign(&mut nodes, root, 0, -1);
+    let sizes: Vec<(f64, f64)> = nodes.iter().map(|n| (n.w, n.h)).collect();
+    let edges: Vec<(usize, usize)> = fc
+        .edges
+        .iter()
+        .filter_map(|e| Some((*idx.get(e.src.as_str())?, *idx.get(e.dst.as_str())?)))
+        .collect();
+    let pos = kymo_layout_graph::cose::layout(&sizes, &edges);
+    for (n, p) in nodes.iter_mut().zip(&pos) {
+        n.x = p.0;
+        n.y = p.1;
+    }
+    let pnodes: Vec<PNode> = nodes
+        .iter()
+        .map(|n| PNode { label: n.label.clone(), shape: n.shape, branch: n.branch, cx: n.x, cy: n.y, w: n.w, h: n.h })
+        .collect();
+    let mut pedges = Vec::new();
+    for n in &nodes {
+        for &c in &n.children {
+            pedges.push(PEdge { branch: nodes[c].branch, pts: vec![(n.x, n.y), (nodes[c].x, nodes[c].y)] });
+        }
+    }
+    render_positioned(&pnodes, &pedges)
+}
+
 pub fn render(fc: &Flowchart) -> String {
     if fc.nodes.is_empty() {
         return empty_svg();
