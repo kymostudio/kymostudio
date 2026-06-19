@@ -67,7 +67,8 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   const feed = useStatusFeed();
   const [tab, setTab] = useState<Tab>("chat");
   const feedRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { const el = feedRef.current; if (el) el.scrollTop = el.scrollHeight; }, [feed.length, tab]);
+  // Scroll the body (the feed has no frame/own scroll now) to the latest message.
+  useEffect(() => { if (tab !== "chat") return; const el = feedRef.current?.parentElement; if (el) el.scrollTop = el.scrollHeight; }, [feed.length, tab]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", k);
@@ -95,7 +96,12 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
     <aside className="aiside" aria-label="Connect AI">
       <div className="aiside-head">
         <h2><Sparkles size={17} strokeWidth={2} className="cn-title-ic" /> Connect AI</h2>
-        <button className="aiside-close" onClick={onClose} aria-label="Close panel" title="Close">✕</button>
+        <div className="aiside-head-actions">
+          {tab === "chat" && feed.length > 0 && (
+            <button className="cn-clear" onClick={clearStatus} aria-label="Clear chat" title="Clear chat"><Eraser size={15} strokeWidth={2} /></button>
+          )}
+          <button className="aiside-close" onClick={onClose} aria-label="Close panel" title="Close">✕</button>
+        </div>
       </div>
 
       <div className="aiside-tabs" role="tablist">
@@ -107,19 +113,13 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
       <div className="aiside-body">
         {tab === "chat" && (
           feed.length > 0 ? (
-            <div className="cn-feed-wrap">
-              <div className="cn-feed-head">
-                <span>Live activity</span>
-                <button className="cn-feed-clear" onClick={clearStatus} title="Clear"><Eraser size={12} strokeWidth={2} /> Clear</button>
-              </div>
-              <div className="cn-feed" ref={feedRef}>
-                {feed.map((it) => (
-                  <div key={it.id} className={"cn-msg cn-msg-" + it.kind}>
-                    <span className="cn-msg-ic">{FEED_ICON[it.kind]}</span>
-                    <span className="cn-msg-text">{it.text}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="cn-feed" ref={feedRef}>
+              {feed.map((it) => (
+                <div key={it.id} className={"cn-msg cn-msg-" + it.kind}>
+                  <span className="cn-msg-ic">{FEED_ICON[it.kind]}</span>
+                  <span className="cn-msg-text">{it.text}</span>
+                </div>
+              ))}
             </div>
           ) : (
             <p className="cn-empty">No activity yet. Type below to message the AI, or drive kymo from a connected client (Claude / Cursor) — its requests &amp; reasoning show up here.</p>
