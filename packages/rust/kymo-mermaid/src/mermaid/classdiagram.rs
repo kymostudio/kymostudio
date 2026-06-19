@@ -166,7 +166,9 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         if low == "class" || low.starts_with("class ") {
             let rest = stmt[5..].trim();
             let opens = rest.ends_with('{');
-            let head = rest.trim_end_matches('{').trim();
+            // Head is everything before the first `{` (handles `class X {}` on one
+            // line and `class X {` opening a block).
+            let head = rest.split('{').next().unwrap_or(rest).trim();
             // `class X:::styleName` — record the inline style reference.
             if let Some((base, sty)) = head.split_once(":::") {
                 let key = decl_class_key(base);
