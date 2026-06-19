@@ -9,6 +9,22 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.8] - 2026-06-20
+
+### Fixed
+
+- Update the `autonumber_off_keeps_counting` core test to assert the autonumber
+  **badge** (its own `<text>` on the source lifeline) rather than a number
+  prefixed onto the message label — matching the renderer's actual (mermaid-like)
+  output. This unblocks the crates.io publish (the Rust test suite is not run by
+  `test.yml`, so the stale assertion only surfaced in `release-crate.yml`).
+- Bump the VS Code extension version in lockstep (it had drifted), so the
+  `v*`-tag publish no longer fails its tag/`package.json` version check.
+
+> Note: 0.4.7 published to PyPI + npm but its crates.io and VS Code Marketplace
+> publishes failed (the two issues above); 0.4.8 is the first fully-published
+> release of this series across all four registries.
+
 ## [0.4.7] - 2026-06-20
 
 ### Fixed
