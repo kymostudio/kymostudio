@@ -45,7 +45,7 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
             let label = line
                 .strip_prefix("block:")
                 .or_else(|| line.strip_prefix("BLOCK:"))
-                .and_then(|r| tokenize(r).into_iter().next().map(|(_, l, _)| l))
+                .and_then(|r| tokenize(r).into_iter().next().map(|(_, l, _, _)| l))
                 .unwrap_or_default();
             stack.push(Grid { columns: 0, items: Vec::new(), label });
             continue;
@@ -56,10 +56,10 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
             }
             continue;
         }
-        for (id, label, span) in tokenize(line) {
+        for (id, label, span, shape) in tokenize(line) {
             // A bare id (no `["label"]`) displays the id itself.
             let label = if label.is_empty() { id.clone() } else { label };
-            stack.last_mut().unwrap().items.push(Item::Cell(Cell { id, label, span }));
+            stack.last_mut().unwrap().items.push(Item::Cell(Cell { id, label, span, shape }));
         }
     }
     while stack.len() > 1 {
@@ -102,10 +102,41 @@ pub fn render(src: &str) -> String {
 }
 
 fn rect(p: &Placed, fill: &str, stroke: &str, container: bool) -> String {
-    let mut s = format!(
-        "<rect x=\"{:.1}\" y=\"{:.1}\" width=\"{:.1}\" height=\"{:.1}\" rx=\"3\" fill=\"{fill}\" stroke=\"{stroke}\" stroke-width=\"1\"/>",
-        p.x, p.y, p.w, p.h
-    );
+    let (x, y, w, h) = (p.x, p.y, p.w, p.h);
+    let (cx, cy) = (x + w / 2.0, y + h / 2.0);
+    let pen = format!("fill=\"{fill}\" stroke=\"{stroke}\" stroke-width=\"1\"");
+    let mut s = match p.shape.as_str() {
+        "diamond" => format!(
+            "<polygon points=\"{cx:.1},{:.1} {:.1},{cy:.1} {cx:.1},{:.1} {:.1},{cy:.1}\" {pen}/>",
+            y, x + w, y + h, x
+        ),
+        "hexagon" => {
+            let q = w * 0.18;
+            format!(
+                "<polygon points=\"{:.1},{y:.1} {:.1},{y:.1} {:.1},{cy:.1} {:.1},{:.1} {:.1},{:.1} {:.1},{cy:.1}\" {pen}/>",
+                x + q, x + w - q, x + w, x + w - q, y + h, x + q, y + h, x
+            )
+        }
+        "circle" => format!(
+            "<ellipse cx=\"{cx:.1}\" cy=\"{cy:.1}\" rx=\"{:.1}\" ry=\"{:.1}\" {pen}/>",
+            w / 2.0, h / 2.0
+        ),
+        "rounded" => format!(
+            "<rect x=\"{x:.1}\" y=\"{y:.1}\" width=\"{w:.1}\" height=\"{h:.1}\" rx=\"{:.1}\" {pen}/>",
+            h / 2.0
+        ),
+        // rectangle with a left inverted-arrow flag
+        "rect-larrow" => {
+            let n = (h / 2.0).min(10.0);
+            format!(
+                "<path d=\"M {:.1} {y:.1} H {:.1} V {:.1} H {:.1} L {x:.1} {cy:.1} Z\" {pen}/>",
+                x + n, x + w, y + h, x + n
+            )
+        }
+        _ => format!(
+            "<rect x=\"{x:.1}\" y=\"{y:.1}\" width=\"{w:.1}\" height=\"{h:.1}\" rx=\"3\" {pen}/>"
+        ),
+    };
     if !p.label.is_empty() {
         let (ty, base) = if container {
             (p.y + 14.0, "")
@@ -188,14 +219,14 @@ fn parse_edge(line: &str) -> Option<(String, String, String)> {
             _ => String::new(),
         }
     };
-    let src = tokenize(&line[..pos]).into_iter().last().map(|(id, _, _)| id)?;
-    let dst = tokenize(&line[end..]).into_iter().next().map(|(id, _, _)| id)?;
+    let src = tokenize(&line[..pos]).into_iter().last().map(|(id, _, _, _)| id)?;
+    let dst = tokenize(&line[end..]).into_iter().next().map(|(id, _, _, _)| id)?;
     if src.is_empty() || dst.is_empty() {
         return None;
     }
     Some((src, dst, label))
 }
-fn tokenize(line: &str) -> Vec<(String, String, usize)> {
+fn tokenize(line: &str) -> Vec<(String, String, usize, String)> {
     let chars: Vec<char> = line.chars().collect();
     let mut out = Vec::new();
     let mut i = 0;
@@ -210,7 +241,39 @@ fn tokenize(line: &str) -> Vec<(String, String, usize)> {
         }
         let id: String = chars[s..i].iter().collect();
         let mut label = String::new();
+        let mut shape = String::new();
+        // `id>"label"]` — rectangle with a left inverted arrow (flag).
+        if i < chars.len() && chars[i] == '>' {
+            shape = "rect-larrow".to_string();
+            i += 1;
+            if i < chars.len() && chars[i] == '"' {
+                let st = i + 1;
+                i += 1;
+                while i < chars.len() && chars[i] != '"' {
+                    i += 1;
+                }
+                label = crate::mermaid::decode_entities(&chars[st..i].iter().collect::<String>());
+                if i < chars.len() {
+                    i += 1; // closing "
+                }
+                if i < chars.len() && chars[i] == ']' {
+                    i += 1;
+                }
+            }
+        }
         if i < chars.len() && matches!(chars[i], '[' | '(' | '{') {
+            let open = chars[i];
+            let dbl = chars.get(i + 1) == Some(&open);
+            if shape.is_empty() {
+                shape = match (open, dbl) {
+                    ('{', true) => "hexagon",
+                    ('{', false) => "diamond",
+                    ('(', true) => "circle",
+                    ('(', false) => "rounded",
+                    _ => "rect",
+                }
+                .to_string();
+            }
             let mut d = 0i32;
             let st = i;
             while i < chars.len() {
@@ -262,7 +325,7 @@ fn tokenize(line: &str) -> Vec<(String, String, usize)> {
             span = chars[ds..i].iter().collect::<String>().parse().unwrap_or(1);
         }
         if !id.is_empty() {
-            out.push((id, label, span));
+            out.push((id, label, span, shape));
         } else {
             i += 1;
         }
