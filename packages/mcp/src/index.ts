@@ -687,6 +687,16 @@ export class UserChannel extends DurableObject<Env> {
       if (found) this.notifyTarget();
       return Response.json({ ok: found });
     }
+    // Long-poll for prompts the user typed in the editor panel (web → this session).
+    // Drains the durable inbox; waits up to ~25s for a new one, else returns empty.
+    if (url.pathname.endsWith("/inbox-wait") && request.method === "POST") {
+      for (let i = 0; i < 32; i++) {
+        const inbox = ((await this.ctx.storage.get<string[]>("inbox")) || []);
+        if (inbox.length) { await this.ctx.storage.delete("inbox"); return Response.json({ messages: inbox }); }
+        await new Promise((r) => setTimeout(r, 800));
+      }
+      return Response.json({ messages: [] });
+    }
     return new Response("not found", { status: 404 });
   }
 
@@ -734,6 +744,11 @@ export class UserChannel extends DurableObject<Env> {
     } else if (data.type === "unpin") {
       ws.serializeAttachment({ ...sockMeta(ws), pinned: false });
       this.notifyTarget();
+    } else if (data.type === "prompt" && typeof data.text === "string" && data.text.trim()) {
+      // User typed in the editor panel → queue it for the agent's wait_for_user_message.
+      const inbox = ((await this.ctx.storage.get<string[]>("inbox")) || []);
+      inbox.push(data.text.trim().slice(0, 4000));
+      await this.ctx.storage.put("inbox", inbox.slice(-50));
     }
   }
 }
@@ -1111,6 +1126,20 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         });
         const j = (await r.json()) as { clients: number };
         return { content: [{ type: "text", text: j.clients ? `shown in ${j.clients} window(s)` : "no live editor window — open editor.kymo.studio (or run ui_list_sessions)" }] };
+      }
+    );
+
+    // ---- Receive prompts the user types in the editor panel (web → this session).
+    // Long-polls ~25s; call it in a loop to stay responsive to the user's web input. ----
+    this.server.tool(
+      "wait_for_user_message",
+      "Wait for a message the user types into their editor's Connect AI panel (editor.kymo.studio) and return it — this is how the user drives YOU from the web. Long-polls up to ~25s; returns the queued message(s), or a timeout note. Call it in a loop to keep listening; act on each message (narrate via ui_status, edit diagrams), then call it again.",
+      {},
+      async () => {
+        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/inbox-wait", { method: "POST" });
+        const { messages } = (await r.json()) as { messages: string[] };
+        if (!messages || !messages.length) return { content: [{ type: "text", text: "(no message yet — timed out. Call wait_for_user_message again to keep listening.)" }] };
+        return { content: [{ type: "text", text: `The user typed in the editor panel:\n${messages.map((m) => "• " + m).join("\n")}` }] };
       }
     );
   }
