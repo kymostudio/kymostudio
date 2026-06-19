@@ -6,7 +6,7 @@ use kymo_layout_graph::grid::{layout, Cell, Grid, Item, Placed};
 use std::collections::HashMap;
 
 /// Parse block source → a kymo-layout grid tree + edge list.
-fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
+fn parse(src: &str) -> (Grid, Vec<(String, String, String, &'static str)>) {
     let lines: Vec<String> = src.lines().map(|l| strip(l).trim().to_string()).collect();
     let mut edges = Vec::new();
     let mut stack: Vec<Grid> = vec![Grid { columns: 0, items: Vec::new(), label: String::new() }];
@@ -82,7 +82,7 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String)>) {
     // does this for `A --> C` where C only appears in the edge).
     let mut ids = std::collections::HashSet::new();
     collect_ids(&root, &mut ids);
-    for (s, d, _) in &edges {
+    for (s, d, _, _) in &edges {
         for id in [s, d] {
             if !id.is_empty() && ids.insert(id.clone()) {
                 root.items.push(Item::Cell(Cell {
@@ -127,14 +127,21 @@ pub fn render(src: &str) -> String {
         }
         body += &rect(p, "#ECECFF", "#9370DB", false);
     }
-    for (s, d, lbl) in &edges {
+    for (s, d, lbl, etype) in &edges {
         if let (Some(&a), Some(&b)) = (pos.get(s), pos.get(d)) {
-            // Clip both ends to the box borders so the arrow doesn't cut through.
+            // Clip both ends to the box borders so the marker doesn't cut through.
             let (x1, y1) = border_pt(a, (b.0, b.1));
             let (x2, y2) = border_pt(b, (a.0, a.1));
+            // `-->` arrow, `--o` circle, `--x` cross, `--` none.
+            let marker = match *etype {
+                "arrow" => " marker-end=\"url(#blk-arrow)\"",
+                "circle" => " marker-end=\"url(#blk-circle)\"",
+                "cross" => " marker-end=\"url(#blk-cross)\"",
+                _ => "",
+            };
             body += &format!(
                 "<line x1=\"{x1:.1}\" y1=\"{y1:.1}\" x2=\"{x2:.1}\" y2=\"{y2:.1}\" stroke=\"#333333\" \
-                 stroke-width=\"1.4\" marker-end=\"url(#blk-arrow)\"/>"
+                 stroke-width=\"1.4\"{marker}/>"
             );
             if !lbl.is_empty() {
                 body += &format!("<text x=\"{:.1}\" y=\"{:.1}\" text-anchor=\"middle\" font-size=\"12\" fill=\"#333\">{}</text>", (x1 + x2) / 2.0, (y1 + y2) / 2.0 - 4.0, esc(lbl));
@@ -142,7 +149,11 @@ pub fn render(src: &str) -> String {
         }
     }
     const DEFS: &str = "<marker id=\"blk-arrow\" markerWidth=\"12\" markerHeight=\"10\" refX=\"9\" refY=\"5\" \
-orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9 Z\" fill=\"#333333\"/></marker>";
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9 Z\" fill=\"#333333\"/></marker>\
+<marker id=\"blk-circle\" markerWidth=\"12\" markerHeight=\"12\" refX=\"10\" refY=\"6\" \
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><circle cx=\"6\" cy=\"6\" r=\"4\" fill=\"#ffffff\" stroke=\"#333333\" stroke-width=\"1.2\"/></marker>\
+<marker id=\"blk-cross\" markerWidth=\"14\" markerHeight=\"14\" refX=\"10\" refY=\"7\" \
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M3,3 L11,11 M11,3 L3,11\" fill=\"none\" stroke=\"#333333\" stroke-width=\"1.6\"/></marker>";
     format!(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
          <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width:.0} {height:.0}\" width=\"{width:.0}\" height=\"{height:.0}\" \
@@ -278,7 +289,7 @@ fn mask(line: &str) -> String {
     }
     o
 }
-fn parse_edge(line: &str) -> Option<(String, String, String)> {
+fn parse_edge(line: &str) -> Option<(String, String, String, &'static str)> {
     let masked = mask(line);
     let pos = masked.find(['-', '=', '.'])?;
     let c: Vec<char> = masked.chars().collect();
@@ -286,9 +297,12 @@ fn parse_edge(line: &str) -> Option<(String, String, String)> {
     while end < c.len() && matches!(c[end], '-' | '=' | '.' | '<' | '>') {
         end += 1;
     }
+    // End-arrow type: `-->` arrow, `--o` circle, `--x` cross, plain `--` none.
+    let mut etype = if c[pos..end].contains(&'>') { "arrow" } else { "none" };
     // Block edge-end markers `--o` (circle) / `--x` (cross): the o/x is part of
     // the arrow, not the destination node.
     if end < c.len() && matches!(c[end], 'o' | 'x') && (end + 1 >= c.len() || c[end + 1] == ' ') {
+        etype = if c[end] == 'o' { "circle" } else { "cross" };
         end += 1;
     }
     // A matching start marker (`o--` / `x--`) on the source side.
@@ -308,7 +322,7 @@ fn parse_edge(line: &str) -> Option<(String, String, String)> {
     if src.is_empty() || dst.is_empty() {
         return None;
     }
-    Some((src, dst, label))
+    Some((src, dst, label, etype))
 }
 fn tokenize(line: &str) -> Vec<(String, String, usize, String)> {
     let chars: Vec<char> = line.chars().collect();
