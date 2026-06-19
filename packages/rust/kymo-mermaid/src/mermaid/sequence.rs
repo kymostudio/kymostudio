@@ -390,6 +390,18 @@ fn strip_ci<'a>(s: &'a str, prefix: &str) -> Option<&'a str> {
 }
 
 /// Parse `Note left of X: t` / `Note right of X: t` / `Note over X[,Y]: t`.
+/// Strip a leading `wrap:` / `nowrap:` directive (`Note over X:wrap: text` and
+/// `A->>B:nowrap: text`) — kymo wraps only on explicit `<br/>`, so it's dropped.
+fn strip_wrap(s: &str) -> String {
+    let t = s.trim();
+    for d in ["wrap:", "nowrap:"] {
+        if let Some(r) = t.strip_prefix(d) {
+            return r.trim().to_string();
+        }
+    }
+    t.to_string()
+}
+
 fn parse_note(stmt: &str) -> Option<Note> {
     let rest = strip_kw(stmt, "note")?;
     let (placement, after) = if let Some(r) = strip_ci(rest, "left of ") {
@@ -401,10 +413,12 @@ fn parse_note(stmt: &str) -> Option<Note> {
     } else {
         return None;
     };
-    let (targets_part, text) = match after.split_once(':') {
-        Some((t, x)) => (t.trim(), x.trim().to_string()),
-        None => (after.trim(), String::new()),
+    let (targets_part, raw) = match after.split_once(':') {
+        Some((t, x)) => (t.trim(), x.trim()),
+        None => (after.trim(), ""),
     };
+    let wrap = raw.starts_with("wrap:");
+    let text = strip_wrap(raw);
     let targets: Vec<String> = targets_part
         .split(',')
         .map(|s| s.trim().to_string())
@@ -417,13 +431,14 @@ fn parse_note(stmt: &str) -> Option<Note> {
         placement,
         targets,
         text,
+        wrap,
     })
 }
 
 /// Parse a message `A<arrow>B: text` (with optional `+`/`-` activation).
 fn parse_message(stmt: &str) -> Option<Message> {
     let (left, text) = match stmt.split_once(':') {
-        Some((l, r)) => (l.trim(), r.trim().to_string()),
+        Some((l, r)) => (l.trim(), strip_wrap(r.trim())),
         None => (stmt.trim(), String::new()),
     };
     let (start, end, sort, bidirectional) = find_arrow(left)?;
