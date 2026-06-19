@@ -148,6 +148,8 @@ fn parse_dir(tok: &str) -> Direction {
 
 /// Find or create a box; `kw` (the keyword) becomes the stereotype.
 fn decl(classes: &mut Vec<ClassBox>, name: &str, kw: &str) -> usize {
+    // Drop an inline `:::styleClass` so it doesn't leak into the name.
+    let name = name.split(":::").next().unwrap_or(name);
     let id = name.trim().trim_matches('"').trim();
     if id.is_empty() {
         return 0;
