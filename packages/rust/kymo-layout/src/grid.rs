@@ -8,6 +8,8 @@ pub struct Cell {
     pub id: String,
     pub label: String,
     pub span: usize,
+    /// Shape keyword ("rect"/"diamond"/"hexagon"/"rounded"/"circle"/"stadium"/"rect-larrow"/"rect-rarrow"); empty = rect.
+    pub shape: String,
 }
 
 /// One slot in a grid: a cell, an empty space (span columns), or a nested grid.
@@ -33,6 +35,7 @@ pub struct Placed {
     pub w: f64,
     pub h: f64,
     pub container: bool,
+    pub shape: String,
 }
 
 const CELL_W: f64 = 92.0;
@@ -129,6 +132,7 @@ pub fn layout(g: &Grid) -> (Vec<Placed>, f64, f64) {
                 w: cw,
                 h: CELL_H,
                 container: false,
+                shape: c2.shape.clone(),
             }),
             Item::Space(_) => {}
             Item::Grid(sub_g) => {
@@ -140,6 +144,7 @@ pub fn layout(g: &Grid) -> (Vec<Placed>, f64, f64) {
                     w: cw.max(s.w),
                     h: s.h,
                     container: true,
+                    shape: String::new(),
                 });
                 // offset the nested grid's children (+header room if labelled).
                 let dy = if sub_g.label.is_empty() { 0.0 } else { HEADER };
@@ -153,6 +158,7 @@ pub fn layout(g: &Grid) -> (Vec<Placed>, f64, f64) {
                             w: ch.w,
                             h: ch.h,
                             container: ch.container,
+                            shape: ch.shape,
                         });
                     }
                 }
