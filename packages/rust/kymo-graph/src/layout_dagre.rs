@@ -38,7 +38,15 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
         Direction::Rl => RankDir::RL,
     };
 
+    // A node id that is ALSO a subgraph id is a CLUSTER, not a node (mermaid draws
+    // it as a cluster, and `A --> subgraphId` is a cluster edge) — exclude it from
+    // the node set so kymo's node count matches mermaid's (it lands in `regions`).
+    let sg_ids: std::collections::HashSet<&str> =
+        fc.subgraphs.iter().map(|s| s.id.as_str()).collect();
     for n in &fc.nodes {
+        if sg_ids.contains(n.id.as_str()) {
+            continue;
+        }
         let (w, h) = if matches!(style, FlowStyle::Mermaid) {
             node_size_mermaid_f(&n.label, n.shape)
         } else {
@@ -114,6 +122,9 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
     );
 
     for n in &fc.nodes {
+        if sg_ids.contains(n.id.as_str()) {
+            continue; // cluster, emitted as a region below — not a node
+        }
         if let Some(nd) = g.node(&n.id) {
             geom.nodes.push(FNode {
                 id: n.id.clone(),
