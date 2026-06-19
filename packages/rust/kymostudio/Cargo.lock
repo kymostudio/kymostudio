@@ -301,10 +301,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kymo-layout-graph"
+version = "0.1.0"
+
+[[package]]
 name = "kymo-mermaid"
 version = "0.1.0"
 dependencies = [
  "kymo-graph",
+ "kymo-layout-graph",
 ]
 
 [[package]]
