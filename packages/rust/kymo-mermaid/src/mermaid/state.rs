@@ -173,7 +173,7 @@ fn handle_decl(
         shape = Some(if kind.contains("choice") {
             Shape::Diamond
         } else {
-            Shape::Box // fork / join — drawn as a plain bar-ish box
+            Shape::StateFork // fork / join — a solid bar
         });
         rest = rest[..p].trim_end();
     }

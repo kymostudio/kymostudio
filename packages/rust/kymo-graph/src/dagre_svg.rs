@@ -361,6 +361,13 @@ fn node_svg(
             nf(cx - hw), nf(cy - hh), nf(2.0 * hw), nf(2.0 * hh), nf(hh),
         )
             }
+            Shape::StateFork => format!(
+                "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"2\" fill=\"#334155\"/>",
+                nf(cx - hw),
+                nf(cy - 5.0),
+                nf(2.0 * hw),
+                nf(10.0),
+            ),
             Shape::StateStart => format!(
                 "<circle cx=\"{}\" cy=\"{}\" r=\"8\" fill=\"#334155\"/>",
                 nf(cx),
@@ -391,8 +398,8 @@ fn node_svg(
     };
     let label = if let Some(m) = &n.math {
         format!("<g transform=\"translate({},{})\">{m}</g>", nf(cx), nf(cy))
-    } else if n.name.is_empty() {
-        String::new()
+    } else if n.name.is_empty() || matches!(n.shape, Shape::StateFork) {
+        String::new() // fork/join bars carry no visible label
     } else {
         let mut lstyle = String::new();
         if let Some(c) = &ovr.color {
