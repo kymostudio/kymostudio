@@ -754,10 +754,13 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ type: "status", kind, text: String(text).slice(0, 500), ts: Date.now() }),
       }).then(() => {}).catch(() => {});
+    // Appended to every write/UI tool's description so ANY MCP client narrates first —
+    // the panel then reads request → reasoning → action without relying on memory.
+    const NARRATE = " Before calling this, narrate to the user's editor panel: first call ui_status(kind:\"user\", <the user's request>) then ui_status(kind:\"thinking\", <your plan/reasoning>) — so the Live Activity feed reads request → reasoning → action.";
 
     this.server.tool(
       "new_diagram",
-      "Create a NEW diagram for the signed-in user and open it live. Returns its id + URL. A user can own many diagrams. Optionally seed a title and initial DSL; otherwise a minimal scaffold is used.",
+      "Create a NEW diagram for the signed-in user and open it live. Returns its id + URL. A user can own many diagrams. Optionally seed a title and initial DSL; otherwise a minimal scaffold is used." + NARRATE,
       {
         title: z.string().optional().describe("A short name for the diagram (for list_diagrams)."),
         source: z.string().optional().describe("Optional initial kymo DSL (flowchart TD { ... }). Defaults to a minimal scaffold."),
@@ -810,7 +813,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "edit_diagram",
-      "Edit one of your diagrams: update its content (`source`) and/or rename it (`title`). Pushes live to editor.kymo.studio. Pass `id` to target a specific diagram; omit to use your most recent. At least one of source/title is required. Use the `flowchart TD { ... }` block syntax for source.",
+      "Edit one of your diagrams: update its content (`source`) and/or rename it (`title`). Pushes live to editor.kymo.studio. Pass `id` to target a specific diagram; omit to use your most recent. At least one of source/title is required. Use the `flowchart TD { ... }` block syntax for source." + NARRATE,
       {
         source: z.string().optional().describe("New full diagram source (replaces the content)."),
         title: z.string().optional().describe("New name for the diagram (rename)."),
@@ -857,7 +860,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "delete_diagram",
-      "Permanently delete one of your diagrams (content and listing). Cannot be undone.",
+      "Permanently delete one of your diagrams (content and listing). Cannot be undone." + NARRATE,
       { id: z.string().describe("Diagram id to delete (from list_diagrams).") },
       async ({ id }) => {
         const st = await destroyDiagram(this.env, me(), id);
@@ -869,7 +872,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "ui_open_diagram",
-      "Switch the diagram currently shown in the signed-in user's open editor tab(s) to this one — live navigation in the browser, without changing its content. Pass `id` (from list_diagrams), or omit to use your most recent. Returns how many live tabs were switched (0 = no editor tab open right now).",
+      "Switch the diagram currently shown in the signed-in user's open editor tab(s) to this one — live navigation in the browser, without changing its content. Pass `id` (from list_diagrams), or omit to use your most recent. Returns how many live tabs were switched (0 = no editor tab open right now)." + NARRATE,
       { id: z.string().optional().describe("Diagram id to open. Omit to use your most recent.") },
       async ({ id }) => {
         const did = id ?? (await this.env.OAUTH_KV.get(`last:${me()}`));
@@ -908,7 +911,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "new_project",
-      "Create a NEW project for the signed-in user. Returns its id + name. File diagrams under it via new_diagram's `project` arg or move_diagram.",
+      "Create a NEW project for the signed-in user. Returns its id + name. File diagrams under it via new_diagram's `project` arg or move_diagram." + NARRATE,
       { name: z.string().describe("A short name for the project (max 40 chars).") },
       async ({ name }) => {
         if (!name.trim()) return { content: [{ type: "text", text: "Provide a non-empty project name." }] };
@@ -920,7 +923,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "rename_project",
-      "Rename one of your projects. Identify it by id or current name.",
+      "Rename one of your projects. Identify it by id or current name." + NARRATE,
       {
         project: z.string().describe("The project to rename — its id or current name (from list_projects)."),
         name: z.string().describe("The new project name (max 40 chars)."),
@@ -936,7 +939,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "delete_project",
-      "Delete one of your projects AND everything inside it (its folders + diagrams move to Trash, recoverable for 30 days). You can't delete your only project.",
+      "Delete one of your projects AND everything inside it (its folders + diagrams move to Trash, recoverable for 30 days). You can't delete your only project." + NARRATE,
       { project: z.string().describe("The project to delete — its id or name (from list_projects).") },
       async ({ project }) => {
         const proj = await findProject(this.env, me(), project);
@@ -950,7 +953,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "move_diagram",
-      "Move one of your diagrams into a project. Pass the diagram `id` (from list_diagrams) and the target `project` (id or name). Moving across projects clears its folder (folders are project-local).",
+      "Move one of your diagrams into a project. Pass the diagram `id` (from list_diagrams) and the target `project` (id or name). Moving across projects clears its folder (folders are project-local)." + NARRATE,
       {
         id: z.string().describe("Diagram id to move (from list_diagrams)."),
         project: z.string().describe("Target project — its id or name (from list_projects)."),
@@ -969,7 +972,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "ui_open_project",
-      "Switch the ACTIVE project in the signed-in user's open editor tab(s) — the project the sidebar/explorer is filtered to — without changing any content (the project sibling of ui_open_diagram). Pass `project` (id or name from list_projects), or omit to use your most recently opened project. Returns how many live tabs were switched (0 = no editor tab open right now).",
+      "Switch the ACTIVE project in the signed-in user's open editor tab(s) — the project the sidebar/explorer is filtered to — without changing any content (the project sibling of ui_open_diagram). Pass `project` (id or name from list_projects), or omit to use your most recently opened project. Returns how many live tabs were switched (0 = no editor tab open right now)." + NARRATE,
       { project: z.string().optional().describe("Project id or name to switch to. Omit to use your most recently opened project.") },
       async ({ project }) => {
         let proj: Project | null = null;
@@ -1034,7 +1037,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "ui_close_file",
-      "Close an open diagram tab in the editor (VS Code-style) — removes it from the project's open-files set and live-closes it in any open editor tab(s), without deleting the diagram. Pass the diagram `id` (from ui_list_open_files / list_diagrams).",
+      "Close an open diagram tab in the editor (VS Code-style) — removes it from the project's open-files set and live-closes it in any open editor tab(s), without deleting the diagram. Pass the diagram `id` (from ui_list_open_files / list_diagrams)." + NARRATE,
       { id: z.string().describe("Diagram id of the open tab to close (from ui_list_open_files).") },
       async ({ id }) => {
         const row = await this.env.DB.prepare("SELECT project_id FROM diagrams WHERE id = ?1 AND owner = ?2 AND deleted IS NULL")
