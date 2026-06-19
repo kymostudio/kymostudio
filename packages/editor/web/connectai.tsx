@@ -1,7 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Sparkles, Copy, Check } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
-import { useMcpActive, useAiTarget, requestPin, sessionIdValue } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, type StatusKind } from "./mcpstatus";
+
+const FEED_ICON: Record<StatusKind, React.ReactNode> = {
+  user: <User size={13} strokeWidth={2} />,
+  thinking: <Brain size={13} strokeWidth={2} />,
+  action: <Wrench size={13} strokeWidth={2} />,
+  result: <CheckCircle2 size={13} strokeWidth={2} />,
+};
 
 // "Connect AI": kymo already runs a remote MCP server (mcp.kymo.studio) — this
 // panel just tells the user how to wire it into their AI client, shows whether an
@@ -56,6 +63,9 @@ const CLIENTS: { name: string; steps: React.ReactNode; url?: string }[] = [
 export function ConnectAI({ onClose }: { onClose: () => void }) {
   const live = useMcpActive();
   const target = useAiTarget();
+  const feed = useStatusFeed();
+  const feedRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { const el = feedRef.current; if (el) el.scrollTop = el.scrollHeight; }, [feed.length]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", k);
@@ -69,7 +79,23 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
         <button className="aiside-close" onClick={onClose} aria-label="Close panel" title="Close">✕</button>
       </div>
       <div className="aiside-body">
-        <p className="aiside-sub">Drive kymo from Claude, Cursor, or any MCP client — create &amp; edit diagrams by chatting; the changes appear <b>live in this editor</b>.</p>
+        {feed.length > 0 && (
+          <div className="cn-feed-wrap">
+            <div className="cn-feed-head">
+              <span>Live activity</span>
+              <button className="cn-feed-clear" onClick={clearStatus} title="Clear"><Eraser size={12} strokeWidth={2} /> Clear</button>
+            </div>
+            <div className="cn-feed" ref={feedRef}>
+              {feed.map((it) => (
+                <div key={it.id} className={"cn-msg cn-msg-" + it.kind}>
+                  <span className="cn-msg-ic">{FEED_ICON[it.kind]}</span>
+                  <span className="cn-msg-text">{it.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <p className="aiside-sub">Drive kymo from Claude, Cursor, or any MCP client — create &amp; edit diagrams by chatting; the changes appear <b>live in this editor</b>. With an AI client connected, ask it to <b>stream its work</b> (it calls <code>ui_status</code>) and you'll see requests &amp; reasoning here.</p>
 
         <div className={"cn-status" + (live ? " live" : "")}>
           <span className="cn-status-dot" />
