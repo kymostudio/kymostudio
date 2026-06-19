@@ -169,6 +169,42 @@ pub fn render_er_positioned(cd: &ClassDiagram, pos: &HashMap<String, (i32, i32, 
     )
 }
 
+/// Render an `erDiagram` with kymo's own **dagre** layout (mermaid-faithful
+/// entity placement, pure Rust — no merman): size each entity by its table
+/// text, lay out with `layout_dagre`, then draw the 2-column tables in place.
+pub fn render_er_dagre(cd: &ClassDiagram) -> String {
+    use kymo_graph::style::FlowStyle;
+    let mut fc = Flowchart {
+        direction: cd.direction,
+        nodes: Vec::new(),
+        edges: Vec::new(),
+        subgraphs: Vec::new(),
+    };
+    for c in &cd.classes {
+        fc.nodes.push(FlowNode {
+            id: c.id.clone(),
+            label: box_label(c),
+            shape: Shape::Box,
+        });
+    }
+    for r in &cd.relations {
+        fc.edges.push(FlowEdge {
+            src: r.from.clone(),
+            dst: r.to.clone(),
+            label: r.label.clone(),
+            dashed: r.dashed,
+            no_arrow: true,
+        });
+    }
+    let geom = kymo_graph::layout_dagre::dagre_geom(&fc, FlowStyle::Mermaid);
+    let pos: HashMap<String, (i32, i32, i32, i32)> = geom
+        .nodes
+        .iter()
+        .map(|n| (n.id.clone(), (n.cx as i32, n.cy as i32, n.w as i32, n.h as i32)))
+        .collect();
+    render_er_positioned(cd, &pos)
+}
+
 /// The multi-line text used only to size the box (one line per rendered row).
 fn box_label(c: &ClassBox) -> String {
     let mut lines = Vec::new();
