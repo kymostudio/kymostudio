@@ -656,10 +656,11 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .aiside-gear-wrap { position: relative; display: inline-flex; }
 .aiside-gear { position: relative; border: 0; background: none; cursor: pointer; color: var(--dim); padding: 4px 6px; border-radius: 7px; display: inline-flex; align-items: center; }
 .aiside-gear:hover { color: var(--ink); background: var(--bg-soft); }
-.aiside-gear.on { color: var(--accent); }
-.aiside-gear-badge { position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 1.5px solid var(--bg); }
+.aiside-gear.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.aiside-gear-badge { position: absolute; top: 1px; right: 1px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 1.5px solid var(--bg); }
 .aiside-settings { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 184px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 12px 32px rgba(36, 33, 49, 0.16); padding: 6px; }
-.aiside-settings .cn-ask-tool { width: 100%; justify-content: space-between; padding: 6px 8px; }
+.aiside-settings .cn-ask-tool { width: 100%; justify-content: flex-start; padding: 6px 8px; }
+.aiside-settings .cn-ask-switch { margin-left: auto; }
 .aiside-body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px; }
 /* Tab bar: Chat · Connection · Setup. */
 .aiside-tabs { flex: none; display: flex; gap: 2px; padding: 0 10px; border-bottom: 1px solid var(--border); }
