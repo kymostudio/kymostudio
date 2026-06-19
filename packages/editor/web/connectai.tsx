@@ -77,6 +77,10 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   }, [onClose]);
   const [showBridge, setShowBridge] = useState(false);
   const [ask, setAsk] = useState("");
+  // Auto-grow the composer textarea with its content (up to the CSS max-height,
+  // after which it scrolls). Runs on every value change incl. send-clear + tab show.
+  const askRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => { const el = askRef.current; if (!el) return; el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }, [ask, tab]);
   const submitAsk = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const t = ask.trim();
@@ -184,7 +188,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
       {tab === "chat" && (
         <div className="cn-ask-foot">
           <form className="cn-composer" onSubmit={submitAsk}>
-            <textarea className="cn-composer-input" value={ask} onChange={(e) => setAsk(e.target.value)} rows={2}
+            <textarea ref={askRef} className="cn-composer-input" value={ask} onChange={(e) => setAsk(e.target.value)} rows={1}
               placeholder="Describe what you want to create..." aria-label="Message the AI"
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submitAsk(e); } }} />
             <div className="cn-composer-bar">
