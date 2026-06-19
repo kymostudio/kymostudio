@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Keyboard } from "lucide-react";
-import { registerShortcutsOpener, toggleConnect } from "./mcpstatus";
+import { registerShortcutsOpener, toggleConnect, toggleSidebar } from "./mcpstatus";
 
 // Mac shows ⌘, everyone else Ctrl. (Best-effort platform sniff.)
 const IS_MAC = typeof navigator !== "undefined" && /mac|iphone|ipad/i.test(navigator.platform || navigator.userAgent || "");
@@ -28,6 +28,7 @@ const GROUPS: { title: string; items: { keys: string[]; desc: string }[] }[] = [
   {
     title: "Panels",
     items: [
+      { keys: [MOD, "B"], desc: "Toggle the primary sidebar (Explorer)" },
       { keys: [MOD, "⇧", "A"], desc: "Toggle the Connect AI panel" },
     ],
   },
@@ -53,6 +54,10 @@ export function ShortcutsModal() {
       // ⌘/Ctrl+⇧+A → toggle Connect AI (works even while typing — it's modified).
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.code === "KeyA" || e.key === "a" || e.key === "A")) {
         e.preventDefault(); toggleConnect(); return;
+      }
+      // ⌘/Ctrl+B → toggle the primary sidebar (Explorer), VS Code-style.
+      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && (e.code === "KeyB" || e.key === "b" || e.key === "B")) {
+        e.preventDefault(); toggleSidebar(); return;
       }
       if (e.key === "Escape") { setOpen(false); return; }
       // "?" opens the panel — but not while typing in a field.

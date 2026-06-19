@@ -132,6 +132,11 @@ let connectToggle: (() => void) | null = null;
 export function registerConnectToggle(fn: (() => void) | null) { connectToggle = fn; }
 export function toggleConnect(): boolean { if (connectToggle) { connectToggle(); return true; } return false; }
 
+// Primary sidebar (Explorer) toggle (EditorPage registers it) — used by the ⌘/Ctrl+B shortcut.
+let sidebarToggle: (() => void) | null = null;
+export function registerSidebarToggle(fn: (() => void) | null) { sidebarToggle = fn; }
+export function toggleSidebar(): boolean { if (sidebarToggle) { sidebarToggle(); return true; } return false; }
+
 // MCP-driven "delete project by simulating the real UI" (open Manage-projects modal →
 // filter to the project → click delete → confirm). ProjectsModal registers it;
 // userchannel calls it when the worker pushes {type:"ui-delete-project", id}.
