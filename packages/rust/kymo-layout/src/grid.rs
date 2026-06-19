@@ -74,8 +74,8 @@ pub fn layout(g: &Grid) -> (Vec<Placed>, f64, f64) {
         }
     }
 
-    // Column unit = widest single-column cell; nested grids span ceil(w / unit).
-    let unit = sized
+    // Preliminary unit = widest single-column plain cell/space.
+    let unit0 = sized
         .iter()
         .filter_map(|s| match s.item {
             Item::Cell(c) => Some(s.w / c.span.max(1) as f64),
@@ -83,22 +83,34 @@ pub fn layout(g: &Grid) -> (Vec<Placed>, f64, f64) {
             Item::Grid(_) => None,
         })
         .fold(CELL_W, f64::max);
-    let span_of = |s: &Sized| -> usize {
-        match s.item {
-            Item::Cell(c) => c.span.max(1),
-            Item::Space(sp) => (*sp).max(1),
-            Item::Grid(_) => ((s.w + GAP) / (unit + GAP)).ceil() as usize,
-        }
-        .clamp(1, cols)
-    };
+    // Each item's column span. Like mermaid, a nested block occupies ONE column
+    // (the column unit widens to fit it) rather than spanning several.
+    let _ = unit0;
+    let spans: Vec<usize> = sized
+        .iter()
+        .map(|s| {
+            match s.item {
+                Item::Cell(c) => c.span.max(1),
+                Item::Space(sp) => (*sp).max(1),
+                Item::Grid(_) => 1,
+            }
+            .clamp(1, cols)
+        })
+        .collect();
+    // Final unit: a span-N item must fit in N units, so nested grids widen the
+    // column unit (otherwise their content overflows the box).
+    let unit = sized
+        .iter()
+        .zip(&spans)
+        .map(|(s, &sp)| (s.w - (sp as f64 - 1.0) * GAP) / sp as f64)
+        .fold(unit0, f64::max);
 
     // Place row-major; track each item's (row, col).
     let mut col = 0usize;
     let mut row = 0usize;
     let mut rows_h = vec![0f64];
     let mut placement: Vec<(usize, usize, usize)> = Vec::new(); // (row, col, span)
-    for s in &sized {
-        let sp = span_of(s);
+    for (s, &sp) in sized.iter().zip(&spans) {
         if col + sp > cols && col > 0 {
             row += 1;
             col = 0;
