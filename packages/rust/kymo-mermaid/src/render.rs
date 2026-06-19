@@ -41,7 +41,12 @@ impl MermaidFlowchart {
         crate::render_flowchart_math(&mut fc);
         let style = FlowStyle::Mermaid;
         let (node_styles, default_style) = mermaid::extract_node_styles(src);
-        let geom = layout(src, &fc, style);
+        let mut geom = layout(src, &fc, style);
+        // Apply a `%%{init: {theme: …}}%%` palette (dark/forest/neutral) when the
+        // layout didn't already carry one (merman lifts it under `full`).
+        if geom.theme.is_none() {
+            geom.theme = theme_colors(src);
+        }
         Ok(Self {
             geom,
             style,
@@ -89,4 +94,39 @@ fn layout(_src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
 fn layout(src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
     crate::katex_layout::build_geom(src, fc)
         .unwrap_or_else(|| kymo_graph::layout_dagre::dagre_geom(fc, style))
+}
+
+/// Map a `%%{init: {"theme": "dark"|"forest"|"neutral"}}%%` directive to kymo's
+/// `ThemeColors` (mermaid's built-in palettes). `None` for default/base/unknown
+/// (kymo's default palette already matches mermaid's default theme).
+fn theme_colors(src: &str) -> Option<kymo_graph::dagre_svg::ThemeColors> {
+    use kymo_graph::dagre_svg::ThemeColors;
+    let low = src.to_ascii_lowercase();
+    if !low.contains("\"theme\"") && !low.contains("'theme'") && !low.contains("theme:") {
+        return None;
+    }
+    let i = low.find("theme")?;
+    let val: String = low[i + 5..]
+        .trim_start_matches(|c: char| c == ':' || c == '"' || c == '\'' || c == ' ')
+        .chars()
+        .take_while(|c| c.is_ascii_alphabetic())
+        .collect();
+    let c = |s: &str| Some(s.to_string());
+    let (nf, ns, tx, ln, cf, cs) = match val.as_str() {
+        "dark" => ("#1f2020", "#ccc", "#ccc", "lightgrey", "hsl(180,1.6%,28.4%)", "rgba(255,255,255,0.25)"),
+        "forest" => ("#cde498", "#13540c", "#333333", "#000000", "#cdffb2", "#6eaa49"),
+        "neutral" => ("#eeeeee", "#999999", "#333333", "#666666", "#ffffff", "#aaaaaa"),
+        _ => return None,
+    };
+    Some(ThemeColors {
+        node_fill: c(nf),
+        node_stroke: c(ns),
+        text: c(tx),
+        line: c(ln),
+        cluster_fill: c(cf),
+        cluster_stroke: c(cs),
+        background: None, // mermaid keeps the svg background white even in dark theme
+        gradient: None,
+        drop_shadow: false,
+    })
 }
