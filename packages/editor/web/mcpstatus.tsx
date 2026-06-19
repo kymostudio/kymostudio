@@ -147,6 +147,19 @@ let newDiagram: (() => void) | null = null;
 export function registerNewDiagram(fn: (() => void) | null) { newDiagram = fn; }
 export function fireNewDiagram(): boolean { if (newDiagram) { newDiagram(); return true; } return false; }
 
+// ---- "A process is listening" signal: the server pushes {type:"listening"} each
+// time something long-polls wait_for_user_message (~every 25s). The chat composer
+// is disabled until this is fresh, so users can't type into a void. ----
+const LISTEN_MS = 35_000; // a poll fires ~every 25s; treat as listening within 35s
+let lastListen = 0;
+const listenSubs = new Set<() => void>();
+export function pingListening() { lastListen = Date.now(); listenSubs.forEach((f) => f()); }
+export function useListening(): boolean {
+  const [, bump] = useReducer((c: number) => c + 1, 0);
+  useEffect(() => { listenSubs.add(bump); const iv = setInterval(bump, 5000); return () => { listenSubs.delete(bump); clearInterval(iv); }; }, []);
+  return lastListen > 0 && Date.now() - lastListen < LISTEN_MS;
+}
+
 // Find: open the Search panel + focus its box (EditorPage registers) — ⌘/Ctrl+F.
 let findOpen: (() => void) | null = null;
 export function registerFindOpen(fn: (() => void) | null) { findOpen = fn; }
