@@ -92,7 +92,12 @@ const feedSubs = new Set<() => void>();
 
 export function pushStatus(it: { kind?: string; text?: string; ts?: number }) {
   const kind: StatusKind = (["user", "thinking", "action", "result"].includes(String(it.kind)) ? it.kind : "thinking") as StatusKind;
-  feed = [...feed, { id: ++feedSeq, kind, text: String(it.text ?? ""), ts: Number(it.ts) || 0 }].slice(-200);
+  const text = String(it.text ?? "");
+  // Drop a consecutive duplicate (e.g. the panel's local echo of a typed prompt +
+  // the agent re-narrating the same line via ui_status).
+  const last = feed[feed.length - 1];
+  if (last && last.kind === kind && last.text === text) return;
+  feed = [...feed, { id: ++feedSeq, kind, text, ts: Number(it.ts) || 0 }].slice(-200);
   feedSubs.forEach((f) => f());
 }
 export function clearStatus() { feed = []; feedSubs.forEach((f) => f()); }
