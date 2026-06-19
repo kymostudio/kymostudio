@@ -19,6 +19,48 @@ const MY: f64 = 8.0;
 
 /// Lay out a flowchart with dagre, sizing nodes per `style`, keeping every
 /// coordinate in `f64` (no rounding) so the renderer can match mermaid sub-pixel.
+/// Bounding box (x1,y1,x2,y2) of subgraph `i` = the union of its node members'
+/// boxes and the boxes of its child subgraphs (nesting via `Subgraph::parent`),
+/// padded by 8px plus a top band for the cluster label. Memoised by index.
+fn region_bounds(
+    i: usize,
+    subs: &[crate::flowchart::Subgraph],
+    children: &[Vec<usize>],
+    node_box: &std::collections::HashMap<&str, (f64, f64, f64, f64)>,
+    dagre_box: &[Option<(f64, f64, f64, f64)>],
+    memo: &mut [Option<Option<(f64, f64, f64, f64)>>],
+) -> Option<(f64, f64, f64, f64)> {
+    if let Some(c) = memo[i] {
+        return c;
+    }
+    // The dagre crate already sized this cluster from its leaf members — trust it
+    // (keeps single-level subgraphs byte-identical). Only clusters it left
+    // degenerate (those containing only other clusters) fall through to the union.
+    if let Some(bx) = dagre_box[i] {
+        memo[i] = Some(Some(bx));
+        return Some(bx);
+    }
+    memo[i] = Some(None); // guard against parent cycles while recursing
+    let mut b: Option<(f64, f64, f64, f64)> = None;
+    let mut acc = |b: &mut Option<(f64, f64, f64, f64)>, m: Option<(f64, f64, f64, f64)>| {
+        if let Some((x1, y1, x2, y2)) = m {
+            *b = Some(match *b {
+                None => (x1, y1, x2, y2),
+                Some((a1, c1, a2, c2)) => (a1.min(x1), c1.min(y1), a2.max(x2), c2.max(y2)),
+            });
+        }
+    };
+    for mem in &subs[i].members {
+        acc(&mut b, node_box.get(mem.as_str()).copied());
+    }
+    for &c in &children[i] {
+        acc(&mut b, region_bounds(c, subs, children, node_box, dagre_box, memo));
+    }
+    let res = b.map(|(x1, y1, x2, y2)| (x1 - 8.0, y1 - 21.0, x2 + 8.0, y2 + 8.0));
+    memo[i] = Some(res);
+    res
+}
+
 pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
     let mut geom = FGeom::default();
     if fc.nodes.is_empty() {
@@ -139,21 +181,51 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
             });
         }
     }
-    for sg in &fc.subgraphs {
-        if let Some(cd) = g.node(&sg.id) {
-            let (x, y, w, h) = (
-                cd.x.unwrap_or(0.0),
-                cd.y.unwrap_or(0.0),
-                cd.width,
-                cd.height,
-            );
+    // Cluster bounds: the dagre crate sizes a cluster from its *leaf* members, so
+    // a subgraph that only contains other subgraphs comes back 0×0. Compute each
+    // region as the union of its members' boxes (recursing into nested
+    // subgraphs) so a parent encloses its child clusters.
+    let node_box: std::collections::HashMap<&str, (f64, f64, f64, f64)> = geom
+        .nodes
+        .iter()
+        .map(|n| (n.id.as_str(), (n.cx - n.w / 2.0, n.cy - n.h / 2.0, n.cx + n.w / 2.0, n.cy + n.h / 2.0)))
+        .collect();
+    let mut children: Vec<Vec<usize>> = vec![Vec::new(); fc.subgraphs.len()];
+    for (ci, sg) in fc.subgraphs.iter().enumerate() {
+        if let Some(p) = sg.parent {
+            if p < children.len() {
+                children[p].push(ci);
+            }
+        }
+    }
+    // The dagre crate's own cluster box (geom coords), kept when non-degenerate.
+    let dagre_box: Vec<Option<(f64, f64, f64, f64)>> = fc
+        .subgraphs
+        .iter()
+        .map(|sg| {
+            g.node(&sg.id).and_then(|cd| {
+                let (w, h) = (cd.width, cd.height);
+                if w > 0.0 && h > 0.0 {
+                    let (x, y) = (cd.x.unwrap_or(0.0), cd.y.unwrap_or(0.0));
+                    Some((x - w / 2.0 + MX, y - h / 2.0 + MY, x + w / 2.0 + MX, y + h / 2.0 + MY))
+                } else {
+                    None
+                }
+            })
+        })
+        .collect();
+    let mut memo: Vec<Option<Option<(f64, f64, f64, f64)>>> = vec![None; fc.subgraphs.len()];
+    for (i, sg) in fc.subgraphs.iter().enumerate() {
+        if let Some((x1, y1, x2, y2)) =
+            region_bounds(i, &fc.subgraphs, &children, &node_box, &dagre_box, &mut memo)
+        {
             geom.regions.push(FRegion {
                 id: sg.id.clone(),
                 label: sg.title.clone(),
-                x: x - w / 2.0 + MX,
-                y: y - h / 2.0 + MY,
-                w,
-                h,
+                x: x1,
+                y: y1,
+                w: x2 - x1,
+                h: y2 - y1,
                 visible: true,
             });
         }

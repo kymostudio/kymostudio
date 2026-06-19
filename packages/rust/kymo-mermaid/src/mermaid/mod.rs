@@ -377,7 +377,7 @@ fn touch_node(fc: &mut Flowchart, index: &mut Vec<(String, usize)>, n: &parser::
     if let Some((_, idx)) = index.iter().find(|(id, _)| id == &n.id) {
         let node = &mut fc.nodes[*idx];
         if let Some(label) = &n.label {
-            node.label = label.clone();
+            node.label = strip_html(label);
         }
         if let Some(shape) = n.shape {
             node.shape = shape;
@@ -386,11 +386,41 @@ fn touch_node(fc: &mut Flowchart, index: &mut Vec<(String, usize)>, n: &parser::
         let idx = fc.nodes.len();
         fc.nodes.push(FlowNode {
             id: n.id.clone(),
-            label: n.label.clone().unwrap_or_else(|| n.id.clone()),
+            label: n.label.as_deref().map(strip_html).unwrap_or_else(|| n.id.clone()),
             shape: n.shape.unwrap_or(Shape::Rect),
         });
         index.push((n.id.clone(), idx));
     }
+}
+
+/// Strip HTML markup from a label (mermaid renders `htmlLabels`): `<br>` →
+/// newline, all other tags removed, so `a["<strong>Haiya</strong>"]` shows
+/// `Haiya` rather than the literal tags.
+fn strip_html(s: &str) -> String {
+    if !s.contains('<') {
+        return s.to_string();
+    }
+    let mut out = String::with_capacity(s.len());
+    let mut chars = s.chars().peekable();
+    while let Some(c) = chars.next() {
+        if c == '<' {
+            // Collect the tag name to special-case <br>.
+            let mut tag = String::new();
+            for tc in chars.by_ref() {
+                if tc == '>' {
+                    break;
+                }
+                tag.push(tc);
+            }
+            let t = tag.trim().trim_start_matches('/').to_ascii_lowercase();
+            if t == "br" || t.starts_with("br ") || t.starts_with("br/") {
+                out.push('\n');
+            }
+        } else {
+            out.push(c);
+        }
+    }
+    out
 }
 
 /// Record a node as a member of the innermost open subgraph (deduplicated).
