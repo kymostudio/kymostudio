@@ -137,6 +137,21 @@ let sidebarToggle: (() => void) | null = null;
 export function registerSidebarToggle(fn: (() => void) | null) { sidebarToggle = fn; }
 export function toggleSidebar(): boolean { if (sidebarToggle) { sidebarToggle(); return true; } return false; }
 
+// Source/Preview pane toggles (EditorPage registers) — used by ⌘/Ctrl+⇧+E and ⌘/Ctrl+⇧+P.
+let paneToggle: ((k: "source" | "preview") => void) | null = null;
+export function registerPaneToggle(fn: ((k: "source" | "preview") => void) | null) { paneToggle = fn; }
+export function firePaneToggle(k: "source" | "preview"): boolean { if (paneToggle) { paneToggle(k); return true; } return false; }
+
+// New-diagram launcher (EditorPage registers) — used by the "N" shortcut.
+let newDiagram: (() => void) | null = null;
+export function registerNewDiagram(fn: (() => void) | null) { newDiagram = fn; }
+export function fireNewDiagram(): boolean { if (newDiagram) { newDiagram(); return true; } return false; }
+
+// Find: open the Search panel + focus its box (EditorPage registers) — ⌘/Ctrl+F.
+let findOpen: (() => void) | null = null;
+export function registerFindOpen(fn: (() => void) | null) { findOpen = fn; }
+export function openFind(): boolean { if (findOpen) { findOpen(); return true; } return false; }
+
 // MCP-driven "delete project by simulating the real UI" (open Manage-projects modal →
 // filter to the project → click delete → confirm). ProjectsModal registers it;
 // userchannel calls it when the worker pushes {type:"ui-delete-project", id}.

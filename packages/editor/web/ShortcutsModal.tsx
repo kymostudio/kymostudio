@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Keyboard } from "lucide-react";
-import { registerShortcutsOpener, toggleConnect, toggleSidebar } from "./mcpstatus";
+import { registerShortcutsOpener, toggleConnect, toggleSidebar, firePaneToggle, fireNewDiagram, openFind } from "./mcpstatus";
 
 // Mac shows ⌘, everyone else Ctrl. (Best-effort platform sniff.)
 const IS_MAC = typeof navigator !== "undefined" && /mac|iphone|ipad/i.test(navigator.platform || navigator.userAgent || "");
@@ -22,6 +22,8 @@ const GROUPS: { title: string; items: { keys: string[]; desc: string }[] }[] = [
   {
     title: "Diagram",
     items: [
+      { keys: ["N"], desc: "New diagram" },
+      { keys: [MOD, "F"], desc: "Find — search your diagrams" },
       { keys: [MOD, "S"], desc: "Save the current diagram" },
     ],
   },
@@ -29,6 +31,8 @@ const GROUPS: { title: string; items: { keys: string[]; desc: string }[] }[] = [
     title: "Panels",
     items: [
       { keys: [MOD, "B"], desc: "Toggle the primary sidebar (Explorer)" },
+      { keys: [MOD, "⇧", "E"], desc: "Toggle the Source pane" },
+      { keys: [MOD, "⇧", "P"], desc: "Toggle the Preview pane" },
       { keys: [MOD, "⇧", "A"], desc: "Toggle the Connect AI panel" },
     ],
   },
@@ -59,9 +63,19 @@ export function ShortcutsModal() {
       if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && (e.code === "KeyB" || e.key === "b" || e.key === "B")) {
         e.preventDefault(); toggleSidebar(); return;
       }
+      // ⌘/Ctrl+F → open the Find menu (Search panel), overriding the browser's find.
+      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && (e.code === "KeyF" || e.key === "f" || e.key === "F")) {
+        e.preventDefault(); openFind(); return;
+      }
+      // ⌘/Ctrl+⇧+E / ⌘/Ctrl+⇧+P → toggle the Source / Preview pane.
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyE") { e.preventDefault(); firePaneToggle("source"); return; }
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyP") { e.preventDefault(); firePaneToggle("preview"); return; }
       if (e.key === "Escape") { setOpen(false); return; }
-      // "?" opens the panel — but not while typing in a field.
-      if (e.key === "?" && !isTyping(e.target)) { e.preventDefault(); setOpen((o) => !o); }
+      // Un-modified keys below: ignore while typing or when a dialog is already open.
+      if (isTyping(e.target)) return;
+      const dialogUp = !!document.querySelector(".ks-overlay, .pm-overlay, .tpl-overlay, .confirm-overlay");
+      if (e.key === "?") { e.preventDefault(); setOpen((o) => !o); return; }
+      if ((e.key === "n" || e.key === "N") && !e.metaKey && !e.ctrlKey && !e.altKey && !dialogUp) { e.preventDefault(); fireNewDiagram(); }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
