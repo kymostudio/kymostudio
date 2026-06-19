@@ -305,21 +305,24 @@ fn ensure_decl(seq: &mut Sequence, rest: &str, is_actor: bool) {
     if rest.is_empty() {
         return;
     }
-    // Strip a Mermaid 11 `@{ "type": X }` metadata block off the declaration.
+    // Strip a Mermaid 11 `@{ "type": X }` metadata block out of the declaration,
+    // keeping the text on BOTH sides (`U@{…} as End User` → `U as End User`).
     let (decl, mut kind) = match rest.find("@{") {
         Some(at) => {
-            let body = &rest[at + 2..];
-            let end = body.find('}').unwrap_or(body.len());
-            (rest[..at].trim(), meta_type(&body[..end]))
+            let after = &rest[at + 2..];
+            let close = after.find('}');
+            let meta = &after[..close.unwrap_or(after.len())];
+            let tail = close.map(|c| &after[c + 1..]).unwrap_or("");
+            (format!("{} {}", &rest[..at], tail).trim().to_string(), meta_type(meta))
         }
-        None => (rest, String::new()),
+        None => (rest.to_string(), String::new()),
     };
     if is_actor && kind.is_empty() {
         kind = "actor".to_string();
     }
-    let (id, label) = match split_as(decl) {
+    let (id, label) = match split_as(&decl) {
         Some((l, r)) => (l.trim().to_string(), r.trim().to_string()),
-        None => (decl.to_string(), decl.to_string()),
+        None => (decl.clone(), decl.clone()),
     };
     if let Some(p) = seq.participants.iter_mut().find(|p| p.id == id) {
         p.label = label;
