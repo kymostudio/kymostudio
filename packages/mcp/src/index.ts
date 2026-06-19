@@ -770,6 +770,14 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ type: "status", kind, text: String(text).slice(0, 500), ts: Date.now() }),
       }).then(() => {}).catch(() => {});
+    // Tell open editor windows to refetch their project list after a server-side
+    // project mutation (rename/delete) so the switcher + Manage-projects modal don't
+    // show a stale entry until reload. (new_project already pushes open-project.)
+    const projectsChanged = () =>
+      this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ type: "projects-changed" }),
+      }).then(() => {}).catch(() => {});
     // Appended to every write/UI tool's description so ANY MCP client narrates first —
     // the panel then reads request → reasoning → action without relying on memory.
     const NARRATE = " Before calling this, narrate to the user's editor panel: first call ui_status(kind:\"user\", <the user's request>) then ui_status(kind:\"thinking\", <your plan/reasoning>) — so the Live Activity feed reads request → reasoning → action.";
@@ -975,6 +983,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         const proj = await findProject(this.env, me(), project);
         if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects.` }] };
         await renameProject(this.env, me(), proj.id, name);
+        await projectsChanged();
         return { content: [{ type: "text", text: `Renamed project ${proj.id} → "${name.trim().slice(0, 40)}".` }] };
       }
     );
@@ -1007,6 +1016,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         const res = await deleteProjectCascade(this.env, me(), proj.id);
         if (!res.ok) return { content: [{ type: "text", text: res.error === "cannot delete your only project" ? "Can't delete your only project — create another first." : `Project ${proj.id} not found.` }] };
         await feed("action", `Deleted project "${proj.name}" (moved to Trash)`);
+        await projectsChanged();
         return { content: [{ type: "text", text: `Deleted project "${proj.name}" (id ${proj.id}) and moved its contents to Trash.` }] };
       }
     );
