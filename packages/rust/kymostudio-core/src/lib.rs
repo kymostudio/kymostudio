@@ -265,14 +265,17 @@ mod tests {
     #[test]
     fn autonumber_off_keeps_counting() {
         // `off` hides but keeps advancing; bare `autonumber` resumes from the
-        // running count (5,10, hidden 15, then 20) — matching mermaid.
+        // running count (5,10, hidden 15, then 20) — matching mermaid. The index
+        // renders as a badge (its own `<text>`) on the source lifeline, separate
+        // from the message label.
         let svg = super::mermaid_to_sequence_svg(
             "sequenceDiagram\nautonumber 5 5\nA->>B: a\nA->>B: b\nautonumber off\nA->>B: c\nautonumber\nA->>B: d",
         )
         .unwrap();
-        assert!(svg.contains(">5 a<") && svg.contains(">10 b<"));
-        assert!(svg.contains(">c<") && !svg.contains(">15 c<")); // hidden but counted
-        assert!(svg.contains(">20 d<")); // resumes at 20, not 1
+        assert!(svg.contains(">5<") && svg.contains(">a<")); // badge 5 + label a
+        assert!(svg.contains(">10<") && svg.contains(">b<")); // badge 10 + label b
+        assert!(svg.contains(">c<") && !svg.contains(">15<")); // hidden but counted
+        assert!(svg.contains(">20<") && svg.contains(">d<")); // resumes at 20, not 1
     }
 
     #[test]
