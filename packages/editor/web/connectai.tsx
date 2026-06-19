@@ -185,7 +185,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
         <div className="cn-ask-foot">
           <form className="cn-composer" onSubmit={submitAsk}>
             <textarea className="cn-composer-input" value={ask} onChange={(e) => setAsk(e.target.value)} rows={2}
-              placeholder="Message the AI…  (received via wait_for_user_message)" aria-label="Message the AI"
+              placeholder="Describe what you want to create..." aria-label="Message the AI"
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submitAsk(e); } }} />
             <div className="cn-composer-bar">
               <button type="button" className={"cn-ask-tool" + (simulate ? " on" : "")} onClick={() => setSimulate(!simulate)}
