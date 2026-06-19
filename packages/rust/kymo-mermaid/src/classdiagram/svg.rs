@@ -258,28 +258,33 @@ fn box_svg(c: &ClassBox, comp: &Component) -> String {
     let (cx, cy) = comp.pos;
     let (w, h) = comp.size.unwrap_or((120, 60));
     let (x, y) = (cx - w / 2, cy - h / 2);
+    // `classDef` styling (fill/stroke/stroke-width/color), else the defaults.
+    let fill = c.style.fill.as_deref().unwrap_or("#ECECFF");
+    let stroke = c.style.stroke.as_deref().unwrap_or("#9370DB");
+    let sw = c.style.stroke_width.as_deref().unwrap_or("1.2");
+    let ink = c.style.color.as_deref().unwrap_or("#131300");
     let mut out = format!(
-        "<rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"2\" fill=\"#ECECFF\" \
-         stroke=\"#9370DB\" stroke-width=\"1.2\"/>"
+        "<rect x=\"{x}\" y=\"{y}\" width=\"{w}\" height=\"{h}\" rx=\"2\" fill=\"{fill}\" \
+         stroke=\"{stroke}\" stroke-width=\"{sw}\"/>"
     );
     let mut ty = y + 4;
     if !c.stereotype.is_empty() {
         ty += LINE_H - 4;
         out += &format!(
-            "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-size=\"11\" fill=\"#333333\">{}</text>",
+            "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-size=\"11\" fill=\"{ink}\">{}</text>",
             esc(&format!("<<{}>>", c.stereotype))
         );
         ty += 4;
     }
     ty += LINE_H - 4;
     out += &format!(
-        "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-weight=\"700\" fill=\"#131300\">{}</text>",
+        "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-weight=\"700\" fill=\"{ink}\">{}</text>",
         esc(&c.name)
     );
     ty += 6;
     let row = |ty: i32, t: &str| {
         format!(
-            "<text x=\"{}\" y=\"{ty}\" fill=\"#131300\">{}</text>",
+            "<text x=\"{}\" y=\"{ty}\" fill=\"{ink}\">{}</text>",
             x + 6,
             esc(t)
         )

@@ -7,8 +7,9 @@
 //! `: label`. Styling / click / note lines are accepted and ignored.
 
 use super::MermaidError;
-use crate::classdiagram::{ClassBox, ClassDiagram, ClassNote, Crow, RelKind, Relation};
+use crate::classdiagram::{ClassBox, ClassDiagram, ClassNote, ClassStyle, Crow, RelKind, Relation};
 use kymo_graph::flowchart::Direction;
+use std::collections::HashMap;
 
 /// Parse class-diagram source into a [`ClassDiagram`].
 pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
@@ -38,6 +39,8 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         er: false,
     };
     let mut cur: Option<usize> = None; // open `class X { … }` block
+    let mut class_defs: HashMap<String, ClassStyle> = HashMap::new(); // classDef name → style
+    let mut style_refs: HashMap<String, Vec<String>> = HashMap::new(); // class id → style names
     let mut ns_stack: Vec<usize> = Vec::new(); // open (nestable) namespaces
     let mut pending_note: Option<String> = None; // unterminated `note "…`
     let mut started = false;
@@ -130,9 +133,26 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             }
             continue;
         }
+        // `classDef name fill:#f9f,stroke:#333,...` — define a reusable style.
+        if low.starts_with("classdef ") {
+            let rest = stmt[9..].trim();
+            if let Some((name, props)) = rest.split_once(char::is_whitespace) {
+                class_defs.insert(name.trim().to_string(), parse_class_style(props));
+            }
+            continue;
+        }
+        // `cssClass "id1,id2" styleName` — apply a style to listed classes.
+        if low.starts_with("cssclass ") {
+            let rest = stmt[9..].trim();
+            if let Some((ids, name)) = rest.rsplit_once(char::is_whitespace) {
+                let name = name.trim().to_string();
+                for id in ids.trim().trim_matches('"').split(',') {
+                    style_refs.entry(id.trim().to_string()).or_default().push(name.clone());
+                }
+            }
+            continue;
+        }
         if low.starts_with("style ")
-            || low.starts_with("classdef ")
-            || low.starts_with("cssclass ")
             || low.starts_with("click ")
             || low.starts_with("callback ")
             || low.starts_with("link ")
@@ -147,6 +167,11 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             let rest = stmt[5..].trim();
             let opens = rest.ends_with('{');
             let head = rest.trim_end_matches('{').trim();
+            // `class X:::styleName` — record the inline style reference.
+            if let Some((base, sty)) = head.split_once(":::") {
+                let key = decl_class_key(base);
+                style_refs.entry(key).or_default().push(sty.trim().to_string());
+            }
             let ci = decl_class(&mut cd.classes, head);
             let id = cd.classes[ci].id.clone();
             for &n in &ns_stack {
@@ -182,7 +207,57 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
         decl_class(&mut cd.classes, stmt);
     }
 
+    // Resolve `classDef` styles onto each class (later refs win per property).
+    for c in &mut cd.classes {
+        if let Some(names) = style_refs.get(&c.id) {
+            for n in names {
+                if let Some(st) = class_defs.get(n) {
+                    if st.fill.is_some() {
+                        c.style.fill = st.fill.clone();
+                    }
+                    if st.stroke.is_some() {
+                        c.style.stroke = st.stroke.clone();
+                    }
+                    if st.stroke_width.is_some() {
+                        c.style.stroke_width = st.stroke_width.clone();
+                    }
+                    if st.color.is_some() {
+                        c.style.color = st.color.clone();
+                    }
+                }
+            }
+        }
+    }
     Ok(cd)
+}
+
+/// Parse `fill:#f9f,stroke:#333,stroke-width:6px,color:#fff` into a [`ClassStyle`].
+fn parse_class_style(props: &str) -> ClassStyle {
+    let mut s = ClassStyle::default();
+    for kv in props.split(',') {
+        if let Some((k, v)) = kv.split_once(':') {
+            let v = v.trim().to_string();
+            match k.trim().to_ascii_lowercase().as_str() {
+                "fill" => s.fill = Some(v),
+                "stroke" => s.stroke = Some(v),
+                "stroke-width" => s.stroke_width = Some(v),
+                "color" => s.color = Some(v),
+                _ => {}
+            }
+        }
+    }
+    s
+}
+
+/// The canonical class id for a head (strips `:::`, `["…"]`, `~T~`, quotes).
+fn decl_class_key(head: &str) -> String {
+    let head = head.split(":::").next().unwrap_or(head).trim();
+    let head = match head.find('[') {
+        Some(b) if head.ends_with(']') => head[..b].trim(),
+        _ => head,
+    };
+    let id_part = head.split_once('~').map(|(a, _)| a.trim()).unwrap_or(head);
+    id_part.trim_matches('"').trim().to_string()
 }
 
 /// `note for X "text"` → (X, text).
