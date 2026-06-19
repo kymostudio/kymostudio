@@ -127,17 +127,10 @@ pub fn render(seq: &Sequence) -> String {
 }
 
 fn head_box(cx: i64, top: i64, label: &str, kind: &str) -> String {
-    // A typed participant (`@{type:…}`) draws its UML glyph + the name below it,
-    // rather than a plain box (mirrors mermaid 11).
+    // A typed participant (`@{type:…}`) draws its UML glyph (mermaid 11 geometry).
     if !kind.is_empty() && kind != "participant" {
-        if let Some(glyph) = actor_glyph(kind, cx, top) {
-            let name = format!(
-                "<text x=\"{cx}\" y=\"{}\" text-anchor=\"middle\" dominant-baseline=\"central\" \
-                 fill=\"#333333\" font-weight=\"600\">{}</text>",
-                top + HEAD_H - 5,
-                esc(label)
-            );
-            return format!("{glyph}{name}");
+        if let Some(glyph) = actor_glyph(kind, cx, top, label) {
+            return glyph;
         }
     }
     let x = cx - HEAD_W / 2;
@@ -161,60 +154,110 @@ fn head_box(cx: i64, top: i64, label: &str, kind: &str) -> String {
     )
 }
 
-/// A small UML actor glyph for a `@{type:…}` participant, centred on `cx` in the
-/// band `top..top+HEAD_H`. `None` for an unknown type (caller draws a box).
-fn actor_glyph(kind: &str, cx: i64, top: i64) -> Option<String> {
+/// The centred actor name under/inside a typed glyph.
+fn glyph_label(cx: i64, y: f64, label: &str) -> String {
+    format!(
+        "<text x=\"{cx}\" y=\"{y:.2}\" text-anchor=\"middle\" dominant-baseline=\"central\" \
+         fill=\"#333333\" font-weight=\"400\" font-size=\"16\">{}</text>",
+        esc(label)
+    )
+}
+
+/// A UML actor glyph for a `@{type:…}` participant, ported from mermaid 11's
+/// `svgDraw` geometry (actor box 150×65, `top` = box top, `cx` = lifeline x).
+/// `None` for an unknown type (caller draws a plain box).
+fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
+    const H: f64 = HEAD_H as f64; // 65
+    const W: f64 = HEAD_W as f64; // 150
     let f = "#ECECFF";
     let s = "#9370DB";
-    let pen = format!("fill=\"none\" stroke=\"{s}\" stroke-width=\"1.5\"");
-    let fill = format!("fill=\"{f}\" stroke=\"{s}\" stroke-width=\"1.5\"");
-    let gy = top + 13; // glyph vertical centre
+    let pen = format!("fill=\"none\" stroke=\"{s}\" stroke-width=\"2\"");
+    let fill = format!("fill=\"{f}\" stroke=\"{s}\" stroke-width=\"2\"");
+    let (t, c) = (top as f64, cx as f64);
     let g = match kind {
-        "actor" => format!(
-            "<circle cx=\"{cx}\" cy=\"{}\" r=\"4\" {fill}/>\
-             <line x1=\"{cx}\" y1=\"{}\" x2=\"{cx}\" y2=\"{}\" {pen}/>\
-             <line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>\
-             <line x1=\"{cx}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>\
-             <line x1=\"{cx}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>",
-            top + 5,
-            top + 9, top + 20,
-            cx - 8, top + 13, cx + 8, top + 13,
-            top + 20, cx - 6, top + 28,
-            top + 20, cx + 6, top + 28,
-        ),
-        "database" | "queue" => {
-            // cylinder
-            let (w, t, b) = (12i64, top + 4, top + 24);
+        // Stick figure: head circle r=15, torso, arms, two legs.
+        "actor" => {
+            let (cy, r) = (t + 10.0, 15.0);
+            let (tt, tb) = (cy + r, cy + r + 20.0); // torso top/bottom
+            let ay = tt + 8.0; // arms
+            let ly = tb + 15.0; // leg foot
             format!(
-                "<path d=\"M {l} {t} A {w} 3 0 0 0 {r} {t} L {r} {b} A {w} 3 0 0 1 {l} {b} Z\" {fill}/>\
-                 <path d=\"M {l} {t} A {w} 3 0 0 0 {r} {t}\" {pen}/>",
-                l = cx - w, r = cx + w, t = t, b = b, w = w,
+                "<circle cx=\"{c}\" cy=\"{cy}\" r=\"15\" {fill}/>\
+                 <line x1=\"{c}\" y1=\"{tt}\" x2=\"{c}\" y2=\"{tb}\" {pen}/>\
+                 <line x1=\"{ax1}\" y1=\"{ay}\" x2=\"{ax2}\" y2=\"{ay}\" {pen}/>\
+                 <line x1=\"{ax1}\" y1=\"{ly}\" x2=\"{c}\" y2=\"{tb}\" {pen}/>\
+                 <line x1=\"{c}\" y1=\"{tb}\" x2=\"{lx2}\" y2=\"{ly}\" {pen}/>{lbl}",
+                ax1 = c - 18.0, ax2 = c + 18.0, lx2 = c + 16.0,
+                lbl = glyph_label(cx, t + H + 2.5, label),
             )
         }
-        "control" => format!(
-            "<circle cx=\"{cx}\" cy=\"{gy}\" r=\"9\" {fill}/>\
-             <path d=\"M {} {} l 5 -3 l 0 6 Z\" fill=\"{s}\"/>",
-            cx - 4, top + 5,
-        ),
-        "boundary" => format!(
-            "<circle cx=\"{}\" cy=\"{gy}\" r=\"8\" {fill}/>\
-             <line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>\
-             <line x1=\"{}\" y1=\"{gy}\" x2=\"{}\" y2=\"{gy}\" {pen}/>",
-            cx + 4,
-            cx - 11, top + 5, cx - 11, top + 21,
-            cx - 11, cx - 4,
-        ),
-        "entity" => format!(
-            "<circle cx=\"{cx}\" cy=\"{}\" r=\"8\" {fill}/>\
-             <line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" {pen}/>",
-            top + 11,
-            cx - 8, top + 23, cx + 8, top + 23,
-        ),
-        "collections" => format!(
-            "<rect x=\"{}\" y=\"{}\" width=\"18\" height=\"14\" rx=\"2\" {fill}/>\
-             <rect x=\"{}\" y=\"{}\" width=\"18\" height=\"14\" rx=\"2\" {fill}/>",
-            cx - 10, top + 4, cx - 4, top + 9,
-        ),
+        // Boundary: circle r=22, a stalk (vertical bar + connector) on its left.
+        "boundary" => {
+            let cy = t + 33.0; // 12 + translate 21
+            format!(
+                "<line x1=\"{x1}\" y1=\"{yt}\" x2=\"{x2}\" y2=\"{yt}\" {pen}/>\
+                 <line x1=\"{x1}\" y1=\"{y0}\" x2=\"{x1}\" y2=\"{y20}\" {pen}/>\
+                 <circle cx=\"{c}\" cy=\"{cy}\" r=\"22\" {fill}/>{lbl}",
+                x1 = c - 55.0, x2 = c - 15.0,
+                yt = t + 31.0, y0 = t + 21.0, y20 = t + 41.0,
+                lbl = glyph_label(cx, t + 68.5, label),
+            )
+        }
+        // Control: circle r=22 with a small rotating arrowhead at the top.
+        "control" => {
+            let cy = t + 32.0;
+            format!(
+                "<circle cx=\"{c}\" cy=\"{cy}\" r=\"22\" {fill}/>\
+                 <path d=\"M {ax:.1} {ay:.1} l 8 4 l -8 4 Z\" fill=\"{s}\"/>{lbl}",
+                ax = c - 4.0, ay = cy - 26.0,
+                lbl = glyph_label(cx, t + 66.5, label),
+            )
+        }
+        // Entity: circle r=22 with an underline (the "grounded" bar).
+        "entity" => {
+            let cy = t + 31.0; // 25 + translate 6
+            format!(
+                "<circle cx=\"{c}\" cy=\"{cy}\" r=\"22\" {fill}/>\
+                 <line x1=\"{x1}\" y1=\"{y}\" x2=\"{x2}\" y2=\"{y}\" {pen}/>{lbl}",
+                x1 = c - 22.0, x2 = c + 22.0, y = cy + 22.0,
+                lbl = glyph_label(cx, t + 68.5, label),
+            )
+        }
+        // Database: vertical cylinder, width = box/3, centred on cx.
+        "database" => {
+            let w = W / 3.0; // 50
+            let (left, ttop) = (c - w / 2.0, t + 8.0);
+            let (rx, ry, bh) = (w / 2.0, 7.0, 40.0);
+            format!(
+                "<path d=\"M {left:.1} {ttop:.1} a {rx} {ry} 0 0 0 {w} 0 a {rx} {ry} 0 0 0 {nw} 0 \
+                 l 0 {bh} a {rx} {ry} 0 0 0 {w} 0 l 0 {nbh}\" {fill}/>{lbl}",
+                nw = -w, nbh = -bh,
+                lbl = glyph_label(cx, t + 35.0 + H / 2.0, label),
+            )
+        }
+        // Queue: a horizontal cylinder (stadium with elliptical end-caps).
+        "queue" => {
+            let ry = H / 2.0; // 32.5
+            let rx = ry / (2.5 + H / 50.0); // ≈ 8.55
+            let body_w = W - 2.0 * rx;
+            let (x0, xr) = (c - W / 2.0 + rx, c - W / 2.0 + W - rx);
+            format!(
+                "<path d=\"M {x0:.2} {t} a {rx:.2} {ry} 0 0 0 0 {H} h {body_w:.2} a {rx:.2} {ry} 0 0 0 0 {nh} Z\" {fill}/>\
+                 <path d=\"M {xr:.2} {t} a {rx:.2} {ry} 0 0 0 0 {H}\" {pen}/>{lbl}",
+                nh = -H,
+                lbl = glyph_label(cx, t + H / 2.0, label),
+            )
+        }
+        // Collections: two offset boxes (a stacked-card shadow).
+        "collections" => {
+            let (x, off) = (c - W / 2.0, 6.0);
+            format!(
+                "<rect x=\"{x:.1}\" y=\"{t}\" width=\"{W}\" height=\"{H}\" rx=\"3\" {fill}/>\
+                 <rect x=\"{fx:.1}\" y=\"{fy:.1}\" width=\"{W}\" height=\"{H}\" rx=\"3\" {fill}/>{lbl}",
+                fx = x - off, fy = t + off,
+                lbl = glyph_label(cx - 6, t + off + H / 2.0, label),
+            )
+        }
         _ => return None,
     };
     Some(g)
