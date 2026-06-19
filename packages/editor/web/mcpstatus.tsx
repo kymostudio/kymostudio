@@ -80,6 +80,28 @@ export function sessionIdValue(): string {
   return sessionId;
 }
 
+// ---- Live activity feed: lines pushed by the MCP `ui_status` tool (the AI
+// narrating its work — user request / thinking / action / result). Rendered as a
+// chat-like feed in the Connect AI panel. ----
+
+export type StatusKind = "user" | "thinking" | "action" | "result";
+export type StatusItem = { id: number; kind: StatusKind; text: string; ts: number };
+let feed: StatusItem[] = [];
+let feedSeq = 0;
+const feedSubs = new Set<() => void>();
+
+export function pushStatus(it: { kind?: string; text?: string; ts?: number }) {
+  const kind: StatusKind = (["user", "thinking", "action", "result"].includes(String(it.kind)) ? it.kind : "thinking") as StatusKind;
+  feed = [...feed, { id: ++feedSeq, kind, text: String(it.text ?? ""), ts: Number(it.ts) || 0 }].slice(-200);
+  feedSubs.forEach((f) => f());
+}
+export function clearStatus() { feed = []; feedSubs.forEach((f) => f()); }
+export function useStatusFeed(): StatusItem[] {
+  const [, bump] = useReducer((c: number) => c + 1, 0);
+  useEffect(() => { feedSubs.add(bump); return () => { feedSubs.delete(bump); }; }, []);
+  return feed;
+}
+
 export type SessionCtx = { project?: string; projectName?: string; diagram?: string; title?: string };
 let ctx: SessionCtx = {};
 let ctxSender: ((c: SessionCtx) => void) | null = null;

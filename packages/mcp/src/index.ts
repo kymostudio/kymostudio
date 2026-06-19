@@ -1074,6 +1074,25 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         return { content: [{ type: "text", text: ok ? `AI target switched to window ${session}. Control commands now act there.` : `No open window with session "${session}" — run ui_list_sessions for current ids.` }] };
       }
     );
+
+    // ---- Live activity feed: stream what you're doing to the editor's Connect-AI
+    // panel so the user can watch progress in the browser. ----
+    this.server.tool(
+      "ui_status",
+      "Stream a short status line to the user's editor 'Connect AI' panel so they can watch your work live in the browser. Call it LIBERALLY as you work — one short line each: echo the user's request (kind 'user'), your plan/reasoning before acting (kind 'thinking'), the action you're taking (kind 'action'), and the outcome (kind 'result'). Routes to the user's active editor window (the pinned one, see ui_switch_session).",
+      {
+        text: z.string().describe("One short line to display (a request echo, a thought, an action, or a result)."),
+        kind: z.enum(["user", "thinking", "action", "result"]).optional().describe("user = the user's request · thinking = your reasoning/plan · action = what you're doing · result = the outcome. Default 'thinking'."),
+      },
+      async ({ text, kind }) => {
+        const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ type: "status", kind: kind ?? "thinking", text: String(text).slice(0, 2000), ts: Date.now() }),
+        });
+        const j = (await r.json()) as { clients: number };
+        return { content: [{ type: "text", text: j.clients ? `shown in ${j.clients} window(s)` : "no live editor window — open editor.kymo.studio (or run ui_list_sessions)" }] };
+      }
+    );
   }
 }
 
