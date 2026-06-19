@@ -289,12 +289,12 @@ fn box_svg(c: &ClassBox, comp: &Component) -> String {
             esc(t)
         )
     };
-    out += &divider(x, ty, w);
+    out += &divider(x, ty, w, stroke);
     for a in &c.attributes {
         ty += LINE_H;
         out += &row(ty, &generics(a));
     }
-    out += &divider(x, ty + 6, w);
+    out += &divider(x, ty + 6, w, stroke);
     for m in &c.methods {
         ty += LINE_H;
         out += &row(ty, &method_label(m));
@@ -377,9 +377,9 @@ fn note_box(text: &str, comp: &Component) -> String {
     out
 }
 
-fn divider(x: i32, ty: i32, w: i32) -> String {
+fn divider(x: i32, ty: i32, w: i32, stroke: &str) -> String {
     format!(
-        "<line x1=\"{x}\" y1=\"{ty}\" x2=\"{}\" y2=\"{ty}\" stroke=\"#9370DB\" stroke-width=\"1\"/>",
+        "<line x1=\"{x}\" y1=\"{ty}\" x2=\"{}\" y2=\"{ty}\" stroke=\"{stroke}\" stroke-width=\"1\"/>",
         x + w
     )
 }
