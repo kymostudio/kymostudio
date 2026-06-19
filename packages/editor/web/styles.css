@@ -714,6 +714,7 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 /* Manage-projects modal (was the /projects route) — filter + list + delete. */
 .pm-overlay { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(36, 33, 49, 0.4); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
 .pm-modal { width: min(560px, 100%); max-height: min(72vh, 640px); display: flex; flex-direction: column; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 24px 60px rgba(0,0,0,0.28); overflow: hidden; }
+.pm-modal svg { flex: none; } /* lucide icons collapse to width:0 as flex items without this */
 .pm-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
 .pm-head h2 { margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
 .pm-head-actions { display: flex; align-items: center; gap: 8px; }
