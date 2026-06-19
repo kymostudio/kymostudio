@@ -226,6 +226,14 @@ fn parse_dir(tok: &str) -> Direction {
 /// an inline `:::class` is stripped. Returns its index.
 fn decl_class(classes: &mut Vec<ClassBox>, head: &str) -> usize {
     let head = head.split(":::").next().unwrap_or(head).trim();
+    // `Id["display label"]` — a bracketed text label overrides the shown name.
+    let (head, label) = match head.find('[') {
+        Some(b) if head.ends_with(']') => (
+            head[..b].trim(),
+            Some(decode_entities(head[b + 1..head.len() - 1].trim().trim_matches('"'))),
+        ),
+        _ => (head, None),
+    };
     // generics: Box~T~  → id "Box", remember "T" is part of the name text.
     let (id_part, generic) = match head.split_once('~') {
         Some((a, b)) => (a.trim(), b.trim_end_matches('~').trim()),
@@ -235,14 +243,17 @@ fn decl_class(classes: &mut Vec<ClassBox>, head: &str) -> usize {
     if id.is_empty() {
         return 0;
     }
+    let name = match &label {
+        Some(l) => l.clone(),
+        None if generic.is_empty() => id.to_string(),
+        None => format!("{id}<{generic}>"),
+    };
     if let Some(i) = classes.iter().position(|c| c.id == id) {
+        if label.is_some() {
+            classes[i].name = name; // a later `class Id["label"]` sets the display name
+        }
         return i;
     }
-    let name = if generic.is_empty() {
-        id.to_string()
-    } else {
-        format!("{id}<{generic}>")
-    };
     classes.push(ClassBox {
         id: id.to_string(),
         name,
@@ -251,10 +262,20 @@ fn decl_class(classes: &mut Vec<ClassBox>, head: &str) -> usize {
     classes.len() - 1
 }
 
+/// Decode the HTML entities mermaid uses in labels/members (`&lt;`→`<`, …).
+fn decode_entities(s: &str) -> String {
+    s.replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&#35;", "#")
+        .replace("&amp;", "&")
+}
+
 /// Add a member line to a class: `<<stereotype>>`, a method (`()`), or an
 /// attribute. Leading visibility markers are kept verbatim.
 fn add_member(c: &mut ClassBox, raw: &str) {
-    let m = raw.trim();
+    let decoded = decode_entities(raw.trim());
+    let m = decoded.trim();
     if m.is_empty() {
         return;
     }

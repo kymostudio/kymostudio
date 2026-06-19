@@ -267,7 +267,7 @@ fn box_svg(c: &ClassBox, comp: &Component) -> String {
         ty += LINE_H - 4;
         out += &format!(
             "<text x=\"{cx}\" y=\"{ty}\" text-anchor=\"middle\" font-size=\"11\" fill=\"#333333\">{}</text>",
-            esc(&format!("«{}»", c.stereotype))
+            esc(&format!("<<{}>>", c.stereotype))
         );
         ty += 4;
     }
