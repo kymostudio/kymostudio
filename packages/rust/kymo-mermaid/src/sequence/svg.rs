@@ -321,11 +321,13 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
     };
 
     // `autonumber` badge: a dark disc with the index on the source lifeline.
+    // The fills use inline `style=` (beats any leaked `text{}`/`circle{}` CSS
+    // when several diagrams share one HTML page) so the white number is visible.
     let badge = match m.number {
         Some(n) => format!(
-            "<circle cx=\"{x1}\" cy=\"{y}\" r=\"9\" fill=\"#333333\"/>\
+            "<circle cx=\"{x1}\" cy=\"{y}\" r=\"9\" style=\"fill:#333333;stroke:none\"/>\
              <text x=\"{x1}\" y=\"{y}\" text-anchor=\"middle\" dominant-baseline=\"central\" \
-             fill=\"#ffffff\" font-size=\"12\">{n}</text>"
+             style=\"fill:#ffffff\" font-size=\"12\" font-weight=\"700\">{n}</text>"
         ),
         None => String::new(),
     };
