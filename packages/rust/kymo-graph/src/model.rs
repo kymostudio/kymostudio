@@ -56,7 +56,7 @@ str_enum! {
         Annotation => "annotation", AwsTile => "aws-tile", AwsTileHero => "aws-tile-hero",
         Badge => "badge", Image => "image",
         BpmnStart => "bpmn-start", BpmnEnd => "bpmn-end",
-        StateStart => "state-start", StateEnd => "state-end",
+        StateStart => "state-start", StateEnd => "state-end", StateFork => "state-fork",
         BpmnIntermediate => "bpmn-intermediate", BpmnBoundary => "bpmn-boundary",
         BpmnTask => "bpmn-task", BpmnSubprocess => "bpmn-subprocess",
         BpmnGateway => "bpmn-gateway", BpmnDataObject => "bpmn-data-object",
@@ -168,6 +168,7 @@ impl Shape {
             // sized to match the glyph drawn in flowchart_svg (r=8 / r=9).
             StateStart => (8, 8),
             StateEnd => (9, 9),
+            StateFork => (70, 14), // fork/join bar
         }
     }
 

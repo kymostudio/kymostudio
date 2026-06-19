@@ -131,6 +131,7 @@ pub(crate) fn node_size_mermaid_f(label: &str, shape: Shape) -> (f64, f64) {
             ((tw + 55.0).max(70.0), slanted_h)
         }
         Shape::Cylinder | Shape::Badge | Shape::Box => ((tw + 30.0).max(56.0), wrapped_h),
+        Shape::StateFork => (70.0, 14.0), // fork/join bar, label hidden
         _ => (tw + 60.0, wrapped_h),
     }
 }
