@@ -14,15 +14,16 @@ use super::{Fragment, FragmentOp, Item, MessageSort, Note, NotePlacement, Sequen
 pub(crate) const FRAME_LEFT: i64 = 8;
 pub(crate) const FRAME_TOP: i64 = 8;
 pub(crate) const HEAD_TOP: i64 = 40;
-pub(crate) const HEAD_W: i64 = 100;
+pub(crate) const HEAD_W: i64 = 150; // mermaid sequence actor box width
 pub(crate) const HEAD_H: i64 = 40;
 pub(crate) const LINE_TOP: i64 = HEAD_TOP + HEAD_H; // dashed lifeline starts here
 pub(crate) const SELF_EXTRA: i64 = 24; // extra drop for a self-message loop
 pub(crate) const FRAG_HEADER: i64 = 28; // operator band at the top of a fragment
 const FIRST_HEAD_LEFT: i64 = 24;
-const LL_GAP: i64 = 150; // centre-to-centre spacing
+const ACTOR_MARGIN: i64 = 50; // mermaid: min edge-to-edge gap between actors
+const MSG_CHAR_W: i64 = 8; // approx glyph advance at messageFontSize 16
 const FIRST_MSG_Y: i64 = LINE_TOP + 32;
-const ROW: i64 = 40; // vertical step per message
+const ROW: i64 = 44; // vertical step per message (mermaid messageMargin rhythm)
 const OPERAND_DIV: i64 = 22; // divider + guard band before else/and
 const FRAG_PAD: i64 = 12; // padding below the last operand row
 const FRAG_GAP: i64 = 12; // gap after a fragment box
@@ -94,6 +95,31 @@ pub(crate) struct Layout {
 }
 
 /// Lay out a sequence diagram.
+/// Collect (from_idx, to_idx, label_width) for every message, recursing into
+/// combined fragments — feeds mermaid's dynamic actor-spacing.
+fn collect_msg_widths(
+    items: &[Item],
+    index: &HashMap<String, usize>,
+    out: &mut Vec<(usize, usize, i64)>,
+) {
+    for item in items {
+        match item {
+            Item::Message(m) => {
+                if let (Some(&a), Some(&b)) = (index.get(&m.from), index.get(&m.to)) {
+                    let w = m.text.chars().count() as i64 * MSG_CHAR_W + 20;
+                    out.push((a, b, w));
+                }
+            }
+            Item::Fragment(f) => {
+                for op in &f.operands {
+                    collect_msg_widths(&op.items, index, out);
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
 pub(crate) fn layout(seq: &Sequence) -> Layout {
     let mut lay = Layout::new(seq);
     lay.walk(&seq.items);
@@ -103,11 +129,40 @@ pub(crate) fn layout(seq: &Sequence) -> Layout {
 
 impl Layout {
     fn new(seq: &Sequence) -> Self {
-        let mut centers = Vec::with_capacity(seq.participants.len());
+        let n = seq.participants.len();
         let mut index = HashMap::new();
         for (i, p) in seq.participants.iter().enumerate() {
-            centers.push(FIRST_HEAD_LEFT + HEAD_W / 2 + i as i64 * LL_GAP);
             index.insert(p.id.clone(), i);
+        }
+        // mermaid spaces actors dynamically: the gap between two adjacent actors
+        // grows so the widest message label between them fits (centre-to-centre ≥
+        // label width). Collect message widths, then expand the base actorMargin.
+        let mut gap = vec![ACTOR_MARGIN; n.saturating_sub(1)];
+        let mut msgw: Vec<(usize, usize, i64)> = Vec::new();
+        collect_msg_widths(&seq.items, &index, &mut msgw);
+        for (a, b, w) in msgw {
+            if a == b {
+                continue;
+            }
+            let (lo, hi) = (a.min(b), a.max(b));
+            let inner = (hi - lo - 1) as i64 * HEAD_W; // actors strictly between
+            let cur: i64 = gap[lo..hi].iter().sum();
+            let span = HEAD_W + inner + cur; // HEAD_W/2 + HEAD_W/2 = HEAD_W
+            if span < w {
+                let ng = (hi - lo) as i64;
+                let add = (w - span + ng - 1) / ng; // ceil-distribute the deficit
+                for g in gap.iter_mut().take(hi).skip(lo) {
+                    *g += add;
+                }
+            }
+        }
+        let mut centers = Vec::with_capacity(n);
+        let mut x = FIRST_HEAD_LEFT + HEAD_W / 2;
+        for i in 0..n {
+            if i > 0 {
+                x += HEAD_W + gap[i - 1];
+            }
+            centers.push(x);
         }
         Layout {
             centers,
