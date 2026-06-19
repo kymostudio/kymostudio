@@ -7,13 +7,10 @@
 //! combined fragments (`loop`/`alt`/`opt`/`par`), notes, activation bars and
 //! `autonumber` — everything as real `<text>`, so PNG/PDF keep their labels.
 
-use super::layout::{self, PActiv, PFrag, PMsg, PNote, HEAD_H, HEAD_TOP, HEAD_W, LINE_TOP};
+use super::layout::{self, PActiv, PFrag, PMsg, PNote, HEAD_H, HEAD_TOP, HEAD_W, LINE_TOP, SELF_EXTRA};
 use super::{FragmentOp, MessageSort, Sequence};
 
 const ACT_W: i64 = 8; // activation-bar width
-// The walk leaves a trailing ROW (44) below the last message; mermaid drops the
-// foot only ~20px below it, so pull the foot box up to match its rhythm.
-const FOOT_GAP: i64 = -24;
 // mermaid's default sequence font — matching it keeps glyph shapes/widths in
 // step for visual parity.
 const FONT: &str = "\"trebuchet ms\", verdana, arial, sans-serif";
@@ -33,7 +30,23 @@ stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></marke
 pub fn render(seq: &Sequence) -> String {
     let lay = layout::layout(seq);
 
-    let foot_top = lay.bottom + FOOT_GAP;
+    // Foot box sits ~20px below the last drawn element. Using the real content
+    // bottom (not lay.bottom, which carries a trailing message ROW) keeps the
+    // foot from overlapping a trailing note while matching mermaid's tight gap.
+    let mut content_bottom = LINE_TOP;
+    for m in &lay.msgs {
+        content_bottom = content_bottom.max(m.y + if m.self_loop { SELF_EXTRA } else { 8 });
+    }
+    for n in &lay.notes {
+        content_bottom = content_bottom.max(n.top + n.height);
+    }
+    for f in &lay.frags {
+        content_bottom = content_bottom.max(f.top + f.height);
+    }
+    for a in &lay.acts {
+        content_bottom = content_bottom.max(a.bottom);
+    }
+    let foot_top = content_bottom + 16;
     let mut right = lay.centers.iter().copied().max().unwrap_or(HEAD_W) + HEAD_W / 2;
     for f in &lay.frags {
         right = right.max(f.left + f.width);

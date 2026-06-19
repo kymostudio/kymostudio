@@ -284,7 +284,7 @@ impl Layout {
 
     /// Position a note box at the current y (placement relative to its targets).
     fn place_note(&self, n: &Note) -> PNote {
-        let lines: Vec<String> = n
+        let mut lines: Vec<String> = n
             .text
             .split('\n')
             .flat_map(|s| s.split("<br/>"))
@@ -292,6 +292,15 @@ impl Layout {
             .map(|s| s.trim().to_string())
             .filter(|s| !s.is_empty())
             .collect();
+        // `:wrap:` — word-wrap each line so a long note doesn't overflow the
+        // lifelines (mermaid wraps to ~the actor width).
+        if n.wrap {
+            const MAX_CH: usize = 28;
+            lines = lines
+                .iter()
+                .flat_map(|l| wrap_words(l, MAX_CH))
+                .collect();
+        }
         let lines = if lines.is_empty() {
             vec![String::new()]
         } else {
@@ -417,6 +426,27 @@ impl Layout {
         let max = touched.iter().map(|&i| self.centers[i]).max().unwrap();
         (min - FRAG_MARGIN, max + FRAG_MARGIN)
     }
+}
+
+/// Greedy word-wrap to at most `max_ch` characters per line.
+fn wrap_words(line: &str, max_ch: usize) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut cur = String::new();
+    for w in line.split_whitespace() {
+        if cur.is_empty() {
+            cur = w.to_string();
+        } else if cur.chars().count() + 1 + w.chars().count() <= max_ch {
+            cur.push(' ');
+            cur.push_str(w);
+        } else {
+            out.push(std::mem::take(&mut cur));
+            cur = w.to_string();
+        }
+    }
+    if !cur.is_empty() {
+        out.push(cur);
+    }
+    out
 }
 
 /// Collect participant indices touched (transitively) by one item.

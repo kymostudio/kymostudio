@@ -158,6 +158,8 @@ pub struct Note {
     pub targets: Vec<String>,
     /// The note body.
     pub text: String,
+    /// A `:wrap:` directive — auto-wrap long text to a column width.
+    pub wrap: bool,
 }
 
 /// The operator of a combined fragment.
