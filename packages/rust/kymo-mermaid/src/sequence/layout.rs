@@ -13,16 +13,16 @@ use super::{Fragment, FragmentOp, Item, MessageSort, Note, NotePlacement, Sequen
 // ── Layout constants (pixels) ───────────────────────────────────────────────
 pub(crate) const FRAME_LEFT: i64 = 8;
 pub(crate) const FRAME_TOP: i64 = 8;
-pub(crate) const HEAD_TOP: i64 = 40;
+pub(crate) const HEAD_TOP: i64 = 0; // actor box top (mermaid origin; viewBox adds top margin)
 pub(crate) const HEAD_W: i64 = 150; // mermaid sequence actor box width
 pub(crate) const HEAD_H: i64 = 65; // mermaid sequence actor box height (conf.height)
 pub(crate) const LINE_TOP: i64 = HEAD_TOP + HEAD_H; // dashed lifeline starts here
 pub(crate) const SELF_EXTRA: i64 = 24; // extra drop for a self-message loop
 pub(crate) const FRAG_HEADER: i64 = 28; // operator band at the top of a fragment
-const FIRST_HEAD_LEFT: i64 = 24;
+const FIRST_HEAD_LEFT: i64 = 0; // first actor edge at x=0 (viewBox adds the left margin)
 const ACTOR_MARGIN: i64 = 50; // mermaid: min edge-to-edge gap between actors
 const MSG_CHAR_W: i64 = 8; // approx glyph advance at messageFontSize 16
-const FIRST_MSG_Y: i64 = LINE_TOP + 32;
+const FIRST_MSG_Y: i64 = LINE_TOP + 44; // mermaid: first arrow ~one messageMargin below box
 const ROW: i64 = 44; // vertical step per message (mermaid messageMargin rhythm)
 const OPERAND_DIV: i64 = 22; // divider + guard band before else/and
 const FRAG_PAD: i64 = 12; // padding below the last operand row

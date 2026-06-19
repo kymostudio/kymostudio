@@ -10,11 +10,13 @@
 use super::layout::{self, PActiv, PFrag, PMsg, PNote, HEAD_H, HEAD_TOP, HEAD_W, LINE_TOP};
 use super::{FragmentOp, MessageSort, Sequence};
 
-const MARGIN: i64 = 12;
 const ACT_W: i64 = 8; // activation-bar width
-const FOOT_GAP: i64 = 12;
-const FONT: &str =
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+// The walk leaves a trailing ROW (44) below the last message; mermaid drops the
+// foot only ~20px below it, so pull the foot box up to match its rhythm.
+const FOOT_GAP: i64 = -24;
+// mermaid's default sequence font — matching it keeps glyph shapes/widths in
+// step for visual parity.
+const FONT: &str = "\"trebuchet ms\", verdana, arial, sans-serif";
 
 const DEFS: &str = "<marker id=\"seq-arrow\" markerWidth=\"12\" markerHeight=\"10\" refX=\"9\" refY=\"5\" \
 orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9 Z\" fill=\"#333333\"/></marker>\
@@ -42,8 +44,15 @@ pub fn render(seq: &Sequence) -> String {
     if !seq.title.is_empty() {
         right = right.max(seq.title.chars().count() as i64 * 8);
     }
-    let width = right + MARGIN;
-    let height = foot_top + HEAD_H + MARGIN;
+    // Match mermaid's viewBox origin: a 50px left/right margin and a 10px top /
+    // 30px bottom margin around the y=0-anchored actor boxes.
+    const MX: i64 = 50;
+    const MY_TOP: i64 = 10;
+    const MY_BOT: i64 = 30;
+    let vb_w = right + 2 * MX;
+    let vb_h = foot_top + HEAD_H + MY_TOP + MY_BOT;
+    let width = vb_w;
+    let height = vb_h;
 
     let mut body = String::new();
 
@@ -117,12 +126,13 @@ pub fn render(seq: &Sequence) -> String {
         body += &head_box(cx, foot_top, &p.label, &p.kind);
     }
 
+    let (vx, vy) = (-MX, -MY_TOP);
     format!(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
-         <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width} {height}\" \
+         <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"{vx} {vy} {width} {height}\" \
          width=\"{width}\" height=\"{height}\" style=\"max-width:100%;height:auto\" \
          font-family=\"{FONT}\" font-size=\"14\">\n<defs>{DEFS}</defs>\n\
-         <rect width=\"{width}\" height=\"{height}\" fill=\"#ffffff\"/>\n{body}</svg>\n"
+         <rect x=\"{vx}\" y=\"{vy}\" width=\"{width}\" height=\"{height}\" fill=\"#ffffff\"/>\n{body}</svg>\n"
     )
 }
 
@@ -172,7 +182,8 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
     let f = "#ECECFF";
     let s = "#9370DB";
     let pen = format!("fill=\"none\" stroke=\"{s}\" stroke-width=\"2\"");
-    let fill = format!("fill=\"{f}\" stroke=\"{s}\" stroke-width=\"2\"");
+    let fill = format!("fill=\"{f}\" stroke=\"{s}\" stroke-width=\"2\""); // .actor-man circle/line
+    let thin = format!("fill=\"{f}\" stroke=\"{s}\" stroke-width=\"1\""); // .actor rect/path shapes
     let (t, c) = (top as f64, cx as f64);
     let g = match kind {
         // Stick figure: head circle r=15, torso, arms, two legs.
@@ -230,7 +241,7 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
             let (rx, ry, bh) = (w / 2.0, 7.0, 40.0);
             format!(
                 "<path d=\"M {left:.1} {ttop:.1} a {rx} {ry} 0 0 0 {w} 0 a {rx} {ry} 0 0 0 {nw} 0 \
-                 l 0 {bh} a {rx} {ry} 0 0 0 {w} 0 l 0 {nbh}\" {fill}/>{lbl}",
+                 l 0 {bh} a {rx} {ry} 0 0 0 {w} 0 l 0 {nbh}\" {thin}/>{lbl}",
                 nw = -w, nbh = -bh,
                 lbl = glyph_label(cx, t + 35.0 + H / 2.0, label),
             )
@@ -242,8 +253,8 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
             let body_w = W - 2.0 * rx;
             let (x0, xr) = (c - W / 2.0 + rx, c - W / 2.0 + W - rx);
             format!(
-                "<path d=\"M {x0:.2} {t} a {rx:.2} {ry} 0 0 0 0 {H} h {body_w:.2} a {rx:.2} {ry} 0 0 0 0 {nh} Z\" {fill}/>\
-                 <path d=\"M {xr:.2} {t} a {rx:.2} {ry} 0 0 0 0 {H}\" {pen}/>{lbl}",
+                "<path d=\"M {x0:.2} {t} a {rx:.2} {ry} 0 0 0 0 {H} h {body_w:.2} a {rx:.2} {ry} 0 0 0 0 {nh} Z\" {thin}/>\
+                 <path d=\"M {xr:.2} {t} a {rx:.2} {ry} 0 0 0 0 {H}\" fill=\"none\" stroke=\"#9370DB\" stroke-width=\"1\"/>{lbl}",
                 nh = -H,
                 lbl = glyph_label(cx, t + H / 2.0, label),
             )
@@ -252,8 +263,8 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
         "collections" => {
             let (x, off) = (c - W / 2.0, 6.0);
             format!(
-                "<rect x=\"{x:.1}\" y=\"{t}\" width=\"{W}\" height=\"{H}\" rx=\"3\" {fill}/>\
-                 <rect x=\"{fx:.1}\" y=\"{fy:.1}\" width=\"{W}\" height=\"{H}\" rx=\"3\" {fill}/>{lbl}",
+                "<rect x=\"{x:.1}\" y=\"{t}\" width=\"{W}\" height=\"{H}\" rx=\"3\" {thin}/>\
+                 <rect x=\"{fx:.1}\" y=\"{fy:.1}\" width=\"{W}\" height=\"{H}\" rx=\"3\" {thin}/>{lbl}",
                 fx = x - off, fy = t + off,
                 lbl = glyph_label(cx - 6, t + off + H / 2.0, label),
             )
@@ -331,9 +342,12 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
         String::new()
     } else {
         let mid = (x1 + x2) / 2;
+        // mermaid sits the label ~29px above the arrow with `dominant-baseline:
+        // middle; dy:1em` at messageFontSize 16 — replicate exactly for parity.
         format!(
-            "<text x=\"{mid}\" y=\"{}\" text-anchor=\"middle\" fill=\"#333333\">{}</text>",
-            y - 6,
+            "<text x=\"{mid}\" y=\"{}\" text-anchor=\"middle\" dominant-baseline=\"middle\" \
+             alignment-baseline=\"middle\" dy=\"1em\" fill=\"#333333\" font-size=\"16\">{}</text>",
+            y - 29,
             esc(&m.text)
         )
     };
