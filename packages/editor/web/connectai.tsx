@@ -77,7 +77,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   }, [onClose]);
   const [showBridge, setShowBridge] = useState(false);
   const [ask, setAsk] = useState("");
-  const submitAsk = (e: React.FormEvent) => {
+  const submitAsk = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const t = ask.trim();
     if (!t) return;
@@ -183,20 +183,23 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
 
       {tab === "chat" && (
         <div className="cn-ask-foot">
-          <form className="cn-ask" onSubmit={submitAsk}>
-            <input className="cn-ask-input" value={ask} onChange={(e) => setAsk(e.target.value)}
-              placeholder="Message the AI…  (received via wait_for_user_message)" aria-label="Message the AI" />
-            <button className="cn-ask-send" type="submit" disabled={!ask.trim()} aria-label="Send"><Send size={15} strokeWidth={2.2} /></button>
+          <form className="cn-composer" onSubmit={submitAsk}>
+            <textarea className="cn-composer-input" value={ask} onChange={(e) => setAsk(e.target.value)} rows={2}
+              placeholder="Message the AI…  (received via wait_for_user_message)" aria-label="Message the AI"
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submitAsk(e); } }} />
+            <div className="cn-composer-bar">
+              <button type="button" className={"cn-ask-tool" + (simulate ? " on" : "")} onClick={() => setSimulate(!simulate)}
+                role="switch" aria-checked={simulate}
+                title="When on, the AI creates projects by animating the real New-project UI (open switcher → type name → submit; no reload), i.e. it calls new_project with simulate:true.">
+                <Wand2 size={13} strokeWidth={2} />
+                Simulate UI
+                <span className="cn-ask-switch" aria-hidden="true" />
+              </button>
+              <button className="cn-composer-send" type="submit" disabled={!ask.trim()}>
+                <Send size={14} strokeWidth={2.2} /> Send
+              </button>
+            </div>
           </form>
-          <div className="cn-ask-tools">
-            <button className={"cn-ask-tool" + (simulate ? " on" : "")} onClick={() => setSimulate(!simulate)}
-              role="switch" aria-checked={simulate}
-              title="When on, the AI creates projects by animating the real New-project UI (open switcher → type name → submit; no reload), i.e. it calls new_project with simulate:true.">
-              <Wand2 size={13} strokeWidth={2} />
-              Simulate UI
-              <span className="cn-ask-switch" aria-hidden="true" />
-            </button>
-          </div>
         </div>
       )}
     </aside>
