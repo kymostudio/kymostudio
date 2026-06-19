@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send, Wand2 } from "lucide-react";
+import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send, Wand2, Settings } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
 import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, useListening, feedLength, type StatusKind } from "./mcpstatus";
 
@@ -79,6 +79,14 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", k);
   }, [onClose]);
   const [showBridge, setShowBridge] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!settingsOpen) return;
+    const h = (e: MouseEvent) => { if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) setSettingsOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [settingsOpen]);
   const [ask, setAsk] = useState("");
   // Auto-grow the composer textarea with its content (up to the CSS max-height,
   // after which it scrolls). Runs on every value change incl. send-clear + tab show.
@@ -117,6 +125,24 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
           {tab === "chat" && feed.length > 0 && (
             <button className="cn-clear" onClick={clearStatus} aria-label="Clear chat" title="Clear chat"><Eraser size={15} strokeWidth={2} /></button>
           )}
+          <div className="aiside-gear-wrap" ref={settingsRef}>
+            <button className={"aiside-gear" + (simulate ? " on" : "")} onClick={() => setSettingsOpen((o) => !o)}
+              aria-label="Settings" aria-haspopup="menu" aria-expanded={settingsOpen} title={simulate ? "Settings — Simulate UI is on" : "Settings"}>
+              <Settings size={16} strokeWidth={2} />
+              {simulate && <span className="aiside-gear-badge" aria-hidden="true" />}
+            </button>
+            {settingsOpen && (
+              <div className="aiside-settings" role="menu">
+                <button className={"cn-ask-tool" + (simulate ? " on" : "")} onClick={() => setSimulate(!simulate)}
+                  role="switch" aria-checked={simulate}
+                  title="When on, the AI creates/deletes projects by animating the real UI (no reload) — i.e. it passes simulate:true.">
+                  <Wand2 size={13} strokeWidth={2} />
+                  Simulate UI
+                  <span className="cn-ask-switch" aria-hidden="true" />
+                </button>
+              </div>
+            )}
+          </div>
           <button className="aiside-close" onClick={onClose} aria-label="Close panel" title="Close">✕</button>
         </div>
       </div>
@@ -221,13 +247,6 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
               aria-label="Message the AI"
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submitAsk(e); } }} />
             <div className="cn-composer-bar">
-              <button type="button" className={"cn-ask-tool" + (simulate ? " on" : "")} onClick={() => setSimulate(!simulate)}
-                role="switch" aria-checked={simulate}
-                title="When on, the AI creates projects by animating the real New-project UI (open switcher → type name → submit; no reload), i.e. it calls new_project with simulate:true.">
-                <Wand2 size={13} strokeWidth={2} />
-                Simulate UI
-                <span className="cn-ask-switch" aria-hidden="true" />
-              </button>
               <button className="cn-composer-send" type="submit" disabled={!ask.trim() || !listening}
                 title={listening ? "Send" : "No listener — connect a client and ask it to listen"}>
                 <Send size={14} strokeWidth={2.2} /> Send
