@@ -117,7 +117,8 @@ fn parse_dir(tok: &str) -> Direction {
 
 /// Find or create an entity. Accepts `NAME` and `NAME["alias"]`.
 fn decl_entity(classes: &mut Vec<ClassBox>, head: &str) -> usize {
-    let head = head.trim();
+    // Strip an inline `:::styleClass` so it doesn't leak into the id/alias.
+    let head = head.split(":::").next().unwrap_or(head).trim();
     let (id, alias) = match head.split_once('[') {
         Some((a, b)) => (a.trim(), b.trim_end_matches(']').trim().trim_matches('"')),
         None => (head.trim_matches('"'), ""),
