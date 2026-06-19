@@ -108,6 +108,13 @@ export function clearStatus() { feed = []; feedSubs.forEach((f) => f()); }
 let promptSender: ((text: string) => boolean) | null = null;
 export function registerPromptSender(fn: ((text: string) => boolean) | null) { promptSender = fn; }
 export function sendPrompt(text: string): boolean { return promptSender ? promptSender(text) : false; }
+
+// MCP-driven "create project by simulating the real UI" (open switcher → fill name
+// input → submit, no reload). addressbar.tsx registers the simulator; userchannel
+// calls it when the worker pushes {type:"ui-new-project", name}.
+let newProjectSim: ((name: string) => void) | null = null;
+export function registerNewProjectSimulator(fn: ((name: string) => void) | null) { newProjectSim = fn; }
+export function runNewProjectSim(name: string): boolean { if (newProjectSim) { newProjectSim(name); return true; } return false; }
 export function useStatusFeed(): StatusItem[] {
   const [, bump] = useReducer((c: number) => c + 1, 0);
   useEffect(() => { feedSubs.add(bump); return () => { feedSubs.delete(bump); }; }, []);
