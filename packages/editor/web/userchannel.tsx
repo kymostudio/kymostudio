@@ -19,8 +19,9 @@ export function UserChannel() {
   const { signedIn } = useAuth();
   const navigate = useNavigate();
   const navRef = useRef(navigate); navRef.current = navigate;
-  const { setCurrentProject } = useWorkspace();
+  const { setCurrentProject, refresh } = useWorkspace();
   const setProjectRef = useRef(setCurrentProject); setProjectRef.current = setCurrentProject;
+  const refreshRef = useRef(refresh); refreshRef.current = refresh;
 
   useEffect(() => {
     if (!signedIn) return;
@@ -50,7 +51,13 @@ export function UserChannel() {
       // open a diagram as a tab in the live editor; if no editor is mounted
       // (e.g. on /projects), fall back to a ?d= deep-link that the editor adopts.
       if (data && data.type === "open" && data.id) { if (!requestOpen(String(data.id))) navRef.current("/?d=" + encodeURIComponent(String(data.id))); }
-      else if (data && data.type === "open-project" && data.id) { setProjectRef.current(String(data.id)); navRef.current("/?p=" + encodeURIComponent(String(data.id))); }
+      else if (data && data.type === "open-project" && data.id) {
+        const pid = String(data.id);
+        // Refetch the project list FIRST so a brand-new project is present — otherwise
+        // the workspace auto-pin effect bounces an unknown id back to project[0] (and
+        // the switcher wouldn't show it without a reload). Then switch + navigate.
+        Promise.resolve(refreshRef.current?.()).then(() => { setProjectRef.current(pid); navRef.current("/?p=" + encodeURIComponent(pid)); });
+      }
       else if (data && data.type === "close" && data.id) { requestClose(String(data.id)); }
     });
     ws.addEventListener("error", () => { try { ws.close(); } catch {} });

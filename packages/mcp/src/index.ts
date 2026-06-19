@@ -932,7 +932,12 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         if (!name.trim()) return { content: [{ type: "text", text: "Provide a non-empty project name." }] };
         const p = await createProject(this.env, me(), name);
         await feed("action", `Created project "${p.name}"`);
-        return { content: [{ type: "text", text: `Created project "${p.name}" (id ${p.id}).` }] };
+        // Live-switch the editor to the new project (it refetches its project list first).
+        await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ type: "open-project", id: p.id }),
+        }).then(() => {}).catch(() => {});
+        return { content: [{ type: "text", text: `Created project "${p.name}" (id ${p.id}). Open: ${projLink(p.id)}` }] };
       }
     );
 
