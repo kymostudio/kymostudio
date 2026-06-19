@@ -779,9 +779,18 @@ pub fn mindmap_to_svg_merman(src: &str) -> Option<String> {
     for ln in &layout.nodes {
         let (label, shape_s, branch) = info.get(ln.id.as_str()).copied().unwrap_or(("", "rect", 0));
         branch_of.insert(ln.id.as_str(), branch);
-        let _ = &pad;
-        let w = ln.width;
-        let h = ln.height;
+        // child shapes draw at label_size + padding (tighter than the full
+        // cose-bilkent box); the root keeps its full box (mermaid draws the root
+        // emphasised/larger than its bare label).
+        let p = pad.get(ln.id.as_str()).copied().unwrap_or(0.0);
+        let (w, h) = if branch < 0 {
+            (ln.width, ln.height)
+        } else {
+            (
+                ln.label_width.map(|lw| lw + p * 0.5).unwrap_or(ln.width),
+                ln.label_height.map(|lh| lh + p * 0.5).unwrap_or(ln.height),
+            )
+        };
         pnodes.push(crate::mindmap_svg::PNode {
             label: label.replace("<br/>", " ").replace("<br>", " ").replace("<br />", " "),
             shape: map_mindmap_shape(shape_s),

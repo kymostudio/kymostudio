@@ -45,7 +45,15 @@ function elemBox(tag, el) {
   if (tag === "circle") { const r = a("r"); return { cx: a("cx"), cy: a("cy"), w: 2 * r, h: 2 * r }; }
   if (tag === "ellipse") return { cx: a("cx"), cy: a("cy"), w: 2 * a("rx"), h: 2 * a("ry") };
   if (tag === "rect") { const x = a("x"), y = a("y"), w = a("width"), h = a("height"); return { cx: x + w / 2, cy: y + h / 2, w, h }; }
-  const src = tag === "polygon" ? (el.match(/points="([^"]*)"/)?.[1] || "") : (el.match(/\bd="([^"]*)"/)?.[1] || "");
+  if (tag === "path") {
+    // Flatten bezier curves to on-curve points — raw `d` numbers include control
+    // points that inflate the bbox of rounded/curved node shapes.
+    const d = el.match(/\bd="([^"]*)"/)?.[1] || "";
+    const pts = flatten(d); if (pts.length < 2) return null;
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+    return { cx: (Math.min(...xs) + Math.max(...xs)) / 2, cy: (Math.min(...ys) + Math.max(...ys)) / 2, w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+  }
+  const src = el.match(/points="([^"]*)"/)?.[1] || "";
   const ns = [...src.matchAll(/-?\d+\.?\d*/g)].map(Number); if (ns.length < 4) return null;
   const xs = ns.filter((_, i) => i % 2 === 0), ys = ns.filter((_, i) => i % 2 === 1);
   return { cx: (Math.min(...xs) + Math.max(...xs)) / 2, cy: (Math.min(...ys) + Math.max(...ys)) / 2, w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
@@ -112,7 +120,7 @@ function walk(svg) {
 // A node = the smallest shape enclosing a label token; its label = that token.
 // kymo↔mmdc then pair by label (id-free but exact).
 function nodesOf(w) {
-  const inside = (t, b) => Math.abs(t.x - b.cx) <= b.w / 2 + 3 && Math.abs(t.y - b.cy) <= b.h / 2 + 3;
+  const inside = (t, b) => Math.abs(t.x - b.cx) <= b.w / 2 + Math.max(4, b.w * 0.2) && Math.abs(t.y - b.cy) <= b.h / 2 + Math.max(4, b.h * 0.2);
   const out = [];
   for (const t of w.toks) {
     let best = null, ba = Infinity;
