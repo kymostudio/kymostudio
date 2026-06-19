@@ -862,6 +862,8 @@ export default function EditorPage() {
         )}
       </header>
       {galleryOpen && <TemplateGallery onPick={createDiagram} onClose={() => setGalleryOpen(false)} />}
+      <div className="workrow">
+      <div className="workcol">
       <div className="workarea">
         {claims && !shared && (
           <>
@@ -1009,9 +1011,11 @@ export default function EditorPage() {
           </>
         )}
         </main>
-        {connectOpen && claims && !shared && <ConnectAI onClose={() => setConnectOpen(false)} />}
       </div>
       {!showWelcome && !noFileOpen && <div className={"status" + (statusErr ? " error" : "")} title={statusTitle}>{status}</div>}
+      </div>
+      {connectOpen && claims && !shared && <ConnectAI onClose={() => setConnectOpen(false)} />}
+      </div>
     </div>
   );
 }
