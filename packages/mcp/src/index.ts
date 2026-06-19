@@ -690,6 +690,9 @@ export class UserChannel extends DurableObject<Env> {
     // Long-poll for prompts the user typed in the editor panel (web → this session).
     // Drains the durable inbox; waits up to ~25s for a new one, else returns empty.
     if (url.pathname.endsWith("/inbox-wait") && request.method === "POST") {
+      // A process is now listening → tell open editor windows so they enable the
+      // chat composer (it's disabled until something is waiting for the message).
+      for (const ws of this.ctx.getWebSockets()) { try { ws.send(JSON.stringify({ type: "listening", ts: Date.now() })); } catch {} }
       for (let i = 0; i < 32; i++) {
         const inbox = ((await this.ctx.storage.get<any[]>("inbox")) || []);
         if (inbox.length) { await this.ctx.storage.delete("inbox"); return Response.json({ messages: inbox }); }

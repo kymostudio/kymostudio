@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send, Wand2 } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
-import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, type StatusKind } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, useListening, type StatusKind } from "./mcpstatus";
 
 const FEED_ICON: Record<StatusKind, React.ReactNode> = {
   user: <User size={13} strokeWidth={2} />,
@@ -68,6 +68,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   const target = useAiTarget();
   const feed = useStatusFeed();
   const simulate = useSimulate();
+  const listening = useListening(); // a process is waiting on wait_for_user_message
   const [tab, setTab] = useState<Tab>("chat");
   const feedRef = useRef<HTMLDivElement>(null);
   // Scroll the body (the feed has no frame/own scroll now) to the latest message.
@@ -86,7 +87,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   const submitAsk = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const t = ask.trim();
-    if (!t) return;
+    if (!t || !listening) return;
     const ok = sendPrompt(t);
     pushStatus({ kind: "user", text: t });
     if (!ok) pushStatus({ kind: "result", text: "⚠ Not delivered (offline) — reload & retry." });
@@ -204,9 +205,11 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
 
       {tab === "chat" && (
         <div className="cn-ask-foot">
-          <form className="cn-composer" onSubmit={submitAsk}>
+          <form className={"cn-composer" + (listening ? "" : " disabled")} onSubmit={submitAsk}>
             <textarea ref={askRef} className="cn-composer-input" value={ask} onChange={(e) => setAsk(e.target.value)} rows={1}
-              placeholder="Describe what you want to create..." aria-label="Message the AI"
+              disabled={!listening}
+              placeholder={listening ? "Describe what you want to create..." : "Waiting for a listener… connect a client and ask it to listen (see Setup)"}
+              aria-label="Message the AI"
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submitAsk(e); } }} />
             <div className="cn-composer-bar">
               <button type="button" className={"cn-ask-tool" + (simulate ? " on" : "")} onClick={() => setSimulate(!simulate)}
@@ -216,7 +219,8 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
                 Simulate UI
                 <span className="cn-ask-switch" aria-hidden="true" />
               </button>
-              <button className="cn-composer-send" type="submit" disabled={!ask.trim()}>
+              <button className="cn-composer-send" type="submit" disabled={!ask.trim() || !listening}
+                title={listening ? "Send" : "No listener — connect a client and ask it to listen"}>
                 <Send size={14} strokeWidth={2.2} /> Send
               </button>
             </div>

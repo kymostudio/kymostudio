@@ -5,7 +5,7 @@ import { useWorkspace } from "./workspace";
 import { USER_WS } from "./const";
 import { LOCAL } from "./localdb";
 import { requestOpen, requestClose } from "./tabs";
-import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx, pushStatus, registerPromptSender, runNewProjectSim, runDeleteProjectSim, simulateValue } from "./mcpstatus";
+import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx, pushStatus, registerPromptSender, runNewProjectSim, runDeleteProjectSim, simulateValue, pingListening } from "./mcpstatus";
 
 // Connects every signed-in tab to the user's control channel (one DO per email)
 // so the MCP `ui_open_diagram` / `ui_open_project` tools can steer THIS tab. Carries no
@@ -48,6 +48,7 @@ export function UserChannel() {
       if (data && data.type === "ai-target") { setPinned(!!data.pinned); return; } // server: am I the target?
       if (data) pingMcp(); // every control message here is MCP-driven → AI is active
       if (data && data.type === "status") { pushStatus(data); return; } // ui_status → live feed in panel
+      if (data && data.type === "listening") { pingListening(); return; } // a process is waiting → enable the chat composer
       // open a diagram as a tab in the live editor; if no editor is mounted
       // (e.g. on /projects), fall back to a ?d= deep-link that the editor adopts.
       if (data && data.type === "open" && data.id) { if (!requestOpen(String(data.id))) navRef.current("/?d=" + encodeURIComponent(String(data.id))); }
