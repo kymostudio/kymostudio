@@ -240,7 +240,10 @@ fn parse_class_style(props: &str) -> ClassStyle {
             match k.trim().to_ascii_lowercase().as_str() {
                 "fill" => s.fill = Some(v),
                 "stroke" => s.stroke = Some(v),
-                "stroke-width" => s.stroke_width = Some(v),
+                // SVG presentation attrs want a unitless length — drop the `px`.
+                "stroke-width" => {
+                    s.stroke_width = Some(v.trim_end_matches("px").trim().to_string())
+                }
                 "color" => s.color = Some(v),
                 _ => {}
             }
