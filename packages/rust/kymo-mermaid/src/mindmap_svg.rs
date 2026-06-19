@@ -145,10 +145,25 @@ pub fn render_cose(fc: &Flowchart) -> String {
         .iter()
         .map(|n| PNode { label: n.label.clone(), shape: n.shape, branch: n.branch, cx: n.x, cy: n.y, w: n.w, h: n.h })
         .collect();
+    // Edges run border-to-border (mermaid clips the branch to each node's edge),
+    // not centre-to-centre — clip both ends to their node box.
+    let border = |cx: f64, cy: f64, w: f64, h: f64, tx: f64, ty: f64| -> (f64, f64) {
+        let (dx, dy) = (tx - cx, ty - cy);
+        if dx == 0.0 && dy == 0.0 {
+            return (cx, cy);
+        }
+        let sx = if dx != 0.0 { (w / 2.0) / dx.abs() } else { f64::INFINITY };
+        let sy = if dy != 0.0 { (h / 2.0) / dy.abs() } else { f64::INFINITY };
+        let s = sx.min(sy);
+        (cx + dx * s, cy + dy * s)
+    };
     let mut pedges = Vec::new();
     for n in &nodes {
         for &c in &n.children {
-            pedges.push(PEdge { branch: nodes[c].branch, pts: vec![(n.x, n.y), (nodes[c].x, nodes[c].y)] });
+            let ch = &nodes[c];
+            let p = border(n.x, n.y, n.w, n.h, ch.x, ch.y);
+            let q = border(ch.x, ch.y, ch.w, ch.h, n.x, n.y);
+            pedges.push(PEdge { branch: ch.branch, pts: vec![p, q] });
         }
     }
     render_positioned(&pnodes, &pedges)
@@ -229,10 +244,25 @@ pub fn render(fc: &Flowchart) -> String {
         .iter()
         .map(|n| PNode { label: n.label.clone(), shape: n.shape, branch: n.branch, cx: n.x, cy: n.y, w: n.w, h: n.h })
         .collect();
+    // Edges run border-to-border (mermaid clips the branch to each node's edge),
+    // not centre-to-centre — clip both ends to their node box.
+    let border = |cx: f64, cy: f64, w: f64, h: f64, tx: f64, ty: f64| -> (f64, f64) {
+        let (dx, dy) = (tx - cx, ty - cy);
+        if dx == 0.0 && dy == 0.0 {
+            return (cx, cy);
+        }
+        let sx = if dx != 0.0 { (w / 2.0) / dx.abs() } else { f64::INFINITY };
+        let sy = if dy != 0.0 { (h / 2.0) / dy.abs() } else { f64::INFINITY };
+        let s = sx.min(sy);
+        (cx + dx * s, cy + dy * s)
+    };
     let mut pedges = Vec::new();
     for n in &nodes {
         for &c in &n.children {
-            pedges.push(PEdge { branch: nodes[c].branch, pts: vec![(n.x, n.y), (nodes[c].x, nodes[c].y)] });
+            let ch = &nodes[c];
+            let p = border(n.x, n.y, n.w, n.h, ch.x, ch.y);
+            let q = border(ch.x, ch.y, ch.w, ch.h, n.x, n.y);
+            pedges.push(PEdge { branch: ch.branch, pts: vec![p, q] });
         }
     }
     render_positioned(&pnodes, &pedges)
