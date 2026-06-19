@@ -53,6 +53,19 @@ impl std::error::Error for MermaidError {}
 
 /// Strip a `%% …` line comment (outside of quotes — kept simple: Mermaid
 /// comments occupy whole lines or trailing text we don't otherwise parse).
+/// Decode the HTML entities mermaid uses in labels (`&lt;`→`<`, …) so they
+/// render as the intended characters rather than the literal entity text.
+pub(crate) fn decode_entities(s: &str) -> String {
+    if !s.contains('&') {
+        return s.to_string();
+    }
+    s.replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&#35;", "#")
+        .replace("&amp;", "&")
+}
+
 fn strip_comment(line: &str) -> &str {
     match line.find("%%") {
         Some(idx) => &line[..idx],
@@ -146,8 +159,22 @@ fn split_statements(src: &str) -> Vec<(usize, String)> {
                 in_comment = true;
             }
             ';' => {
-                flush(&mut cur, start, &mut out);
-                start = line;
+                // A ';' that closes an HTML entity (`&lt;`, `&#35;`, …) is part of
+                // the text, not a statement separator.
+                let tail = cur.rsplit(|c: char| c.is_whitespace()).next().unwrap_or("");
+                let in_entity = tail
+                    .rfind('&')
+                    .map(|a| {
+                        let e = &tail[a + 1..];
+                        !e.is_empty() && e.chars().all(|c| c.is_ascii_alphanumeric() || c == '#')
+                    })
+                    .unwrap_or(false);
+                if in_entity {
+                    cur.push(';');
+                } else {
+                    flush(&mut cur, start, &mut out);
+                    start = line;
+                }
             }
             _ => cur.push(c),
         }

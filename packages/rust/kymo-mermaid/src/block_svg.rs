@@ -225,13 +225,14 @@ fn tokenize(line: &str) -> Vec<(String, String, usize)> {
                 }
                 i += 1;
             }
-            label = chars[st..i]
+            let raw = chars[st..i]
                 .iter()
                 .collect::<String>()
                 .trim_matches(|c| matches!(c, '[' | ']' | '(' | ')' | '{' | '}'))
                 .trim()
                 .trim_matches('"')
                 .to_string();
+            label = crate::mermaid::decode_entities(&raw);
         }
         if i < chars.len() && chars[i] == '<' {
             while i < chars.len() && chars[i] != '>' {

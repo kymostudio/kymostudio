@@ -89,7 +89,7 @@ pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError
             let lhs = stmt[..pos].trim();
             let rest = stmt[pos + 3..].trim();
             let (rhs, label) = match rest.split_once(':') {
-                Some((r, l)) => (r.trim(), l.trim().to_string()),
+                Some((r, l)) => (r.trim(), super::decode_entities(l.trim())),
                 None => (rest, String::new()),
             };
             if lhs.is_empty() || rhs.is_empty() {
@@ -112,7 +112,7 @@ pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError
             let id = id.trim();
             if !id.is_empty() && id != "[*]" {
                 touch(id, None, None, &mut fc, &mut index, &sub_stack);
-                set_label(&mut fc, &index, id, desc.trim());
+                set_label(&mut fc, &index, id, super::decode_entities(desc.trim()).trim());
             }
             continue;
         }
@@ -159,7 +159,9 @@ fn handle_decl(
     index: &mut Vec<(String, usize)>,
     sub_stack: &mut Vec<usize>,
 ) {
-    let mut rest = rest.trim();
+    // Decode entities first so `&lt;&lt;fork&gt;&gt;` reads as `<<fork>>`.
+    let decoded = super::decode_entities(rest.trim());
+    let mut rest = decoded.as_str();
     let opens = rest.ends_with('{');
     if opens {
         rest = rest[..rest.len() - 1].trim_end();
