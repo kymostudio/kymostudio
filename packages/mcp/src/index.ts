@@ -981,11 +981,29 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     this.server.tool(
       "delete_project",
-      "Delete one of your projects AND everything inside it (its folders + diagrams move to Trash, recoverable for 30 days). You can't delete your only project." + NARRATE,
-      { project: z.string().describe("The project to delete — its id or name (from list_projects).") },
-      async ({ project }) => {
+      "Delete one of your projects AND everything inside it (its folders + diagrams move to Trash, recoverable for 30 days). You can't delete your only project. Set `simulate:true` to delete by animating the editor's real Manage-projects UI instead (only when the user asks / the panel's Simulate toggle is on)." + NARRATE,
+      {
+        project: z.string().describe("The project to delete — its id or name (from list_projects)."),
+        simulate: z.boolean().optional().describe("Default false (delete server-side directly). true = drive the editor's real Manage-projects modal (open it → filter to the project → click delete → confirm) — use only when the user opted into UI simulation (e.g. the panel's Simulate toggle)."),
+      },
+      async ({ project, simulate }) => {
         const proj = await findProject(this.env, me(), project);
         if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects.` }] };
+        // simulate=true: drive the real Manage-projects UI (open modal → filter →
+        // click delete → confirm). If a live window receives it, the editor performs
+        // the delete itself; falls back to a server-side delete when none is connected.
+        if (simulate) {
+          const r = await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+            method: "POST", headers: { "content-type": "application/json" },
+            body: JSON.stringify({ type: "ui-delete-project", id: proj.id }),
+          }).catch(() => null);
+          const clients = r ? (((await r.json().catch(() => ({}))) as { clients?: number }).clients ?? 0) : 0;
+          if (clients > 0) {
+            await feed("action", `Xoá project "${proj.name}" (mô phỏng UI trong editor)…`);
+            return { content: [{ type: "text", text: `Triggered the editor to delete project "${proj.name}" by simulating the Manage-projects UI (open → filter → delete → confirm).` }] };
+          }
+          // no live window → fall through to the server-side delete below
+        }
         const res = await deleteProjectCascade(this.env, me(), proj.id);
         if (!res.ok) return { content: [{ type: "text", text: res.error === "cannot delete your only project" ? "Can't delete your only project — create another first." : `Project ${proj.id} not found.` }] };
         await feed("action", `Deleted project "${proj.name}" (moved to Trash)`);
@@ -1169,7 +1187,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         // Back-compat: older entries were bare strings; normalize to {text, simulate}.
         const items = messages.map((m) => (typeof m === "string" ? { text: m, simulate: false } : { text: String(m?.text ?? ""), simulate: !!m?.simulate }));
         const anySim = items.some((it) => it.simulate);
-        const hint = anySim ? "\n\n[Simulate UI = ON] If this leads to creating a project, call new_project with simulate:true so the editor animates the real New-project UI (open switcher → type name → submit; no reload)." : "";
+        const hint = anySim ? "\n\n[Simulate UI = ON] If this leads to creating or deleting a project, pass simulate:true (new_project / delete_project) so the editor animates the real UI (create: open switcher → type name → submit; delete: open Manage-projects → filter → delete → confirm)." : "";
         return { content: [{ type: "text", text: `The user typed in the editor panel:\n${items.map((it) => "• " + it.text).join("\n")}${hint}` }] };
       }
     );

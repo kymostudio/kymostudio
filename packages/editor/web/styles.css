@@ -710,6 +710,34 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-ask-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.3); transition: transform 0.15s; }
 .cn-ask-tool.on .cn-ask-switch { background: color-mix(in srgb, var(--ink) 55%, transparent); }
 .cn-ask-tool.on .cn-ask-switch::after { transform: translateX(11px); }
+
+/* Manage-projects modal (was the /projects route) — filter + list + delete. */
+.pm-overlay { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(36, 33, 49, 0.4); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+.pm-modal { width: min(560px, 100%); max-height: min(72vh, 640px); display: flex; flex-direction: column; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 24px 60px rgba(0,0,0,0.28); overflow: hidden; }
+.pm-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.pm-head h2 { margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.pm-head-actions { display: flex; align-items: center; gap: 8px; }
+.pm-new { display: inline-flex; align-items: center; gap: 5px; font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 11px; border-radius: 9px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--ink); cursor: pointer; }
+.pm-new:hover { border-color: var(--accent); color: var(--accent); }
+.pm-close { border: 0; background: none; cursor: pointer; color: var(--dim); font-size: 15px; padding: 4px 6px; border-radius: 7px; }
+.pm-close:hover { color: var(--ink); background: var(--bg-soft); }
+.pm-search { flex: none; display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.pm-search-ic { color: var(--dim); flex: none; }
+.pm-search-input { flex: 1; min-width: 0; font: inherit; font-size: 13.5px; border: 0; background: none; color: var(--ink); outline: none; }
+.pm-list { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; }
+.pm-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; }
+.pm-row:hover { background: var(--bg-soft); }
+.pm-thumb { flex: none; display: inline-flex; color: var(--dim); }
+.pm-name { flex: 1; min-width: 0; font-size: 13.5px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pm-name:hover { color: var(--accent); }
+.pm-current { flex: none; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: var(--accent); }
+.pm-open { flex: none; font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--ink); cursor: pointer; }
+.pm-open:hover { border-color: var(--accent); color: var(--accent); }
+.pm-icon { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; border-radius: 7px; background: none; color: var(--dim); cursor: pointer; }
+.pm-icon:hover { background: var(--bg); color: var(--ink); }
+.pm-del:hover { color: var(--error); }
+.pm-icon:disabled { opacity: 0.4; cursor: default; }
+.pm-empty { padding: 20px; text-align: center; color: var(--dim); font-size: 13px; }
 .cn-ask-input { flex: 1; min-width: 0; font: inherit; font-size: 12.5px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-soft); color: var(--ink); outline: none; }
 .cn-ask-input:focus { border-color: var(--accent); background: var(--bg); }
 .cn-ask-send { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; cursor: pointer; }

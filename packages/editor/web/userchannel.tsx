@@ -5,7 +5,7 @@ import { useWorkspace } from "./workspace";
 import { USER_WS } from "./const";
 import { LOCAL } from "./localdb";
 import { requestOpen, requestClose } from "./tabs";
-import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx, pushStatus, registerPromptSender, runNewProjectSim, simulateValue } from "./mcpstatus";
+import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx, pushStatus, registerPromptSender, runNewProjectSim, runDeleteProjectSim, simulateValue } from "./mcpstatus";
 
 // Connects every signed-in tab to the user's control channel (one DO per email)
 // so the MCP `ui_open_diagram` / `ui_open_project` tools can steer THIS tab. Carries no
@@ -60,6 +60,7 @@ export function UserChannel() {
       }
       else if (data && data.type === "close" && data.id) { requestClose(String(data.id)); }
       else if (data && data.type === "ui-new-project" && data.name) { runNewProjectSim(String(data.name)); } // simulate the real New-project UI flow
+      else if (data && data.type === "ui-delete-project" && data.id) { runDeleteProjectSim(String(data.id)); } // simulate the real Delete-project UI flow
     });
     ws.addEventListener("error", () => { try { ws.close(); } catch {} });
     return () => {

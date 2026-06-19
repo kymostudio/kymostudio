@@ -12,6 +12,7 @@ import TrashPage from "./TrashPage";
 import ProjectsPage from "./ProjectsPage";
 import LoginPage from "./LoginPage";
 import { UserChannel } from "./userchannel";
+import { ProjectsModal } from "./ProjectsModal";
 import { installLocalApi } from "./localdb";
 
 // Local dev has no kymo-mcp backend — back the data API + rooms with localStorage
@@ -27,6 +28,7 @@ createRoot(document.getElementById("root")!).render(
         <ToastProvider>
         <ContextMenuProvider>
         <UserChannel />
+        <ProjectsModal />
         <Routes>
           <Route path="/" element={<EditorPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
