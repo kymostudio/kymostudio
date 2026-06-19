@@ -203,6 +203,21 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             continue;
         }
 
+        // Standalone annotation: `<<interface>> Class01` sets a class stereotype.
+        let dec = decode_entities(stmt);
+        let dt = dec.trim();
+        if dt.starts_with("<<") {
+            if let Some(end) = dt.find(">>") {
+                let stereo = dt[2..end].trim().to_string();
+                let target = dt[end + 2..].trim();
+                if !target.is_empty() {
+                    let ci = decl_class(&mut cd.classes, target);
+                    cd.classes[ci].stereotype = stereo;
+                    continue;
+                }
+            }
+        }
+
         // A bare token — declare the class.
         decl_class(&mut cd.classes, stmt);
     }
