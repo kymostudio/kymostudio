@@ -61,6 +61,7 @@ export function UserChannel() {
       else if (data && data.type === "close" && data.id) { requestClose(String(data.id)); }
       else if (data && data.type === "ui-new-project" && data.name) { runNewProjectSim(String(data.name)); } // simulate the real New-project UI flow
       else if (data && data.type === "ui-delete-project" && data.id) { runDeleteProjectSim(String(data.id)); } // simulate the real Delete-project UI flow
+      else if (data && data.type === "projects-changed") { Promise.resolve(refreshRef.current?.()); } // server-side rename/delete → refetch list (switcher + modal)
     });
     ws.addEventListener("error", () => { try { ws.close(); } catch {} });
     return () => {
