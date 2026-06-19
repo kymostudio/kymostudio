@@ -42,6 +42,8 @@ pub(crate) struct PMsg {
     pub(crate) y: i64,
     pub(crate) self_loop: bool,
     pub(crate) bidirectional: bool,
+    /// `autonumber` sequence index, drawn as a badge on the source lifeline.
+    pub(crate) number: Option<i64>,
 }
 
 /// A placed combined fragment box (with operand sub-bands).
@@ -192,19 +194,15 @@ impl Layout {
                     let from = self.idx(&m.from);
                     let to = self.idx(&m.to);
                     let self_loop = from == to;
-                    let text = if self.auto_enabled {
+                    // mermaid draws the autonumber as a badge on the lifeline (not
+                    // a text prefix); record the index and keep the label clean.
+                    let number = if self.auto_enabled {
                         let n = self.auto_n;
                         let show = self.auto_display;
                         self.auto_n += self.auto_step; // advances even when hidden
-                        if !show {
-                            m.text.clone()
-                        } else if m.text.is_empty() {
-                            n.to_string()
-                        } else {
-                            format!("{} {}", n, m.text)
-                        }
+                        show.then_some(n)
                     } else {
-                        m.text.clone()
+                        None
                     };
                     if m.activate_target {
                         self.open_acts.entry(to).or_default().push(self.y);
@@ -212,11 +210,12 @@ impl Layout {
                     self.msgs.push(PMsg {
                         from,
                         to,
-                        text,
+                        text: m.text.clone(),
                         sort: m.sort,
                         y: self.y,
                         self_loop,
                         bidirectional: m.bidirectional,
+                        number,
                     });
                     if m.deactivate_source {
                         self.close_act(from, self.y);

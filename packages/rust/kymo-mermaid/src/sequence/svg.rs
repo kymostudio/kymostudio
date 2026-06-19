@@ -278,21 +278,24 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
     Some(g)
 }
 
-/// Split a label on `<br>` / `<br/>` / `<br />` hard-breaks (mermaid's line break).
+/// Split a label on `<br>` / `<br/>` / `<br />` hard-breaks (mermaid's line
+/// break) and on literal newlines (the parser folds some `<br>` to `\n`).
 fn split_br(s: &str) -> Vec<&str> {
     let mut out = Vec::new();
-    let mut rest = s;
-    while let Some(p) = rest.find("<br") {
-        out.push(&rest[..p]);
-        match rest[p..].find('>') {
-            Some(q) => rest = &rest[p + q + 1..],
-            None => {
-                rest = "";
-                break;
+    for seg in s.split('\n') {
+        let mut rest = seg;
+        while let Some(p) = rest.find("<br") {
+            out.push(&rest[..p]);
+            match rest[p..].find('>') {
+                Some(q) => rest = &rest[p + q + 1..],
+                None => {
+                    rest = "";
+                    break;
+                }
             }
         }
+        out.push(rest);
     }
-    out.push(rest);
     out
 }
 
@@ -317,6 +320,16 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
         String::new()
     };
 
+    // `autonumber` badge: a dark disc with the index on the source lifeline.
+    let badge = match m.number {
+        Some(n) => format!(
+            "<circle cx=\"{x1}\" cy=\"{y}\" r=\"9\" fill=\"#333333\"/>\
+             <text x=\"{x1}\" y=\"{y}\" text-anchor=\"middle\" dominant-baseline=\"central\" \
+             fill=\"#ffffff\" font-size=\"12\">{n}</text>"
+        ),
+        None => String::new(),
+    };
+
     if m.self_loop || x1 == x2 {
         // Self-message: a small rectangular loop to the right of the lifeline.
         let r = x1 + 60;
@@ -329,25 +342,37 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
             String::new()
         } else {
             format!(
-                "<text x=\"{}\" y=\"{}\" fill=\"#333333\">{}</text>",
+                "<text x=\"{}\" y=\"{}\" fill=\"#333333\" font-size=\"16\">{}</text>",
                 r + 6,
                 y + 14,
-                esc(&m.text)
+                esc(&split_br(&m.text).join(" "))
             )
         };
-        return path + &label;
+        return path + &label + &badge;
     }
 
     let line = format!(
         "<line x1=\"{x1}\" y1=\"{y}\" x2=\"{x2}\" y2=\"{y}\" stroke=\"#333333\" \
          stroke-width=\"1.4\"{dash}{start_marker} marker-end=\"url(#{head})\"/>"
     );
+    let mid = (x1 + x2) / 2;
+    let lines = split_br(&m.text);
     let label = if m.text.is_empty() {
         String::new()
+    } else if lines.len() > 1 {
+        // Multi-line (`<br>`): centre the block just above the arrow.
+        const LH: i64 = 18;
+        let top = y - 12 - (lines.len() as i64 - 1) * LH;
+        let tspans: String = lines
+            .iter()
+            .enumerate()
+            .map(|(i, l)| {
+                format!("<tspan x=\"{mid}\" y=\"{}\">{}</tspan>", top + i as i64 * LH, esc(l.trim()))
+            })
+            .collect();
+        format!("<text text-anchor=\"middle\" fill=\"#333333\" font-size=\"16\">{tspans}</text>")
     } else {
-        let mid = (x1 + x2) / 2;
-        // mermaid sits the label ~29px above the arrow with `dominant-baseline:
-        // middle; dy:1em` at messageFontSize 16 — replicate exactly for parity.
+        // Single line: mermaid's `dominant-baseline:middle; dy:1em` at 16px.
         format!(
             "<text x=\"{mid}\" y=\"{}\" text-anchor=\"middle\" dominant-baseline=\"middle\" \
              alignment-baseline=\"middle\" dy=\"1em\" fill=\"#333333\" font-size=\"16\">{}</text>",
@@ -355,7 +380,7 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
             esc(&m.text)
         )
     };
-    line + &label
+    line + &label + &badge
 }
 
 fn frag_svg(f: &PFrag) -> String {
