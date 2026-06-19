@@ -253,7 +253,17 @@ pub fn render_flowchart_math(fc: &mut flowchart::Flowchart) {
 pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> {
     let mut fc = mermaid::parse_state(src)?;
     render_flowchart_math(&mut fc);
-    Ok(flowchart_svg::render(&layout::layout_flowchart(&fc)))
+    // Use kymo's dagre geometry: it nests composite states (`state X { … }`)
+    // as clusters and routes edges to them (`[*] --> X`), matching mermaid;
+    // the Sugiyama path drew the composite id as a separate node.
+    let (node_styles, default_style) = mermaid::extract_node_styles(src);
+    let geom = kymo_graph::layout_dagre::dagre_geom(&fc, style::FlowStyle::Mermaid);
+    Ok(kymo_graph::dagre_svg::render(
+        &geom,
+        style::FlowStyle::Mermaid,
+        &node_styles,
+        default_style.as_ref(),
+    ))
 }
 
 /// Render a Mermaid `classDiagram` → SVG (kymo own multi-compartment renderer).
