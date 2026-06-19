@@ -85,31 +85,53 @@ pub fn render(src: &str) -> String {
     let (placed, w, h) = layout(&grid);
     let width = w.max(40.0);
     let height = h.max(40.0);
-    let mut pos: HashMap<String, (f64, f64)> = HashMap::new();
+    // id → box (cx, cy, w, h) so edges can clip to the border.
+    let mut pos: HashMap<String, (f64, f64, f64, f64)> = HashMap::new();
     let mut body = String::new();
     for p in placed.iter().filter(|p| p.container) {
         body += &rect(p, "#ffffff", "#9370DB", true);
     }
     for p in placed.iter().filter(|p| !p.container) {
         if !p.id.is_empty() {
-            pos.insert(p.id.clone(), (p.x + p.w / 2.0, p.y + p.h / 2.0));
+            pos.insert(p.id.clone(), (p.x + p.w / 2.0, p.y + p.h / 2.0, p.w, p.h));
         }
         body += &rect(p, "#ECECFF", "#9370DB", false);
     }
     for (s, d, lbl) in &edges {
-        if let (Some(&(x1, y1)), Some(&(x2, y2))) = (pos.get(s), pos.get(d)) {
-            body += &format!("<line x1=\"{x1:.1}\" y1=\"{y1:.1}\" x2=\"{x2:.1}\" y2=\"{y2:.1}\" stroke=\"#333333\" stroke-width=\"1.4\"/>");
+        if let (Some(&a), Some(&b)) = (pos.get(s), pos.get(d)) {
+            // Clip both ends to the box borders so the arrow doesn't cut through.
+            let (x1, y1) = border_pt(a, (b.0, b.1));
+            let (x2, y2) = border_pt(b, (a.0, a.1));
+            body += &format!(
+                "<line x1=\"{x1:.1}\" y1=\"{y1:.1}\" x2=\"{x2:.1}\" y2=\"{y2:.1}\" stroke=\"#333333\" \
+                 stroke-width=\"1.4\" marker-end=\"url(#blk-arrow)\"/>"
+            );
             if !lbl.is_empty() {
                 body += &format!("<text x=\"{:.1}\" y=\"{:.1}\" text-anchor=\"middle\" font-size=\"12\" fill=\"#333\">{}</text>", (x1 + x2) / 2.0, (y1 + y2) / 2.0 - 4.0, esc(lbl));
             }
         }
     }
+    const DEFS: &str = "<marker id=\"blk-arrow\" markerWidth=\"12\" markerHeight=\"10\" refX=\"9\" refY=\"5\" \
+orient=\"auto\" markerUnits=\"userSpaceOnUse\"><path d=\"M1,1 L10,5 L1,9 Z\" fill=\"#333333\"/></marker>";
     format!(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
          <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {width:.0} {height:.0}\" width=\"{width:.0}\" height=\"{height:.0}\" \
          style=\"max-width:100%;height:auto\" font-family=\"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif\" font-size=\"14\">\n\
-         <rect width=\"{width:.0}\" height=\"{height:.0}\" fill=\"#ffffff\"/>\n{body}</svg>\n"
+         <defs>{DEFS}</defs>\n<rect width=\"{width:.0}\" height=\"{height:.0}\" fill=\"#ffffff\"/>\n{body}</svg>\n"
     )
+}
+
+/// Intersection of the line from box centre `(cx,cy,w,h)` toward `(tx,ty)` with
+/// the box border.
+fn border_pt((cx, cy, w, h): (f64, f64, f64, f64), (tx, ty): (f64, f64)) -> (f64, f64) {
+    let (dx, dy) = (tx - cx, ty - cy);
+    if dx == 0.0 && dy == 0.0 {
+        return (cx, cy);
+    }
+    let sx = if dx != 0.0 { (w / 2.0) / dx.abs() } else { f64::INFINITY };
+    let sy = if dy != 0.0 { (h / 2.0) / dy.abs() } else { f64::INFINITY };
+    let s = sx.min(sy);
+    (cx + dx * s, cy + dy * s)
 }
 
 fn rect(p: &Placed, fill: &str, stroke: &str, container: bool) -> String {
