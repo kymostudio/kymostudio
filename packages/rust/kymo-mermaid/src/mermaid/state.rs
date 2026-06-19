@@ -23,8 +23,9 @@ pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError
     };
     let mut index: Vec<(String, usize)> = Vec::new();
     let mut sub_stack: Vec<usize> = Vec::new();
-    let mut skip_note = false;
     let mut skip_acc = false;
+    let mut note_buf: Option<(String, Vec<String>)> = None; // (target, lines) for a block note
+    let mut note_n = 0usize;
 
     for (_lineno, raw) in stmts.iter().skip(1) {
         let stmt = raw.trim();
@@ -33,9 +34,13 @@ pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError
         }
         let low = stmt.to_ascii_lowercase();
 
-        if skip_note {
+        // Accumulating a multi-line `note … end note` block.
+        if let Some((_, lines)) = note_buf.as_mut() {
             if low == "end note" {
-                skip_note = false;
+                let (target, ls) = note_buf.take().unwrap();
+                add_note(&mut fc, &mut index, &mut note_n, &target, &ls.join("\n"), &sub_stack);
+            } else {
+                lines.push(super::decode_entities(stmt));
             }
             continue;
         }
@@ -45,9 +50,17 @@ pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError
             }
             continue;
         }
-        if low.starts_with("note ") || low == "note" {
-            if !stmt.contains(':') {
-                skip_note = true; // a multi-line `note ... end note` block
+        // `note <left|right> of TARGET [: text]` — a state note (yellow box).
+        if low.starts_with("note ") {
+            let rest = stmt[5..].trim();
+            let after = rest.split(" of ").nth(1).unwrap_or(rest);
+            let (target, inline) = match after.split_once(':') {
+                Some((t, txt)) => (t.trim().to_string(), Some(super::decode_entities(txt.trim()))),
+                None => (after.trim().to_string(), None),
+            };
+            match inline {
+                Some(txt) => add_note(&mut fc, &mut index, &mut note_n, &target, &txt, &sub_stack),
+                None => note_buf = Some((target, Vec::new())),
             }
             continue;
         }
@@ -239,6 +252,36 @@ fn set_label(fc: &mut Flowchart, index: &[(String, usize)], id: &str, label: &st
     if let Some((_, idx)) = index.iter().find(|(i, _)| i == id) {
         fc.nodes[*idx].label = label.to_string();
     }
+}
+
+/// Add a state note: a `__note*` box carrying the text, linked to its target by
+/// a dashed, arrow-less edge. The engine paints `__note*` nodes yellow.
+fn add_note(
+    fc: &mut Flowchart,
+    index: &mut Vec<(String, usize)>,
+    n: &mut usize,
+    target: &str,
+    text: &str,
+    sub_stack: &[usize],
+) {
+    if target.is_empty() {
+        return;
+    }
+    let id = format!("__note{}", *n);
+    *n += 1;
+    let label = text.replace("<br/>", "\n").replace("<br>", "\n");
+    let idx = fc.nodes.len();
+    fc.nodes.push(FlowNode { id: id.clone(), label, shape: Shape::Box });
+    index.push((id.clone(), idx));
+    register_member(fc, sub_stack, &id);
+    touch(target, None, None, fc, index, sub_stack);
+    fc.edges.push(FlowEdge {
+        src: id,
+        dst: target.to_string(),
+        label: String::new(),
+        dashed: true,
+        no_arrow: true,
+    });
 }
 
 fn register_member(fc: &mut Flowchart, sub_stack: &[usize], id: &str) {

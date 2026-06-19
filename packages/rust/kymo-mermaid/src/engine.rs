@@ -256,7 +256,20 @@ pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
     // Use kymo's dagre geometry: it nests composite states (`state X { … }`)
     // as clusters and routes edges to them (`[*] --> X`), matching mermaid;
     // the Sugiyama path drew the composite id as a separate node.
-    let (node_styles, default_style) = mermaid::extract_node_styles(src);
+    let (mut node_styles, default_style) = mermaid::extract_node_styles(src);
+    // Paint state-note boxes (`__note*`) mermaid's pale yellow.
+    for n in &fc.nodes {
+        if n.id.starts_with("__note") {
+            node_styles.insert(
+                n.id.clone(),
+                style::NodeStyle {
+                    fill: Some("#fff5ad".into()),
+                    stroke: Some("#aaaa33".into()),
+                    ..Default::default()
+                },
+            );
+        }
+    }
     let geom = kymo_graph::layout_dagre::dagre_geom(&fc, style::FlowStyle::Mermaid);
     Ok(kymo_graph::dagre_svg::render(
         &geom,
