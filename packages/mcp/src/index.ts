@@ -746,6 +746,14 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
     const me = () => this.props.email;
     const link = (id: string) => `${EDITOR_URL}/?d=${id}`;
     const projLink = (id: string) => `${EDITOR_URL}/?p=${id}`;
+    // Auto-narrate tool activity to the editor's Live Activity feed (kind "action")
+    // so every MCP mutation shows up without the agent calling ui_status. The MCP
+    // tools differ from a bare API edit precisely by this side-effect.
+    const feed = (kind: "action" | "result", text: string) =>
+      this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/push", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ type: "status", kind, text: String(text).slice(0, 500), ts: Date.now() }),
+      }).then(() => {}).catch(() => {});
 
     this.server.tool(
       "new_diagram",
@@ -771,6 +779,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         await touchIndex(this.env, me(), id, title ?? "Untitled", kind && kind !== "kymo" ? kind : "kymo");
         if (proj) await assignProject(this.env, me(), id, proj.id);
         const where = proj ? ` in project "${proj.name}"` : "";
+        await feed("action", `Created ${kind ?? "kymo"} "${title ?? "Untitled"}"${where}`);
         return { content: [{ type: "text", text: `Created ${kind ?? "kymo"} diagram "${title ?? "Untitled"}"${where} (id ${id}). Open: ${link(id)}` }] };
       }
     );
@@ -824,6 +833,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         const j = (await r.json()) as { clients: number };
         await touchIndex(this.env, me(), did, title, kind === undefined ? undefined : (kind === "kymo" || kind === "" ? "kymo" : kind));
         const what = [source !== undefined ? "content" : null, title !== undefined ? `renamed to \"${title}\"` : null].filter(Boolean).join(", ");
+        await feed("action", `Edited ${title ? `"${title}"` : `diagram ${did}`} (${what || "content"})`);
         return { content: [{ type: "text", text: `Edited ${did} (${what}; ${j.clients} live tab(s)). ${link(did)}` }] };
       }
     );
@@ -852,6 +862,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       async ({ id }) => {
         const st = await destroyDiagram(this.env, me(), id);
         if (st === 403) return { content: [{ type: "text", text: `Diagram ${id} isn't yours.` }] };
+        await feed("action", `Deleted diagram ${id}`);
         return { content: [{ type: "text", text: `Deleted diagram ${id}.` }] };
       }
     );
@@ -873,6 +884,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         });
         const j = (await r.json()) as { clients: number };
         const where = j.clients ? `${j.clients} live tab(s) switched` : "no live editor tab open right now — use the link below";
+        await feed("action", `Opened diagram ${did}`);
         return { content: [{ type: "text", text: `Opened ${did} (${where}). ${link(did)}` }] };
       }
     );
@@ -901,6 +913,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       async ({ name }) => {
         if (!name.trim()) return { content: [{ type: "text", text: "Provide a non-empty project name." }] };
         const p = await createProject(this.env, me(), name);
+        await feed("action", `Created project "${p.name}"`);
         return { content: [{ type: "text", text: `Created project "${p.name}" (id ${p.id}).` }] };
       }
     );
@@ -930,6 +943,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects.` }] };
         const res = await deleteProjectCascade(this.env, me(), proj.id);
         if (!res.ok) return { content: [{ type: "text", text: res.error === "cannot delete your only project" ? "Can't delete your only project — create another first." : `Project ${proj.id} not found.` }] };
+        await feed("action", `Deleted project "${proj.name}" (moved to Trash)`);
         return { content: [{ type: "text", text: `Deleted project "${proj.name}" (id ${proj.id}) and moved its contents to Trash.` }] };
       }
     );
@@ -948,6 +962,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         if (!proj) return { content: [{ type: "text", text: `No project named/id "${project}" — use list_projects (or new_project).` }] };
         await assignProject(this.env, me(), id, proj.id);
         await this.env.DB.prepare("UPDATE diagrams SET ws = '' WHERE id = ?1 AND owner = ?2").bind(id, me()).run();
+        await feed("action", `Moved diagram ${id} → "${proj.name}"`);
         return { content: [{ type: "text", text: `Moved diagram ${id} to project "${proj.name}".` }] };
       }
     );
@@ -977,6 +992,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         });
         const j = (await r.json()) as { clients: number };
         const where = j.clients ? `${j.clients} live tab(s) switched` : "no live editor tab open right now — use the link below";
+        await feed("action", `Switched to project "${proj.name}"`);
         return { content: [{ type: "text", text: `Switched active project to "${proj.name}" (id ${proj.id}; ${where}). Open: ${projLink(proj.id)}` }] };
       }
     );
@@ -1037,6 +1053,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         });
         const j = (await r.json()) as { clients: number };
         const where = j.clients ? `${j.clients} live tab(s) notified` : "no live editor tab open right now";
+        await feed("action", `Closed tab ${id}`);
         return { content: [{ type: "text", text: `Closed tab ${id} (${next.tabs.length} file(s) still open; ${where}).` }] };
       }
     );
