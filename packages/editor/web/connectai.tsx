@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send, Wand2, Settings } from "lucide-react";
-import { MCP_HTTP, MCP_SSE } from "./const";
+import { MCP_HTTP, MCP_SSE, CONNECTIONS_API, apiFetch } from "./const";
 import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, useListening, feedLength, type StatusKind } from "./mcpstatus";
 
 const FEED_ICON: Record<StatusKind, React.ReactNode> = {
@@ -63,6 +63,48 @@ const CLIENTS: { name: string; steps: React.ReactNode; url?: string }[] = [
 
 type Tab = "chat" | "connection" | "setup";
 
+// One MCP client connection (FR-AI-11) as returned by /api/connections.
+type McpConn = { connId: string; client: string; clientVersion: string; protocol: string; serverVersion: string; connectedAt: number; lastSeenAt: number; outdated: boolean; reasons: string[] };
+type ConnData = { connections: McpConn[]; summary: { total: number; connected: number; outdated: number } };
+
+const REASON_LABEL: Record<string, string> = {
+  server: "built against an old server version — reconnect to refresh tools",
+  stale: "no recent activity",
+  protocol: "old MCP protocol version",
+  client: "client version below the recommended minimum",
+};
+
+function ago(ts: number): string {
+  if (!ts) return "—";
+  const s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+  if (s < 60) return `${s}s ago`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  return h < 24 ? `${h}h ago` : `${Math.round(h / 24)}d ago`;
+}
+
+// Fetch the user's MCP connection registry while the Connection tab is open (poll ~15s).
+function useConnections(active: boolean): ConnData | null {
+  const [data, setData] = useState<ConnData | null>(null);
+  useEffect(() => {
+    if (!active) return;
+    let alive = true;
+    const load = async () => {
+      try {
+        const r = await apiFetch(CONNECTIONS_API);
+        if (!r.ok) return;
+        const d = (await r.json()) as ConnData;
+        if (alive) setData(d);
+      } catch {}
+    };
+    load();
+    const iv = setInterval(load, 15_000);
+    return () => { alive = false; clearInterval(iv); };
+  }, [active]);
+  return data;
+}
+
 export function ConnectAI({ onClose }: { onClose: () => void }) {
   const live = useMcpActive();
   const target = useAiTarget();
@@ -70,6 +112,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   const simulate = useSimulate();
   const listening = useListening(); // a process is waiting on wait_for_user_message
   const [tab, setTab] = useState<Tab>("chat");
+  const conns = useConnections(tab === "connection"); // MCP connection registry (FR-AI-11)
   const feedRef = useRef<HTMLDivElement>(null);
   // Scroll the body (the feed has no frame/own scroll now) to the latest message.
   useEffect(() => { if (tab !== "chat") return; const el = feedRef.current?.parentElement; if (el) el.scrollTop = el.scrollHeight; }, [feed.length, tab]);
@@ -190,6 +233,31 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
             </button>
             <p className="cn-target-hint">With the editor open in several windows, AI commands act only on the chosen window. None chosen → the window you used most recently. From an AI client: <code>ui_list_sessions</code> then <code>ui_switch_session</code>.</p>
             <p className="cn-session">This window · session <code>{sessionIdValue()}</code></p>
+
+            {conns && conns.summary.total > 0 && (
+              <div className="cn-conns">
+                <div className="cn-conns-head">
+                  <span>MCP clients</span>
+                  <span className="cn-conns-sum">
+                    {conns.summary.connected} connected
+                    {conns.summary.outdated > 0 && <span className="cn-conns-out"> · {conns.summary.outdated} outdated</span>}
+                  </span>
+                </div>
+                <ul className="cn-conns-list">
+                  {conns.connections.map((c) => (
+                    <li className={"cn-conn" + (c.outdated ? " outdated" : "")} key={c.connId}>
+                      <span className="cn-conn-name">{c.client}{c.clientVersion && c.clientVersion !== "?" ? ` ${c.clientVersion}` : ""}</span>
+                      <span className="cn-conn-meta">{c.protocol ? `proto ${c.protocol} · ` : ""}seen {ago(c.lastSeenAt)}</span>
+                      {c.outdated && (
+                        <span className="cn-conn-badge" title={c.reasons.map((r) => REASON_LABEL[r] || r).join("; ")}>
+                          Outdated{c.reasons.includes("server") && <button type="button" className="cn-conn-reconnect" onClick={() => setTab("setup")}>reconnect</button>}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </>
         )}
 

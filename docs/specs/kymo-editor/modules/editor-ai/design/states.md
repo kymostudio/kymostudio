@@ -1,7 +1,7 @@
 ---
 title: Connect AI — MCP/AI connection states (as surfaced in the editor)
 document_id: DESIGN-KAI-002
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -13,6 +13,7 @@ related_documents:
   - FEAT-KAI-001
   - DESIGN-KAI-001
   - FEAT-KEMCP-001
+  - CR-KAI-001
 authors:
   - Vũ Anh
 language: en
@@ -36,12 +37,16 @@ keywords:
 | Supplements | `DESIGN-KAI-001` (the channel & panel design) |
 
 > What "connected" means inside **Connect AI**, and the states the editor shows for the MCP/AI connection. This is **not a state machine** — the editor can't observe a persistent MCP session (the remote MCP is **stateless HTTP**, with no server-held connection per editor window). Instead it infers a small set of **independent, time-windowed signals** from the *events* the agent causes, and surfaces them. This doc enumerates those states, how each is detected, and where each shows up.
+>
+> *(CR-KAI-001 adds **CS-07**, a server-side **per-connection registry** — still freshness-based, not a socket flag — that lets the panel count how many MCP clients are connected and how many are outdated.)*
 
 ## 1. Why there is no single "connected" flag
 
 An MCP host (Claude/Cursor/ChatGPT/Claude Code) talks to `mcp.kymo.studio` over Streamable-HTTP/SSE (`FR-MC-03`). That connection is between the **host and the Worker** — the editor window never sees it. What the editor *can* see is the side-effects the agent produces over the per-user **`UserChannel`** (`/userws`) and the per-diagram room: a `ui_status` line, an `open`/`open-project` control message, an `edit_diagram` doc push, a `wait_for_user_message` poll. So "connection state" is **recent activity**, not a socket handshake — which is what the user actually cares about ("is an AI doing things in my editor right now?").
 
 Therefore the state is **a set of orthogonal, freshness-based signals**, each held in `web/mcpstatus.tsx`, not one enum. A window can be *active* and *targeted* and *listening* at the same time, or any subset.
+
+The same freshness logic can also be kept **server-side, per connection**: `CR-KAI-001`'s registry (CS-07) records each MCP client's last activity in the `UserChannel` DO, so the panel can report *how many* clients are connected and *which are outdated* — without ever observing a real socket (still recent-activity, not a handshake).
 
 ## 2. The connection-state signals
 
@@ -53,8 +58,14 @@ Therefore the state is **a set of orthogonal, freshness-based signals**, each he
 | **CS-04** | **AI target** (`pinned`) | the user pins via ✨ / Connection toggle / `ui_switch_session`; server echoes `{type:"ai-target"}` | sticky (until unpinned / socket drop) | **this** window is where `ui_*` control messages land | ✨ button `.target`; Connection toggle "AI is controlling THIS window" |
 | **CS-05** | **Listening** (`listening`) | server pushes `{type:"listening"}` on each `wait_for_user_message` poll | **35 s** window (a poll fires ~every 25 s) | a process is waiting for the user's typed message | chat composer **enabled** (else disabled with "Waiting for a listener…") |
 | **CS-06** | **Simulate UI** | user toggle (orthogonal preference, not a connection state) | persisted | typed prompts carry `simulate:true` | settings-gear "UI" badge |
+| **CS-07** | **Registered connection** (per MCP client) | a heartbeat from `KymoMCP` on each tool call / `wait_for_user_message` poll → upsert in the `UserChannel` registry | **`STALE_MS` (10 min)** = *connected*; `> HARD_TTL` (60 min) = pruned | a specific MCP **client** (Claude / Cursor / Claude Code …) has acted on this account recently; its record carries client+protocol+server version | **Connection** tab "N connected · M **outdated**" + per-connection list (outdated reasons: `server`/`stale`/`protocol`/`client`) — `FR-AI-11`, `CR-KAI-001` |
 
-Detail on the windows/identities behind targeting and the inbox/listening mechanics is in `DESIGN-KAI-001` §2 (UserChannel) and §5 (reverse channel).
+CS-02 vs CS-07: **CS-02** is the editor's own client-side, *aggregate* "an AI did
+something here" (120 s, in `mcpstatus.tsx`); **CS-07** is the Worker's *per-connection*
+registry — it can say *which* clients, *how many*, and which are **outdated**. Same
+freshness-window idea, different vantage point (server-side, per client).
+
+Detail on the windows/identities behind targeting and the inbox/listening mechanics is in `DESIGN-KAI-001` §2 (UserChannel) and §5 (reverse channel); the registry behind CS-07 is in `DESIGN-KAI-001` §7.
 
 ## 3. The states a user reads, by panel surface
 
@@ -75,24 +86,29 @@ The flow a connection moves through (informative, not a normative FSM — the §
 
 A worker redeploy or connection drop returns the host to **Disconnected** (the MCP connector drops — see [[mcp-connector-drops-on-redeploy]]); the editor signals simply go stale.
 
+One node per state (CS-01..CS-06, each appears exactly once). The lifecycle states (CS-01/02/03/05) carry the transitions; CS-04 and CS-06 are **orthogonal flags** (no transitions — they can hold in any lifecycle state):
+
 ```mermaid
 stateDiagram-v2
-    [*] --> Disconnected
-    Disconnected --> Connecting: add MCP client (Setup) + Google OAuth
-    Connecting --> Active: agent runs a tool — CS-02 fresh
-    Connecting --> Disconnected: auth failed / cancelled
-    Active --> Listening: wait_for_user_message — CS-05 fresh
-    Listening --> Active: ~35s idle — CS-05 stale
-    Active --> Waiting: ~120s idle — CS-02 stale
-    Waiting --> Active: agent acts again — CS-02 fresh
-    Active --> Disconnected: worker redeploy / drop
-    Listening --> Disconnected: connection drop
-    note right of Listening: chat composer ENABLED (CS-05)
-    note right of Active: CS-04 (AI target) is an orthogonal pin (✨ / ui_switch_session)
-    note left of Disconnected: composer disabled
+    CS01 : CS-01 Socket up
+    CS02 : CS-02 AI active
+    CS03 : CS-03 Waiting (idle)
+    CS05 : CS-05 Listening
+    CS04 : CS-04 AI target (orthogonal flag)
+    CS06 : CS-06 Simulate UI (orthogonal flag)
+    [*] --> CS01
+    CS01 --> CS02 : agent acts
+    CS02 --> CS03 : ~120s idle
+    CS03 --> CS02 : agent acts again
+    CS02 --> CS05 : wait_for_user_message
+    CS05 --> CS02 : ~35s idle
+    CS01 --> [*] : socket drop / redeploy
+    note right of CS05 : chat composer ENABLED
+    note right of CS04 : this window pinned (star button / ui_switch_session)
+    note right of CS06 : user preference (settings gear)
 ```
 
-> The flow above is informative — the **CS-01..CS-06** signals in §2 are the source of truth (they are orthogonal, not a single FSM; e.g. CS-04 "AI target" applies in any of Active/Listening/Waiting). The same picture also ships as the sample diagram **"Connect AI — States"** in the Kymo project.
+> Informative — the **CS-01..CS-06** signals in §2 are the source of truth (orthogonal, not a single FSM): before **CS-01** the host is disconnected/connecting; **CS-04** and **CS-06** are flags that hold across any lifecycle state. The same picture also ships as the sample diagram **"Connect AI — States"** in the Kymo project.
 
 ## Annex A — Revision History
 
@@ -100,3 +116,4 @@ stateDiagram-v2
 |---------|------|--------|---------|
 | 0.1 | 2026-06-20 | Vũ Anh | Initial note: the MCP/AI connection states Connect AI surfaces (Socket up / AI active / Waiting / AI target / Listening + the Simulate preference), how each is detected (signal + freshness window) and where it shows, plus the informative connect flow. Supplements `DESIGN-KAI-001`. |
 | 0.2 | 2026-06-20 | Vũ Anh | Numbered the signals **CS-01..CS-06** (§2) and cross-referenced them from §3/§4; embedded a `stateDiagram-v2` mermaid diagram of the connect flow in §4. |
+| 0.3 | 2026-06-20 | Vũ Anh | Added **CS-07** (server-side per-MCP-connection registry, `FR-AI-11` / `CR-KAI-001`): freshness-based "connected" + four outdated reasons (server / stale / protocol / client), surfaced as "N connected · M outdated" in the Connection tab; clarified CS-02 (client-side aggregate) vs CS-07 (server-side per-connection) and nuanced §1. |

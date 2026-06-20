@@ -78,6 +78,8 @@ function handle(method: string, u: URL, body: any): Response | null {
 
   // thumbnails aren't generated locally — the Explorer falls back to an icon
   if (path === "/api/diagrams/thumb") return new Response("no thumb", { status: 404 });
+  // No MCP connection registry locally (no remote MCP on localhost) → empty.
+  if (path === "/api/connections") return json({ connections: [], summary: { total: 0, connected: 0, outdated: 0 } });
 
   // per-project open-tab state (VS Code window state)
   if (path === "/api/tabs") {
@@ -159,7 +161,7 @@ function handle(method: string, u: URL, body: any): Response | null {
   return null;
 }
 
-const DATA_PATH = /^\/api\/(diagrams|workspaces|projects|trash|tabs)(\/thumb)?$/;
+const DATA_PATH = /^\/api\/(diagrams|workspaces|projects|trash|tabs|connections)(\/thumb)?$/;
 
 export function installLocalApi() {
   if (!LOCAL) return;

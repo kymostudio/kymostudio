@@ -624,6 +624,42 @@ export class EditorRoom extends DurableObject<Env> {
   }
 }
 
+// ---- MCP connection registry (FR-AI-11, CR-KAI-001). Per-user index of which
+// MCP CLIENTS (Claude / Cursor / Claude Code …) are connected, fed by a heartbeat
+// from KymoMCP on every tool call. MCP is stateless HTTP (no disconnect event), so
+// "connected" = seen recently; "outdated" = any of four reasons below. Stored in the
+// per-user UserChannel DO's ctx.storage (clients hold no WebSocket here). ----
+export const MCP_SERVER_VERSION = "0.4.1";          // KymoMCP server.version (compared for `server` outdated)
+const MCP_MIN_PROTOCOL = "2025-06-18";              // hosts below this report `protocol` outdated
+const MCP_STALE_MS = 10 * 60_000;                   // no activity beyond this → not connected / `stale`
+const MCP_HARD_TTL = 60 * 60_000;                   // beyond this → pruned (treated as gone)
+const MCP_MIN_CLIENT: Record<string, string> = {};  // best-effort recommended-minimum client versions (advisory)
+
+type McpConn = { connId: string; client: string; clientVersion: string; protocol: string; serverVersion: string; connectedAt: number; lastSeenAt: number };
+
+// Less-than for dotted version strings ("1.2.0" < "1.10.0"); non-numeric / missing → not-less (no opinion).
+function verLt(a: string, b: string): boolean {
+  if (!a || !b) return false;
+  const pa = a.split(".").map((n) => parseInt(n, 10)), pb = b.split(".").map((n) => parseInt(n, 10));
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const x = pa[i] || 0, y = pb[i] || 0;
+    if (Number.isNaN(x) || Number.isNaN(y)) return false;
+    if (x !== y) return x < y;
+  }
+  return false;
+}
+
+// Compute the outdated reasons for a record against the current server constants.
+function mcpOutdated(rec: McpConn, now: number): string[] {
+  const reasons: string[] = [];
+  if (rec.serverVersion && rec.serverVersion !== MCP_SERVER_VERSION) reasons.push("server");
+  if (now - rec.lastSeenAt > MCP_STALE_MS) reasons.push("stale");
+  if (rec.protocol && verLt(rec.protocol, MCP_MIN_PROTOCOL)) reasons.push("protocol");
+  const min = MCP_MIN_CLIENT[rec.client];
+  if (min && verLt(rec.clientVersion, min)) reasons.push("client");
+  return reasons;
+}
+
 // ---- One UserChannel DO per signed-in user (keyed by email). Every open
 // editor tab of that user connects here; it carries no document, only control
 // messages — `{type:"open", id}` so the MCP `ui_open_diagram` tool can switch
@@ -700,6 +736,42 @@ export class UserChannel extends DurableObject<Env> {
       }
       return Response.json({ messages: [] });
     }
+    // MCP connection registry (FR-AI-11): KymoMCP heartbeats here on each tool call.
+    if (url.pathname.endsWith("/mcp-seen") && request.method === "POST") {
+      const b = (await request.json().catch(() => ({}))) as Partial<McpConn> & { ts?: number };
+      const connId = String(b.connId || "").slice(0, 128);
+      if (!connId) return Response.json({ ok: false });
+      const now = b.ts || Date.now();
+      const prev = await this.ctx.storage.get<McpConn>(`conn:${connId}`);
+      const rec: McpConn = {
+        connId,
+        client: String(b.client || prev?.client || "?").slice(0, 80),
+        clientVersion: String(b.clientVersion || prev?.clientVersion || "?").slice(0, 40),
+        protocol: String(b.protocol || prev?.protocol || "").slice(0, 40),
+        serverVersion: String(b.serverVersion || prev?.serverVersion || "").slice(0, 40),
+        connectedAt: prev?.connectedAt || now,
+        lastSeenAt: now,
+      };
+      await this.ctx.storage.put(`conn:${connId}`, rec);
+      return Response.json({ ok: true });
+    }
+    // List the user's MCP connections + a {total, connected, outdated} summary; prune dead ones.
+    if (url.pathname.endsWith("/mcp-connections") && request.method === "GET") {
+      const now = Date.now();
+      const map = await this.ctx.storage.list<McpConn>({ prefix: "conn:" });
+      const connections: (McpConn & { outdated: boolean; reasons: string[] })[] = [];
+      const dead: string[] = [];
+      for (const [key, rec] of map) {
+        if (now - rec.lastSeenAt > MCP_HARD_TTL) { dead.push(key); continue; }
+        const reasons = mcpOutdated(rec, now);
+        connections.push({ ...rec, outdated: reasons.length > 0, reasons });
+      }
+      if (dead.length) await this.ctx.storage.delete(dead);
+      connections.sort((a, b) => b.lastSeenAt - a.lastSeenAt);
+      const connected = connections.filter((c) => now - c.lastSeenAt <= MCP_STALE_MS).length;
+      const outdated = connections.filter((c) => c.outdated).length;
+      return Response.json({ connections, summary: { total: connections.length, connected, outdated } });
+    }
     return new Response("not found", { status: 404 });
   }
 
@@ -759,7 +831,7 @@ export class UserChannel extends DurableObject<Env> {
 
 // ---- MCP server: per-user multi-diagram tools (owner = props.email). ----
 export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: string }> {
-  server = new McpServer({ name: "kymostudio", version: "0.4.1" });
+  server = new McpServer({ name: "kymostudio", version: MCP_SERVER_VERSION });
 
   async init() {
     const me = () => this.props.email;
@@ -785,7 +857,29 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
     // the panel then reads request → reasoning → action without relying on memory.
     const NARRATE = " Before calling this, narrate to the user's editor panel: first call ui_status(kind:\"user\", <the user's request>) then ui_status(kind:\"thinking\", <your plan/reasoning>) — so the Live Activity feed reads request → reasoning → action.";
 
-    this.server.tool(
+    // MCP connection registry heartbeat (FR-AI-11, CR-KAI-001): on every tool call,
+    // upsert this client's record in the per-user UserChannel. clientInfo + protocol
+    // are only known after the `initialize` handshake, so we read them here (not in
+    // init's tool registration). Fire-and-forget, like feed().
+    const seen = (extra: any) => {
+      try {
+        const ci = this.server.server.getClientVersion();
+        const ph = extra?.requestInfo?.headers?.["mcp-protocol-version"];
+        const protocol = Array.isArray(ph) ? (ph[0] || "") : (ph || "");
+        return this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/mcp-seen", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            connId: extra?.sessionId || "anon", client: ci?.name || "?", clientVersion: ci?.version || "?",
+            protocol, serverVersion: MCP_SERVER_VERSION, ts: Date.now(),
+          }),
+        }).then(() => {}).catch(() => {});
+      } catch { return Promise.resolve(); }
+    };
+    // Thin wrapper around server.tool that heartbeats the registry before delegating.
+    const tool = (name: string, desc: string, schema: any, handler: (args: any, extra: any) => any) =>
+      this.server.tool(name, desc, schema, async (args: any, extra: any) => { await seen(extra); return handler(args, extra); });
+
+    tool(
       "new_diagram",
       "Create a NEW diagram for the signed-in user and open it live. Returns its id + URL. A user can own many diagrams. Optionally seed a title and initial DSL; otherwise a minimal scaffold is used." + NARRATE,
       {
@@ -814,7 +908,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "list_diagrams",
       "List the signed-in user's diagrams (id, title, URL), most-recent first. Pass `project` (id or name) to list only that project's diagrams; omit for your default project.",
       { project: z.string().optional().describe("Project id or name (from list_projects) to scope the list. Omit for your default project.") },
@@ -838,7 +932,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "edit_diagram",
       "Edit one of your diagrams: update its content (`source`) and/or rename it (`title`). Pushes live to editor.kymo.studio. Pass `id` to target a specific diagram; omit to use your most recent. At least one of source/title is required. Use the `flowchart TD { ... }` block syntax for source." + NARRATE,
       {
@@ -868,7 +962,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "get_diagram",
       "Get the kymo DSL of one of your diagrams. Pass `id`, or omit to use your most recent.",
       { id: z.string().optional().describe("Diagram id. Omit to use your most recent.") },
@@ -885,7 +979,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "delete_diagram",
       "Permanently delete one of your diagrams (content and listing). Cannot be undone." + NARRATE,
       { id: z.string().describe("Diagram id to delete (from list_diagrams).") },
@@ -897,7 +991,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "ui_open_diagram",
       "Switch the diagram currently shown in the signed-in user's open editor tab(s) to this one — live navigation in the browser, without changing its content. Pass `id` (from list_diagrams), or omit to use your most recent. Returns how many live tabs were switched (0 = no editor tab open right now)." + NARRATE,
       { id: z.string().optional().describe("Diagram id to open. Omit to use your most recent.") },
@@ -921,7 +1015,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     // ---- Projects: the layer above folders. Each user always has at least one
     // (a default "Personal"); diagrams can be filed under any project. ----
-    this.server.tool(
+    tool(
       "list_projects",
       "List the signed-in user's projects (id, name, created date). Every user has at least one default project ('Personal').",
       {},
@@ -936,7 +1030,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "new_project",
       "Create a NEW project for the signed-in user. Returns its id + name. File diagrams under it via new_diagram's `project` arg or move_diagram. Set `simulate:true` to create by animating the editor's real New-project UI instead (only when the user asks for it / the panel's Simulate toggle is on)." + NARRATE,
       {
@@ -974,7 +1068,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "rename_project",
       "Rename one of your projects. Identify it by id or current name." + NARRATE,
       {
@@ -991,7 +1085,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "delete_project",
       "Delete one of your projects AND everything inside it (its folders + diagrams move to Trash, recoverable for 30 days). You can't delete your only project. Set `simulate:true` to delete by animating the editor's real Manage-projects UI instead (only when the user asks / the panel's Simulate toggle is on)." + NARRATE,
       {
@@ -1024,7 +1118,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "move_diagram",
       "Move one of your diagrams into a project. Pass the diagram `id` (from list_diagrams) and the target `project` (id or name). Moving across projects clears its folder (folders are project-local)." + NARRATE,
       {
@@ -1043,7 +1137,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "ui_open_project",
       "Switch the ACTIVE project in the signed-in user's open editor tab(s) — the project the sidebar/explorer is filtered to — without changing any content (the project sibling of ui_open_diagram). Pass `project` (id or name from list_projects), or omit to use your most recently opened project. Returns how many live tabs were switched (0 = no editor tab open right now)." + NARRATE,
       { project: z.string().optional().describe("Project id or name to switch to. Omit to use your most recently opened project.") },
@@ -1076,7 +1170,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
     // ---- Open files (tabs): the diagrams currently open in a project's editor,
     // VS Code-style. Mirrors the live editor's tab strip and the `/api/tabs`
     // store, so list/close stay in lockstep with the browser. ----
-    this.server.tool(
+    tool(
       "ui_list_open_files",
       "List the diagrams currently OPEN as tabs in a project's editor (VS Code-style window state), marking the active one. Pass `project` (id or name); omit to use your most recently opened project (or your default).",
       { project: z.string().optional().describe("Project id or name (from list_projects). Omit to use your most recently opened project.") },
@@ -1108,7 +1202,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "ui_close_file",
       "Close an open diagram tab in the editor (VS Code-style) — removes it from the project's open-files set and live-closes it in any open editor tab(s), without deleting the diagram. Pass the diagram `id` (from ui_list_open_files / list_diagrams)." + NARRATE,
       { id: z.string().describe("Diagram id of the open tab to close (from ui_list_open_files).") },
@@ -1136,7 +1230,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     // ---- Sessions (windows): each OPEN editor window has a short session id.
     // List them, then switch which one AI commands target. ----
-    this.server.tool(
+    tool(
       "ui_list_sessions",
       "List the user's OPEN editor windows ('sessions'). Each has a short session id and shows its project + active diagram; the one AI control commands (ui_open_diagram / ui_open_project / ui_close_file) currently act on is marked '← AI target'. Use ui_switch_session to change it. Returns nothing open if no editor window is connected.",
       {},
@@ -1154,7 +1248,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       }
     );
 
-    this.server.tool(
+    tool(
       "ui_switch_session",
       "Make a specific open editor window the AI target — subsequent ui_open_diagram / ui_open_project / ui_close_file act on THAT window. Pass the `session` id from ui_list_sessions. The window's ✨ Connect-AI toggle flips on to confirm.",
       { session: z.string().describe("Session id of the window to target (from ui_list_sessions).") },
@@ -1170,7 +1264,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     // ---- Live activity feed: stream what you're doing to the editor's Connect-AI
     // panel so the user can watch progress in the browser. ----
-    this.server.tool(
+    tool(
       "ui_status",
       "Stream a short status line to the user's editor 'Connect AI' panel so they can watch your work live in the browser. Call it LIBERALLY as you work — one short line each: echo the user's request (kind 'user'), your plan/reasoning before acting (kind 'thinking'), the action you're taking (kind 'action'), and the outcome (kind 'result'). Routes to the user's active editor window (the pinned one, see ui_switch_session).",
       {
@@ -1189,7 +1283,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
 
     // ---- Receive prompts the user types in the editor panel (web → this session).
     // Long-polls ~25s; call it in a loop to stay responsive to the user's web input. ----
-    this.server.tool(
+    tool(
       "wait_for_user_message",
       "Wait for a message the user types into their editor's Connect AI panel (editor.kymo.studio) and return it — this is how the user drives YOU from the web. Long-polls up to ~25s; returns the queued message(s), or a timeout note. Call it in a loop to keep listening; act on each message (narrate via ui_status, edit diagrams), then call it again.",
       {},
@@ -1324,6 +1418,18 @@ export default {
       if ("error" in auth) return Response.json({ error: auth.error }, { status: auth.error === "forbidden" ? 403 : 401, headers: cors });
       const headers = auth.setCookie ? { ...cors, "set-cookie": auth.setCookie } : cors;
       return Response.json({ email: auth.email, name: auth.name }, { headers });
+    }
+    // MCP connection registry for the signed-in user (FR-AI-11): how many MCP clients
+    // are connected + how many are outdated. Forwards to the per-user UserChannel DO.
+    if (url.pathname === "/api/connections") {
+      const cors = corsFor(request, "GET, OPTIONS");
+      if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+      const auth = await resolveAuth(request, env);
+      if ("error" in auth) return Response.json({ error: auth.error }, { status: auth.error === "forbidden" ? 403 : 401, headers: cors });
+      const r = await env.USER_CHANNEL.get(env.USER_CHANNEL.idFromName(auth.email)).fetch("https://chan/mcp-connections");
+      const data = await r.json();
+      const headers = auth.setCookie ? { ...cors, "set-cookie": auth.setCookie } : cors;
+      return Response.json(data, { headers });
     }
     // Browser-callable APIs for the signed-in user (session cookie or legacy token).
     if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/projects" || url.pathname === "/api/trash" || url.pathname === "/api/tabs") {
