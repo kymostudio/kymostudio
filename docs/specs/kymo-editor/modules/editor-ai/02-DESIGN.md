@@ -1,7 +1,7 @@
 ---
 title: Editor AI (Connect AI) — Design
 document_id: DESIGN-KAI-001
-version: "0.3"
+version: "0.4"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -146,7 +146,7 @@ already exists — the `UserChannel` DO — and derives "connected" as *seen rec
 McpConn = { connId, client, clientVersion, protocol, serverVersion, connectedAt, lastSeenAt }
 ```
 
-- `connId` — the transport session id (the `KymoMCP` DO name is `streamable-http:<id>` / `sse:<id>`, so `this.getSessionId()`), stable for the connection's whole lifetime.
+- `connId` — the registry **key**: the **OAuth `client_id`** (Dynamic Client Registration), which is *stable across reconnects* for an install — so a `/mcp` reconnect updates one row instead of leaving a ghost per session. Sources: grant `props` (`oauthReq.clientId` at `completeAuthorization`) → `extra.authInfo.clientId` (captured on a tool call + persisted, for pre-existing tokens) → the rotating session id (last resort). The `Mcp-Session-Id` is kept as a debug-only `sessionId`. *(`clientInfo {name,version}` is not an id; the session id rotates each reconnect — neither is a stable per-install key.)*
 - `client`/`clientVersion`/`protocol` — `clientInfo` from the live handshake (`server.getClientVersion()`) + protocol from the persisted `initialize` request.
 - `serverVersion` — the `McpServer` version at connect time (`index.ts` `new McpServer({version})`).
 
@@ -218,4 +218,5 @@ counterpart of the client-side activity signal CS-02 — see `DESIGN-KAI-002` **
 |---------|------|--------|---------|
 | 0.1 | 2026-06-20 | Vũ Anh | Initial as-built design for Connect AI: `UserChannel` DO + protocol, editor signal hub, reverse channel + listener gating, UI-simulation drivers. Realises `FEAT-KAI-001`. |
 | 0.2 | 2026-06-20 | Vũ Anh | Added **§7 MCP connection registry** (`FR-AI-11`, `CR-KAI-001`): per-user `McpConn` records in `UserChannel` storage, heartbeat from `KymoMCP` (`POST /mcp-seen`), `GET /mcp-connections` + `/api/connections`, the four outdated reasons (server / stale / protocol / client) + thresholds, Connection-tab surface. Renumbered Traceability → §8 and added its `FR-AI-11` row. |
+| 0.4 | 2026-06-20 | Vũ Anh | §7 registry **keyed by OAuth `client_id`** (stable per install) instead of the rotating session id (`CR-KAI-001` v1.2) — a `/mcp` reconnect updates one row, no ghost-per-reconnect; `client_id` from grant props → `authInfo` cache → session id; `Mcp-Session-Id` retained as debug-only `sessionId`. |
 | 0.3 | 2026-06-20 | Vũ Anh | §7 reworked to **lifecycle + live push** (`CR-KAI-001` v1.1): register on `oninitialized`, refresh on `onStart` (idle SSE wake), drop on `destroy()` (clean `DELETE`); `POST /mcp-gone` + `broadcastConns()` push `{type:"mcp-connections"}` over `/userws`; DO **alarm** ages out ungraceful drops; editor renders from the `useConnections` signal (**no poll**). Endpoints added to §2. |

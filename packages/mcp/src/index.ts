@@ -635,7 +635,7 @@ const MCP_STALE_MS = 10 * 60_000;                   // no activity beyond this �
 const MCP_HARD_TTL = 60 * 60_000;                   // beyond this → pruned (treated as gone)
 const MCP_MIN_CLIENT: Record<string, string> = {};  // best-effort recommended-minimum client versions (advisory)
 
-type McpConn = { connId: string; client: string; clientVersion: string; protocol: string; serverVersion: string; connectedAt: number; lastSeenAt: number };
+type McpConn = { connId: string; sessionId?: string; client: string; clientVersion: string; protocol: string; serverVersion: string; connectedAt: number; lastSeenAt: number };
 
 // Less-than for dotted version strings ("1.2.0" < "1.10.0"); non-numeric / missing → not-less (no opinion).
 function verLt(a: string, b: string): boolean {
@@ -748,6 +748,7 @@ export class UserChannel extends DurableObject<Env> {
       const prev = await this.ctx.storage.get<McpConn>(`conn:${connId}`);
       const rec: McpConn = {
         connId,
+        sessionId: String(b.sessionId || prev?.sessionId || "").slice(0, 128) || undefined,
         client: String(b.client || prev?.client || "?").slice(0, 80),
         clientVersion: String(b.clientVersion || prev?.clientVersion || "?").slice(0, 40),
         protocol: String(b.protocol || prev?.protocol || "").slice(0, 40),
@@ -868,11 +869,26 @@ export class UserChannel extends DurableObject<Env> {
 }
 
 // ---- MCP server: per-user multi-diagram tools (owner = props.email). ----
-export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: string }> {
+export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: string; clientId?: string }> {
   server = new McpServer({ name: "kymostudio", version: MCP_SERVER_VERSION });
 
-  // The transport session id (DO name is `streamable-http:<id>` / `sse:<id>`).
-  private connId(): string { return this.name.split(":")[1] || ""; }
+  // The transport session id (DO name is `streamable-http:<id>` / `sse:<id>`) — rotates
+  // on every reconnect.
+  private sessionId(): string { return this.name.split(":")[1] || ""; }
+  // OAuth client_id captured from a tool call's authInfo (covers tokens minted before
+  // clientId was added to props) and persisted across hibernation.
+  private _clientId?: string;
+  // Registry key (FR-AI-11): the OAuth client_id (Dynamic Client Registration) is STABLE
+  // across reconnects, so keying by it means a `/mcp` reconnect of the same install
+  // updates ONE row instead of leaving a ghost per session. Sources, in order: props
+  // (new authorizations) → authInfo cache (existing tokens) → session id (last resort).
+  private connId(): string { return this.props?.clientId || this._clientId || this.sessionId(); }
+  // Capture client_id from a tool call's authInfo (available for ALL tokens, unlike props)
+  // and persist it so the lifecycle hooks key by it too.
+  private async noteClientId(extra: any) {
+    const cid = extra?.authInfo?.clientId;
+    if (cid && cid !== this._clientId) { this._clientId = String(cid); try { await this.ctx.storage.put("mcp_client_id", this._clientId); } catch {} }
+  }
 
   // Upsert this connection in the per-user registry (FR-AI-11). Reads clientInfo from
   // the live handshake + protocol from the persisted initialize request. UserChannel
@@ -886,7 +902,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       if (proto === undefined) { const ir = await this.getInitializeRequest().catch(() => undefined) as any; proto = String(ir?.params?.protocolVersion || ""); }
       await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(email)).fetch("https://chan/mcp-seen", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ connId: id, client: ci?.name || "?", clientVersion: ci?.version || "?", protocol: proto, serverVersion: MCP_SERVER_VERSION, ts: Date.now() }),
+        body: JSON.stringify({ connId: id, sessionId: this.sessionId(), client: ci?.name || "?", clientVersion: ci?.version || "?", protocol: proto, serverVersion: MCP_SERVER_VERSION, ts: Date.now() }),
       });
     } catch {}
   }
@@ -894,8 +910,9 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
   // Refresh presence on every DO wake (incl. the idle SSE reconnect Cloudflare forces
   // ~every 5 min) so an alive-but-idle client isn't aged out by the registry alarm.
   // Only once the handshake is on record — avoids a phantom row before `initialize`.
-  async onStart(props?: { email: string; name?: string }) {
+  async onStart(props?: { email: string; name?: string; clientId?: string }) {
     await super.onStart(props);
+    try { if (!this.props?.clientId) this._clientId = (await this.ctx.storage.get<string>("mcp_client_id")) || undefined; } catch {}
     try { if (await this.getInitializeRequest()) await this.mcpHeartbeat(); } catch {}
   }
 
@@ -945,7 +962,8 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
     this.server.server.oninitialized = () => { this.mcpHeartbeat().catch(() => {}); };
     // Per-tool heartbeat: refreshes lastSeen (keeps long-idle sessions out of `stale`)
     // and carries the live protocol header. Registration itself is on connect/onStart.
-    const seen = (extra: any) => {
+    const seen = async (extra: any) => {
+      await this.noteClientId(extra); // learn the OAuth client_id (keys the registry by install, not session)
       const ph = extra?.requestInfo?.headers?.["mcp-protocol-version"];
       return this.mcpHeartbeat(Array.isArray(ph) ? (ph[0] || "") : (ph || "")).catch(() => {});
     };
@@ -1416,7 +1434,7 @@ const defaultHandler = {
       const oauthReq = JSON.parse(body.oauthReq);
       const { redirectTo } = await env.OAUTH_PROVIDER.completeAuthorization({
         request: oauthReq, userId: p.sub as string, scope: oauthReq.scope ?? [],
-        metadata: { email: p.email }, props: { email: p.email, name: p.name },
+        metadata: { email: p.email }, props: { email: p.email, name: p.name, clientId: oauthReq.clientId },
       });
       return Response.json({ redirectTo });
     }
