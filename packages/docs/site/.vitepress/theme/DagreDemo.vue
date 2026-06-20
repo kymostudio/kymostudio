@@ -92,4 +92,18 @@ const dir = ref<"vertical" | "horizontal">("vertical");
   max-width: 100%;
   height: auto;
 }
+/* March the dashes from source → target, React-Flow's animated edge. */
+.dd-stage :deep(.rf-edge) {
+  animation: rf-flow 0.5s linear infinite;
+}
+@keyframes rf-flow {
+  to {
+    stroke-dashoffset: -9; /* one dash+gap cycle (5 + 4) */
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dd-stage :deep(.rf-edge) {
+    animation: none;
+  }
+}
 </style>
