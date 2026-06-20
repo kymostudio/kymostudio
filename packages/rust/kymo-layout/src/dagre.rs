@@ -1,15 +1,15 @@
 //! Dagre-based flowchart layout — a mermaid-faithful alternative to the native
-//! Sugiyama layout in [`crate::layout`]. Builds a dagre graph from the
+//! Sugiyama layout in [`kymo_graph::sugiyama`]. Builds a dagre graph from the
 //! [`Flowchart`] IR, runs the dagre.js port (`dagre` crate), and maps node
 //! positions, edge waypoints, and compound cluster bounds into float geometry
-//! ([`FGeom`]). The float renderer ([`crate::dagre_svg`]) draws it; with the
+//! ([`FGeom`]). The float renderer ([`kymo_graph::dagre_svg`]) draws it; with the
 //! mermaid [`FlowStyle`] the output aims to match mermaid.js 11. A rounded
 //! [`Diagram`] is also available for the kymojson interchange path.
 
-use crate::dagre_svg::{FEdge, FGeom, FNode, FRegion};
-use crate::flowchart::{Direction, Flowchart};
-use crate::layout::{node_size_for, node_size_mermaid_f};
-use crate::style::FlowStyle;
+use kymo_graph::dagre_svg::{FEdge, FGeom, FNode, FRegion};
+use kymo_graph::flowchart::{Direction, Flowchart};
+use kymo_graph::metrics::{node_size_for, node_size_mermaid_f};
+use kymo_graph::style::FlowStyle;
 use dagre::graph::{Graph, GraphOptions};
 use dagre::layout::layout;
 use dagre::layout::types::{EdgeLabel, LayoutOptions, NodeLabel, RankDir};
@@ -24,7 +24,7 @@ const MY: f64 = 8.0;
 /// padded by 8px plus a top band for the cluster label. Memoised by index.
 fn region_bounds(
     i: usize,
-    subs: &[crate::flowchart::Subgraph],
+    subs: &[kymo_graph::flowchart::Subgraph],
     children: &[Vec<usize>],
     node_box: &std::collections::HashMap<&str, (f64, f64, f64, f64)>,
     dagre_box: &[Option<(f64, f64, f64, f64)>],
@@ -107,7 +107,7 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
         }
     };
     let mut node_size: HashMap<&str, (f64, f64)> = HashMap::new();
-    let mut node_meta: HashMap<&str, (&str, crate::model::Shape)> = HashMap::new();
+    let mut node_meta: HashMap<&str, (&str, kymo_graph::model::Shape)> = HashMap::new();
     for n in &fc.nodes {
         if sg_ids.contains(n.id.as_str()) {
             continue;
@@ -324,7 +324,7 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
     geom.w = root.w;
     geom.h = root.h;
     for (id, cx, cy, w, h) in &root.nodes {
-        let (name, shape) = node_meta.get(id.as_str()).copied().unwrap_or((id.as_str(), crate::model::Shape::Box));
+        let (name, shape) = node_meta.get(id.as_str()).copied().unwrap_or((id.as_str(), kymo_graph::model::Shape::Box));
         geom.nodes.push(FNode {
             id: id.clone(),
             name: name.to_string(),
@@ -453,7 +453,7 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
             (0.0, 0.0)
         } else {
             // mermaid sizes the edge label to its measured text, height 24.
-            (crate::layout::text_w_mermaid(&e.label).max(10.0), 24.0)
+            (kymo_graph::metrics::text_w_mermaid(&e.label).max(10.0), 24.0)
         };
         g.set_edge(
             e.src.clone(),

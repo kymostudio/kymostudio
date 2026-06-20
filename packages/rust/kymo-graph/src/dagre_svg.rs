@@ -2,7 +2,7 @@
 //!
 //! [`crate::flowchart_svg`] renders the integer [`Diagram`](crate::model::Diagram)
 //! — fine for kymo's own diagrams, but the dagre path
-//! ([`crate::layout_dagre`]) carries mermaid-faithful sub-pixel positions that
+//! (`kymo_layout::dagre`) carries mermaid-faithful sub-pixel positions that
 //! the `(i32, i32)` [`Point`](crate::model::Point) rounds away (a node centre
 //! `172.65 → 173` shifts the whole glyph + its text ~0.35px). This module keeps
 //! the dagre geometry in `f64` end-to-end and emits coordinates verbatim, so the
@@ -416,7 +416,7 @@ fn node_svg(
         // Mermaid wraps rectangle labels at ~200px and uses an HTML alphabetic
         // baseline (y = centre + 0.30*16); reproduce both.
         let lines = if matches!(style, FlowStyle::Mermaid) {
-            crate::layout::node_lines_mermaid(&n.name, n.shape)
+            crate::metrics::node_lines_mermaid(&n.name, n.shape)
         } else {
             n.name.split('\n').map(|l| l.to_string()).collect()
         };

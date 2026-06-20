@@ -84,7 +84,7 @@ fn parse_flowchart_ir(src: &str) -> Result<Flowchart, MermaidError> {
 /// Default geometry: kymo's OWN dagre adapter (lean, Unicode math, raster-safe).
 #[cfg(not(feature = "katex-layout"))]
 fn layout(_src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
-    kymo_graph::layout_dagre::dagre_geom(fc, style)
+    kymo_layout::dagre_geom(fc, style)
 }
 
 /// `katex-layout` geometry: merman's mermaid-exact positions sized by kymo's
@@ -93,7 +93,7 @@ fn layout(_src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
 #[cfg(feature = "katex-layout")]
 fn layout(src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
     crate::katex_layout::build_geom(src, fc)
-        .unwrap_or_else(|| kymo_graph::layout_dagre::dagre_geom(fc, style))
+        .unwrap_or_else(|| kymo_layout::dagre_geom(fc, style))
 }
 
 /// Map a `%%{init: {"theme": "dark"|"forest"|"neutral"}}%%` directive to kymo's

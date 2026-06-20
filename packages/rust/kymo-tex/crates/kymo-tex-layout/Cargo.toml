@@ -1,5 +1,5 @@
 [package]
-name = "kymo-layout"
+name = "kymo-tex-layout"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -15,5 +15,5 @@ kymo-parser = { workspace = true }
 serde_json   = { workspace = true }
 
 [[bin]]
-name = "kymo-layout"
+name = "kymo-tex-layout"
 path = "src/bin/layout.rs"

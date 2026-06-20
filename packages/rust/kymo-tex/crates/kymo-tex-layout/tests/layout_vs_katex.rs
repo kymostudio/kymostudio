@@ -5,8 +5,8 @@
 /// ascent (height) and depth in em units for display mode.
 ///
 /// Tolerance: 0.001em (well within the 0.02em threshold from the plan).
-use kymo_layout::{layout, LayoutOptions};
-use kymo_layout::to_display_list;
+use kymo_tex_layout::{layout, LayoutOptions};
+use kymo_tex_layout::to_display_list;
 use kymo_parser::parser::parse;
 use kymo_types::MathStyle;
 use kymo_types::color::Color;
@@ -34,7 +34,7 @@ fn check(input: &str, expected_height: f64, expected_depth: f64) {
     );
 }
 
-fn layout_with_style(input: &str, style: MathStyle) -> kymo_layout::LayoutBox {
+fn layout_with_style(input: &str, style: MathStyle) -> kymo_tex_layout::LayoutBox {
     let ast = parse(input).unwrap_or_else(|e| panic!("Parse error for `{input}`: {e}"));
     let options = LayoutOptions::default().with_style(style);
     layout(&ast, &options)
@@ -446,7 +446,7 @@ fn mathrm_sin() {
 #[test]
 fn mathrm_mm_squared_both_m_upright() {
     use kymo_font::FontId;
-    use kymo_layout::layout_box::{BoxContent, LayoutBox};
+    use kymo_tex_layout::layout_box::{BoxContent, LayoutBox};
 
     fn collect_m_fonts(lb: &LayoutBox) -> Vec<FontId> {
         let mut v = Vec::new();

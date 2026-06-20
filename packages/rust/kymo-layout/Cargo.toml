@@ -1,13 +1,15 @@
 [package]
-name = "kymo-layout-graph"
+name = "kymo-layout"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "Pure-Rust graph/diagram layout algorithms for kymo's mermaid renderers (grid, force-directed) — no merman dependency."
+description = "Pure-Rust graph/diagram layout algorithms for kymo's mermaid renderers (dagre, layered/Sugiyama, grid, force-directed) — no merman dependency."
 
 [lib]
-name = "kymo_layout_graph"
+name = "kymo_layout"
 path = "src/lib.rs"
 
 [dependencies]
+kymo-graph = { path = "../kymo-graph", version = "0.1.0" }
 kymo-manatee = { path = "../kymo-manatee", version = "0.1.0" }
+dagre = "0.1.1"

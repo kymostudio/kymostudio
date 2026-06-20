@@ -14,7 +14,7 @@ default = []
 ## When `SvgOptions::embed_glyphs = true`, `SvgOptions::font_dir` is needed unless `embed-fonts` is enabled.
 standalone = ["dep:ab_glyph", "dep:base64", "dep:kymo-font", "dep:kymo-font-loader", "dep:kymo-unicode-font"]
 ## `render-svg` binary: parse + layout from stdin (needs `standalone` for outlined glyphs).
-cli = ["dep:kymo-layout", "dep:kymo-parser"]
+cli = ["dep:kymo-tex-layout", "dep:kymo-parser"]
 ## Embed font source files in binary. No need for font directory with this feature. Implicitly enables 'standalone' feature.
 embed-fonts = ["standalone", "dep:kymo-katex-fonts", "kymo-font-loader/embed-fonts"]
 
@@ -24,7 +24,7 @@ ab_glyph = { version = "0.2", optional = true }
 base64 = { version = "0.22", optional = true }
 kymo-font = { workspace = true, optional = true }
 kymo-font-loader = { workspace = true, optional = true }
-kymo-layout = { workspace = true, optional = true }
+kymo-tex-layout = { workspace = true, optional = true }
 kymo-parser = { workspace = true, optional = true }
 kymo-katex-fonts = { workspace = true, optional = true }
 kymo-unicode-font = { workspace = true, optional = true }
@@ -35,7 +35,7 @@ path = "src/bin/render_svg.rs"
 required-features = ["cli", "standalone"]
 
 [dev-dependencies]
-kymo-layout = { workspace = true }
+kymo-tex-layout = { workspace = true }
 kymo-parser = { workspace = true }
 png = "0.17"
 resvg = { version = "0.47", default-features = false }

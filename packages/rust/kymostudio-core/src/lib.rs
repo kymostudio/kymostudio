@@ -14,9 +14,11 @@ use resvg::{tiny_skia, usvg};
 // it under the same module paths so every `crate::model` / `crate::flowchart` / …
 // inside this crate (and external `kymostudio_core::model::…` users) keep resolving.
 pub use kymo_graph::{
-    d2, dagre_svg, dot, drawio, flowchart, flowchart_svg, kymojson, layout, layout_dagre, math,
-    model, style,
+    d2, dagre_svg, dot, drawio, flowchart, flowchart_svg, kymojson, math, metrics, model, style,
 };
+// Layout algorithms moved to the `kymo-layout` crate; re-export under the old
+// paths so the public API (`kymostudio_core::layout` / `::layout_dagre`) is stable.
+pub use kymo_layout::{self as layout, dagre as layout_dagre};
 
 // Mermaid front-end (parser + per-grammar renderers + the `mermaid_to_*` convert
 // / render entry points) lives in the `kymo-mermaid` crate. Re-export its modules

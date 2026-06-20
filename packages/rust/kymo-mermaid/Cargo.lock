@@ -904,9 +904,6 @@ dependencies = [
 [[package]]
 name = "kymo-graph"
 version = "0.1.0"
-dependencies = [
- "dagre",
-]
 
 [[package]]
 name = "kymo-katex-fonts"
@@ -917,18 +914,10 @@ dependencies = [
 
 [[package]]
 name = "kymo-layout"
-version = "0.1.11"
-dependencies = [
- "kymo-font",
- "kymo-parser",
- "kymo-types",
- "serde_json",
-]
-
-[[package]]
-name = "kymo-layout-graph"
 version = "0.1.0"
 dependencies = [
+ "dagre",
+ "kymo-graph",
  "kymo-manatee",
 ]
 
@@ -957,9 +946,9 @@ version = "0.1.0"
 dependencies = [
  "kymo-graph",
  "kymo-layout",
- "kymo-layout-graph",
  "kymo-parser",
  "kymo-svg",
+ "kymo-tex-layout",
  "kymo-types",
  "merman-bindings-core",
  "merman-core",
@@ -995,6 +984,16 @@ dependencies = [
  "kymo-katex-fonts",
  "kymo-types",
  "kymo-unicode-font",
+]
+
+[[package]]
+name = "kymo-tex-layout"
+version = "0.1.11"
+dependencies = [
+ "kymo-font",
+ "kymo-parser",
+ "kymo-types",
+ "serde_json",
 ]
 
 [[package]]

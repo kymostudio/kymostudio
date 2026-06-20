@@ -136,7 +136,7 @@ pub fn render_cose(fc: &Flowchart) -> String {
         .iter()
         .filter_map(|e| Some((*idx.get(e.src.as_str())?, *idx.get(e.dst.as_str())?)))
         .collect();
-    let pos = kymo_layout_graph::cose::layout(&sizes, &edges);
+    let pos = kymo_layout::cose::layout(&sizes, &edges);
     for (n, p) in nodes.iter_mut().zip(&pos) {
         n.x = p.0;
         n.y = p.1;

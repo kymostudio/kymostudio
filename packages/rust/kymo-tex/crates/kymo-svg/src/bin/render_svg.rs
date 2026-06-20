@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 
-use kymo_layout::{layout, to_display_list, LayoutOptions};
+use kymo_tex_layout::{layout, to_display_list, LayoutOptions};
 use kymo_parser::parser::parse;
 use kymo_svg::{render_to_svg, SvgOptions};
 use kymo_types::color::Color;

@@ -3,7 +3,7 @@
 //!
 //! merman's own `VendoredFontMetricsTextMeasurer` measures text from vendored
 //! font tables, which sit ~1px off the browser — that's the ~2.8% merman floor.
-//! kymo's [`text_w_mermaid`](kymo_graph::layout::text_w_mermaid) is calibrated to the
+//! kymo's [`text_w_mermaid`](kymo_graph::metrics::text_w_mermaid) is calibrated to the
 //! *actual browser* (the `w`-glyph fix etc.), so feeding it into merman's exact
 //! dagre layout sizes nodes the way mermaid.js does. Positions then match
 //! mermaid.js more tightly than merman itself. Shapes/labels/styles come from
@@ -11,7 +11,7 @@
 
 use kymo_graph::dagre_svg::{FEdge, FGeom, FNode, FRegion};
 use kymo_graph::flowchart::{Direction, FlowEdge, FlowNode, Flowchart, Subgraph};
-use kymo_graph::layout::text_w_mermaid;
+use kymo_graph::metrics::text_w_mermaid;
 use kymo_graph::model::Shape;
 use merman_core::diagrams::flowchart::{parse_flowchart, parse_flowchart_model_for_render};
 use merman_core::{MermaidConfig, ParseMetadata};

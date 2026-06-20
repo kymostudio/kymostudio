@@ -13,7 +13,7 @@ members = [
     "crates/kymo-font",
     "crates/kymo-lexer",
     "crates/kymo-parser",
-    "crates/kymo-layout",
+    "crates/kymo-tex-layout",
     "crates/kymo-katex-fonts",
     "crates/kymo-font-loader",
     "crates/kymo-unicode-font",
@@ -33,7 +33,7 @@ kymo-types  = { path = "crates/kymo-types", version = "0.1.11" }
 kymo-font   = { path = "crates/kymo-font", version = "0.1.11" }
 kymo-lexer  = { path = "crates/kymo-lexer", version = "0.1.11" }
 kymo-parser = { path = "crates/kymo-parser", version = "0.1.11" }
-kymo-layout = { path = "crates/kymo-layout", version = "0.1.11" }
+kymo-tex-layout = { path = "crates/kymo-tex-layout", version = "0.1.11" }
 kymo-katex-fonts = { path = "crates/kymo-katex-fonts", version = "0.1.11" }
 kymo-font-loader = { path = "crates/kymo-font-loader", version = "0.1.11" }
 kymo-unicode-font = { path = "crates/kymo-unicode-font", version = "0.1.11" }

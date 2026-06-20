@@ -1,6 +1,6 @@
 //! Serialize a [`DisplayList`](kymo_types::display_item::DisplayList) to SVG.
 //!
-//! Coordinates match [`kymo_layout::to_display_list`](https://docs.rs/kymo-layout): **em** units
+//! Coordinates match [`kymo_tex_layout::to_display_list`](https://docs.rs/kymo-tex-layout): **em** units
 //! with **y downward** and the baseline at `y = height` in layout space. They are scaled by
 //! [`SvgOptions::font_size`] plus [`SvgOptions::padding`], same convention as `kymo-render`.
 //!

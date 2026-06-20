@@ -328,16 +328,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kymo-layout"
-version = "0.1.11"
-dependencies = [
- "kymo-font",
- "kymo-parser",
- "kymo-types",
- "serde_json",
-]
-
-[[package]]
 name = "kymo-lexer"
 version = "0.1.11"
 dependencies = [
@@ -371,12 +361,22 @@ dependencies = [
  "kymo-font",
  "kymo-font-loader",
  "kymo-katex-fonts",
- "kymo-layout",
  "kymo-parser",
+ "kymo-tex-layout",
  "kymo-types",
  "kymo-unicode-font",
  "png 0.17.16",
  "resvg",
+]
+
+[[package]]
+name = "kymo-tex-layout"
+version = "0.1.11"
+dependencies = [
+ "kymo-font",
+ "kymo-parser",
+ "kymo-types",
+ "serde_json",
 ]
 
 [[package]]

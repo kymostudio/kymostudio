@@ -1,13 +1,20 @@
 //! kymo's own diagram-layout algorithms — pure Rust, no merman.
 //!
-//! Hosts the layout passes kymo's mermaid renderers used to borrow from merman:
+//! The single home for every graph/diagram layout kymo's mermaid renderers use:
+//! - [`dagre`] — the dagre adapter (flowchart / er / state): `Flowchart` → `FGeom`.
+//! - [`sugiyama`] — the layered flowchart layout: `Flowchart` → `Diagram`.
 //! - [`grid`] — the `block` diagram column grid (columns / nested / spans / space).
-//! - (planned) `cose` — the `mindmap` force-directed layout.
+//! - [`cose`] — the `mindmap` force-directed (cose-bilkent) layout.
 //!
-//! `kymo-graph` already carries the dagre adapter (flowchart / er / state) and
-//! the sequence layout lives in `kymo-mermaid`; this crate fills the rest so the
-//! default build needs no merman feature.
-
-pub mod grid;
+//! IR, geometry types, text metrics and the SVG renderer live in `kymo-graph`;
+//! this crate depends on it for those and supplies only the algorithms.
 
 pub mod cose;
+pub mod dagre;
+pub mod grid;
+pub mod sugiyama;
+
+// Convenience re-exports so callers use `kymo_layout::dagre_geom` /
+// `kymo_layout::layout_flowchart` directly.
+pub use dagre::dagre_geom;
+pub use sugiyama::{layout_flowchart, layout_flowchart_styled};
