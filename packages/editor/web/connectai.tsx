@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send, Wand2, Settings } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
-import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, useListening, feedLength, useConnections, type StatusKind } from "./mcpstatus";
+import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, useListening, feedLength, useConnections, type StatusKind, type McpConn } from "./mcpstatus";
 
 const FEED_ICON: Record<StatusKind, React.ReactNode> = {
   user: <User size={13} strokeWidth={2} />,
@@ -78,6 +78,31 @@ function ago(ts: number): string {
   if (m < 60) return `${m}m ago`;
   const h = Math.round(m / 60);
   return h < 24 ? `${h}h ago` : `${Math.round(h / 24)}d ago`;
+}
+
+// "Connected" freshness window (mirrors the server's STALE_MS). Computed client-side so
+// the row flips connected→stale on the local interval, not only on a server push.
+const CONN_FRESH_MS = 10 * 60_000;
+
+type ConnGroup = { client: string; clientVersion: string; protocol: string; lastSeenAt: number; sessions: number; connected: boolean; reasons: string[] };
+// Collapse the per-session rows (one MCP session = one row, so a reconnect adds a ghost)
+// into ONE row per client app: the freshest session represents it, with a "N sessions"
+// hint. `connected` is recomputed locally from lastSeenAt (so it flips on the interval);
+// `reasons` are the still-connected outdated reasons (server/protocol/client) from the
+// server — a non-fresh group is shown as "Disconnected", not "Outdated".
+function groupByClient(conns: McpConn[]): { groups: ConnGroup[]; connected: number; outdated: number } {
+  const now = Date.now();
+  const by = new Map<string, McpConn[]>();
+  for (const c of conns) { const k = c.client || "?"; (by.get(k) ?? by.set(k, []).get(k)!).push(c); }
+  const groups: ConnGroup[] = [];
+  for (const [client, list] of by) {
+    const top = list.reduce((a, b) => (b.lastSeenAt > a.lastSeenAt ? b : a));
+    const connected = now - top.lastSeenAt < CONN_FRESH_MS;
+    const reasons = (top.reasons || []).filter((r) => r !== "stale"); // server/protocol/client
+    groups.push({ client, clientVersion: top.clientVersion, protocol: top.protocol, lastSeenAt: top.lastSeenAt, sessions: list.length, connected, reasons });
+  }
+  groups.sort((a, b) => b.lastSeenAt - a.lastSeenAt);
+  return { groups, connected: groups.filter((g) => g.connected).length, outdated: groups.filter((g) => g.connected && g.reasons.length > 0).length };
 }
 
 
@@ -210,30 +235,38 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
             <p className="cn-target-hint">With the editor open in several windows, AI commands act only on the chosen window. None chosen → the window you used most recently. From an AI client: <code>ui_list_sessions</code> then <code>ui_switch_session</code>.</p>
             <p className="cn-session">This window · session <code>{sessionIdValue()}</code></p>
 
-            {conns && conns.summary.total > 0 && (
-              <div className="cn-conns">
-                <div className="cn-conns-head">
-                  <span>MCP clients</span>
-                  <span className="cn-conns-sum">
-                    {conns.summary.connected} connected
-                    {conns.summary.outdated > 0 && <span className="cn-conns-out"> · {conns.summary.outdated} outdated</span>}
-                  </span>
+            {(() => {
+              const g = groupByClient(conns?.connections ?? []);
+              if (!g.groups.length) return null;
+              return (
+                <div className="cn-conns">
+                  <div className="cn-conns-head">
+                    <span>MCP clients</span>
+                    <span className="cn-conns-sum">
+                      {g.connected} connected
+                      {g.outdated > 0 && <span className="cn-conns-out"> · {g.outdated} outdated</span>}
+                    </span>
+                  </div>
+                  <ul className="cn-conns-list">
+                    {g.groups.map((gr) => {
+                      const outdated = gr.connected && gr.reasons.length > 0;
+                      return (
+                        <li className={"cn-conn" + (outdated ? " outdated" : "") + (gr.connected ? "" : " gone")} key={gr.client}>
+                          <span className="cn-conn-name">{gr.client}{gr.clientVersion && gr.clientVersion !== "?" ? ` ${gr.clientVersion}` : ""}</span>
+                          <span className="cn-conn-meta">{gr.protocol ? `proto ${gr.protocol} · ` : ""}seen {ago(gr.lastSeenAt)}{gr.sessions > 1 ? ` · ${gr.sessions} sessions` : ""}</span>
+                          {!gr.connected && <span className="cn-conn-badge gone">Disconnected</span>}
+                          {outdated && (
+                            <span className="cn-conn-badge" title={gr.reasons.map((r) => REASON_LABEL[r] || r).join("; ")}>
+                              Outdated{gr.reasons.includes("server") && <button type="button" className="cn-conn-reconnect" onClick={() => setTab("setup")}>reconnect</button>}
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
-                <ul className="cn-conns-list">
-                  {conns.connections.map((c) => (
-                    <li className={"cn-conn" + (c.outdated ? " outdated" : "")} key={c.connId}>
-                      <span className="cn-conn-name">{c.client}{c.clientVersion && c.clientVersion !== "?" ? ` ${c.clientVersion}` : ""}</span>
-                      <span className="cn-conn-meta">{c.protocol ? `proto ${c.protocol} · ` : ""}seen {ago(c.lastSeenAt)}</span>
-                      {c.outdated && (
-                        <span className="cn-conn-badge" title={c.reasons.map((r) => REASON_LABEL[r] || r).join("; ")}>
-                          Outdated{c.reasons.includes("server") && <button type="button" className="cn-conn-reconnect" onClick={() => setTab("setup")}>reconnect</button>}
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+              );
+            })()}
           </>
         )}
 

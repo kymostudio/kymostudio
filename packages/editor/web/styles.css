@@ -704,6 +704,8 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-conn-meta { font-size: 10.5px; color: var(--dim); margin-left: auto; }
 .cn-conn-badge { display: inline-flex; align-items: center; gap: 6px; flex-basis: 100%; font-size: 10.5px; font-weight: 600; color: #b45309; }
 .cn-conn.outdated { background: color-mix(in srgb, #f59e0b 7%, transparent); }
+.cn-conn.gone { opacity: .55; }
+.cn-conn-badge.gone { color: var(--dim); }
 .cn-conn-reconnect { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
 
 /* Live activity feed — the AI narrating its work (ui_status) as chat-like lines. */

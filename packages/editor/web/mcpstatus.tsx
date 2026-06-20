@@ -171,7 +171,9 @@ const connSubs = new Set<() => void>();
 export function setConnections(d: ConnData) { connData = d; connSubs.forEach((f) => f()); }
 export function useConnections(): ConnData | null {
   const [, bump] = useReducer((c: number) => c + 1, 0);
-  useEffect(() => { connSubs.add(bump); return () => { connSubs.delete(bump); }; }, []);
+  // Re-render on each push AND on a slow interval so "seen … ago" + the connected/stale
+  // classification advance between pushes (the panel recomputes freshness from lastSeenAt).
+  useEffect(() => { connSubs.add(bump); const iv = setInterval(bump, 10_000); return () => { connSubs.delete(bump); clearInterval(iv); }; }, []);
   return connData;
 }
 
