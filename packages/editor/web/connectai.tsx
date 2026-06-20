@@ -114,6 +114,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
   const listening = useListening(); // a process is waiting on wait_for_user_message
   const [tab, setTab] = useState<Tab>("chat");
   const conns = useConnections(); // MCP connection registry (FR-AI-11) — live push over /userws
+  const connClients = groupByClient(conns?.connections ?? []); // collapsed per-client view (recomputed each render → advances with the 10s tick)
   const feedRef = useRef<HTMLDivElement>(null);
   // Scroll the body (the feed has no frame/own scroll now) to the latest message.
   useEffect(() => { if (tab !== "chat") return; const el = feedRef.current?.parentElement; if (el) el.scrollTop = el.scrollHeight; }, [feed.length, tab]);
@@ -223,9 +224,13 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
 
         {tab === "connection" && (
           <>
-            <div className={"cn-status" + (live ? " live" : "")}>
+            <div className={"cn-status" + (live || connClients.connected > 0 ? " live" : "")}>
               <span className="cn-status-dot" />
-              {live ? "Connected — an AI client is driving this editor right now." : "Waiting for an AI client to connect…"}
+              {live
+                ? "Connected — an AI client is driving this editor right now."
+                : connClients.connected > 0
+                  ? `Connected — ${connClients.connected} AI client${connClients.connected > 1 ? "s" : ""} connected.`
+                  : "Waiting for an AI client to connect…"}
             </div>
             <button className={"cn-target" + (target ? " on" : "")} onClick={() => requestPin(!target)} aria-pressed={target}>
               <Sparkles size={15} strokeWidth={2} />
@@ -235,20 +240,17 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
             <p className="cn-target-hint">With the editor open in several windows, AI commands act only on the chosen window. None chosen → the window you used most recently. From an AI client: <code>ui_list_sessions</code> then <code>ui_switch_session</code>.</p>
             <p className="cn-session">This window · session <code>{sessionIdValue()}</code></p>
 
-            {(() => {
-              const g = groupByClient(conns?.connections ?? []);
-              if (!g.groups.length) return null;
-              return (
+            {connClients.groups.length > 0 && (
                 <div className="cn-conns">
                   <div className="cn-conns-head">
                     <span>MCP clients</span>
                     <span className="cn-conns-sum">
-                      {g.connected} connected
-                      {g.outdated > 0 && <span className="cn-conns-out"> · {g.outdated} outdated</span>}
+                      {connClients.connected} connected
+                      {connClients.outdated > 0 && <span className="cn-conns-out"> · {connClients.outdated} outdated</span>}
                     </span>
                   </div>
                   <ul className="cn-conns-list">
-                    {g.groups.map((gr) => {
+                    {connClients.groups.map((gr) => {
                       const outdated = gr.connected && gr.reasons.length > 0;
                       return (
                         <li className={"cn-conn" + (outdated ? " outdated" : "") + (gr.connected ? "" : " gone")} key={gr.client}>
@@ -265,8 +267,7 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
                     })}
                   </ul>
                 </div>
-              );
-            })()}
+            )}
           </>
         )}
 

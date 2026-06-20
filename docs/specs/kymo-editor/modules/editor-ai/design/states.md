@@ -1,7 +1,7 @@
 ---
 title: Connect AI — MCP/AI connection states (as surfaced in the editor)
 document_id: DESIGN-KAI-002
-version: "0.6"
+version: "0.7"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -54,7 +54,7 @@ The same freshness logic can also be kept **server-side, per connection**: `CR-K
 |----|--------------|-----------------------|-----------|---------|----------------|
 | **CS-01** | **Socket up** | the `/userws` WebSocket is `OPEN` | live (no timed reconnect) | the window can send/receive control messages at all | (implicit; offline send → warning) |
 | **CS-02** | **AI active** (`mcpActive`) | `pingMcp()` on **any** `/userws` control message or an `origin:"mcp"` room push | **120 s** window | an AI client acted on this account recently | ✨ button `.live` (pulse); open file-tab badge `.file-tab-ai`; Connection tab "Connected — an AI client is driving this editor right now" |
-| **CS-03** | **Waiting** (no `mcpActive`) | `mcpActive` is stale/false | — | no recent AI activity | Connection tab "Waiting for an AI client to connect…" |
+| **CS-03** | **Waiting** | `mcpActive` stale/false **and** the CS-07 registry has no connected client | — | no AI connected and none acting | Connection tab "Waiting for an AI client to connect…" — the banner shows **Connected** if *either* CS-02 (driving now) *or* CS-07 (a client is registered) holds, so a connected-but-idle client no longer reads as "Waiting" |
 | **CS-04** | **AI target** (`pinned`) | the user pins via ✨ / Connection toggle / `ui_switch_session`; server echoes `{type:"ai-target"}` | sticky (until unpinned / socket drop) | **this** window is where `ui_*` control messages land | ✨ button `.target`; Connection toggle "AI is controlling THIS window" |
 | **CS-05** | **Listening** (`listening`) | server pushes `{type:"listening"}` on each `wait_for_user_message` poll | **35 s** window (a poll fires ~every 25 s) | a process is waiting for the user's typed message | chat composer **enabled** (else disabled with "Waiting for a listener…") |
 | **CS-06** | **Simulate UI** | user toggle (orthogonal preference, not a connection state) | persisted | typed prompts carry `simulate:true` | settings-gear "UI" badge |
@@ -117,6 +117,7 @@ stateDiagram-v2
 | 0.1 | 2026-06-20 | Vũ Anh | Initial note: the MCP/AI connection states Connect AI surfaces (Socket up / AI active / Waiting / AI target / Listening + the Simulate preference), how each is detected (signal + freshness window) and where it shows, plus the informative connect flow. Supplements `DESIGN-KAI-001`. |
 | 0.2 | 2026-06-20 | Vũ Anh | Numbered the signals **CS-01..CS-06** (§2) and cross-referenced them from §3/§4; embedded a `stateDiagram-v2` mermaid diagram of the connect flow in §4. |
 | 0.3 | 2026-06-20 | Vũ Anh | Added **CS-07** (server-side per-MCP-connection registry, `FR-AI-11` / `CR-KAI-001`): freshness-based "connected" + four outdated reasons (server / stale / protocol / client), surfaced as "N connected · M outdated" in the Connection tab; clarified CS-02 (client-side aggregate) vs CS-07 (server-side per-connection) and nuanced §1. |
+| 0.7 | 2026-06-20 | Vũ Anh | Connection-tab banner reconciled CS-02 with CS-07: shows **Connected** if *either* an AI is acting (CS-02) *or* a client is registered (CS-07), so a connected-but-idle client no longer reads "Waiting" (`CR-KAI-001`). Updated CS-03. |
 | 0.6 | 2026-06-20 | Vũ Anh | CS-07 reliability (`CR-KAI-001` v1.3): rendered over a **self-reconnecting `/userws`** + 10 s local re-render (no freeze after a redeploy), rows **collapsed per client** (dimmed "Disconnected" when stale). |
 | 0.5 | 2026-06-20 | Vũ Anh | CS-07 **keyed by OAuth `client_id`** (per install) not the rotating session id (`CR-KAI-001` v1.2) — a reconnect updates one row instead of a ghost per session. |
 | 0.4 | 2026-06-20 | Vũ Anh | CS-07 reworked to **lifecycle + live push** (`CR-KAI-001` v1.1): source is `KymoMCP` connect (`oninitialized`) / wake (`onStart`) / clean disconnect (`destroy()`→`DELETE`), each pushing `{type:"mcp-connections"}` over `/userws` (no poll), with a DO alarm for ungraceful drops — so a reconnect/disconnect shows in the editor immediately without any tool call. |
