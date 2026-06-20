@@ -1,7 +1,7 @@
 ---
 title: Editor AI (Connect AI) — Design
 document_id: DESIGN-KAI-001
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -90,6 +90,7 @@ SockMeta = { focusedAt, pinned, pinnedAt, session?, project?, projectName?, diag
 | `GET /sessions` | list open windows for `ui_list_sessions` (session, project, diagram, pinned) |
 | `POST /target` | pin a session for `ui_switch_session` |
 | `POST /inbox-wait` | the `wait_for_user_message` long-poll: **broadcast `{type:"listening"}`** to all sockets, then drain the inbox (≤ 32 × 800 ms ≈ 25 s); return `messages` or `[]` |
+| `POST /mcp-seen` · `POST /mcp-gone` · `GET /mcp-connections` | the MCP connection registry (`FR-AI-11`) — see §7 |
 
 **`pickTarget()`** — most-recent **pinned** socket → else highest **`focusedAt`** → else `null` (caller broadcasts). Used by `/push` and by the `ui_*` tools so control lands on the chosen window (`FR-AI-02`).
 
@@ -145,22 +146,32 @@ already exists — the `UserChannel` DO — and derives "connected" as *seen rec
 McpConn = { connId, client, clientVersion, protocol, serverVersion, connectedAt, lastSeenAt }
 ```
 
-- `connId` — the MCP `Mcp-Session-Id` (fallback: the `KymoMCP` DO id), stable per session.
-- `client`/`clientVersion`/`protocol` — read from the MCP `initialize` handshake.
+- `connId` — the transport session id (the `KymoMCP` DO name is `streamable-http:<id>` / `sse:<id>`, so `this.getSessionId()`), stable for the connection's whole lifetime.
+- `client`/`clientVersion`/`protocol` — `clientInfo` from the live handshake (`server.getClientVersion()`) + protocol from the persisted `initialize` request.
 - `serverVersion` — the `McpServer` version at connect time (`index.ts` `new McpServer({version})`).
 
-**Heartbeat (capture).** `clientInfo`/protocol exist only **after** `initialize`, so
-`KymoMCP` heartbeats **per tool call** (a thin wrapper around `this.server.tool`), and
-**inside the `wait_for_user_message` poll** so an idle-but-listening agent still counts.
-Each heartbeat fires `POST /mcp-seen` to its `UserChannel` (fire-and-forget, like
-`feed()` in §3) → upsert: `connectedAt` on first sight, always bump `lastSeenAt`.
+**Capture — bound to the connection lifecycle, not to tool calls** (so a reconnect/disconnect shows in the editor **immediately, with no tool call**):
+
+| event | hook in `KymoMCP` | effect |
+|-------|-------------------|--------|
+| **connect** | `this.server.server.oninitialized` (fires once the `initialize` handshake completes — `clientInfo` is populated by then) | `POST /mcp-seen` → register |
+| **wake / idle SSE reconnect** | `onStart()` override (runs on every DO wake; Cloudflare recycles an idle SSE stream ~every 5 min) | `POST /mcp-seen` → refresh `lastSeenAt` so an alive-but-idle client isn't aged out |
+| **clean disconnect** | `destroy()` override — the MCP `DELETE` (client quit / `/mcp` reconnect) routes to `agent.destroy()` | `POST /mcp-gone` → drop the record |
+| **any tool call** | the `this.server.tool` wrapper | `POST /mcp-seen` → refresh `lastSeenAt` (carries the live protocol header) |
+
+`POST /mcp-seen` upserts (`connectedAt` set once, always bump `lastSeenAt`); both it and `/mcp-gone` then **push** the new snapshot to every open editor window over `/userws` (no polling).
 
 **Endpoints** (added to the §2 table):
 
 | path | purpose |
 |------|---------|
-| `POST /mcp-seen` | upsert a connection record (heartbeat from `KymoMCP`) |
-| `GET /mcp-connections` | prune entries older than `HARD_TTL`; return `{connections[], summary:{total,connected,outdated}}` with each connection's outdated reasons |
+| `POST /mcp-seen` | upsert a connection record (from the lifecycle hooks above) → `broadcastConns()` |
+| `POST /mcp-gone` | delete a connection (clean disconnect via `destroy()`) → `broadcastConns()` |
+| `GET /mcp-connections` | `snapshotConns()` — prune entries older than `HARD_TTL`; return `{connections[], summary:{total,connected,outdated}}` (the `/api/connections` path uses this) |
+
+**Liveness without polling.** `UserChannel` keeps a DO **alarm** armed at `lastSeen + STALE_MS` whenever a record is upserted; `alarm()` re-pushes the snapshot and reschedules while any record remains — so an **ungraceful** drop (crash/network loss → no `DELETE`) ages out of `connected` on its own. A freshly-opened editor tab is sent the current snapshot on `/userws` connect. The editor renders from these pushes (`mcpstatus.tsx` `useConnections` signal), so there is **no `setInterval` poll**.
+
+> Limit (inherent to stateless MCP): only a **clean** disconnect (the client sends `DELETE`) is instant; an ungraceful drop is detected via the `STALE_MS` alarm, not instantly. Reconnect is always instant (new session → `oninitialized`).
 
 **Outdated reasons** (a connection is outdated if **any** hold), computed at read time
 against current constants:
@@ -176,17 +187,18 @@ Thresholds (one place, tunable): `STALE_MS = 10 min`, `HARD_TTL = 60 min`,
 `CURRENT_SERVER_VERSION` = the `McpServer` version, `MIN_PROTOCOL` = latest supported,
 `MIN_CLIENT` = small per-client map (initially advisory). `connected` = seen within `STALE_MS`.
 
-**Browser surface.** Worker `GET /api/connections` (auth via `resolveAuth` → `email`,
-CORS like the other `/api/*`) forwards to `UserChannel /mcp-connections`. The
-**Connection** tab (`connectai.tsx`) fetches on open + polls ~15 s and renders
-**"N connected · M outdated"** + a row per connection (client + version, protocol, last
-seen) with an outdated-reason badge; a `server`-outdated row links to **Setup** to
-reconnect. This is the server-side, per-connection counterpart of the client-side
-activity signal CS-02 — see `DESIGN-KAI-002` **CS-07**.
+**Browser surface.** `userchannel.tsx` dispatches the `{type:"mcp-connections"}` push
+into the `mcpstatus.tsx` `useConnections` signal; the **Connection** tab (`connectai.tsx`)
+renders it live — **"N connected · M outdated"** + a row per connection (client + version,
+protocol, last seen) with an outdated-reason badge; a `server`-outdated row links to
+**Setup** to reconnect. The `GET /api/connections` route (auth via `resolveAuth` → `email`,
+CORS like the other `/api/*`; forwards to `UserChannel /mcp-connections`) remains for
+non-WS/debug use and the localhost stub. This is the server-side, per-connection
+counterpart of the client-side activity signal CS-02 — see `DESIGN-KAI-002` **CS-07**.
 
-> Limit (inherent to stateless MCP): there is no disconnect event, so "connected" is
-> *recent activity*, and "outdated" is advisory (the user reconnects the client). The
-> registry does not gate any tool.
+> Limit (inherent to stateless MCP): only a **clean** disconnect (client `DELETE`) is
+> instant; an ungraceful drop ages out via the `STALE_MS` alarm. "Outdated" is advisory
+> (the user reconnects the client). The registry does not gate any tool.
 
 ## 8. Traceability
 
@@ -206,3 +218,4 @@ activity signal CS-02 — see `DESIGN-KAI-002` **CS-07**.
 |---------|------|--------|---------|
 | 0.1 | 2026-06-20 | Vũ Anh | Initial as-built design for Connect AI: `UserChannel` DO + protocol, editor signal hub, reverse channel + listener gating, UI-simulation drivers. Realises `FEAT-KAI-001`. |
 | 0.2 | 2026-06-20 | Vũ Anh | Added **§7 MCP connection registry** (`FR-AI-11`, `CR-KAI-001`): per-user `McpConn` records in `UserChannel` storage, heartbeat from `KymoMCP` (`POST /mcp-seen`), `GET /mcp-connections` + `/api/connections`, the four outdated reasons (server / stale / protocol / client) + thresholds, Connection-tab surface. Renumbered Traceability → §8 and added its `FR-AI-11` row. |
+| 0.3 | 2026-06-20 | Vũ Anh | §7 reworked to **lifecycle + live push** (`CR-KAI-001` v1.1): register on `oninitialized`, refresh on `onStart` (idle SSE wake), drop on `destroy()` (clean `DELETE`); `POST /mcp-gone` + `broadcastConns()` push `{type:"mcp-connections"}` over `/userws`; DO **alarm** ages out ungraceful drops; editor renders from the `useConnections` signal (**no poll**). Endpoints added to §2. |

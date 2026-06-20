@@ -686,6 +686,9 @@ export class UserChannel extends DurableObject<Env> {
       server.serializeAttachment({ focusedAt: 0, pinned: false, pinnedAt: 0 });
       // Tell the newcomer it isn't the pinned AI target (another window may be).
       try { server.send(JSON.stringify({ type: "ai-target", pinned: false })); } catch {}
+      // Send the current MCP connection snapshot so a freshly-opened tab shows the
+      // registry immediately (the push on change covers everything afterwards).
+      try { server.send(JSON.stringify({ type: "mcp-connections", ...(await this.snapshotConns()) })); } catch {}
       return new Response(null, { status: 101, webSocket: client });
     }
     if (url.pathname.endsWith("/push") && request.method === "POST") {
@@ -753,24 +756,23 @@ export class UserChannel extends DurableObject<Env> {
         lastSeenAt: now,
       };
       await this.ctx.storage.put(`conn:${connId}`, rec);
+      // Live-push the new state to open editor windows (no poll) + arm the alarm so
+      // an ungracefully-dropped connection (no DELETE) ages out on its own.
+      await this.broadcastConns();
+      await this.ctx.storage.setAlarm(Date.now() + MCP_STALE_MS);
+      return Response.json({ ok: true });
+    }
+    // A connection went away cleanly (KymoMCP.destroy on the MCP `DELETE` session-end):
+    // drop it and push the new state so the browser reflects the disconnect immediately.
+    if (url.pathname.endsWith("/mcp-gone") && request.method === "POST") {
+      const b = (await request.json().catch(() => ({}))) as { connId?: string };
+      const connId = String(b.connId || "").slice(0, 128);
+      if (connId) { await this.ctx.storage.delete(`conn:${connId}`); await this.broadcastConns(); }
       return Response.json({ ok: true });
     }
     // List the user's MCP connections + a {total, connected, outdated} summary; prune dead ones.
     if (url.pathname.endsWith("/mcp-connections") && request.method === "GET") {
-      const now = Date.now();
-      const map = await this.ctx.storage.list<McpConn>({ prefix: "conn:" });
-      const connections: (McpConn & { outdated: boolean; reasons: string[] })[] = [];
-      const dead: string[] = [];
-      for (const [key, rec] of map) {
-        if (now - rec.lastSeenAt > MCP_HARD_TTL) { dead.push(key); continue; }
-        const reasons = mcpOutdated(rec, now);
-        connections.push({ ...rec, outdated: reasons.length > 0, reasons });
-      }
-      if (dead.length) await this.ctx.storage.delete(dead);
-      connections.sort((a, b) => b.lastSeenAt - a.lastSeenAt);
-      const connected = connections.filter((c) => now - c.lastSeenAt <= MCP_STALE_MS).length;
-      const outdated = connections.filter((c) => c.outdated).length;
-      return Response.json({ connections, summary: { total: connections.length, connected, outdated } });
+      return Response.json(await this.snapshotConns());
     }
     return new Response("not found", { status: 404 });
   }
@@ -795,6 +797,42 @@ export class UserChannel extends DurableObject<Env> {
     const all = this.ctx.getWebSockets();
     for (const ws of all) { const m = sockMeta(ws); if (m.pinned && m.pinnedAt >= pinnedAt) { pinnedAt = m.pinnedAt; pinned = ws; } }
     for (const ws of all) { try { ws.send(JSON.stringify({ type: "ai-target", pinned: ws === pinned })); } catch {} }
+  }
+
+  // MCP connection registry (FR-AI-11): build the {connections, summary} snapshot,
+  // pruning records past HARD_TTL. Connected = seen within STALE_MS; outdated = any
+  // of the four reasons (server / stale / protocol / client).
+  private async snapshotConns(): Promise<{ connections: (McpConn & { outdated: boolean; reasons: string[] })[]; summary: { total: number; connected: number; outdated: number } }> {
+    const now = Date.now();
+    const map = await this.ctx.storage.list<McpConn>({ prefix: "conn:" });
+    const connections: (McpConn & { outdated: boolean; reasons: string[] })[] = [];
+    const dead: string[] = [];
+    for (const [key, rec] of map) {
+      if (now - rec.lastSeenAt > MCP_HARD_TTL) { dead.push(key); continue; }
+      const reasons = mcpOutdated(rec, now);
+      connections.push({ ...rec, outdated: reasons.length > 0, reasons });
+    }
+    if (dead.length) await this.ctx.storage.delete(dead);
+    connections.sort((a, b) => b.lastSeenAt - a.lastSeenAt);
+    const connected = connections.filter((c) => now - c.lastSeenAt <= MCP_STALE_MS).length;
+    const outdated = connections.filter((c) => c.outdated).length;
+    return { connections, summary: { total: connections.length, connected, outdated } };
+  }
+
+  // Push the current connection snapshot to every open editor window (live, no poll).
+  private async broadcastConns() {
+    const snap = await this.snapshotConns();
+    const msg = JSON.stringify({ type: "mcp-connections", ...snap });
+    for (const ws of this.ctx.getWebSockets()) { try { ws.send(msg); } catch {} }
+  }
+
+  // Backstop for ungraceful drops (no MCP DELETE → no /mcp-gone): re-evaluate freshness
+  // and push. snapshotConns() prunes dead rows; reschedule while any remain so a stalled
+  // connection flips to `stale` (and drops out of `connected`) without a reader.
+  async alarm() {
+    await this.broadcastConns();
+    const remaining = await this.ctx.storage.list<McpConn>({ prefix: "conn:" });
+    if (remaining.size > 0) await this.ctx.storage.setAlarm(Date.now() + MCP_STALE_MS);
   }
 
   // The editor reports `{type:"focus"}` (window gained focus) and `{type:"pin"|"unpin"}`
@@ -833,6 +871,50 @@ export class UserChannel extends DurableObject<Env> {
 export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: string }> {
   server = new McpServer({ name: "kymostudio", version: MCP_SERVER_VERSION });
 
+  // The transport session id (DO name is `streamable-http:<id>` / `sse:<id>`).
+  private connId(): string { return this.name.split(":")[1] || ""; }
+
+  // Upsert this connection in the per-user registry (FR-AI-11). Reads clientInfo from
+  // the live handshake + protocol from the persisted initialize request. UserChannel
+  // pushes the change to open editor windows. Fire-and-forget. No tool call required.
+  private async mcpHeartbeat(protocol?: string) {
+    try {
+      const id = this.connId(); const email = this.props?.email;
+      if (!id || !email) return;
+      const ci = this.server.server.getClientVersion();
+      let proto = protocol;
+      if (proto === undefined) { const ir = await this.getInitializeRequest().catch(() => undefined) as any; proto = String(ir?.params?.protocolVersion || ""); }
+      await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(email)).fetch("https://chan/mcp-seen", {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ connId: id, client: ci?.name || "?", clientVersion: ci?.version || "?", protocol: proto, serverVersion: MCP_SERVER_VERSION, ts: Date.now() }),
+      });
+    } catch {}
+  }
+
+  // Refresh presence on every DO wake (incl. the idle SSE reconnect Cloudflare forces
+  // ~every 5 min) so an alive-but-idle client isn't aged out by the registry alarm.
+  // Only once the handshake is on record — avoids a phantom row before `initialize`.
+  async onStart(props?: { email: string; name?: string }) {
+    await super.onStart(props);
+    try { if (await this.getInitializeRequest()) await this.mcpHeartbeat(); } catch {}
+  }
+
+  // Clean session end (FR-AI-11): the MCP `DELETE` (client disconnect / reconnect)
+  // routes to agent.destroy() — drop this connection from the registry and push the
+  // change so the editor reflects the disconnect IMMEDIATELY, before tearing down.
+  async destroy() {
+    try {
+      const id = this.connId();
+      const email = this.props?.email;
+      if (id && email) {
+        await this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(email)).fetch("https://chan/mcp-gone", {
+          method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ connId: id }),
+        });
+      }
+    } catch {}
+    await super.destroy();
+  }
+
   async init() {
     const me = () => this.props.email;
     const link = (id: string) => `${EDITOR_URL}/?d=${id}`;
@@ -857,23 +939,15 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
     // the panel then reads request → reasoning → action without relying on memory.
     const NARRATE = " Before calling this, narrate to the user's editor panel: first call ui_status(kind:\"user\", <the user's request>) then ui_status(kind:\"thinking\", <your plan/reasoning>) — so the Live Activity feed reads request → reasoning → action.";
 
-    // MCP connection registry heartbeat (FR-AI-11, CR-KAI-001): on every tool call,
-    // upsert this client's record in the per-user UserChannel. clientInfo + protocol
-    // are only known after the `initialize` handshake, so we read them here (not in
-    // init's tool registration). Fire-and-forget, like feed().
+    // MCP connection registry (FR-AI-11, CR-KAI-001). Register the moment the
+    // `initialize` handshake completes — so a reconnect shows up in the editor
+    // IMMEDIATELY, with no tool call (clientInfo is populated by now).
+    this.server.server.oninitialized = () => { this.mcpHeartbeat().catch(() => {}); };
+    // Per-tool heartbeat: refreshes lastSeen (keeps long-idle sessions out of `stale`)
+    // and carries the live protocol header. Registration itself is on connect/onStart.
     const seen = (extra: any) => {
-      try {
-        const ci = this.server.server.getClientVersion();
-        const ph = extra?.requestInfo?.headers?.["mcp-protocol-version"];
-        const protocol = Array.isArray(ph) ? (ph[0] || "") : (ph || "");
-        return this.env.USER_CHANNEL.get(this.env.USER_CHANNEL.idFromName(me())).fetch("https://chan/mcp-seen", {
-          method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            connId: extra?.sessionId || "anon", client: ci?.name || "?", clientVersion: ci?.version || "?",
-            protocol, serverVersion: MCP_SERVER_VERSION, ts: Date.now(),
-          }),
-        }).then(() => {}).catch(() => {});
-      } catch { return Promise.resolve(); }
+      const ph = extra?.requestInfo?.headers?.["mcp-protocol-version"];
+      return this.mcpHeartbeat(Array.isArray(ph) ? (ph[0] || "") : (ph || "")).catch(() => {});
     };
     // Thin wrapper around server.tool that heartbeats the registry before delegating.
     const tool = (name: string, desc: string, schema: any, handler: (args: any, extra: any) => any) =>

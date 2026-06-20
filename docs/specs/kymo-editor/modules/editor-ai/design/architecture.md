@@ -1,7 +1,7 @@
 ---
 title: Connect AI — Architecture overview
 document_id: DESIGN-KAI-003
-version: "0.2"
+version: "0.3"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -142,7 +142,7 @@ sequenceDiagram
 
 **UI simulation:** C2 (`new_project`/`delete_project` with `simulate:true`) pushes `ui-new-project`/`ui-delete-project` to C3 → C7 invokes C8, which animates the real switcher / Manage-projects flow (no reload).
 
-**Connection registry (`FR-AI-11`, `CR-KAI-001`):** on every tool call (and each `wait_for_user_message` poll) C2 heartbeats `POST /mcp-seen` to C3, which upserts an `McpConn` record (client+protocol+server version, first/last-seen) into C9. The Connection tab in C5 fetches `/api/connections` → C3 `/mcp-connections`, which prunes dead entries and returns *N connected · M outdated* (outdated = server / stale / protocol / client). Because MCP is stateless, this is recent-activity per connection, not a live socket — see `DESIGN-KAI-002` CS-07.
+**Connection registry (`FR-AI-11`, `CR-KAI-001`):** C2 registers on the connection **lifecycle**, not on tool calls — `server.oninitialized` (connect) and `onStart` (idle-SSE wake) `POST /mcp-seen`; `destroy()` (the clean MCP `DELETE`) `POST /mcp-gone` — so C3 updates C9 (the `McpConn` registry: client+protocol+server version, first/last-seen) and **pushes** `{type:"mcp-connections"}` to C7 over `/userws`; C6's `useConnections` signal feeds the Connection tab in C5 **live (no poll)** as *N connected · M outdated* (outdated = server / stale / protocol / client). A C3 **alarm** ages out ungraceful drops. Net: a Claude Code reconnect/disconnect shows in the editor immediately with no tool call — but because MCP is stateless, only a *clean* disconnect is instant; an ungraceful one waits for the alarm (`DESIGN-KAI-002` CS-07).
 
 ## 5. Deployment
 
@@ -158,3 +158,4 @@ No new artefact. C2/C3/C4 are the existing `kymo-mcp` Worker + its Durable Objec
 |---------|------|--------|---------|
 | 0.1 | 2026-06-20 | Vũ Anh | Initial architecture overview: components C1–C8; **topology** diagram (§2), **layered dependency** diagram (§3, editor-ai→editor-mcp→editor-live), and **sequence** diagrams for the agent-acts + reverse-channel flows (§4); the control-plane (UserChannel) vs document-plane (EditorRoom) split, deployment, key files. Supplements `DESIGN-KAI-001`/`DESIGN-KAI-002`. |
 | 0.2 | 2026-06-20 | Vũ Anh | Added **C9 MCP connection registry** (`FR-AI-11` / `CR-KAI-001`) to the component table, a **connection-registry** key flow in §4 (heartbeat `/mcp-seen` → registry → `/api/connections` → Connection tab; *N connected · M outdated*), and the registry to the key-files list. |
+| 0.3 | 2026-06-20 | Vũ Anh | Reworked the §4 connection-registry flow to **lifecycle + live push** (`CR-KAI-001` v1.1): register on `oninitialized`/`onStart`, drop on `destroy()` (`DELETE`), push `{type:"mcp-connections"}` over `/userws` (no poll) + DO alarm backstop — reconnect/disconnect reflected in the editor with no tool call. |
