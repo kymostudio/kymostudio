@@ -28,13 +28,13 @@
 </Diagram>
 <LifelineItem id="lli-0">
 <matrix>
-<val>(1.0, 0.0, 0.0, 1.0, 24.0, 40.0)</val>
+<val>(1.0, 0.0, 0.0, 1.0, 178.0, 0.0)</val>
 </matrix>
 <width>
-<val>100.0</val>
+<val>150.0</val>
 </width>
 <height>
-<val>40.0</val>
+<val>65.0</val>
 </height>
 <diagram>
 <ref refid="dgm"/>
@@ -43,18 +43,18 @@
 <ref refid="ll-0"/>
 </subject>
 <lifetime-length>
-<val>274.0</val>
+<val>348.0</val>
 </lifetime-length>
 </LifelineItem>
 <LifelineItem id="lli-1">
 <matrix>
-<val>(1.0, 0.0, 0.0, 1.0, 174.0, 40.0)</val>
+<val>(1.0, 0.0, 0.0, 1.0, 378.0, 0.0)</val>
 </matrix>
 <width>
-<val>100.0</val>
+<val>150.0</val>
 </width>
 <height>
-<val>40.0</val>
+<val>65.0</val>
 </height>
 <diagram>
 <ref refid="dgm"/>
@@ -63,7 +63,7 @@
 <ref refid="ll-1"/>
 </subject>
 <lifetime-length>
-<val>274.0</val>
+<val>348.0</val>
 </lifetime-length>
 </LifelineItem>
 <MessageItem id="mi-0">
@@ -83,7 +83,7 @@
 <val>(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)</val>
 </matrix>
 <points>
-<val>[(74.0, 158.0), (224.0, 158.0)]</val>
+<val>[(253.0, 173.0), (453.0, 173.0)]</val>
 </points>
 <head-connection>
 <ref refid="lli-0"/>
@@ -109,7 +109,7 @@
 <val>(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)</val>
 </matrix>
 <points>
-<val>[(224.0, 244.0), (74.0, 244.0)]</val>
+<val>[(453.0, 281.0), (253.0, 281.0)]</val>
 </points>
 <head-connection>
 <ref refid="lli-1"/>

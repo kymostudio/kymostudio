@@ -76,8 +76,8 @@
                                     "font": "Arial;13;0",
                                     "left": 8,
                                     "top": 8,
-                                    "width": 290,
-                                    "height": 264,
+                                    "width": 386,
+                                    "height": 273,
                                     "nameLabel": {
                                         "$ref": "frame-name"
                                     },
@@ -122,9 +122,9 @@
                                                         "$ref": "nc-0"
                                                     },
                                                     "font": "Arial;13;1",
-                                                    "left": 30,
-                                                    "top": 47,
-                                                    "width": 88,
+                                                    "left": 14,
+                                                    "top": 7,
+                                                    "width": 138,
                                                     "height": 13,
                                                     "text": "Alice"
                                                 },
@@ -150,10 +150,10 @@
                                                 }
                                             ],
                                             "font": "Arial;13;0",
-                                            "left": 24,
-                                            "top": 40,
-                                            "width": 100,
-                                            "height": 40,
+                                            "left": 8,
+                                            "top": 0,
+                                            "width": 150,
+                                            "height": 65,
                                             "stereotypeLabel": {
                                                 "$ref": "nc-0-st"
                                             },
@@ -177,17 +177,17 @@
                                                 "$ref": "lifeline-0"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 74,
-                                            "top": 80,
+                                            "left": 83,
+                                            "top": 65,
                                             "width": 1,
-                                            "height": 176
+                                            "height": 200
                                         }
                                     ],
                                     "font": "Arial;13;0",
-                                    "left": 24,
-                                    "top": 40,
-                                    "width": 100,
-                                    "height": 216,
+                                    "left": 8,
+                                    "top": 0,
+                                    "width": 150,
+                                    "height": 265,
                                     "nameCompartment": {
                                         "$ref": "nc-0"
                                     },
@@ -232,9 +232,9 @@
                                                         "$ref": "nc-1"
                                                     },
                                                     "font": "Arial;13;1",
-                                                    "left": 180,
-                                                    "top": 47,
-                                                    "width": 88,
+                                                    "left": 226,
+                                                    "top": 7,
+                                                    "width": 138,
                                                     "height": 13,
                                                     "text": "John"
                                                 },
@@ -260,10 +260,10 @@
                                                 }
                                             ],
                                             "font": "Arial;13;0",
-                                            "left": 174,
-                                            "top": 40,
-                                            "width": 100,
-                                            "height": 40,
+                                            "left": 220,
+                                            "top": 0,
+                                            "width": 150,
+                                            "height": 65,
                                             "stereotypeLabel": {
                                                 "$ref": "nc-1-st"
                                             },
@@ -287,17 +287,17 @@
                                                 "$ref": "lifeline-1"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 224,
-                                            "top": 80,
+                                            "left": 295,
+                                            "top": 65,
                                             "width": 1,
-                                            "height": 176
+                                            "height": 200
                                         }
                                     ],
                                     "font": "Arial;13;0",
-                                    "left": 174,
-                                    "top": 40,
-                                    "width": 100,
-                                    "height": 216,
+                                    "left": 220,
+                                    "top": 0,
+                                    "width": 150,
+                                    "height": 265,
                                     "nameCompartment": {
                                         "$ref": "nc-1"
                                     },
@@ -325,8 +325,8 @@
                                                 "$ref": "message-0"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 96,
+                                            "left": 159,
+                                            "top": 93,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -383,7 +383,7 @@
                                     "tail": {
                                         "$ref": "lp-0"
                                     },
-                                    "points": "74:112;224:112",
+                                    "points": "83:109;295:109",
                                     "nameLabel": {
                                         "$ref": "message-view-0-nm"
                                     },
@@ -414,8 +414,8 @@
                                                 "$ref": "message-1"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 136,
+                                            "left": 159,
+                                            "top": 137,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -472,7 +472,7 @@
                                     "tail": {
                                         "$ref": "lp-1"
                                     },
-                                    "points": "224:152;74:152",
+                                    "points": "295:153;83:153",
                                     "nameLabel": {
                                         "$ref": "message-view-1-nm"
                                     },
@@ -503,8 +503,8 @@
                                                 "$ref": "message-2"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 176,
+                                            "left": 159,
+                                            "top": 181,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -561,7 +561,7 @@
                                     "tail": {
                                         "$ref": "lp-0"
                                     },
-                                    "points": "74:192;224:192",
+                                    "points": "83:197;295:197",
                                     "nameLabel": {
                                         "$ref": "message-view-2-nm"
                                     },

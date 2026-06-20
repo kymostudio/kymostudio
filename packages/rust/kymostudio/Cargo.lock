@@ -446,14 +446,14 @@ dependencies = [
 
 [[package]]
 name = "kymostudio"
-version = "0.4.8"
+version = "0.4.9"
 dependencies = [
  "kymostudio-core",
 ]
 
 [[package]]
 name = "kymostudio-core"
-version = "0.4.8"
+version = "0.4.9"
 dependencies = [
  "kymo-graph",
  "kymo-mermaid",

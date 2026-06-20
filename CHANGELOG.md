@@ -9,6 +9,20 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.9] - 2026-06-20
+
+### Fixed
+
+- Regenerate the sequence `.gaphor` and `.mdj` export goldens to match the
+  refreshed sequence-diagram geometry (actor box size + lifeline/message
+  coordinates) from the renderer parity work — these golden tests run only in
+  `release-crate.yml`, so the drift blocked 0.4.8's crates.io publish.
+
+> Note: 0.4.7 reached PyPI + npm; 0.4.8 added VS Code + binaries but its
+> crates.io publish hit a second stale-golden test; 0.4.9 is the first release
+> that publishes cleanly to **all** registries (PyPI, npm, crates.io ×2, VS Code
+> Marketplace, GitHub binaries).
+
 ## [0.4.8] - 2026-06-20
 
 ### Fixed
