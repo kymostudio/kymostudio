@@ -76,8 +76,8 @@
                                     "font": "Arial;13;0",
                                     "left": 8,
                                     "top": 8,
-                                    "width": 290,
-                                    "height": 636,
+                                    "width": 374,
+                                    "height": 657,
                                     "nameLabel": {
                                         "$ref": "frame-name"
                                     },
@@ -122,9 +122,9 @@
                                                         "$ref": "nc-0"
                                                     },
                                                     "font": "Arial;13;1",
-                                                    "left": 30,
-                                                    "top": 47,
-                                                    "width": 88,
+                                                    "left": 14,
+                                                    "top": 7,
+                                                    "width": 138,
                                                     "height": 13,
                                                     "text": "Client"
                                                 },
@@ -150,10 +150,10 @@
                                                 }
                                             ],
                                             "font": "Arial;13;0",
-                                            "left": 24,
-                                            "top": 40,
-                                            "width": 100,
-                                            "height": 40,
+                                            "left": 8,
+                                            "top": 0,
+                                            "width": 150,
+                                            "height": 65,
                                             "stereotypeLabel": {
                                                 "$ref": "nc-0-st"
                                             },
@@ -177,17 +177,17 @@
                                                 "$ref": "lifeline-0"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 74,
-                                            "top": 80,
+                                            "left": 83,
+                                            "top": 65,
                                             "width": 1,
-                                            "height": 548
+                                            "height": 584
                                         }
                                     ],
                                     "font": "Arial;13;0",
-                                    "left": 24,
-                                    "top": 40,
-                                    "width": 100,
-                                    "height": 588,
+                                    "left": 8,
+                                    "top": 0,
+                                    "width": 150,
+                                    "height": 649,
                                     "nameCompartment": {
                                         "$ref": "nc-0"
                                     },
@@ -232,9 +232,9 @@
                                                         "$ref": "nc-1"
                                                     },
                                                     "font": "Arial;13;1",
-                                                    "left": 180,
-                                                    "top": 47,
-                                                    "width": 88,
+                                                    "left": 214,
+                                                    "top": 7,
+                                                    "width": 138,
                                                     "height": 13,
                                                     "text": "Server"
                                                 },
@@ -260,10 +260,10 @@
                                                 }
                                             ],
                                             "font": "Arial;13;0",
-                                            "left": 174,
-                                            "top": 40,
-                                            "width": 100,
-                                            "height": 40,
+                                            "left": 208,
+                                            "top": 0,
+                                            "width": 150,
+                                            "height": 65,
                                             "stereotypeLabel": {
                                                 "$ref": "nc-1-st"
                                             },
@@ -287,17 +287,17 @@
                                                 "$ref": "lifeline-1"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 224,
-                                            "top": 80,
+                                            "left": 283,
+                                            "top": 65,
                                             "width": 1,
-                                            "height": 548
+                                            "height": 584
                                         }
                                     ],
                                     "font": "Arial;13;0",
-                                    "left": 174,
-                                    "top": 40,
-                                    "width": 100,
-                                    "height": 588,
+                                    "left": 208,
+                                    "top": 0,
+                                    "width": 150,
+                                    "height": 649,
                                     "nameCompartment": {
                                         "$ref": "nc-1"
                                     },
@@ -322,8 +322,8 @@
                                                 "$ref": "frag-view-0"
                                             },
                                             "font": "Arial;13;1",
-                                            "left": 68,
-                                            "top": 116,
+                                            "left": 77,
+                                            "top": 113,
                                             "width": 120,
                                             "height": 13,
                                             "text": ""
@@ -335,8 +335,8 @@
                                                 "$ref": "frag-view-0"
                                             },
                                             "font": "Arial;13;1",
-                                            "left": 48,
-                                            "top": 116,
+                                            "left": 57,
+                                            "top": 113,
                                             "width": 32,
                                             "height": 13,
                                             "text": "alt"
@@ -368,18 +368,18 @@
                                                                 "$ref": "operand-view-0-0"
                                                             },
                                                             "font": "Arial;13;0",
-                                                            "left": 52,
-                                                            "top": 142,
+                                                            "left": 61,
+                                                            "top": 139,
                                                             "width": 80,
                                                             "height": 13,
                                                             "text": "[is authorized]"
                                                         }
                                                     ],
                                                     "font": "Arial;13;0",
-                                                    "left": 44,
-                                                    "top": 140,
-                                                    "width": 210,
-                                                    "height": 80,
+                                                    "left": 53,
+                                                    "top": 137,
+                                                    "width": 260,
+                                                    "height": 88,
                                                     "guardLabel": {
                                                         "$ref": "operand-view-0-0-g"
                                                     }
@@ -401,35 +401,35 @@
                                                                 "$ref": "operand-view-0-1"
                                                             },
                                                             "font": "Arial;13;0",
-                                                            "left": 52,
-                                                            "top": 244,
+                                                            "left": 61,
+                                                            "top": 249,
                                                             "width": 80,
                                                             "height": 13,
                                                             "text": "[unauthorized]"
                                                         }
                                                     ],
                                                     "font": "Arial;13;0",
-                                                    "left": 44,
-                                                    "top": 242,
-                                                    "width": 210,
-                                                    "height": 40,
+                                                    "left": 53,
+                                                    "top": 247,
+                                                    "width": 260,
+                                                    "height": 44,
                                                     "guardLabel": {
                                                         "$ref": "operand-view-0-1-g"
                                                     }
                                                 }
                                             ],
                                             "font": "Arial;13;0",
-                                            "left": 44,
-                                            "top": 140,
-                                            "width": 210,
-                                            "height": 154
+                                            "left": 53,
+                                            "top": 137,
+                                            "width": 260,
+                                            "height": 166
                                         }
                                     ],
                                     "font": "Arial;13;0",
-                                    "left": 44,
-                                    "top": 112,
-                                    "width": 210,
-                                    "height": 182,
+                                    "left": 53,
+                                    "top": 109,
+                                    "width": 260,
+                                    "height": 194,
                                     "nameLabel": {
                                         "$ref": "frag-view-0-nm"
                                     },
@@ -457,8 +457,8 @@
                                                 "$ref": "frag-view-1"
                                             },
                                             "font": "Arial;13;1",
-                                            "left": 68,
-                                            "top": 338,
+                                            "left": 77,
+                                            "top": 347,
                                             "width": 120,
                                             "height": 13,
                                             "text": ""
@@ -470,8 +470,8 @@
                                                 "$ref": "frag-view-1"
                                             },
                                             "font": "Arial;13;1",
-                                            "left": 48,
-                                            "top": 338,
+                                            "left": 57,
+                                            "top": 347,
                                             "width": 32,
                                             "height": 13,
                                             "text": "loop"
@@ -503,35 +503,35 @@
                                                                 "$ref": "operand-view-1-0"
                                                             },
                                                             "font": "Arial;13;0",
-                                                            "left": 52,
-                                                            "top": 364,
+                                                            "left": 61,
+                                                            "top": 373,
                                                             "width": 80,
                                                             "height": 13,
                                                             "text": "[up to 3 times]"
                                                         }
                                                     ],
                                                     "font": "Arial;13;0",
-                                                    "left": 44,
-                                                    "top": 362,
-                                                    "width": 210,
-                                                    "height": 40,
+                                                    "left": 53,
+                                                    "top": 371,
+                                                    "width": 260,
+                                                    "height": 44,
                                                     "guardLabel": {
                                                         "$ref": "operand-view-1-0-g"
                                                     }
                                                 }
                                             ],
                                             "font": "Arial;13;0",
-                                            "left": 44,
-                                            "top": 362,
-                                            "width": 210,
-                                            "height": 52
+                                            "left": 53,
+                                            "top": 371,
+                                            "width": 260,
+                                            "height": 56
                                         }
                                     ],
                                     "font": "Arial;13;0",
-                                    "left": 44,
-                                    "top": 334,
-                                    "width": 210,
-                                    "height": 80,
+                                    "left": 53,
+                                    "top": 343,
+                                    "width": 260,
+                                    "height": 84,
                                     "nameLabel": {
                                         "$ref": "frag-view-1-nm"
                                     },
@@ -559,8 +559,8 @@
                                                 "$ref": "frag-view-2"
                                             },
                                             "font": "Arial;13;1",
-                                            "left": 68,
-                                            "top": 310,
+                                            "left": 77,
+                                            "top": 319,
                                             "width": 120,
                                             "height": 13,
                                             "text": ""
@@ -572,8 +572,8 @@
                                                 "$ref": "frag-view-2"
                                             },
                                             "font": "Arial;13;1",
-                                            "left": 48,
-                                            "top": 310,
+                                            "left": 57,
+                                            "top": 319,
                                             "width": 32,
                                             "height": 13,
                                             "text": "opt"
@@ -605,35 +605,35 @@
                                                                 "$ref": "operand-view-2-0"
                                                             },
                                                             "font": "Arial;13;0",
-                                                            "left": 52,
-                                                            "top": 336,
+                                                            "left": 61,
+                                                            "top": 345,
                                                             "width": 80,
                                                             "height": 13,
                                                             "text": "[retry on flake]"
                                                         }
                                                     ],
                                                     "font": "Arial;13;0",
-                                                    "left": 44,
-                                                    "top": 334,
-                                                    "width": 210,
-                                                    "height": 92,
+                                                    "left": 53,
+                                                    "top": 343,
+                                                    "width": 260,
+                                                    "height": 96,
                                                     "guardLabel": {
                                                         "$ref": "operand-view-2-0-g"
                                                     }
                                                 }
                                             ],
                                             "font": "Arial;13;0",
-                                            "left": 44,
-                                            "top": 334,
-                                            "width": 210,
-                                            "height": 104
+                                            "left": 53,
+                                            "top": 343,
+                                            "width": 260,
+                                            "height": 108
                                         }
                                     ],
                                     "font": "Arial;13;0",
-                                    "left": 44,
-                                    "top": 306,
-                                    "width": 210,
-                                    "height": 132,
+                                    "left": 53,
+                                    "top": 315,
+                                    "width": 260,
+                                    "height": 136,
                                     "nameLabel": {
                                         "$ref": "frag-view-2-nm"
                                     },
@@ -661,8 +661,8 @@
                                                 "$ref": "frag-view-3"
                                             },
                                             "font": "Arial;13;1",
-                                            "left": 68,
-                                            "top": 454,
+                                            "left": 77,
+                                            "top": 467,
                                             "width": 120,
                                             "height": 13,
                                             "text": ""
@@ -674,8 +674,8 @@
                                                 "$ref": "frag-view-3"
                                             },
                                             "font": "Arial;13;1",
-                                            "left": 48,
-                                            "top": 454,
+                                            "left": 57,
+                                            "top": 467,
                                             "width": 32,
                                             "height": 13,
                                             "text": "par"
@@ -707,18 +707,18 @@
                                                                 "$ref": "operand-view-3-0"
                                                             },
                                                             "font": "Arial;13;0",
-                                                            "left": 52,
-                                                            "top": 480,
+                                                            "left": 61,
+                                                            "top": 493,
                                                             "width": 80,
                                                             "height": 13,
                                                             "text": "[notify]"
                                                         }
                                                     ],
                                                     "font": "Arial;13;0",
-                                                    "left": 44,
-                                                    "top": 478,
-                                                    "width": 210,
-                                                    "height": 40,
+                                                    "left": 53,
+                                                    "top": 491,
+                                                    "width": 260,
+                                                    "height": 44,
                                                     "guardLabel": {
                                                         "$ref": "operand-view-3-0-g"
                                                     }
@@ -740,35 +740,35 @@
                                                                 "$ref": "operand-view-3-1"
                                                             },
                                                             "font": "Arial;13;0",
-                                                            "left": 52,
-                                                            "top": 542,
+                                                            "left": 61,
+                                                            "top": 559,
                                                             "width": 80,
                                                             "height": 13,
                                                             "text": ""
                                                         }
                                                     ],
                                                     "font": "Arial;13;0",
-                                                    "left": 44,
-                                                    "top": 540,
-                                                    "width": 210,
-                                                    "height": 40,
+                                                    "left": 53,
+                                                    "top": 557,
+                                                    "width": 260,
+                                                    "height": 44,
                                                     "guardLabel": {
                                                         "$ref": "operand-view-3-1-g"
                                                     }
                                                 }
                                             ],
                                             "font": "Arial;13;0",
-                                            "left": 44,
-                                            "top": 478,
-                                            "width": 210,
-                                            "height": 114
+                                            "left": 53,
+                                            "top": 491,
+                                            "width": 260,
+                                            "height": 122
                                         }
                                     ],
                                     "font": "Arial;13;0",
-                                    "left": 44,
-                                    "top": 450,
-                                    "width": 210,
-                                    "height": 142,
+                                    "left": 53,
+                                    "top": 463,
+                                    "width": 260,
+                                    "height": 150,
                                     "nameLabel": {
                                         "$ref": "frag-view-3-nm"
                                     },
@@ -799,8 +799,8 @@
                                                 "$ref": "message-0"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 124,
+                                            "left": 153,
+                                            "top": 121,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -857,7 +857,7 @@
                                     "tail": {
                                         "$ref": "lp-0"
                                     },
-                                    "points": "74:140;224:140",
+                                    "points": "83:137;283:137",
                                     "nameLabel": {
                                         "$ref": "message-view-0-nm"
                                     },
@@ -888,8 +888,8 @@
                                                 "$ref": "message-1"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 164,
+                                            "left": 153,
+                                            "top": 165,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -946,7 +946,7 @@
                                     "tail": {
                                         "$ref": "lp-1"
                                     },
-                                    "points": "224:180;74:180",
+                                    "points": "283:181;83:181",
                                     "nameLabel": {
                                         "$ref": "message-view-1-nm"
                                     },
@@ -977,8 +977,8 @@
                                                 "$ref": "message-2"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 226,
+                                            "left": 153,
+                                            "top": 231,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -1035,7 +1035,7 @@
                                     "tail": {
                                         "$ref": "lp-1"
                                     },
-                                    "points": "224:242;74:242",
+                                    "points": "283:247;83:247",
                                     "nameLabel": {
                                         "$ref": "message-view-2-nm"
                                     },
@@ -1066,8 +1066,8 @@
                                                 "$ref": "message-3"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 346,
+                                            "left": 153,
+                                            "top": 355,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -1124,7 +1124,7 @@
                                     "tail": {
                                         "$ref": "lp-0"
                                     },
-                                    "points": "74:362;224:362",
+                                    "points": "83:371;283:371",
                                     "nameLabel": {
                                         "$ref": "message-view-3-nm"
                                     },
@@ -1155,8 +1155,8 @@
                                                 "$ref": "message-4"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 462,
+                                            "left": 153,
+                                            "top": 475,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -1213,7 +1213,7 @@
                                     "tail": {
                                         "$ref": "lp-1"
                                     },
-                                    "points": "224:478;74:478",
+                                    "points": "283:491;83:491",
                                     "nameLabel": {
                                         "$ref": "message-view-4-nm"
                                     },
@@ -1244,8 +1244,8 @@
                                                 "$ref": "message-5"
                                             },
                                             "font": "Arial;13;0",
-                                            "left": 119,
-                                            "top": 524,
+                                            "left": 153,
+                                            "top": 541,
                                             "width": 60,
                                             "height": 13,
                                             "alpha": 1.5707963267948966,
@@ -1302,7 +1302,7 @@
                                     "tail": {
                                         "$ref": "lp-1"
                                     },
-                                    "points": "224:540;74:540",
+                                    "points": "283:557;83:557",
                                     "nameLabel": {
                                         "$ref": "message-view-5-nm"
                                     },
