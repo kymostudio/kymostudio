@@ -9,6 +9,19 @@ packages share a version number.
 
 ## [Unreleased]
 
+## [0.4.10] - 2026-06-20
+
+### Changed
+
+- **Dropped the merman dependency entirely** — kymostudio-core's Mermaid engine
+  is now pure Rust with no git dependency, which unblocks its crates.io publish.
+  KaTeX `$$…$$` math renders natively via the kymo-tex stack; the graph layout
+  algorithms were consolidated into a new `kymo-layout` crate (dagre + Sugiyama +
+  grid + cose), and the kymo-tex crates were namespaced as `kymo-tex-*`.
+- All supporting Rust crates are now published to crates.io (kymo-graph,
+  kymo-layout, kymo-manatee, kymo-mermaid, and the kymo-tex-* KaTeX stack), so
+  `kymostudio-core` and the `kymostudio` CLI publish cleanly from the registry.
+
 ## [0.4.9] - 2026-06-20
 
 ### Fixed

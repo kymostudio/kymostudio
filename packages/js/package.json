@@ -1,6 +1,6 @@
 {
   "name": "kymostudio",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "description": "Prompt it. See it appear. Watch it animate.",
   "type": "module",
   "license": "Apache-2.0",
