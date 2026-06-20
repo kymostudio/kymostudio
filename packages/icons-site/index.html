@@ -57,7 +57,7 @@
       display: flex; flex-direction: column; align-items: center; gap: 8px;
     }
     .cell:hover { border-color: var(--pink); box-shadow: 0 4px 14px rgba(36,33,49,.08); transform: translateY(-1px); }
-    .cell img { width: 44px; height: 44px; object-fit: contain; }
+    .cell img, .cell svg { width: 44px; height: 44px; object-fit: contain; }
     .cell .key { font-size: 11px; color: var(--muted); word-break: break-word; line-height: 1.3; font-family: ui-monospace, Menlo, monospace; }
     #sentinel { height: 1px; }
     #toast {
@@ -142,7 +142,9 @@
         cell.className = "cell";
         cell.title = "Copy " + it.key;
         cell.innerHTML =
-          `<img loading="lazy" src="${it.path}" alt="${it.key}" width="44" height="44">` +
+          (it.svg
+            ? it.svg // inline IconifyJSON set (e.g. ai:) — SVG body, no PNG
+            : `<img loading="lazy" src="${it.path}" alt="${it.key}" width="44" height="44">`) +
           `<span class="key">${it.key}</span>`;
         cell.addEventListener("click", () => {
           try {
@@ -169,8 +171,27 @@
 
     $("#q").addEventListener("input", applyFilter);
 
-    fetch("icons-manifest.json").then((r) => r.json()).then((m) => {
+    // Vendored inline IconifyJSON sets — SVG `body` per icon, no PNG art. Rendered
+    // inline at runtime so they appear in the gallery like the file-backed sets.
+    const INLINE_SETS = ["ai"];
+    async function loadInline() {
+      for (const pfx of INLINE_SETS) {
+        try {
+          const s = await fetch(`sets/${pfx}.json`).then((r) => r.json());
+          const dw = s.width || 16, dh = s.height || 16;
+          for (const [name, ic] of Object.entries(s.icons || {})) {
+            const w = ic.width || dw, h = ic.height || dh;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}">${ic.body}</svg>`;
+            ALL.push({ key: `${pfx}:${name}`, svg, set: pfx });
+          }
+        } catch (_) { /* set not shipped — skip */ }
+      }
+    }
+
+    fetch("icons-manifest.json").then((r) => r.json()).then(async (m) => {
       ALL = Object.entries(m.icons).map(([key, path]) => ({ key, path, set: key.split(":")[0] }));
+      await loadInline();
+      ALL.sort((a, b) => a.key.localeCompare(b.key));
       $("#total").textContent = `· ${ALL.length.toLocaleString()} icons`;
       // set chips from the icons we can actually show (the manifest), sorted by
       // size desc — collection-only sets (e.g. vendored `ai:`) have no file-backed

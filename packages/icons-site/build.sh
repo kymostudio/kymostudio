@@ -16,6 +16,9 @@ cp "$ICONS/icons-manifest.json" dist/
 cp "$ICONS/icons-collections.json" dist/
 # the icon art (manifest paths are icons/<set>/…)
 cp -R "$ICONS/icons" dist/icons
+# vendored inline IconifyJSON sets (SVG body, no PNG) — rendered at runtime
+mkdir -p dist/sets
+cp "$ICONS/sets/ai.json" dist/sets/
 # brand favicon (optional)
 cp ../docs/brand/favicon.svg dist/favicon.svg 2>/dev/null || true
 
