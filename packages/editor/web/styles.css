@@ -53,7 +53,7 @@ header { position: relative; display: flex; align-items: center; gap: 10px; padd
 .muted { font-size: 12.5px; color: var(--dim); }
 
 button, .btn { background: var(--bg); color: var(--ink); border: 1px solid var(--border-strong); border-radius: var(--radius-btn); padding: 7px 14px; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft); }
+button:not(:disabled):hover, .btn:not(:disabled):hover { border-color: var(--dim); background: var(--bg-soft); }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
 .btn-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
 .btn-danger { background: var(--error); border-color: var(--error); color: #fff; font-weight: 700; }
@@ -461,7 +461,7 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 @media (prefers-reduced-motion: reduce) {
   .kloader > div { animation: none !important; transform: none; }
 }
-button:active, .btn:active, .pill:active { transform: translateY(1px); }
+button:not(:disabled):active, .btn:not(:disabled):active, .pill:not(:disabled):active { transform: translateY(1px); }
 
 /* ---- diagrams page ---- */
 .page { max-width: 880px; margin: 0 auto; padding: 44px 24px 60px; }
@@ -892,9 +892,11 @@ button, .btn, .pill, .ws-pill, .kind-select, .rmove, .acct-item, .linklike, .dia
 }
 .chev, .chev-icon, .exp-item svg { transition: color 0.15s ease, transform 0.18s ease; }
 
-button:hover, .btn:hover { border-color: var(--border-strong); background: var(--bg-soft); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(36, 33, 49, 0.1), 0 1px 3px rgba(36, 33, 49, 0.06); }
+button:not(:disabled):hover, .btn:not(:disabled):hover { border-color: var(--border-strong); background: var(--bg-soft); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(36, 33, 49, 0.1), 0 1px 3px rgba(36, 33, 49, 0.06); }
 .btn-primary { box-shadow: 0 1px 2px rgba(224, 9, 95, 0.18); }
-.btn-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); box-shadow: 0 5px 16px rgba(224, 9, 95, 0.3), 0 2px 5px rgba(224, 9, 95, 0.18); }
+.btn-primary:not(:disabled):hover { background: var(--accent-deep); border-color: var(--accent-deep); box-shadow: 0 5px 16px rgba(224, 9, 95, 0.3), 0 2px 5px rgba(224, 9, 95, 0.18); }
+/* disabled buttons never react to hover/press (no lift, shadow, border or bg change) */
+button:disabled, button[disabled], .btn:disabled, .btn[disabled] { transform: none !important; box-shadow: none !important; cursor: default; }
 
 .pill:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(36, 33, 49, 0.1); }
 .pill-dark { box-shadow: 0 1px 2px rgba(224, 9, 95, 0.18); }
@@ -916,7 +918,7 @@ button:hover, .btn:hover { border-color: var(--border-strong); background: var(-
 .linklike:hover { color: var(--accent); }
 
 /* press: settle back down, tighter shadow, instant response */
-button:active, .btn:active, .pill:active, .ws-pill:active { transform: translateY(0) scale(0.98); box-shadow: 0 1px 2px rgba(36, 33, 49, 0.08); transition-duration: 0.05s; }
+button:not(:disabled):active, .btn:not(:disabled):active, .pill:not(:disabled):active, .ws-pill:not(:disabled):active { transform: translateY(0) scale(0.98); box-shadow: 0 1px 2px rgba(36, 33, 49, 0.08); transition-duration: 0.05s; }
 .acct-item:active, .ws-btn:active, .acct-btn:active, .linklike:active { transform: scale(0.98); box-shadow: none; }
 
 @media (prefers-reduced-motion: reduce) {
