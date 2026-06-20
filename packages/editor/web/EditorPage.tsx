@@ -95,7 +95,9 @@ export default function EditorPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const [connectOpen, setConnectOpen] = useState(false);
+  // Connect AI panel open-state, persisted across refresh (like the other panels).
+  const [connectOpen, setConnectOpen] = useState<boolean>(() => { try { return localStorage.getItem("kymo_connect") === "1"; } catch { return false; } });
+  useEffect(() => { try { localStorage.setItem("kymo_connect", connectOpen ? "1" : "0"); } catch {} }, [connectOpen]);
   // Let the ⌘/Ctrl+⇧+A shortcut (handled globally) toggle the Connect AI panel.
   useEffect(() => { registerConnectToggle(() => setConnectOpen((o) => !o)); return () => registerConnectToggle(null); }, []);
   const mcpLive = useMcpActive(); // an AI client (MCP) is actively driving this editor
