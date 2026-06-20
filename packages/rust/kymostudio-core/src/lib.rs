@@ -28,12 +28,11 @@ pub use kymo_layout::{self as layout, dagre as layout_dagre};
 // engine, depends only on kymo-graph; no merman).
 pub use kymo_mermaid::{classdiagram, mermaid, sequence};
 pub use kymo_mermaid::{
-    mermaid_to_d2, mermaid_to_drawio, mermaid_to_dot, mermaid_to_gaphor, mermaid_to_kymojson,
-    mermaid_to_mdj, mermaid_to_mermaid, mermaid_to_svg, mermaid_to_svg_auto, mermaid_to_svg_dagre,
-    mermaid_to_svg_styled,
-    mermaid_to_xmi, mermaid_block_to_svg, mermaid_class_to_svg, mermaid_er_to_svg,
-    mermaid_kanban_to_svg, mermaid_mindmap_to_svg, mermaid_requirement_to_svg,
-    mermaid_to_sequence_svg, mermaid_state_to_svg, render_flowchart_math,
+    mermaid_block_to_svg, mermaid_class_to_svg, mermaid_er_to_svg, mermaid_kanban_to_svg,
+    mermaid_mindmap_to_svg, mermaid_requirement_to_svg, mermaid_state_to_svg, mermaid_to_d2,
+    mermaid_to_dot, mermaid_to_drawio, mermaid_to_gaphor, mermaid_to_kymojson, mermaid_to_mdj,
+    mermaid_to_mermaid, mermaid_to_sequence_svg, mermaid_to_svg, mermaid_to_svg_auto,
+    mermaid_to_svg_dagre, mermaid_to_svg_styled, mermaid_to_xmi, render_flowchart_math,
 };
 
 // The `.kymo` DSL front-end (parser + layout + alignment + rich SVG renderer) —

@@ -13,7 +13,12 @@ pub fn layout(sizes: &[(f64, f64)], edges: &[(usize, usize)]) -> Vec<(f64, f64)>
     }
     let nodes: Vec<IndexedNode> = sizes
         .iter()
-        .map(|&(w, h)| IndexedNode { width: w.max(1.0), height: h.max(1.0), x: 0.0, y: 0.0 })
+        .map(|&(w, h)| IndexedNode {
+            width: w.max(1.0),
+            height: h.max(1.0),
+            x: 0.0,
+            y: 0.0,
+        })
         .collect();
     let edges: Vec<IndexedEdge> = edges
         .iter()
@@ -23,7 +28,11 @@ pub fn layout(sizes: &[(f64, f64)], edges: &[(usize, usize)]) -> Vec<(f64, f64)>
     let pts = match layout_indexed(&nodes, &edges, &Default::default()) {
         Ok(p) => p,
         Err(_) => {
-            return sizes.iter().enumerate().map(|(i, _)| (i as f64 * 120.0, 0.0)).collect()
+            return sizes
+                .iter()
+                .enumerate()
+                .map(|(i, _)| (i as f64 * 120.0, 0.0))
+                .collect()
         }
     };
     let mut out: Vec<(f64, f64)> = pts.iter().map(|p| (p.x, p.y)).collect();

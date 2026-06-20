@@ -15,17 +15,16 @@
 //! - **`wasm`** — the `mermaidToSvgAuto` JS surface (all grammars, raster-safe).
 
 // ── kymo's OWN mermaid engine — always compiled, depends only on kymo-graph ───
-pub mod classdiagram;
 pub mod block_svg;
+pub mod classdiagram;
+mod engine;
 pub mod kanban_svg;
-pub mod mindmap_svg;
 pub mod mermaid;
+pub mod mindmap_svg;
 pub mod render;
 pub mod sequence;
-mod engine;
 pub use engine::*;
 pub use render::MermaidFlowchart;
-
 
 // ── native multi-grammar dispatch (raster-safe, no merman; feature `wasm`) ────
 #[cfg(feature = "wasm")]
@@ -42,7 +41,6 @@ mod wasm_native {
         crate::mermaid_to_svg_auto(source).map_err(|e| JsError::new(&e.to_string()))
     }
 }
-
 
 // ── native KaTeX math (`$$…$$`) via kymo-tex (feature `math`, default-on) ──────
 // Pure Rust, no merman: `katex` lays a formula out with KaTeX's own fonts and

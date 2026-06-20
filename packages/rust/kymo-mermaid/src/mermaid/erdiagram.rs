@@ -216,7 +216,6 @@ fn crow_of(tok: &str) -> Crow {
     }
 }
 
-
 /// Decode entities + convert generics (`type~T~`→`type<T>`) in attribute text.
 fn attr_text(s: &str) -> String {
     subst_generics(&super::decode_entities(s))

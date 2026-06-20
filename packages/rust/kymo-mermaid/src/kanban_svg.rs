@@ -76,10 +76,8 @@ pub fn render(fc: &Flowchart) -> String {
         // Pre-measure card heights to size the column.
         let wrapped: Vec<Vec<String>> = cards.iter().map(|c| wrap(c, max_chars)).collect();
         let card_h = |lines: &[String]| (lines.len() as i64 * LINE_H + 16).max(36);
-        let col_h = HEADER_H
-            + PAD
-            + wrapped.iter().map(|w| card_h(w) + CARD_GAP).sum::<i64>()
-            + PAD;
+        let col_h =
+            HEADER_H + PAD + wrapped.iter().map(|w| card_h(w) + CARD_GAP).sum::<i64>() + PAD;
         max_h = max_h.max(col_h);
 
         // Column section background + title.

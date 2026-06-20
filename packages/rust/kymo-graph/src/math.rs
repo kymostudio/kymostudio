@@ -434,6 +434,9 @@ mod tests {
         // uppercase Greek incl. the Latin look-alikes (Alpha/Beta/Eta/… were
         // missing from the table; KaTeX renders them as upright Latin glyphs)
         assert_eq!(render(r"$$\\Alpha\\Beta\\Gamma\\Delta\\Epsilon$$"), "ABΓΔE");
-        assert_eq!(render(r"$$\\Eta\\Iota\\Kappa\\Mu\\Nu\\Rho\\Tau\\Chi$$"), "HIKMNPTX");
+        assert_eq!(
+            render(r"$$\\Eta\\Iota\\Kappa\\Mu\\Nu\\Rho\\Tau\\Chi$$"),
+            "HIKMNPTX"
+        );
     }
 }

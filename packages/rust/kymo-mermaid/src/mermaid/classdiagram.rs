@@ -147,7 +147,10 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             if let Some((ids, name)) = rest.rsplit_once(char::is_whitespace) {
                 let name = name.trim().to_string();
                 for id in ids.trim().trim_matches('"').split(',') {
-                    style_refs.entry(id.trim().to_string()).or_default().push(name.clone());
+                    style_refs
+                        .entry(id.trim().to_string())
+                        .or_default()
+                        .push(name.clone());
                 }
             }
             continue;
@@ -172,7 +175,10 @@ pub fn parse(src: &str) -> Result<ClassDiagram, MermaidError> {
             // `class X:::styleName` — record the inline style reference.
             if let Some((base, sty)) = head.split_once(":::") {
                 let key = decl_class_key(base);
-                style_refs.entry(key).or_default().push(sty.trim().to_string());
+                style_refs
+                    .entry(key)
+                    .or_default()
+                    .push(sty.trim().to_string());
             }
             let ci = decl_class(&mut cd.classes, head);
             let id = cd.classes[ci].id.clone();
@@ -325,7 +331,9 @@ fn decl_class(classes: &mut Vec<ClassBox>, head: &str) -> usize {
     let (head, label) = match head.find('[') {
         Some(b) if head.ends_with(']') => (
             head[..b].trim(),
-            Some(decode_entities(head[b + 1..head.len() - 1].trim().trim_matches('"'))),
+            Some(decode_entities(
+                head[b + 1..head.len() - 1].trim().trim_matches('"'),
+            )),
         ),
         _ => (head, None),
     };

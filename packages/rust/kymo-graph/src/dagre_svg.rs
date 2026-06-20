@@ -100,7 +100,9 @@ impl ThemeColors {
             s.push_str(&format!(".fc-shape{{fill:{c}}}"));
         }
         if let Some(c) = &self.node_stroke {
-            s.push_str(&format!(".fc-shape{{stroke:{c}}}.fc-shape-line{{stroke:{c}}}"));
+            s.push_str(&format!(
+                ".fc-shape{{stroke:{c}}}.fc-shape-line{{stroke:{c}}}"
+            ));
         }
         if let Some(c) = &self.text {
             s.push_str(&format!("text{{fill:{c}}}.fc-label{{fill:{c}}}"));
@@ -185,8 +187,16 @@ pub fn render(
     };
     // Theme (from `%%{init themeVariables}%%`): a CSS override on the default palette
     // + a background fill rect. None on un-themed diagrams (byte-identical to before).
-    let theme_css = geom.theme.as_ref().map(ThemeColors::css_override).unwrap_or_default();
-    let theme_defs = geom.theme.as_ref().and_then(|t| t.gradient.clone()).unwrap_or_default();
+    let theme_css = geom
+        .theme
+        .as_ref()
+        .map(ThemeColors::css_override)
+        .unwrap_or_default();
+    let theme_defs = geom
+        .theme
+        .as_ref()
+        .and_then(|t| t.gradient.clone())
+        .unwrap_or_default();
     if let Some(b) = geom.theme.as_ref().and_then(|t| t.background.as_ref()) {
         bg = format!("<rect width=\"{w}\" height=\"{h}\" fill=\"{b}\"/>\n{bg}");
     }

@@ -101,9 +101,20 @@ fn theme_colors(src: &str) -> Option<kymo_graph::dagre_svg::ThemeColors> {
         .collect();
     let c = |s: &str| Some(s.to_string());
     let (nf, ns, tx, ln, cf, cs) = match val.as_str() {
-        "dark" => ("#1f2020", "#ccc", "#ccc", "lightgrey", "hsl(180,1.6%,28.4%)", "rgba(255,255,255,0.25)"),
-        "forest" => ("#cde498", "#13540c", "#333333", "#000000", "#cdffb2", "#6eaa49"),
-        "neutral" => ("#eeeeee", "#999999", "#333333", "#666666", "#ffffff", "#aaaaaa"),
+        "dark" => (
+            "#1f2020",
+            "#ccc",
+            "#ccc",
+            "lightgrey",
+            "hsl(180,1.6%,28.4%)",
+            "rgba(255,255,255,0.25)",
+        ),
+        "forest" => (
+            "#cde498", "#13540c", "#333333", "#000000", "#cdffb2", "#6eaa49",
+        ),
+        "neutral" => (
+            "#eeeeee", "#999999", "#333333", "#666666", "#ffffff", "#aaaaaa",
+        ),
         _ => return None,
     };
     Some(ThemeColors {

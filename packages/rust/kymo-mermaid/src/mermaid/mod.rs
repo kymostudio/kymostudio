@@ -417,7 +417,11 @@ fn touch_node(fc: &mut Flowchart, index: &mut Vec<(String, usize)>, n: &parser::
         let idx = fc.nodes.len();
         fc.nodes.push(FlowNode {
             id: n.id.clone(),
-            label: n.label.as_deref().map(strip_html).unwrap_or_else(|| n.id.clone()),
+            label: n
+                .label
+                .as_deref()
+                .map(strip_html)
+                .unwrap_or_else(|| n.id.clone()),
             shape: n.shape.unwrap_or(Shape::Rect),
         });
         index.push((n.id.clone(), idx));

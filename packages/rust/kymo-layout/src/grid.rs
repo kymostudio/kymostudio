@@ -52,7 +52,11 @@ fn cell_w(label: &str, span: usize) -> f64 {
 
 /// Lay a grid out at its own origin; returns (placed boxes, width, height).
 pub fn layout(g: &Grid) -> (Vec<Placed>, f64, f64) {
-    let cols = if g.columns > 0 { g.columns } else { g.items.len().max(1) };
+    let cols = if g.columns > 0 {
+        g.columns
+    } else {
+        g.items.len().max(1)
+    };
 
     // Pre-size every item (nested grids recursively) so the column unit + spans
     // can account for their real width — this is what fixes nested-overlap.
@@ -65,11 +69,26 @@ pub fn layout(g: &Grid) -> (Vec<Placed>, f64, f64) {
     let mut sized: Vec<Sized> = Vec::new();
     for it in &g.items {
         match it {
-            Item::Cell(c) => sized.push(Sized { w: cell_w(&c.label, c.span), h: CELL_H, sub: None, item: it }),
-            Item::Space(sp) => sized.push(Sized { w: CELL_W * *sp as f64 + GAP * (*sp as f64 - 1.0), h: CELL_H, sub: None, item: it }),
+            Item::Cell(c) => sized.push(Sized {
+                w: cell_w(&c.label, c.span),
+                h: CELL_H,
+                sub: None,
+                item: it,
+            }),
+            Item::Space(sp) => sized.push(Sized {
+                w: CELL_W * *sp as f64 + GAP * (*sp as f64 - 1.0),
+                h: CELL_H,
+                sub: None,
+                item: it,
+            }),
             Item::Grid(sub) => {
                 let (p, w, h) = layout(sub);
-                sized.push(Sized { w, h, sub: Some(p), item: it });
+                sized.push(Sized {
+                    w,
+                    h,
+                    sub: Some(p),
+                    item: it,
+                });
             }
         }
     }

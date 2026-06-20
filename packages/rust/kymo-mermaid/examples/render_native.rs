@@ -4,7 +4,9 @@
 use kymo_mermaid as km;
 
 fn main() {
-    let path = std::env::args().nth(1).expect("usage: render_native <file.mmd>");
+    let path = std::env::args()
+        .nth(1)
+        .expect("usage: render_native <file.mmd>");
     let src = std::fs::read_to_string(&path).expect("read");
     eprintln!("[{}] {path}", km::diagram_kind(&src));
     match km::mermaid_to_svg_auto(&src) {

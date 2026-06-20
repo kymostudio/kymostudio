@@ -69,7 +69,8 @@ pub fn render_to_svg(list: &DisplayList, opts: &SvgOptions) -> String {
     #[cfg(feature = "standalone")]
     let prerendered_glyphs: Option<Vec<Option<standalone::StandaloneGlyph>>> = {
         if load_fonts {
-            if let Ok(fonts) = kymo_tex_font_loader::load_fonts_for_items(&opts.font_dir, &list.items)
+            if let Ok(fonts) =
+                kymo_tex_font_loader::load_fonts_for_items(&opts.font_dir, &list.items)
             {
                 if let Ok(font_refs) = standalone::build_font_refs(&fonts) {
                     let em = opts.em_px();

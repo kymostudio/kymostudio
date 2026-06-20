@@ -313,7 +313,10 @@ fn ensure_decl(seq: &mut Sequence, rest: &str, is_actor: bool) {
             let close = after.find('}');
             let meta = &after[..close.unwrap_or(after.len())];
             let tail = close.map(|c| &after[c + 1..]).unwrap_or("");
-            (format!("{} {}", &rest[..at], tail).trim().to_string(), meta_type(meta))
+            (
+                format!("{} {}", &rest[..at], tail).trim().to_string(),
+                meta_type(meta),
+            )
         }
         None => (rest.to_string(), String::new()),
     };
@@ -331,7 +334,12 @@ fn ensure_decl(seq: &mut Sequence, rest: &str, is_actor: bool) {
             p.kind = kind;
         }
     } else {
-        seq.participants.push(Participant { id, label, is_actor, kind });
+        seq.participants.push(Participant {
+            id,
+            label,
+            is_actor,
+            kind,
+        });
     }
 }
 
