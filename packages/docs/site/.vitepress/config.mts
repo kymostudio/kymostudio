@@ -55,6 +55,16 @@ export default defineConfig({
         ],
       },
       {
+        text: "Layouts",
+        items: [
+          { text: "Overview", link: "/layouts/" },
+          { text: "Layered (Dagre)", link: "/layouts/dagre" },
+          { text: "Layered (Sugiyama)", link: "/layouts/layered" },
+          { text: "Grid", link: "/layouts/grid" },
+          { text: "Force-directed", link: "/layouts/force" },
+        ],
+      },
+      {
         text: "References",
         items: [
           { text: "The .kymo Language", link: "/guide/dsl-guide" },
