@@ -1,7 +1,7 @@
 ---
 title: Connect AI — MCP/AI connection states (as surfaced in the editor)
 document_id: DESIGN-KAI-002
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -75,10 +75,28 @@ The flow a connection moves through (informative, not a normative FSM — the §
 
 A worker redeploy or connection drop returns the host to **Disconnected** (the MCP connector drops — see [[mcp-connector-drops-on-redeploy]]); the editor signals simply go stale.
 
-> An illustrative `stateDiagram-v2` of this flow ships as the sample diagram **"Connect AI — States"** in the Kymo project; it visualises the §4 transitions and the two notes ("composer disabled" / "chat composer ENABLED").
+```mermaid
+stateDiagram-v2
+    [*] --> Disconnected
+    Disconnected --> Connecting: add MCP client (Setup) + Google OAuth
+    Connecting --> Active: agent runs a tool — CS-02 fresh
+    Connecting --> Disconnected: auth failed / cancelled
+    Active --> Listening: wait_for_user_message — CS-05 fresh
+    Listening --> Active: ~35s idle — CS-05 stale
+    Active --> Waiting: ~120s idle — CS-02 stale
+    Waiting --> Active: agent acts again — CS-02 fresh
+    Active --> Disconnected: worker redeploy / drop
+    Listening --> Disconnected: connection drop
+    note right of Listening: chat composer ENABLED (CS-05)
+    note right of Active: CS-04 (AI target) is an orthogonal pin (✨ / ui_switch_session)
+    note left of Disconnected: composer disabled
+```
+
+> The flow above is informative — the **CS-01..CS-06** signals in §2 are the source of truth (they are orthogonal, not a single FSM; e.g. CS-04 "AI target" applies in any of Active/Listening/Waiting). The same picture also ships as the sample diagram **"Connect AI — States"** in the Kymo project.
 
 ## Annex A — Revision History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-06-20 | Vũ Anh | Initial note: the MCP/AI connection states Connect AI surfaces (Socket up / AI active / Waiting / AI target / Listening + the Simulate preference), how each is detected (signal + freshness window) and where it shows, plus the informative connect flow. Supplements `DESIGN-KAI-001`. |
+| 0.2 | 2026-06-20 | Vũ Anh | Numbered the signals **CS-01..CS-06** (§2) and cross-referenced them from §3/§4; embedded a `stateDiagram-v2` mermaid diagram of the connect flow in §4. |
