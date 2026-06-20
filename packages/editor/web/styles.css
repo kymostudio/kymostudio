@@ -708,6 +708,64 @@ button:active, .btn:active, .pill:active { transform: translateY(1px); }
 .cn-conn-badge.gone { color: var(--dim); }
 .cn-conn-reconnect { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
 
+/* ===== Connect AI · Connection tab — modern redesign (cn2) ===== */
+.cn2 { display: flex; flex-direction: column; gap: 16px; }
+
+/* status hero */
+.cn2-hero { display: flex; align-items: center; gap: 11px; padding: 11px 14px; border: 1px solid var(--border); border-radius: 13px; background: var(--bg-soft); }
+.cn2-hero-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); }
+.cn2-hero.on { border-color: color-mix(in srgb, #16a34a 32%, var(--border)); background: color-mix(in srgb, #16a34a 8%, transparent); }
+.cn2-hero.on .cn2-hero-dot { background: #16a34a; animation: mcp-pulse 1.8s ease-in-out infinite; }
+.cn2-hero-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cn2-hero-txt b { font-size: 13px; font-weight: 700; color: var(--ink); }
+.cn2-hero.on .cn2-hero-txt b { color: #15803d; }
+.cn2-hero-txt span { font-size: 11.5px; color: var(--dim); }
+
+/* section */
+.cn2-sec { display: flex; flex-direction: column; gap: 9px; }
+.cn2-sec-head { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--dim); }
+.cn2-count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--bg-soft); border: 1px solid var(--border); font-size: 10.5px; font-weight: 700; color: var(--ink); letter-spacing: 0; }
+.cn2-sess { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; font-weight: 600; color: var(--ink); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; letter-spacing: 0; text-transform: none; }
+
+/* client cards */
+.cn2-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cn2-card { display: flex; align-items: center; gap: 11px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 13px; background: var(--bg); transition: border-color .15s, background .15s; }
+.cn2-card.cn2-warn { border-color: color-mix(in srgb, #f59e0b 38%, var(--border)); background: color-mix(in srgb, #f59e0b 5%, transparent); }
+.cn2-card.cn2-gone { opacity: .6; }
+.cn2-card-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cn2-card-top { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.cn2-card-name { font-size: 13px; font-weight: 650; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cn2-ver { flex: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; color: var(--dim); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 5px; padding: 0 4px; }
+.cn2-card-meta { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* app-icon tile */
+.ai-tile { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; overflow: hidden; box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 6%, transparent); }
+.ai-tile svg { width: 21px; height: 21px; display: block; }
+.ai-mono svg, .ai-mono svg * { fill: var(--ai-fg) !important; }
+.ai-monogram { font-size: 16px; font-weight: 700; line-height: 1; }
+
+/* status pill */
+.cn2-pill { flex: none; display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 600; padding: 3px 8px 3px 6px; border-radius: 999px; }
+.cn2-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.cn2-pill-ok { color: #15803d; background: color-mix(in srgb, #16a34a 11%, transparent); }
+.cn2-pill-warn { color: #b45309; background: color-mix(in srgb, #f59e0b 14%, transparent); }
+.cn2-pill-gone { color: var(--dim); background: var(--bg-soft); }
+.cn2-reconnect { flex: none; font: inherit; font-size: 11px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+.cn2-reconnect:hover { text-decoration: underline; }
+
+/* this-window target toggle */
+.cn2-target { display: flex; align-items: center; gap: 9px; width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--ink); font-size: 12.5px; font-weight: 600; cursor: pointer; transition: border-color .15s, background .15s; }
+.cn2-target:hover { background: var(--bg-soft); }
+.cn2-target.on { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); background: color-mix(in srgb, var(--accent) 7%, transparent); color: var(--accent); }
+.cn2-target-txt { flex: 1 1 auto; text-align: left; }
+.cn2-switch { flex: none; width: 30px; height: 18px; border-radius: 999px; background: var(--border-strong); position: relative; transition: background .15s; }
+.cn2-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.cn2-switch.on { background: var(--accent); }
+.cn2-switch.on::after { transform: translateX(12px); }
+.cn2-hint { margin: 0; font-size: 11px; line-height: 1.5; color: var(--dim); }
+.cn2-hint code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 5px; padding: 0 4px; }
+.cn2-empty { margin: 0; font-size: 12px; color: var(--dim); }
+
 /* Live activity feed — the AI narrating its work (ui_status) as chat-like lines. */
 /* No frame — just the message bubbles, scrolling with the panel body. */
 .cn-feed { display: flex; flex-direction: column; gap: 8px; }
