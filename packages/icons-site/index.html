@@ -169,16 +169,15 @@
 
     $("#q").addEventListener("input", applyFilter);
 
-    Promise.all([
-      fetch("icons-manifest.json").then((r) => r.json()),
-      fetch("icons-collections.json").then((r) => r.json()).catch(() => ({})),
-    ]).then(([m, coll]) => {
+    fetch("icons-manifest.json").then((r) => r.json()).then((m) => {
       ALL = Object.entries(m.icons).map(([key, path]) => ({ key, path, set: key.split(":")[0] }));
       $("#total").textContent = `· ${ALL.length.toLocaleString()} icons`;
-      // set chips, sorted by size desc
-      const sets = Object.entries(coll).length
-        ? Object.entries(coll).map(([k, v]) => [k, v.total]).sort((a, b) => b[1] - a[1])
-        : [...new Set(ALL.map((i) => i.set))].map((s) => [s, ALL.filter((i) => i.set === s).length]);
+      // set chips from the icons we can actually show (the manifest), sorted by
+      // size desc — collection-only sets (e.g. vendored `ai:`) have no file-backed
+      // art, so they'd render an empty grid; derive counts straight from ALL.
+      const counts = {};
+      for (const i of ALL) counts[i.set] = (counts[i.set] || 0) + 1;
+      const sets = Object.entries(counts).sort((a, b) => b[1] - a[1]);
       const chips = $("#chips");
       const mk = (id, label, n) => {
         const c = document.createElement("button");
