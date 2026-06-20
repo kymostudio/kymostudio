@@ -9,8 +9,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 echo "→ syncing content (docs/ → site/)"
-rm -rf site/guide site/diagrams
-mkdir -p site/guide site/diagrams site/public
+rm -rf site/guide site/diagrams site/layouts
+mkdir -p site/guide site/diagrams site/layouts site/public
 cp ../../docs/guide/getting-started.md   site/guide/
 cp ../../docs/guide/dsl-guide.md         site/guide/
 cp ../../docs/guide/faq.md               site/guide/

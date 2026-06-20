@@ -3,6 +3,7 @@ dist/
 site/.vitepress/cache/
 site/guide/
 site/diagrams/
+site/layouts/
 site/public/logo.svg
 site/public/favicon.svg
 site/public/_redirects
