@@ -164,7 +164,7 @@ export function useListening(): boolean {
 // ---- MCP connection registry (FR-AI-11): the server pushes {type:"mcp-connections"}
 // over /userws whenever a client connects/disconnects (and on a freshly-opened tab).
 // The Connection tab renders this live — no polling. ----
-export type McpConn = { connId: string; client: string; clientVersion: string; protocol: string; serverVersion: string; connectedAt: number; lastSeenAt: number; outdated: boolean; reasons: string[] };
+export type McpConn = { connId: string; sessionId?: string; client: string; clientVersion: string; protocol: string; serverVersion: string; connectedAt: number; lastSeenAt: number; outdated: boolean; reasons: string[] };
 export type ConnData = { connections: McpConn[]; summary: { total: number; connected: number; outdated: number } };
 let connData: ConnData | null = null;
 const connSubs = new Set<() => void>();
