@@ -5,7 +5,8 @@
 //! every `pub fn` here unchanged, so the wasm + Python surfaces are stable.
 
 use crate::{classdiagram, mermaid, sequence};
-use kymo_graph::{drawio, flowchart, flowchart_svg, kymojson, layout, math, style};
+use kymo_graph::{drawio, flowchart, flowchart_svg, kymojson, math, style};
+use kymo_layout as layout;
 
 /// Parse Mermaid source (flowchart) into the `.kymo.json` interchange string.
 ///
@@ -279,7 +280,7 @@ pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
             ..Default::default()
         });
     }
-    let geom = kymo_graph::layout_dagre::dagre_geom(&fc, style::FlowStyle::Mermaid);
+    let geom = kymo_layout::dagre_geom(&fc, style::FlowStyle::Mermaid);
     Ok(kymo_graph::dagre_svg::render(
         &geom,
         style::FlowStyle::Mermaid,

@@ -2,7 +2,7 @@
 //!
 //! This is the hub of the flowchart family: front-ends parse a source DSL into a
 //! [`Flowchart`] (today only `mermaid::parse`), and back-ends consume it — either
-//! [`crate::layout::layout_flowchart`] (→ a positioned [`crate::model::Diagram`]
+//! `kymo_layout::sugiyama::layout_flowchart` (→ a positioned [`crate::model::Diagram`]
 //! for rendering) or the text emitters in [`emit`] (→ Mermaid / D2 / Graphviz
 //! DOT). Keeping the IR here (not inside `mermaid`) is what lets one parse feed
 //! many targets — `mmd → {mermaid, d2, dot}` is a parse plus an emit, with no
@@ -56,7 +56,7 @@ pub struct Subgraph {
     pub direction: Option<Direction>,
 }
 
-/// A parsed flowchart, ready for [`crate::layout::layout_flowchart`] or [`emit`].
+/// A parsed flowchart, ready for `kymo_layout::sugiyama::layout_flowchart` or [`emit`].
 #[derive(Debug, Clone)]
 pub struct Flowchart {
     pub direction: Direction,

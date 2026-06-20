@@ -7,7 +7,7 @@
 //! Only compiled under the `katex-layout` feature (see lib.rs); the math `<g>`
 //! is sized + centred by [`crate::katex_layout`].
 
-use kymo_layout::{layout, to_display_list, LayoutOptions};
+use kymo_tex_layout::{layout, to_display_list, LayoutOptions};
 use kymo_parser::parser::parse;
 use kymo_svg::{render_to_svg, SvgOptions};
 use kymo_types::color::Color;

@@ -53,6 +53,7 @@ serde_json = { version = "1", optional = true }
 # `kymostudio_core::{model,flowchart,layout,dagre_svg,…}`. `dagre` itself now lives
 # inside this crate. The `bpmn` model fields are gated through to it.
 kymo-graph = { path = "../kymo-graph", version = "0.1.0" }
+kymo-layout = { path = "../kymo-layout", version = "0.1.0" }
 # Mermaid front-end (parser + per-grammar renderers + `mermaid_to_*` entry points),
 # re-exported under `kymostudio_core::mermaid` / `::mermaid_to_*`. Default (lean)
 # features: kymo's OWN engine, no merman git dep, no kymo-tex — so the editor wasm

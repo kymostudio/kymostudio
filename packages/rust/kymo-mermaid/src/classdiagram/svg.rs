@@ -1,11 +1,11 @@
 //! Render a [`ClassDiagram`] to SVG. Classes become multi-compartment boxes
 //! (name + attributes + methods), positioned by reusing
-//! [`kymo_graph::layout::layout_flowchart`]; relationships draw the UML arrowhead for
+//! [`kymo_layout::layout_flowchart`]; relationships draw the UML arrowhead for
 //! their kind. Everything is real `<text>`, so PNG/PDF keep the labels.
 
 use super::{ClassBox, ClassDiagram, Crow, RelKind, Relation};
 use kymo_graph::flowchart::{FlowEdge, FlowNode, Flowchart, Subgraph};
-use kymo_graph::layout;
+use kymo_layout as layout;
 use kymo_graph::model::{Component, Shape};
 use std::collections::HashMap;
 
@@ -197,7 +197,7 @@ pub fn render_er_dagre(cd: &ClassDiagram) -> String {
             no_arrow: true,
         });
     }
-    let geom = kymo_graph::layout_dagre::dagre_geom(&fc, FlowStyle::Mermaid);
+    let geom = kymo_layout::dagre_geom(&fc, FlowStyle::Mermaid);
     let pos: HashMap<String, (i32, i32, i32, i32)> = geom
         .nodes
         .iter()

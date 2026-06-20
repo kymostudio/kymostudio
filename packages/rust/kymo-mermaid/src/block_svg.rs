@@ -1,8 +1,8 @@
 //! Render a Mermaid `block` / `block-beta` diagram as its real column grid,
-//! using kymo's own [`kymo_layout_graph::grid`] layout (pure Rust, no merman):
+//! using kymo's own [`kymo_layout::grid`] layout (pure Rust, no merman):
 //! parse → grid tree → layout → raster-safe SVG.
 
-use kymo_layout_graph::grid::{layout, Cell, Grid, Item, Placed};
+use kymo_layout::grid::{layout, Cell, Grid, Item, Placed};
 use std::collections::HashMap;
 
 /// Parse block source → a kymo-layout grid tree + edge list.

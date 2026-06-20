@@ -1,7 +1,7 @@
 //! Render style for the flowchart family: kymo's native look vs a
 //! mermaid.js-like look. Selected per render call (API param) or detected from
 //! the source's frontmatter / `%%{init}%%` directive; the renderer
-//! ([`crate::flowchart_svg`]) and sizing ([`crate::layout`]) branch on it.
+//! ([`crate::flowchart_svg`]) and sizing (`kymo_layout`) branch on it.
 
 /// Visual language of a flowchart render.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

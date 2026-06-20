@@ -1,5 +1,5 @@
 //! Mermaid state diagrams (`stateDiagram` / `stateDiagram-v2`) → the flowchart
-//! IR, so they reuse [`kymo_graph::layout::layout_flowchart`] and the text-based
+//! IR, so they reuse [`kymo_layout::layout_flowchart`] and the text-based
 //! [`kymo_graph::flowchart_svg`] renderer. (merman renders state labels in a
 //! `<foreignObject>`, which the rasterizer drops; this keeps PNG/PDF text.)
 //!

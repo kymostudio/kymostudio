@@ -716,14 +716,15 @@ dependencies = [
 name = "kymo-graph"
 version = "0.1.0"
 dependencies = [
- "dagre",
  "serde_json",
 ]
 
 [[package]]
-name = "kymo-layout-graph"
+name = "kymo-layout"
 version = "0.1.0"
 dependencies = [
+ "dagre",
+ "kymo-graph",
  "kymo-manatee",
 ]
 
@@ -742,7 +743,7 @@ name = "kymo-mermaid"
 version = "0.1.0"
 dependencies = [
  "kymo-graph",
- "kymo-layout-graph",
+ "kymo-layout",
 ]
 
 [[package]]
@@ -750,6 +751,7 @@ name = "kymostudio-core"
 version = "0.4.9"
 dependencies = [
  "kymo-graph",
+ "kymo-layout",
  "kymo-mermaid",
  "pyo3",
  "regex",

@@ -3,7 +3,7 @@
 
 use std::path::PathBuf;
 
-use kymo_layout::{layout, to_display_list, LayoutOptions};
+use kymo_tex_layout::{layout, to_display_list, LayoutOptions};
 use kymo_parser::parser::parse;
 use kymo_svg::{render_to_svg, SvgOptions};
 use resvg::{tiny_skia, usvg};
@@ -346,8 +346,8 @@ fn golden_svg_mhchem_pass_rate() {
 /// Standalone SVG: color emoji embedded as `data:image/png;base64` (Apple Color Emoji sbix).
 #[cfg(target_os = "macos")]
 mod macos_emoji_svg {
-    use kymo_layout::to_display_list;
-    use kymo_layout::{layout, LayoutOptions};
+    use kymo_tex_layout::to_display_list;
+    use kymo_tex_layout::{layout, LayoutOptions};
     use kymo_parser::parser::parse;
     use kymo_svg::{render_to_svg, SvgOptions};
 

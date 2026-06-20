@@ -5,7 +5,7 @@
 //! format). draw.io is a generic WYSIWYG format that needs explicit geometry, so
 //! unlike the [`crate::flowchart::emit`] text spokes (which emit the positionless
 //! IR and let the target lay out) this consumes the **positioned** `Diagram` that
-//! [`crate::layout::layout_flowchart`] produces. Output is plain (uncompressed)
+//! `kymo_layout::sugiyama::layout_flowchart` produces. Output is plain (uncompressed)
 //! mxfile XML — app.diagrams.net reads it directly.
 
 use crate::model::Diagram;

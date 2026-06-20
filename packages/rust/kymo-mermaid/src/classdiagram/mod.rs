@@ -1,7 +1,7 @@
 //! Class-diagram IR. A `classDiagram` parses to a set of class boxes (name,
 //! stereotype, attribute and method compartments) plus typed relationships.
 //! Rendered by [`svg`] as real `<text>` (raster-safe), positioned by reusing
-//! [`kymo_graph::layout::layout_flowchart`].
+//! [`kymo_layout::layout_flowchart`].
 
 use kymo_graph::flowchart::Direction;
 

@@ -1,4 +1,4 @@
-use kymo_layout::{layout, to_display_list, LayoutOptions};
+use kymo_tex_layout::{layout, to_display_list, LayoutOptions};
 use kymo_parser::parser::parse;
 use kymo_types::display_item::DisplayItem;
 
