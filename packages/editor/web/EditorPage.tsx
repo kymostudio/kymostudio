@@ -20,7 +20,7 @@ import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
 import { readDoc, writeDoc, dropDoc } from "./doccache";
 import { KLoader } from "./kloader";
-import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, SquareCode, Eye, Download, ChevronDown, FilePlus2, X, Sparkles } from "lucide-react";
+import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, PanelRight, SquareCode, Eye, Download, ChevronDown, FilePlus2, X, Sparkles } from "lucide-react";
 
 export default function EditorPage() {
   const { claims, signedIn, signOut, devSignIn } = useAuth();
@@ -834,6 +834,9 @@ export default function EditorPage() {
               )}
               <button className={"pane-tg" + (panes.source ? " on" : "")} onClick={() => togglePane("source")} title="Toggle Source" aria-pressed={panes.source}><SquareCode size={16} strokeWidth={2} /></button>
               <button className={"pane-tg" + (panes.preview ? " on" : "")} onClick={() => togglePane("preview")} title="Toggle Preview" aria-pressed={panes.preview}><Eye size={16} strokeWidth={2} /></button>
+              {claims && !shared && (
+                <button className={"pane-tg" + (connectOpen ? " on" : "")} onClick={() => setConnectOpen((o) => !o)} title="Toggle Connect AI" aria-pressed={connectOpen}><PanelRight size={16} strokeWidth={2} /></button>
+              )}
             </div>
           )}
           {/* guests have no Explorer/activity-bar rail — surface New here in the header */}
