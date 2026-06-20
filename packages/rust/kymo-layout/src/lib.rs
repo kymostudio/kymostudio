@@ -16,5 +16,5 @@ pub mod sugiyama;
 
 // Convenience re-exports so callers use `kymo_layout::dagre_geom` /
 // `kymo_layout::layout_flowchart` directly.
-pub use dagre::dagre_geom;
+pub use dagre::{dagre_geom, dagre_geom_with_math};
 pub use sugiyama::{layout_flowchart, layout_flowchart_styled};

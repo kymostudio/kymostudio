@@ -55,7 +55,7 @@ jobs:
         # 22 grammars stripped by LTO because nothing references their dispatch.
         # `merman` feature = the merman-backed slice (kymo's own engine is now the
         # crate default; LTO strips it here since the editor only loads the slice).
-        run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm,merman
+        run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm,math
       - name: Build packages/js with the fresh core
         working-directory: packages/js
         run: |

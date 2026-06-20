@@ -37,13 +37,15 @@ impl MermaidFlowchart {
     /// the labels first; geometry uses the dagre adapter (or merman under
     /// `katex-layout`).
     pub fn parse(src: &str) -> Result<Self, MermaidError> {
-        let mut fc = parse_flowchart_ir(src)?;
-        crate::render_flowchart_math(&mut fc);
+        let mut fc = mermaid::parse_with_config(src)?.0;
+        // Collect `$$…$$` glyph boxes BEFORE labels are cleaned to Unicode, so the
+        // dagre layout sizes math nodes/edges by their KaTeX box and draws glyphs.
+        let (node_math, edge_math) = collect_math(&fc);
+        crate::render_flowchart_math(&mut fc); // Unicode fallback for any math
         let style = FlowStyle::Mermaid;
         let (node_styles, default_style) = mermaid::extract_node_styles(src);
-        let mut geom = layout(src, &fc, style);
-        // Apply a `%%{init: {theme: …}}%%` palette (dark/forest/neutral) when the
-        // layout didn't already carry one (merman lifts it under `full`).
+        let mut geom = kymo_layout::dagre_geom_with_math(&fc, style, &node_math, &edge_math);
+        // Apply a `%%{init: {theme: …}}%%` palette (dark/forest/neutral).
         if geom.theme.is_none() {
             geom.theme = theme_colors(src);
         }
@@ -66,34 +68,20 @@ impl MermaidFlowchart {
     }
 }
 
-/// Parse mermaid source to kymo's `Flowchart` IR. Under `katex-layout`, use
-/// **merman's** grammar-faithful parser (translated to kymo structs) for 100%
-/// topology parity, falling back to kymo's own parser if merman can't parse it.
-#[cfg(feature = "katex-layout")]
-fn parse_flowchart_ir(src: &str) -> Result<Flowchart, MermaidError> {
-    if let Some(fc) = crate::katex_layout::flowchart_from_merman(src) {
-        return Ok(fc);
-    }
-    Ok(mermaid::parse_with_config(src)?.0)
+/// `$$…$$` glyph boxes per node id / edge endpoints, for the dagre math sizing.
+/// With `math` (default) kymo-tex renders the glyphs; without it the maps are
+/// empty and math labels fall back to their Unicode form.
+type MathMaps = (
+    std::collections::HashMap<String, kymo_layout::dagre::MathBox>,
+    std::collections::HashMap<(String, String), kymo_layout::dagre::MathBox>,
+);
+#[cfg(feature = "math")]
+fn collect_math(fc: &Flowchart) -> MathMaps {
+    crate::math_glyph::collect(fc)
 }
-#[cfg(not(feature = "katex-layout"))]
-fn parse_flowchart_ir(src: &str) -> Result<Flowchart, MermaidError> {
-    Ok(mermaid::parse_with_config(src)?.0)
-}
-
-/// Default geometry: kymo's OWN dagre adapter (lean, Unicode math, raster-safe).
-#[cfg(not(feature = "katex-layout"))]
-fn layout(_src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
-    kymo_layout::dagre_geom(fc, style)
-}
-
-/// `katex-layout` geometry: merman's mermaid-exact positions sized by kymo's
-/// browser-calibrated metrics, falling back to the dagre adapter if merman can't
-/// lay the graph out.
-#[cfg(feature = "katex-layout")]
-fn layout(src: &str, fc: &Flowchart, style: FlowStyle) -> FGeom {
-    crate::katex_layout::build_geom(src, fc)
-        .unwrap_or_else(|| kymo_layout::dagre_geom(fc, style))
+#[cfg(not(feature = "math"))]
+fn collect_math(_fc: &Flowchart) -> MathMaps {
+    Default::default()
 }
 
 /// Map a `%%{init: {"theme": "dark"|"forest"|"neutral"}}%%` directive to kymo's

@@ -13,6 +13,18 @@ use kymo_graph::style::FlowStyle;
 use dagre::graph::{Graph, GraphOptions};
 use dagre::layout::layout;
 use dagre::layout::types::{EdgeLabel, LayoutOptions, NodeLabel, RankDir};
+use std::collections::HashMap;
+
+/// A pre-rendered `$$…$$` glyph group plus its pixel size, computed by the caller
+/// (kymo-mermaid via kymo-tex) so this crate stays math-engine-free. Keyed by node
+/// id (nodes) or `(src, dst)` (edges) in the maps passed to [`dagre_geom_with_math`].
+pub type MathBox = (String, f64, f64);
+
+/// Box size for a math node/edge: glyph content + box padding, floored to a
+/// sensible minimum (mirrors the text path's `(tw + 30).max(56)` shaping).
+fn math_box_size((_, w, h): &MathBox) -> (f64, f64) {
+    ((w + 24.0).max(56.0), (h + 18.0).max(40.0))
+}
 
 const MX: f64 = 8.0;
 const MY: f64 = 8.0;
@@ -368,6 +380,19 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
 }
 
 pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
+    dagre_geom_with_math(fc, style, &HashMap::new(), &HashMap::new())
+}
+
+/// Like [`dagre_geom`] but sizes `$$…$$` nodes/edges by their pre-rendered glyph
+/// box and carries the glyph through to `FNode.math` / `FEdge.math`. Math sizing
+/// applies to the flat (non-nested) path; a math node inside a subgraph falls
+/// back to its (Unicode) text size.
+pub fn dagre_geom_with_math(
+    fc: &Flowchart,
+    style: FlowStyle,
+    node_math: &HashMap<String, MathBox>,
+    edge_math: &HashMap<(String, String), MathBox>,
+) -> FGeom {
     let mut geom = FGeom::default();
     if fc.nodes.is_empty() {
         geom.w = 40.0;
@@ -401,7 +426,9 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
         if sg_ids.contains(n.id.as_str()) {
             continue;
         }
-        let (w, h) = if matches!(style, FlowStyle::Mermaid) {
+        let (w, h) = if let Some(mb) = node_math.get(n.id.as_str()) {
+            math_box_size(mb)
+        } else if matches!(style, FlowStyle::Mermaid) {
             node_size_mermaid_f(&n.label, n.shape)
         } else {
             let (wi, hi) = node_size_for(&n.label, n.shape, style);
@@ -449,7 +476,9 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
     // Reverse insertion order so the dagre crate's order phase breaks ties
     // the same way dagre-d3-es (mermaid's lib) does.
     for e in fc.edges.iter().rev() {
-        let (lw, lh) = if e.label.is_empty() {
+        let (lw, lh) = if let Some((_, mw, mh)) = edge_math.get(&(e.src.clone(), e.dst.clone())) {
+            (*mw, *mh)
+        } else if e.label.is_empty() {
             (0.0, 0.0)
         } else {
             // mermaid sizes the edge label to its measured text, height 24.
@@ -489,7 +518,7 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
                 w: nd.width,
                 h: nd.height,
                 icon: None,
-                math: None,
+                math: node_math.get(n.id.as_str()).map(|(g, _, _)| g.clone()),
             });
         }
     }
@@ -561,8 +590,9 @@ pub fn dagre_geom(fc: &Flowchart, style: FlowStyle) -> FGeom {
                 no_arrow: e.no_arrow,
                 points,
                 label_pt,
-                // Lean path renders edge math as Unicode in the label text.
-                math: None,
+                math: edge_math
+                    .get(&(e.src.clone(), e.dst.clone()))
+                    .map(|(g, _, _)| g.clone()),
             });
         }
     }

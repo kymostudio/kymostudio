@@ -3,19 +3,12 @@ name = "kymo-mermaid"
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
-description = "Mermaid flowchart -> SVG for the kymo editor: a flowchart-only slice of merman (MIT OR Apache-2.0), linker-trimmed to ~1.5 MB raw / ~473 KB brotli."
+description = "Pure-Rust Mermaid engine: parse + raster-safe SVG for every grammar (flowchart/sequence/class/state/er/block/mindmap/kanban/requirement) with native KaTeX math — no merman, no JS."
 
-# cdylib -> wasm (the editor loads this lazily for kind=mermaid flowcharts);
-# rlib -> native smoke tests.
+# cdylib -> wasm (the editor + render-api load this); rlib -> native tests.
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-# merman is pinned by rev, NOT vendored: every flowchart module it exposes is
-# pub, so calling the flowchart pipeline directly (no Engine/registry dispatch)
-# lets LTO strip the other 22 grammars at link time. default-features = false
-# drops full-config (YAML/json5 front-matter) and full-sanitization (lol_html):
-# the editor sanitizes all SVG client-side with DOMPurify anyway.
-# Measured 2026-06-12: 1.49 MB raw / 473 KB brotli vs mermaid.js 760 KB brotli.
 [dependencies]
 # The shared diagram substrate (Flowchart IR + layout + raster-safe SVG renderer
 # + d2/dot/drawio/kymojson). kymo's OWN mermaid engine (default) builds on this
@@ -23,34 +16,23 @@ crate-type = ["cdylib", "rlib"]
 kymo-graph = { path = "../kymo-graph", version = "0.1.0" }
 kymo-layout = { path = "../kymo-layout", version = "0.1.0" }
 
-# merman (the headless Rust port of mermaid.js), pinned by rev. Optional: only the
-# merman-backed paths (`merman`/`full`/`katex-layout`) pull it in.
-merman-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
-merman-render = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, optional = true }
-# The FULL engine — every grammar through merman's own dispatch (render-api worker).
-merman-bindings-core = { git = "https://github.com/Latias94/merman", rev = "89641493dc9bd72d2e9d8a22ebd0fc7c7c8294a3", default-features = false, features = ["core-full", "render"], optional = true }
-serde_json = { version = "1", optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
 
-# `katex-layout` only: kymo-tex draws `$$…$$` as KaTeX glyph outlines (ttf-parser
-# reads KaTeX's own fonts via kymo-svg). Optional so the lean default never builds them.
+# `math` feature: kymo-tex draws `$$…$$` as KaTeX glyph outlines (ttf-parser reads
+# KaTeX's own fonts via kymo-svg) — pure Rust, no merman. On by default; opt out
+# (`default-features = false`) for the leanest build (math falls back to Unicode).
 kymo-types = { path = "../kymo-tex/crates/kymo-types", optional = true }
 kymo-parser = { path = "../kymo-tex/crates/kymo-parser", optional = true }
 kymo-tex-layout = { path = "../kymo-tex/crates/kymo-tex-layout", optional = true }
 kymo-svg = { path = "../kymo-tex/crates/kymo-svg", default-features = false, features = ["standalone", "embed-fonts"], optional = true }
 
 [features]
-default = []
+default = ["math"]
 wasm = ["dep:wasm-bindgen"]
 
-# merman-backed flowchart slice (the editor's lazy in-browser path).
-merman = ["dep:merman-core", "dep:merman-render", "dep:serde_json"]
-# All-grammar render via merman's own dispatch (render-api worker).
-full = ["merman", "dep:merman-bindings-core"]
-# mermaid-faithful layout (merman) + raster-safe KaTeX math (kymo-tex). Selects
-# mermaid_to_svg_dagre's high-fidelity geometry. Matches mermaid.js to ~0.7%
-# median at ~1.9 MB wasm. Moved here (with merman) from kymostudio-core.
-katex-layout = ["merman", "merman-render/cytoscape-layout", "dep:kymo-types", "dep:kymo-parser", "dep:kymo-tex-layout", "dep:kymo-svg"]
+# Native KaTeX `$$…$$` glyph rendering via kymo-tex (pure Rust). The flowchart
+# renderer sizes math nodes by their glyph box and draws raster-safe outlines.
+math = ["dep:kymo-types", "dep:kymo-parser", "dep:kymo-tex-layout", "dep:kymo-svg"]
 
 [profile.release]
 opt-level = "z"

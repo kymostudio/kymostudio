@@ -8,7 +8,7 @@
 // here. kymostudio's initSync marks the JS lib ready AND instantiates the
 // same core glue (one shared node_modules copy), so one call powers both.
 import mermanWasm from "kymo-mermaid/kymo_mermaid_bg.wasm";
-import { initSync as mermanInit, mermaidRenderSvg } from "kymo-mermaid";
+import { initSync as mermanInit, mermaidToSvgAuto } from "kymo-mermaid";
 import svgbobWasm from "kymo-svgbob/kymo_svgbob_bg.wasm";
 import { initSync as svgbobInit, svgbobToSvg } from "kymo-svgbob";
 import wasmModule from "kymostudio-core/kymostudio_core_bg.wasm";
@@ -109,7 +109,7 @@ export const SELF_RENDERERS: Record<string, (source: string) => string | Promise
     } catch {
       // unsupported syntax for kymo's engine → fall through to merman
     }
-    return mermaidRenderSvg(source);
+    return mermaidToSvgAuto(source);
   },
   d2: (source) => {
     ensure();
