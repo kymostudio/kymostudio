@@ -1,7 +1,7 @@
 ---
 title: "Connect AI CR-001 — Server-side MCP connection registry: per-user view of how many clients are connected and how many are outdated"
 document_id: CR-KAI-001
-version: "1.2"
+version: "1.3"
 issue_date: 2026-06-20
 status: Open
 classification: Internal
@@ -105,13 +105,14 @@ one is a stable per-install id: `clientInfo {name, version}` is **not** unique
 ("claude-code"/"2.1.183" is the same for everyone); the `Mcp-Session-Id` **rotates on
 every reconnect** (so keying by it leaves a *ghost row per reconnect*); the **OAuth
 `client_id`** from Dynamic Client Registration (`/register`) is **stable across
-reconnects** for an install. Keying by `client_id` means a `/mcp` reconnect of the same
-install updates **one** row instead of accumulating ghosts. Sources, in order: the
-authorization grant's `client_id` (added to `props` at `completeAuthorization`, covers
-new auths) → `extra.authInfo.clientId` captured on a tool call and persisted (covers
-tokens minted before that) → the session id (last resort). Trade-off: two windows of the
-*same install* share a token → one row (acceptable — "is my client connected?" stays
-correct); two **different installs** have different `client_id`s → correctly two rows.
+reconnects** for an install. So `connId` = `props.clientId` (added to the grant at
+`completeAuthorization` via `oauthReq.clientId`) → session id when absent. **Limitation:**
+`client_id` only reaches `props` for tokens minted *after* this shipped — a pre-existing
+token (no re-auth) still keys by session id, so it produces a ghost per reconnect. (An
+`extra.authInfo.clientId` fallback was tried and dropped: `authInfo` was not populated in
+this McpAgent setup, and it would arrive only *after* `oninitialized` had already created
+a session-keyed row.) Pre-existing tokens are therefore deduped **in the panel** by
+grouping rows per client (see §3.4); a re-authentication gives clean `client_id` keying.
 
 Storage choice: **`ctx.storage`, not `serializeAttachment`** — MCP clients do not hold
 a WebSocket to `UserChannel` (they reach it via internal `fetch`), so the per-socket
@@ -122,7 +123,7 @@ attachment used for editor windows (`DESIGN-KAI-001` §2) does not apply here.
 The requirement is that a **reconnect or disconnect is reflected in the editor
 immediately, without the agent calling any tool**. So capture hooks the MCP/DO
 lifecycle, not (only) tool calls. The registry key `connId` is the **OAuth `client_id`**
-(stable per install), falling back to the session id (§3.1).
+(stable per install) when present, else the session id (§3.1).
 
 | event | hook in `KymoMCP` | effect |
 |-------|-------------------|--------|
@@ -158,7 +159,8 @@ connection is outdated if **any** hold):
 Returns `{ connections: McpConn[] & {outdated, reasons[]}, summary: {total, connected, outdated} }`
 where `connected` = records seen within `STALE_MS`.
 
-Thresholds (initial): `STALE_MS = 10 min`, `HARD_TTL = 60 min`,
+Thresholds: `STALE_MS = 10 min` (must stay above the ~5 min idle-SSE recycle so an
+alive-but-idle client isn't aged out), `HARD_TTL = 15 min` (prune ghosts quickly),
 `CURRENT_SERVER_VERSION` = the `McpServer` version constant, `MIN_PROTOCOL` = the
 latest protocol the server supports, `MIN_CLIENT` = a small per-client map (initially
 empty / advisory). All tunable in one place.
@@ -172,12 +174,22 @@ empty / advisory). All tunable in one place.
   `lastSeen + STALE_MS` on each upsert; `alarm()` re-pushes the snapshot (re-evaluating
   freshness) and reschedules while any record remains — so an **ungraceful** drop ages
   out of `connected` on its own.
+- **`/userws` auto-reconnect** (`web/userchannel.tsx`): a dropped socket (worker redeploy,
+  network blip) is reconnected with backoff (1→10 s, paused while the tab is hidden,
+  resumed on focus); on reconnect the server re-sends the snapshot. This is what stops the
+  panel/feed from **freezing** after a deploy — previously there was no auto-reconnect so a
+  stale socket left the panel stuck on an old snapshot. *(Scope: the control channel only;
+  the per-diagram `/ws` doc sync keeps its no-auto-reconnect behaviour, risk R10.)*
 - `web/userchannel.tsx` routes the push into a `web/mcpstatus.tsx` `useConnections`
-  signal; the **Connection** tab (`web/connectai.tsx`) renders it **live (no poll)**:
-  a header **"N connected · M outdated"**, then a row per connection — client + version,
-  protocol, "last seen 2m ago" — with an **Outdated** badge whose tooltip lists the
-  reason(s); a `server`-outdated row links to the **Setup** tab to reconnect. This sits
-  **above** the existing per-window pin/target controls (CS-04), which are unchanged.
+  signal that **also re-renders on a 10 s interval**, so "seen … ago" and the
+  connected/stale classification advance between pushes (freshness is recomputed locally).
+- The **Connection** tab (`web/connectai.tsx`) **collapses rows per client** (one MCP
+  session = one row, so a reconnect would add a ghost): the freshest session represents
+  each client app, with a "N sessions" hint; `connected` is recomputed locally from
+  `lastSeenAt`. Header **"N connected · M outdated"**; an `outdated` badge (connected but
+  server/protocol/client-flagged) lists reasons + a `server` reconnect link; a non-fresh
+  group shows a dimmed **Disconnected**. Sits above the per-window pin/target controls
+  (CS-04, unchanged).
 - `GET /api/connections` (auth via `resolveAuth` → `email`) remains for non-WS/debug
   use + the localhost stub.
 
@@ -240,6 +252,7 @@ No requirement/clause text is amended while this CR is **Open**; the re-baseline
 | Date | Actor | Decision |
 |------|-------|----------|
 | 2026-06-20 | Vũ Anh | **Opened.** Root-caused the gap: each MCP client is its own `KymoMCP` DO with no per-user index, and MCP statelessness means only *activity* is observable. Proposed an upsert-on-activity **connection registry** in the existing per-user `UserChannel` DO, fed by a heartbeat from `KymoMCP` (per tool call + `wait_for_user_message` keepalive), read via `/mcp-connections` → `/api/connections`, with **four** outdated reasons (server / stale / protocol / client) surfaced in the Connection tab as "N connected · M outdated". Defined `SN-AI-06` / `FR-AI-11` / `US-AI-06` and the design additions to `DESIGN-KAI-001/002/003`. Code is a follow-up; CR stays Open until it lands and the baseline is re-based. |
+| 2026-06-20 | Vũ Anh | **Stop the panel freezing + collapse ghosts (A+B).** Testing via chrome-anhv showed two issues: (A) after a worker redeploy the `/userws` socket dropped with no auto-reconnect, so the panel froze on a stale snapshot (worsened by the dropped Offline pill); (B) every reconnect of the *same existing token* still keyed by session id (the `authInfo` fallback never populated), piling up ghost rows. Fixes: **`/userws` auto-reconnect** (backoff, visibility-aware) + a **10 s local re-render** so freshness advances between pushes; **dropped the `authInfo` fallback** (keep `props.clientId` for new auths); **`HARD_TTL` 60 → 15 min**; and the panel now **collapses rows per client** (freshest + "N sessions", local freshness, dimmed "Disconnected"). |
 | 2026-06-20 | Vũ Anh | **Keyed the registry by OAuth `client_id`** instead of the session id, so a `/mcp` reconnect of the same install updates one row instead of leaving a ghost per session (the duplicate rows observed in testing). `client_id` sourced from the grant (`props`, via `oauthReq.clientId` at `completeAuthorization`) → `extra.authInfo.clientId` (captured on a tool call + persisted, for pre-existing tokens) → session id. `McpConn` gains a debug-only `sessionId`. |
 | 2026-06-20 | Vũ Anh | **Reworked to lifecycle + live push** (user requirement: a reconnect/disconnect must be detected by the browser **immediately, without calling any tool**). Capture now hooks the MCP/DO lifecycle — register on `server.oninitialized` (connect), refresh on `onStart` (idle SSE wake), drop on `destroy()` (the clean MCP `DELETE`) — instead of relying on tool calls. Added `POST /mcp-gone` + `broadcastConns()` pushing `{type:"mcp-connections"}` over `/userws`, a DO **alarm** backstop for ungraceful drops, and snapshot-on-tab-connect; the editor renders from a `useConnections` signal with **no polling**. Documented the honest limit (clean disconnect instant; ungraceful → `STALE_MS` alarm). First implementation landed (worker + editor). |
 
@@ -248,5 +261,6 @@ No requirement/clause text is amended while this CR is **Open**; the re-baseline
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2026-06-20 | Vũ Anh | Initial — server-side MCP connection registry CR. Finding: each MCP client is a separate `KymoMCP` DO with no per-user index; stateless MCP exposes only activity. Proposed a heartbeat-fed registry in `UserChannel` (record `McpConn`; `POST /mcp-seen` upsert; `GET /mcp-connections` + `GET /api/connections`), with four outdated reasons (server / stale / protocol / client; thresholds `STALE_MS`/`HARD_TTL`/`MIN_PROTOCOL`/`MIN_CLIENT`) surfaced in the Connection tab. Identified `SN-AI-06`/`FR-AI-11`/`US-AI-06` + `DESIGN-KAI-001 §8` / `DESIGN-KAI-002 CS-07` / `DESIGN-KAI-003` as the additions to baseline on close. Status Open. |
+| 1.3 | 2026-06-20 | Vũ Anh | **A+B reliability pass.** `/userws` **auto-reconnect** (backoff, paused while hidden) + 10 s local re-render so the panel/feed never freeze after a redeploy and freshness advances between pushes. Dropped the unreliable `authInfo` client_id fallback (keep `props.clientId`). `HARD_TTL` 60 → 15 min. Panel **collapses rows per client** (freshest + "N sessions"; local connected/stale; dimmed "Disconnected"). |
 | 1.2 | 2026-06-20 | Vũ Anh | Registry **keyed by OAuth `client_id`** (stable per install) rather than the rotating session id, eliminating the ghost-row-per-reconnect duplicates. `client_id` from grant props (`oauthReq.clientId`) → `extra.authInfo.clientId` (cached) → session id. Added debug-only `sessionId` to `McpConn`. |
 | 1.1 | 2026-06-20 | Vũ Anh | Reworked capture to the **connection lifecycle** (register on `oninitialized`, refresh on `onStart`, drop on `destroy()`/`DELETE`) so reconnect/disconnect is detected with **no tool call**; added **live push** over `/userws` (`broadcastConns` + `POST /mcp-gone` + snapshot-on-connect) and a DO **alarm** backstop, replacing the 15 s poll. Stated the clean-vs-ungraceful disconnect limit. First implementation landed. |

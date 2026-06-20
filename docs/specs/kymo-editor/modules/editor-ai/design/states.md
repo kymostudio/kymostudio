@@ -1,7 +1,7 @@
 ---
 title: Connect AI — MCP/AI connection states (as surfaced in the editor)
 document_id: DESIGN-KAI-002
-version: "0.5"
+version: "0.6"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -58,7 +58,7 @@ The same freshness logic can also be kept **server-side, per connection**: `CR-K
 | **CS-04** | **AI target** (`pinned`) | the user pins via ✨ / Connection toggle / `ui_switch_session`; server echoes `{type:"ai-target"}` | sticky (until unpinned / socket drop) | **this** window is where `ui_*` control messages land | ✨ button `.target`; Connection toggle "AI is controlling THIS window" |
 | **CS-05** | **Listening** (`listening`) | server pushes `{type:"listening"}` on each `wait_for_user_message` poll | **35 s** window (a poll fires ~every 25 s) | a process is waiting for the user's typed message | chat composer **enabled** (else disabled with "Waiting for a listener…") |
 | **CS-06** | **Simulate UI** | user toggle (orthogonal preference, not a connection state) | persisted | typed prompts carry `simulate:true` | settings-gear "UI" badge |
-| **CS-07** | **Registered connection** (per MCP client) | `KymoMCP` lifecycle → `UserChannel` registry: **connect** = `server.oninitialized`, **wake / idle-SSE** = `onStart`, **clean disconnect** = `destroy()` (MCP `DELETE`) → `/mcp-gone`; tool calls also refresh `lastSeen`. Each change **pushes** `{type:"mcp-connections"}` over `/userws`; a DO **alarm** ages out ungraceful drops | **`STALE_MS` (10 min)** = *connected*; `> HARD_TTL` (60 min) = pruned | a specific MCP **client install** (Claude / Cursor / Claude Code …) is connected to this account — **keyed by OAuth `client_id`** so a reconnect updates one row (not a ghost per session); record carries client+protocol+server version | **Connection** tab "N connected · M **outdated**" rendered **live (no poll)** + per-connection list (outdated reasons: `server`/`stale`/`protocol`/`client`) — `FR-AI-11`, `CR-KAI-001` |
+| **CS-07** | **Registered connection** (per MCP client) | `KymoMCP` lifecycle → `UserChannel` registry: **connect** = `server.oninitialized`, **wake / idle-SSE** = `onStart`, **clean disconnect** = `destroy()` (MCP `DELETE`) → `/mcp-gone`; tool calls also refresh `lastSeen`. Each change **pushes** `{type:"mcp-connections"}` over `/userws`; a DO **alarm** ages out ungraceful drops | **`STALE_MS` (10 min)** = *connected*; `> HARD_TTL` (60 min) = pruned | a specific MCP **client install** (Claude / Cursor / Claude Code …) is connected to this account — **keyed by OAuth `client_id`** so a reconnect updates one row (not a ghost per session); record carries client+protocol+server version | **Connection** tab "N connected · M **outdated**" rendered **live** (push over a **self-reconnecting** `/userws` + 10 s local re-render — no freeze on redeploy, no poll); rows **collapsed per client** (freshest + "N sessions"; dimmed "Disconnected" when stale) — `FR-AI-11`, `CR-KAI-001` |
 
 CS-02 vs CS-07: **CS-02** is the editor's own client-side, *aggregate* "an AI did
 something here" (120 s, in `mcpstatus.tsx`); **CS-07** is the Worker's *per-connection*
@@ -117,5 +117,6 @@ stateDiagram-v2
 | 0.1 | 2026-06-20 | Vũ Anh | Initial note: the MCP/AI connection states Connect AI surfaces (Socket up / AI active / Waiting / AI target / Listening + the Simulate preference), how each is detected (signal + freshness window) and where it shows, plus the informative connect flow. Supplements `DESIGN-KAI-001`. |
 | 0.2 | 2026-06-20 | Vũ Anh | Numbered the signals **CS-01..CS-06** (§2) and cross-referenced them from §3/§4; embedded a `stateDiagram-v2` mermaid diagram of the connect flow in §4. |
 | 0.3 | 2026-06-20 | Vũ Anh | Added **CS-07** (server-side per-MCP-connection registry, `FR-AI-11` / `CR-KAI-001`): freshness-based "connected" + four outdated reasons (server / stale / protocol / client), surfaced as "N connected · M outdated" in the Connection tab; clarified CS-02 (client-side aggregate) vs CS-07 (server-side per-connection) and nuanced §1. |
+| 0.6 | 2026-06-20 | Vũ Anh | CS-07 reliability (`CR-KAI-001` v1.3): rendered over a **self-reconnecting `/userws`** + 10 s local re-render (no freeze after a redeploy), rows **collapsed per client** (dimmed "Disconnected" when stale). |
 | 0.5 | 2026-06-20 | Vũ Anh | CS-07 **keyed by OAuth `client_id`** (per install) not the rotating session id (`CR-KAI-001` v1.2) — a reconnect updates one row instead of a ghost per session. |
 | 0.4 | 2026-06-20 | Vũ Anh | CS-07 reworked to **lifecycle + live push** (`CR-KAI-001` v1.1): source is `KymoMCP` connect (`oninitialized`) / wake (`onStart`) / clean disconnect (`destroy()`→`DELETE`), each pushing `{type:"mcp-connections"}` over `/userws` (no poll), with a DO alarm for ungraceful drops — so a reconnect/disconnect shows in the editor immediately without any tool call. |

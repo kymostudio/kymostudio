@@ -1,7 +1,7 @@
 ---
 title: Editor AI (Connect AI) — Design
 document_id: DESIGN-KAI-001
-version: "0.4"
+version: "0.5"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -146,7 +146,7 @@ already exists — the `UserChannel` DO — and derives "connected" as *seen rec
 McpConn = { connId, client, clientVersion, protocol, serverVersion, connectedAt, lastSeenAt }
 ```
 
-- `connId` — the registry **key**: the **OAuth `client_id`** (Dynamic Client Registration), which is *stable across reconnects* for an install — so a `/mcp` reconnect updates one row instead of leaving a ghost per session. Sources: grant `props` (`oauthReq.clientId` at `completeAuthorization`) → `extra.authInfo.clientId` (captured on a tool call + persisted, for pre-existing tokens) → the rotating session id (last resort). The `Mcp-Session-Id` is kept as a debug-only `sessionId`. *(`clientInfo {name,version}` is not an id; the session id rotates each reconnect — neither is a stable per-install key.)*
+- `connId` — the registry **key**: the **OAuth `client_id`** (Dynamic Client Registration), *stable across reconnects* for an install, so a `/mcp` reconnect updates one row instead of leaving a ghost per session. Source: grant `props` (`oauthReq.clientId` at `completeAuthorization`) → the rotating session id when absent. `client_id` only reaches `props` for tokens minted after this shipped, so a **pre-existing token still keys by session** (one ghost per reconnect) until re-auth — those are deduped in the panel by **grouping rows per client** (§ browser surface). The `Mcp-Session-Id` is kept as a debug-only `sessionId`. *(`clientInfo {name,version}` is not an id; the session id rotates — neither is a stable per-install key.)*
 - `client`/`clientVersion`/`protocol` — `clientInfo` from the live handshake (`server.getClientVersion()`) + protocol from the persisted `initialize` request.
 - `serverVersion` — the `McpServer` version at connect time (`index.ts` `new McpServer({version})`).
 
@@ -183,18 +183,26 @@ against current constants:
 | `protocol` | `rec.protocol < MIN_PROTOCOL` (host below the server's advertised protocol) |
 | `client` | `clientVersion < MIN_CLIENT[client]` (best-effort; only for clients in the map) |
 
-Thresholds (one place, tunable): `STALE_MS = 10 min`, `HARD_TTL = 60 min`,
-`CURRENT_SERVER_VERSION` = the `McpServer` version, `MIN_PROTOCOL` = latest supported,
-`MIN_CLIENT` = small per-client map (initially advisory). `connected` = seen within `STALE_MS`.
+Thresholds (one place, tunable): `STALE_MS = 10 min` (above the ~5 min idle-SSE recycle),
+`HARD_TTL = 15 min`, `CURRENT_SERVER_VERSION` = the `McpServer` version, `MIN_PROTOCOL` =
+latest supported, `MIN_CLIENT` = small per-client map (initially advisory). `connected` =
+seen within `STALE_MS`.
 
-**Browser surface.** `userchannel.tsx` dispatches the `{type:"mcp-connections"}` push
-into the `mcpstatus.tsx` `useConnections` signal; the **Connection** tab (`connectai.tsx`)
-renders it live — **"N connected · M outdated"** + a row per connection (client + version,
-protocol, last seen) with an outdated-reason badge; a `server`-outdated row links to
-**Setup** to reconnect. The `GET /api/connections` route (auth via `resolveAuth` → `email`,
-CORS like the other `/api/*`; forwards to `UserChannel /mcp-connections`) remains for
-non-WS/debug use and the localhost stub. This is the server-side, per-connection
-counterpart of the client-side activity signal CS-02 — see `DESIGN-KAI-002` **CS-07**.
+**Browser surface.** `userchannel.tsx` keeps the `/userws` socket alive with
+**auto-reconnect** (backoff 1→10 s, paused while the tab is hidden, resumed on focus; the
+server re-sends the snapshot on reconnect) — this is what stops the panel/feed **freezing**
+after a worker redeploy (there was previously no auto-reconnect). It dispatches the
+`{type:"mcp-connections"}` push into the `mcpstatus.tsx` `useConnections` signal, which
+**also re-renders every 10 s** so "seen … ago" + connected/stale advance between pushes.
+The **Connection** tab (`connectai.tsx`) **collapses rows per client** (one MCP session =
+one row, so a reconnect would add a ghost): the freshest session represents the client,
+with a "N sessions" hint and locally-computed freshness — **"N connected · M outdated"**,
+an `outdated` badge (connected but server/protocol/client-flagged) with a `server`
+reconnect link, and a dimmed **Disconnected** for a non-fresh group. `GET /api/connections`
+(auth via `resolveAuth` → `email`) remains for non-WS/debug use + the localhost stub.
+*(Scope: only the `/userws` control channel auto-reconnects; the per-diagram `/ws` doc sync
+keeps risk R10.)* This is the server-side, per-connection counterpart of the client-side
+activity signal CS-02 — see `DESIGN-KAI-002` **CS-07**.
 
 > Limit (inherent to stateless MCP): only a **clean** disconnect (client `DELETE`) is
 > instant; an ungraceful drop ages out via the `STALE_MS` alarm. "Outdated" is advisory
@@ -218,5 +226,6 @@ counterpart of the client-side activity signal CS-02 — see `DESIGN-KAI-002` **
 |---------|------|--------|---------|
 | 0.1 | 2026-06-20 | Vũ Anh | Initial as-built design for Connect AI: `UserChannel` DO + protocol, editor signal hub, reverse channel + listener gating, UI-simulation drivers. Realises `FEAT-KAI-001`. |
 | 0.2 | 2026-06-20 | Vũ Anh | Added **§7 MCP connection registry** (`FR-AI-11`, `CR-KAI-001`): per-user `McpConn` records in `UserChannel` storage, heartbeat from `KymoMCP` (`POST /mcp-seen`), `GET /mcp-connections` + `/api/connections`, the four outdated reasons (server / stale / protocol / client) + thresholds, Connection-tab surface. Renumbered Traceability → §8 and added its `FR-AI-11` row. |
+| 0.5 | 2026-06-20 | Vũ Anh | §7 reliability (`CR-KAI-001` v1.3): `/userws` **auto-reconnect** + 10 s local re-render (panel/feed no longer freeze after a redeploy); dropped the `authInfo` client_id fallback (keep `props.clientId`); `HARD_TTL` 60→15 min; panel **collapses rows per client** (freshest + "N sessions", local freshness, dimmed "Disconnected"). |
 | 0.4 | 2026-06-20 | Vũ Anh | §7 registry **keyed by OAuth `client_id`** (stable per install) instead of the rotating session id (`CR-KAI-001` v1.2) — a `/mcp` reconnect updates one row, no ghost-per-reconnect; `client_id` from grant props → `authInfo` cache → session id; `Mcp-Session-Id` retained as debug-only `sessionId`. |
 | 0.3 | 2026-06-20 | Vũ Anh | §7 reworked to **lifecycle + live push** (`CR-KAI-001` v1.1): register on `oninitialized`, refresh on `onStart` (idle SSE wake), drop on `destroy()` (clean `DELETE`); `POST /mcp-gone` + `broadcastConns()` push `{type:"mcp-connections"}` over `/userws`; DO **alarm** ages out ungraceful drops; editor renders from the `useConnections` signal (**no poll**). Endpoints added to §2. |
