@@ -138,7 +138,10 @@ a.exp-item { text-decoration: none; } /* Docs/Diagrams links inside the ⋯ menu
 
 /* Centered in the header (project name only) — absolute so it sits at the true
    header centre regardless of the brand/nav widths on either side. */
-.addrbar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5; }
+/* z-index 30: the addrbar is a stacking context, so its dropdowns (project switcher,
+   search results) must sit ABOVE the pane .splitter (z-index 5) — otherwise the
+   splitter's border-line paints through an open dropdown. */
+.addrbar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 30; }
 /* VS Code Command Center: a wide centred bar (project switcher · search). */
 .addr-crumbs { display: flex; align-items: center; gap: 4px; width: clamp(280px, 34vw, 460px); height: 32px; padding: 0 4px 0 7px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: background-color 0.14s ease, border-color 0.14s ease; }
 .addr-crumbs:hover { background: var(--bg-raise); border-color: var(--border-strong); }
