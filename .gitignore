@@ -2,8 +2,16 @@
 __pycache__/
 *.pyc
 .DS_Store
-.claude/
-CLAUDE.md
+CLAUDE.local.md
+# .claude: commit shareable agent config (skills/commands/workflows/settings),
+# ignore machine-local runtime state.
+.claude/*
+!.claude/skills/
+!.claude/commands/
+!.claude/workflows/
+!.claude/settings.json
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
 # transient build artefacts
 out/
 tmp/
