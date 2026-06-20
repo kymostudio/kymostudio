@@ -5,6 +5,10 @@
 reads as a directed graph of boxes and arrows. kymo uses a pure-Rust port of the
 same dagre algorithm mermaid.js runs, so positions match mermaid to sub-pixel.
 
+The same graph, laid out two ways — toggle the direction and dagre re-ranks it:
+
+<DagreDemo />
+
 ## How it works
 
 Dagre lays a directed graph out in four passes:

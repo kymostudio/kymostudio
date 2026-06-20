@@ -1,0 +1,37 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 746.5 434" width="746.5" height="434" style="max-width:100%;height:auto" font-family="'trebuchet ms', verdana, arial, sans-serif">
+<style>text{fill:#333333}.fc-shape{fill:#ECECFF;stroke:#9370DB;stroke-width:1}.fc-shape-line{fill:none;stroke:#9370DB;stroke-width:1}.fc-label{font-size:16px;fill:#333333;text-anchor:middle}.edge-path{fill:none;stroke:#333333;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}.edge-label{font-size:16px;fill:#333333;text-anchor:middle;paint-order:stroke;stroke:#e8e8e8;stroke-width:5;stroke-linejoin:round}.region-rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1}.region-label{font-size:16px;fill:#333333;paint-order:stroke;stroke:#ffffde;stroke-width:3}</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker></defs>
+<path class="edge-path" d="M74.13,216.00 L83.06,203.17 C91.99,190.33 109.84,164.67 122.94,151.83 C136.03,139.00 144.37,139.00 148.53,139.00 L152.70,139.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M74.13,270.00 L83.06,282.83 C91.99,295.67 109.84,321.33 122.94,334.17 C136.03,347.00 144.37,347.00 148.53,347.00 L152.70,347.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M225.01,112.00 L234.54,99.17 C244.07,86.33 263.14,60.67 276.83,47.83 C290.53,35.00 298.87,35.00 303.03,35.00 L307.20,35.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M257.20,139.00 L261.37,139.00 C265.53,139.00 273.87,139.00 282.20,139.00 C290.53,139.00 298.87,139.00 303.03,139.00 L307.20,139.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M225.01,166.00 L234.54,178.83 C244.07,191.67 263.14,217.33 276.91,230.17 C290.68,243.00 299.17,243.00 303.41,243.00 L307.65,243.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M420.15,243.00 L424.39,243.00 C428.63,243.00 437.12,243.00 445.53,243.00 C453.93,243.00 462.27,243.00 466.43,243.00 L470.60,243.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M257.20,347.00 L261.37,347.00 C265.53,347.00 273.87,347.00 282.94,347.00 C292.02,347.00 301.83,347.00 306.74,347.00 L311.65,347.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M416.15,347.00 L421.06,347.00 C425.97,347.00 435.78,347.00 445.60,347.00 C455.42,347.00 465.23,347.00 470.14,347.00 L475.05,347.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M569.72,320.00 L576.27,315.83 C582.81,311.67 595.91,303.33 606.62,299.17 C617.33,295.00 625.67,295.00 629.83,295.00 L634.00,295.00" marker-end="url(#arrow)"/>
+<path class="edge-path" d="M569.72,374.00 L576.27,378.17 C582.81,382.33 595.91,390.67 606.62,394.83 C617.33,399.00 625.67,399.00 629.83,399.00 L634.00,399.00" marker-end="url(#arrow)"/>
+<g class="fc-node" data-id="input"><rect class="fc-shape" x="8" y="216" width="94.7" height="54" rx="0"/><text class="fc-label" x="55.35" y="248">input</text>
+</g>
+<g class="fc-node" data-id="node2"><rect class="fc-shape" x="152.7" y="112" width="104.5" height="54" rx="0"/><text class="fc-label" x="204.95" y="144">node2</text>
+</g>
+<g class="fc-node" data-id="node3"><rect class="fc-shape" x="152.7" y="320" width="104.5" height="54" rx="0"/><text class="fc-label" x="204.95" y="352">node3</text>
+</g>
+<g class="fc-node" data-id="node2a"><rect class="fc-shape" x="307.2" y="8" width="113.4" height="54" rx="0"/><text class="fc-label" x="363.9" y="40">node2a</text>
+</g>
+<g class="fc-node" data-id="node2b"><rect class="fc-shape" x="307.2" y="112" width="113.4" height="54" rx="0"/><text class="fc-label" x="363.9" y="144">node2b</text>
+</g>
+<g class="fc-node" data-id="node2c"><rect class="fc-shape" x="307.65" y="216" width="112.5" height="54" rx="0"/><text class="fc-label" x="363.9" y="248">node2c</text>
+</g>
+<g class="fc-node" data-id="node2d"><rect class="fc-shape" x="470.6" y="216" width="113.4" height="54" rx="0"/><text class="fc-label" x="527.3" y="248">node2d</text>
+</g>
+<g class="fc-node" data-id="node4"><rect class="fc-shape" x="311.65" y="320" width="104.5" height="54" rx="0"/><text class="fc-label" x="363.9" y="352">node4</text>
+</g>
+<g class="fc-node" data-id="node5"><rect class="fc-shape" x="475.05" y="320" width="104.5" height="54" rx="0"/><text class="fc-label" x="527.3" y="352">node5</text>
+</g>
+<g class="fc-node" data-id="o1"><rect class="fc-shape" x="634" y="268" width="104.5" height="54" rx="0"/><text class="fc-label" x="686.25" y="300">output</text>
+</g>
+<g class="fc-node" data-id="o2"><rect class="fc-shape" x="634" y="372" width="104.5" height="54" rx="0"/><text class="fc-label" x="686.25" y="404">output</text>
+</g>
+</svg>
