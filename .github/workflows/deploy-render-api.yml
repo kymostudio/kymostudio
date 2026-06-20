@@ -44,7 +44,7 @@ jobs:
         run: wasm-pack build --target web --out-dir pkg --out-name kymostudio_core -- --no-default-features --features wasm,pdf
       - name: Build kymo-mermaid wasm (full — every merman grammar)
         working-directory: packages/rust/kymo-mermaid
-        run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm,full
+        run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm,math
       - name: Build kymo-svgbob wasm
         working-directory: packages/rust/kymo-svgbob
         run: wasm-pack build --target web --out-dir pkg --out-name kymo_svgbob
