@@ -1,0 +1,31 @@
+name: Deploy icons site
+
+# Cloudflare Pages project "kymo-icons", served at https://icons.kymo.studio.
+# Static gallery: ./build.sh copies the icon manifest + art from packages/icons
+# into dist/, then wrangler deploys. Path-filtered to the icons site + the icon
+# catalogue.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/icons-site/**"
+      - "packages/icons/icons-manifest.json"
+      - "packages/icons/icons-collections.json"
+      - "packages/icons/icons/**"
+      - ".github/workflows/deploy-icons.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build dist/
+        run: ./build.sh
+        working-directory: packages/icons-site
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy packages/icons-site/dist --project-name=kymo-icons --branch=main
