@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use kymo_types::display_item::{DisplayItem, DisplayList};
-use kymo_types::path_command::PathCommand;
+use kymo_tex_types::display_item::{DisplayItem, DisplayList};
+use kymo_tex_types::path_command::PathCommand;
 
 use crate::layout_box::{BoxContent, LayoutBox, VBoxChildKind};
 use crate::surd::surd_font_for_inner_height;
@@ -19,7 +19,7 @@ const SURD_CHAR: u32 = 0x221A;
 pub fn to_display_list(root: &LayoutBox) -> DisplayList {
     let mut items = Vec::new();
     let baseline_y = root.height;
-    let mut font_str_cache: HashMap<kymo_font::FontId, String> = HashMap::new();
+    let mut font_str_cache: HashMap<kymo_tex_font::FontId, String> = HashMap::new();
     emit_box(root, 0.0, baseline_y, 1.0, &mut items, &mut font_str_cache);
 
     if items.is_empty() {
@@ -125,7 +125,7 @@ fn emit_box(
     y: f64,
     scale: f64,
     items: &mut Vec<DisplayItem>,
-    font_str_cache: &mut HashMap<kymo_font::FontId, String>,
+    font_str_cache: &mut HashMap<kymo_tex_font::FontId, String>,
 ) {
     match &lbox.content {
         BoxContent::HBox(children) => {
@@ -198,7 +198,7 @@ fn emit_box(
             emit_box(denom, frac_x, y + denom_shift * scale, child_denom_scale, items, font_str_cache);
 
             if *bar_thickness > 0.0 {
-                let metrics = kymo_font::get_global_metrics(0);
+                let metrics = kymo_tex_font::get_global_metrics(0);
                 items.push(DisplayItem::Line {
                     x,
                     y: y - metrics.axis_height * scale,
@@ -285,7 +285,7 @@ fn emit_box(
                 );
             }
             let surd_font = surd_font_for_inner_height(*inner_height);
-            let gh = kymo_font::get_char_metrics(surd_font, SURD_CHAR)
+            let gh = kymo_tex_font::get_char_metrics(surd_font, SURD_CHAR)
                 .map(|m| m.height)
                 .unwrap_or(lbox.height - rule_thickness);
             let surd_font_str = font_str_cache
@@ -730,8 +730,8 @@ fn compute_visual_bounds(items: &[DisplayItem]) -> (f64, f64, f64, f64) {
                 ..
             } => {
                 let font_id =
-                    kymo_font::FontId::parse(font).unwrap_or(kymo_font::FontId::MainRegular);
-                let (w, h, d) = kymo_font::get_char_metrics(font_id, *char_code)
+                    kymo_tex_font::FontId::parse(font).unwrap_or(kymo_tex_font::FontId::MainRegular);
+                let (w, h, d) = kymo_tex_font::get_char_metrics(font_id, *char_code)
                     .map(|m| (m.width, m.height, m.depth))
                     .unwrap_or((0.0, 0.0, 0.0));
                 min_x = min_x.min(*x);

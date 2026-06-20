@@ -302,48 +302,58 @@ dependencies = [
 ]
 
 [[package]]
-name = "kymo-font"
+name = "kymo-tex-font"
 version = "0.1.11"
 dependencies = [
- "kymo-types",
+ "kymo-tex-types",
  "phf",
 ]
 
 [[package]]
-name = "kymo-font-loader"
+name = "kymo-tex-font-loader"
 version = "0.1.11"
 dependencies = [
  "ab_glyph",
- "kymo-font",
- "kymo-katex-fonts",
- "kymo-types",
- "kymo-unicode-font",
+ "kymo-tex-font",
+ "kymo-tex-katex-fonts",
+ "kymo-tex-types",
+ "kymo-tex-unicode-font",
 ]
 
 [[package]]
-name = "kymo-katex-fonts"
+name = "kymo-tex-katex-fonts"
 version = "0.1.11"
 dependencies = [
  "rust-embed",
 ]
 
 [[package]]
-name = "kymo-lexer"
+name = "kymo-tex-layout"
 version = "0.1.11"
 dependencies = [
- "kymo-types",
+ "kymo-tex-font",
+ "kymo-tex-parser",
+ "kymo-tex-types",
+ "serde_json",
+]
+
+[[package]]
+name = "kymo-tex-lexer"
+version = "0.1.11"
+dependencies = [
+ "kymo-tex-types",
  "serde",
  "thiserror",
 ]
 
 [[package]]
-name = "kymo-parser"
+name = "kymo-tex-parser"
 version = "0.1.11"
 dependencies = [
  "fancy-regex",
- "kymo-font",
- "kymo-lexer",
- "kymo-types",
+ "kymo-tex-font",
+ "kymo-tex-lexer",
+ "kymo-tex-types",
  "regex",
  "regex-lite",
  "serde",
@@ -353,34 +363,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "kymo-svg"
+name = "kymo-tex-svg"
 version = "0.1.11"
 dependencies = [
  "ab_glyph",
  "base64",
- "kymo-font",
- "kymo-font-loader",
- "kymo-katex-fonts",
- "kymo-parser",
+ "kymo-tex-font",
+ "kymo-tex-font-loader",
+ "kymo-tex-katex-fonts",
  "kymo-tex-layout",
- "kymo-types",
- "kymo-unicode-font",
+ "kymo-tex-parser",
+ "kymo-tex-types",
+ "kymo-tex-unicode-font",
  "png 0.17.16",
  "resvg",
 ]
 
 [[package]]
-name = "kymo-tex-layout"
-version = "0.1.11"
-dependencies = [
- "kymo-font",
- "kymo-parser",
- "kymo-types",
- "serde_json",
-]
-
-[[package]]
-name = "kymo-types"
+name = "kymo-tex-types"
 version = "0.1.11"
 dependencies = [
  "serde",
@@ -388,7 +388,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "kymo-unicode-font"
+name = "kymo-tex-unicode-font"
 version = "0.1.11"
 dependencies = [
  "fontdb",

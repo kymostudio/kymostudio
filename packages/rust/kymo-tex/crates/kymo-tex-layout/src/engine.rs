@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
-use kymo_font::{get_char_metrics, get_global_metrics, FontId};
-use kymo_parser::parse_node::{
+use kymo_tex_font::{get_char_metrics, get_global_metrics, FontId};
+use kymo_tex_parser::parse_node::{
     ArrayTag, AtomFamily, Mode, ParseNode, ProofBranch, ProofLineStyle,
 };
-use kymo_types::color::Color;
-use kymo_types::math_style::MathStyle;
-use kymo_types::path_command::PathCommand;
+use kymo_tex_types::color::Color;
+use kymo_tex_types::math_style::MathStyle;
+use kymo_tex_types::path_command::PathCommand;
 
 use crate::hbox::make_hbox;
 use crate::layout_box::{BoxContent, LayoutBox, PlacedBox, ProofRule};
@@ -310,10 +310,10 @@ fn layout_node(node: &ParseNode, options: &LayoutOptions) -> LayoutBox {
 
         ParseNode::Styling { style, body, .. } => {
             let new_style = match style {
-                kymo_parser::parse_node::StyleStr::Display => MathStyle::Display,
-                kymo_parser::parse_node::StyleStr::Text => MathStyle::Text,
-                kymo_parser::parse_node::StyleStr::Script => MathStyle::Script,
-                kymo_parser::parse_node::StyleStr::Scriptscript => MathStyle::ScriptScript,
+                kymo_tex_parser::parse_node::StyleStr::Display => MathStyle::Display,
+                kymo_tex_parser::parse_node::StyleStr::Text => MathStyle::Text,
+                kymo_tex_parser::parse_node::StyleStr::Script => MathStyle::Script,
+                kymo_tex_parser::parse_node::StyleStr::Scriptscript => MathStyle::ScriptScript,
             };
             let ratio = new_style.size_multiplier() / options.style.size_multiplier();
             let new_opts = options.with_style(new_style);
@@ -608,7 +608,7 @@ fn missing_glyph_width_em(ch: char) -> f64 {
     }
 }
 
-fn missing_glyph_height_em(ch: char, m: &kymo_font::MathConstants) -> f64 {
+fn missing_glyph_height_em(ch: char, m: &kymo_tex_font::MathConstants) -> f64 {
     let ru = ch as u32;
     if (0x1F000..=0x1FAFF).contains(&ru) {
         // Supplementary-plane emoji: `missing_glyph_width_em` uses ~1em width for raster
@@ -634,7 +634,7 @@ fn missing_glyph_metrics_fallback(ch: char, options: &LayoutOptions) -> (f64, f6
 
 /// KaTeX `SymbolNode.toNode`: math symbols use `margin-right: italic` (advance = width + italic).
 #[inline]
-fn math_glyph_advance_em(m: &kymo_font::CharMetrics, mode: Mode) -> f64 {
+fn math_glyph_advance_em(m: &kymo_tex_font::CharMetrics, mode: Mode) -> f64 {
     if mode == Mode::Math {
         m.width + m.italic
     } else {
@@ -655,7 +655,7 @@ fn layout_symbol(text: &str, mode: Mode, options: &LayoutOptions) -> LayoutBox {
     let char_code = ch as u32;
 
     if let Some((font_id, metric_cp)) =
-        kymo_font::font_and_metric_for_mathematical_alphanumeric(char_code)
+        kymo_tex_font::font_and_metric_for_mathematical_alphanumeric(char_code)
     {
         let m = get_char_metrics(font_id, metric_cp);
         let (width, height, depth) = match m {
@@ -728,8 +728,8 @@ fn layout_symbol(text: &str, mode: Mode, options: &LayoutOptions) -> LayoutBox {
 /// Resolve a symbol name to its actual character.
 fn resolve_symbol_char(text: &str, mode: Mode) -> char {
     let font_mode = match mode {
-        Mode::Math => kymo_font::Mode::Math,
-        Mode::Text => kymo_font::Mode::Text,
+        Mode::Math => kymo_tex_font::Mode::Math,
+        Mode::Text => kymo_tex_font::Mode::Text,
     };
 
     if let Some(raw) = text.chars().next() {
@@ -739,7 +739,7 @@ fn resolve_symbol_char(text: &str, mode: Mode) -> char {
         }
     }
 
-    if let Some(info) = kymo_font::get_symbol(text, font_mode) {
+    if let Some(info) = kymo_tex_font::get_symbol(text, font_mode) {
         if let Some(cp) = info.codepoint {
             return cp;
         }
@@ -753,12 +753,12 @@ fn resolve_symbol_char(text: &str, mode: Mode) -> char {
 /// to choose between MathItalic (for letters and Greek) and MainRegular.
 fn select_font(text: &str, resolved_char: char, mode: Mode, _options: &LayoutOptions) -> FontId {
     let font_mode = match mode {
-        Mode::Math => kymo_font::Mode::Math,
-        Mode::Text => kymo_font::Mode::Text,
+        Mode::Math => kymo_tex_font::Mode::Math,
+        Mode::Text => kymo_tex_font::Mode::Text,
     };
 
-    if let Some(info) = kymo_font::get_symbol(text, font_mode) {
-        if info.font == kymo_font::SymbolFont::Ams {
+    if let Some(info) = kymo_tex_font::get_symbol(text, font_mode) {
+        if info.font == kymo_tex_font::SymbolFont::Ams {
             return FontId::AmsRegular;
         }
     }
@@ -1145,7 +1145,7 @@ fn layout_radical(
     let tex_height = select_surd_height(min_delim_height);
     let rule_width = theta;
     let surd_font = crate::surd::surd_font_for_inner_height(tex_height);
-    let advance_width = kymo_font::get_char_metrics(surd_font, 0x221A)
+    let advance_width = kymo_tex_font::get_char_metrics(surd_font, 0x221A)
         .map(|m| m.width)
         .unwrap_or(0.833);
 
@@ -1403,8 +1403,8 @@ fn resolve_op_char(name: &str) -> char {
         "\\oiiint" => return '\u{222D}', // ∭ (triple integral)
         _ => {}
     }
-    let font_mode = kymo_font::Mode::Math;
-    if let Some(info) = kymo_font::get_symbol(name, font_mode) {
+    let font_mode = kymo_tex_font::Mode::Math;
+    if let Some(info) = kymo_tex_font::get_symbol(name, font_mode) {
         if let Some(cp) = info.codepoint {
             return cp;
         }
@@ -2417,10 +2417,10 @@ fn layout_delim_sizing(size: u8, delim: &str, options: &LayoutOptions) -> Layout
 #[allow(clippy::too_many_arguments)]
 fn layout_array(
     body: &[Vec<ParseNode>],
-    cols: Option<&[kymo_parser::parse_node::AlignSpec]>,
+    cols: Option<&[kymo_tex_parser::parse_node::AlignSpec]>,
     arraystretch: f64,
     add_jot: bool,
-    row_gaps: &[Option<kymo_parser::parse_node::Measurement>],
+    row_gaps: &[Option<kymo_tex_parser::parse_node::Measurement>],
     hlines: &[Vec<bool>],
     col_sep_type: Option<&str>,
     hskip: bool,
@@ -2465,9 +2465,9 @@ fn layout_array(
     let num_cols = body.iter().map(|r| r.len()).max().unwrap_or(0);
 
     // Extract per-column alignment and column separators from cols spec.
-    use kymo_parser::parse_node::AlignType;
+    use kymo_tex_parser::parse_node::AlignType;
     let col_aligns: Vec<u8> = {
-        let align_specs: Vec<&kymo_parser::parse_node::AlignSpec> = cols
+        let align_specs: Vec<&kymo_tex_parser::parse_node::AlignSpec> = cols
             .map(|cs| {
                 cs.iter()
                     .filter(|s| matches!(s.align_type, AlignType::Align))
@@ -2952,7 +2952,7 @@ fn layout_enclose(
     options: &LayoutOptions,
 ) -> LayoutBox {
     use crate::layout_box::BoxContent;
-    use kymo_types::color::Color;
+    use kymo_tex_types::color::Color;
 
     // \phase: angle mark (diagonal line) below the body with underline
     if label == "\\phase" {
@@ -3027,7 +3027,7 @@ fn layout_raisebox(shift: f64, body: &ParseNode, options: &LayoutOptions) -> Lay
 /// Returns true if the parse node is a single character box (atom / mathord / textord),
 /// mirroring KaTeX's `isCharacterBox` + `getBaseElem` logic.
 fn is_single_char_body(node: &ParseNode) -> bool {
-    use kymo_parser::parse_node::ParseNode as PN;
+    use kymo_tex_parser::parse_node::ParseNode as PN;
     match node {
         // Unwrap single-element ord-groups and styling nodes.
         PN::OrdGroup { body, .. } if body.len() == 1 => is_single_char_body(&body[0]),
@@ -3269,7 +3269,7 @@ fn layout_with_font(node: &ParseNode, font_id: FontId, options: &LayoutOptions) 
         | ParseNode::Atom { text, mode, .. } => {
             let ch = resolve_symbol_char(text, *mode);
             let char_code = ch as u32;
-            let metric_cp = kymo_font::font_and_metric_for_mathematical_alphanumeric(char_code)
+            let metric_cp = kymo_tex_font::font_and_metric_for_mathematical_alphanumeric(char_code)
                 .map(|(_, m)| m)
                 .unwrap_or(char_code);
             if let Some(m) = get_char_metrics(font_id, metric_cp) {
@@ -3397,7 +3397,7 @@ fn layout_spacing_command(text: &str, options: &LayoutOptions) -> LayoutBox {
 // Measurement conversion
 // ============================================================================
 
-fn measurement_to_em(m: &kymo_parser::parse_node::Measurement, options: &LayoutOptions) -> f64 {
+fn measurement_to_em(m: &kymo_tex_parser::parse_node::Measurement, options: &LayoutOptions) -> f64 {
     let metrics = options.metrics();
     match m.unit.as_str() {
         "em" => m.number,
@@ -5042,7 +5042,7 @@ fn horiz_brace_path(width: f64, height: f64, is_over: bool) -> Vec<PathCommand> 
 #[cfg(test)]
 mod missing_glyph_width_em_tests {
     use super::{missing_glyph_height_em, missing_glyph_width_em};
-    use kymo_font::get_global_metrics;
+    use kymo_tex_font::get_global_metrics;
 
     #[test]
     fn supplementary_plane_emoji_is_one_em() {
@@ -5089,8 +5089,8 @@ mod missing_glyph_width_em_tests {
 mod cjk_font_switching_tests {
     use super::super::to_display::to_display_list;
     use super::*;
-    use kymo_parser::parser::parse;
-    use kymo_types::display_item::DisplayItem;
+    use kymo_tex_parser::parser::parse;
+    use kymo_tex_types::display_item::DisplayItem;
 
     fn first_glyph_font_name(latex: &str) -> Option<String> {
         let ast = parse(latex).ok()?;

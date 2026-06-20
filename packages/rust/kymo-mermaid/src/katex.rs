@@ -8,10 +8,10 @@
 //! is sized + centred by [`crate::katex_layout`].
 
 use kymo_tex_layout::{layout, to_display_list, LayoutOptions};
-use kymo_parser::parser::parse;
-use kymo_svg::{render_to_svg, SvgOptions};
-use kymo_types::color::Color;
-use kymo_types::math_style::MathStyle;
+use kymo_tex_parser::parser::parse;
+use kymo_tex_svg::{render_to_svg, SvgOptions};
+use kymo_tex_types::color::Color;
+use kymo_tex_types::math_style::MathStyle;
 
 /// mermaid's default-theme node label colour (`nodeTextColor`). kymo-tex defaults
 /// to pure black; mermaid draws labels (and KaTeX math) in `#333333`, so without

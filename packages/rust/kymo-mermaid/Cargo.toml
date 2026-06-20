@@ -21,10 +21,10 @@ wasm-bindgen = { version = "0.2", optional = true }
 # `math` feature: kymo-tex draws `$$…$$` as KaTeX glyph outlines (ttf-parser reads
 # KaTeX's own fonts via kymo-svg) — pure Rust, no merman. On by default; opt out
 # (`default-features = false`) for the leanest build (math falls back to Unicode).
-kymo-types = { path = "../kymo-tex/crates/kymo-types", optional = true }
-kymo-parser = { path = "../kymo-tex/crates/kymo-parser", optional = true }
+kymo-tex-types = { path = "../kymo-tex/crates/kymo-tex-types", optional = true }
+kymo-tex-parser = { path = "../kymo-tex/crates/kymo-tex-parser", optional = true }
 kymo-tex-layout = { path = "../kymo-tex/crates/kymo-tex-layout", optional = true }
-kymo-svg = { path = "../kymo-tex/crates/kymo-svg", default-features = false, features = ["standalone", "embed-fonts"], optional = true }
+kymo-tex-svg = { path = "../kymo-tex/crates/kymo-tex-svg", default-features = false, features = ["standalone", "embed-fonts"], optional = true }
 
 [features]
 default = ["math"]
@@ -32,7 +32,7 @@ wasm = ["dep:wasm-bindgen"]
 
 # Native KaTeX `$$…$$` glyph rendering via kymo-tex (pure Rust). The flowchart
 # renderer sizes math nodes by their glyph box and draws raster-safe outlines.
-math = ["dep:kymo-types", "dep:kymo-parser", "dep:kymo-tex-layout", "dep:kymo-svg"]
+math = ["dep:kymo-tex-types", "dep:kymo-tex-parser", "dep:kymo-tex-layout", "dep:kymo-tex-svg"]
 
 [profile.release]
 opt-level = "z"

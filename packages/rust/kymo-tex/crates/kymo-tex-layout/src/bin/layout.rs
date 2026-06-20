@@ -1,5 +1,5 @@
 use kymo_tex_layout::{layout, to_display_list, LayoutOptions};
-use kymo_parser::parser::parse;
+use kymo_tex_parser::parser::parse;
 use std::io::{self, BufRead, Write};
 
 fn main() {

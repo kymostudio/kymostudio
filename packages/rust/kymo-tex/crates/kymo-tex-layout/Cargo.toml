@@ -9,9 +9,9 @@ documentation.workspace = true
 description = "Layout engine for RaTeX"
 
 [dependencies]
-kymo-types  = { workspace = true }
-kymo-font   = { workspace = true }
-kymo-parser = { workspace = true }
+kymo-tex-types  = { workspace = true }
+kymo-tex-font   = { workspace = true }
+kymo-tex-parser = { workspace = true }
 serde_json   = { workspace = true }
 
 [[bin]]

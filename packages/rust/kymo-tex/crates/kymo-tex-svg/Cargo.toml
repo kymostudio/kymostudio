@@ -1,0 +1,46 @@
+[package]
+name = "kymo-tex-svg"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "SVG export for RaTeX DisplayList (vector output, optional KaTeX webfonts)"
+
+[features]
+default = []
+## Enable outlined-glyph SVG support (`ab_glyph`).
+## When `SvgOptions::embed_glyphs = true`, `SvgOptions::font_dir` is needed unless `embed-fonts` is enabled.
+standalone = ["dep:ab_glyph", "dep:base64", "dep:kymo-tex-font", "dep:kymo-tex-font-loader", "dep:kymo-tex-unicode-font"]
+## `render-svg` binary: parse + layout from stdin (needs `standalone` for outlined glyphs).
+cli = ["dep:kymo-tex-layout", "dep:kymo-tex-parser"]
+## Embed font source files in binary. No need for font directory with this feature. Implicitly enables 'standalone' feature.
+embed-fonts = ["standalone", "dep:kymo-tex-katex-fonts", "kymo-tex-font-loader/embed-fonts"]
+
+[dependencies]
+kymo-tex-types = { workspace = true }
+ab_glyph = { version = "0.2", optional = true }
+base64 = { version = "0.22", optional = true }
+kymo-tex-font = { workspace = true, optional = true }
+kymo-tex-font-loader = { workspace = true, optional = true }
+kymo-tex-layout = { workspace = true, optional = true }
+kymo-tex-parser = { workspace = true, optional = true }
+kymo-tex-katex-fonts = { workspace = true, optional = true }
+kymo-tex-unicode-font = { workspace = true, optional = true }
+
+[[bin]]
+name = "render-svg"
+path = "src/bin/render_svg.rs"
+required-features = ["cli", "standalone"]
+
+[dev-dependencies]
+kymo-tex-layout = { workspace = true }
+kymo-tex-parser = { workspace = true }
+png = "0.17"
+resvg = { version = "0.47", default-features = false }
+
+[[test]]
+name = "golden_svg"
+path = "tests/golden_svg.rs"
+required-features = ["standalone"]

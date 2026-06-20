@@ -357,34 +357,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "kymo-font"
-version = "0.1.11"
-dependencies = [
- "kymo-types",
- "phf",
-]
-
-[[package]]
-name = "kymo-font-loader"
-version = "0.1.11"
-dependencies = [
- "ab_glyph",
- "kymo-font",
- "kymo-katex-fonts",
- "kymo-types",
- "kymo-unicode-font",
-]
-
-[[package]]
 name = "kymo-graph"
 version = "0.1.0"
-
-[[package]]
-name = "kymo-katex-fonts"
-version = "0.1.11"
-dependencies = [
- "rust-embed",
-]
 
 [[package]]
 name = "kymo-layout"
@@ -393,15 +367,6 @@ dependencies = [
  "dagre",
  "kymo-graph",
  "kymo-manatee",
-]
-
-[[package]]
-name = "kymo-lexer"
-version = "0.1.11"
-dependencies = [
- "kymo-types",
- "serde",
- "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -420,21 +385,66 @@ version = "0.1.0"
 dependencies = [
  "kymo-graph",
  "kymo-layout",
- "kymo-parser",
- "kymo-svg",
  "kymo-tex-layout",
- "kymo-types",
+ "kymo-tex-parser",
+ "kymo-tex-svg",
+ "kymo-tex-types",
  "wasm-bindgen",
 ]
 
 [[package]]
-name = "kymo-parser"
+name = "kymo-tex-font"
+version = "0.1.11"
+dependencies = [
+ "kymo-tex-types",
+ "phf",
+]
+
+[[package]]
+name = "kymo-tex-font-loader"
+version = "0.1.11"
+dependencies = [
+ "ab_glyph",
+ "kymo-tex-font",
+ "kymo-tex-katex-fonts",
+ "kymo-tex-types",
+ "kymo-tex-unicode-font",
+]
+
+[[package]]
+name = "kymo-tex-katex-fonts"
+version = "0.1.11"
+dependencies = [
+ "rust-embed",
+]
+
+[[package]]
+name = "kymo-tex-layout"
+version = "0.1.11"
+dependencies = [
+ "kymo-tex-font",
+ "kymo-tex-parser",
+ "kymo-tex-types",
+ "serde_json",
+]
+
+[[package]]
+name = "kymo-tex-lexer"
+version = "0.1.11"
+dependencies = [
+ "kymo-tex-types",
+ "serde",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "kymo-tex-parser"
 version = "0.1.11"
 dependencies = [
  "fancy-regex",
- "kymo-font",
- "kymo-lexer",
- "kymo-types",
+ "kymo-tex-font",
+ "kymo-tex-lexer",
+ "kymo-tex-types",
  "regex",
  "regex-lite",
  "serde",
@@ -444,37 +454,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "kymo-svg"
+name = "kymo-tex-svg"
 version = "0.1.11"
 dependencies = [
  "ab_glyph",
  "base64",
- "kymo-font",
- "kymo-font-loader",
- "kymo-katex-fonts",
- "kymo-types",
- "kymo-unicode-font",
+ "kymo-tex-font",
+ "kymo-tex-font-loader",
+ "kymo-tex-katex-fonts",
+ "kymo-tex-types",
+ "kymo-tex-unicode-font",
 ]
 
 [[package]]
-name = "kymo-tex-layout"
-version = "0.1.11"
-dependencies = [
- "kymo-font",
- "kymo-parser",
- "kymo-types",
- "serde_json",
-]
-
-[[package]]
-name = "kymo-types"
+name = "kymo-tex-types"
 version = "0.1.11"
 dependencies = [
  "serde",
 ]
 
 [[package]]
-name = "kymo-unicode-font"
+name = "kymo-tex-unicode-font"
 version = "0.1.11"
 dependencies = [
  "fontdb",

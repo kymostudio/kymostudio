@@ -9,15 +9,15 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/kymo-types",
-    "crates/kymo-font",
-    "crates/kymo-lexer",
-    "crates/kymo-parser",
+    "crates/kymo-tex-types",
+    "crates/kymo-tex-font",
+    "crates/kymo-tex-lexer",
+    "crates/kymo-tex-parser",
     "crates/kymo-tex-layout",
-    "crates/kymo-katex-fonts",
-    "crates/kymo-font-loader",
-    "crates/kymo-unicode-font",
-    "crates/kymo-svg",
+    "crates/kymo-tex-katex-fonts",
+    "crates/kymo-tex-font-loader",
+    "crates/kymo-tex-unicode-font",
+    "crates/kymo-tex-svg",
 ]
 
 [workspace.package]
@@ -29,15 +29,15 @@ homepage = "https://kymo.studio"
 documentation = "https://github.com/kymostudio/kymostudio"
 
 [workspace.dependencies]
-kymo-types  = { path = "crates/kymo-types", version = "0.1.11" }
-kymo-font   = { path = "crates/kymo-font", version = "0.1.11" }
-kymo-lexer  = { path = "crates/kymo-lexer", version = "0.1.11" }
-kymo-parser = { path = "crates/kymo-parser", version = "0.1.11" }
+kymo-tex-types  = { path = "crates/kymo-tex-types", version = "0.1.11" }
+kymo-tex-font   = { path = "crates/kymo-tex-font", version = "0.1.11" }
+kymo-tex-lexer  = { path = "crates/kymo-tex-lexer", version = "0.1.11" }
+kymo-tex-parser = { path = "crates/kymo-tex-parser", version = "0.1.11" }
 kymo-tex-layout = { path = "crates/kymo-tex-layout", version = "0.1.11" }
-kymo-katex-fonts = { path = "crates/kymo-katex-fonts", version = "0.1.11" }
-kymo-font-loader = { path = "crates/kymo-font-loader", version = "0.1.11" }
-kymo-unicode-font = { path = "crates/kymo-unicode-font", version = "0.1.11" }
-kymo-svg    = { path = "crates/kymo-svg", version = "0.1.11" }
+kymo-tex-katex-fonts = { path = "crates/kymo-tex-katex-fonts", version = "0.1.11" }
+kymo-tex-font-loader = { path = "crates/kymo-tex-font-loader", version = "0.1.11" }
+kymo-tex-unicode-font = { path = "crates/kymo-tex-unicode-font", version = "0.1.11" }
+kymo-tex-svg    = { path = "crates/kymo-tex-svg", version = "0.1.11" }
 
 phf        = { version = "0.11", features = ["macros"] }
 thiserror  = "1.0"

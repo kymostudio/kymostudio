@@ -36,7 +36,7 @@ pub fn make_vbox(children: Vec<VBoxChild>) -> LayoutBox {
         height,
         depth,
         content: BoxContent::VBox(children),
-        color: kymo_types::color::Color::BLACK,
+        color: kymo_tex_types::color::Color::BLACK,
     }
 }
 
@@ -56,7 +56,7 @@ pub fn make_vbox_with_depth(children: Vec<VBoxChild>, depth_below_baseline: f64)
 mod tests {
     use super::*;
     use crate::layout_box::BoxContent;
-    use kymo_types::color::Color;
+    use kymo_tex_types::color::Color;
 
     fn make_test_box(w: f64, h: f64, d: f64) -> LayoutBox {
         LayoutBox {

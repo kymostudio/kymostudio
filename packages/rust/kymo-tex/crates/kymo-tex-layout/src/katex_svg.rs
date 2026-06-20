@@ -1,4 +1,4 @@
-use kymo_types::PathCommand;
+use kymo_tex_types::PathCommand;
 
 /// Returns (commands, width, height, fill) for a KaTeX SVG accent, or `None` if unhandled.
 ///
