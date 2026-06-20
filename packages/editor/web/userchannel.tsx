@@ -5,7 +5,7 @@ import { useWorkspace } from "./workspace";
 import { USER_WS } from "./const";
 import { LOCAL } from "./localdb";
 import { requestOpen, requestClose } from "./tabs";
-import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx, pushStatus, registerPromptSender, runNewProjectSim, runDeleteProjectSim, simulateValue, pingListening } from "./mcpstatus";
+import { pingMcp, registerPinSender, setPinned, registerCtxSender, sessionIdValue, sessionCtx, pushStatus, registerPromptSender, runNewProjectSim, runDeleteProjectSim, simulateValue, pingListening, setConnections } from "./mcpstatus";
 
 // Connects every signed-in tab to the user's control channel (one DO per email)
 // so the MCP `ui_open_diagram` / `ui_open_project` tools can steer THIS tab. Carries no
@@ -46,6 +46,7 @@ export function UserChannel() {
     ws.addEventListener("message", (e) => {
       let data: any; try { data = JSON.parse(e.data); } catch { return; }
       if (data && data.type === "ai-target") { setPinned(!!data.pinned); return; } // server: am I the target?
+      if (data && data.type === "mcp-connections") { setConnections(data); return; } // live registry push (connect/disconnect) — not "AI active"
       if (data) pingMcp(); // every control message here is MCP-driven → AI is active
       if (data && data.type === "status") { pushStatus(data); return; } // ui_status → live feed in panel
       if (data && data.type === "listening") { pingListening(); return; } // a process is waiting → enable the chat composer
