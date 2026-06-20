@@ -12,5 +12,10 @@
   "devDependencies": {
     "vitepress": "^1.6.0"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "kymo-layout": "^0.1.0-alpha.0"
+  }
 }
