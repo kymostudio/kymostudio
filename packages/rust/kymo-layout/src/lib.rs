@@ -14,6 +14,9 @@ pub mod dagre;
 pub mod grid;
 pub mod sugiyama;
 
+#[cfg(feature = "wasm")]
+pub mod wasm;
+
 // Convenience re-exports so callers use `kymo_layout::dagre_geom` /
 // `kymo_layout::layout_flowchart` directly.
 pub use dagre::{dagre_geom, dagre_geom_with_math};

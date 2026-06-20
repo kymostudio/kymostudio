@@ -8,8 +8,15 @@ description = "Pure-Rust graph/diagram layout algorithms for kymo's mermaid rend
 [lib]
 name = "kymo_layout"
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 kymo-graph = { path = "../kymo-graph", version = "0.1.0" }
 kymo-manatee = { path = "../kymo-manatee", version = "0.1.0" }
 dagre = "0.1.1"
+wasm-bindgen = { version = "0.2", optional = true }
+serde_json = { version = "1", optional = true }
+
+[features]
+# Browser layout: expose the dagre/grid/force passes to JS via wasm-bindgen.
+wasm = ["dep:wasm-bindgen", "dep:serde_json"]
