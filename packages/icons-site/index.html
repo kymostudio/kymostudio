@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>kymo icons — 2,400+ provider & architecture icons</title>
+  <meta name="description" content="Browse and search every icon in the KymoStudio diagram library — AWS, Azure, GCP, Kubernetes and more. Click to copy the icon key for your .kymo diagrams." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    :root {
+      --pink: #e0095f; --pink-dark: #c70854; --navy: #242131; --teal: #ddecee;
+      --bg: #fafafb; --card: #fff; --line: #ececf1; --muted: #6b6b78;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--navy);
+      font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    a { color: var(--pink); text-decoration: none; }
+    header {
+      position: sticky; top: 0; z-index: 10; background: rgba(250, 250, 251, 0.92);
+      backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); padding: 16px 24px 12px;
+    }
+    .top { display: flex; align-items: center; gap: 12px; max-width: 1280px; margin: 0 auto; }
+    .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 18px; letter-spacing: -0.01em; }
+    .brand .k { width: 26px; height: 26px; border-radius: 7px; background: var(--pink); color: #fff;
+      display: grid; place-items: center; font-weight: 900; }
+    .brand small { color: var(--muted); font-weight: 600; font-size: 13px; }
+    .nav { margin-left: auto; display: flex; gap: 18px; font-size: 14px; font-weight: 600; }
+    .nav a { color: var(--navy); }
+    .nav a:hover { color: var(--pink); }
+    .search-row { max-width: 1280px; margin: 12px auto 0; }
+    #q {
+      width: 100%; padding: 12px 16px; font-size: 16px; border: 1.5px solid var(--line);
+      border-radius: 10px; background: #fff; outline: none;
+    }
+    #q:focus { border-color: var(--pink); }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; max-width: 1280px; margin: 12px auto 0; }
+    .chip {
+      padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff;
+      font-size: 12.5px; font-weight: 600; color: var(--navy); cursor: pointer; white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--pink); }
+    .chip.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+    .chip .n { opacity: 0.6; font-weight: 500; margin-left: 4px; }
+    .chip.active .n { opacity: 0.8; }
+    main { max-width: 1280px; margin: 20px auto 80px; padding: 0 24px; }
+    #count { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+    #grid {
+      display: grid; gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+    }
+    .cell {
+      background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+      padding: 14px 8px 9px; text-align: center; cursor: pointer; transition: border-color .12s, box-shadow .12s, transform .12s;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .cell:hover { border-color: var(--pink); box-shadow: 0 4px 14px rgba(36,33,49,.08); transform: translateY(-1px); }
+    .cell img { width: 44px; height: 44px; object-fit: contain; }
+    .cell .key { font-size: 11px; color: var(--muted); word-break: break-word; line-height: 1.3; font-family: ui-monospace, Menlo, monospace; }
+    #sentinel { height: 1px; }
+    #toast {
+      position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+      background: var(--navy); color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 14px;
+      font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; z-index: 50;
+      box-shadow: 0 8px 24px rgba(36,33,49,.3);
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast code { font-family: ui-monospace, Menlo, monospace; color: #ff9ec4; }
+    footer { text-align: center; color: var(--muted); font-size: 13px; padding: 0 24px 48px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top">
+      <span class="brand"><span class="k">K</span> kymo icons <small id="total"></small></span>
+      <nav class="nav">
+        <a href="https://docs.kymo.studio">Docs</a>
+        <a href="https://editor.kymo.studio">Editor</a>
+        <a href="https://kymo.studio">kymo.studio</a>
+      </nav>
+    </div>
+    <div class="search-row">
+      <input id="q" type="search" placeholder="Search 2,400+ icons — “ec2”, “kubernetes”, “database”…" autocomplete="off" autofocus />
+    </div>
+    <div class="chips" id="chips"></div>
+  </header>
+  <main>
+    <p id="count"></p>
+    <div id="grid"></div>
+    <div id="sentinel"></div>
+  </main>
+  <footer>
+    Click an icon to copy its key, then use it in a <a href="https://docs.kymo.studio/guide/getting-started">.kymo</a> diagram:
+    <code>node box/aws:compute-ec2/blue "EC2"</code>
+  </footer>
+  <div id="toast"></div>
+
+  <script>
+    const PAGE = 200; // incremental render batch
+    let ALL = [], filtered = [], shown = 0, set = "all";
+
+    const $ = (s) => document.querySelector(s);
+    const grid = $("#grid"), toastEl = $("#toast");
+    let toastTimer;
+    function toast(key) {
+      toastEl.innerHTML = `Copied <code>${key}</code>`;
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1600);
+    }
+
+    function matches(it) {
+      if (set !== "all" && it.set !== set) return false;
+      const q = $("#q").value.trim().toLowerCase();
+      return !q || it.key.toLowerCase().includes(q);
+    }
+    function applyFilter() {
+      filtered = ALL.filter(matches);
+      shown = 0;
+      grid.innerHTML = "";
+      $("#count").textContent = `${filtered.length.toLocaleString()} icon${filtered.length === 1 ? "" : "s"}`;
+      renderMore();
+    }
+    function renderMore() {
+      const next = filtered.slice(shown, shown + PAGE);
+      const frag = document.createDocumentFragment();
+      for (const it of next) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.title = "Copy " + it.key;
+        cell.innerHTML =
+          `<img loading="lazy" src="${it.path}" alt="${it.key}" width="44" height="44">` +
+          `<span class="key">${it.key}</span>`;
+        cell.addEventListener("click", () => {
+          try {
+            navigator.clipboard?.writeText(it.key);
+          } catch (_) {
+            // older browsers / blocked clipboard — fall back to a hidden textarea
+            const t = document.createElement("textarea");
+            t.value = it.key; document.body.appendChild(t); t.select();
+            try { document.execCommand("copy"); } catch (_) {}
+            t.remove();
+          }
+          toast(it.key);
+        });
+        frag.appendChild(cell);
+      }
+      grid.appendChild(frag);
+      shown += next.length;
+    }
+
+    // infinite scroll
+    new IntersectionObserver((es) => {
+      if (es[0].isIntersecting && shown < filtered.length) renderMore();
+    }).observe($("#sentinel"));
+
+    $("#q").addEventListener("input", applyFilter);
+
+    Promise.all([
+      fetch("icons-manifest.json").then((r) => r.json()),
+      fetch("icons-collections.json").then((r) => r.json()).catch(() => ({})),
+    ]).then(([m, coll]) => {
+      ALL = Object.entries(m.icons).map(([key, path]) => ({ key, path, set: key.split(":")[0] }));
+      $("#total").textContent = `· ${ALL.length.toLocaleString()} icons`;
+      // set chips, sorted by size desc
+      const sets = Object.entries(coll).length
+        ? Object.entries(coll).map(([k, v]) => [k, v.total]).sort((a, b) => b[1] - a[1])
+        : [...new Set(ALL.map((i) => i.set))].map((s) => [s, ALL.filter((i) => i.set === s).length]);
+      const chips = $("#chips");
+      const mk = (id, label, n) => {
+        const c = document.createElement("button");
+        c.className = "chip" + (id === "all" ? " active" : "");
+        c.innerHTML = label + (n != null ? ` <span class="n">${n}</span>` : "");
+        c.addEventListener("click", () => {
+          set = id;
+          [...chips.children].forEach((x) => x.classList.toggle("active", x === c));
+          applyFilter();
+        });
+        chips.appendChild(c);
+      };
+      mk("all", "All", ALL.length);
+      for (const [s, n] of sets) mk(s, s, n);
+      applyFilter();
+    });
+  </script>
+</body>
+</html>
