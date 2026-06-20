@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Sparkles, Copy, Check, User, Brain, Wrench, CheckCircle2, Eraser, Send, Wand2, Settings } from "lucide-react";
 import { MCP_HTTP, MCP_SSE } from "./const";
 import { useMcpActive, useAiTarget, requestPin, sessionIdValue, useStatusFeed, clearStatus, sendPrompt, pushStatus, useSimulate, setSimulate, useListening, feedLength, useConnections, type StatusKind, type McpConn } from "./mcpstatus";
+import { brandFor, monogram } from "./aiicons";
 
 const FEED_ICON: Record<StatusKind, React.ReactNode> = {
   user: <User size={13} strokeWidth={2} />,
@@ -103,6 +104,19 @@ function groupByClient(conns: McpConn[]): { groups: ConnGroup[]; connected: numb
   }
   groups.sort((a, b) => b.lastSeenAt - a.lastSeenAt);
   return { groups, connected: groups.filter((g) => g.connected).length, outdated: groups.filter((g) => g.connected && g.reasons.length > 0).length };
+}
+
+// Rounded "app tile" for an MCP client: the brand mark when known (vendored SVG),
+// else a deterministic monogram. `mono` brands get their glyph recoloured via --ai-fg.
+function ClientTile({ client }: { client: string }) {
+  const b = brandFor(client);
+  if (b) {
+    const style: React.CSSProperties = { background: b.bg };
+    if (b.mono) (style as any)["--ai-fg"] = b.mono;
+    return <span className={"ai-tile" + (b.mono ? " ai-mono" : "")} style={style} aria-hidden dangerouslySetInnerHTML={{ __html: b.svg }} />;
+  }
+  const m = monogram(client);
+  return <span className="ai-tile ai-monogram" style={{ background: m.bg, color: m.fg }} aria-hidden>{m.ch}</span>;
 }
 
 
@@ -223,52 +237,67 @@ export function ConnectAI({ onClose }: { onClose: () => void }) {
         )}
 
         {tab === "connection" && (
-          <>
-            <div className={"cn-status" + (live || connClients.connected > 0 ? " live" : "")}>
-              <span className="cn-status-dot" />
-              {live
-                ? "Connected — an AI client is driving this editor right now."
-                : connClients.connected > 0
-                  ? `Connected — ${connClients.connected} AI client${connClients.connected > 1 ? "s" : ""} connected.`
-                  : "Waiting for an AI client to connect…"}
+          <div className="cn2">
+            {/* status hero */}
+            <div className={"cn2-hero" + (live || connClients.connected > 0 ? " on" : "")}>
+              <span className="cn2-hero-dot" />
+              <div className="cn2-hero-txt">
+                <b>{live || connClients.connected > 0 ? "Connected" : "Waiting…"}</b>
+                <span>{live
+                  ? "an AI client is driving this editor right now"
+                  : connClients.connected > 0
+                    ? `${connClients.connected} AI client${connClients.connected > 1 ? "s" : ""} connected`
+                    : "no AI client connected yet"}</span>
+              </div>
             </div>
-            <button className={"cn-target" + (target ? " on" : "")} onClick={() => requestPin(!target)} aria-pressed={target}>
-              <Sparkles size={15} strokeWidth={2} />
-              <span className="cn-target-txt">{target ? "AI is controlling THIS window" : "Make AI control this window"}</span>
-              <span className="cn-target-state">{target ? "On" : "Off"}</span>
-            </button>
-            <p className="cn-target-hint">With the editor open in several windows, AI commands act only on the chosen window. None chosen → the window you used most recently. From an AI client: <code>ui_list_sessions</code> then <code>ui_switch_session</code>.</p>
-            <p className="cn-session">This window · session <code>{sessionIdValue()}</code></p>
 
-            {connClients.groups.length > 0 && (
-                <div className="cn-conns">
-                  <div className="cn-conns-head">
-                    <span>MCP clients</span>
-                    <span className="cn-conns-sum">
-                      {connClients.connected} connected
-                      {connClients.outdated > 0 && <span className="cn-conns-out"> · {connClients.outdated} outdated</span>}
-                    </span>
-                  </div>
-                  <ul className="cn-conns-list">
-                    {connClients.groups.map((gr) => {
-                      const outdated = gr.connected && gr.reasons.length > 0;
-                      return (
-                        <li className={"cn-conn" + (outdated ? " outdated" : "") + (gr.connected ? "" : " gone")} key={gr.client}>
-                          <span className="cn-conn-name">{gr.client}{gr.clientVersion && gr.clientVersion !== "?" ? ` ${gr.clientVersion}` : ""}</span>
-                          <span className="cn-conn-meta">{gr.protocol ? `proto ${gr.protocol} · ` : ""}seen {ago(gr.lastSeenAt)}{gr.sessions > 1 ? ` · ${gr.sessions} sessions` : ""}</span>
-                          {!gr.connected && <span className="cn-conn-badge gone">Disconnected</span>}
-                          {outdated && (
-                            <span className="cn-conn-badge" title={gr.reasons.map((r) => REASON_LABEL[r] || r).join("; ")}>
-                              Outdated{gr.reasons.includes("server") && <button type="button" className="cn-conn-reconnect" onClick={() => setTab("setup")}>reconnect</button>}
-                            </span>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
+            {/* MCP clients */}
+            {connClients.groups.length > 0 ? (
+              <section className="cn2-sec">
+                <div className="cn2-sec-head"><span>MCP clients</span><span className="cn2-count">{connClients.groups.length}</span></div>
+                <ul className="cn2-list">
+                  {connClients.groups.map((gr) => {
+                    const outdated = gr.connected && gr.reasons.length > 0;
+                    const state = !gr.connected ? "gone" : outdated ? "warn" : "ok";
+                    return (
+                      <li className={"cn2-card cn2-" + state} key={gr.client}>
+                        <ClientTile client={gr.client} />
+                        <div className="cn2-card-main">
+                          <div className="cn2-card-top">
+                            <span className="cn2-card-name">{gr.client}</span>
+                            {gr.clientVersion && gr.clientVersion !== "?" && <span className="cn2-ver">{gr.clientVersion}</span>}
+                          </div>
+                          <div className="cn2-card-meta">
+                            {gr.protocol ? `proto ${gr.protocol} · ` : ""}seen {ago(gr.lastSeenAt)}{gr.sessions > 1 ? ` · ${gr.sessions} sessions` : ""}
+                          </div>
+                        </div>
+                        <span className={"cn2-pill cn2-pill-" + state} title={outdated ? gr.reasons.map((r) => REASON_LABEL[r] || r).join("; ") : undefined}>
+                          <span className="cn2-pill-dot" />
+                          {state === "ok" ? "Connected" : state === "warn" ? "Outdated" : "Offline"}
+                        </span>
+                        {outdated && gr.reasons.includes("server") && (
+                          <button type="button" className="cn2-reconnect" onClick={() => setTab("setup")}>Reconnect</button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            ) : (
+              <p className="cn2-empty">No MCP client has connected yet. Wire one up in <button type="button" className="cn-empty-link" onClick={() => setTab("setup")}>Setup</button>.</p>
             )}
-          </>
+
+            {/* this window */}
+            <section className="cn2-sec">
+              <div className="cn2-sec-head"><span>This window</span><span className="cn2-sess">{sessionIdValue()}</span></div>
+              <button className={"cn2-target" + (target ? " on" : "")} onClick={() => requestPin(!target)} aria-pressed={target}>
+                <Sparkles size={16} strokeWidth={2} />
+                <span className="cn2-target-txt">{target ? "AI controls this window" : "Make AI control this window"}</span>
+                <span className={"cn2-switch" + (target ? " on" : "")} aria-hidden />
+              </button>
+              <p className="cn2-hint">With several windows open, AI commands act on the chosen one (else the most-recently used). From a client: <code>ui_list_sessions</code> → <code>ui_switch_session</code>.</p>
+            </section>
+          </div>
         )}
 
         {tab === "setup" && (
