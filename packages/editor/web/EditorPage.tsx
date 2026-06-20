@@ -81,7 +81,6 @@ export default function EditorPage() {
   const [statusTitle, setStatusTitle] = useState(""); // dev detail (bytes · ms), shown only on hover
   const [statusErr, setStatusErr] = useState(false);
   const [live, setLive] = useState(false);
-  const [showOffline, setShowOffline] = useState(false);
   const [booted, setBooted] = useState(false); // first-load full-screen splash until the project's data is in
   const [flashTab, setFlashTab] = useState<string | null>(null); // briefly highlight a just-opened/created tab
   const [title, setTitle] = useState(seed ? seed.title : "");
@@ -260,14 +259,13 @@ export default function EditorPage() {
     return () => clearTimeout(t);
   }, [booted]);
 
-  // "Offline" is for a genuine, sustained disconnection — not the momentary socket
-  // drop while switching tabs (old room's WS closes before the new one opens) or
-  // the initial connect. Only surface it after `live` stays false past a grace
-  // window; switching rooms (`d`) re-arms it so a tab change never flashes it.
+  // We no longer surface an "Offline" pill in the UI — a worker redeploy / momentary
+  // socket drop is recovered transparently and shouldn't alarm the user. Keep the
+  // sustained-disconnect detection but only console.debug it (gated past a grace
+  // window so tab switches / initial connect don't log noise; `d` re-arms it).
   useEffect(() => {
-    if (live) { setShowOffline(false); return; }
-    setShowOffline(false);
-    const t = setTimeout(() => setShowOffline(true), 2500);
+    if (live) return;
+    const t = setTimeout(() => console.debug("[room] disconnected from EditorRoom (/ws) — not saving until it reconnects", { d }), 2500);
     return () => clearTimeout(t);
   }, [live, d]);
 
@@ -822,14 +820,9 @@ export default function EditorPage() {
         {claims && !shared
           ? <AddressBar titleNode={titleEl} onOpenDiagram={openDiagram} />
           : titleEl}
-        {/* the steady "Saved" pill is dropped (saving is silent + automatic); the
-            unsaved-draft pill is dropped too (the draft Save button already signals
-            it). Only the disconnection warning still surfaces. */}
-        {claims && d && !booting && showOffline && (
-          <span className="save-ind off" title="Disconnected — changes are not being saved">
-            Offline
-          </span>
-        )}
+        {/* Status pills are all dropped: saving is silent + automatic, and a transient
+            disconnect (e.g. a worker redeploy) recovers without alarming the user — it
+            is console.debug'd instead of shown. */}
         <div className="spacer" />
         {/* actions: nav · create · output (Share is the CTA) · account last */}
         <nav className="nav-group">
