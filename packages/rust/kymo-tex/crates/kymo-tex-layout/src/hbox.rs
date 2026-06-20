@@ -21,7 +21,7 @@ pub fn make_hbox(children: Vec<LayoutBox>) -> LayoutBox {
         height,
         depth,
         content: BoxContent::HBox(children),
-        color: kymo_types::color::Color::BLACK,
+        color: kymo_tex_types::color::Color::BLACK,
     }
 }
 
@@ -44,7 +44,7 @@ mod tests {
             height: 0.43,
             depth: 0.0,
             content: BoxContent::Empty,
-            color: kymo_types::color::Color::BLACK,
+            color: kymo_tex_types::color::Color::BLACK,
         };
         let hbox = make_hbox(vec![child]);
         assert!((hbox.width - 0.5).abs() < 1e-10);
@@ -58,14 +58,14 @@ mod tests {
             height: 0.43,
             depth: 0.0,
             content: BoxContent::Empty,
-            color: kymo_types::color::Color::BLACK,
+            color: kymo_tex_types::color::Color::BLACK,
         };
         let b = LayoutBox {
             width: 0.6,
             height: 0.69,
             depth: 0.1,
             content: BoxContent::Empty,
-            color: kymo_types::color::Color::BLACK,
+            color: kymo_tex_types::color::Color::BLACK,
         };
         let hbox = make_hbox(vec![a, b]);
         assert!((hbox.width - 1.1).abs() < 1e-10);

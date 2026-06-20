@@ -1,6 +1,6 @@
 use kymo_tex_layout::{layout, to_display_list, LayoutOptions};
-use kymo_parser::parser::parse;
-use kymo_types::display_item::DisplayItem;
+use kymo_tex_parser::parser::parse;
+use kymo_tex_types::display_item::DisplayItem;
 
 #[test]
 fn ce_co2_line_emits_cjk_regular_for_simplified_chinese() {

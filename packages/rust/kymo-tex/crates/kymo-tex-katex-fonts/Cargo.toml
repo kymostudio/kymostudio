@@ -1,0 +1,15 @@
+[package]
+name = "kymo-tex-katex-fonts"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "KaTeX TTF fonts embedded for RaTeX (optional embed-fonts support)"
+readme = "README.md"
+
+[dependencies]
+# Not from `[workspace.dependencies]`: keep `rust-embed` without `debug-embed` so
+# dev builds always embed bytes from this crate (no disk path to `fonts/`).
+rust-embed = { version = "8.11.0" }

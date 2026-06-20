@@ -1,8 +1,8 @@
 //! Stacked stretchy delimiters for `\left`/`\right` when a single Size4 glyph is too short.
 //! Mirrors KaTeX `delimiter.ts`: `stackLargeDelimiters` use `makeStackedDelim` past the large-font stage.
 
-use kymo_font::{get_char_metrics, CharMetrics, FontId};
-use kymo_types::path_command::PathCommand;
+use kymo_tex_font::{get_char_metrics, CharMetrics, FontId};
+use kymo_tex_types::path_command::PathCommand;
 
 use crate::layout_options::LayoutOptions;
 use crate::katex_svg::parse_svg_path_data;

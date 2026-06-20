@@ -1,6 +1,6 @@
-use kymo_font::{get_global_metrics, MathConstants};
-use kymo_types::color::Color;
-use kymo_types::math_style::MathStyle;
+use kymo_tex_font::{get_global_metrics, MathConstants};
+use kymo_tex_types::color::Color;
+use kymo_tex_types::math_style::MathStyle;
 
 /// Layout options passed through the layout tree.
 #[derive(Debug, Clone)]

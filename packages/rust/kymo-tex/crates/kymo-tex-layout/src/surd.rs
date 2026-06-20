@@ -1,4 +1,4 @@
-use kymo_font::FontId;
+use kymo_tex_font::FontId;
 
 /// Map surd `inner_height` from `layout_radical` (1.0 … 3.0) to the KaTeX font for U+221A.
 pub fn surd_font_for_inner_height(h: f64) -> FontId {

@@ -7,10 +7,10 @@
 /// Tolerance: 0.001em (well within the 0.02em threshold from the plan).
 use kymo_tex_layout::{layout, LayoutOptions};
 use kymo_tex_layout::to_display_list;
-use kymo_parser::parser::parse;
-use kymo_types::MathStyle;
-use kymo_types::color::Color;
-use kymo_types::display_item::DisplayItem;
+use kymo_tex_parser::parser::parse;
+use kymo_tex_types::MathStyle;
+use kymo_tex_types::color::Color;
+use kymo_tex_types::display_item::DisplayItem;
 
 const TOLERANCE: f64 = 0.002;
 
@@ -445,7 +445,7 @@ fn mathrm_sin() {
 /// `\mathrm{mm^{2}}` (e.g. mhchem `\pu{123 mm2}`): base of superscript must stay roman, not math italic.
 #[test]
 fn mathrm_mm_squared_both_m_upright() {
-    use kymo_font::FontId;
+    use kymo_tex_font::FontId;
     use kymo_tex_layout::layout_box::{BoxContent, LayoutBox};
 
     fn collect_m_fonts(lb: &LayoutBox) -> Vec<FontId> {

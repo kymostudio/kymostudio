@@ -1,5 +1,5 @@
-use kymo_types::color::Color;
-use kymo_types::path_command::PathCommand;
+use kymo_tex_types::color::Color;
+use kymo_tex_types::path_command::PathCommand;
 
 /// A TeX box: the fundamental unit of layout.
 ///
@@ -29,7 +29,7 @@ pub enum BoxContent {
 
     /// A single glyph character.
     Glyph {
-        font_id: kymo_font::FontId,
+        font_id: kymo_tex_font::FontId,
         char_code: u32,
     },
 
