@@ -1,7 +1,7 @@
 ---
 title: Editor AI (Connect AI) — Requirements (ConOps, StRS & SRS)
 document_id: FEAT-KAI-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -16,6 +16,7 @@ related_documents:
   - FEAT-KLIBRARY-001
   - FEAT-KHOME-001
   - DESIGN-KAI-001
+  - CR-KAI-001
   - RES-MCP-001
 authors:
   - Vũ Anh
@@ -48,7 +49,7 @@ keywords:
 | Field             | Value |
 |-------------------|-------|
 | Document ID       | `FEAT-KAI-001` |
-| Version           | 0.1 |
+| Version           | 0.2 |
 | Status            | Implemented |
 | Owner             | `diagrams/` project |
 | Related Documents | `FEAT-KEDITOR-001` (the umbrella the needs were carved from), `FEAT-KEMCP-001` (sibling — the remote MCP channel this module **builds on**: OAuth, transports, diagram/project tools, the `ui_*` family + `/userws` channel), `FEAT-KLIVE-001` (sibling — accounts & rooms; the OAuth identity reused here), `FEAT-KLIBRARY-001` (sibling — the project/folder data the simulation drives), `FEAT-KHOME-001` (sibling), `DESIGN-KAI-001` (the *how* — UserChannel DO, protocol, panel), `RES-MCP-001` (MCP landscape) |
@@ -89,6 +90,7 @@ keywords:
 | **SN-AI-03** | A user with **several editor windows** open wants to choose **which window** the AI acts in. |
 | **SN-AI-04** | A user optionally wants AI-driven **create/delete to look like the real UI**, and wants the editor to **stay in sync (switcher, lists) without a page reload**. |
 | **SN-AI-05** | A user wants **clear instructions** to connect their AI client to the editor, including **Claude Code**. |
+| **SN-AI-06** | A user with one or more AI clients wired to their account wants to see **how many MCP clients are connected** and **how many are outdated** (built against a superseded server, long idle, or on an old protocol/client version) so they know which to reconnect. *(realised by `CR-KAI-001`)* |
 
 ### A.5 Scope
 
@@ -141,6 +143,7 @@ Requirements use RFC-2119 keywords. Because Connect AI is UI/UX-heavy, the funct
 | **FR-AI-08** | Project management SHALL be a **modal** (filter box + open / rename / delete-with-confirm), opened from the switcher's "Manage projects…"; it SHALL be the surface the delete-project simulation (`FR-AI-04`) drives, and SHALL reflect live project-list changes (`FR-AI-05`). | SN-AI-04 |
 | **FR-AI-09** | The **Setup** tab SHALL show the MCP server URL (copyable), a sign-in hint, and per-client connect steps — **Claude (web & desktop)**, **Claude Code** (the one-line `claude mcp add --transport http kymostudio <url>` + `/mcp` → Authenticate), **Cursor** (SSE), **ChatGPT** — plus a config-JSON block (with an `mcp-remote` bridge variant). The **Chat** empty state SHALL show a short how-to-connect guide with a link to Setup. | SN-AI-05 |
 | **FR-AI-10** | The editor SHALL surface **agent presence**: the ✨ button and the open file-tab badge reflect recent agent activity (a ~2-min activity window, pinged by every control message and `edit_diagram` origin); the **Connection** tab SHALL show Connected/Waiting, the pin/target toggle, and the window's session id. | SN-AI-01, SN-AI-03 |
+| **FR-AI-11** | The Worker SHALL maintain a **per-user MCP connection registry** in the `UserChannel` DO, upserted by a **heartbeat** from `KymoMCP` on every tool call (and on each `wait_for_user_message` poll, so an idle-but-listening agent still counts as connected); each entry records the client `name`/`version`, negotiated **protocol** version, the **server** version at connect time, and first-/last-seen timestamps. The Worker SHALL expose **`GET /api/connections`** (auth-scoped to the user's `email`) returning the connections plus a `{total, connected, outdated}` summary, where a connection is **connected** if seen within the freshness window and **outdated** if **any** of four reasons hold — `server` (built against a superseded server version), `stale` (idle beyond the window), `protocol` (host below the server's protocol), or `client` (below a recommended-minimum client version, best-effort). Entries idle beyond a hard TTL SHALL be pruned. The **Connection** tab SHALL surface **"N connected · M outdated"** with a per-connection list and an outdated-reason badge. *(realised by `CR-KAI-001`)* | SN-AI-06 |
 
 ### C.3 Non-functional requirements
 
@@ -165,6 +168,8 @@ UI/UX user-story layer (`As a … I want … so that …` + Given/When/Then), ci
   *Given* Simulate UI is on, *when* the agent creates/deletes a project, *then* the editor animates the switcher / Manage-projects flow and the lists update without a reload.
 - **US-AI-05** *(→ FR-AI-09)* — **As** a new user, **I want** clear steps to connect my client (incl. Claude Code), **so that** I can get started.
   *Given* the Setup tab, *when* I copy the Claude Code command and run `/mcp → Authenticate`, *then* my client is connected to my account.
+- **US-AI-06** *(→ FR-AI-11)* — **As** a user with one or more AI clients wired up, **I want** to see how many are connected and how many are outdated, **so that** I know which to reconnect (e.g. after a deploy). *(realised by `CR-KAI-001`)*
+  *Given* the Connection tab, *when* clients have acted on my account, *then* I see "N connected · M outdated" and a row per connection (client + version, protocol, last seen); *given* a connection built against an old server build, *then* its row shows an Outdated badge with the reason and a reconnect hint.
 
 ### C.5 Acceptance criteria (module-level)
 
@@ -181,3 +186,4 @@ UI/UX user-story layer (`As a … I want … so that …` + Given/When/Then), ci
 | Version | Date       | Author | Changes |
 |---------|------------|--------|---------|
 | 0.1     | 2026-06-20 | Vũ Anh | Initial **as-built carve-out** under the kymo-editor umbrella (7th module). Owns `SN-AI-01..05`, `FR-AI-01..10`, `NFR-AI-01..02`, `US-AI-01..05`. Documents the Connect AI panel + the `UserChannel` control plane (live feed `ui_status`; window sessions `ui_list_sessions`/`ui_switch_session`; reverse channel `wait_for_user_message` + durable inbox + `listening` gating; `new_project`/`delete_project` `simulate`; live project-list sync; connect instructions incl. Claude Code) as shipped over PRs ~#514→#598. Builds on `FEAT-KEMCP-001` (`FR-MC-05` `ui_*` family + `/userws`). Design in `DESIGN-KAI-001`. |
+| 0.2     | 2026-06-20 | Vũ Anh | Added **`SN-AI-06` / `FR-AI-11` / `US-AI-06`** — a server-side **MCP connection registry** (per-user view of how many MCP clients are connected and how many are outdated: server / stale / protocol / client). Pre-staged per `CR-KAI-001` (Open); design in `DESIGN-KAI-001` §8, states in `DESIGN-KAI-002` CS-07. |

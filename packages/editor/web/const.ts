@@ -17,6 +17,9 @@ export const USER_WS = `${API_WS}/userws`;
 // httpOnly session cookie, GET /api/me to resolve it back to {email,name}.
 export const SESSION_API = `${API_HTTP}/api/session`;
 export const ME_API = `${API_HTTP}/api/me`;
+// Per-user MCP connection registry (FR-AI-11): how many MCP clients are connected
+// and how many are outdated (server/stale/protocol/client) — shown in the Connection tab.
+export const CONNECTIONS_API = `${API_HTTP}/api/connections`;
 // Every authenticated call sends the session cookie. It is Domain=kymo.studio
 // (api.kymo.studio + editor.kymo.studio are same-site), so `credentials:"include"`
 // carries it cross-subdomain; the worker echoes the allow-listed Origin + allow-credentials.

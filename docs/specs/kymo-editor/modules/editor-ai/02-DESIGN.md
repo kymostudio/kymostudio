@@ -1,7 +1,7 @@
 ---
 title: Editor AI (Connect AI) — Design
 document_id: DESIGN-KAI-001
-version: "0.1"
+version: "0.2"
 issue_date: 2026-06-20
 status: Implemented
 classification: Internal
@@ -15,6 +15,8 @@ related_documents:
   - FEAT-KLIVE-001
   - FEAT-KLIBRARY-001
   - DESIGN-KEDITOR-001
+  - DESIGN-KAI-002
+  - CR-KAI-001
 authors:
   - Vũ Anh
 language: en
@@ -128,7 +130,65 @@ The composer's Send pushes `{type:"prompt", text, simulate}`; the DO queues `{te
 
 Both are driven by the worker only when a live window receives the push; otherwise the tool falls back to a direct server mutation. SVG/lucide icons inside these surfaces need `svg { flex: none }` (else they collapse to width 0).
 
-## 7. Traceability
+## 7. MCP connection registry (`FR-AI-11`, `CR-KAI-001`)
+
+A per-user view of **how many MCP clients are connected and how many are outdated**.
+Because MCP is stateless HTTP there is no socket to count (`DESIGN-KAI-002` §1); each
+client connection is a separate `KymoMCP` (`McpAgent`) DO with **no per-user index**.
+So the registry records **last activity per connection** in the one per-user place that
+already exists — the `UserChannel` DO — and derives "connected" as *seen recently*.
+
+**Record** (in `UserChannel` `ctx.storage`, key `conn:<connId>` — **not**
+`serializeAttachment`, since MCP clients hold no WebSocket here, only internal `fetch`):
+
+```
+McpConn = { connId, client, clientVersion, protocol, serverVersion, connectedAt, lastSeenAt }
+```
+
+- `connId` — the MCP `Mcp-Session-Id` (fallback: the `KymoMCP` DO id), stable per session.
+- `client`/`clientVersion`/`protocol` — read from the MCP `initialize` handshake.
+- `serverVersion` — the `McpServer` version at connect time (`index.ts` `new McpServer({version})`).
+
+**Heartbeat (capture).** `clientInfo`/protocol exist only **after** `initialize`, so
+`KymoMCP` heartbeats **per tool call** (a thin wrapper around `this.server.tool`), and
+**inside the `wait_for_user_message` poll** so an idle-but-listening agent still counts.
+Each heartbeat fires `POST /mcp-seen` to its `UserChannel` (fire-and-forget, like
+`feed()` in §3) → upsert: `connectedAt` on first sight, always bump `lastSeenAt`.
+
+**Endpoints** (added to the §2 table):
+
+| path | purpose |
+|------|---------|
+| `POST /mcp-seen` | upsert a connection record (heartbeat from `KymoMCP`) |
+| `GET /mcp-connections` | prune entries older than `HARD_TTL`; return `{connections[], summary:{total,connected,outdated}}` with each connection's outdated reasons |
+
+**Outdated reasons** (a connection is outdated if **any** hold), computed at read time
+against current constants:
+
+| reason | test |
+|--------|------|
+| `server` | `rec.serverVersion !== CURRENT_SERVER_VERSION` (built against a superseded build → reconnect) |
+| `stale` | `now − rec.lastSeenAt > STALE_MS` (idle beyond the freshness window) |
+| `protocol` | `rec.protocol < MIN_PROTOCOL` (host below the server's advertised protocol) |
+| `client` | `clientVersion < MIN_CLIENT[client]` (best-effort; only for clients in the map) |
+
+Thresholds (one place, tunable): `STALE_MS = 10 min`, `HARD_TTL = 60 min`,
+`CURRENT_SERVER_VERSION` = the `McpServer` version, `MIN_PROTOCOL` = latest supported,
+`MIN_CLIENT` = small per-client map (initially advisory). `connected` = seen within `STALE_MS`.
+
+**Browser surface.** Worker `GET /api/connections` (auth via `resolveAuth` → `email`,
+CORS like the other `/api/*`) forwards to `UserChannel /mcp-connections`. The
+**Connection** tab (`connectai.tsx`) fetches on open + polls ~15 s and renders
+**"N connected · M outdated"** + a row per connection (client + version, protocol, last
+seen) with an outdated-reason badge; a `server`-outdated row links to **Setup** to
+reconnect. This is the server-side, per-connection counterpart of the client-side
+activity signal CS-02 — see `DESIGN-KAI-002` **CS-07**.
+
+> Limit (inherent to stateless MCP): there is no disconnect event, so "connected" is
+> *recent activity*, and "outdated" is advisory (the user reconnects the client). The
+> registry does not gate any tool.
+
+## 8. Traceability
 
 | FR | Worker | Editor |
 |----|--------|--------|
@@ -138,9 +198,11 @@ Both are driven by the worker only when a live window receives the push; otherwi
 | FR-AI-04 | `new_project`/`delete_project` `simulate` → `ui-*-project` push | `simulateNewProject`/`ProjectsModal.simulate` |
 | FR-AI-05 | `open-project`/`projects-changed` push | `refresh()` on those messages |
 | FR-AI-06..10 | — | `connectai.tsx` (panel/tabs/gear), `mcpstatus.tsx`, `sidebar.tsx` (✨) |
+| FR-AI-11 | `KymoMCP` heartbeat, `UserChannel` `/mcp-seen` + `/mcp-connections`, `/api/connections` | `connectai.tsx` Connection tab (connection list + outdated badges) |
 
 ## Annex A — Revision History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-06-20 | Vũ Anh | Initial as-built design for Connect AI: `UserChannel` DO + protocol, editor signal hub, reverse channel + listener gating, UI-simulation drivers. Realises `FEAT-KAI-001`. |
+| 0.2 | 2026-06-20 | Vũ Anh | Added **§7 MCP connection registry** (`FR-AI-11`, `CR-KAI-001`): per-user `McpConn` records in `UserChannel` storage, heartbeat from `KymoMCP` (`POST /mcp-seen`), `GET /mcp-connections` + `/api/connections`, the four outdated reasons (server / stale / protocol / client) + thresholds, Connection-tab surface. Renumbered Traceability → §8 and added its `FR-AI-11` row. |
