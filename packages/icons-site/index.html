@@ -116,12 +116,23 @@
       const q = $("#q").value.trim().toLowerCase();
       return !q || it.key.toLowerCase().includes(q);
     }
+    // Reflect the current set + query in the URL so any view is shareable /
+    // bookmarkable (e.g. ?set=aws&q=lambda). replaceState = no history spam.
+    function syncURL() {
+      const p = new URLSearchParams();
+      if (set !== "all") p.set("set", set);
+      const q = $("#q").value.trim();
+      if (q) p.set("q", q);
+      const qs = p.toString();
+      history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+    }
     function applyFilter() {
       filtered = ALL.filter(matches);
       shown = 0;
       grid.innerHTML = "";
       $("#count").textContent = `${filtered.length.toLocaleString()} icon${filtered.length === 1 ? "" : "s"}`;
       renderMore();
+      syncURL();
     }
     function renderMore() {
       const next = filtered.slice(shown, shown + PAGE);
@@ -172,6 +183,7 @@
       const mk = (id, label, n) => {
         const c = document.createElement("button");
         c.className = "chip" + (id === "all" ? " active" : "");
+        c.dataset.set = id;
         c.innerHTML = label + (n != null ? ` <span class="n">${n}</span>` : "");
         c.addEventListener("click", () => {
           set = id;
@@ -182,6 +194,15 @@
       };
       mk("all", "All", ALL.length);
       for (const [s, n] of sets) mk(s, s, n);
+      // Restore set + query from the URL (?set=aws&q=lambda) on load.
+      const params = new URLSearchParams(location.search);
+      const urlQ = params.get("q");
+      if (urlQ) $("#q").value = urlQ;
+      const urlSet = params.get("set");
+      if (urlSet && [...chips.children].some((c) => c.dataset.set === urlSet)) {
+        set = urlSet;
+        [...chips.children].forEach((c) => c.classList.toggle("active", c.dataset.set === urlSet));
+      }
       applyFilter();
     });
   </script>
