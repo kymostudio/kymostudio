@@ -4250,11 +4250,11 @@ impl XorShift64Star {
 #[cfg(test)]
 mod tests {
     use super::{
-        BoundsExtras, Constraints, IndexedAlignmentConstraint, IndexedCompound, IndexedEdge,
-        IndexedFcoseOptions, IndexedGraph, IndexedNode, IndexedRelativePlacementConstraint,
-        RelConstraint, RepulsionGrid, SimGraph, SimNode, XorShift64Star,
         apply_reflection_for_relative_placement, layout, layout_indexed,
-        procrustes_transform_for_alignments,
+        procrustes_transform_for_alignments, BoundsExtras, Constraints, IndexedAlignmentConstraint,
+        IndexedCompound, IndexedEdge, IndexedFcoseOptions, IndexedGraph, IndexedNode,
+        IndexedRelativePlacementConstraint, RelConstraint, RepulsionGrid, SimGraph, SimNode,
+        XorShift64Star,
     };
     use crate::algo::{AlignmentConstraint, FcoseOptions, RelativePlacementConstraint};
     use crate::graph::{Anchor, Compound, Edge, Graph, Node, Point};
@@ -4665,7 +4665,7 @@ mod tests {
 
     #[test]
     fn relative_placement_gap_is_center_to_center() {
-        use super::{Constraints, RelConstraint, apply_constraints_to_displacements};
+        use super::{apply_constraints_to_displacements, Constraints, RelConstraint};
 
         let nodes = vec![
             node_at(0.0, 0.0, 10.0, 10.0),  // center_x = 5

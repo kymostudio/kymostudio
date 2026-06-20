@@ -586,7 +586,11 @@ fn bfs_fill_column(
         }
     }
 
-    if min_dist.is_some() { max_idx } else { pivot }
+    if min_dist.is_some() {
+        max_idx
+    } else {
+        pivot
+    }
 }
 
 #[derive(Debug, Clone)]

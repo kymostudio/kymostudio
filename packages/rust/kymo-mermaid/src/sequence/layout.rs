@@ -297,10 +297,7 @@ impl Layout {
         // lifelines (mermaid wraps to ~the actor width).
         if n.wrap {
             const MAX_CH: usize = 28;
-            lines = lines
-                .iter()
-                .flat_map(|l| wrap_words(l, MAX_CH))
-                .collect();
+            lines = lines.iter().flat_map(|l| wrap_words(l, MAX_CH)).collect();
         }
         let lines = if lines.is_empty() {
             vec![String::new()]

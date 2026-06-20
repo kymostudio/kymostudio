@@ -9,7 +9,11 @@ use std::collections::HashMap;
 fn parse(src: &str) -> (Grid, Vec<(String, String, String, &'static str)>) {
     let lines: Vec<String> = src.lines().map(|l| strip(l).trim().to_string()).collect();
     let mut edges = Vec::new();
-    let mut stack: Vec<Grid> = vec![Grid { columns: 0, items: Vec::new(), label: String::new() }];
+    let mut stack: Vec<Grid> = vec![Grid {
+        columns: 0,
+        items: Vec::new(),
+        label: String::new(),
+    }];
     let mut started = false;
     for line in &lines {
         if line.is_empty() {
@@ -34,11 +38,18 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String, &'static str)>) {
             continue;
         }
         if low == "space" || low.starts_with("space:") {
-            let sp = low.strip_prefix("space:").and_then(|s| s.trim().parse().ok()).unwrap_or(1);
+            let sp = low
+                .strip_prefix("space:")
+                .and_then(|s| s.trim().parse().ok())
+                .unwrap_or(1);
             stack.last_mut().unwrap().items.push(Item::Space(sp));
             continue;
         }
-        if low.starts_with("style ") || low.starts_with("classdef ") || low.starts_with("class ") || low.starts_with("click ") {
+        if low.starts_with("style ")
+            || low.starts_with("classdef ")
+            || low.starts_with("class ")
+            || low.starts_with("click ")
+        {
             continue;
         }
         if low == "block" || low.starts_with("block:") || low.starts_with("block ") {
@@ -51,11 +62,19 @@ fn parse(src: &str) -> (Grid, Vec<(String, String, String, &'static str)>) {
             // `block:id` → the id labels the group; `block id …` → id and any
             // trailing tokens are cells inside the new (anonymous) block.
             let label = if colon {
-                tokenize(rest).into_iter().next().map(|(_, l, _, _)| l).unwrap_or_default()
+                tokenize(rest)
+                    .into_iter()
+                    .next()
+                    .map(|(_, l, _, _)| l)
+                    .unwrap_or_default()
             } else {
                 String::new()
             };
-            stack.push(Grid { columns: 0, items: Vec::new(), label });
+            stack.push(Grid {
+                columns: 0,
+                items: Vec::new(),
+                label,
+            });
             if !colon {
                 for (id, l, span, shape) in tokenize(rest) {
                     push_token(stack.last_mut().unwrap(), id, l, span, shape);
@@ -169,8 +188,16 @@ fn border_pt((cx, cy, w, h): (f64, f64, f64, f64), (tx, ty): (f64, f64)) -> (f64
     if dx == 0.0 && dy == 0.0 {
         return (cx, cy);
     }
-    let sx = if dx != 0.0 { (w / 2.0) / dx.abs() } else { f64::INFINITY };
-    let sy = if dy != 0.0 { (h / 2.0) / dy.abs() } else { f64::INFINITY };
+    let sx = if dx != 0.0 {
+        (w / 2.0) / dx.abs()
+    } else {
+        f64::INFINITY
+    };
+    let sy = if dy != 0.0 {
+        (h / 2.0) / dy.abs()
+    } else {
+        f64::INFINITY
+    };
     let s = sx.min(sy);
     (cx + dx * s, cy + dy * s)
 }
@@ -234,7 +261,12 @@ fn push_token(g: &mut Grid, id: String, label: String, span: usize, shape: Strin
         return;
     }
     let label = if label.is_empty() { id.clone() } else { label };
-    g.items.push(Item::Cell(Cell { id, label, span, shape }));
+    g.items.push(Item::Cell(Cell {
+        id,
+        label,
+        span,
+        shape,
+    }));
 }
 
 fn strip(l: &str) -> &str {
@@ -298,7 +330,11 @@ fn parse_edge(line: &str) -> Option<(String, String, String, &'static str)> {
         end += 1;
     }
     // End-arrow type: `-->` arrow, `--o` circle, `--x` cross, plain `--` none.
-    let mut etype = if c[pos..end].contains(&'>') { "arrow" } else { "none" };
+    let mut etype = if c[pos..end].contains(&'>') {
+        "arrow"
+    } else {
+        "none"
+    };
     // Block edge-end markers `--o` (circle) / `--x` (cross): the o/x is part of
     // the arrow, not the destination node.
     if end < c.len() && matches!(c[end], 'o' | 'x') && (end + 1 >= c.len() || c[end + 1] == ' ') {
@@ -317,8 +353,14 @@ fn parse_edge(line: &str) -> Option<(String, String, String, &'static str)> {
             _ => String::new(),
         }
     };
-    let src = tokenize(&line[..start]).into_iter().last().map(|(id, _, _, _)| id)?;
-    let dst = tokenize(&line[end..]).into_iter().next().map(|(id, _, _, _)| id)?;
+    let src = tokenize(&line[..start])
+        .into_iter()
+        .last()
+        .map(|(id, _, _, _)| id)?;
+    let dst = tokenize(&line[end..])
+        .into_iter()
+        .next()
+        .map(|(id, _, _, _)| id)?;
     if src.is_empty() || dst.is_empty() {
         return None;
     }
@@ -334,7 +376,9 @@ fn tokenize(line: &str) -> Vec<(String, String, usize, String)> {
             continue;
         }
         let s = i;
-        while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_' || chars[i] == '-' || chars[i] == '.') {
+        while i < chars.len()
+            && (chars[i].is_alphanumeric() || chars[i] == '_' || chars[i] == '-' || chars[i] == '.')
+        {
             i += 1;
         }
         let id: String = chars[s..i].iter().collect();

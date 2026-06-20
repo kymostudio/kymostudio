@@ -38,7 +38,14 @@ pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError
         if let Some((_, lines)) = note_buf.as_mut() {
             if low == "end note" {
                 let (target, ls) = note_buf.take().unwrap();
-                add_note(&mut fc, &mut index, &mut note_n, &target, &ls.join("\n"), &sub_stack);
+                add_note(
+                    &mut fc,
+                    &mut index,
+                    &mut note_n,
+                    &target,
+                    &ls.join("\n"),
+                    &sub_stack,
+                );
             } else {
                 lines.push(super::decode_entities(stmt));
             }
@@ -55,7 +62,10 @@ pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError
             let rest = stmt[5..].trim();
             let after = rest.split(" of ").nth(1).unwrap_or(rest);
             let (target, inline) = match after.split_once(':') {
-                Some((t, txt)) => (t.trim().to_string(), Some(super::decode_entities(txt.trim()))),
+                Some((t, txt)) => (
+                    t.trim().to_string(),
+                    Some(super::decode_entities(txt.trim())),
+                ),
                 None => (after.trim().to_string(), None),
             };
             match inline {
@@ -125,7 +135,12 @@ pub(super) fn parse(stmts: &[(usize, String)]) -> Result<Flowchart, MermaidError
             let id = id.trim();
             if !id.is_empty() && id != "[*]" {
                 touch(id, None, None, &mut fc, &mut index, &sub_stack);
-                set_label(&mut fc, &index, id, super::decode_entities(desc.trim()).trim());
+                set_label(
+                    &mut fc,
+                    &index,
+                    id,
+                    super::decode_entities(desc.trim()).trim(),
+                );
             }
             continue;
         }
@@ -274,7 +289,11 @@ fn add_note(
     *n += 1;
     let label = text.replace("<br/>", "\n").replace("<br>", "\n");
     let idx = fc.nodes.len();
-    fc.nodes.push(FlowNode { id: id.clone(), label, shape: Shape::Box });
+    fc.nodes.push(FlowNode {
+        id: id.clone(),
+        label,
+        shape: Shape::Box,
+    });
     index.push((id.clone(), idx));
     register_member(fc, sub_stack, &id);
     touch(target, None, None, fc, index, sub_stack);

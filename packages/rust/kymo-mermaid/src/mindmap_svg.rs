@@ -68,7 +68,11 @@ fn section_color(branch: i32) -> (String, String, &'static str) {
     ];
     if branch < 0 {
         // root section--1: solid dark blue (#0000EC), no contrasting ring.
-        return ("hsl(240, 100%, 46%)".into(), "hsl(240, 100%, 46%)".into(), "#ffffff");
+        return (
+            "hsl(240, 100%, 46%)".into(),
+            "hsl(240, 100%, 46%)".into(),
+            "#ffffff",
+        );
     }
     let (h, l) = SECTIONS[(branch as usize) % SECTIONS.len()];
     let h = h as f64;
@@ -118,7 +122,17 @@ pub fn render_cose(fc: &Flowchart) -> String {
         .iter()
         .map(|n| {
             let (w, h) = node_size(&n.label, n.shape);
-            Node { label: n.label.clone(), shape: n.shape, children: Vec::new(), depth: 0, branch: -1, w, h, x: 0.0, y: 0.0 }
+            Node {
+                label: n.label.clone(),
+                shape: n.shape,
+                children: Vec::new(),
+                depth: 0,
+                branch: -1,
+                w,
+                h,
+                x: 0.0,
+                y: 0.0,
+            }
         })
         .collect();
     let mut has_parent = vec![false; nodes.len()];
@@ -143,7 +157,15 @@ pub fn render_cose(fc: &Flowchart) -> String {
     }
     let pnodes: Vec<PNode> = nodes
         .iter()
-        .map(|n| PNode { label: n.label.clone(), shape: n.shape, branch: n.branch, cx: n.x, cy: n.y, w: n.w, h: n.h })
+        .map(|n| PNode {
+            label: n.label.clone(),
+            shape: n.shape,
+            branch: n.branch,
+            cx: n.x,
+            cy: n.y,
+            w: n.w,
+            h: n.h,
+        })
         .collect();
     // Edges run border-to-border (mermaid clips the branch to each node's edge),
     // not centre-to-centre — clip both ends to their node box.
@@ -152,8 +174,16 @@ pub fn render_cose(fc: &Flowchart) -> String {
         if dx == 0.0 && dy == 0.0 {
             return (cx, cy);
         }
-        let sx = if dx != 0.0 { (w / 2.0) / dx.abs() } else { f64::INFINITY };
-        let sy = if dy != 0.0 { (h / 2.0) / dy.abs() } else { f64::INFINITY };
+        let sx = if dx != 0.0 {
+            (w / 2.0) / dx.abs()
+        } else {
+            f64::INFINITY
+        };
+        let sy = if dy != 0.0 {
+            (h / 2.0) / dy.abs()
+        } else {
+            f64::INFINITY
+        };
         let s = sx.min(sy);
         (cx + dx * s, cy + dy * s)
     };
@@ -163,7 +193,10 @@ pub fn render_cose(fc: &Flowchart) -> String {
             let ch = &nodes[c];
             let p = border(n.x, n.y, n.w, n.h, ch.x, ch.y);
             let q = border(ch.x, ch.y, ch.w, ch.h, n.x, n.y);
-            pedges.push(PEdge { branch: ch.branch, pts: vec![p, q] });
+            pedges.push(PEdge {
+                branch: ch.branch,
+                pts: vec![p, q],
+            });
         }
     }
     render_positioned(&pnodes, &pedges)
@@ -242,7 +275,15 @@ pub fn render(fc: &Flowchart) -> String {
     // Hand off to the shared drawer (edges = parent→child centre pairs).
     let pnodes: Vec<PNode> = nodes
         .iter()
-        .map(|n| PNode { label: n.label.clone(), shape: n.shape, branch: n.branch, cx: n.x, cy: n.y, w: n.w, h: n.h })
+        .map(|n| PNode {
+            label: n.label.clone(),
+            shape: n.shape,
+            branch: n.branch,
+            cx: n.x,
+            cy: n.y,
+            w: n.w,
+            h: n.h,
+        })
         .collect();
     // Edges run border-to-border (mermaid clips the branch to each node's edge),
     // not centre-to-centre — clip both ends to their node box.
@@ -251,8 +292,16 @@ pub fn render(fc: &Flowchart) -> String {
         if dx == 0.0 && dy == 0.0 {
             return (cx, cy);
         }
-        let sx = if dx != 0.0 { (w / 2.0) / dx.abs() } else { f64::INFINITY };
-        let sy = if dy != 0.0 { (h / 2.0) / dy.abs() } else { f64::INFINITY };
+        let sx = if dx != 0.0 {
+            (w / 2.0) / dx.abs()
+        } else {
+            f64::INFINITY
+        };
+        let sy = if dy != 0.0 {
+            (h / 2.0) / dy.abs()
+        } else {
+            f64::INFINITY
+        };
         let s = sx.min(sy);
         (cx + dx * s, cy + dy * s)
     };
@@ -262,16 +311,30 @@ pub fn render(fc: &Flowchart) -> String {
             let ch = &nodes[c];
             let p = border(n.x, n.y, n.w, n.h, ch.x, ch.y);
             let q = border(ch.x, ch.y, ch.w, ch.h, n.x, n.y);
-            pedges.push(PEdge { branch: ch.branch, pts: vec![p, q] });
+            pedges.push(PEdge {
+                branch: ch.branch,
+                pts: vec![p, q],
+            });
         }
     }
     render_positioned(&pnodes, &pedges)
 }
 
 /// A positioned mindmap node (absolute centre). `branch` < 0 = root.
-pub struct PNode { pub label: String, pub shape: Shape, pub branch: i32, pub cx: f64, pub cy: f64, pub w: f64, pub h: f64 }
+pub struct PNode {
+    pub label: String,
+    pub shape: Shape,
+    pub branch: i32,
+    pub cx: f64,
+    pub cy: f64,
+    pub w: f64,
+    pub h: f64,
+}
 /// A positioned mindmap edge: a polyline (2 pts → smooth bezier; more → polyline).
-pub struct PEdge { pub branch: i32, pub pts: Vec<(f64, f64)> }
+pub struct PEdge {
+    pub branch: i32,
+    pub pts: Vec<(f64, f64)>,
+}
 
 /// Draw positioned nodes + edges to a self-contained SVG. Shared by the native
 /// tidy-tree layout and the merman (cose-bilkent) layout so both render identically.
@@ -286,7 +349,14 @@ pub fn render_positioned(nodes: &[PNode], edges: &[PEdge]) -> String {
         maxx = maxx.max(n.cx + n.w / 2.0);
         maxy = maxy.max(n.cy + n.h / 2.0);
     }
-    for e in edges { for p in &e.pts { minx = minx.min(p.0); miny = miny.min(p.1); maxx = maxx.max(p.0); maxy = maxy.max(p.1); } }
+    for e in edges {
+        for p in &e.pts {
+            minx = minx.min(p.0);
+            miny = miny.min(p.1);
+            maxx = maxx.max(p.0);
+            maxy = maxy.max(p.1);
+        }
+    }
     let (ox, oy) = (minx - 12.0, miny - 12.0);
     let width = (maxx - minx + 24.0).max(40.0);
     let height = (maxy - miny + 24.0).max(40.0);
@@ -297,10 +367,15 @@ pub fn render_positioned(nodes: &[PNode], edges: &[PEdge]) -> String {
         let p: Vec<(f64, f64)> = e.pts.iter().map(|q| (q.0 - ox, q.1 - oy)).collect();
         let d = if p.len() == 2 {
             let mx = (p[0].0 + p[1].0) / 2.0;
-            format!("M{:.1},{:.1} C{mx:.1},{:.1} {mx:.1},{:.1} {:.1},{:.1}", p[0].0, p[0].1, p[0].1, p[1].1, p[1].0, p[1].1)
+            format!(
+                "M{:.1},{:.1} C{mx:.1},{:.1} {mx:.1},{:.1} {:.1},{:.1}",
+                p[0].0, p[0].1, p[0].1, p[1].1, p[1].0, p[1].1
+            )
         } else {
             let mut s = format!("M{:.1},{:.1}", p[0].0, p[0].1);
-            for q in &p[1..] { s += &format!(" L{:.1},{:.1}", q.0, q.1); }
+            for q in &p[1..] {
+                s += &format!(" L{:.1},{:.1}", q.0, q.1);
+            }
             s
         };
         body += &format!("<path d=\"{d}\" fill=\"none\" stroke=\"{col}\" stroke-width=\"2\"/>");

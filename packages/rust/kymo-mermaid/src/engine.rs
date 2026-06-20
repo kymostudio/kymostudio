@@ -274,11 +274,13 @@ pub fn mermaid_state_to_svg(src: &str) -> Result<String, mermaid::MermaidError> 
     // State composites are light lavender (the dagre default `#ffffde` is the
     // flowchart subgraph yellow, wrong for state).
     for sg in &fc.subgraphs {
-        node_styles.entry(sg.id.clone()).or_insert_with(|| style::NodeStyle {
-            fill: Some("#ECECFF".into()),
-            stroke: Some("#9370DB".into()),
-            ..Default::default()
-        });
+        node_styles
+            .entry(sg.id.clone())
+            .or_insert_with(|| style::NodeStyle {
+                fill: Some("#ECECFF".into()),
+                stroke: Some("#9370DB".into()),
+                ..Default::default()
+            });
     }
     let geom = kymo_layout::dagre_geom(&fc, style::FlowStyle::Mermaid);
     Ok(kymo_graph::dagre_svg::render(
@@ -333,7 +335,10 @@ mod auto_tests {
 
     #[test]
     fn kind_detection_skips_directives() {
-        assert_eq!(diagram_kind("%%{init:{}}%%\nsequenceDiagram\nA->>B: hi"), "sequence");
+        assert_eq!(
+            diagram_kind("%%{init:{}}%%\nsequenceDiagram\nA->>B: hi"),
+            "sequence"
+        );
         assert_eq!(diagram_kind("classDiagram\nclass A"), "class");
         assert_eq!(diagram_kind("stateDiagram-v2\n[*] --> A"), "state");
         assert_eq!(diagram_kind("erDiagram\nA ||--o{ B : has"), "er");
@@ -347,9 +352,15 @@ mod auto_tests {
     fn auto_dispatches_to_native_renderer() {
         // sequence → real <text>, not the flowchart fallback (which would error/garble)
         let svg = mermaid_to_svg_auto("sequenceDiagram\nAlice->>Bob: hi").unwrap();
-        assert!(svg.contains("seq-arrow"), "sequence should use the sequence renderer");
+        assert!(
+            svg.contains("seq-arrow"),
+            "sequence should use the sequence renderer"
+        );
         // class → mermaid palette from the class-box renderer
         let svg = mermaid_to_svg_auto("classDiagram\nclass A {\n  +int x\n}").unwrap();
-        assert!(svg.contains("ECECFF"), "class should use the class-box renderer");
+        assert!(
+            svg.contains("ECECFF"),
+            "class should use the class-box renderer"
+        );
     }
 }

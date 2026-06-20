@@ -831,7 +831,11 @@ impl SimGraph {
         for &idx in tree {
             max_diag = max_diag.max(self.nodes[idx].diagonal());
         }
-        if !max_diag.is_finite() { 0.0 } else { max_diag }
+        if !max_diag.is_finite() {
+            0.0
+        } else {
+            max_diag
+        }
     }
 
     fn branch_radial_layout(
@@ -2141,7 +2145,7 @@ fn decide_directions_for_overlapping_nodes(a: &SimNode, b: &SimNode) -> (i32, i3
 
 #[cfg(test)]
 mod tests {
-    use super::{IndexedEdge, IndexedNode, SimGraph, layout_indexed};
+    use super::{layout_indexed, IndexedEdge, IndexedNode, SimGraph};
 
     fn assert_close(a: f64, b: f64) {
         let eps = 1e-3;

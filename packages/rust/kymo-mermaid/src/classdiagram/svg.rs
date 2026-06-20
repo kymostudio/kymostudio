@@ -5,8 +5,8 @@
 
 use super::{ClassBox, ClassDiagram, Crow, RelKind, Relation};
 use kymo_graph::flowchart::{FlowEdge, FlowNode, Flowchart, Subgraph};
-use kymo_layout as layout;
 use kymo_graph::model::{Component, Shape};
+use kymo_layout as layout;
 use std::collections::HashMap;
 
 const LINE_H: i32 = 18;
@@ -121,7 +121,10 @@ pub fn render(cd: &ClassDiagram) -> String {
 /// Render an `erDiagram` at externally-supplied entity positions (from merman's
 /// mermaid-exact ER layout) — reuses the 2-column table + relationship drawing,
 /// so entity boxes land where mermaid.js puts them. `pos`: id → (cx, cy, w, h).
-pub fn render_er_positioned(cd: &ClassDiagram, pos: &HashMap<String, (i32, i32, i32, i32)>) -> String {
+pub fn render_er_positioned(
+    cd: &ClassDiagram,
+    pos: &HashMap<String, (i32, i32, i32, i32)>,
+) -> String {
     use kymo_graph::model::Accent;
     let mk = |id: &str| -> Option<Component> {
         pos.get(id).map(|&(cx, cy, w, h)| Component {
@@ -201,7 +204,12 @@ pub fn render_er_dagre(cd: &ClassDiagram) -> String {
     let pos: HashMap<String, (i32, i32, i32, i32)> = geom
         .nodes
         .iter()
-        .map(|n| (n.id.clone(), (n.cx as i32, n.cy as i32, n.w as i32, n.h as i32)))
+        .map(|n| {
+            (
+                n.id.clone(),
+                (n.cx as i32, n.cy as i32, n.w as i32, n.h as i32),
+            )
+        })
         .collect();
     render_er_positioned(cd, &pos)
 }
@@ -333,7 +341,11 @@ fn er_box_svg(c: &ClassBox, comp: &Component) -> String {
             None => (a.trim(), ""),
         })
         .collect();
-    let typew = rows.iter().map(|(t, _)| t.chars().count()).max().unwrap_or(4) as i32;
+    let typew = rows
+        .iter()
+        .map(|(t, _)| t.chars().count())
+        .max()
+        .unwrap_or(4) as i32;
     let col_x = (x + typew * 7 + 12).clamp(x + 30, x + w - 30);
     let avail = h - header_h;
     let row_h = (avail / n).max(1);

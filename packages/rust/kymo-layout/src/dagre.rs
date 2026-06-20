@@ -6,13 +6,13 @@
 //! mermaid [`FlowStyle`] the output aims to match mermaid.js 11. A rounded
 //! [`Diagram`] is also available for the kymojson interchange path.
 
+use dagre::graph::{Graph, GraphOptions};
+use dagre::layout::layout;
+use dagre::layout::types::{EdgeLabel, LayoutOptions, NodeLabel, RankDir};
 use kymo_graph::dagre_svg::{FEdge, FGeom, FNode, FRegion};
 use kymo_graph::flowchart::{Direction, Flowchart};
 use kymo_graph::metrics::{node_size_for, node_size_mermaid_f};
 use kymo_graph::style::FlowStyle;
-use dagre::graph::{Graph, GraphOptions};
-use dagre::layout::layout;
-use dagre::layout::types::{EdgeLabel, LayoutOptions, NodeLabel, RankDir};
 use std::collections::HashMap;
 
 /// A pre-rendered `$$…$$` glyph group plus its pixel size, computed by the caller
@@ -54,7 +54,7 @@ fn region_bounds(
     }
     memo[i] = Some(None); // guard against parent cycles while recursing
     let mut b: Option<(f64, f64, f64, f64)> = None;
-    let mut acc = |b: &mut Option<(f64, f64, f64, f64)>, m: Option<(f64, f64, f64, f64)>| {
+    let acc = |b: &mut Option<(f64, f64, f64, f64)>, m: Option<(f64, f64, f64, f64)>| {
         if let Some((x1, y1, x2, y2)) = m {
             *b = Some(match *b {
                 None => (x1, y1, x2, y2),
@@ -66,7 +66,10 @@ fn region_bounds(
         acc(&mut b, node_box.get(mem.as_str()).copied());
     }
     for &c in &children[i] {
-        acc(&mut b, region_bounds(c, subs, children, node_box, dagre_box, memo));
+        acc(
+            &mut b,
+            region_bounds(c, subs, children, node_box, dagre_box, memo),
+        );
     }
     let res = b.map(|(x1, y1, x2, y2)| (x1 - 8.0, y1 - 21.0, x2 + 8.0, y2 + 8.0));
     memo[i] = Some(res);
@@ -88,9 +91,9 @@ fn dir_to_rankdir(d: Direction) -> RankDir {
 struct CL {
     w: f64,
     h: f64,
-    nodes: Vec<(String, f64, f64, f64, f64)>,      // id, cx, cy, w, h
+    nodes: Vec<(String, f64, f64, f64, f64)>, // id, cx, cy, w, h
     regions: Vec<(String, String, f64, f64, f64, f64)>, // id, label, x, y, w, h
-    edges: Vec<(usize, Vec<(f64, f64)>)>,          // edge index, points
+    edges: Vec<(usize, Vec<(f64, f64)>)>,     // edge index, points
 }
 
 /// True when the flowchart needs the recursive (per-subgraph-direction /
@@ -159,7 +162,10 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
         if let Some(&c) = node_container.get(id) {
             return Some(c);
         }
-        fc.subgraphs.iter().position(|s| s.id == id).and_then(|i| fc.subgraphs[i].parent)
+        fc.subgraphs
+            .iter()
+            .position(|s| s.id == id)
+            .and_then(|i| fc.subgraphs[i].parent)
     };
     // Chain of (container, element-id) from the element up to the root.
     let chain = |id: &str| -> Vec<(Option<usize>, String)> {
@@ -219,28 +225,53 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
         let mut g: Graph<NodeLabel, EdgeLabel> = Graph::with_options(GraphOptions::default());
         for &nid in nodes_here {
             let (w, h) = node_size[nid];
-            g.set_node(nid.to_string(), Some(NodeLabel { width: w, height: h, ..Default::default() }));
+            g.set_node(
+                nid.to_string(),
+                Some(NodeLabel {
+                    width: w,
+                    height: h,
+                    ..Default::default()
+                }),
+            );
         }
         for &si in sgs_here {
             let cl = &done[&si];
             g.set_node(
                 fc.subgraphs[si].id.clone(),
-                Some(NodeLabel { width: cl.w.max(1.0), height: cl.h.max(1.0), ..Default::default() }),
+                Some(NodeLabel {
+                    width: cl.w.max(1.0),
+                    height: cl.h.max(1.0),
+                    ..Default::default()
+                }),
             );
         }
         if let Some(es) = edges_at.get(&container) {
             for (ra, rb, ei) in es {
                 let lw = fc.edges[*ei].label.chars().count() as f64 * 7.0;
-                let lh = if fc.edges[*ei].label.is_empty() { 0.0 } else { 16.0 };
+                let lh = if fc.edges[*ei].label.is_empty() {
+                    0.0
+                } else {
+                    16.0
+                };
                 g.set_edge(
                     ra.clone(),
                     rb.clone(),
-                    Some(EdgeLabel { width: lw, height: lh, ..Default::default() }),
+                    Some(EdgeLabel {
+                        width: lw,
+                        height: lh,
+                        ..Default::default()
+                    }),
                     None,
                 );
             }
         }
-        layout(&mut g, Some(LayoutOptions { rankdir: dir_to_rankdir(dir), ..Default::default() }));
+        layout(
+            &mut g,
+            Some(LayoutOptions {
+                rankdir: dir_to_rankdir(dir),
+                ..Default::default()
+            }),
+        );
 
         // bbox of placed elements
         let (mut minx, mut miny, mut maxx, mut maxy) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
@@ -252,18 +283,30 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
         };
         for &nid in nodes_here {
             if let Some(nd) = g.node(nid) {
-                acc(nd.x.unwrap_or(0.0), nd.y.unwrap_or(0.0), nd.width, nd.height);
+                acc(
+                    nd.x.unwrap_or(0.0),
+                    nd.y.unwrap_or(0.0),
+                    nd.width,
+                    nd.height,
+                );
             }
         }
         for &si in sgs_here {
             if let Some(nd) = g.node(&fc.subgraphs[si].id) {
-                acc(nd.x.unwrap_or(0.0), nd.y.unwrap_or(0.0), nd.width, nd.height);
+                acc(
+                    nd.x.unwrap_or(0.0),
+                    nd.y.unwrap_or(0.0),
+                    nd.width,
+                    nd.height,
+                );
             }
         }
         if minx > maxx {
             return CL::default();
         }
-        let titled = container.map(|i| !fc.subgraphs[i].title.is_empty()).unwrap_or(false);
+        let titled = container
+            .map(|i| !fc.subgraphs[i].title.is_empty())
+            .unwrap_or(false);
         let (padl, padr, padt, padb) = match container {
             Some(_) => (8.0, 8.0, if titled { 25.0 } else { 8.0 }, 8.0),
             None => (MX, MX, MY, MY),
@@ -276,7 +319,13 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
         };
         for &nid in nodes_here {
             if let Some(nd) = g.node(nid) {
-                cl.nodes.push((nid.to_string(), nd.x.unwrap_or(0.0) + sx, nd.y.unwrap_or(0.0) + sy, nd.width, nd.height));
+                cl.nodes.push((
+                    nid.to_string(),
+                    nd.x.unwrap_or(0.0) + sx,
+                    nd.y.unwrap_or(0.0) + sy,
+                    nd.width,
+                    nd.height,
+                ));
             }
         }
         for &si in sgs_here {
@@ -287,21 +336,33 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
             let sub = &done[&si];
             let ox = nd.x.unwrap_or(0.0) - sub.w / 2.0 + sx;
             let oy = nd.y.unwrap_or(0.0) - sub.h / 2.0 + sy;
-            cl.regions.push((fc.subgraphs[si].id.clone(), fc.subgraphs[si].title.clone(), ox, oy, sub.w, sub.h));
+            cl.regions.push((
+                fc.subgraphs[si].id.clone(),
+                fc.subgraphs[si].title.clone(),
+                ox,
+                oy,
+                sub.w,
+                sub.h,
+            ));
             for (id, cx, cy, w, h) in &sub.nodes {
                 cl.nodes.push((id.clone(), ox + cx, oy + cy, *w, *h));
             }
             for (id, lbl, rx, ry, rw, rh) in &sub.regions {
-                cl.regions.push((id.clone(), lbl.clone(), ox + rx, oy + ry, *rw, *rh));
+                cl.regions
+                    .push((id.clone(), lbl.clone(), ox + rx, oy + ry, *rw, *rh));
             }
             for (ei, pts) in &sub.edges {
-                cl.edges.push((*ei, pts.iter().map(|(px, py)| (ox + px, oy + py)).collect()));
+                cl.edges
+                    .push((*ei, pts.iter().map(|(px, py)| (ox + px, oy + py)).collect()));
             }
         }
         if let Some(es) = edges_at.get(&container) {
             for (ra, rb, ei) in es {
                 if let Some(ed) = g.edge(ra, rb, None) {
-                    cl.edges.push((*ei, ed.points.iter().map(|p| (p.x + sx, p.y + sy)).collect()));
+                    cl.edges.push((
+                        *ei,
+                        ed.points.iter().map(|p| (p.x + sx, p.y + sy)).collect(),
+                    ));
                 }
             }
         }
@@ -336,7 +397,10 @@ fn dagre_geom_nested(fc: &Flowchart, style: FlowStyle) -> FGeom {
     geom.w = root.w;
     geom.h = root.h;
     for (id, cx, cy, w, h) in &root.nodes {
-        let (name, shape) = node_meta.get(id.as_str()).copied().unwrap_or((id.as_str(), kymo_graph::model::Shape::Box));
+        let (name, shape) = node_meta
+            .get(id.as_str())
+            .copied()
+            .unwrap_or((id.as_str(), kymo_graph::model::Shape::Box));
         geom.nodes.push(FNode {
             id: id.clone(),
             name: name.to_string(),
@@ -482,7 +546,10 @@ pub fn dagre_geom_with_math(
             (0.0, 0.0)
         } else {
             // mermaid sizes the edge label to its measured text, height 24.
-            (kymo_graph::metrics::text_w_mermaid(&e.label).max(10.0), 24.0)
+            (
+                kymo_graph::metrics::text_w_mermaid(&e.label).max(10.0),
+                24.0,
+            )
         };
         g.set_edge(
             e.src.clone(),
@@ -529,7 +596,17 @@ pub fn dagre_geom_with_math(
     let node_box: std::collections::HashMap<&str, (f64, f64, f64, f64)> = geom
         .nodes
         .iter()
-        .map(|n| (n.id.as_str(), (n.cx - n.w / 2.0, n.cy - n.h / 2.0, n.cx + n.w / 2.0, n.cy + n.h / 2.0)))
+        .map(|n| {
+            (
+                n.id.as_str(),
+                (
+                    n.cx - n.w / 2.0,
+                    n.cy - n.h / 2.0,
+                    n.cx + n.w / 2.0,
+                    n.cy + n.h / 2.0,
+                ),
+            )
+        })
         .collect();
     let mut children: Vec<Vec<usize>> = vec![Vec::new(); fc.subgraphs.len()];
     for (ci, sg) in fc.subgraphs.iter().enumerate() {
@@ -548,7 +625,12 @@ pub fn dagre_geom_with_math(
                 let (w, h) = (cd.width, cd.height);
                 if w > 0.0 && h > 0.0 {
                     let (x, y) = (cd.x.unwrap_or(0.0), cd.y.unwrap_or(0.0));
-                    Some((x - w / 2.0 + MX, y - h / 2.0 + MY, x + w / 2.0 + MX, y + h / 2.0 + MY))
+                    Some((
+                        x - w / 2.0 + MX,
+                        y - h / 2.0 + MY,
+                        x + w / 2.0 + MX,
+                        y + h / 2.0 + MY,
+                    ))
                 } else {
                     None
                 }
@@ -557,9 +639,14 @@ pub fn dagre_geom_with_math(
         .collect();
     let mut memo: Vec<Option<Option<(f64, f64, f64, f64)>>> = vec![None; fc.subgraphs.len()];
     for (i, sg) in fc.subgraphs.iter().enumerate() {
-        if let Some((x1, y1, x2, y2)) =
-            region_bounds(i, &fc.subgraphs, &children, &node_box, &dagre_box, &mut memo)
-        {
+        if let Some((x1, y1, x2, y2)) = region_bounds(
+            i,
+            &fc.subgraphs,
+            &children,
+            &node_box,
+            &dagre_box,
+            &mut memo,
+        ) {
             geom.regions.push(FRegion {
                 id: sg.id.clone(),
                 label: sg.title.clone(),

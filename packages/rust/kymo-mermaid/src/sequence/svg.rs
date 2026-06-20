@@ -7,12 +7,14 @@
 //! combined fragments (`loop`/`alt`/`opt`/`par`), notes, activation bars and
 //! `autonumber` — everything as real `<text>`, so PNG/PDF keep their labels.
 
-use super::layout::{self, PActiv, PFrag, PMsg, PNote, HEAD_H, HEAD_TOP, HEAD_W, LINE_TOP, SELF_EXTRA};
+use super::layout::{
+    self, PActiv, PFrag, PMsg, PNote, HEAD_H, HEAD_TOP, HEAD_W, LINE_TOP, SELF_EXTRA,
+};
 use super::{FragmentOp, MessageSort, Sequence};
 
 const ACT_W: i64 = 8; // activation-bar width
-// mermaid's default sequence font — matching it keeps glyph shapes/widths in
-// step for visual parity.
+                      // mermaid's default sequence font — matching it keeps glyph shapes/widths in
+                      // step for visual parity.
 const FONT: &str = "\"trebuchet ms\", verdana, arial, sans-serif";
 
 const DEFS: &str = "<marker id=\"seq-arrow\" markerWidth=\"12\" markerHeight=\"10\" refX=\"9\" refY=\"5\" \
@@ -211,7 +213,9 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
                  <line x1=\"{ax1}\" y1=\"{ay}\" x2=\"{ax2}\" y2=\"{ay}\" {pen}/>\
                  <line x1=\"{ax1}\" y1=\"{ly}\" x2=\"{c}\" y2=\"{tb}\" {pen}/>\
                  <line x1=\"{c}\" y1=\"{tb}\" x2=\"{lx2}\" y2=\"{ly}\" {pen}/>{lbl}",
-                ax1 = c - 18.0, ax2 = c + 18.0, lx2 = c + 16.0,
+                ax1 = c - 18.0,
+                ax2 = c + 18.0,
+                lx2 = c + 16.0,
                 lbl = glyph_label(cx, t + H + 2.5, label),
             )
         }
@@ -222,8 +226,11 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
                 "<line x1=\"{x1}\" y1=\"{yt}\" x2=\"{x2}\" y2=\"{yt}\" {pen}/>\
                  <line x1=\"{x1}\" y1=\"{y0}\" x2=\"{x1}\" y2=\"{y20}\" {pen}/>\
                  <circle cx=\"{c}\" cy=\"{cy}\" r=\"22\" {fill}/>{lbl}",
-                x1 = c - 55.0, x2 = c - 15.0,
-                yt = t + 31.0, y0 = t + 21.0, y20 = t + 41.0,
+                x1 = c - 55.0,
+                x2 = c - 15.0,
+                yt = t + 31.0,
+                y0 = t + 21.0,
+                y20 = t + 41.0,
                 lbl = glyph_label(cx, t + 68.5, label),
             )
         }
@@ -247,7 +254,9 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
             format!(
                 "<circle cx=\"{c}\" cy=\"{cy}\" r=\"22\" {fill}/>\
                  <line x1=\"{x1}\" y1=\"{y}\" x2=\"{x2}\" y2=\"{y}\" {pen}/>{lbl}",
-                x1 = c - 22.0, x2 = c + 22.0, y = cy + 22.0,
+                x1 = c - 22.0,
+                x2 = c + 22.0,
+                y = cy + 22.0,
                 lbl = glyph_label(cx, t + 68.5, label),
             )
         }
@@ -259,7 +268,8 @@ fn actor_glyph(kind: &str, cx: i64, top: i64, label: &str) -> Option<String> {
             format!(
                 "<path d=\"M {left:.1} {ttop:.1} a {rx} {ry} 0 0 0 {w} 0 a {rx} {ry} 0 0 0 {nw} 0 \
                  l 0 {bh} a {rx} {ry} 0 0 0 {w} 0 l 0 {nbh}\" {thin}/>{lbl}",
-                nw = -w, nbh = -bh,
+                nw = -w,
+                nbh = -bh,
                 lbl = glyph_label(cx, t + 35.0 + H / 2.0, label),
             )
         }
@@ -382,7 +392,11 @@ fn msg_svg(m: &PMsg, centers: &[i64]) -> String {
             .iter()
             .enumerate()
             .map(|(i, l)| {
-                format!("<tspan x=\"{mid}\" y=\"{}\">{}</tspan>", top + i as i64 * LH, esc(l.trim()))
+                format!(
+                    "<tspan x=\"{mid}\" y=\"{}\">{}</tspan>",
+                    top + i as i64 * LH,
+                    esc(l.trim())
+                )
             })
             .collect();
         format!("<text text-anchor=\"middle\" fill=\"#333333\" font-size=\"16\">{tspans}</text>")

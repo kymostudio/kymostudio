@@ -9,14 +9,14 @@
 //! this crate. Downstream crates re-export these modules (core does so under the
 //! same names for API stability).
 
-pub mod model;
+pub mod d2;
+pub mod dagre_svg;
+pub mod dot;
+pub mod drawio;
+pub mod flowchart;
+pub mod flowchart_svg;
 pub mod kymojson;
 pub mod math;
-pub mod style;
-pub mod flowchart;
 pub mod metrics;
-pub mod flowchart_svg;
-pub mod dagre_svg;
-pub mod drawio;
-pub mod d2;
-pub mod dot;
+pub mod model;
+pub mod style;
