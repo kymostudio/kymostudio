@@ -16,9 +16,8 @@ type Variant = { variant: string; key: string; path: string; ver: number };
 type Brand = { set: string; slug: string; name: string; color: string; variants: Variant[] };
 
 export function BrandPage() {
-  const parts = location.pathname.replace(/\/+$/, "").split("/"); // /brand/<set>/<slug>
-  const set = decodeURIComponent(parts[2] || "");
-  const slug = decodeURIComponent(parts.slice(3).join("/") || "");
+  const parts = location.pathname.replace(/\/+$/, "").split("/"); // /brand/<slug>
+  const slug = decodeURIComponent(parts.slice(2).join("/") || "");
   const [brand, setBrand] = useState<Brand | null | undefined>(undefined);
   const [toast, setToast] = useState<string | null>(null);
   const flash = (m: string) => { setToast(m); window.setTimeout(() => setToast(null), 1500); };
@@ -31,7 +30,7 @@ export function BrandPage() {
     (async () => {
       try {
         const d = await fetch(`${API}/api/icons`).then((r) => r.json());
-        setBrand((d.brands || []).find((x: Brand) => x.set === set && x.slug === slug) || null);
+        setBrand((d.brands || []).find((x: Brand) => x.slug === slug) || null);
       } catch { setBrand(null); }
     })();
   }, []);
@@ -43,13 +42,13 @@ export function BrandPage() {
         <a className="brand" href="/" style={{ textDecoration: "none" }}>
           <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> kymo icons
         </a>
-        <nav className="nav"><a href={set ? `/?set=${set}` : "/"}>← Gallery</a></nav>
+        <nav className="nav"><a href={brand ? `/?set=${brand.set}` : "/"}>← Gallery</a></nav>
       </div>
     </header>
   );
 
   if (brand === undefined) return <>{Header}<main className="brandpage"><p className="count">Loading…</p></main></>;
-  if (!brand) return <>{Header}<main className="brandpage"><div className="login-card"><h2>Brand not found</h2><p>No brand <b>{set}:{slug}</b>.</p><a href="/">← All icons</a></div></main></>;
+  if (!brand) return <>{Header}<main className="brandpage"><div className="login-card"><h2>Brand not found</h2><p>No brand <b>{slug}</b>.</p><a href="/">← All icons</a></div></main></>;
 
   const def = brand.variants.find((v) => v.variant === "color") || brand.variants[0];
 
