@@ -36,6 +36,10 @@ export function Admin() {
   }, [loading, claims]);
 
   const isAdmin = !!claims && claims.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  // After a successful admin sign-in on /login, move to /admin (the management URL).
+  const onLogin = location.pathname.replace(/\/+$/, "") === "/login";
+  const redirecting = isAdmin && onLogin;
+  useEffect(() => { if (redirecting) location.replace("/admin"); }, [redirecting]);
 
   return (
     <>
@@ -52,8 +56,8 @@ export function Admin() {
       </header>
 
       <main style={{ maxWidth: 720, margin: "0 auto" }}>
-        {loading ? (
-          <p className="count">Checking session…</p>
+        {loading || redirecting ? (
+          <p className="count">{redirecting ? "Signed in — opening admin…" : "Checking session…"}</p>
         ) : !claims ? (
           <div className="login-card">
             <h2>Admin sign-in</h2>
