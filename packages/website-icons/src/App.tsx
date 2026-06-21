@@ -96,6 +96,9 @@ const SET_LABELS: Record<string, string> = {
 };
 const setLabel = (s: string) => SET_LABELS[s] || s;
 
+// Count actual icons, not cards: a brand card bundles several variant icons.
+const iconCount = (list: Icon[]) => list.reduce((n, it) => n + (it.variants?.length || 1), 0);
+
 export function App() {
   const [items, setItems] = useState<Icon[]>([]);
   const [set, setSet] = useState(() => new URLSearchParams(location.search).get("set") || "all");
@@ -129,14 +132,14 @@ export function App() {
   // set list (counts), biggest first
   const sets = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const i of items) counts[i.set] = (counts[i.set] || 0) + 1;
+    for (const i of items) counts[i.set] = (counts[i.set] || 0) + (i.variants?.length || 1);
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [items]);
 
   // subsets per set (brand `grp`, e.g. ai → model/application/provider), biggest first
   const subsets = useMemo(() => {
     const m: Record<string, Record<string, number>> = {};
-    for (const i of items) if (i.grp) { (m[i.set] ||= {})[i.grp] = ((m[i.set] ||= {})[i.grp] || 0) + 1; }
+    for (const i of items) if (i.grp) { (m[i.set] ||= {})[i.grp] = ((m[i.set] ||= {})[i.grp] || 0) + (i.variants?.length || 1); }
     const out: Record<string, [string, number][]> = {};
     for (const s in m) out[s] = Object.entries(m[s]).sort((a, b) => b[1] - a[1]);
     return out;
@@ -270,7 +273,7 @@ export function App() {
         <div className="top">
           <span className="brand">
             <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> kymo icons{" "}
-            {items.length > 0 && <small>· {items.length.toLocaleString()} icons</small>}
+            {items.length > 0 && <small>· {iconCount(items).toLocaleString()} icons</small>}
           </span>
           <nav className="nav">
             <a href="https://docs.kymo.studio">Docs</a>
@@ -300,7 +303,7 @@ export function App() {
             <div className="sets">
               <button className={"set-row" + (set === "all" ? " active" : "")} onClick={() => { setSet("all"); setSub(""); }}>
                 <span className="label">All</span>
-                <span className="n">{items.length.toLocaleString()}</span>
+                <span className="n">{iconCount(items).toLocaleString()}</span>
               </button>
               {sets.map(([s, n]) => (
                 <Fragment key={s}>
@@ -325,7 +328,7 @@ export function App() {
             <div className="search-wrap">
               <span className="s"><SearchGlyph /></span>
               <input ref={searchRef} className="q" type="search" autoFocus autoComplete="off"
-                placeholder="Search 2,400+ icons — “ec2”, “kubernetes”, “database”…"
+                placeholder={`Search ${(iconCount(items) || 2700).toLocaleString()} icons — “ec2”, “kubernetes”, “database”…`}
                 value={query} onChange={(e) => setQuery(e.target.value)} />
               <span className="kbd">⌘K</span>
             </div>
@@ -335,7 +338,7 @@ export function App() {
               <option value="set">By set</option>
             </select>
           </div>
-          <p className="count">{filtered.length.toLocaleString()} icon{filtered.length === 1 ? "" : "s"}</p>
+          <p className="count">{iconCount(filtered).toLocaleString()} icon{iconCount(filtered) === 1 ? "" : "s"}</p>
           <div className="grid">
             {visible.map((it) => (
               <a key={it.key} className="cell" href={iconHref(it.key)}
