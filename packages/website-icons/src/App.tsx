@@ -12,7 +12,10 @@ const CDN_BASE = new URLSearchParams(location.search).get("cdn") || "https://cdn
 export const API = "https://api.kymo.studio";
 const iconUrl = (path: string, ver?: number) => CDN_BASE + path + (ver ? `?v=${ver}` : "");
 
-type Icon = { key: string; set: string; path?: string; svg?: string; ver?: number };
+type Variant = { variant: string; key: string; path: string; ver: number };
+// An item is one card: a static icon, an inline-SVG icon, or a BRAND (1 card with
+// several variants — icon/color/text/brand — switchable in the dialog).
+type Icon = { key: string; set: string; path?: string; svg?: string; ver?: number; name?: string; variants?: Variant[] };
 
 // ── inline SVG glyphs (Lucide-style) ──────────────────────────────────────
 const S = (d: React.ReactNode, vb = "0 0 24 24", fill = "none") => (
@@ -54,6 +57,7 @@ export function App() {
   const [sortBy, setSortBy] = useState<"name" | "set">("name");
   const [shown, setShown] = useState(PAGE);
   const [dialog, setDialog] = useState<Icon | null>(null);
+  const [dlgVar, setDlgVar] = useState<Variant | null>(null); // selected variant in a brand dialog
   const [tip, setTip] = useState<{ key: string; x: number; y: number } | null>(null);
   const [toast, setToastState] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">(
@@ -79,32 +83,33 @@ export function App() {
       const all: Icon[] = Object.entries(m.icons as Record<string, string>).map(
         ([key, path]) => ({ key, path, set: key.split(":")[0] }),
       );
-      // vendored inline IconifyJSON sets (SVG body, no PNG) — e.g. ai:
-      for (const pfx of ["ai"]) {
-        try {
-          const s = await fetch(`sets/${pfx}.json`).then((r) => r.json());
-          const dw = s.width || 16, dh = s.height || 16;
-          for (const [name, ic] of Object.entries<any>(s.icons || {})) {
-            const w = ic.width || dw, h = ic.height || dh;
-            all.push({
-              key: `${pfx}:${name}`, set: pfx,
-              svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}">${ic.body}</svg>`,
-            });
-          }
-        } catch { /* set not shipped — skip */ }
-      }
-      // merge the live admin overlay (added/removed) so admin changes show
-      // without a redeploy. Overlay-added icons carry `ver` to bust the CDN cache.
+      // merge the live DB catalogue (brands + variants, removed) over the static
+      // manifest so admin changes show without a redeploy.
       let merged = all;
       try {
         const ov: any = await fetch(`${API}/api/icons`).then((r) => r.json());
         const removed = new Set<string>(ov.removed || []);
-        const map = new Map<string, Icon>(all.filter((it) => !removed.has(it.key)).map((it) => [it.key, it]));
+        const map = new Map<string, Icon>();
+        for (const it of all) if (!removed.has(it.key)) map.set(it.key, it);
+        // brand items: ONE card per brand; default variant (color→icon) is the
+        // card art, the full variant list powers the dialog switcher.
+        const brandKeys = new Set<string>();
+        for (const b of (ov.brands || []) as any[]) {
+          const variants: Variant[] = b.variants || [];
+          for (const v of variants) brandKeys.add(v.key);
+          const def = variants.find((v) => v.variant === "color") || variants.find((v) => v.variant === "icon") || variants[0];
+          if (!def) continue;
+          const key = `${b.set}:${b.slug}`;
+          brandKeys.add(key);
+          map.set(key, { key, set: b.set, name: b.name, path: def.path, ver: def.ver, variants });
+        }
+        // any brand-less overlay icon (not a brand default/variant)
         for (const [key, v] of Object.entries<any>(ov.icons || {})) {
+          if (brandKeys.has(key)) continue;
           map.set(key, { key, set: key.split(":")[0], path: v.path, ver: v.ver });
         }
         merged = [...map.values()];
-      } catch { /* overlay unavailable — static catalogue only */ }
+      } catch { /* catalogue unavailable — static only */ }
       merged.sort((a, b) => a.key.localeCompare(b.key));
       setItems(merged);
     })();
@@ -126,7 +131,7 @@ export function App() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const out = items.filter(
-      (it) => (set === "all" || it.set === set) && (!q || it.key.toLowerCase().includes(q)),
+      (it) => (set === "all" || it.set === set) && (!q || it.key.toLowerCase().includes(q) || (it.name || "").toLowerCase().includes(q)),
     );
     out.sort(sortBy === "set"
       ? (a, b) => a.set.localeCompare(b.set) || a.key.localeCompare(b.key)
@@ -199,6 +204,17 @@ export function App() {
     else save(`${API}/api/icons/download?key=${encodeURIComponent(it.key)}`, base + (it.path!.toLowerCase().endsWith(".svg") ? ".svg" : ".png"));
   };
 
+  // open a card; for a brand, default the variant switcher to color → icon
+  const openDialog = (it: Icon) => {
+    setTip(null);
+    setDialog(it);
+    setDlgVar(it.variants ? (it.variants.find((v) => v.variant === "color") || it.variants[0]) : null);
+  };
+  // the active variant of the open dialog (a brand's selected variant, else the card itself)
+  const av: Icon | null = dialog
+    ? (dlgVar ? { key: dlgVar.key, set: dialog.set, path: dlgVar.path, ver: dlgVar.ver } : dialog)
+    : null;
+
   const visible = filtered.slice(0, shown);
 
   return (
@@ -267,7 +283,7 @@ export function App() {
           <p className="count">{filtered.length.toLocaleString()} icon{filtered.length === 1 ? "" : "s"}</p>
           <div className="grid">
             {visible.map((it) => (
-              <div key={it.key} className="cell" onClick={() => { setTip(null); setDialog(it); }}
+              <div key={it.key} className="cell" onClick={() => openDialog(it)}
                 onMouseEnter={(e) => {
                   const r = e.currentTarget.getBoundingClientRect();
                   setTip({ key: it.key, x: r.left + r.width / 2, y: r.top - 8 });
@@ -293,23 +309,31 @@ export function App() {
         <div className="toast" dangerouslySetInnerHTML={{ __html: toast }} />
       )}
 
-      {dialog && (
+      {dialog && av && (
         <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) setDialog(null); }}>
           <div className="dialog" role="dialog" aria-modal="true">
-            <div className="dlg-preview"><Art it={dialog} /></div>
+            <div className="dlg-preview"><Art it={av} /></div>
             <div className="dlg-body">
               <div className="dlg-head">
-                <span className="dlg-key">{dialog.key}</span>
+                <span className="dlg-key">{dialog.name || av.key}</span>
                 <span className="dlg-set">{dialog.set}</span>
               </div>
+              {dialog.variants && dialog.variants.length > 1 && (
+                <div className="dlg-variants">
+                  {dialog.variants.map((v) => (
+                    <button key={v.key} className={"vtab" + (dlgVar?.key === v.key ? " active" : "")}
+                      onClick={() => setDlgVar(v)}>{v.variant}</button>
+                  ))}
+                </div>
+              )}
               <div className="dlg-actions">
-                <button className="btn primary" onClick={() => { copy(dialog.key); flash(`Copied <code>${dialog.key}</code>`); }}>
+                <button className="btn primary" onClick={() => { copy(av.key); flash(`Copied <code>${av.key}</code>`); }}>
                   <CopyGlyph /> Copy key
                 </button>
-                <button className="btn" onClick={() => { copy(dialog.svg ? dialog.key : iconUrl(dialog.path!, dialog.ver)); flash("Copied URL"); }}>
+                <button className="btn" onClick={() => { copy(av.svg ? av.key : iconUrl(av.path!, av.ver)); flash("Copied URL"); }}>
                   <LinkGlyph /> Copy URL
                 </button>
-                <button className="btn" onClick={() => downloadIcon(dialog)}>
+                <button className="btn" onClick={() => downloadIcon(av)}>
                   <DownloadGlyph /> Download
                 </button>
                 <button className="btn" onClick={() => setDialog(null)}>
@@ -319,9 +343,9 @@ export function App() {
               <div className="dlg-usage">
                 <p className="ul">Use in a .kymo diagram</p>
                 <div className="snippet">
-                  <code>{snippetFor(dialog.key)}</code>
+                  <code>{snippetFor(av.key)}</code>
                   <button title="Copy snippet" aria-label="Copy snippet"
-                    onClick={() => { copy(snippetFor(dialog.key)); flash("Copied snippet"); }}>
+                    onClick={() => { copy(snippetFor(av.key)); flash("Copied snippet"); }}>
                     <CopyGlyph />
                   </button>
                 </div>

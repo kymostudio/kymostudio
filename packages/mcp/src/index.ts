@@ -156,8 +156,10 @@ async function resolveAuth(request: Request, env: Env, renew = true): Promise<Au
 // The site merges static ⊕ overlay at load, so changes show without a redeploy.
 // Art binaries live in R2 at the manifest path (`icons/<set>/…`), served by
 // cdn.kymo.studio; `ver` (an edit timestamp) busts the CDN cache on replace.
-type IconOverlay = { icons: Record<string, { path: string; ver: number }>; removed: string[]; updatedAt: number };
+type Variant = { variant: string; key: string; path: string; ver: number };
+type Brand = { set: string; slug: string; name: string; color: string; variants: Variant[] };
 const ICON_CDN = "https://cdn.kymo.studio";
+const VORDER: Record<string, number> = { icon: 0, color: 1, text: 2, brand: 3 };
 
 function isIconAdmin(email: string | undefined, env: Env): boolean {
   if (!email) return false;
@@ -165,12 +167,6 @@ function isIconAdmin(email: string | undefined, env: Env): boolean {
   return list.length > 0 && list.includes(email.toLowerCase());
 }
 const iconSlug = (s: string) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "x";
-// Mirror packages/icons/scripts/build-manifest.mjs: key = `<set>:<category-name>`,
-// path = `icons/<set>/[<category>/]<name>.<ext>` (category folded into the key).
-function iconKeyPath(set: string, name: string, category: string | undefined, ext: "png" | "svg") {
-  const p = iconSlug(set), cat = category ? iconSlug(category) : "", nm = iconSlug(name);
-  return { key: `${p}:${cat ? cat + "-" : ""}${nm}`, path: `icons/${p}/${cat ? cat + "/" : ""}${nm}.${ext}` };
-}
 function b64ToBytes(b64: string): Uint8Array {
   const s = b64.includes(",") ? b64.slice(b64.indexOf(",") + 1) : b64; // tolerate data: URLs
   const bin = atob(s.replace(/\s+/g, ""));
@@ -178,76 +174,102 @@ function b64ToBytes(b64: string): Uint8Array {
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
 }
-let iconTableReady = false;
-async function ensureIconTable(env: Env) {
-  if (iconTableReady) return;
-  try { await env.DB.prepare("CREATE TABLE IF NOT EXISTS icon_overrides (key TEXT PRIMARY KEY, path TEXT, ver INTEGER, removed INTEGER DEFAULT 0, updated_at INTEGER)").run(); } catch { /* ignore */ }
-  iconTableReady = true;
-}
-// The live overlay, read out of D1: added/replaced icons (path + ver) and the
-// keys of hidden static icons.
-async function readIconOverlay(env: Env): Promise<IconOverlay> {
-  await ensureIconTable(env);
-  const icons: Record<string, { path: string; ver: number }> = {};
-  const removed: string[] = [];
-  let updatedAt = 0;
+
+// Runtime catalogue in D1: `brands` (1 row/brand — the display metadata) +
+// `icons` (N variant rows/brand, linked by set_id+brand). A tombstone (hide a
+// static manifest icon) is an icons row with brand NULL + removed=1. Art binaries
+// live in R2 at `icons/<set>/<brand>[-variant].<ext>`, served by cdn.kymo.studio.
+let iconTablesReady = false;
+async function ensureIconTables(env: Env) {
+  if (iconTablesReady) return;
   try {
-    const { results } = await env.DB.prepare("SELECT key, path, ver, removed, updated_at FROM icon_overrides").all<any>();
-    for (const r of results || []) {
-      if ((r.updated_at || 0) > updatedAt) updatedAt = r.updated_at;
-      if (r.removed) removed.push(r.key);
-      else if (r.path) icons[r.key] = { path: r.path, ver: r.ver || 0 };
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS brands (set_id TEXT, slug TEXT, name TEXT, color TEXT, grp TEXT, created_at INTEGER, PRIMARY KEY (set_id, slug))").run();
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS icons (key TEXT PRIMARY KEY, set_id TEXT, brand TEXT, variant TEXT, path TEXT, ver INTEGER, removed INTEGER DEFAULT 0, updated_at INTEGER)").run();
+  } catch { /* ignore */ }
+  iconTablesReady = true;
+}
+// Whole runtime catalogue for the site: brands (with grouped variants), a flat
+// map of each brand's default variant (back-compat), and removed tombstones.
+async function readCatalog(env: Env): Promise<{ brands: Brand[]; icons: Record<string, { path: string; ver: number }>; removed: string[] }> {
+  await ensureIconTables(env);
+  const brands = new Map<string, Brand>(); // "set:slug" -> Brand
+  const flat: Record<string, { path: string; ver: number }> = {};
+  const removed: string[] = [];
+  try {
+    const br = await env.DB.prepare("SELECT set_id, slug, name, color FROM brands").all<any>();
+    for (const b of br.results || []) brands.set(`${b.set_id}:${b.slug}`, { set: b.set_id, slug: b.slug, name: b.name || b.slug, color: b.color || "", variants: [] });
+    const ic = await env.DB.prepare("SELECT key, set_id, brand, variant, path, ver, removed FROM icons").all<any>();
+    for (const r of ic.results || []) {
+      if (r.removed) { removed.push(r.key); continue; }
+      if (!r.path) continue;
+      const bk = r.brand ? `${r.set_id}:${r.brand}` : null;
+      if (bk && brands.has(bk)) brands.get(bk)!.variants.push({ variant: r.variant, key: r.key, path: r.path, ver: r.ver || 0 });
+      else flat[r.key] = { path: r.path, ver: r.ver || 0 }; // brand-less single icon
     }
   } catch { /* empty / unavailable */ }
-  return { icons, removed, updatedAt };
+  const out: Brand[] = [];
+  for (const b of brands.values()) {
+    if (!b.variants.length) continue;
+    b.variants.sort((a, z) => (VORDER[a.variant] ?? 9) - (VORDER[z.variant] ?? 9));
+    const def = b.variants.find((v) => v.variant === "color") || b.variants.find((v) => v.variant === "icon") || b.variants[0];
+    flat[`${b.set}:${b.slug}`] = { path: def.path, ver: def.ver }; // default variant under the brand key
+    out.push(b);
+  }
+  return { brands: out, icons: flat, removed };
 }
-async function upsertIcon(env: Env, key: string, path: string | null, ver: number | null, removed: number) {
-  await ensureIconTable(env);
-  await env.DB.prepare("INSERT INTO icon_overrides (key, path, ver, removed, updated_at) VALUES (?1,?2,?3,?4,?5) ON CONFLICT(key) DO UPDATE SET path=?2, ver=?3, removed=?4, updated_at=?5")
-    .bind(key, path, ver, removed, Date.now()).run();
+async function upsertBrand(env: Env, set: string, slug: string, name: string, color: string) {
+  await ensureIconTables(env);
+  await env.DB.prepare("INSERT INTO brands (set_id, slug, name, color, created_at) VALUES (?1,?2,?3,?4,?5) ON CONFLICT(set_id, slug) DO UPDATE SET name=?3, color=?4")
+    .bind(set, slug, name, color, Date.now()).run();
 }
-async function deleteIconRow(env: Env, key: string) {
-  await ensureIconTable(env);
-  await env.DB.prepare("DELETE FROM icon_overrides WHERE key=?1").bind(key).run();
+async function upsertIconRow(env: Env, key: string, set: string | null, brand: string | null, variant: string | null, path: string | null, ver: number | null, removed: number) {
+  await ensureIconTables(env);
+  await env.DB.prepare("INSERT INTO icons (key, set_id, brand, variant, path, ver, removed, updated_at) VALUES (?1,?2,?3,?4,?5,?6,?7,?8) ON CONFLICT(key) DO UPDATE SET set_id=?2, brand=?3, variant=?4, path=?5, ver=?6, removed=?7, updated_at=?8")
+    .bind(key, set, brand, variant, path, ver, removed, Date.now()).run();
 }
-async function lookupIconRow(env: Env, key: string): Promise<{ path: string | null; removed: number } | null> {
-  await ensureIconTable(env);
-  return await env.DB.prepare("SELECT path, removed FROM icon_overrides WHERE key=?1").bind(key).first<any>();
+async function lookupIconRow(env: Env, key: string): Promise<{ set_id: string | null; brand: string | null; variant: string | null; path: string | null; removed: number } | null> {
+  await ensureIconTables(env);
+  return await env.DB.prepare("SELECT set_id, brand, variant, path, removed FROM icons WHERE key=?1").bind(key).first<any>();
 }
-// Add or replace an icon: write art to R2 + record it in the overlay. Returns the key/url.
-async function addIcon(env: Env, input: { set: string; name: string; category?: string; image: string; format?: string }) {
-  const fmt = (input.format || "png").toLowerCase();
-  const ext: "png" | "svg" = fmt === "svg" ? "svg" : "png";
-  if (!input.set || !input.name) throw new Error("set and name are required");
+// Add or replace an icon variant. brand defaults to a slug of name; variant 'icon'.
+async function addIcon(env: Env, input: { set: string; name?: string; brand?: string; variant?: string; image: string; format?: string }) {
+  const ext: "png" | "svg" = (input.format || "png").toLowerCase() === "svg" ? "svg" : "png";
+  const set = iconSlug(input.set || "");
+  const brand = iconSlug(input.brand || input.name || "");
+  const variant = (input.variant || "icon").toLowerCase();
+  if (!set || brand === "x") throw new Error("set and name/brand are required");
   const bytes = b64ToBytes(input.image || "");
   if (!bytes.length) throw new Error("empty image");
-  // light validation
   const isPng = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
   const head = new TextDecoder().decode(bytes.slice(0, 256)).toLowerCase();
-  if (ext === "png" && !isPng) throw new Error("not a PNG (set format:'svg' for SVG art)");
+  if (ext === "png" && !isPng) throw new Error("not a PNG (use format:'svg' for SVG)");
   if (ext === "svg" && !head.includes("<svg")) throw new Error("not an SVG");
-  const { key, path } = iconKeyPath(input.set, input.name, input.category, ext);
+  const suffix = variant === "icon" ? "" : `-${variant}`;
+  const key = `${set}:${brand}${suffix}`;
+  const path = `icons/${set}/${brand}${suffix}.${ext}`;
   const ver = Date.now();
-  await env.ICONS.put(path, bytes, {
-    httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" },
-  });
-  await upsertIcon(env, key, path, ver, 0);
-  return { key, path, url: `${ICON_CDN}/${path}?v=${ver}` };
+  await env.ICONS.put(path, bytes, { httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" } });
+  await upsertBrand(env, set, brand, input.name || brand, "");
+  await upsertIconRow(env, key, set, brand, variant, path, ver, 0);
+  return { key, path, brand, variant, url: `${ICON_CDN}/${path}?v=${ver}` };
 }
-// Remove an icon. An overlay-added icon is fully purged (art + row). A STATIC
-// icon is hidden via a tombstone row (removed=1) the site filters.
+// Delete a key. Overlay-added → purge art + row (+ the brand if it has no more
+// variants). Static manifest icon → tombstone row (removed=1).
 async function deleteIcon(env: Env, key: string) {
   if (!key) throw new Error("key is required");
   const row = await lookupIconRow(env, key);
   if (row && row.path && !row.removed) {
     try { await env.ICONS.delete(row.path); } catch { /* ignore */ }
-    await deleteIconRow(env, key); // overlay-added → purge, no tombstone
+    await env.DB.prepare("DELETE FROM icons WHERE key=?1").bind(key).run();
+    if (row.brand) {
+      const left = await env.DB.prepare("SELECT count(*) AS n FROM icons WHERE set_id=?1 AND brand=?2").bind(row.set_id, row.brand).first<any>();
+      if (!left || !left.n) await env.DB.prepare("DELETE FROM brands WHERE set_id=?1 AND slug=?2").bind(row.set_id, row.brand).run();
+    }
   } else {
-    await upsertIcon(env, key, null, null, 1); // static → hide
+    await upsertIconRow(env, key, null, null, null, null, null, 1);
   }
   return { key, removed: true };
 }
-// Resolve an icon key → its art path (overlay row first, else the static manifest).
 async function resolveIconPath(env: Env, key: string): Promise<{ path: string; ext: "png" | "svg" } | null> {
   const row = await lookupIconRow(env, key);
   let path: string | undefined = row?.path || undefined;
@@ -257,8 +279,7 @@ async function resolveIconPath(env: Env, key: string): Promise<{ path: string; e
   if (!path) return null;
   return { path, ext: path.toLowerCase().endsWith(".svg") ? "svg" : "png" };
 }
-// Edit an EXISTING icon (static or overlay): replace its art at the same path,
-// bump `ver` to bust the CDN cache, and record it in the overlay.
+// Replace the art of an existing icon (keeps its brand/variant); busts CDN cache.
 async function editIcon(env: Env, input: { key: string; image: string; format?: string }) {
   if (!input.key) throw new Error("key is required");
   const resolved = await resolveIconPath(env, input.key);
@@ -267,10 +288,9 @@ async function editIcon(env: Env, input: { key: string; image: string; format?: 
   const bytes = b64ToBytes(input.image || "");
   if (!bytes.length) throw new Error("empty image");
   const ver = Date.now();
-  await env.ICONS.put(resolved.path, bytes, {
-    httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" },
-  });
-  await upsertIcon(env, input.key, resolved.path, ver, 0);
+  await env.ICONS.put(resolved.path, bytes, { httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" } });
+  const row = await lookupIconRow(env, input.key);
+  await upsertIconRow(env, input.key, row?.set_id ?? null, row?.brand ?? null, row?.variant ?? "icon", resolved.path, ver, 0);
   return { key: input.key, path: resolved.path, url: `${ICON_CDN}/${resolved.path}?v=${ver}` };
 }
 
@@ -1511,19 +1531,19 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
     const notAdmin = { content: [{ type: "text" as const, text: "Not authorized — icon add/edit/delete is admin-only." }] };
     tool(
       "add_icon",
-      "ADMIN-ONLY. Add a NEW icon to the kymo library (icons.kymo.studio) or REPLACE an existing one. The art is stored on the kymo-icons CDN and appears live on the site (no redeploy). Provide the image as base64 PNG (or SVG with format:'svg').",
+      "ADMIN-ONLY. Add a NEW icon to the kymo library (icons.kymo.studio) or REPLACE an existing one. A brand (e.g. 'openai') groups multiple variants (icon/color/text/brand); the gallery shows one card per brand with a variant switcher. Art is stored on the kymo-icons CDN and appears live (no redeploy). Provide the image as base64 (PNG, or SVG with format:'svg').",
       {
-        set: z.string().describe("Icon set / provider prefix, e.g. 'aws', 'gcp', 'custom'."),
-        name: z.string().describe("Icon name, e.g. 'lambda' or 'event-bridge'."),
-        category: z.string().optional().describe("Optional sub-category folder, e.g. 'compute'."),
+        set: z.string().describe("Icon set, e.g. 'ai', 'diagrams', 'custom'."),
+        name: z.string().describe("Brand name / slug, e.g. 'openai' (also the brand grouping key)."),
+        variant: z.string().optional().describe("Variant: 'icon' (default), 'color', 'text', or 'brand'."),
         image: z.string().describe("Base64-encoded image bytes (data: URLs accepted)."),
         format: z.string().optional().describe("'png' (default) or 'svg'."),
       },
-      async ({ set, name, category, image, format }) => {
+      async ({ set, name, variant, image, format }) => {
         if (!isIconAdmin(me(), this.env)) return notAdmin;
         try {
-          const r = await addIcon(this.env, { set, name, category, image, format });
-          return { content: [{ type: "text", text: `Added icon \`${r.key}\` → ${r.url}\nLive: https://icons.kymo.studio/?q=${encodeURIComponent(r.key)}` }] };
+          const r = await addIcon(this.env, { set, name, variant, image, format });
+          return { content: [{ type: "text", text: `Added \`${r.key}\` (brand ${r.brand}, ${r.variant}) → ${r.url}\nLive: https://icons.kymo.studio/?q=${encodeURIComponent(r.brand)}` }] };
         } catch (e: any) { return { content: [{ type: "text", text: `add_icon failed: ${e?.message || e}` }] }; }
       }
     );
@@ -1565,7 +1585,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
       async ({ query, limit }) => {
         try {
           const m = (await fetch(`${ICONS_URL}/icons-manifest.json`).then((r) => r.json())) as any;
-          const o = await readIconOverlay(this.env);
+          const o = await readCatalog(this.env);
           const map = new Map<string, string>(Object.entries((m?.icons || {}) as Record<string, string>));
           for (const k of o.removed) map.delete(k);
           for (const [k, v] of Object.entries(o.icons)) map.set(k, v.path);
@@ -1735,8 +1755,8 @@ export default {
       const cors = corsFor(request, "GET, POST, PATCH, DELETE, OPTIONS");
       if (request.method === "OPTIONS") return new Response(null, { headers: cors });
       if (request.method === "GET") {
-        const o = await readIconOverlay(env);
-        return Response.json({ icons: o.icons, removed: o.removed, updatedAt: o.updatedAt }, { headers: { ...cors, "cache-control": "no-store" } });
+        const c = await readCatalog(env);
+        return Response.json({ brands: c.brands, icons: c.icons, removed: c.removed }, { headers: { ...cors, "cache-control": "no-store" } });
       }
       const auth = await resolveAuth(request, env);
       if ("error" in auth) return Response.json({ error: auth.error }, { status: auth.error === "forbidden" ? 403 : 401, headers: cors });

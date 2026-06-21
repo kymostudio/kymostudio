@@ -126,6 +126,11 @@ main { padding: 22px 24px 90px; min-width: 0; }
 .dlg-key { font: 600 15px ui-monospace, Menlo, monospace; color: var(--text); word-break: break-all; flex: 1; }
 .dlg-set { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
   color: var(--pink); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+.dlg-variants { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.vtab { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card);
+  color: var(--muted); font: 600 12.5px inherit; text-transform: capitalize; cursor: pointer; }
+.vtab:hover { border-color: var(--line-strong); color: var(--text); }
+.vtab.active { background: var(--pink); border-color: var(--pink); color: #fff; }
 .dlg-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 16px; }
 .btn {
   display: flex; align-items: center; justify-content: center; gap: 7px;
