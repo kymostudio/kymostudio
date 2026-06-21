@@ -72,8 +72,9 @@ async function loadDiagram(lib, input) {
   if (low.endsWith(".bpmn")) return lib.parseBpmn(text);
   if (low.endsWith(".json")) return lib.parseKymoJson(text);
   if (isMermaid) return lib.parseMermaid(text);
+  if (low.endsWith(".dbml")) return lib.parseDbml(text);   // pure TS — no core
   if (low.endsWith(".kymo")) return lib.parseDiagram(text);
-  throw new Error(`unsupported source: ${input} (expected .kymo, .kymo.json, .bpmn, .mmd or .svg)`);
+  throw new Error(`unsupported source: ${input} (expected .kymo, .kymo.json, .bpmn, .mmd, .dbml or .svg)`);
 }
 
 async function renderToSvg(input) {

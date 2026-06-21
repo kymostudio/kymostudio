@@ -18,6 +18,7 @@ import {
 } from "./model.js";
 import { getIcon } from "./icons-loader.js";
 import { coreBpmnRender } from "./core.js";
+import { HEADER_H, ROW_H, PAD, PK_ICON_W, NN_W, nameWidth } from "./from-dbml.js";
 
 export interface RenderOptions {
   /** Outer margin around the content, in px. Default 52. */
@@ -89,6 +90,170 @@ const FLOWCHART_STYLE = `
     .fc-shape { fill: #eff6ff; stroke: #3b82f6; stroke-width: 1.6; }
     .fc-shape-line { fill: none; stroke: #3b82f6; stroke-width: 1.6; stroke-linecap: round; }
     .fc-label { fill: #1e3a8a; font-size: 13px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }`;
+
+// ER-table styling (.dbml import) — injected ONLY when a diagram has a
+// `table` component, so every other diagram stays byte-identical. Mirrors
+// the dbdiagram.io look: steel-blue header bar, white field rows (name left,
+// type right in gray monospace), 🔑 on PKs, NN badge on not-null, and gray
+// relationship lines with junction dots.
+const TABLE_STYLE = `
+    .er-box   { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1; }
+    .er-title { fill: #ffffff; font-size: 13px; font-weight: 700; dominant-baseline: central; }
+    .er-field { fill: #1f2937; font-size: 13px; dominant-baseline: central; }
+    .er-field.er-pk { font-weight: 700; }
+    .er-type  { fill: #94a3b8; font-size: 12px; text-anchor: end; dominant-baseline: central;
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .er-sep   { stroke: #f1f5f9; stroke-width: 1; }
+    .er-key   { fill: none; stroke: #64748b; stroke-width: 1.4; }
+    .er-nn    { fill: #94a3b8; font-size: 9px; font-weight: 700; text-anchor: end; dominant-baseline: central; }
+    .er-note  { fill: none; stroke: #cbd5e1; stroke-width: 1.2; }
+    .er-rel     { fill: none; stroke: #9aa7b8; stroke-width: 1.6; }
+    .er-rel-dot { fill: #ffffff; stroke: #9aa7b8; stroke-width: 1.6; }
+    .er-foot    { fill: none; stroke: #9aa7b8; stroke-width: 1.6; stroke-linecap: round; }`;
+
+/** Small key outline drawn centred at (x, y) — the PK marker. */
+function keyGlyph(x: number, y: number): string {
+  return `<g class="er-key" transform="translate(${r1(x)},${r1(y)})">`
+    + `<circle cx="3.2" cy="0" r="3.2"/>`
+    + `<path d="M6,0 H12 M9.5,0 V2.6 M12,0 V2.6"/></g>`;
+}
+
+/** Small note (page) outline drawn centred at (x, y) — the column-note marker. */
+function noteGlyph(x: number, y: number): string {
+  return `<rect class="er-note" x="${r1(x)}" y="${r1(y - 5)}" width="9" height="10" rx="1.5"/>`;
+}
+
+/** ER table box: header bar + field rows (.dbml import). Sized from c.size. */
+function tableNode(c: Component): string {
+  const rows = c.rows ?? [];
+  const w = c.size ? c.size[0] : 180;
+  const h = c.size ? c.size[1] : HEADER_H + rows.length * ROW_H;
+  const x0 = Math.round(c.pos[0] - w / 2);
+  const y0 = Math.round(c.pos[1] - h / 2);
+  const head = c.headerColor || "#33526e";
+  // data-* lets the editor make the box draggable, re-route its edges live, and
+  // map field rows → column names (for creating relationships by dragging).
+  const cols = escapeXml(JSON.stringify(rows.map((r) => r.name)));
+  const out: string[] = [`<g class="er-table" data-tid="${escapeXml(c.id)}" data-x="${x0}" data-y="${y0}" data-w="${w}" data-h="${h}" data-cols="${cols}" filter="url(#soft)">`];
+  out.push(`<rect class="er-box" x="${x0}" y="${y0}" width="${w}" height="${h}" rx="7"/>`);
+  // header bar with rounded top corners only
+  out.push(`<path d="M${x0},${y0 + HEADER_H} V${y0 + 7} a7,7 0 0 1 7,-7 H${x0 + w - 7} a7,7 0 0 1 7,7 V${y0 + HEADER_H} Z" fill="${head}"/>`);
+  out.push(`<text class="er-title" x="${x0 + PAD}" y="${y0 + HEADER_H / 2 + 1}">${escapeXml(c.name)}</text>`);
+  rows.forEach((row, i) => {
+    const ry = y0 + HEADER_H + i * ROW_H;
+    const midY = ry + ROW_H / 2;
+    if (i > 0) out.push(`<line class="er-sep" x1="${x0}" y1="${ry}" x2="${x0 + w}" y2="${ry}"/>`);
+    let nameX = x0 + PAD;
+    if (row.pk) { out.push(keyGlyph(nameX, midY)); nameX += PK_ICON_W; }
+    out.push(`<text class="er-field${row.pk ? " er-pk" : ""}" x="${nameX}" y="${midY}">${escapeXml(row.name)}</text>`);
+    if (row.note) out.push(noteGlyph(nameX + nameWidth(row.name, row.pk) + 5, midY));
+    let typeRight = x0 + w - PAD;
+    if (row.notNull) { out.push(`<text class="er-nn" x="${typeRight}" y="${midY}">NN</text>`); typeRight -= NN_W; }
+    if (row.type) out.push(`<text class="er-type" x="${typeRight}" y="${midY}">${escapeXml(row.type)}</text>`);
+  });
+  out.push(`</g>`);
+  return out.join("");
+}
+
+/** An ER table box as a drag geometry: top-left (x,y), size (w,h), and the
+ *  vertical offset `oy` of the connected field row from the box top. */
+export interface ErBox { x: number; y: number; w: number; h: number; oy: number }
+
+/**
+ * Geometry of a foreign-key relationship line between two table rows. Picks the
+ * facing sides from the tables' current centres and returns the connector path
+ * plus its two endpoints. Shared by the static renderer (`fkEdge`) and the
+ * editor's live drag re-route, so a dragged table's edges match exactly.
+ */
+/** Radius of the "one"-side connection circle, and its centre offset from the
+ *  table edge. The connector runs all the way to the edge, so a short stub of
+ *  line stays visible between the edge and the circle (dbdiagram look): the
+ *  circle floats slightly off the table but the path still covers the gap. */
+export const ER_DOT_R = 3.5;
+const ER_DOT_GAP = 2.5;                                // edge → circle inner-edge gap
+export const ER_DOT_OFFSET = ER_DOT_R + ER_DOT_GAP;    // edge → circle centre
+const ER_FOOT_LEN = 9;       // crow's-foot stem length (apex distance from edge)
+const ER_FOOT_SPREAD = 5;
+
+/** Crow's-foot path ("many" side): two prongs fan from `apex` (a point ON the
+ *  connector curve, ~`ER_FOOT_LEN` from the table) back to the edge (ex,ey)
+ *  ±spread. Apex comes from `erEdgeGeometry` so it sits exactly on the line. */
+export function erMarkerD(apexX: number, apexY: number, ex: number, ey: number): string {
+  return `M${r1(apexX)},${r1(apexY)} L${r1(ex)},${r1(ey - ER_FOOT_SPREAD)}`
+    + ` M${r1(apexX)},${r1(apexY)} L${r1(ex)},${r1(ey + ER_FOOT_SPREAD)}`;
+}
+
+/** Cubic Bézier point at parameter t. */
+function bez(p0: Point, p1: Point, p2: Point, p3: Point, t: number): Point {
+  const u = 1 - t;
+  return [
+    u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0],
+    u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1],
+  ];
+}
+
+// Which end gets the "many" (crow's-foot) vs "one" (circle) marker, per operator.
+const ER_ENDS: Record<string, [string, string]> = {
+  ">": ["many", "one"], "<": ["one", "many"], "-": ["one", "one"], "<>": ["many", "many"],
+};
+
+export function erEdgeGeometry(s: ErBox, t: ErBox): {
+  d: string; x1: number; y1: number; x2: number; y2: number; srcApex: Point; dstApex: Point;
+} {
+  const goRight = (t.x + t.w / 2) >= (s.x + s.w / 2);
+  const x1 = goRight ? s.x + s.w : s.x;          // connector runs to the table edge
+  const x2 = goRight ? t.x : t.x + t.w;
+  const y1 = s.y + s.oy;
+  const y2 = t.y + t.oy;
+  const sa: Side = goRight ? "right" : "left";
+  const da: Side = goRight ? "left" : "right";
+  // Control points match edgePath's so the crow's-foot apex lands on the curve.
+  const k = Math.max(40, Math.abs(x2 - x1) * 0.5);
+  const P0: Point = [x1, y1], P3: Point = [x2, y2];
+  const c1: Point = [x1 + (sa === "right" ? k : -k), y1];
+  const c2: Point = [x2 + (da === "right" ? k : -k), y2];
+  const dt = ER_FOOT_LEN / (3 * k);              // ≈ arc-distance ER_FOOT_LEN from an end
+  return {
+    d: edgePath(x1, y1, sa, x2, y2, da), x1, y1, x2, y2,
+    srcApex: bez(P0, c1, c2, P3, dt),
+    dstApex: bez(P0, c1, c2, P3, 1 - dt),
+  };
+}
+
+const erBox = (c: Component, rowIdx: number): ErBox => {
+  const w = c.size ? c.size[0] : 180;
+  const h = c.size ? c.size[1] : HEADER_H;
+  return {
+    x: Math.round(c.pos[0] - w / 2), y: Math.round(c.pos[1] - h / 2),
+    w, h, oy: HEADER_H + rowIdx * ROW_H + ROW_H / 2,
+  };
+};
+
+/** Foreign-key relationship line between two table rows (row-to-row). The
+ *  wrapping group carries data-* so the editor can re-route it live on drag. */
+/** A cardinality marker at an endpoint: hollow circle ("one") or crow's-foot ("many"). */
+function erMarker(kind: string, ex: number, ey: number, apex: Point, outDir: number, cls: string): string {
+  return kind === "one"
+    ? `<circle class="er-rel-dot ${cls}" cx="${r1(ex + outDir * ER_DOT_OFFSET)}" cy="${r1(ey)}" r="${ER_DOT_R}"/>`
+    : `<path class="er-foot ${cls}" d="${erMarkerD(apex[0], apex[1], ex, ey)}"/>`;
+}
+
+function fkEdge(e: { srcRow?: number; dstRow?: number; srcCol?: string; dstCol?: string; relOp?: string }, s: Component, t: Component): string {
+  const sb = erBox(s, e.srcRow ?? 0);
+  const tb = erBox(t, e.dstRow ?? 0);
+  const g = erEdgeGeometry(sb, tb);
+  const op = e.relOp ?? ">";
+  const [srcKind, dstKind] = ER_ENDS[op] ?? ER_ENDS[">"];
+  const goRight = (tb.x + tb.w / 2) >= (sb.x + sb.w / 2);
+  return `<g class="er-rel-g" data-src="${escapeXml(s.id)}" data-dst="${escapeXml(t.id)}"`
+    + ` data-src-col="${escapeXml(e.srcCol ?? "")}" data-dst-col="${escapeXml(e.dstCol ?? "")}" data-op="${escapeXml(op)}"`
+    + ` data-soy="${sb.oy}" data-doy="${tb.oy}">`
+    + `<path class="er-rel-hit" d="${g.d}" fill="none" stroke="transparent" stroke-width="12"/>`
+    + `<path class="er-rel" d="${g.d}"/>`
+    + erMarker(srcKind, g.x1, g.y1, g.srcApex, goRight ? 1 : -1, "er-ep-src")
+    + erMarker(dstKind, g.x2, g.y2, g.dstApex, goRight ? -1 : 1, "er-ep-dst")
+    + `</g>`;
+}
 
 /**
  * Icon-less flowchart node (Mermaid import): a shape outline sized from
@@ -166,7 +331,8 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
   const pad = opts.padding ?? 52;
   const background = opts.background === undefined ? "#f8fafc" : opts.background;
   const needsRegionStyle = d.regions.length > 0;
-  const needsFlowchartStyle = d.components.some((c) => !c.icon);
+  const needsTableStyle = d.components.some((c) => c.shape === "table");
+  const needsFlowchartStyle = d.components.some((c) => !c.icon && c.shape !== "table");
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   const grow = (x: number, y: number): void => {
@@ -175,7 +341,8 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
   };
   for (const c of d.components) {
     const [hw, hh] = half(c);
-    const lh = c.size ? (c.name ? 30 : 0) : (LABEL_HEIGHT[c.shape] ?? 0);
+    // Table boxes carry their name in the header bar, not a label band below.
+    const lh = c.shape === "table" ? 0 : (c.size ? (c.name ? 30 : 0) : (LABEL_HEIGHT[c.shape] ?? 0));
     grow(c.pos[0] - hw, c.pos[1] - hh);
     grow(c.pos[0] + hw, c.pos[1] + hh + lh);
   }
@@ -195,6 +362,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
     const s = byId.get(e.src);
     const t = byId.get(e.dst);
     if (!s || !t) continue;
+    if (e.style === "fk") { edges.push(fkEdge(e, s, t)); continue; }
     const [sa, da] = resolveAnchors(e, s, t);
     const [x1, y1] = anchor(s, sa);
     const [x2, y2] = anchor(t, da);
@@ -206,6 +374,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 
   const nodes: string[] = [];
   for (const c of d.components) {
+    if (c.shape === "table") { nodes.push(tableNode(c)); continue; }
     if (!c.icon) { nodes.push(flowchartNode(c)); continue; }
     const glyph = await getIcon(c.icon);
     const [, hh] = half(c);
@@ -229,7 +398,7 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${w} ${h}" width="${w}" height="${h}">
   <defs>${DEFS}
   </defs>
-  <style>${CSS}${needsRegionStyle ? REGION_STYLE : ""}${needsFlowchartStyle ? FLOWCHART_STYLE : ""}
+  <style>${CSS}${needsRegionStyle ? REGION_STYLE : ""}${needsFlowchartStyle ? FLOWCHART_STYLE : ""}${needsTableStyle ? TABLE_STYLE : ""}
   </style>
   ${bg}
   ${title}${regionRects}

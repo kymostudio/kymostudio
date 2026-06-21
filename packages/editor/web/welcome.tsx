@@ -22,7 +22,7 @@ export function WelcomeView({ onNew, onOpenFile, onTemplate, onOpen }: {
   const quick = QUICK.map((n) => TEMPLATES.find((t) => t.name === n)).filter(Boolean) as Template[];
   const openFile = () => fileRef.current?.click();
   const fileInput = (
-    <input ref={fileRef} data-testid="wel-open-input" type="file" accept=".kymo,.bpmn,.mmd,.mermaid,.txt,.md" hidden
+    <input ref={fileRef} data-testid="wel-open-input" type="file" accept=".kymo,.bpmn,.dbml,.mmd,.mermaid,.txt,.md" hidden
       onChange={(e) => { const f = e.target.files?.[0]; if (f) onOpenFile(f); e.target.value = ""; }} />
   );
 

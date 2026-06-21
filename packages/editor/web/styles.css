@@ -192,8 +192,29 @@ main.scroll { display: block; overflow: auto; }
 textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !important; padding: 16px; background: var(--bg); color: var(--ink); caret-color: var(--accent); font: 13.5px/1.7 var(--mono); tab-size: 2; }
 #preview { flex: 1; position: relative; overflow: hidden; background: #fff; touch-action: none; cursor: grab; }
 #preview:active { cursor: grabbing; }
-.pv-stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
+.pv-stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; user-select: none; -webkit-user-select: none; }
 .pv-stage svg { display: block; background: #fff; }
+/* ER tables (DBML) are draggable — show a grab affordance over each box. */
+.pv-stage svg .er-table { cursor: grab; }
+/* Relationship editing chrome (DBML): field handles, ghost line, edge select + toolbar. */
+.pv-stage svg .er-rel-hit { pointer-events: stroke; cursor: pointer; }
+.pv-stage svg .er-handle { fill: #2563eb; stroke: #fff; stroke-width: 1.5; cursor: crosshair; }
+.pv-stage svg .er-handle:hover { r: 6; }
+/* clean smooth ghost connector + smart snap point (Miro-style), no caterpillar dashes */
+.pv-stage svg .er-ghost { fill: none; stroke: #2563eb; stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+.pv-stage svg .er-ghost-dot { fill: #2563eb; stroke: #fff; stroke-width: 2; pointer-events: none; }
+.pv-stage svg .er-rowhi { fill: rgba(37, 99, 235, 0.12); pointer-events: none; }
+/* candidate connection points revealed when a drag approaches a table (Miro-style) */
+.pv-stage svg .er-point { fill: #fff; stroke: #2563eb; stroke-width: 1.5; pointer-events: none; }
+.pv-stage svg .er-rel-g.er-sel path.er-rel { stroke: #2563eb; stroke-width: 2.4; }
+.pv-stage svg .er-rel-g.er-sel circle.er-rel-dot { stroke: #2563eb; }
+.pv-stage svg .er-rel-g.er-sel .er-foot { stroke: #2563eb; }
+.pv-stage svg .er-del { cursor: pointer; }
+.pv-stage svg .er-del-bg { fill: #ef4444; }
+.pv-stage svg .er-del-tx { fill: #fff; font: 700 15px ui-sans-serif, system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.pv-stage svg .er-op { cursor: pointer; }
+.pv-stage svg .er-op-bg { fill: #fff; stroke: #2563eb; stroke-width: 1.4; }
+.pv-stage svg .er-op-tx { fill: #2563eb; font: 700 12px ui-monospace, monospace; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
 .pv-controls { position: absolute; right: 12px; bottom: 12px; z-index: 6; display: flex; align-items: center; gap: 2px; padding: 3px; background: rgba(255, 255, 255, 0.92); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); cursor: default; }
 .pv-controls button { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; background: transparent; color: var(--ink); border-radius: 7px; cursor: pointer; }
 .pv-controls button svg { flex: none; }

@@ -19,8 +19,10 @@
  */
 export * from "./model.js";
 export * from "./icons-loader.js"; // ICONS, getIcon, setIconBaseURL, setManifest, registerIcon
-export * from "./render.js";       // renderSVG
+export * from "./render.js";       // renderSVG, erEdgeGeometry (ER drag re-route)
 export { parse, parseDiagram, type ParseResult } from "./dsl.js";
+// DBML import (dbdiagram.io syntax → ER-table Diagram). Pure TS, no core init.
+export { parseDbml } from "./from-dbml.js";
 export {
   layout, applyLayoutTree, minimizeCrossings, cellSize,
   type LayoutNode, type RegionLayout, type ExternalSpec, type LayoutOptions, type Cell,
