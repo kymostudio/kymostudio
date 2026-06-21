@@ -1,0 +1,52 @@
+{
+  "name": "branch",
+  "direction": "TB",
+  "nodes": [
+    {
+      "id": "A",
+      "label": "A"
+    },
+    {
+      "id": "B",
+      "label": "B"
+    },
+    {
+      "id": "C",
+      "label": "C"
+    },
+    {
+      "id": "D",
+      "label": "D"
+    },
+    {
+      "id": "E",
+      "label": "E"
+    },
+    {
+      "id": "F",
+      "label": "F"
+    }
+  ],
+  "edges": [
+    {
+      "source": "A",
+      "target": "B"
+    },
+    {
+      "source": "B",
+      "target": "C"
+    },
+    {
+      "source": "B",
+      "target": "D"
+    },
+    {
+      "source": "C",
+      "target": "E"
+    },
+    {
+      "source": "D",
+      "target": "F"
+    }
+  ]
+}

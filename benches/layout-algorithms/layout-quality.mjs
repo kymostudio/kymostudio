@@ -12,29 +12,33 @@
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+import { dirname, resolve, basename } from "node:path";
 import { extractGeometry } from "./geometry.mjs";
 import { scoreLayout, WEIGHTS } from "./metric.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../..");
-const FIXDIR = resolve(HERE, "../mermaid-format/datasets/mermaid-cypress/flowchart") + "/";
+// Dataset: the bench's own datasets/<name> by default; override with
+// LAYOUT_DATASET=<name|abs-path> (e.g. ../mermaid-format/datasets/mermaid-cypress/flowchart).
+const DATASET = process.env.LAYOUT_DATASET || "layout-suite";
+const FIXDIR = (DATASET.startsWith("/") ? DATASET : resolve(HERE, "datasets", DATASET)) + "/";
+const DATASET_NAME = basename(DATASET.replace(/\/$/, ""));
 const TMP = "/tmp/layout-quality/";
 mkdirSync(TMP, { recursive: true });
 
-// date-stamped asset dir (committed); DATE overridable for reproducible CI runs
+// date-stamped asset dir (committed), suffixed by dataset so runs don't clobber each other.
 const DATE = process.env.LAYOUT_BENCH_DATE || new Date().toISOString().slice(0, 10);
-const ASSETS = resolve(HERE, "research/assets", `${DATE}-layout-quality`);
+const ASSETS = resolve(HERE, "research/assets", `${DATE}-layout-quality-${DATASET_NAME}`);
 mkdirSync(ASSETS, { recursive: true });
 mkdirSync(resolve(HERE, "results"), { recursive: true });
 
 const argv = process.argv.slice(2);
 const nFlag = argv.indexOf("--n");
-const allFiles = readdirSync(FIXDIR).filter((f) => /^flowchart(-v2)?_\d+\.mmd$/.test(f)).map((f) => f.replace(/\.mmd$/, "")).sort();
-const FILES = argv.includes("--all") ? allFiles
-  : nFlag >= 0 ? allFiles.slice(0, +argv[nFlag + 1] || 12)
-  : argv.length ? argv
-  : ["flowchart_023", "flowchart_025", "flowchart_027", "flowchart_029"];
+const positional = argv.filter((a) => !a.startsWith("--") && a !== argv[nFlag + 1]);
+const allFiles = readdirSync(FIXDIR).filter((f) => f.endsWith(".mmd")).map((f) => f.replace(/\.mmd$/, "")).sort();
+const FILES = nFlag >= 0 ? allFiles.slice(0, +argv[nFlag + 1] || 12)
+  : positional.length ? positional
+  : allFiles; // default: the whole dataset
 
 // kymo renderer (wasm; the flowchart path routes through packages/rust/kymo-layout)
 const m = await import(ROOT + "/packages/rust/kymo-mermaid/pkg/kymo_mermaid.js");
@@ -83,7 +87,7 @@ for (const f of FILES) {
 const mean = (xs) => xs.length ? +(xs.reduce((a, b) => a + b, 0) / xs.length).toFixed(2) : null;
 const scored = rows.filter((r) => Number.isFinite(r.kymo?.composite) && Number.isFinite(r.mermaidjs?.composite));
 const leaderboard = {
-  date: DATE, fixtures: scored.length, weights: WEIGHTS,
+  date: DATE, dataset: DATASET_NAME, fixtures: scored.length, weights: WEIGHTS,
   mean: { kymo: mean(scored.map((r) => r.kymo.composite)), mermaidjs: mean(scored.map((r) => r.mermaidjs.composite)) },
   // d2: TODO — needs d2 renders of equivalent diagrams (the metric already scores any SVG).
 };
@@ -95,8 +99,8 @@ writeFileSync(resolve(ASSETS, "leaderboard.json"), JSON.stringify(leaderboard, n
 // ── REPORT.md (headline artifact) ─────────────────────────────────────────────
 const worst = scored.slice().sort((a, b) => (a.kymo.composite - b.kymo.composite) - 0).slice(0, 10);
 const report = [
-  `# Layout-quality leaderboard — ${DATE}`, "",
-  `Absolute composite score (0–100, higher = better) over **${scored.length}** flowchart fixtures.`,
+  `# Layout-quality leaderboard — ${DATE} · dataset \`${DATASET_NAME}\``, "",
+  `Absolute composite score (0–100, higher = better) over **${scored.length}** fixtures.`,
   `Metric: \`metric.mjs\` (BPD-DGM-001 §6/§7.6). The layout-hillclimb loop drives kymo's mean upward.`, "",
   `| Engine | Mean composite |`, `|---|---|`,
   `| **kymo** | **${leaderboard.mean.kymo}** |`, `| mermaid.js | ${leaderboard.mean.mermaidjs} |`, "",
@@ -105,9 +109,10 @@ const report = [
   `| fixture | kymo | mermaid | crossings | node_overlap | orthogonality |`, `|---|---|---|---|---|---|`,
   ...worst.map((r) => `| ${r.file} | ${r.kymo.composite} | ${r.mermaidjs.composite} | ${r.kymo.terms.crossings.raw} | ${r.kymo.terms.node_overlap.raw} | ${r.kymo.terms.orthogonality.raw} |`),
 ].join("\n");
-writeFileSync(resolve(HERE, "results", "REPORT.md"), report + "\n");
+const reportPath = resolve(HERE, "results", `REPORT-${DATASET_NAME}.md`);
+writeFileSync(reportPath, report + "\n");
 
-console.log(`\nleaderboard: kymo ${leaderboard.mean.kymo} vs mermaid.js ${leaderboard.mean.mermaidjs}  →  kymo leads: ${leaderboard.kymo_leads ? "YES" : "not yet"}`);
+console.log(`\ndataset '${DATASET_NAME}': kymo ${leaderboard.mean.kymo} vs mermaid.js ${leaderboard.mean.mermaidjs}  →  kymo leads: ${leaderboard.kymo_leads ? "YES" : "not yet"}`);
 console.log(`wrote ${resolve(ASSETS, "scores.json")}`);
 console.log(`wrote ${resolve(ASSETS, "leaderboard.json")}`);
-console.log(`wrote ${resolve(HERE, "results", "REPORT.md")}`);
+console.log(`wrote ${reportPath}`);

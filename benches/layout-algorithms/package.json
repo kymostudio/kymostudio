@@ -1,5 +1,5 @@
 {
-  "name": "layout-bench",
+  "name": "layout-algorithms-bench",
   "private": true,
   "type": "module",
   "description": "Absolute layout-quality bench: scores ANY engine's SVG on edge crossings, overlap, orthogonality, compactness, aspect & grid-snap (BPD-DGM-001), then ranks kymo vs mermaid.js vs d2. Drives the layout-hillclimb loop toward best-in-market.",
@@ -10,5 +10,9 @@
     "@mermaid-js/mermaid-cli": "^11.15.0",
     "pngjs": "^7.0.0",
     "puppeteer-core": "^24.0.0"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "^3.0.0",
+    "elkjs": "^0.11.1"
   }
 }

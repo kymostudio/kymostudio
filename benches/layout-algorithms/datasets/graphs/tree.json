@@ -1,0 +1,60 @@
+{
+  "name": "tree",
+  "direction": "TB",
+  "nodes": [
+    {
+      "id": "R",
+      "label": "R"
+    },
+    {
+      "id": "A",
+      "label": "A"
+    },
+    {
+      "id": "B",
+      "label": "B"
+    },
+    {
+      "id": "A1",
+      "label": "A1"
+    },
+    {
+      "id": "A2",
+      "label": "A2"
+    },
+    {
+      "id": "B1",
+      "label": "B1"
+    },
+    {
+      "id": "B2",
+      "label": "B2"
+    }
+  ],
+  "edges": [
+    {
+      "source": "R",
+      "target": "A"
+    },
+    {
+      "source": "R",
+      "target": "B"
+    },
+    {
+      "source": "A",
+      "target": "A1"
+    },
+    {
+      "source": "A",
+      "target": "A2"
+    },
+    {
+      "source": "B",
+      "target": "B1"
+    },
+    {
+      "source": "B",
+      "target": "B2"
+    }
+  ]
+}

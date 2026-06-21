@@ -1,0 +1,60 @@
+{
+  "name": "dag",
+  "direction": "LR",
+  "nodes": [
+    {
+      "id": "in",
+      "label": "in"
+    },
+    {
+      "id": "p",
+      "label": "p"
+    },
+    {
+      "id": "q",
+      "label": "q"
+    },
+    {
+      "id": "r",
+      "label": "r"
+    },
+    {
+      "id": "s",
+      "label": "s"
+    },
+    {
+      "id": "out",
+      "label": "out"
+    }
+  ],
+  "edges": [
+    {
+      "source": "in",
+      "target": "p"
+    },
+    {
+      "source": "in",
+      "target": "q"
+    },
+    {
+      "source": "p",
+      "target": "r"
+    },
+    {
+      "source": "q",
+      "target": "r"
+    },
+    {
+      "source": "q",
+      "target": "s"
+    },
+    {
+      "source": "r",
+      "target": "out"
+    },
+    {
+      "source": "s",
+      "target": "out"
+    }
+  ]
+}

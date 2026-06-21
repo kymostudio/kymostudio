@@ -1,0 +1,36 @@
+{
+  "date": "2026-06-21",
+  "weights": {
+    "crossings": 0.28,
+    "node_overlap": 0.22,
+    "edge_node_overlap": 0.16,
+    "orthogonality": 0.16,
+    "compactness": 0.08,
+    "aspect_balance": 0.05,
+    "grid_snap": 0.05
+  },
+  "board": {
+    "kymo-dagre": {
+      "mean": 76.47,
+      "graphs": 12
+    },
+    "dagre.js": {
+      "mean": 74.65,
+      "graphs": 12
+    },
+    "elk": {
+      "mean": 79.5,
+      "graphs": 12
+    },
+    "graphviz": {
+      "mean": 81.18,
+      "graphs": 12
+    }
+  },
+  "ranking": [
+    "graphviz",
+    "elk",
+    "kymo-dagre",
+    "dagre.js"
+  ]
+}

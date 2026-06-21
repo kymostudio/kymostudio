@@ -53,7 +53,7 @@ jobs:
         run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm,math
 
       - name: Install bench deps
-        working-directory: benches/layout
+        working-directory: benches/layout-algorithms
         run: npm ci
 
       - name: Run layout-hillclimb and open a PR
@@ -70,7 +70,7 @@ jobs:
             When it finishes:
             - If it returns one or more `kept` fixes: create a branch `layout/nightly-hillclimb`,
               apply each kept diff (the `patch` field), regenerate the leaderboard with
-              `cd benches/layout && node layout-quality.mjs --all`, commit
+              `cd benches/layout-algorithms && node layout-quality.mjs --all`, commit
               (message: `perf(layout): nightly hill-climb — <n> fix(es), +<totalGain> composite`,
               no AI-attribution trailer), and open a PR to main. The PR body must list each kept
               fix's one-sentence rationale, the before→after composite, and the refreshed

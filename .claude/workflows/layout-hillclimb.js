@@ -14,7 +14,7 @@ export const meta = {
 
 // ── The layout-quality hill-climb (RES-LOOP-002 Loop; sibling of mermaid-hillclimb) ─
 // Reward  : kComposite (ABSOLUTE layout-quality 0–100, HIGHER better) for the target
-//           fixture must RISE. Source: benches/layout/layout-quality.mjs →
+//           fixture must RISE. Source: benches/layout-algorithms/layout-quality.mjs →
 //           research/assets/<date>-layout-quality/scores.json + leaderboard.json.
 // Subject : packages/rust/kymo-layout (dagre.rs / sugiyama.rs) — the graph layout that
 //           mermaidToSvgDagre routes through. A fix there is rebuilt to the kymo-mermaid
@@ -31,10 +31,10 @@ export const meta = {
 // PRECONDITIONS (local macOS bench harness):
 //   - Google Chrome at the default path (override with $CHROME); mmdc + puppeteer-core.
 //   - wasm toolchain: wasm-pack + rust wasm32 target.
-//   - Bench deps: cd benches/layout && npm ci   (and a kymo-mermaid wasm build).
-// See benches/layout/README.md for the full contract.
+//   - Bench deps: cd benches/layout-algorithms && npm ci   (and a kymo-mermaid wasm build).
+// See benches/layout-algorithms/README.md for the full contract.
 
-const BENCH = 'benches/layout'
+const BENCH = 'benches/layout-algorithms'
 const WASM_BUILD =
   'cd packages/rust/kymo-mermaid && wasm-pack build --target web --out-dir pkg ' +
   '--out-name kymo_mermaid -- --no-default-features --features wasm,math'
@@ -131,9 +131,9 @@ while (dry < MAX_DRY && cursor < ranked.length) {
       `You are in an isolated git worktree — changes here never reach the user's tree.\n\n` +
       `TARGET: ${target.file}  (current kComposite=${target.kComposite.toFixed(2)}, mermaid.js bar ` +
       `mComposite=${target.mComposite.toFixed(2)}; the composite is 0–100, HIGHER is better).\n\n` +
-      `The metric (benches/layout/metric.mjs, per docs/diagrams/best-practices.md §6/§7.6) rewards: fewer edge ` +
+      `The metric (benches/layout-algorithms/metric.mjs, per docs/diagrams/best-practices.md §6/§7.6) rewards: fewer edge ` +
       `crossings, no node/edge overlap, orthogonal edges, sane compactness/aspect. Read the per-term breakdown ` +
-      `for this fixture in benches/layout/research/assets/*-layout-quality/scores.json to see which term is weakest.\n\n` +
+      `for this fixture in benches/layout-algorithms/research/assets/*-layout-quality/scores.json to see which term is weakest.\n\n` +
       `STEPS:\n` +
       `1. Diagnose the weakest term for ${target.file}. Inspect the source ` +
       `benches/mermaid-format/datasets/mermaid-cypress/flowchart/${target.file}.mmd and the kymo geometry.\n` +
