@@ -150,14 +150,13 @@ async function resolveAuth(request: Request, env: Env, renew = true): Promise<Au
   return { error: "unauthorized" };
 }
 
-// ---- Icons admin: live add/edit/delete over the kymo-icons R2 bucket. ----
+// ---- Icons admin: live add/edit/delete, managed in the DB (no code commits). ----
 // The website (icons.kymo.studio) ships a STATIC manifest; admin mutations are a
-// dynamic OVERLAY stored at `overrides.json` in the same bucket. The site merges
-// static ⊕ overlay at load, so changes show without a redeploy. Art lives at the
-// same repo-relative path (`icons/<set>/…`) the manifest uses, so cdn.kymo.studio
-// serves it directly; `ver` (an edit timestamp) busts the CDN cache on replace.
+// dynamic OVERLAY kept in the D1 table `icon_overrides` (the runtime catalogue).
+// The site merges static ⊕ overlay at load, so changes show without a redeploy.
+// Art binaries live in R2 at the manifest path (`icons/<set>/…`), served by
+// cdn.kymo.studio; `ver` (an edit timestamp) busts the CDN cache on replace.
 type IconOverlay = { icons: Record<string, { path: string; ver: number }>; removed: string[]; updatedAt: number };
-const ICON_OVERLAY_KEY = "overrides.json";
 const ICON_CDN = "https://cdn.kymo.studio";
 
 function isIconAdmin(email: string | undefined, env: Env): boolean {
@@ -179,19 +178,41 @@ function b64ToBytes(b64: string): Uint8Array {
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
 }
-async function readIconOverlay(env: Env): Promise<IconOverlay> {
-  try {
-    const obj = await env.ICONS.get(ICON_OVERLAY_KEY);
-    if (!obj) return { icons: {}, removed: [], updatedAt: 0 };
-    const o = (await obj.json()) as Partial<IconOverlay>;
-    return { icons: o.icons || {}, removed: o.removed || [], updatedAt: o.updatedAt || 0 };
-  } catch { return { icons: {}, removed: [], updatedAt: 0 }; }
+let iconTableReady = false;
+async function ensureIconTable(env: Env) {
+  if (iconTableReady) return;
+  try { await env.DB.prepare("CREATE TABLE IF NOT EXISTS icon_overrides (key TEXT PRIMARY KEY, path TEXT, ver INTEGER, removed INTEGER DEFAULT 0, updated_at INTEGER)").run(); } catch { /* ignore */ }
+  iconTableReady = true;
 }
-async function writeIconOverlay(env: Env, o: IconOverlay): Promise<void> {
-  o.updatedAt = Date.now();
-  await env.ICONS.put(ICON_OVERLAY_KEY, JSON.stringify(o), {
-    httpMetadata: { contentType: "application/json", cacheControl: "no-store, max-age=0" },
-  });
+// The live overlay, read out of D1: added/replaced icons (path + ver) and the
+// keys of hidden static icons.
+async function readIconOverlay(env: Env): Promise<IconOverlay> {
+  await ensureIconTable(env);
+  const icons: Record<string, { path: string; ver: number }> = {};
+  const removed: string[] = [];
+  let updatedAt = 0;
+  try {
+    const { results } = await env.DB.prepare("SELECT key, path, ver, removed, updated_at FROM icon_overrides").all<any>();
+    for (const r of results || []) {
+      if ((r.updated_at || 0) > updatedAt) updatedAt = r.updated_at;
+      if (r.removed) removed.push(r.key);
+      else if (r.path) icons[r.key] = { path: r.path, ver: r.ver || 0 };
+    }
+  } catch { /* empty / unavailable */ }
+  return { icons, removed, updatedAt };
+}
+async function upsertIcon(env: Env, key: string, path: string | null, ver: number | null, removed: number) {
+  await ensureIconTable(env);
+  await env.DB.prepare("INSERT INTO icon_overrides (key, path, ver, removed, updated_at) VALUES (?1,?2,?3,?4,?5) ON CONFLICT(key) DO UPDATE SET path=?2, ver=?3, removed=?4, updated_at=?5")
+    .bind(key, path, ver, removed, Date.now()).run();
+}
+async function deleteIconRow(env: Env, key: string) {
+  await ensureIconTable(env);
+  await env.DB.prepare("DELETE FROM icon_overrides WHERE key=?1").bind(key).run();
+}
+async function lookupIconRow(env: Env, key: string): Promise<{ path: string | null; removed: number } | null> {
+  await ensureIconTable(env);
+  return await env.DB.prepare("SELECT path, removed FROM icon_overrides WHERE key=?1").bind(key).first<any>();
 }
 // Add or replace an icon: write art to R2 + record it in the overlay. Returns the key/url.
 async function addIcon(env: Env, input: { set: string; name: string; category?: string; image: string; format?: string }) {
@@ -210,32 +231,26 @@ async function addIcon(env: Env, input: { set: string; name: string; category?: 
   await env.ICONS.put(path, bytes, {
     httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" },
   });
-  const o = await readIconOverlay(env);
-  o.icons[key] = { path, ver };
-  o.removed = o.removed.filter((k) => k !== key);
-  await writeIconOverlay(env, o);
+  await upsertIcon(env, key, path, ver, 0);
   return { key, path, url: `${ICON_CDN}/${path}?v=${ver}` };
 }
-// Remove an icon. An overlay-added icon is fully purged (art + entry, no
-// tombstone). A STATIC icon is hidden via a `removed` tombstone the site filters.
+// Remove an icon. An overlay-added icon is fully purged (art + row). A STATIC
+// icon is hidden via a tombstone row (removed=1) the site filters.
 async function deleteIcon(env: Env, key: string) {
   if (!key) throw new Error("key is required");
-  const o = await readIconOverlay(env);
-  const added = o.icons[key];
-  if (added) {
-    try { await env.ICONS.delete(added.path); } catch { /* ignore */ }
-    delete o.icons[key];
-    o.removed = o.removed.filter((k) => k !== key); // never existed statically — no tombstone
-  } else if (!o.removed.includes(key)) {
-    o.removed.push(key);
+  const row = await lookupIconRow(env, key);
+  if (row && row.path && !row.removed) {
+    try { await env.ICONS.delete(row.path); } catch { /* ignore */ }
+    await deleteIconRow(env, key); // overlay-added → purge, no tombstone
+  } else {
+    await upsertIcon(env, key, null, null, 1); // static → hide
   }
-  await writeIconOverlay(env, o);
   return { key, removed: true };
 }
-// Resolve an icon key → its art path (overlay first, else the live static manifest).
+// Resolve an icon key → its art path (overlay row first, else the static manifest).
 async function resolveIconPath(env: Env, key: string): Promise<{ path: string; ext: "png" | "svg" } | null> {
-  const o = await readIconOverlay(env);
-  let path: string | undefined = o.icons[key]?.path;
+  const row = await lookupIconRow(env, key);
+  let path: string | undefined = row?.path || undefined;
   if (!path) {
     try { path = ((await fetch(`${ICONS_URL}/icons-manifest.json`).then((r) => r.json())) as any)?.icons?.[key]; } catch { /* ignore */ }
   }
@@ -255,10 +270,7 @@ async function editIcon(env: Env, input: { key: string; image: string; format?: 
   await env.ICONS.put(resolved.path, bytes, {
     httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" },
   });
-  const o = await readIconOverlay(env);
-  o.icons[input.key] = { path: resolved.path, ver };
-  o.removed = o.removed.filter((k) => k !== input.key);
-  await writeIconOverlay(env, o);
+  await upsertIcon(env, input.key, resolved.path, ver, 0);
   return { key: input.key, path: resolved.path, url: `${ICON_CDN}/${resolved.path}?v=${ver}` };
 }
 
