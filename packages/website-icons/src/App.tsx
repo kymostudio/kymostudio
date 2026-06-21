@@ -7,9 +7,12 @@ const PAGE = 200; // incremental render batch (infinite scroll)
 // paths (`icons/<set>/…`, shared with the Python/JS impls); we resolve them
 // against the CDN here. Override at runtime with ?cdn=… for local testing.
 const CDN_BASE = new URLSearchParams(location.search).get("cdn") || "https://cdn.kymo.studio/";
-const iconUrl = (path: string) => CDN_BASE + path;
+// icons-admin backend (shares the kymo.studio Google session); serves the live
+// overlay (added/removed) merged over the static manifest.
+export const API = "https://api.kymo.studio";
+const iconUrl = (path: string, ver?: number) => CDN_BASE + path + (ver ? `?v=${ver}` : "");
 
-type Icon = { key: string; set: string; path?: string; svg?: string };
+type Icon = { key: string; set: string; path?: string; svg?: string; ver?: number };
 
 // ── inline SVG glyphs (Lucide-style) ──────────────────────────────────────
 const S = (d: React.ReactNode, vb = "0 0 24 24", fill = "none") => (
@@ -27,7 +30,7 @@ const GitHubGlyph = () => S(<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.4
 // the icon art itself — PNG from the CDN, or an inline IconifyJSON SVG body
 function Art({ it }: { it: Icon }) {
   if (it.svg) return <span dangerouslySetInnerHTML={{ __html: it.svg }} />;
-  return <img loading="lazy" src={iconUrl(it.path!)} alt={it.key} />;
+  return <img loading="lazy" src={iconUrl(it.path!, it.ver)} alt={it.key} />;
 }
 
 // clipboard with a textarea fallback for older / blocked browsers
@@ -90,8 +93,20 @@ export function App() {
           }
         } catch { /* set not shipped — skip */ }
       }
-      all.sort((a, b) => a.key.localeCompare(b.key));
-      setItems(all);
+      // merge the live admin overlay (added/removed) so admin changes show
+      // without a redeploy. Overlay-added icons carry `ver` to bust the CDN cache.
+      let merged = all;
+      try {
+        const ov: any = await fetch(`${API}/api/icons`).then((r) => r.json());
+        const removed = new Set<string>(ov.removed || []);
+        const map = new Map<string, Icon>(all.filter((it) => !removed.has(it.key)).map((it) => [it.key, it]));
+        for (const [key, v] of Object.entries<any>(ov.icons || {})) {
+          map.set(key, { key, set: key.split(":")[0], path: v.path, ver: v.ver });
+        }
+        merged = [...map.values()];
+      } catch { /* overlay unavailable — static catalogue only */ }
+      merged.sort((a, b) => a.key.localeCompare(b.key));
+      setItems(merged);
     })();
   }, []);
 
@@ -174,7 +189,7 @@ export function App() {
       a.href = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(it.svg);
       a.download = it.key.replace(/[:/]/g, "-") + ".svg";
     } else {
-      a.href = iconUrl(it.path!);
+      a.href = iconUrl(it.path!, it.ver);
       a.download = it.key.replace(/[:/]/g, "-") + ".png";
     }
     document.body.appendChild(a); a.click(); a.remove();
@@ -283,7 +298,7 @@ export function App() {
                 <button className="btn primary" onClick={() => { copy(dialog.key); flash(`Copied <code>${dialog.key}</code>`); }}>
                   <CopyGlyph /> Copy key
                 </button>
-                <button className="btn" onClick={() => { copy(dialog.svg ? dialog.key : iconUrl(dialog.path!)); flash("Copied URL"); }}>
+                <button className="btn" onClick={() => { copy(dialog.svg ? dialog.key : iconUrl(dialog.path!, dialog.ver)); flash("Copied URL"); }}>
                   <LinkGlyph /> Copy URL
                 </button>
                 <button className="btn" onClick={() => downloadIcon(dialog)}>

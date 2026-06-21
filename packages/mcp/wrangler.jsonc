@@ -20,9 +20,16 @@
   "d1_databases": [
     { "binding": "DB", "database_name": "kymo-editor", "database_id": "ad04fd23-3c19-4327-ab2e-d0e307f84a8d" }
   ],
+  // The public kymo-icons bucket (served at cdn.kymo.studio) — the icons-admin
+  // surface writes icon art + the dynamic overlay manifest (overrides.json) here.
+  "r2_buckets": [
+    { "binding": "ICONS", "bucket_name": "kymo-icons" }
+  ],
   "vars": {
     "GOOGLE_CLIENT_ID": "745071116390-6idggmrtohc6heg6gvuubaamkt8dr68u.apps.googleusercontent.com",
-    "ALLOWED_EMAILS": ""
+    "ALLOWED_EMAILS": "",
+    // Who may add/edit/delete icons via /api/icons + the MCP icon tools (CSV).
+    "ICON_ADMIN_EMAILS": "anhv.ict91@gmail.com"
   },
   "routes": [
     { "pattern": "mcp.kymo.studio", "custom_domain": true },

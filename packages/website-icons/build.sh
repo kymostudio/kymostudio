@@ -26,6 +26,7 @@ npx esbuild src/main.tsx --bundle --format=esm --minify \
 echo "→ assembling dist/"
 cp src/index.html dist/
 cp src/styles.css dist/
+cp src/_redirects dist/   # SPA rewrite for /login + /admin (Cloudflare Pages)
 # icon catalogue (manifest paths are relative `icons/<set>/…`; resolved to the CDN at runtime)
 cp "$ICONS/icons-manifest.json" dist/
 cp "$ICONS/icons-collections.json" dist/

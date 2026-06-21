@@ -14,6 +14,8 @@ export interface Env {
   OAUTH_PROVIDER: any;
   GOOGLE_CLIENT_ID: string;
   ALLOWED_EMAILS: string;
+  ICONS: R2Bucket;
+  ICON_ADMIN_EMAILS: string;
 }
 
 const EDITOR_URL = "https://editor.kymo.studio";
@@ -48,7 +50,8 @@ const SESSION_IDLE_MS = 14 * 24 * 60 * 60 * 1000; // sliding renewal window
 const SESSION_ABS_MS = 30 * 24 * 60 * 60 * 1000;  // absolute cap → re-auth via Google
 const SESSION_RENEW_MS = 24 * 60 * 60 * 1000;     // throttle the sliding write to ≤1/day
 const COOKIE_DOMAIN = "kymo.studio";
-const ALLOWED_ORIGINS = new Set([EDITOR_URL, "http://localhost:8231", "http://127.0.0.1:8231"]);
+const ICONS_URL = "https://icons.kymo.studio";
+const ALLOWED_ORIGINS = new Set([EDITOR_URL, ICONS_URL, "http://localhost:8231", "http://127.0.0.1:8231", "http://localhost:8099", "http://127.0.0.1:8099"]);
 
 let sessionsTableReady = false;
 async function ensureSessionsTable(env: Env) {
@@ -145,6 +148,112 @@ async function resolveAuth(request: Request, env: Env, renew = true): Promise<Au
     } catch { /* fall through to unauthorized */ }
   }
   return { error: "unauthorized" };
+}
+
+// ---- Icons admin: live add/edit/delete over the kymo-icons R2 bucket. ----
+// The website (icons.kymo.studio) ships a STATIC manifest; admin mutations are a
+// dynamic OVERLAY stored at `overrides.json` in the same bucket. The site merges
+// static ⊕ overlay at load, so changes show without a redeploy. Art lives at the
+// same repo-relative path (`icons/<set>/…`) the manifest uses, so cdn.kymo.studio
+// serves it directly; `ver` (an edit timestamp) busts the CDN cache on replace.
+type IconOverlay = { icons: Record<string, { path: string; ver: number }>; removed: string[]; updatedAt: number };
+const ICON_OVERLAY_KEY = "overrides.json";
+const ICON_CDN = "https://cdn.kymo.studio";
+
+function isIconAdmin(email: string | undefined, env: Env): boolean {
+  if (!email) return false;
+  const list = (env.ICON_ADMIN_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+  return list.length > 0 && list.includes(email.toLowerCase());
+}
+const iconSlug = (s: string) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "x";
+// Mirror packages/icons/scripts/build-manifest.mjs: key = `<set>:<category-name>`,
+// path = `icons/<set>/[<category>/]<name>.<ext>` (category folded into the key).
+function iconKeyPath(set: string, name: string, category: string | undefined, ext: "png" | "svg") {
+  const p = iconSlug(set), cat = category ? iconSlug(category) : "", nm = iconSlug(name);
+  return { key: `${p}:${cat ? cat + "-" : ""}${nm}`, path: `icons/${p}/${cat ? cat + "/" : ""}${nm}.${ext}` };
+}
+function b64ToBytes(b64: string): Uint8Array {
+  const s = b64.includes(",") ? b64.slice(b64.indexOf(",") + 1) : b64; // tolerate data: URLs
+  const bin = atob(s.replace(/\s+/g, ""));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function readIconOverlay(env: Env): Promise<IconOverlay> {
+  try {
+    const obj = await env.ICONS.get(ICON_OVERLAY_KEY);
+    if (!obj) return { icons: {}, removed: [], updatedAt: 0 };
+    const o = (await obj.json()) as Partial<IconOverlay>;
+    return { icons: o.icons || {}, removed: o.removed || [], updatedAt: o.updatedAt || 0 };
+  } catch { return { icons: {}, removed: [], updatedAt: 0 }; }
+}
+async function writeIconOverlay(env: Env, o: IconOverlay): Promise<void> {
+  o.updatedAt = Date.now();
+  await env.ICONS.put(ICON_OVERLAY_KEY, JSON.stringify(o), {
+    httpMetadata: { contentType: "application/json", cacheControl: "no-store, max-age=0" },
+  });
+}
+// Add or replace an icon: write art to R2 + record it in the overlay. Returns the key/url.
+async function addIcon(env: Env, input: { set: string; name: string; category?: string; image: string; format?: string }) {
+  const fmt = (input.format || "png").toLowerCase();
+  const ext: "png" | "svg" = fmt === "svg" ? "svg" : "png";
+  if (!input.set || !input.name) throw new Error("set and name are required");
+  const bytes = b64ToBytes(input.image || "");
+  if (!bytes.length) throw new Error("empty image");
+  // light validation
+  const isPng = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
+  const head = new TextDecoder().decode(bytes.slice(0, 256)).toLowerCase();
+  if (ext === "png" && !isPng) throw new Error("not a PNG (set format:'svg' for SVG art)");
+  if (ext === "svg" && !head.includes("<svg")) throw new Error("not an SVG");
+  const { key, path } = iconKeyPath(input.set, input.name, input.category, ext);
+  const ver = Date.now();
+  await env.ICONS.put(path, bytes, {
+    httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" },
+  });
+  const o = await readIconOverlay(env);
+  o.icons[key] = { path, ver };
+  o.removed = o.removed.filter((k) => k !== key);
+  await writeIconOverlay(env, o);
+  return { key, path, url: `${ICON_CDN}/${path}?v=${ver}` };
+}
+// Hide an icon (static or overlay-added). Deletes overlay-added art from R2.
+async function deleteIcon(env: Env, key: string) {
+  if (!key) throw new Error("key is required");
+  const o = await readIconOverlay(env);
+  const added = o.icons[key];
+  if (added) { try { await env.ICONS.delete(added.path); } catch { /* ignore */ } delete o.icons[key]; }
+  if (!o.removed.includes(key)) o.removed.push(key);
+  await writeIconOverlay(env, o);
+  return { key, removed: true };
+}
+// Resolve an icon key → its art path (overlay first, else the live static manifest).
+async function resolveIconPath(env: Env, key: string): Promise<{ path: string; ext: "png" | "svg" } | null> {
+  const o = await readIconOverlay(env);
+  let path: string | undefined = o.icons[key]?.path;
+  if (!path) {
+    try { path = ((await fetch(`${ICONS_URL}/icons-manifest.json`).then((r) => r.json())) as any)?.icons?.[key]; } catch { /* ignore */ }
+  }
+  if (!path) return null;
+  return { path, ext: path.toLowerCase().endsWith(".svg") ? "svg" : "png" };
+}
+// Edit an EXISTING icon (static or overlay): replace its art at the same path,
+// bump `ver` to bust the CDN cache, and record it in the overlay.
+async function editIcon(env: Env, input: { key: string; image: string; format?: string }) {
+  if (!input.key) throw new Error("key is required");
+  const resolved = await resolveIconPath(env, input.key);
+  if (!resolved) throw new Error(`unknown icon key: ${input.key}`);
+  const ext = (input.format || resolved.ext).toLowerCase() === "svg" ? "svg" : "png";
+  const bytes = b64ToBytes(input.image || "");
+  if (!bytes.length) throw new Error("empty image");
+  const ver = Date.now();
+  await env.ICONS.put(resolved.path, bytes, {
+    httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" },
+  });
+  const o = await readIconOverlay(env);
+  o.icons[input.key] = { path: resolved.path, ver };
+  o.removed = o.removed.filter((k) => k !== input.key);
+  await writeIconOverlay(env, o);
+  return { key: input.key, path: resolved.path, url: `${ICON_CDN}/${resolved.path}?v=${ver}` };
 }
 
 // ---- Diagram + workspace persistence: Cloudflare D1 (database of record). ----
@@ -1379,6 +1488,77 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         return { content: [{ type: "text", text: `The user typed in the editor panel:\n${items.map((it) => "• " + it.text).join("\n")}${hint}` }] };
       }
     );
+
+    // ── Icons admin (icons.kymo.studio): add/edit/delete are ADMIN-only; list is open. ──
+    const notAdmin = { content: [{ type: "text" as const, text: "Not authorized — icon add/edit/delete is admin-only." }] };
+    tool(
+      "add_icon",
+      "ADMIN-ONLY. Add a NEW icon to the kymo library (icons.kymo.studio) or REPLACE an existing one. The art is stored on the kymo-icons CDN and appears live on the site (no redeploy). Provide the image as base64 PNG (or SVG with format:'svg').",
+      {
+        set: z.string().describe("Icon set / provider prefix, e.g. 'aws', 'gcp', 'custom'."),
+        name: z.string().describe("Icon name, e.g. 'lambda' or 'event-bridge'."),
+        category: z.string().optional().describe("Optional sub-category folder, e.g. 'compute'."),
+        image: z.string().describe("Base64-encoded image bytes (data: URLs accepted)."),
+        format: z.string().optional().describe("'png' (default) or 'svg'."),
+      },
+      async ({ set, name, category, image, format }) => {
+        if (!isIconAdmin(me(), this.env)) return notAdmin;
+        try {
+          const r = await addIcon(this.env, { set, name, category, image, format });
+          return { content: [{ type: "text", text: `Added icon \`${r.key}\` → ${r.url}\nLive: https://icons.kymo.studio/?q=${encodeURIComponent(r.key)}` }] };
+        } catch (e: any) { return { content: [{ type: "text", text: `add_icon failed: ${e?.message || e}` }] }; }
+      }
+    );
+    tool(
+      "edit_icon",
+      "ADMIN-ONLY. Replace the art of an EXISTING icon by key (e.g. 'aws:compute-ec2'). Busts the CDN cache so the new art shows live.",
+      {
+        key: z.string().describe("Existing icon key (from list_icons), e.g. 'aws:compute-ec2'."),
+        image: z.string().describe("Base64-encoded new image bytes."),
+        format: z.string().optional().describe("'png' (default) or 'svg'."),
+      },
+      async ({ key, image, format }) => {
+        if (!isIconAdmin(me(), this.env)) return notAdmin;
+        try {
+          const r = await editIcon(this.env, { key, image, format });
+          return { content: [{ type: "text", text: `Edited \`${r.key}\` → ${r.url}` }] };
+        } catch (e: any) { return { content: [{ type: "text", text: `edit_icon failed: ${e?.message || e}` }] }; }
+      }
+    );
+    tool(
+      "delete_icon",
+      "ADMIN-ONLY. Remove/hide an icon by key (e.g. 'aws:compute-ec2'). Hidden on the site immediately; overlay-added art is also deleted from the CDN.",
+      { key: z.string().describe("Icon key to remove (from list_icons).") },
+      async ({ key }) => {
+        if (!isIconAdmin(me(), this.env)) return notAdmin;
+        try {
+          const r = await deleteIcon(this.env, key);
+          return { content: [{ type: "text", text: `Removed icon \`${r.key}\`.` }] };
+        } catch (e: any) { return { content: [{ type: "text", text: `delete_icon failed: ${e?.message || e}` }] }; }
+      }
+    );
+    tool(
+      "list_icons",
+      "List icons in the kymo library (live: static manifest ⊕ admin overlay). Optionally filter by a substring matched against the icon key.",
+      {
+        query: z.string().optional().describe("Substring to match against keys, e.g. 'lambda' or 'aws:'."),
+        limit: z.number().optional().describe("Max results (default 50, max 200)."),
+      },
+      async ({ query, limit }) => {
+        try {
+          const m = (await fetch(`${ICONS_URL}/icons-manifest.json`).then((r) => r.json())) as any;
+          const o = await readIconOverlay(this.env);
+          const map = new Map<string, string>(Object.entries((m?.icons || {}) as Record<string, string>));
+          for (const k of o.removed) map.delete(k);
+          for (const [k, v] of Object.entries(o.icons)) map.set(k, v.path);
+          const q = (query || "").toLowerCase();
+          const all = [...map.keys()].filter((k) => !q || k.toLowerCase().includes(q)).sort();
+          const lim = Math.max(1, Math.min(limit || 50, 200));
+          const lines = all.slice(0, lim).map((k) => `- ${k} → ${ICON_CDN}/${map.get(k)}`);
+          return { content: [{ type: "text", text: `${all.length} icon(s)${q ? ` matching "${query}"` : ""}${all.length > lim ? ` (showing ${lim})` : ""}:\n${lines.join("\n")}` }] };
+        } catch (e: any) { return { content: [{ type: "text", text: `list_icons failed: ${e?.message || e}` }] }; }
+      }
+    );
   }
 }
 
@@ -1511,6 +1691,37 @@ export default {
       const data = await r.json();
       const headers = auth.setCookie ? { ...cors, "set-cookie": auth.setCookie } : cors;
       return Response.json(data, { headers });
+    }
+    // Icons admin (icons.kymo.studio): GET the live overlay [public, for the site
+    // to merge with its static manifest]; POST add/replace + DELETE hide [icon-admin].
+    if (url.pathname === "/api/icons") {
+      const cors = corsFor(request, "GET, POST, PATCH, DELETE, OPTIONS");
+      if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+      if (request.method === "GET") {
+        const o = await readIconOverlay(env);
+        return Response.json({ icons: o.icons, removed: o.removed, updatedAt: o.updatedAt }, { headers: { ...cors, "cache-control": "no-store" } });
+      }
+      const auth = await resolveAuth(request, env);
+      if ("error" in auth) return Response.json({ error: auth.error }, { status: auth.error === "forbidden" ? 403 : 401, headers: cors });
+      if (!isIconAdmin(auth.email, env)) return Response.json({ error: "forbidden", email: auth.email }, { status: 403, headers: cors });
+      if (auth.setCookie) cors["set-cookie"] = auth.setCookie;
+      try {
+        if (request.method === "POST") {
+          const body: any = await request.json().catch(() => ({}));
+          return Response.json({ ok: true, ...(await addIcon(env, body)) }, { headers: cors });
+        }
+        if (request.method === "PATCH") {
+          const body: any = await request.json().catch(() => ({}));
+          return Response.json({ ok: true, ...(await editIcon(env, body)) }, { headers: cors });
+        }
+        if (request.method === "DELETE") {
+          const key = url.searchParams.get("key") || ((await request.json().catch(() => ({}))) as any).key;
+          return Response.json({ ok: true, ...(await deleteIcon(env, String(key || ""))) }, { headers: cors });
+        }
+      } catch (e: any) {
+        return Response.json({ error: String(e?.message || e) }, { status: 400, headers: cors });
+      }
+      return new Response("method not allowed", { status: 405, headers: cors });
     }
     // Browser-callable APIs for the signed-in user (session cookie or legacy token).
     if (url.pathname === "/api/diagrams" || url.pathname === "/api/diagrams/thumb" || url.pathname === "/api/workspaces" || url.pathname === "/api/projects" || url.pathname === "/api/trash" || url.pathname === "/api/tabs") {
