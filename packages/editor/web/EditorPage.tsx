@@ -941,7 +941,10 @@ export default function EditorPage() {
                 {openTabs.map((id) => {
                   const isActive = id === activeTab;
                   const name = isActive && diagramLabel !== "Untitled" ? diagramLabel : (items.find((i) => i.id === id)?.title || "Untitled");
-                  const k = items.find((i) => i.id === id)?.kind || "kymo";
+                  // active tab: trust the live `kind` (authoritative for the open
+                  // doc) so a freshly-created file shows its real extension (e.g.
+                  // .dbml) immediately, not a stale "kymo" before the list syncs.
+                  const k = isActive ? kind : (items.find((i) => i.id === id)?.kind || "kymo");
                   const ext = extFor(k);
                   return (
                     <div key={id} data-tab-id={id} className={"file-tab" + (isActive ? " active" : "") + (flashTab === id ? " flash" : "")} title={`${name}.${ext}`}
