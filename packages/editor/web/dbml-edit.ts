@@ -122,3 +122,108 @@ export function setRefOp(src: string, sT: string, sC: string, dT: string, dC: st
 }
 
 export const NEXT_OP: Record<string, RelOp> = { ">": "<", "<": "-", "-": "<>", "<>": ">" };
+
+// ── Structural edits (table / field) ───────────────────────────────────────
+// Same surgical-rewrite philosophy as the Ref tools: operate on the text,
+// preserve everything else. Driven by the canvas toolbar AND the AI ghost
+// cursor (er-simulate.ts) — both call these, so the simulation drives the
+// real editing surface.
+
+export interface TableField { name: string; type: string; pk?: boolean }
+
+/** Locate a `Table <name> { … }` block: header start + brace span. */
+function findTableSpan(src: string, table: string): { start: number; open: number; close: number } | null {
+  const tbl = new RegExp(`\\bTable\\s+(?:[\\w".]*\\.)?["\`]?${escapeRe(table)}["\`]?\\b[^\\n{]*\\{`, "i").exec(src);
+  if (!tbl) return null;
+  const open = src.indexOf("{", tbl.index);
+  if (open < 0) return null;
+  let depth = 0, close = -1;
+  for (let i = open; i < src.length; i++) { if (src[i] === "{") depth++; else if (src[i] === "}") { if (--depth === 0) { close = i; break; } } }
+  return { start: tbl.index, open, close: close < 0 ? src.length - 1 : close };
+}
+
+/** Every table name declared in the source (schema dropped). */
+export function tableNames(src: string): string[] {
+  const names: string[] = [];
+  const re = /\bTable\s+(?:[\w".]*\.)?["`]?(\w+)["`]?/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(src))) names.push(m[1]);
+  return names;
+}
+
+/** A table name not already taken (case-insensitive): base, base_1, base_2… */
+export function uniqueTableName(src: string, base = "table"): string {
+  const taken = new Set(tableNames(src).map((n) => n.toLowerCase()));
+  if (!taken.has(base.toLowerCase())) return base;
+  for (let i = 1; ; i++) { const n = `${base}_${i}`; if (!taken.has(n.toLowerCase())) return n; }
+}
+
+/** Append a new `Table` block (default one `id integer [primary key]` row). */
+export function addTable(src: string, name: string, fields?: TableField[]): string {
+  const rows = fields && fields.length ? fields : [{ name: "id", type: "integer", pk: true }];
+  const body = rows.map((f) => `  ${f.name} ${f.type || "integer"}${f.pk ? " [primary key]" : ""}`).join("\n");
+  return src.replace(/\s*$/, "") + `\n\nTable ${name} {\n${body}\n}\n`;
+}
+
+/** Remove a whole `Table` block and every Ref line touching it. */
+export function removeTable(src: string, name: string): string {
+  const span = findTableSpan(src, name);
+  if (!span) return src;
+  let out = src.slice(0, span.start) + src.slice(span.close + 1);
+  out = out.split("\n").filter((line) => { const r = parseRefLine(line); return !(r && (r.sTable === name || r.dTable === name)); }).join("\n");
+  return out.replace(/\n{3,}/g, "\n\n").replace(/^\n+/, "");
+}
+
+/** Insert a field line just before a table block's closing brace. */
+export function addField(src: string, table: string, name: string, type: string): string {
+  const span = findTableSpan(src, table);
+  if (!span) return src;
+  const body = src.slice(span.open + 1, span.close);
+  const ind = (body.match(/\n([ \t]+)\S/) || [, "  "])[1];
+  const before = src.slice(0, span.close).replace(/\s*$/, "");
+  return before + `\n${ind}${name} ${type || "integer"}\n` + src.slice(span.close);
+}
+
+/** Delete a field line (+ its inline ref) and any Ref line referencing it. */
+export function removeField(src: string, table: string, name: string): string {
+  const fld = findFieldLine(src, table, name);
+  if (!fld) return src;
+  const lineStart = Math.max(0, src.lastIndexOf("\n", fld.start - 1));
+  const nl = src.indexOf("\n", fld.end);
+  const lineEnd = nl < 0 ? src.length : nl;
+  let out = src.slice(0, lineStart) + src.slice(lineEnd);
+  out = out.split("\n").filter((line) => {
+    const r = parseRefLine(line);
+    return !(r && ((r.sTable === table && r.sCol === name) || (r.dTable === table && r.dCol === name)));
+  }).join("\n");
+  return out;
+}
+
+/** Rename a table: its header + every Ref / inline-ref endpoint. */
+export function renameTable(src: string, old: string, neu: string): string {
+  const span = findTableSpan(src, old);
+  let out = src;
+  if (span) {
+    const header = out.slice(span.start, span.open);
+    const newHeader = header.replace(new RegExp(`(\\bTable\\s+(?:[\\w".]*\\.)?["\`]?)${escapeRe(old)}(["\`]?)`, "i"), `$1${neu}$2`);
+    out = out.slice(0, span.start) + newHeader + out.slice(span.open);
+  }
+  out = out.split("\n").map((line) => {
+    const r = parseRefLine(line);
+    return r && (r.sTable === old || r.dTable === old) ? line.replace(new RegExp(`\\b${escapeRe(old)}\\.`, "g"), `${neu}.`) : line;
+  }).join("\n");
+  return out.replace(new RegExp(`(ref\\s*:\\s*(?:${OP_RE})\\s*)${escapeRe(old)}\\.`, "gi"), `$1${neu}.`);
+}
+
+/** Rename a field: its line + every Ref endpoint referencing it. */
+export function renameField(src: string, table: string, old: string, neu: string): string {
+  const fld = findFieldLine(src, table, old);
+  if (!fld) return src;
+  const newText = fld.text.replace(new RegExp(`^([ \\t]*["\`]?)${escapeRe(old)}(["\`]?)`), `$1${neu}$2`);
+  let out = src.slice(0, fld.start) + newText + src.slice(fld.end);
+  return out.split("\n").map((line) => {
+    const r = parseRefLine(line);
+    return r && ((r.sTable === table && r.sCol === old) || (r.dTable === table && r.dCol === old))
+      ? line.replace(new RegExp(`\\b${escapeRe(table)}\\.${escapeRe(old)}\\b`, "g"), `${table}.${neu}`) : line;
+  }).join("\n");
+}

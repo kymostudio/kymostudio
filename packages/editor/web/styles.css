@@ -234,6 +234,43 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .pv-controls button:hover { background: var(--bg-raise); color: var(--accent); }
 .pv-controls .pv-pct { width: auto; min-width: 46px; padding: 0 7px; font: 12px/1 var(--mono); color: var(--dim); }
 .pv-controls .pv-pct:hover { color: var(--accent); background: var(--bg-raise); }
+/* ---- ER canvas editor (DBML): toolbar, affordances, inline rename, ghost cursor ---- */
+.pane { position: relative; }
+.er-toolbar { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 7;
+  display: flex; align-items: center; gap: 2px; padding: 5px; background: #fff;
+  border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12); }
+.er-tool { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+  border: 0; background: transparent; color: var(--ink); border-radius: 10px; cursor: pointer; }
+.er-tool:hover { background: var(--bg-raise); }
+.er-tool.active { background: var(--accent-soft); color: var(--accent); }
+.er-tool svg { flex: none; }
+.er-tool-key { position: absolute; right: 4px; bottom: 2px; font: 9px/1 var(--mono); color: var(--dim); }
+.er-tool.active .er-tool-key { color: var(--accent); }
+/* per-tool canvas cursors */
+#preview[data-ertool="table"], #preview[data-ertool="table"] .er-table { cursor: copy; }
+#preview[data-ertool="delete"], #preview[data-ertool="delete"] .er-table, #preview[data-ertool="delete"] .er-rel-hit { cursor: pointer; }
+#preview[data-ertool="hand"] { cursor: grab; }
+/* structural affordances on a selected table */
+.pv-stage svg .er-addfield { cursor: pointer; }
+.pv-stage svg .er-addfield-bg { fill: #fff; stroke: #2563eb; stroke-width: 1.3; }
+.pv-stage svg .er-addfield-tx { fill: #2563eb; font: 600 12px ui-sans-serif, system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.pv-stage svg .er-deltable { cursor: pointer; }
+.pv-stage svg .er-deltable-bg { fill: #ef4444; }
+.pv-stage svg .er-deltable-tx { fill: #fff; font: 700 13px ui-sans-serif, system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+/* inline rename input overlaying a header / field row */
+.er-inline-edit { position: absolute; z-index: 8; box-sizing: border-box; padding: 1px 6px; margin: 0;
+  border: 2px solid var(--accent); border-radius: 4px; background: #fff; color: var(--ink);
+  font: 600 13px ui-sans-serif, system-ui, sans-serif; outline: none; }
+/* AI ghost cursor (Simulate UI) — glides + click pulse + a typing chip */
+.er-ghost-cursor { position: fixed; left: 0; top: 0; z-index: 9000; pointer-events: none;
+  transition: transform 0.36s cubic-bezier(.4, 0, .2, 1), opacity 0.3s; will-change: transform; }
+.er-ghost-cursor svg path { fill: #111827; stroke: #fff; stroke-width: 1.2; }
+.er-ghost-cursor.clicking::after { content: ""; position: absolute; left: 1px; top: 1px; width: 16px; height: 16px;
+  border-radius: 50%; background: rgba(37, 99, 235, 0.35); animation: er-click 0.32s ease-out; }
+@keyframes er-click { from { transform: scale(0.2); opacity: 0.9; } to { transform: scale(2.6); opacity: 0; } }
+.er-ghost-type { position: fixed; z-index: 9000; pointer-events: none; padding: 2px 7px; background: #111827; color: #fff;
+  font: 600 12px ui-monospace, monospace; border-radius: 6px; white-space: pre; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+.er-ghost-type::after { content: "▏"; opacity: 0.85; }
 /* ---- activity bar (VSCode-style left icon rail) ---- */
 .activitybar { flex: none; width: 52px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 8px 0; border-right: 1px solid var(--border); background: var(--bg-soft); z-index: 41; }
 .act-group { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; }

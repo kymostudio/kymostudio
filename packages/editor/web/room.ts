@@ -4,7 +4,7 @@ import { LOCAL, localGetDoc, localSetSource, localSetTitle } from "./localdb";
 import { pingMcp } from "./mcpstatus";
 
 type Handlers = {
-  onDoc?: (source: string, title: string | undefined, fromSelf: boolean, kind?: string) => void;
+  onDoc?: (source: string, title: string | undefined, fromSelf: boolean, kind?: string, simulate?: boolean) => void;
   onMeta?: (title: string) => void;
   onLive?: (live: boolean) => void;
 };
@@ -39,7 +39,7 @@ export function useRoom(roomId: string | null, signedIn: boolean, handlers: Hand
       if (data.origin === "mcp") pingMcp(); // edit_diagram pushed this → AI is active
       if (data.type === "meta") { hRef.current.onMeta?.(data.title); return; }
       if (data.type !== "doc") return;
-      hRef.current.onDoc?.(String(data.source ?? ""), data.title, data.origin === myId, data.kind);
+      hRef.current.onDoc?.(String(data.source ?? ""), data.title, data.origin === myId, data.kind, !!data.simulate);
     });
     return () => { try { ws.close(); } catch {} wsRef.current = null; };
   }, [roomId, signedIn, myId]);

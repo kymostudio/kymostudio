@@ -44,8 +44,12 @@ type T = { z: number; x: number; y: number };
 // ER table box metrics — must match HEADER_H/ROW_H in packages/js/src/from-dbml.ts.
 const ER_HEADER_H = 32, ER_ROW_H = 30;
 
-export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onSetLinkOp }: {
+export type ErTool = "select" | "hand" | "table" | "delete";
+
+export function Preview({ svg, fitKey, tool = "select", onTableMove, onAddLink, onDeleteLink, onSetLinkOp, onAddTable, onDeleteTable, onAddField, onRenameTable, onRenameField }: {
   svg: string; fitKey: string;
+  /** Active canvas tool (DBML ER editing). Defaults to select. */
+  tool?: ErTool;
   /** ER table dragged to a new CENTRE (DBML); persisted by the parent. */
   onTableMove?: (id: string, cx: number, cy: number) => void;
   /** Relationship editing (DBML): create / delete / change-cardinality. The
@@ -53,10 +57,21 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
   onAddLink?: (sT: string, sC: string, dT: string, dC: string) => void;
   onDeleteLink?: (sT: string, sC: string, dT: string, dC: string) => void;
   onSetLinkOp?: (sT: string, sC: string, dT: string, dC: string, op: string) => void;
+  /** Structural editing (DBML): the parent rewrites the table/field source. A
+   *  new table is dropped at a SVG-space centre. */
+  onAddTable?: (cx: number, cy: number) => void;
+  onDeleteTable?: (tid: string) => void;
+  onAddField?: (tid: string) => void;
+  onRenameTable?: (tid: string, name: string) => void;
+  onRenameField?: (tid: string, col: string, name: string) => void;
 }) {
   const vpRef = useRef<HTMLDivElement>(null);
   const [t, setT] = useState<T>({ z: 1, x: 0, y: 0 });
   const tRef = useRef(t); tRef.current = t;
+  const toolRef = useRef(tool); toolRef.current = tool;
+  // Inline rename overlay (HTML <input> positioned over a header / field row).
+  const [editing, setEditing] = useState<{ tid: string; col?: string; x: number; y: number; w: number; h: number; value: string } | null>(null);
+  const editRef = useRef<HTMLInputElement>(null);
   const userAdjusted = useRef(false);
   const fitKeyRef = useRef(fitKey);
 
@@ -182,6 +197,29 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
     const vb = root.viewBox.baseVal, r = vp.getBoundingClientRect(), tt = tRef.current;
     return [vb.x + (clientX - r.left - tt.x) / tt.z, vb.y + (clientY - r.top - tt.y) / tt.z];
   };
+  // SVG-space point → viewport-relative px (inverse of toSvg) for the inline input.
+  const toScreen = (sx: number, sy: number): [number, number] => {
+    const vb = rootSvg()?.viewBox.baseVal, tt = tRef.current;
+    return [(sx - (vb?.x || 0)) * tt.z + tt.x, (sy - (vb?.y || 0)) * tt.z + tt.y];
+  };
+  // Inline rename overlay — open over a table header or a field row.
+  const beginEditTable = (el: SVGGraphicsElement) => {
+    if (!onRenameTable) return;
+    const z = tRef.current.z, b = tableBox(el), [x, y] = toScreen(b.x, b.y), tid = el.dataset.tid || "";
+    setEditing({ tid, x, y, w: b.w * z, h: ER_HEADER_H * z, value: tid });
+  };
+  const beginEditField = (el: SVGGraphicsElement, row: number, col: string) => {
+    if (!onRenameField) return;
+    const z = tRef.current.z, b = tableBox(el), [x, y] = toScreen(b.x, b.y + ER_HEADER_H + row * ER_ROW_H);
+    setEditing({ tid: el.dataset.tid || "", col, x, y, w: b.w * z, h: ER_ROW_H * z, value: col });
+  };
+  const commitEdit = (value: string) => {
+    const ed = editing; setEditing(null);
+    if (!ed) return;
+    const v = value.trim(); if (!v) return;
+    if (ed.col != null) { if (v !== ed.col) onRenameField?.(ed.tid, ed.col, v); }
+    else if (v !== ed.tid) onRenameTable?.(ed.tid, v);
+  };
   // Which table field is at this SVG point? (header / outside → null.)
   const fieldAt = (x: number, y: number): { tid: string; col: string; row: number; sideL: number; sideR: number; ry: number } | null => {
     const root = rootSvg(); if (!root) return null;
@@ -266,6 +304,7 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
   const deselectTable = () => {
     selTable.current?.classList.remove("er-selected");
     rootSvg()?.querySelectorAll(".er-rel-g.er-edge-active").forEach((g) => g.classList.remove("er-edge-active"));
+    clearUi("er-tableui");
     selTable.current = null;
   };
   const selectTable = (el: Element) => {
@@ -277,6 +316,21 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
     rootSvg()?.querySelectorAll<SVGGElement>(".er-rel-g").forEach((g) => {
       if (g.dataset.src === tid || g.dataset.dst === tid) g.classList.add("er-edge-active");
     });
+    // structural affordances: a delete "×" on the header + a "+ field" pill below.
+    const g = uiLayer(); if (!g || !(onAddField || onDeleteTable)) return;
+    const b = tableBox(el as SVGGraphicsElement);
+    if (onDeleteTable) {
+      const del = mkEl("g", { class: "er-tableui er-deltable", transform: `translate(${b.x + b.w - 13},${b.y + 16})` }, g);
+      del.setAttribute("data-tid", tid || "");
+      mkEl("circle", { class: "er-deltable-bg", cx: 0, cy: 0, r: 9 }, del as SVGGElement);
+      (mkEl("text", { class: "er-deltable-tx", x: 0, y: 1 }, del as SVGGElement)).textContent = "×";
+    }
+    if (onAddField) {
+      const add = mkEl("g", { class: "er-tableui er-addfield", transform: `translate(${b.x + b.w / 2},${b.y + b.h + 14})` }, g);
+      add.setAttribute("data-tid", tid || "");
+      mkEl("rect", { class: "er-addfield-bg", x: -42, y: -11, width: 84, height: 22, rx: 11 }, add as SVGGElement);
+      (mkEl("text", { class: "er-addfield-tx", x: 0, y: 1 }, add as SVGGElement)).textContent = "+ field";
+    }
   };
   // Select an edge: highlight + a small toolbar (delete ✕, cardinality badge) at its midpoint.
   const selectEdge = (gEl: SVGGElement) => {
@@ -300,7 +354,7 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
   };
 
   // Clear any selection/handles when the diagram re-renders (svg replaced).
-  useEffect(() => { selEdge.current = null; selTable.current = null; hoverKey.current = ""; }, [svg]);
+  useEffect(() => { selEdge.current = null; selTable.current = null; hoverKey.current = ""; setEditing(null); }, [svg]);
   const rel = (e: React.PointerEvent) => {
     const r = vpRef.current!.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -312,7 +366,24 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
     // mid-drag (no pinch-while-dragging).
     if (tdrag.current || link.current) return;
     const tgt = e.target as Element;
-    if (editEdges) {
+    const curTool = toolRef.current;
+    // Structural affordances (any tool): the "+ field" pill / delete "×".
+    const addBtn = tgt.closest?.(".er-addfield") as SVGGElement | null;
+    if (addBtn) { onAddField?.(addBtn.dataset.tid || ""); e.stopPropagation(); return; }
+    const delTbl = tgt.closest?.(".er-deltable") as SVGGElement | null;
+    if (delTbl) { onDeleteTable?.(delTbl.dataset.tid || ""); e.stopPropagation(); return; }
+    // Delete tool: click an edge / table to remove it.
+    if (curTool === "delete") {
+      const relG = tgt.closest?.(".er-rel-g") as SVGGElement | null;
+      if (relG) { const d = relG.dataset; onDeleteLink?.(d.src || "", d.srcCol || "", d.dst || "", d.dstCol || ""); e.stopPropagation(); return; }
+      const tEl = tgt.closest?.(".er-table") as SVGGraphicsElement | null;
+      if (tEl) { onDeleteTable?.(tEl.dataset.tid || ""); e.stopPropagation(); return; }
+    }
+    // Add-table tool: click empty canvas to drop a new table.
+    if (curTool === "table" && !tgt.closest?.(".er-table")) {
+      const p = toSvg(e.clientX, e.clientY); if (p) { onAddTable?.(p[0], p[1]); e.stopPropagation(); return; }
+    }
+    if (editEdges && curTool === "select") {
       // edge toolbar: delete / cycle cardinality
       const del = tgt.closest?.(".er-del") as SVGGElement | null;
       if (del) { const d = del.dataset; onDeleteLink?.(d.src!, d.sc!, d.dst!, d.dc!); deselectEdge(); e.stopPropagation(); return; }
@@ -332,7 +403,7 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
       // click on empty canvas / table → drop any selection
       if (selEdge.current && !tgt.closest?.(".er-edgeui")) deselectEdge();
     }
-    const tableEl = onTableMove ? (e.target as Element)?.closest?.(".er-table") as SVGGraphicsElement | null : null;
+    const tableEl = (onTableMove && curTool === "select") ? (e.target as Element)?.closest?.(".er-table") as SVGGraphicsElement | null : null;
     if (tableEl && ptrs.current.size === 0) {
       const [tx0, ty0] = getTranslate(tableEl);
       const d = tableEl.dataset;
@@ -390,7 +461,7 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
       return;
     }
     // idle hover: show grab handles on the field row under the pointer.
-    if (editEdges && ptrs.current.size === 0) {
+    if (editEdges && toolRef.current === "select" && ptrs.current.size === 0) {
       const p = toSvg(e.clientX, e.clientY);
       showHandles(p ? fieldAt(p[0], p[1]) : null);
       return;
@@ -435,8 +506,18 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
       pan.current = { x: only.x, y: only.y, tx: tRef.current.x, ty: tRef.current.y };
     } else if (ptrs.current.size === 0) pan.current = null;
   }
-  // double-click toggles fit ↔ 100%
-  function onDblClick() {
+  // double-click a header → rename table, a field row → rename field; else toggle fit ↔ 100%
+  function onDblClick(e: React.MouseEvent) {
+    if ((onRenameTable || onRenameField) && toolRef.current === "select") {
+      const el = (e.target as Element)?.closest?.(".er-table") as SVGGraphicsElement | null;
+      const p = el ? toSvg(e.clientX, e.clientY) : null;
+      if (el && p) {
+        const b = tableBox(el);
+        if (p[1] < b.y + ER_HEADER_H) { beginEditTable(el); return; }
+        const f = fieldAt(p[0], p[1]);
+        if (f) { beginEditField(el, f.row, f.col); return; }
+      }
+    }
     const vp = vpRef.current!;
     if (Math.abs(tRef.current.z - 1) < 0.01) { userAdjusted.current = false; fit(); }
     else zoomAt(1 / tRef.current.z, vp.clientWidth / 2, vp.clientHeight / 2);
@@ -444,11 +525,20 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
   const center = (factor: number) => { const vp = vpRef.current!; zoomAt(factor, vp.clientWidth / 2, vp.clientHeight / 2); };
 
   return (
-    <div id="preview" ref={vpRef}
+    <div id="preview" ref={vpRef} data-ertool={tool}
       onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
       onPointerLeave={() => { if (!link.current && !tdrag.current) showHandles(null); }}
       onDoubleClick={onDblClick}>
       <div className="pv-stage" ref={stageRef} style={{ transform: `translate(${t.x}px, ${t.y}px) scale(${t.z})` }} dangerouslySetInnerHTML={{ __html: svg }} />
+      {editing && (
+        <input ref={editRef} className="er-inline-edit" autoFocus spellCheck={false}
+          style={{ left: editing.x, top: editing.y, width: Math.max(60, editing.w), height: Math.max(20, editing.h) }}
+          value={editing.value}
+          onChange={(e) => setEditing({ ...editing, value: e.target.value })}
+          onBlur={(e) => commitEdit(e.currentTarget.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); commitEdit(e.currentTarget.value); } else if (e.key === "Escape") { e.preventDefault(); setEditing(null); } }}
+          onPointerDown={(e) => e.stopPropagation()} onDoubleClick={(e) => e.stopPropagation()} />
+      )}
       <div className="pv-controls" onPointerDown={(e) => e.stopPropagation()} onDoubleClick={(e) => e.stopPropagation()}>
         <button onClick={() => center(1 / 1.2)} title="Zoom out" aria-label="Zoom out"><Minus size={15} strokeWidth={2.2} /></button>
         <button className="pv-pct" onClick={() => center(1 / tRef.current.z)} title="Reset to 100%">{Math.round(t.z * 100)}%</button>

@@ -19,7 +19,10 @@ import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
 import { readDoc, writeDoc, dropDoc } from "./doccache";
-import { addRef, removeRef, setRefOp } from "./dbml-edit";
+import { addRef, removeRef, setRefOp, addTable, removeTable, addField, removeField, renameTable, renameField, uniqueTableName } from "./dbml-edit";
+import { ErToolbar } from "./ertoolbar";
+import type { ErTool } from "./preview";
+import { planGestures, runSimulation, MAX_GESTURES, type SimCtx } from "./er-simulate";
 import { KLoader } from "./kloader";
 import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, PanelRight, SquareCode, Eye, Download, ChevronDown, FilePlus2, X, Sparkles } from "lucide-react";
 
@@ -172,6 +175,7 @@ export default function EditorPage() {
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
+  const simAnim = useRef<number[]>([]); // pending timers for a Simulate-UI source animation
   const synced = useRef(false);
   const lastSvg = useRef(seed ? seed.svg : "");
   const fresh = useRef(false);      // room exists on the server but has no document yet
@@ -230,6 +234,26 @@ export default function EditorPage() {
     applySrcEdit(removeRef(sourceRef.current, sT, sC, dT, dC)), [applySrcEdit]);
   const onSetLinkOp = useCallback((sT: string, sC: string, dT: string, dC: string, op: string) =>
     applySrcEdit(setRefOp(sourceRef.current, sT, sC, dT, dC, op)), [applySrcEdit]);
+
+  // Seed a table's drag position (so a newly-added table renders where dropped).
+  const setPosition = useCallback((tid: string, cx: number, cy: number) => {
+    const id = dRef.current, p = getPositions(id);
+    p[tid] = [Math.round(cx), Math.round(cy)];
+    try { localStorage.setItem(posKey(id), JSON.stringify(p)); } catch {}
+  }, [getPositions]);
+
+  // DBML structural editing (toolbar + canvas gestures) — rewrites the table /
+  // field source. A new table is dropped at a SVG-space centre and pinned there.
+  const onAddTable = useCallback((cx: number, cy: number) => {
+    const name = uniqueTableName(sourceRef.current, "table");
+    setPosition(name, cx, cy);
+    applySrcEdit(addTable(sourceRef.current, name));
+  }, [applySrcEdit, setPosition]);
+  const onDeleteTable = useCallback((tid: string) => applySrcEdit(removeTable(sourceRef.current, tid)), [applySrcEdit]);
+  const onAddField = useCallback((tid: string) => applySrcEdit(addField(sourceRef.current, tid, "new_field", "integer")), [applySrcEdit]);
+  const onRenameTable = useCallback((tid: string, name: string) => applySrcEdit(renameTable(sourceRef.current, tid, name)), [applySrcEdit]);
+  const onRenameField = useCallback((tid: string, col: string, name: string) => applySrcEdit(renameField(sourceRef.current, tid, col, name)), [applySrcEdit]);
+  const [tool, setTool] = useState<ErTool>("select");
 
   const doRender = useCallback(async (src: string, k: string) => {
     const seq = ++renderSeq.current;
@@ -361,11 +385,61 @@ export default function EditorPage() {
     return () => { stop = true; };
   }, [d, sharedSrc, sharedKind]); // eslint-disable-line
 
+  // Simulate UI for diagram edits: an MCP edit pushed with simulate:true is
+  // animated in the source pane (type/erase the diff over ~1.5s) instead of
+  // applied instantly — the diagram-editing analog of the project-modal sim.
+  // applyingRemote stays set on every frame so no frame echoes back to the room.
+  const animateSourceTo = (to: string) => {
+    simAnim.current.forEach((t) => clearTimeout(t)); simAnim.current = [];
+    const from = sourceRef.current;
+    if (from === to) { applyingRemote.current = true; setSource(to); return; }
+    let p = 0; const mp = Math.min(from.length, to.length);
+    while (p < mp && from[p] === to[p]) p++;
+    let s = 0; const ms = Math.min(from.length - p, to.length - p);
+    while (s < ms && from[from.length - 1 - s] === to[to.length - 1 - s]) s++;
+    const pre = to.slice(0, p), post = to.slice(to.length - s);
+    const oldMid = from.slice(p, from.length - s), newMid = to.slice(p, to.length - s);
+    const frames: string[] = [];
+    const step = Math.max(1, Math.ceil((oldMid.length + newMid.length) / 60)); // ≤~60 frames
+    for (let i = oldMid.length - step; i > 0; i -= step) frames.push(pre + oldMid.slice(0, i) + post); // erase
+    if (oldMid.length) frames.push(pre + post);
+    for (let i = step; i < newMid.length; i += step) frames.push(pre + newMid.slice(0, i) + post); // type
+    frames.push(to);
+    const dt = Math.min(40, Math.max(14, 1500 / frames.length));
+    frames.forEach((f, idx) => simAnim.current.push(window.setTimeout(() => {
+      applyingRemote.current = true; setSource(f);
+    }, Math.round(dt * (idx + 1)))));
+  };
+
+  // DBML "Simulate UI": replay the diff old→new source as ghost-cursor CANVAS
+  // gestures (drop a table, "+ field", draw a relationship, delete) — driving
+  // the same structural editing the human toolbar does. Steps don't echo to the
+  // room (applyingRemote); the authoritative source is committed at the end.
+  const simSignal = useRef<{ cancelled: boolean }>({ cancelled: false });
+  const applyLocalNoEcho = (next: string) => { if (next === sourceRef.current) return; applyingRemote.current = true; setSource(next); };
+  const runDbmlSim = async (newSrc: string) => {
+    simSignal.current.cancelled = true;
+    const signal = { cancelled: false }; simSignal.current = signal;
+    const gestures = planGestures(sourceRef.current, newSrc, getPositions(dRef.current));
+    if (!gestures.length || gestures.length > MAX_GESTURES) { applyLocalNoEcho(newSrc); return; }
+    const ctx: SimCtx = {
+      setTool,
+      addTable: (name, fields, cx, cy) => { setPosition(name, cx, cy); applyLocalNoEcho(addTable(sourceRef.current, name, fields)); },
+      addField: (tid, name, type) => applyLocalNoEcho(addField(sourceRef.current, tid, name, type)),
+      addRel: (sT, sC, dT, dC) => applyLocalNoEcho(addRef(sourceRef.current, sT, sC, ">", dT, dC)),
+      deleteTable: (tid) => applyLocalNoEcho(removeTable(sourceRef.current, tid)),
+      deleteRel: (sT, sC, dT, dC) => applyLocalNoEcho(removeRef(sourceRef.current, sT, sC, dT, dC)),
+      signal,
+    };
+    try { await runSimulation(gestures, ctx); }
+    finally { if (!signal.cancelled) applyLocalNoEcho(newSrc); setTool("select"); }
+  };
+
   const room = useRoom(roomId, signedIn, {
     onLive: setLive, // not cleared here: the OLD socket closing on room switch would kill the boot state
     // Any stored non-"Untitled" title is a hand-typed name (no auto-naming).
     onMeta: (t) => { if (t && t !== "Untitled") titleUserSet.current = true; setTitle(t && t !== "Untitled" ? t : ""); },
-    onDoc: (src, t, fromSelf, k) => {
+    onDoc: (src, t, fromSelf, k, simulate) => {
       setSyncing(false);
       if (t !== undefined) setTitle(t && t !== "Untitled" ? t : "");
       synced.current = true;
@@ -394,6 +468,12 @@ export default function EditorPage() {
       // The synced doc differs from the SAMPLE placeholder we may have rendered
       // while booting — drop that stale SVG so the preview pane shows its loader
       // (not a flash of the sample) until the real content renders.
+      // Simulate UI: DBML edits replay as ghost-cursor canvas gestures; other
+      // kinds fall back to the in-place source typing animation.
+      if (simulate && src !== sourceRef.current) {
+        if (k === "dbml") { runDbmlSim(src); return; }
+        animateSourceTo(src); return;
+      }
       if (src !== sourceRef.current) { setSvg(""); lastSvg.current = ""; }
       applyingRemote.current = true;
       setSource(src);
@@ -1055,10 +1135,17 @@ export default function EditorPage() {
               {previewLoading
                 ? <PaneLoading />
                 : <Preview svg={svg} fitKey={(d || "shared") + ":" + kind}
+                    tool={kind === "dbml" ? tool : "select"}
                     onTableMove={kind === "dbml" ? onTableMove : undefined}
                     onAddLink={kind === "dbml" ? onAddLink : undefined}
                     onDeleteLink={kind === "dbml" ? onDeleteLink : undefined}
-                    onSetLinkOp={kind === "dbml" ? onSetLinkOp : undefined} />}
+                    onSetLinkOp={kind === "dbml" ? onSetLinkOp : undefined}
+                    onAddTable={kind === "dbml" ? onAddTable : undefined}
+                    onDeleteTable={kind === "dbml" ? onDeleteTable : undefined}
+                    onAddField={kind === "dbml" ? onAddField : undefined}
+                    onRenameTable={kind === "dbml" ? onRenameTable : undefined}
+                    onRenameField={kind === "dbml" ? onRenameField : undefined} />}
+              {kind === "dbml" && !previewLoading && <ErToolbar tool={tool} onTool={setTool} />}
             </section>
             )}
           </>

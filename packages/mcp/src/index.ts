@@ -76,8 +76,16 @@ function getCookie(request: Request, name: string): string | null {
   }
   return null;
 }
-function sessionCookie(value: string, maxAgeSec: number): string {
-  return `${SESSION_COOKIE}=${value}; Domain=${COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAgeSec}`;
+// Localhost dev runs CROSS-SITE to api.kymo.studio, where a SameSite=Lax cookie
+// is never sent (so /api/* + the WS would all 401). Issue SameSite=None for
+// localhost-origin logins (still Secure → only sent over https to the API);
+// production (editor.kymo.studio, same-site) keeps the stricter Lax.
+const LOCALHOST_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/;
+function cookieSameSite(request: Request): "Lax" | "None" {
+  return LOCALHOST_ORIGIN.test(request.headers.get("Origin") || "") ? "None" : "Lax";
+}
+function sessionCookie(value: string, maxAgeSec: number, sameSite: "Lax" | "None" = "Lax"): string {
+  return `${SESSION_COOKIE}=${value}; Domain=${COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=${sameSite}; Max-Age=${maxAgeSec}`;
 }
 function clearSessionCookie(): string {
   return `${SESSION_COOKIE}=; Domain=${COOKIE_DOMAIN}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
@@ -85,7 +93,7 @@ function clearSessionCookie(): string {
 function corsFor(request: Request, methods: string): Record<string, string> {
   const origin = request.headers.get("Origin") || "";
   return {
-    "access-control-allow-origin": ALLOWED_ORIGINS.has(origin) ? origin : EDITOR_URL,
+    "access-control-allow-origin": (ALLOWED_ORIGINS.has(origin) || LOCALHOST_ORIGIN.test(origin)) ? origin : EDITOR_URL,
     "access-control-allow-methods": methods,
     "access-control-allow-headers": "authorization, content-type",
     "access-control-allow-credentials": "true",
@@ -133,7 +141,7 @@ async function resolveAuth(request: Request, env: Env, renew = true): Promise<Au
       if (renew && now - row.last_seen > SESSION_RENEW_MS) {
         const newExp = Math.min(now + SESSION_IDLE_MS, row.created_at + SESSION_ABS_MS);
         try { await env.DB.prepare("UPDATE sessions SET last_seen=?, expires_at=? WHERE id_hash=?").bind(now, newExp, h).run(); } catch {}
-        setCookie = sessionCookie(raw, Math.floor((newExp - now) / 1000));
+        setCookie = sessionCookie(raw, Math.floor((newExp - now) / 1000), cookieSameSite(request));
       }
       return { email: row.email, name: row.name, setCookie };
     }
@@ -685,7 +693,7 @@ export class EditorRoom extends DurableObject<Env> {
       return new Response(null, { status: 101, webSocket: client });
     }
     if (url.pathname.endsWith("/set") && request.method === "POST") {
-      const b = (await request.json()) as { source?: string; origin?: string; owner?: string; title?: string; kind?: string; id?: string };
+      const b = (await request.json()) as { source?: string; origin?: string; owner?: string; title?: string; kind?: string; id?: string; simulate?: boolean };
       if (this.owner && b.owner && this.owner !== b.owner) return Response.json({ error: "forbidden" }, { status: 403 });
       if (!this.owner && b.owner) { this.owner = b.owner; await this.ctx.storage.put("owner", b.owner); }
       if (b.id && this.diagramId !== b.id) { this.diagramId = b.id; await this.ctx.storage.put("diagramId", b.id); }
@@ -693,7 +701,7 @@ export class EditorRoom extends DurableObject<Env> {
       if (typeof b.kind === "string") { this.kind = b.kind; await this.ctx.storage.put("kind", this.kind); }
       if (typeof b.source === "string") { this.source = b.source; await this.ctx.storage.put("source", this.source); changedSource = true; }
       if (typeof b.title === "string") { this.title = b.title; await this.ctx.storage.put("title", this.title); changedTitle = true; }
-      if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || "kymo", origin: b.origin ?? "mcp" });
+      if (changedSource) this.broadcast({ type: "doc", source: this.source, title: this.title, kind: this.kind || "kymo", origin: b.origin ?? "mcp", simulate: !!b.simulate });
       else if (changedTitle) this.broadcast({ type: "meta", title: this.title });
       await this.indexUpsert(); // one write per API call (MCP edits), not per-keystroke
       return Response.json({ ok: true, bytes: this.source.length, clients: this.ctx.getWebSockets().length });
@@ -1168,12 +1176,14 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         title: z.string().optional().describe("New name for the diagram (rename)."),
         id: z.string().optional().describe("Diagram id (from new_diagram/list_diagrams). Omit to use your most recent."),
         kind: z.string().optional().describe("Change the diagram kind: 'kymo' or a kroki.io type (plantuml, mermaid, graphviz, …)."),
+        simulate: z.boolean().optional().describe("Default false (apply instantly). true = animate the change in the editor's source pane (it types/erases the edit live) — use when the user opted into UI simulation (the panel's Simulate toggle / the [Simulate UI = ON] hint)."),
       },
-      async ({ source, title, id, kind }) => {
+      async ({ source, title, id, kind, simulate }) => {
         if (source === undefined && title === undefined && kind === undefined) return { content: [{ type: "text", text: "Provide `source`, `title` and/or `kind` to edit." }] };
         const did = id ?? (await this.env.OAUTH_KV.get(`last:${me()}`));
         if (!did) return { content: [{ type: "text", text: "No diagram yet — call new_diagram first (or pass id)." }] };
         const body: Record<string, unknown> = { id: did, origin: "mcp", owner: me() };
+        if (simulate && source !== undefined) body.simulate = true;
         if (source !== undefined) body.source = source;
         if (title !== undefined) body.title = title;
         if (kind !== undefined) body.kind = kind === "kymo" ? "" : kind;
@@ -1522,7 +1532,7 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         // Back-compat: older entries were bare strings; normalize to {text, simulate}.
         const items = messages.map((m) => (typeof m === "string" ? { text: m, simulate: false } : { text: String(m?.text ?? ""), simulate: !!m?.simulate }));
         const anySim = items.some((it) => it.simulate);
-        const hint = anySim ? "\n\n[Simulate UI = ON] If this leads to creating or deleting a project, pass simulate:true (new_project / delete_project) so the editor animates the real UI (create: open switcher → type name → submit; delete: open Manage-projects → filter → delete → confirm)." : "";
+        const hint = anySim ? "\n\n[Simulate UI = ON] Pass simulate:true on whichever tool applies this change so the editor animates it instead of applying instantly: edit_diagram (diagram edits — add/delete a table or edge, rename, etc.; the source change types/erases live in the editor), new_project (create: open switcher → type name → submit), delete_project (open Manage-projects → filter → delete → confirm)." : "";
         return { content: [{ type: "text", text: `The user typed in the editor panel:\n${items.map((it) => "• " + it.text).join("\n")}${hint}` }] };
       }
     );
@@ -1702,7 +1712,7 @@ export default {
         catch { return Response.json({ error: "invalid_token" }, { status: 401, headers: cors }); }
         if (!emailAllowed(p.email, env)) return Response.json({ error: "forbidden", email: p.email }, { status: 403, headers: cors });
         const raw = await createSession(env, p.email!, p.name || "", request.headers.get("user-agent") || "");
-        return Response.json({ email: p.email, name: p.name }, { headers: { ...cors, "set-cookie": sessionCookie(raw, Math.floor(SESSION_IDLE_MS / 1000)) } });
+        return Response.json({ email: p.email, name: p.name }, { headers: { ...cors, "set-cookie": sessionCookie(raw, Math.floor(SESSION_IDLE_MS / 1000), cookieSameSite(request)) } });
       }
       if (request.method === "DELETE") {
         await revokeSession(env, request, url.searchParams.get("all") === "1");
