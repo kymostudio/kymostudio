@@ -1,0 +1,46 @@
+name: Deploy MCP worker to Cloudflare
+
+# packages/mcp is the kymo-mcp Worker (api.kymo.studio + mcp.kymo.studio): the
+# icons catalogue API (D1 brands/icons + grp subsets), the icons-admin
+# endpoints, the MCP server, and the editor session/folder backend. It used to
+# be deploy-by-hand, which let the live worker drift behind main — a stale
+# `wrangler deploy` repeatedly dropped the brands `grp`/subset column and the
+# gallery lost its sub-filters. This deploys it on every push that touches
+# packages/mcp so the live worker always matches main.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/mcp/src/**"
+      - "packages/mcp/wrangler.*"
+      - "packages/mcp/package.json"
+      - ".github/workflows/deploy-mcp.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mcp-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+      - name: Install deps
+        working-directory: packages/mcp
+        # --legacy-peer-deps: the MCP SDK + agents peer ranges otherwise ERESOLVE.
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/mcp
+          command: deploy
