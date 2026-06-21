@@ -15,6 +15,7 @@ on:
       - "packages/mcp/src/**"
       - "packages/mcp/wrangler.*"
       - "packages/mcp/package.json"
+      - "packages/mcp/.npmrc"
       - ".github/workflows/deploy-mcp.yml"
   workflow_dispatch:
 
@@ -33,10 +34,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "20"
-      - name: Install deps
-        working-directory: packages/mcp
-        # --legacy-peer-deps: the MCP SDK + agents peer ranges otherwise ERESOLVE.
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+      # wrangler-action installs deps itself; packages/mcp/.npmrc sets
+      # legacy-peer-deps=true so the MCP SDK + agents peer ranges resolve.
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v4
         with:
