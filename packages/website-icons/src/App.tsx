@@ -183,16 +183,26 @@ export function App() {
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  const downloadIcon = (it: Icon) => {
+  // Force a real download (not open-in-tab). The `download` attribute is ignored
+  // for cross-origin (CDN) URLs, so fetch the art as a same-origin blob first
+  // (the kymo-icons bucket allows CORS GET). Inline SVGs use a data URL directly.
+  const save = (href: string, filename: string) => {
     const a = document.createElement("a");
-    if (it.svg) {
-      a.href = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(it.svg);
-      a.download = it.key.replace(/[:/]/g, "-") + ".svg";
-    } else {
-      a.href = iconUrl(it.path!, it.ver);
-      a.download = it.key.replace(/[:/]/g, "-") + ".png";
-    }
+    a.href = href; a.download = filename;
     document.body.appendChild(a); a.click(); a.remove();
+  };
+  const downloadIcon = async (it: Icon) => {
+    const base = it.key.replace(/[:/]/g, "-");
+    if (it.svg) { save("data:image/svg+xml;charset=utf-8," + encodeURIComponent(it.svg), base + ".svg"); return; }
+    const ext = it.path!.toLowerCase().endsWith(".svg") ? ".svg" : ".png";
+    try {
+      const blob = await fetch(iconUrl(it.path!, it.ver)).then((r) => r.blob());
+      const obj = URL.createObjectURL(blob);
+      save(obj, base + ext);
+      setTimeout(() => URL.revokeObjectURL(obj), 2000);
+    } catch {
+      window.open(iconUrl(it.path!, it.ver), "_blank"); // CORS/fetch failed — fall back to open
+    }
   };
 
   const visible = filtered.slice(0, shown);
