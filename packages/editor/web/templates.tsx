@@ -7,14 +7,71 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { FilePlus2, Search } from "lucide-react";
 
-// One hue per source tool — the gallery tints each type's icon by it, so the grid
-// reads as a colourful, organised palette instead of a flat grey list.
-const VIA_HUE: Record<string, string> = {
-  Kymo: "#db2777", Mermaid: "#0d9488", "BPMN XML": "#4f46e5",
-  PlantUML: "#7c3aed", D2: "#b45309", GraphViz: "#15803d", WaveDrom: "#0284c7",
+// Small corner pills on a language row (e.g. Mermaid is the most-used family).
+const VIA_BADGE: Record<string, string> = { Mermaid: "TOP" };
+
+// One-line blurb per language (left column) and per diagram type (right column),
+// shown as the grey subtitle under each row.
+const VIA_DESC: Record<string, string> = {
+  Mermaid: "Text diagrams, 14 types",
+  Kymo: "Native animated diagrams",
+  "BPMN XML": "Business process models",
+  PlantUML: "UML from plain text",
+  D2: "Modern declarative diagrams",
+  GraphViz: "Graphs via DOT",
+  WaveDrom: "Digital timing diagrams",
+};
+const TYPE_DESC: Record<string, string> = {
+  Flowchart: "Steps & decisions",
+  Architecture: "Services & infra",
+  BPMN: "Business Process Model and Notation",
+  Sequence: "Interactions over time",
+  Class: "Types & relationships",
+  ER: "Entities & relations",
+  State: "States & transitions",
+  C4: "Software architecture",
+  "Use case": "Actors & goals",
+  Activity: "Workflow branches",
+  Component: "Modules & wiring",
+  Deployment: "Nodes & artifacts",
+  Database: "Tables & keys",
+  Gantt: "Project schedule",
+  Timeline: "Events over time",
+  "Git graph": "Branches & merges",
+  Network: "Nodes & links",
+  Mindmap: "Branching ideas",
+  Kanban: "Cards in columns",
+  Timing: "Signal waveforms",
+  Pie: "Proportions",
+  "XY chart": "Plot data",
 };
 
 const G = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+
+// Per-LANGUAGE marks for the left browse column — real brand logos where they
+// exist (Mermaid by Simple Icons, Kymo's own K, PlantUML/GraphViz from TDesign),
+// a custom container glyph for D2. BPMN XML and WaveDrom fall back to their one
+// starter's glyph (the canonical BPMN events / square wave already read right).
+const VIA_GLYPH: Record<string, React.ReactNode> = {
+  // Recognisable per-language marks, drawn monochrome (currentColor) so they read
+  // as a neutral icon set: Mermaid's logo silhouette, Kymo's K, PlantUML/GraphViz
+  // from TDesign, a custom D2 container glyph.
+  Mermaid: (
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.99 2.115A12.22 12.22 0 0 0 12 10.149A12.22 12.22 0 0 0 .01 2.115a12.23 12.23 0 0 0 5.32 10.604a6.56 6.56 0 0 1 2.845 5.423v3.754h7.65v-3.754a6.56 6.56 0 0 1 2.844-5.423a12.22 12.22 0 0 0 5.32-10.604Z" /></svg>
+  ),
+  Kymo: (
+    <svg viewBox="0 0 64 64" fill="currentColor"><path transform="translate(9.90 53.26) scale(0.029471 -0.029471)" d="M312 -25C447 -25 524 55 524 197V378L650 508L974 97C1043 9 1105 -25 1196 -25C1312 -25 1400 64 1400 180C1400 240 1369 304 1296 394L984 780L1282 1098C1342 1162 1364 1208 1364 1272C1364 1381 1274 1468 1163 1468C1091 1468 1036 1440 975 1372L532 871H524V1246C524 1388 447 1468 312 1468C177 1468 100 1388 100 1246V197C100 55 177 -25 312 -25Z" /></svg>
+  ),
+  PlantUML: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round"><path d="M5.5 13.5v4m0-4h13m-13 0V10m13 3.5v4m0-4V10m-13 0V6.5m0 3.5h13m0 0V6.5m-2.5 11h5V21h-5zm-13 0h5V21H3zm13-11h5V3h-5zm-13 0h5V3H3z" /></svg>
+  ),
+  GraphViz: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round"><path d="M12 14H9v-4h3m0 4h3v-4h-3m0 4v5m0-9V5m0 0h5m-5 0H7m10 0a2 2 0 1 0 4 0a2 2 0 0 0-4 0ZM7 5a2 2 0 1 1-4 0a2 2 0 0 1 4 0Zm5 14H7m5 0h5M7 19a2 2 0 1 1-4 0a2 2 0 0 1 4 0Zm10 0a2 2 0 1 0 4 0a2 2 0 0 0-4 0Z" /></svg>
+  ),
+  D2: (
+    <svg viewBox="0 0 24 24" {...G}><rect x="3" y="4.5" width="18" height="15" rx="2" /><rect x="6" y="8" width="5.2" height="3.6" rx="0.9" /><rect x="12.8" y="12" width="5.2" height="3.6" rx="0.9" /><path d="M11.2 9.8h2.1c1 0 1.5.5 1.5 1.5v1" /></svg>
+  ),
+};
 
 export type Template = { name: string; kind: string; via: string; glyph: React.ReactNode; source: string };
 
@@ -384,40 +441,78 @@ const keyOf = (t: Template) => `${t.name}-${t.via}`;
 export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template, name: string) => void; onClose: () => void }) {
   const [q, setQ] = useState("");
   const [name, setName] = useState("Untitled");
-  const [selKey, setSelKey] = useState<string>(keyOf(TEMPLATES[0]));
+  // Default to the first Mermaid type — Mermaid leads the gallery, so the
+  // highlighted card and footer hint should match what's shown on top.
+  const [selKey, setSelKey] = useState<string>(keyOf(TEMPLATES.find((t) => t.via === "Mermaid") ?? TEMPLATES[0]));
+  // Step 2 drill target: a language ("via") or a diagram type ("type"). null = the
+  // two-column browse screen. Search overrides both with a flat result list.
+  const [drill, setDrill] = useState<{ kind: "via" | "type"; key: string } | null>(null);
   const needle = q.trim().toLowerCase();
   const shown = needle
     ? TEMPLATES.filter((t) => `${t.name} ${t.via} ${t.kind}`.toLowerCase().includes(needle))
     : TEMPLATES;
   // The committed selection (falls back to the first visible when filtering away the old one).
   const selected = shown.find((t) => keyOf(t) === selKey) ?? shown[0] ?? null;
-  const create = () => { if (selected) onPick(selected, name.trim() || "Untitled"); };
-  // Group by source tool (first-appearance order) when browsing; flat while filtering.
-  const groups = useMemo(() => {
-    const m = new Map<string, Template[]>();
-    for (const t of shown) { if (!m.has(t.via)) m.set(t.via, []); m.get(t.via)!.push(t); }
-    return [...m.entries()];
-  }, [shown]);
+  const create = () => { if ((needle || drill) && selected) onPick(selected, name.trim() || "Untitled"); };
+  // Languages, Mermaid first (broadest family), the rest in first-appearance order.
+  const vias = useMemo(() => {
+    const order: string[] = [];
+    for (const t of TEMPLATES) if (!order.includes(t.via)) order.push(t.via);
+    return order.sort((a, b) => (a === "Mermaid" ? -1 : b === "Mermaid" ? 1 : 0));
+  }, []);
+  // One representative starter per diagram-type name (for the right browse column).
+  const distinctTypes = useMemo(() => {
+    const seen = new Set<string>(); const out: Template[] = [];
+    for (const t of TEMPLATES) if (!seen.has(t.name)) { seen.add(t.name); out.push(t); }
+    return out;
+  }, []);
+  const viaGlyph = (via: string) => TEMPLATES.find((t) => t.via === via)?.glyph;
+  const drillItems = drill
+    ? TEMPLATES.filter((t) => (drill.kind === "via" ? t.via === drill.key : t.name === drill.key))
+    : [];
+  // Open Step 2 and pre-select its first starter so Create is immediately meaningful.
+  const openDrill = (d: { kind: "via" | "type"; key: string }) => {
+    setDrill(d);
+    const first = TEMPLATES.find((t) => (d.kind === "via" ? t.via === d.key : t.name === d.key));
+    if (first) setSelKey(keyOf(first));
+  };
+  // Create is only meaningful once a concrete starter is in view (search or Step 2).
+  const canCreate = (needle || drill) && selected != null;
   useEffect(() => {
     const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", k);
     return () => document.removeEventListener("keydown", k);
   }, [onClose]);
 
-  const card = (t: Template) => {
-    const k = keyOf(t);
-    const isSel = selected != null && keyOf(selected) === k;
-    return (
-      <button key={k} className={"tpl-card" + (isSel ? " selected" : "")} style={{ ["--k" as any]: VIA_HUE[t.via] || "var(--accent)" }}
-        aria-pressed={isSel}
-        onClick={() => setSelKey(k)}                              // single click selects
-        onDoubleClick={() => onPick(t, name.trim() || "Untitled")}> {/* double-click = create */}
-        <span className="tpl-ic">{t.glyph}</span>
-        <span className="tpl-name">{t.name}</span>
-        <span className="tpl-via">{t.via}</span>
-      </button>
-    );
-  };
+  // Generic Image #4-style row: monochrome icon + bold name + grey subtitle.
+  const row = (opts: {
+    key: string; glyph: React.ReactNode; name: string; sub: string;
+    badge?: string; sel?: boolean; onClick: () => void; onDoubleClick?: () => void;
+  }) => (
+    <button
+      key={opts.key} type="button"
+      className={"tpl-card" + (opts.sel ? " selected" : "")}
+      aria-pressed={!!opts.sel}
+      onClick={opts.onClick} onDoubleClick={opts.onDoubleClick}
+    >
+      <span className="tpl-ic">{opts.glyph}{opts.badge && <span className="tpl-badge">{opts.badge}</span>}</span>
+      <span className="tpl-txt">
+        <span className="tpl-name">{opts.name}</span>
+        <span className="tpl-via">{opts.sub}</span>
+      </span>
+    </button>
+  );
+
+  // A starter row in Step 2 / search results. Subtitle shows the language, except
+  // when we're already inside a single language (then show what makes them differ).
+  const card = (t: Template, sub?: string) =>
+    row({
+      key: keyOf(t), glyph: t.glyph, name: t.name,
+      sub: sub ?? t.via,
+      sel: selected != null && keyOf(selected) === keyOf(t),
+      onClick: () => setSelKey(keyOf(t)),
+      onDoubleClick: () => onPick(t, name.trim() || "Untitled"),
+    });
 
   return (
     <div className="tpl-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="New diagram">
@@ -444,7 +539,7 @@ export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template, nam
               <input
                 autoFocus type="search" placeholder="Search 20+ types — try “sequence” or “plantuml”"
                 value={q} aria-label="Filter diagram types"
-                onChange={(e) => { setQ(e.target.value); }}
+                onChange={(e) => { setQ(e.target.value); if (e.target.value.trim()) setDrill(null); }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") create(); // quick flow: type "seq" ⏎
                   else if (e.key === "Escape" && q) { e.stopPropagation(); setQ(""); } // 1st Esc clears, 2nd closes
@@ -453,20 +548,48 @@ export function TemplateGallery({ onPick, onClose }: { onPick: (t: Template, nam
             </label>
           </div>
         </div>
-        <div className="tpl-body">
-          {!shown.length && <p className="tpl-empty">No diagram type matches “{q.trim()}”.</p>}
-          {needle
-            ? <div className="tpl-grid">{shown.map((t) => card(t))}</div>
-            : groups.map(([via, items]) => (
-                <section className="tpl-group" key={via}>
-                  <h3 className="tpl-grouplabel"><i className="tpl-dot" style={{ background: VIA_HUE[via] || "var(--accent)" }} />{via}</h3>
-                  <div className="tpl-grid">{items.map((t) => card(t))}</div>
-                </section>
-              ))}
-        </div>
+        {needle ? (
+          // Search: flat results across everything.
+          <div className="tpl-body tpl-templates">
+            <h3 className="tpl-colhead">{`Matches for “${q.trim()}”`}</h3>
+            {!shown.length
+              ? <p className="tpl-empty">No diagram type matches “{q.trim()}”.</p>
+              : <div className="tpl-grid">{shown.map((t) => card(t))}</div>}
+          </div>
+        ) : drill ? (
+          // Step 2: the starters for the chosen language or diagram type.
+          <div className="tpl-body tpl-templates">
+            <div className="tpl-tplhead">
+              <button type="button" className="tpl-back" onClick={() => setDrill(null)} aria-label="Back">← Back</button>
+              <h3 className="tpl-colhead">{drill.kind === "via" ? `${drill.key} templates` : `${drill.key} templates`}</h3>
+            </div>
+            <div className="tpl-grid">
+              {drillItems.map((t) => card(t, drill.kind === "via" ? (TYPE_DESC[t.name] || t.via) : t.via))}
+            </div>
+          </div>
+        ) : (
+          // Step 1: two parallel browse columns — Language | Diagrams.
+          <div className="tpl-body tpl-cols">
+            <section className="tpl-col" aria-label="Language">
+              <h3 className="tpl-colhead">Language</h3>
+              {vias.map((via) => row({
+                key: via, glyph: VIA_GLYPH[via] ?? viaGlyph(via), name: via, sub: VIA_DESC[via] || "",
+                badge: VIA_BADGE[via],
+                onClick: () => openDrill({ kind: "via", key: via }),
+              }))}
+            </section>
+            <section className="tpl-col" aria-label="Diagrams">
+              <h3 className="tpl-colhead">Diagrams</h3>
+              {distinctTypes.map((t) => row({
+                key: t.name, glyph: t.glyph, name: t.name, sub: TYPE_DESC[t.name] || "",
+                onClick: () => openDrill({ kind: "type", key: t.name }),
+              }))}
+            </section>
+          </div>
+        )}
         <div className="tpl-foot">
-          <span className="tpl-foot-hint">{selected ? <>Create <b>{(name.trim() || "Untitled")}</b> · {selected.name} ({selected.via})</> : "Pick a diagram type"}</span>
-          <button className="btn-primary tpl-create" disabled={!selected} onClick={create}>Create</button>
+          <span className="tpl-foot-hint">{canCreate && selected ? <>Create <b>{(name.trim() || "Untitled")}</b> · {selected.name} ({selected.via})</> : "Pick a language or diagram type"}</span>
+          <button className="btn-primary tpl-create" disabled={!canCreate} onClick={create}>Create</button>
         </div>
       </div>
     </div>
