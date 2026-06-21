@@ -33,13 +33,13 @@ export function BrandPage() {
       } catch { setBrand(null); }
     })();
   }, []);
-  if (brand) document.title = `${brand.name} · kymo icons`;
+  if (brand) document.title = `${brand.name} · Kymo Icons`;
 
   const Header = (
     <header>
       <div className="top">
         <a className="brand" href="/" style={{ textDecoration: "none" }}>
-          <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> kymo icons
+          <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons
         </a>
         <nav className="nav"><a href={brand ? `/?set=${brand.set}` : "/"}>← Gallery</a></nav>
       </div>

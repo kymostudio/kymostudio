@@ -34,13 +34,13 @@ export function IconPage() {
   }, []);
   // display name: the brand name, or a prettified version of the key's icon part
   const pretty = (it: Item) => it.name || it.key.split(":").slice(1).join(" ").replace(/[-_/]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || it.key;
-  if (item) document.title = `${pretty(item)} · kymo icons`;
+  if (item) document.title = `${pretty(item)} · Kymo Icons`;
 
   const Header = (
     <header>
       <div className="top">
         <a className="brand" href="/" style={{ textDecoration: "none" }}>
-          <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> kymo icons
+          <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons
         </a>
         <nav className="nav"><a href={item ? `/?set=${item.set}` : "/"}>← Gallery</a></nav>
       </div>

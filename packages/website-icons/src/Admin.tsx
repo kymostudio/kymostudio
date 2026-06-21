@@ -46,7 +46,7 @@ export function Admin() {
       <header>
         <div className="top">
           <a className="brand" href="/" style={{ textDecoration: "none" }}>
-            <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> kymo icons <small>· admin</small>
+            <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons <small>· admin</small>
           </a>
           <nav className="nav">
             <a href="/">← Gallery</a>
