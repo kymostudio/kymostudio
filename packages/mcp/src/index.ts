@@ -216,13 +216,19 @@ async function addIcon(env: Env, input: { set: string; name: string; category?: 
   await writeIconOverlay(env, o);
   return { key, path, url: `${ICON_CDN}/${path}?v=${ver}` };
 }
-// Hide an icon (static or overlay-added). Deletes overlay-added art from R2.
+// Remove an icon. An overlay-added icon is fully purged (art + entry, no
+// tombstone). A STATIC icon is hidden via a `removed` tombstone the site filters.
 async function deleteIcon(env: Env, key: string) {
   if (!key) throw new Error("key is required");
   const o = await readIconOverlay(env);
   const added = o.icons[key];
-  if (added) { try { await env.ICONS.delete(added.path); } catch { /* ignore */ } delete o.icons[key]; }
-  if (!o.removed.includes(key)) o.removed.push(key);
+  if (added) {
+    try { await env.ICONS.delete(added.path); } catch { /* ignore */ }
+    delete o.icons[key];
+    o.removed = o.removed.filter((k) => k !== key); // never existed statically — no tombstone
+  } else if (!o.removed.includes(key)) {
+    o.removed.push(key);
+  }
   await writeIconOverlay(env, o);
   return { key, removed: true };
 }
