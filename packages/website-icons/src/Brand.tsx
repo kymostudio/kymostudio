@@ -69,7 +69,7 @@ export function BrandPage() {
           </div>
 
           {brand.variants.map((v) => (
-            <section key={v.key} id={`v-${v.variant}`} className="brand-section">
+            <section key={v.key} id={`v-${v.variant}`} className={`brand-section ${v.variant}`}>
               <h2>{cap(v.variant)}</h2>
               <div className="showcase">
                 <div className="showcase-art"><img src={iconUrl(v.path, v.ver)} alt={v.key} /></div>
