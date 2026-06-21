@@ -31,8 +31,9 @@ cp "$ICONS/icons-manifest.json" dist/
 cp "$ICONS/icons-collections.json" dist/
 # vendored inline IconifyJSON sets (SVG body, no PNG) — rendered inline at runtime
 cp "$ICONS/sets/ai.json" dist/sets/
-# brand favicon (optional)
-cp ../docs/brand/favicon.svg dist/favicon.svg 2>/dev/null || true
+# brand logo — used as both the favicon and the header brand mark (unified).
+# Root brand assets live at <repo>/docs/brand (i.e. ../../docs from here).
+cp ../../docs/brand/logo.svg dist/logo.svg
 
 # cache-bust the bundle + styles refs
 V=$(date +%s)

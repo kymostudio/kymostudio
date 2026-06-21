@@ -31,8 +31,7 @@ header {
   max-width: 1480px; margin: 0 auto; padding: 13px 24px;
 }
 .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 18px; letter-spacing: -0.01em; color: var(--text); }
-.brand .k { width: 26px; height: 26px; border-radius: 7px; background: var(--pink); color: #fff;
-  display: grid; place-items: center; font-weight: 900; }
+.brand .k { width: 26px; height: 26px; border-radius: 7px; display: block; }
 .brand small { color: var(--muted); font-weight: 600; font-size: 13px; }
 .nav { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 14px; font-weight: 600; }
 .nav a { color: var(--text); }
