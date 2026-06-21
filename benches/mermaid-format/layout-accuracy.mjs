@@ -33,6 +33,8 @@ const FILES = argv.includes("--all")
 
 const m = await import(ROOT + "/packages/rust/kymo-mermaid/pkg/kymo_mermaid.js");
 m.initSync({ module: readFileSync(ROOT + "/packages/rust/kymo-mermaid/pkg/kymo_mermaid_bg.wasm") });
+// math-only wasm builds export mermaidToSvgAuto; the katex-layout build exports Dagre.
+const kymoSvg = m.mermaidToSvgDagre || m.mermaidToSvgAuto;
 
 // pixel-Δ (the 2026-06-16 metric): rasterise BOTH SVGs the same way + mean per-channel |Δ|
 const require = (await import("node:module")).createRequire(import.meta.url);
@@ -228,7 +230,7 @@ console.log("-".repeat(96));
 const all = [];
 for (const f of FILES) {
   let mm, ky;
-  try { mm = mermaidSvg(f); ky = m.mermaidToSvgDagre(readFileSync(FIXDIR + f + ".mmd", "utf8")); }
+  try { mm = mermaidSvg(f); ky = kymoSvg(readFileSync(FIXDIR + f + ".mmd", "utf8")); }
   catch (e) { console.log(`${f.padEnd(18)} ERR ${String(e.message || e).slice(0, 50)}`); continue; }
   const mN = mermaidNodes(mm), kN = kymoNodes(ky);
   const mE = edges(mm, false), kE = edges(ky, true);

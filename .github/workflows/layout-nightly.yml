@@ -1,0 +1,80 @@
+name: Layout nightly hill-climb
+
+# Loop 2 (layout) — autonomous nightly. Builds the bench, runs the layout-hillclimb
+# workflow via claude-code-action, and opens a PR with the best kept fix(es). The loop
+# only keeps a change under its HYBRID gate (composite ↑ AND pixel-Δ/golden/cargo green),
+# so a red night opens nothing. Maturity L2: a human reviews & merges the PR.
+#
+# Requires repo secret ANTHROPIC_API_KEY. Org workflow permissions already allow Actions
+# to write + create PRs. Heavy job (wasm build + Chrome + multi-round agents) — runs nightly.
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC nightly
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: layout-nightly
+  cancel-in-progress: false
+
+jobs:
+  hillclimb:
+    name: Hill-climb layout quality
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.LAYOUT_NIGHTLY_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+        with:
+          install-dependencies: true
+
+      - name: Build kymo-mermaid wasm (the bench loads this)
+        working-directory: packages/rust/kymo-mermaid
+        run: wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm,math
+
+      - name: Install bench deps
+        working-directory: benches/layout
+        run: npm ci
+
+      - name: Run layout-hillclimb and open a PR
+        uses: anthropics/claude-code-action@v1
+        env:
+          CHROME: ${{ steps.chrome.outputs.chrome-path }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Run the layout-hillclimb workflow defined at .claude/workflows/layout-hillclimb.js
+            (invoke the Workflow tool with that scriptPath). It hill-climbs kymo's flowchart layout
+            on the absolute layout-quality metric, keeping a fix only under its hybrid gate.
+
+            When it finishes:
+            - If it returns one or more `kept` fixes: create a branch `layout/nightly-hillclimb`,
+              apply each kept diff (the `patch` field), regenerate the leaderboard with
+              `cd benches/layout && node layout-quality.mjs --all`, commit
+              (message: `perf(layout): nightly hill-climb — <n> fix(es), +<totalGain> composite`,
+              no AI-attribution trailer), and open a PR to main. The PR body must list each kept
+              fix's one-sentence rationale, the before→after composite, and the refreshed
+              kymo-vs-mermaid leaderboard means.
+            - If it kept nothing: do not open a PR; just report that the night was dry.
+
+            Never edit the metric, the bench, or any golden/scores file to manufacture a gain.
