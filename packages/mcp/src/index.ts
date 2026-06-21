@@ -1710,6 +1710,25 @@ export default {
       const headers = auth.setCookie ? { ...cors, "set-cookie": auth.setCookie } : cors;
       return Response.json(data, { headers });
     }
+    // Force-download an icon: stream the R2 art with Content-Disposition:attachment
+    // so the browser SAVES it (the `download` attr is ignored cross-origin to the
+    // CDN). Public — anyone can download a public icon by key.
+    if (url.pathname === "/api/icons/download") {
+      const key = url.searchParams.get("key") || "";
+      if (!key) return new Response("missing key", { status: 400 });
+      const resolved = await resolveIconPath(env, key);
+      if (!resolved) return new Response("not found", { status: 404 });
+      const obj = await env.ICONS.get(resolved.path);
+      if (!obj) return new Response("not found", { status: 404 });
+      const filename = key.replace(/[:/]/g, "-") + "." + resolved.ext;
+      return new Response(obj.body, {
+        headers: {
+          "content-type": resolved.ext === "svg" ? "image/svg+xml" : "image/png",
+          "content-disposition": `attachment; filename="${filename}"`,
+          "cache-control": "public, max-age=3600",
+        },
+      });
+    }
     // Icons admin (icons.kymo.studio): GET the live overlay [public, for the site
     // to merge with its static manifest]; POST add/replace + DELETE hide [icon-admin].
     if (url.pathname === "/api/icons") {
