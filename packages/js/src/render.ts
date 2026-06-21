@@ -248,8 +248,8 @@ function fkEdge(e: { srcRow?: number; dstRow?: number; srcCol?: string; dstCol?:
   return `<g class="er-rel-g" data-src="${escapeXml(s.id)}" data-dst="${escapeXml(t.id)}"`
     + ` data-src-col="${escapeXml(e.srcCol ?? "")}" data-dst-col="${escapeXml(e.dstCol ?? "")}" data-op="${escapeXml(op)}"`
     + ` data-soy="${sb.oy}" data-doy="${tb.oy}">`
-    + `<path class="er-rel-hit" d="${g.d}" fill="none" stroke="transparent" stroke-width="12"/>`
     + `<path class="er-rel" d="${g.d}"/>`
+    + `<path class="er-rel-hit" d="${g.d}" fill="none" stroke="transparent" stroke-width="12"/>`
     + erMarker(srcKind, g.x1, g.y1, g.srcApex, goRight ? 1 : -1, "er-ep-src")
     + erMarker(dstKind, g.x2, g.y2, g.dstApex, goRight ? -1 : 1, "er-ep-dst")
     + `</g>`;

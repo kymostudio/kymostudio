@@ -161,6 +161,7 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
   const link = useRef<{ sTid: string; sCol: string; sRow: number; side: string; sx: number; sy: number; target: { tid: string; col: string } | null } | null>(null);
   const hoverKey = useRef<string>("");
   const selEdge = useRef<SVGGElement | null>(null);
+  const selTable = useRef<Element | null>(null);
   const SVGNS = "http://www.w3.org/2000/svg";
 
   const rootSvg = () => stageRef.current?.querySelector("svg") as SVGSVGElement | null;
@@ -260,9 +261,26 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
     selEdge.current = null;
     clearUi("er-edgeui");
   };
+  // Table selection (click, dbdiagram-style): highlight the box + activate every
+  // connected relationship (animated flow). Re-clicking the same table toggles off.
+  const deselectTable = () => {
+    selTable.current?.classList.remove("er-selected");
+    rootSvg()?.querySelectorAll(".er-rel-g.er-edge-active").forEach((g) => g.classList.remove("er-edge-active"));
+    selTable.current = null;
+  };
+  const selectTable = (el: Element) => {
+    if (selTable.current === el) { deselectTable(); return; }
+    deselectTable(); deselectEdge();
+    selTable.current = el;
+    el.classList.add("er-selected");
+    const tid = (el as SVGGraphicsElement).dataset.tid;
+    rootSvg()?.querySelectorAll<SVGGElement>(".er-rel-g").forEach((g) => {
+      if (g.dataset.src === tid || g.dataset.dst === tid) g.classList.add("er-edge-active");
+    });
+  };
   // Select an edge: highlight + a small toolbar (delete ✕, cardinality badge) at its midpoint.
   const selectEdge = (gEl: SVGGElement) => {
-    deselectEdge();
+    deselectEdge(); deselectTable();
     selEdge.current = gEl; gEl.classList.add("er-sel");
     // midpoint of the actual connector curve (robust to circle/crow's-foot ends)
     const path = gEl.querySelector<SVGPathElement>("path.er-rel");
@@ -282,7 +300,7 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
   };
 
   // Clear any selection/handles when the diagram re-renders (svg replaced).
-  useEffect(() => { selEdge.current = null; hoverKey.current = ""; }, [svg]);
+  useEffect(() => { selEdge.current = null; selTable.current = null; hoverKey.current = ""; }, [svg]);
   const rel = (e: React.PointerEvent) => {
     const r = vpRef.current!.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -326,6 +344,7 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
       e.stopPropagation();
       return;
     }
+    deselectTable();   // empty canvas (pan) → drop table selection
     const p = rel(e);
     ptrs.current.set(e.pointerId, p);
     userAdjusted.current = true;
@@ -406,6 +425,7 @@ export function Preview({ svg, fitKey, onTableMove, onAddLink, onDeleteLink, onS
       td.el.style.cursor = "";
       tdrag.current = null;
       if (td.moved && onTableMove) onTableMove(td.tid, td.cx0 + tx, td.cy0 + ty);
+      else selectTable(td.el);   // a click (no drag) selects the table
       return;
     }
     ptrs.current.delete(e.pointerId);
