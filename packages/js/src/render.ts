@@ -388,7 +388,9 @@ export async function renderSVG(d: Diagram, opts: RenderOptions = {}): Promise<s
   const regionLabels = d.regions.length
     ? `\n  <g class="region-labels">\n    ${d.regions.map(regionLabel).join("\n    ")}\n  </g>` : "";
 
-  const bg = background === null
+  // ER (DBML) diagrams render on a plain canvas (like dbdiagram) — no tinted
+  // background box / dot grid; the host (editor preview, white) shows through.
+  const bg = (background === null || needsTableStyle)
     ? ""
     : `<rect x="${x0}" y="${y0}" width="${w}" height="${h}" rx="14" fill="${background}"/>
   <rect x="${x0}" y="${y0}" width="${w}" height="${h}" rx="14" fill="url(#grid)"/>`;

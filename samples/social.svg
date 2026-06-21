@@ -31,8 +31,7 @@
     .er-rel-dot { fill: #ffffff; stroke: #9aa7b8; stroke-width: 1.6; }
     .er-foot    { fill: none; stroke: #9aa7b8; stroke-width: 1.6; stroke-linecap: round; }
   </style>
-  <rect x="-51" y="-74" width="858" height="338" rx="14" fill="#f8fafc"/>
-  <rect x="-51" y="-74" width="858" height="338" rx="14" fill="url(#grid)"/>
+  
   
   <g class="edges">
     <g class="er-rel-g" data-src="posts" data-dst="users" data-src-col="user_id" data-dst-col="id" data-op="&gt;" data-soy="137" data-doy="47"><path class="er-rel-hit" d="M563,137 C523,137 533,47 493,47" fill="none" stroke="transparent" stroke-width="12"/><path class="er-rel" d="M563,137 C523,137 533,47 493,47"/><path class="er-foot er-ep-src" d="M554.8,135.6 L563,132 M554.8,135.6 L563,142"/><circle class="er-rel-dot er-ep-dst" cx="499" cy="47" r="3.5"/></g>
