@@ -187,7 +187,7 @@ export function App() {
       <header>
         <div className="top">
           <span className="brand">
-            <span className="k">K</span> kymo icons{" "}
+            <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> kymo icons{" "}
             {items.length > 0 && <small>· {items.length.toLocaleString()} icons</small>}
           </span>
           <nav className="nav">
