@@ -278,6 +278,10 @@ export function App() {
             ))}
           </div>
           <div ref={sentinelRef} className="sentinel" />
+          <footer className="legal">
+            Logos are trademarks of their respective owners, shown for identification only.
+            kymo is not affiliated with, sponsored by, or endorsed by them.
+          </footer>
         </main>
       </div>
 
