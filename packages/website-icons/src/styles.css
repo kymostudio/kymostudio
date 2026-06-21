@@ -157,6 +157,28 @@ main { padding: 22px 24px 90px; min-width: 0; }
 }
 .toast code { font-family: ui-monospace, Menlo, monospace; color: var(--pink); }
 
+/* ── brand page ─────────────────────────────────────────── */
+.brandpage { max-width: 1100px; margin: 0 auto; }
+.dlg-link { color: var(--pink); text-decoration: none; }
+.dlg-link:hover { text-decoration: underline; }
+.brand-hero { display: flex; align-items: center; gap: 18px; padding: 8px 2px 22px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+.brand-hero-art { width: 72px; height: 72px; display: grid; place-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 16px; flex: none; }
+.brand-hero-art img { width: 48px; height: 48px; object-fit: contain; }
+.brand-hero-meta h1 { margin: 0 0 8px; font-size: 26px; letter-spacing: -0.01em; }
+.brand-hero-sub { display: flex; align-items: center; gap: 10px; }
+.brand-hero-sub .count { margin: 0; }
+.swatch { width: 16px; height: 16px; border-radius: 5px; border: 1px solid var(--line-strong); display: inline-block; }
+.brand-variants { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.bv-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.bv-preview { height: 96px; display: grid; place-items: center; background: var(--card-hover); border-radius: 10px; }
+.bv-preview img { max-width: 72px; max-height: 72px; object-fit: contain; }
+.bv-name { font-weight: 700; text-transform: capitalize; }
+.bv-key { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); word-break: break-all; }
+.bv-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.bv-actions .btn:last-child { grid-column: 1 / -1; }
+.bv-snippet { margin-top: 2px; }
+.bv-snippet button { font: 600 11px ui-monospace, Menlo, monospace; text-transform: uppercase; }
+
 /* ── legal footer ───────────────────────────────────────── */
 .legal { margin: 40px 2px 0; padding-top: 18px; border-top: 1px solid var(--line);
   color: var(--faint); font-size: 12px; line-height: 1.5; max-width: 720px; }
