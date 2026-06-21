@@ -416,12 +416,18 @@ export default function EditorPage() {
   // the same structural editing the human toolbar does. Steps don't echo to the
   // room (applyingRemote); the authoritative source is committed at the end.
   const simSignal = useRef<{ cancelled: boolean }>({ cancelled: false });
+  const simRunning = useRef(false);
+  const simTarget = useRef("");
   const applyLocalNoEcho = (next: string) => { if (next === sourceRef.current) return; applyingRemote.current = true; setSource(next); };
   const runDbmlSim = async (newSrc: string) => {
+    // Ignore re-entry for the same target (duplicate doc / a second window's
+    // echo) — otherwise it would cancel the in-flight animation's signal.
+    if (simRunning.current && simTarget.current === newSrc) return;
     simSignal.current.cancelled = true;
     const signal = { cancelled: false }; simSignal.current = signal;
+    simRunning.current = true; simTarget.current = newSrc;
     const gestures = planGestures(sourceRef.current, newSrc, getPositions(dRef.current));
-    if (!gestures.length || gestures.length > MAX_GESTURES) { applyLocalNoEcho(newSrc); return; }
+    if (!gestures.length || gestures.length > MAX_GESTURES) { simRunning.current = false; applyLocalNoEcho(newSrc); return; }
     const ctx: SimCtx = {
       setTool,
       addTable: (name, fields, cx, cy) => { setPosition(name, cx, cy); applyLocalNoEcho(addTable(sourceRef.current, name, fields)); },
@@ -432,7 +438,7 @@ export default function EditorPage() {
       signal,
     };
     try { await runSimulation(gestures, ctx); }
-    finally { if (!signal.cancelled) applyLocalNoEcho(newSrc); setTool("select"); }
+    finally { simRunning.current = false; if (!signal.cancelled) applyLocalNoEcho(newSrc); setTool("select"); }
   };
 
   const room = useRoom(roomId, signedIn, {
@@ -470,8 +476,11 @@ export default function EditorPage() {
       // (not a flash of the sample) until the real content renders.
       // Simulate UI: DBML edits replay as ghost-cursor canvas gestures; other
       // kinds fall back to the in-place source typing animation.
+      // A duplicate doc or a second window's echo of the source we're already
+      // animating → ignore, so it can't abort the in-flight ghost-cursor run.
+      if (simRunning.current && src === simTarget.current) return;
       if (simulate && src !== sourceRef.current) {
-        if (k === "dbml") { runDbmlSim(src); return; }
+        if (k === "dbml" || kind === "dbml") { runDbmlSim(src); return; }
         animateSourceTo(src); return;
       }
       if (src !== sourceRef.current) { setSvg(""); lastSvg.current = ""; }
