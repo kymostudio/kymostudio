@@ -509,13 +509,20 @@ export function Preview({ svg, fitKey, tool = "select", onTableMove, onAddLink, 
   // double-click a header → rename table, a field row → rename field; else toggle fit ↔ 100%
   function onDblClick(e: React.MouseEvent) {
     if ((onRenameTable || onRenameField) && toolRef.current === "select") {
-      const el = (e.target as Element)?.closest?.(".er-table") as SVGGraphicsElement | null;
-      const p = el ? toSvg(e.clientX, e.clientY) : null;
-      if (el && p) {
-        const b = tableBox(el);
-        if (p[1] < b.y + ER_HEADER_H) { beginEditTable(el); return; }
-        const f = fieldAt(p[0], p[1]);
-        if (f) { beginEditField(el, f.row, f.col); return; }
+      const p = toSvg(e.clientX, e.clientY);
+      const root = rootSvg();
+      if (p && root) {
+        // Hit-test by GEOMETRY, not e.target — a hovered field's smart-connection
+        // handle (or any .er-ui overlay) sits on top of the row, so e.target.closest
+        // (".er-table") would be null and we'd wrongly fall through to zoom.
+        for (const el of root.querySelectorAll<SVGGraphicsElement>(".er-table")) {
+          const b = tableBox(el);
+          if (p[0] < b.x || p[0] > b.x + b.w || p[1] < b.y || p[1] > b.y + b.h) continue;
+          if (p[1] < b.y + ER_HEADER_H) { beginEditTable(el); return; }   // header → rename table
+          const f = fieldAt(p[0], p[1]);
+          if (f) { beginEditField(el, f.row, f.col); return; }            // row → rename field
+          beginEditTable(el); return;                                     // box padding → rename table
+        }
       }
     }
     const vp = vpRef.current!;
