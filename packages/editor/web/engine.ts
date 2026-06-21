@@ -32,3 +32,9 @@ export async function renderDbml(
 ): Promise<string> {
   return await renderSVG(parseDbml(source, positions));
 }
+
+// The parsed ER model (tables + field rows + FK edges), no wasm — used by the
+// ghost-cursor simulate engine (er-simulate.ts) to diff old → new source.
+export function parseDbmlModel(source: string, positions?: Record<string, [number, number]>): any {
+  return parseDbml(source, positions);
+}
