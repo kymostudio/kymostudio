@@ -316,7 +316,7 @@ export function App() {
             <div className="dlg-body">
               <div className="dlg-head">
                 {dialog.variants
-                  ? <a className="dlg-key dlg-link" href={`/brand/${dialog.set}/${dialog.key.split(":")[1]}`}>{dialog.name || av.key} ↗</a>
+                  ? <a className="dlg-key dlg-link" href={`/brand/${dialog.key.split(":")[1]}`}>{dialog.name || av.key} ↗</a>
                   : <span className="dlg-key">{dialog.name || av.key}</span>}
                 <span className="dlg-set">{dialog.set}</span>
               </div>
