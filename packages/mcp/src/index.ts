@@ -165,7 +165,7 @@ async function resolveAuth(request: Request, env: Env, renew = true): Promise<Au
 // Art binaries live in R2 at the manifest path (`icons/<set>/…`), served by
 // cdn.kymo.studio; `ver` (an edit timestamp) busts the CDN cache on replace.
 type Variant = { variant: string; key: string; path: string; ver: number };
-type Brand = { set: string; slug: string; name: string; color: string; grp: string; variants: Variant[] };
+type Brand = { set: string; slug: string; name: string; color: string; subset: string; variants: Variant[] };
 const ICON_CDN = "https://cdn.kymo.studio";
 const VORDER: Record<string, number> = { icon: 0, color: 1, text: 2, brand: 3 };
 
@@ -191,9 +191,11 @@ let iconTablesReady = false;
 async function ensureIconTables(env: Env) {
   if (iconTablesReady) return;
   try {
-    await env.DB.prepare("CREATE TABLE IF NOT EXISTS brands (set_id TEXT, slug TEXT, name TEXT, color TEXT, grp TEXT, created_at INTEGER, PRIMARY KEY (set_id, slug))").run();
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS brands (set_id TEXT, slug TEXT, name TEXT, color TEXT, subset TEXT, created_at INTEGER, PRIMARY KEY (set_id, slug))").run();
     await env.DB.prepare("CREATE TABLE IF NOT EXISTS icons (key TEXT PRIMARY KEY, set_id TEXT, brand TEXT, variant TEXT, path TEXT, ver INTEGER, removed INTEGER DEFAULT 0, updated_at INTEGER)").run();
   } catch { /* ignore */ }
+  // migrate the legacy `grp` column → `subset` (idempotent: errors once renamed)
+  try { await env.DB.prepare("ALTER TABLE brands RENAME COLUMN grp TO subset").run(); } catch { /* already renamed */ }
   iconTablesReady = true;
 }
 // Whole runtime catalogue for the site: brands (with grouped variants), a flat
@@ -204,8 +206,8 @@ async function readCatalog(env: Env): Promise<{ brands: Brand[]; icons: Record<s
   const flat: Record<string, { path: string; ver: number }> = {};
   const removed: string[] = [];
   try {
-    const br = await env.DB.prepare("SELECT set_id, slug, name, color, grp FROM brands").all<any>();
-    for (const b of br.results || []) brands.set(`${b.set_id}:${b.slug}`, { set: b.set_id, slug: b.slug, name: b.name || b.slug, color: b.color || "", grp: b.grp || "", variants: [] });
+    const br = await env.DB.prepare("SELECT set_id, slug, name, color, subset FROM brands").all<any>();
+    for (const b of br.results || []) brands.set(`${b.set_id}:${b.slug}`, { set: b.set_id, slug: b.slug, name: b.name || b.slug, color: b.color || "", subset: b.subset || "", variants: [] });
     const ic = await env.DB.prepare("SELECT key, set_id, brand, variant, path, ver, removed FROM icons").all<any>();
     for (const r of ic.results || []) {
       if (r.removed) { removed.push(r.key); continue; }
@@ -225,11 +227,11 @@ async function readCatalog(env: Env): Promise<{ brands: Brand[]; icons: Record<s
   }
   return { brands: out, icons: flat, removed };
 }
-async function upsertBrand(env: Env, set: string, slug: string, name: string, color: string, grp = "") {
+async function upsertBrand(env: Env, set: string, slug: string, name: string, color: string, subset = "") {
   await ensureIconTables(env);
-  // grp (the subset, e.g. ai → model/application/provider) only overwrites when supplied.
-  await env.DB.prepare("INSERT INTO brands (set_id, slug, name, color, grp, created_at) VALUES (?1,?2,?3,?4,?5,?6) ON CONFLICT(set_id, slug) DO UPDATE SET name=?3, color=?4, grp=CASE WHEN ?5<>'' THEN ?5 ELSE grp END")
-    .bind(set, slug, name, color, grp, Date.now()).run();
+  // subset (e.g. ai → model/application/provider) only overwrites when supplied.
+  await env.DB.prepare("INSERT INTO brands (set_id, slug, name, color, subset, created_at) VALUES (?1,?2,?3,?4,?5,?6) ON CONFLICT(set_id, slug) DO UPDATE SET name=?3, color=?4, subset=CASE WHEN ?5<>'' THEN ?5 ELSE subset END")
+    .bind(set, slug, name, color, subset, Date.now()).run();
 }
 async function upsertIconRow(env: Env, key: string, set: string | null, brand: string | null, variant: string | null, path: string | null, ver: number | null, removed: number) {
   await ensureIconTables(env);
@@ -241,7 +243,7 @@ async function lookupIconRow(env: Env, key: string): Promise<{ set_id: string | 
   return await env.DB.prepare("SELECT set_id, brand, variant, path, removed FROM icons WHERE key=?1").bind(key).first<any>();
 }
 // Add or replace an icon variant. brand defaults to a slug of name; variant 'icon'.
-async function addIcon(env: Env, input: { set: string; name?: string; brand?: string; variant?: string; group?: string; image: string; format?: string }) {
+async function addIcon(env: Env, input: { set: string; name?: string; brand?: string; variant?: string; subset?: string; image: string; format?: string }) {
   const ext: "png" | "svg" = (input.format || "png").toLowerCase() === "svg" ? "svg" : "png";
   const set = iconSlug(input.set || "");
   const brand = iconSlug(input.brand || input.name || "");
@@ -258,7 +260,7 @@ async function addIcon(env: Env, input: { set: string; name?: string; brand?: st
   const path = `icons/${set}/${brand}${suffix}.${ext}`;
   const ver = Date.now();
   await env.ICONS.put(path, bytes, { httpMetadata: { contentType: ext === "svg" ? "image/svg+xml" : "image/png", cacheControl: "public, max-age=31536000" } });
-  await upsertBrand(env, set, brand, input.name || brand, "", (input.group || "").trim().toLowerCase());
+  await upsertBrand(env, set, brand, input.name || brand, "", (input.subset || "").trim().toLowerCase());
   await upsertIconRow(env, key, set, brand, variant, path, ver, 0);
   return { key, path, brand, variant, url: `${ICON_CDN}/${path}?v=${ver}` };
 }
@@ -1547,14 +1549,14 @@ export class KymoMCP extends McpAgent<Env, unknown, { email: string; name?: stri
         set: z.string().describe("Icon set, e.g. 'ai', 'diagrams', 'custom'."),
         name: z.string().describe("Brand name / slug, e.g. 'openai' (also the brand grouping key)."),
         variant: z.string().optional().describe("Variant: 'icon' (default), 'color', 'text', or 'brand'."),
-        group: z.string().optional().describe("Subset within the set, e.g. ai → 'model' | 'application' | 'provider'. Groups brands into sub-filters in the gallery."),
+        subset: z.string().optional().describe("Subset within the set, e.g. ai → 'model' | 'application' | 'provider'. Becomes a sub-filter under the set in the gallery."),
         image: z.string().describe("Base64-encoded image bytes (data: URLs accepted)."),
         format: z.string().optional().describe("'png' (default) or 'svg'."),
       },
-      async ({ set, name, variant, group, image, format }) => {
+      async ({ set, name, variant, subset, image, format }) => {
         if (!isIconAdmin(me(), this.env)) return notAdmin;
         try {
-          const r = await addIcon(this.env, { set, name, variant, group, image, format });
+          const r = await addIcon(this.env, { set, name, variant, subset, image, format });
           return { content: [{ type: "text", text: `Added \`${r.key}\` (brand ${r.brand}, ${r.variant}) → ${r.url}\nLive: https://icons.kymo.studio/?q=${encodeURIComponent(r.brand)}` }] };
         } catch (e: any) { return { content: [{ type: "text", text: `add_icon failed: ${e?.message || e}` }] }; }
       }

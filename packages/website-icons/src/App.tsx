@@ -15,7 +15,7 @@ export const iconUrl = (path: string, ver?: number) => CDN_BASE + path + (ver ? 
 export type Variant = { variant: string; key: string; path: string; ver: number };
 // An item is one card: a static icon, an inline-SVG icon, or a BRAND (1 card with
 // several variants — icon/color/text/brand — switchable in the dialog / icon page).
-export type Icon = { key: string; set: string; path?: string; svg?: string; ver?: number; name?: string; grp?: string; variants?: Variant[] };
+export type Icon = { key: string; set: string; path?: string; svg?: string; ver?: number; name?: string; subset?: string; variants?: Variant[] };
 
 // A per-icon permalink slug, e.g. ai:mistral → "ai-mistral" (the /icon/<slug> page).
 export const iconSlugOf = (key: string) => key.replace(/[:/]/g, "-");
@@ -42,7 +42,7 @@ export async function loadCatalog(): Promise<Icon[]> {
       if (!def) continue;
       const key = `${b.set}:${b.slug}`;
       brandKeys.add(key);
-      map.set(key, { key, set: b.set, name: b.name, grp: b.grp, path: def.path, ver: def.ver, variants });
+      map.set(key, { key, set: b.set, name: b.name, subset: b.subset, path: def.path, ver: def.ver, variants });
     }
     for (const [key, v] of Object.entries<any>(ov.icons || {})) {
       if (brandKeys.has(key)) continue;
@@ -102,7 +102,7 @@ const iconCount = (list: Icon[]) => list.reduce((n, it) => n + (it.variants?.len
 export function App() {
   const [items, setItems] = useState<Icon[]>([]);
   const [set, setSet] = useState(() => new URLSearchParams(location.search).get("set") || "all");
-  const [sub, setSub] = useState(() => new URLSearchParams(location.search).get("sub") || ""); // subset (brand grp) within a set
+  const [sub, setSub] = useState(() => new URLSearchParams(location.search).get("sub") || ""); // selected subset within a set
   const [query, setQuery] = useState(() => new URLSearchParams(location.search).get("q") || "");
   const [sortBy, setSortBy] = useState<"name" | "set">("name");
   const [shown, setShown] = useState(PAGE);
@@ -136,10 +136,10 @@ export function App() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [items]);
 
-  // subsets per set (brand `grp`, e.g. ai → model/application/provider), biggest first
+  // subsets per set (brand `subset`, e.g. ai → model/application/provider), biggest first
   const subsets = useMemo(() => {
     const m: Record<string, Record<string, number>> = {};
-    for (const i of items) if (i.grp) { (m[i.set] ||= {})[i.grp] = ((m[i.set] ||= {})[i.grp] || 0) + (i.variants?.length || 1); }
+    for (const i of items) if (i.subset) { (m[i.set] ||= {})[i.subset] = ((m[i.set] ||= {})[i.subset] || 0) + (i.variants?.length || 1); }
     const out: Record<string, [string, number][]> = {};
     for (const s in m) out[s] = Object.entries(m[s]).sort((a, b) => b[1] - a[1]);
     return out;
@@ -158,7 +158,7 @@ export function App() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const out = items.filter(
-      (it) => (set === "all" || it.set === set) && (!sub || it.grp === sub) && (!q || it.key.toLowerCase().includes(q) || (it.name || "").toLowerCase().includes(q)),
+      (it) => (set === "all" || it.set === set) && (!sub || it.subset === sub) && (!q || it.key.toLowerCase().includes(q) || (it.name || "").toLowerCase().includes(q)),
     );
     out.sort(sortBy === "set"
       ? (a, b) => a.set.localeCompare(b.set) || a.key.localeCompare(b.key)
