@@ -41,7 +41,7 @@ export function BrandPage() {
         <a className="brand" href="/" style={{ textDecoration: "none" }}>
           <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons
         </a>
-        <nav className="nav"><a href={brand ? `/?set=${brand.set}` : "/"}>← Gallery</a></nav>
+        <nav className="nav"><a href={brand ? `/set/${brand.set}` : "/"}>← Gallery</a></nav>
       </div>
     </header>
   );

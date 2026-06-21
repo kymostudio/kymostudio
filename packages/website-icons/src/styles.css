@@ -135,7 +135,13 @@ main { padding: 22px 24px 90px; min-width: 0; }
 .dlg-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
 .dlg-key { font: 600 15px ui-monospace, Menlo, monospace; color: var(--text); word-break: break-all; flex: 1; }
 .dlg-set { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
-  color: var(--pink); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+  color: var(--pink); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; white-space: nowrap; text-decoration: none; }
+a.dlg-set:hover { border-color: var(--pink); }
+.view-title { display: flex; align-items: center; gap: 9px; margin: 0 0 2px; font-size: 24px; letter-spacing: -0.01em; }
+.view-title a { color: var(--text); text-decoration: none; }
+.view-title a:hover { color: var(--pink); }
+.view-sep { color: var(--faint); font-weight: 400; }
+.view-sub { text-transform: capitalize; color: var(--muted); }
 .dlg-sub { font-size: 11px; font-weight: 700; text-transform: capitalize; letter-spacing: .02em;
   color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px;
   white-space: nowrap; text-decoration: none; }
