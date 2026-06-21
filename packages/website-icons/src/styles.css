@@ -152,6 +152,10 @@ main { padding: 22px 24px 90px; min-width: 0; }
 }
 .toast code { font-family: ui-monospace, Menlo, monospace; color: var(--pink); }
 
+/* ── legal footer ───────────────────────────────────────── */
+.legal { margin: 40px 2px 0; padding-top: 18px; border-top: 1px solid var(--line);
+  color: var(--faint); font-size: 12px; line-height: 1.5; max-width: 720px; }
+
 /* ── admin / login ──────────────────────────────────────── */
 .login-card { max-width: 380px; margin: 48px auto; text-align: center; background: var(--panel);
   border: 1px solid var(--line); border-radius: 16px; padding: 32px 28px; box-shadow: var(--shadow); }
