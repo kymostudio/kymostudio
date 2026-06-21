@@ -183,19 +183,13 @@ export function erMarkerD(apexX: number, apexY: number, ex: number, ey: number):
     + ` M${r1(apexX)},${r1(apexY)} L${r1(ex)},${r1(ey + ER_FOOT_SPREAD)}`;
 }
 
-/** Cubic Bézier point at parameter t. */
-function bez(p0: Point, p1: Point, p2: Point, p3: Point, t: number): Point {
-  const u = 1 - t;
-  return [
-    u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0],
-    u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1],
-  ];
-}
 
 // Which end gets the "many" (crow's-foot) vs "one" (circle) marker, per operator.
 const ER_ENDS: Record<string, [string, string]> = {
   ">": ["many", "one"], "<": ["one", "many"], "-": ["one", "one"], "<>": ["many", "many"],
 };
+
+const ER_ELBOW_R = 10;   // corner radius of the elbow connector
 
 export function erEdgeGeometry(s: ErBox, t: ErBox): {
   d: string; x1: number; y1: number; x2: number; y2: number; srcApex: Point; dstApex: Point;
@@ -205,18 +199,29 @@ export function erEdgeGeometry(s: ErBox, t: ErBox): {
   const x2 = goRight ? t.x : t.x + t.w;
   const y1 = s.y + s.oy;
   const y2 = t.y + t.oy;
-  const sa: Side = goRight ? "right" : "left";
-  const da: Side = goRight ? "left" : "right";
-  // Control points match edgePath's so the crow's-foot apex lands on the curve.
-  const k = Math.max(40, Math.abs(x2 - x1) * 0.5);
-  const P0: Point = [x1, y1], P3: Point = [x2, y2];
-  const c1: Point = [x1 + (sa === "right" ? k : -k), y1];
-  const c2: Point = [x2 + (da === "right" ? k : -k), y2];
-  const dt = ER_FOOT_LEN / (3 * k);              // ≈ arc-distance ER_FOOT_LEN from an end
+  const dx = goRight ? 1 : -1;                    // horizontal exit direction
+  // Elbow (orthogonal) routing with rounded corners, dbdiagram-style: leave the
+  // source horizontally, step vertically at the midpoint, enter the target
+  // horizontally. The near-end segments stay horizontal, so the crow's-foot
+  // apex sits exactly on the line (`±ER_FOOT_LEN` from the edge).
+  let d: string;
+  if (Math.abs(y2 - y1) < 1) {
+    d = `M${r1(x1)},${r1(y1)} L${r1(x2)},${r1(y2)}`;
+  } else {
+    const dy = y2 >= y1 ? 1 : -1;
+    const mx = (x1 + x2) / 2;
+    const rr = Math.min(ER_ELBOW_R, Math.abs(x2 - x1) / 2, Math.abs(y2 - y1) / 2);
+    d = `M${r1(x1)},${r1(y1)}`
+      + ` L${r1(mx - dx * rr)},${r1(y1)}`
+      + ` Q${r1(mx)},${r1(y1)} ${r1(mx)},${r1(y1 + dy * rr)}`
+      + ` L${r1(mx)},${r1(y2 - dy * rr)}`
+      + ` Q${r1(mx)},${r1(y2)} ${r1(mx + dx * rr)},${r1(y2)}`
+      + ` L${r1(x2)},${r1(y2)}`;
+  }
   return {
-    d: edgePath(x1, y1, sa, x2, y2, da), x1, y1, x2, y2,
-    srcApex: bez(P0, c1, c2, P3, dt),
-    dstApex: bez(P0, c1, c2, P3, 1 - dt),
+    d, x1, y1, x2, y2,
+    srcApex: [x1 + dx * ER_FOOT_LEN, y1],
+    dstApex: [x2 - dx * ER_FOOT_LEN, y2],
   };
 }
 
