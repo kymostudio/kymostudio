@@ -1,0 +1,8213 @@
+[
+  {
+    "file": "flowchart-v2_000",
+    "kymo": {
+      "composite": 91.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.97,
+          "raw": 0.214
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.94
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.58,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.597,
+          "raw": 0.134
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.85
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_001",
+    "kymo": {
+      "composite": 91.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.97,
+          "raw": 0.214
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.94
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.58,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.597,
+          "raw": 0.134
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.85
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_002",
+    "kymo": {
+      "composite": 83.26,
+      "terms": {
+        "crossings": {
+          "score": 0.8,
+          "raw": 1
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 0.986,
+          "raw": 0.0143
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.761,
+          "raw": 0.169
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.55
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.43,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.875,
+          "raw": 0.875
+        },
+        "compactness": {
+          "score": 0.804,
+          "raw": 0.178
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.34
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_003",
+    "kymo": {
+      "composite": 89,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.7,
+          "raw": 0.7
+        },
+        "compactness": {
+          "score": 0.85,
+          "raw": 0.188
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.51
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 11,
+        "edges": 10
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.7,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.7,
+          "raw": 0.7
+        },
+        "compactness": {
+          "score": 0.562,
+          "raw": 0.127
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.61
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 11,
+        "edges": 10
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_004",
+    "kymo": {
+      "composite": 92.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.7,
+          "raw": 0.344
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.28
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 8,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 92.8,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.725,
+          "raw": 0.334
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.3
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 8,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_005",
+    "kymo": {
+      "composite": 90.52,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.441,
+          "raw": 0.451
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.67
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 93.72,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.84,
+          "raw": 0.286
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.43
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_006",
+    "kymo": {
+      "composite": 91.44,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.59,
+          "raw": 0.389
+        },
+        "aspect_balance": {
+          "score": 0.944,
+          "raw": 0.38
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.47,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.593,
+          "raw": 0.388
+        },
+        "aspect_balance": {
+          "score": 0.945,
+          "raw": 0.38
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_007",
+    "kymo": {
+      "composite": 90.37,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.58
+        },
+        "aspect_balance": {
+          "score": 0.853,
+          "raw": 3.1
+        },
+        "grid_snap": {
+          "score": 0.5,
+          "raw": 0.5
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_008",
+    "kymo": {
+      "composite": 90.52,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.441,
+          "raw": 0.451
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.67
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 92.48,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.685,
+          "raw": 0.35
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.52
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_009",
+    "kymo": {
+      "composite": 91.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.97,
+          "raw": 0.214
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.94
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.58,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.597,
+          "raw": 0.134
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.85
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_012",
+    "kymo": {
+      "composite": 91.61,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.767,
+          "raw": 0.316
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.67
+        },
+        "grid_snap": {
+          "score": 0.333,
+          "raw": 0.33
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": null,
+      "degenerate": true,
+      "terms": {},
+      "counts": {
+        "nodes": 0,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_013",
+    "kymo": {
+      "composite": 91.84,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.605,
+          "raw": 0.136
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.69
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.83,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.604,
+          "raw": 0.136
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.69
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_015",
+    "kymo": {
+      "composite": 86.59,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.449,
+          "raw": 0.103
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.03
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 85.08,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.261,
+          "raw": 0.063
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.58
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_016",
+    "kymo": {
+      "composite": 85.45,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.606,
+          "raw": 0.136
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.42
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 71.71,
+      "terms": {
+        "crossings": {
+          "score": 0.857,
+          "raw": 1
+        },
+        "node_overlap": {
+          "score": 0.709,
+          "raw": 0.2907
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.389,
+          "raw": 0.09
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.56
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 6
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_017",
+    "kymo": {
+      "composite": 92.16,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.645,
+          "raw": 0.367
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.35
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 92.36,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.844,
+          "raw": 0.187
+        },
+        "aspect_balance": {
+          "score": 0.722,
+          "raw": 3.55
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_018",
+    "kymo": {
+      "composite": 93.75,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.844,
+          "raw": 0.187
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.86
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 81.64,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.696,
+          "raw": 0.3037
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.509,
+          "raw": 0.116
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.47
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_019",
+    "kymo": {
+      "composite": 78.97,
+      "terms": {
+        "crossings": {
+          "score": 0.667,
+          "raw": 2
+        },
+        "node_overlap": {
+          "score": 0.998,
+          "raw": 0.0016
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.625,
+          "raw": 0.625
+        },
+        "compactness": {
+          "score": 0.761,
+          "raw": 0.169
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.26
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.15,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.625,
+          "raw": 0.625
+        },
+        "compactness": {
+          "score": 0.769,
+          "raw": 0.171
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.65
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_020",
+    "kymo": {
+      "composite": 94.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.95,
+          "raw": 0.209
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.81
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.67,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.584,
+          "raw": 0.132
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.43
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_021",
+    "kymo": {
+      "composite": 86.24,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 0.961,
+          "raw": 0.0388
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.982,
+          "raw": 0.216
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.31
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 7
+      }
+    },
+    "mermaidjs": {
+      "composite": 78.62,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.869,
+          "raw": 0.1305
+        },
+        "edge_node_overlap": {
+          "score": 0.991,
+          "raw": 0.0094
+        },
+        "orthogonality": {
+          "score": 0.462,
+          "raw": 0.462
+        },
+        "compactness": {
+          "score": 0.407,
+          "raw": 0.094
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.95
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 7
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_022",
+    "kymo": {
+      "composite": 93.41,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.801,
+          "raw": 0.178
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.64
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 9,
+        "edges": 8
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.91,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.996,
+          "raw": 0.219
+        },
+        "aspect_balance": {
+          "score": 0.39,
+          "raw": 0.16
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 9,
+        "edges": 8
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_023",
+    "kymo": {
+      "composite": 92.01,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.803,
+          "raw": 0.301
+        },
+        "aspect_balance": {
+          "score": 0.717,
+          "raw": 0.29
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 93.15,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.769,
+          "raw": 0.171
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.42
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_024",
+    "kymo": {
+      "composite": 88.1,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.638,
+          "raw": 0.143
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.14
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 82.65,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.625,
+          "raw": 0.625
+        },
+        "compactness": {
+          "score": 0.528,
+          "raw": 0.12
+        },
+        "aspect_balance": {
+          "score": 0.485,
+          "raw": 4.35
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_025",
+    "kymo": {
+      "composite": 89.2,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.304,
+          "raw": 0.507
+        },
+        "aspect_balance": {
+          "score": 0.955,
+          "raw": 2.75
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 89.21,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.304,
+          "raw": 0.507
+        },
+        "aspect_balance": {
+          "score": 0.956,
+          "raw": 2.75
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_026",
+    "kymo": {
+      "composite": 86.08,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.886,
+          "raw": 0.196
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.78
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 85.83,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.853,
+          "raw": 0.189
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.8
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_027",
+    "kymo": {
+      "composite": 84,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.933,
+          "raw": 0.0671
+        },
+        "edge_node_overlap": {
+          "score": 0.625,
+          "raw": 0.375
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.403,
+          "raw": 0.466
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.45
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 16,
+        "edges": 8
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.78,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.473,
+          "raw": 0.108
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.49
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 8
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_028",
+    "kymo": {
+      "composite": 92.2,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.65,
+          "raw": 0.365
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.83
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.71,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.589,
+          "raw": 0.39
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.63
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_029",
+    "kymo": {
+      "composite": 77.33,
+      "terms": {
+        "crossings": {
+          "score": 0.917,
+          "raw": 1
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.318,
+          "raw": 0.318
+        },
+        "compactness": {
+          "score": 0.446,
+          "raw": 0.102
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.55
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 11
+      }
+    },
+    "mermaidjs": {
+      "composite": 77.53,
+      "terms": {
+        "crossings": {
+          "score": 0.846,
+          "raw": 2
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.455,
+          "raw": 0.455
+        },
+        "compactness": {
+          "score": 0.511,
+          "raw": 0.116
+        },
+        "aspect_balance": {
+          "score": 0.896,
+          "raw": 0.36
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 11
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_030",
+    "kymo": {
+      "composite": 90.03,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 0.947,
+          "raw": 0.0526
+        },
+        "orthogonality": {
+          "score": 0.833,
+          "raw": 0.833
+        },
+        "compactness": {
+          "score": 0.818,
+          "raw": 0.181
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.98
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 81.83,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.513,
+          "raw": 0.4872
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.693,
+          "raw": 0.155
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.24
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_031",
+    "kymo": {
+      "composite": 83.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.56
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 6.05
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 83.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.559
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 6.01
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_032",
+    "kymo": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.762
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.09
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.57,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.776
+        },
+        "aspect_balance": {
+          "score": 0.995,
+          "raw": 2.62
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_033",
+    "kymo": {
+      "composite": 88.03,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.796,
+          "raw": 0.304
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.86
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.32,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.581,
+          "raw": 0.393
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.77
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_034",
+    "kymo": {
+      "composite": 77.08,
+      "terms": {
+        "crossings": {
+          "score": 0.667,
+          "raw": 1
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.955,
+          "raw": 0.211
+        },
+        "aspect_balance": {
+          "score": 0.954,
+          "raw": 2.76
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 93.03,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.754,
+          "raw": 0.168
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.57
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_035",
+    "kymo": {
+      "composite": 86.42,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.927,
+          "raw": 0.205
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.51
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.06,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.568,
+          "raw": 0.4317
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.757,
+          "raw": 0.168
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.34
+        },
+        "grid_snap": {
+          "score": 0.5,
+          "raw": 0.5
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_036",
+    "kymo": {
+      "composite": 77.08,
+      "terms": {
+        "crossings": {
+          "score": 0.667,
+          "raw": 1
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.955,
+          "raw": 0.211
+        },
+        "aspect_balance": {
+          "score": 0.954,
+          "raw": 2.76
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 84.71,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.618,
+          "raw": 0.3818
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.764,
+          "raw": 0.17
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.55
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_037",
+    "kymo": {
+      "composite": 86.42,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.927,
+          "raw": 0.205
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.51
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 93.06,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.757,
+          "raw": 0.168
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.34
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_038",
+    "kymo": {
+      "composite": 87,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.667,
+          "raw": 0.149
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.37
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.43,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.728,
+          "raw": 0.162
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.49
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_039",
+    "kymo": {
+      "composite": 91.25,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.833,
+          "raw": 0.833
+        },
+        "compactness": {
+          "score": 0.656,
+          "raw": 0.147
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.21
+        },
+        "grid_snap": {
+          "score": 0.333,
+          "raw": 0.33
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 89.54,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.701,
+          "raw": 0.156
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.11
+        },
+        "grid_snap": {
+          "score": 0.667,
+          "raw": 0.67
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_040",
+    "kymo": {
+      "composite": 87,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.667,
+          "raw": 0.149
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.37
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.43,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.728,
+          "raw": 0.162
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.49
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_042",
+    "kymo": {
+      "composite": 94.67,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.959,
+          "raw": 0.211
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.03
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 82.15,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0,
+          "raw": 0
+        },
+        "compactness": {
+          "score": 0.769,
+          "raw": 0.171
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.55
+        },
+        "grid_snap": {
+          "score": 1,
+          "raw": 1
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_043",
+    "kymo": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.657
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.94
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": null,
+      "degenerate": true,
+      "terms": {},
+      "counts": {
+        "nodes": 0,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_044",
+    "kymo": {
+      "composite": 91.53,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.566,
+          "raw": 0.128
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.29
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.57,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.901,
+          "raw": 0.0989
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.239,
+          "raw": 0.058
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.12
+        },
+        "grid_snap": {
+          "score": 0.167,
+          "raw": 0.17
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_045",
+    "kymo": {
+      "composite": 90.24,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.405,
+          "raw": 0.466
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.29
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.22,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.403,
+          "raw": 0.466
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.38
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_046",
+    "kymo": {
+      "composite": 82.04,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.333,
+          "raw": 0.333
+        },
+        "compactness": {
+          "score": 0.714,
+          "raw": 0.338
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.44
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 82.07,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.333,
+          "raw": 0.333
+        },
+        "compactness": {
+          "score": 0.717,
+          "raw": 0.337
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.43
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_049",
+    "kymo": {
+      "composite": 88.74,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.885,
+          "raw": 0.268
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.33
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.22,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.413,
+          "raw": 0.462
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.07
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_050",
+    "kymo": {
+      "composite": 89.76,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.345,
+          "raw": 0.49
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.44
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.98,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.497,
+          "raw": 0.427
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.24
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_051",
+    "kymo": {
+      "composite": 81.58,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.25,
+          "raw": 0.25
+        },
+        "compactness": {
+          "score": 0.822,
+          "raw": 0.182
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.94
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 94.77,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.972,
+          "raw": 0.214
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.8
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_052",
+    "kymo": {
+      "composite": 86.75,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.983,
+          "raw": 0.216
+        },
+        "aspect_balance": {
+          "score": 0.977,
+          "raw": 2.68
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 81.04,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.655,
+          "raw": 0.3449
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.703,
+          "raw": 0.157
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.32
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_055",
+    "kymo": {
+      "composite": 88.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.26,
+          "raw": 0.525
+        },
+        "aspect_balance": {
+          "score": 0.896,
+          "raw": 2.95
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_056",
+    "kymo": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.663
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_057",
+    "kymo": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.6
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.03
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_059",
+    "kymo": {
+      "composite": 93.38,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.798,
+          "raw": 0.177
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.87
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_060",
+    "kymo": {
+      "composite": 88.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.26,
+          "raw": 0.525
+        },
+        "aspect_balance": {
+          "score": 0.896,
+          "raw": 2.95
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_061",
+    "kymo": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.663
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_062",
+    "kymo": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.6
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.03
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_064",
+    "kymo": {
+      "composite": 93.38,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.798,
+          "raw": 0.177
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.87
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_065",
+    "kymo": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.628
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.23
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart-v2_066",
+    "kymo": {
+      "composite": 91.53,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.566,
+          "raw": 0.128
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.29
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.57,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.901,
+          "raw": 0.0989
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.239,
+          "raw": 0.058
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.12
+        },
+        "grid_snap": {
+          "score": 0.167,
+          "raw": 0.17
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_067",
+    "kymo": {
+      "composite": 92.68,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.606,
+          "raw": 0.136
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.86
+        },
+        "grid_snap": {
+          "score": 0.167,
+          "raw": 0.17
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.23,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.892,
+          "raw": 0.108
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.243,
+          "raw": 0.059
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.09
+        },
+        "grid_snap": {
+          "score": 0.333,
+          "raw": 0.33
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_070",
+    "kymo": {
+      "composite": 92.75,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.829,
+          "raw": 0.184
+        },
+        "aspect_balance": {
+          "score": 0.823,
+          "raw": 3.2
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "composite": 68.2,
+      "terms": {
+        "crossings": {
+          "score": 0.72,
+          "raw": 7
+        },
+        "node_overlap": {
+          "score": 0.859,
+          "raw": 0.1413
+        },
+        "edge_node_overlap": {
+          "score": 0.942,
+          "raw": 0.0578
+        },
+        "orthogonality": {
+          "score": 0.389,
+          "raw": 0.389
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.017
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.16
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 18
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_071",
+    "kymo": {
+      "composite": 79.08,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.333,
+          "raw": 0.333
+        },
+        "compactness": {
+          "score": 0.344,
+          "raw": 0.491
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.77
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 83.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.429,
+          "raw": 0.429
+        },
+        "compactness": {
+          "score": 0.712,
+          "raw": 0.159
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.68
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 7
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_072",
+    "kymo": {
+      "composite": 88.93,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.644,
+          "raw": 0.367
+        },
+        "aspect_balance": {
+          "score": 0.356,
+          "raw": 4.79
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 79.71,
+      "terms": {
+        "crossings": {
+          "score": 0.846,
+          "raw": 2
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.545,
+          "raw": 0.545
+        },
+        "compactness": {
+          "score": 0.328,
+          "raw": 0.077
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.81
+        },
+        "grid_snap": {
+          "score": 0.333,
+          "raw": 0.33
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 11
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_073",
+    "kymo": {
+      "composite": 83.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.604
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 7.62
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "composite": 83.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.607
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 7.79
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 0
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_075",
+    "kymo": {
+      "composite": 83.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.604
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 7.62
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "composite": 83.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.607
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 7.79
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 0
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_076",
+    "kymo": {
+      "composite": 87.16,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.687,
+          "raw": 0.349
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.27
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.18,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.689,
+          "raw": 0.348
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.29
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_077",
+    "kymo": {
+      "composite": 85.28,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.785,
+          "raw": 0.309
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.18
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 85.81,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.851,
+          "raw": 0.282
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.43
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_078",
+    "kymo": {
+      "composite": 88.71,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.214,
+          "raw": 0.544
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.73
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 99.54,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.942,
+          "raw": 0.208
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.74
+        },
+        "grid_snap": {
+          "score": 1,
+          "raw": 1
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_079",
+    "kymo": {
+      "composite": 83.43,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.554,
+          "raw": 0.404
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.01
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 83.68,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.585,
+          "raw": 0.391
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.22
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_080",
+    "kymo": {
+      "composite": 89.15,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.944,
+          "raw": 0.243
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.7
+        },
+        "grid_snap": {
+          "score": 0.2,
+          "raw": 0.2
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.27,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.709,
+          "raw": 0.158
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.68
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_081",
+    "kymo": {
+      "composite": 86.87,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.983,
+          "raw": 0.216
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.73
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 8
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.48,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 0.98,
+          "raw": 0.02
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.975,
+          "raw": 0.215
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.71
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 8
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_082",
+    "kymo": {
+      "composite": 90.04,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.511,
+          "raw": 0.422
+        },
+        "aspect_balance": {
+          "score": 0.79,
+          "raw": 3.31
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.05,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.511,
+          "raw": 0.422
+        },
+        "aspect_balance": {
+          "score": 0.792,
+          "raw": 3.31
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart-v2_083",
+    "kymo": {
+      "composite": 93.54,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.505,
+          "raw": 0.115
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.42
+        },
+        "grid_snap": {
+          "score": 0.5,
+          "raw": 0.5
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart_000",
+    "kymo": {
+      "composite": 91.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.97,
+          "raw": 0.214
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.94
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.58,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.597,
+          "raw": 0.134
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.85
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart_002",
+    "kymo": {
+      "composite": 88.71,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.614,
+          "raw": 0.379
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.65
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.61,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.476,
+          "raw": 0.109
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.64
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart_003",
+    "kymo": {
+      "composite": 89.57,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.617,
+          "raw": 0.378
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.67
+        },
+        "grid_snap": {
+          "score": 0.167,
+          "raw": 0.17
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 85.4,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.017
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.65
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart_004",
+    "kymo": {
+      "composite": 90.24,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.905,
+          "raw": 0.259
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.55
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.25,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.906,
+          "raw": 0.259
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.54
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart_005",
+    "kymo": {
+      "composite": 78.85,
+      "terms": {
+        "crossings": {
+          "score": 0.909,
+          "raw": 2
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 0.983,
+          "raw": 0.017
+        },
+        "orthogonality": {
+          "score": 0.475,
+          "raw": 0.475
+        },
+        "compactness": {
+          "score": 0.674,
+          "raw": 0.151
+        },
+        "aspect_balance": {
+          "score": 0.535,
+          "raw": 4.18
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 14,
+        "edges": 20
+      }
+    },
+    "mermaidjs": {
+      "composite": 79.09,
+      "terms": {
+        "crossings": {
+          "score": 0.909,
+          "raw": 2
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 0.983,
+          "raw": 0.017
+        },
+        "orthogonality": {
+          "score": 0.475,
+          "raw": 0.475
+        },
+        "compactness": {
+          "score": 0.619,
+          "raw": 0.139
+        },
+        "aspect_balance": {
+          "score": 0.67,
+          "raw": 3.72
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 14,
+        "edges": 20
+      }
+    }
+  },
+  {
+    "file": "flowchart_006",
+    "kymo": {
+      "composite": 74.64,
+      "terms": {
+        "crossings": {
+          "score": 0.727,
+          "raw": 15
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 0.984,
+          "raw": 0.0164
+        },
+        "orthogonality": {
+          "score": 0.313,
+          "raw": 0.313
+        },
+        "compactness": {
+          "score": 0.647,
+          "raw": 0.145
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.19
+        },
+        "grid_snap": {
+          "score": 0.273,
+          "raw": 0.27
+        }
+      },
+      "counts": {
+        "nodes": 22,
+        "edges": 40
+      }
+    },
+    "mermaidjs": {
+      "composite": 75.61,
+      "terms": {
+        "crossings": {
+          "score": 0.714,
+          "raw": 16
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 0.991,
+          "raw": 0.0089
+        },
+        "orthogonality": {
+          "score": 0.325,
+          "raw": 0.325
+        },
+        "compactness": {
+          "score": 0.745,
+          "raw": 0.166
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.9
+        },
+        "grid_snap": {
+          "score": 0.318,
+          "raw": 0.32
+        }
+      },
+      "counts": {
+        "nodes": 22,
+        "edges": 40
+      }
+    }
+  },
+  {
+    "file": "flowchart_007",
+    "kymo": {
+      "composite": 94.25,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.907,
+          "raw": 0.2
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.29
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "composite": 92.95,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.744,
+          "raw": 0.166
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.14
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    }
+  },
+  {
+    "file": "flowchart_008",
+    "kymo": {
+      "composite": 94.83,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.978,
+          "raw": 0.229
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.73
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 93.7,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.837,
+          "raw": 0.185
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.28
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_009",
+    "kymo": {
+      "composite": 94.83,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.978,
+          "raw": 0.229
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.73
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 93.7,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.837,
+          "raw": 0.185
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.28
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_010",
+    "kymo": {
+      "composite": 77.33,
+      "terms": {
+        "crossings": {
+          "score": 0.917,
+          "raw": 1
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.318,
+          "raw": 0.318
+        },
+        "compactness": {
+          "score": 0.446,
+          "raw": 0.102
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.55
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 11
+      }
+    },
+    "mermaidjs": {
+      "composite": 77.53,
+      "terms": {
+        "crossings": {
+          "score": 0.846,
+          "raw": 2
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.455,
+          "raw": 0.455
+        },
+        "compactness": {
+          "score": 0.511,
+          "raw": 0.116
+        },
+        "aspect_balance": {
+          "score": 0.896,
+          "raw": 0.36
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 11
+      }
+    }
+  },
+  {
+    "file": "flowchart_011",
+    "kymo": {
+      "composite": 86.57,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.684,
+          "raw": 0.684
+        },
+        "compactness": {
+          "score": 0.952,
+          "raw": 0.21
+        },
+        "aspect_balance": {
+          "score": 0.335,
+          "raw": 4.86
+        },
+        "grid_snap": {
+          "score": 0.067,
+          "raw": 0.07
+        }
+      },
+      "counts": {
+        "nodes": 15,
+        "edges": 19
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.17,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.605,
+          "raw": 0.605
+        },
+        "compactness": {
+          "score": 0.919,
+          "raw": 0.203
+        },
+        "aspect_balance": {
+          "score": 0.761,
+          "raw": 3.41
+        },
+        "grid_snap": {
+          "score": 0.067,
+          "raw": 0.07
+        }
+      },
+      "counts": {
+        "nodes": 15,
+        "edges": 19
+      }
+    }
+  },
+  {
+    "file": "flowchart_012",
+    "kymo": {
+      "composite": 87.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.551
+        },
+        "aspect_balance": {
+          "score": 0.793,
+          "raw": 3.31
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.54,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.553
+        },
+        "aspect_balance": {
+          "score": 0.787,
+          "raw": 3.32
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_013",
+    "kymo": {
+      "composite": 90.29,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.811,
+          "raw": 0.298
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.75
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.3,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.562,
+          "raw": 0.127
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.75
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart_014",
+    "kymo": {
+      "composite": 91.56,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.97,
+          "raw": 0.214
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.94
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.58,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.597,
+          "raw": 0.134
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.85
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart_015",
+    "kymo": {
+      "composite": 91.61,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.767,
+          "raw": 0.316
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.67
+        },
+        "grid_snap": {
+          "score": 0.333,
+          "raw": 0.33
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": null,
+      "degenerate": true,
+      "terms": {},
+      "counts": {
+        "nodes": 0,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart_016",
+    "kymo": {
+      "composite": 97.7,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.712,
+          "raw": 0.339
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.4
+        },
+        "grid_snap": {
+          "score": 1,
+          "raw": 1
+        }
+      },
+      "counts": {
+        "nodes": 12,
+        "edges": 6
+      }
+    },
+    "mermaidjs": {
+      "composite": 93.66,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.585,
+          "raw": 0.391
+        },
+        "aspect_balance": {
+          "score": 0.896,
+          "raw": 0.36
+        },
+        "grid_snap": {
+          "score": 0.5,
+          "raw": 0.5
+        }
+      },
+      "counts": {
+        "nodes": 12,
+        "edges": 6
+      }
+    }
+  },
+  {
+    "file": "flowchart_017",
+    "kymo": {
+      "composite": 86.76,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.337,
+          "raw": 0.493
+        },
+        "aspect_balance": {
+          "score": 0.413,
+          "raw": 4.6
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.78,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.338,
+          "raw": 0.493
+        },
+        "aspect_balance": {
+          "score": 0.415,
+          "raw": 4.59
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart_018",
+    "kymo": {
+      "composite": 87.39,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.893,
+          "raw": 0.264
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.85
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.4,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.893,
+          "raw": 0.264
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.85
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart_019",
+    "kymo": {
+      "composite": 86.64,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.955,
+          "raw": 0.238
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.74
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.26,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.907,
+          "raw": 0.258
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.64
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart_020",
+    "kymo": {
+      "composite": 46.04,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0,
+          "raw": 1.8063
+        },
+        "edge_node_overlap": {
+          "score": 0,
+          "raw": 1
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 3.249
+        },
+        "aspect_balance": {
+          "score": 0.904,
+          "raw": 2.93
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 8,
+        "edges": 9
+      }
+    },
+    "mermaidjs": {
+      "composite": null,
+      "degenerate": true,
+      "terms": {},
+      "counts": {
+        "nodes": 0,
+        "edges": 9
+      }
+    }
+  },
+  {
+    "file": "flowchart_023",
+    "kymo": {
+      "composite": 93.35,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.794,
+          "raw": 0.305
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 7.53
+        },
+        "grid_snap": {
+          "score": 1,
+          "raw": 1
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 84.09,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.261,
+          "raw": 0.063
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 8.93
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart_024",
+    "kymo": {
+      "composite": 80.76,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.845,
+          "raw": 0.284
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 6.81
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 6
+      }
+    },
+    "mermaidjs": {
+      "composite": 81.45,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.842,
+          "raw": 0.285
+        },
+        "aspect_balance": {
+          "score": 0,
+          "raw": 6.99
+        },
+        "grid_snap": {
+          "score": 0.143,
+          "raw": 0.14
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 6
+      }
+    }
+  },
+  {
+    "file": "flowchart_025",
+    "kymo": {
+      "composite": 93.44,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.805,
+          "raw": 0.301
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.91
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 92.82,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.416,
+          "raw": 0.096
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.91
+        },
+        "grid_snap": {
+          "score": 0.5,
+          "raw": 0.5
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart_027",
+    "kymo": {
+      "composite": 84.9,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.738,
+          "raw": 0.328
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.01
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 85.1,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.762,
+          "raw": 0.318
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.04
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart_029",
+    "kymo": {
+      "composite": 91.14,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.517,
+          "raw": 0.117
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.03
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.5,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.437,
+          "raw": 0.1
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.02
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart_030",
+    "kymo": {
+      "composite": 81.46,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.333,
+          "raw": 0.333
+        },
+        "compactness": {
+          "score": 0.641,
+          "raw": 0.368
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.52
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 85.14,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.767,
+          "raw": 0.316
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.61
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "flowchart_031",
+    "kymo": {
+      "composite": 90.03,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.868,
+          "raw": 0.274
+        },
+        "aspect_balance": {
+          "score": 0.857,
+          "raw": 3.09
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": null,
+      "degenerate": true,
+      "terms": {},
+      "counts": {
+        "nodes": 0,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart_033",
+    "kymo": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.688
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.11
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.6,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.687
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.09
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    }
+  },
+  {
+    "file": "flowchart_034",
+    "kymo": {
+      "composite": 89,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.7,
+          "raw": 0.7
+        },
+        "compactness": {
+          "score": 0.85,
+          "raw": 0.188
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.51
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 11,
+        "edges": 10
+      }
+    },
+    "mermaidjs": {
+      "composite": 86.96,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.7,
+          "raw": 0.7
+        },
+        "compactness": {
+          "score": 0.595,
+          "raw": 0.134
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.5
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 11,
+        "edges": 10
+      }
+    }
+  },
+  {
+    "file": "flowchart_035",
+    "kymo": {
+      "composite": 90.52,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.441,
+          "raw": 0.451
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.67
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.53,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.442,
+          "raw": 0.45
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.67
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_039",
+    "kymo": {
+      "composite": 89.67,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.844,
+          "raw": 0.284
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.92
+        },
+        "grid_snap": {
+          "score": 0.25,
+          "raw": 0.25
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.84,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.585,
+          "raw": 0.132
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.96
+        },
+        "grid_snap": {
+          "score": 0.5,
+          "raw": 0.5
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart_040",
+    "kymo": {
+      "composite": 89.2,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.304,
+          "raw": 0.507
+        },
+        "aspect_balance": {
+          "score": 0.955,
+          "raw": 2.75
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 89.21,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.304,
+          "raw": 0.507
+        },
+        "aspect_balance": {
+          "score": 0.956,
+          "raw": 2.75
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_041",
+    "kymo": {
+      "composite": 78.06,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.912,
+          "raw": 0.0884
+        },
+        "edge_node_overlap": {
+          "score": 0.4,
+          "raw": 0.6
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 0.606
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.69
+        },
+        "grid_snap": {
+          "score": 0.2,
+          "raw": 0.2
+        }
+      },
+      "counts": {
+        "nodes": 10,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.52,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.356,
+          "raw": 0.083
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.72
+        },
+        "grid_snap": {
+          "score": 0.333,
+          "raw": 0.33
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "flowchart_042",
+    "kymo": {
+      "composite": 92.2,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.65,
+          "raw": 0.365
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.83
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.71,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.589,
+          "raw": 0.39
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.63
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_043",
+    "kymo": {
+      "composite": 94.31,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.913,
+          "raw": 0.202
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.3
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "composite": 92.95,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.744,
+          "raw": 0.166
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.14
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 1,
+        "edges": 0
+      }
+    }
+  },
+  {
+    "file": "flowchart_047",
+    "kymo": {
+      "composite": 89.47,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.309,
+          "raw": 0.505
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.71
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 89.5,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.313,
+          "raw": 0.503
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.73
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_048",
+    "kymo": {
+      "composite": 89.47,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.309,
+          "raw": 0.505
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.71
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 89.5,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.313,
+          "raw": 0.503
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.73
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_049",
+    "kymo": {
+      "composite": 88.74,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.884,
+          "raw": 0.268
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.9
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.78,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.89,
+          "raw": 0.266
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.87
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "flowchart_050",
+    "kymo": {
+      "composite": 93.37,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.797,
+          "raw": 0.304
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.14
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 85.79,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.77,
+          "raw": 0.2302
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.482,
+          "raw": 0.11
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.79
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart_051",
+    "kymo": {
+      "composite": 93.37,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.797,
+          "raw": 0.304
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.14
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 81.65,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.501,
+          "raw": 0.4991
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.704,
+          "raw": 0.157
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.25
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart_052",
+    "kymo": {
+      "composite": 92.36,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.67,
+          "raw": 0.356
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.49
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    },
+    "mermaidjs": {
+      "composite": 93.29,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.787,
+          "raw": 0.175
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.57
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 1
+      }
+    }
+  },
+  {
+    "file": "flowchart_053",
+    "kymo": {
+      "error": "line 2: edge with no destination node in: \"mermaid{\\\"What is"
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  },
+  {
+    "file": "flowchart_054",
+    "kymo": {
+      "composite": 94.88,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.985,
+          "raw": 0.226
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.48
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    },
+    "mermaidjs": {
+      "composite": 79.17,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.503,
+          "raw": 0.4967
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.794,
+          "raw": 0.176
+        },
+        "aspect_balance": {
+          "score": 0.348,
+          "raw": 4.82
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 2
+      }
+    }
+  },
+  {
+    "file": "flowchart_055",
+    "kymo": {
+      "composite": null,
+      "degenerate": true,
+      "terms": {},
+      "counts": {
+        "nodes": 0,
+        "edges": 0
+      }
+    },
+    "mermaidjs": {
+      "error": "Command failed: npx mmdc -i /Users/anhv/projects/workspace_k"
+    }
+  }
+]
