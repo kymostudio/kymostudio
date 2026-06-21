@@ -59,7 +59,7 @@ export function IconPage() {
   };
 
   // related: same set (and same subset, if any), excluding self
-  const related = all.filter((i) => i.set === item.set && i.key !== item.key && (!item.grp || i.grp === item.grp)).slice(0, 24);
+  const related = all.filter((i) => i.set === item.set && i.key !== item.key && (!item.subset || i.subset === item.subset)).slice(0, 24);
 
   return (
     <>
