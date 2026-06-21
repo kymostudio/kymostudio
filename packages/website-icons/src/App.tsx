@@ -191,18 +191,12 @@ export function App() {
     a.href = href; a.download = filename;
     document.body.appendChild(a); a.click(); a.remove();
   };
-  const downloadIcon = async (it: Icon) => {
+  const downloadIcon = (it: Icon) => {
     const base = it.key.replace(/[:/]/g, "-");
-    if (it.svg) { save("data:image/svg+xml;charset=utf-8," + encodeURIComponent(it.svg), base + ".svg"); return; }
-    const ext = it.path!.toLowerCase().endsWith(".svg") ? ".svg" : ".png";
-    try {
-      const blob = await fetch(iconUrl(it.path!, it.ver)).then((r) => r.blob());
-      const obj = URL.createObjectURL(blob);
-      save(obj, base + ext);
-      setTimeout(() => URL.revokeObjectURL(obj), 2000);
-    } catch {
-      window.open(iconUrl(it.path!, it.ver), "_blank"); // CORS/fetch failed — fall back to open
-    }
+    // Inline SVG (e.g. ai:) → data URL. R2-backed art → the worker streams it with
+    // Content-Disposition:attachment, which forces a save even cross-origin.
+    if (it.svg) save("data:image/svg+xml;charset=utf-8," + encodeURIComponent(it.svg), base + ".svg");
+    else save(`${API}/api/icons/download?key=${encodeURIComponent(it.key)}`, base + (it.path!.toLowerCase().endsWith(".svg") ? ".svg" : ".png"));
   };
 
   const visible = filtered.slice(0, shown);
