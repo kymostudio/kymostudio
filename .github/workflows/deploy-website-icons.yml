@@ -1,0 +1,34 @@
+name: Deploy website-icons
+
+# Cloudflare Pages project "kymo-icons", served at https://icons.kymo.studio.
+# React app (esbuild): ./build.sh bundles src/ + copies the icon manifest into
+# dist/, then wrangler deploys. The icon ART is NOT shipped here — it lives on
+# Cloudflare R2 (cdn.kymo.studio); republish it with packages/website-icons/upload-icons.sh.
+# Path-filtered to the app + the icon manifest.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/website-icons/**"
+      - "packages/icons/icons-manifest.json"
+      - "packages/icons/icons-collections.json"
+      - ".github/workflows/deploy-website-icons.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+      - name: Build dist/
+        run: ./build.sh
+        working-directory: packages/website-icons
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy packages/website-icons/dist --project-name=kymo-icons --branch=main
