@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 // ── config ────────────────────────────────────────────────────────────────
 const PAGE = 200; // incremental render batch (infinite scroll)
@@ -10,12 +10,49 @@ const CDN_BASE = new URLSearchParams(location.search).get("cdn") || "https://cdn
 // icons-admin backend (shares the kymo.studio Google session); serves the live
 // overlay (added/removed) merged over the static manifest.
 export const API = "https://api.kymo.studio";
-const iconUrl = (path: string, ver?: number) => CDN_BASE + path + (ver ? `?v=${ver}` : "");
+export const iconUrl = (path: string, ver?: number) => CDN_BASE + path + (ver ? `?v=${ver}` : "");
 
-type Variant = { variant: string; key: string; path: string; ver: number };
+export type Variant = { variant: string; key: string; path: string; ver: number };
 // An item is one card: a static icon, an inline-SVG icon, or a BRAND (1 card with
-// several variants — icon/color/text/brand — switchable in the dialog).
-type Icon = { key: string; set: string; path?: string; svg?: string; ver?: number; name?: string; variants?: Variant[] };
+// several variants — icon/color/text/brand — switchable in the dialog / icon page).
+export type Icon = { key: string; set: string; path?: string; svg?: string; ver?: number; name?: string; grp?: string; variants?: Variant[] };
+
+// A per-icon permalink slug, e.g. ai:mistral → "ai-mistral" (the /icon/<slug> page).
+export const iconSlugOf = (key: string) => key.replace(/[:/]/g, "-");
+export const iconHref = (key: string) => "/icon/" + iconSlugOf(key);
+
+// Shared catalogue loader: static manifest ⊕ live DB (brands+variants, removed).
+// Used by the gallery and the per-icon page so both resolve icons identically.
+export async function loadCatalog(): Promise<Icon[]> {
+  const m = await fetch("/icons-manifest.json").then((r) => r.json());
+  const all: Icon[] = Object.entries(m.icons as Record<string, string>).map(
+    ([key, path]) => ({ key, path, set: key.split(":")[0] }),
+  );
+  let merged = all;
+  try {
+    const ov: any = await fetch(`${API}/api/icons`).then((r) => r.json());
+    const removed = new Set<string>(ov.removed || []);
+    const map = new Map<string, Icon>();
+    for (const it of all) if (!removed.has(it.key)) map.set(it.key, it);
+    const brandKeys = new Set<string>();
+    for (const b of (ov.brands || []) as any[]) {
+      const variants: Variant[] = b.variants || [];
+      for (const v of variants) brandKeys.add(v.key);
+      const def = variants.find((v) => v.variant === "color") || variants.find((v) => v.variant === "icon") || variants[0];
+      if (!def) continue;
+      const key = `${b.set}:${b.slug}`;
+      brandKeys.add(key);
+      map.set(key, { key, set: b.set, name: b.name, grp: b.grp, path: def.path, ver: def.ver, variants });
+    }
+    for (const [key, v] of Object.entries<any>(ov.icons || {})) {
+      if (brandKeys.has(key)) continue;
+      map.set(key, { key, set: key.split(":")[0], path: v.path, ver: v.ver });
+    }
+    merged = [...map.values()];
+  } catch { /* catalogue unavailable — static only */ }
+  merged.sort((a, b) => a.key.localeCompare(b.key));
+  return merged;
+}
 
 // ── inline SVG glyphs (Lucide-style) ──────────────────────────────────────
 const S = (d: React.ReactNode, vb = "0 0 24 24", fill = "none") => (
@@ -26,6 +63,7 @@ const CopyGlyph = () => S(<><rect width="14" height="14" x="8" y="8" rx="2" /><p
 const LinkGlyph = () => S(<><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></>);
 const DownloadGlyph = () => S(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></>);
 const CloseGlyph = () => S(<><path d="M18 6 6 18" /><path d="m6 6 12 12" /></>);
+const ExternalGlyph = () => S(<><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></>);
 const SunGlyph = () => S(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></>);
 const MoonGlyph = () => S(<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />);
 const GitHubGlyph = () => S(<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />, "0 0 16 16", "currentColor");
@@ -48,16 +86,23 @@ function copy(text: string) {
   }
 }
 
-const snippetFor = (key: string) => `node box/${key}/blue "Label"`;
+export const snippetFor = (key: string) => `node box/${key}/blue "Label"`;
+
+// Acronyms / proper brand names CSS `capitalize` would mangle (ai → "Ai").
+// capitalize only touches the first letter, so a correctly-cased value survives.
+const SET_LABELS: Record<string, string> = {
+  ai: "AI", aws: "AWS", ibm: "IBM", gcp: "GCP", oci: "OCI", gis: "GIS", saas: "SaaS",
+  openstack: "OpenStack", digitalocean: "DigitalOcean", alibabacloud: "Alibaba Cloud",
+};
+const setLabel = (s: string) => SET_LABELS[s] || s;
 
 export function App() {
   const [items, setItems] = useState<Icon[]>([]);
   const [set, setSet] = useState(() => new URLSearchParams(location.search).get("set") || "all");
+  const [sub, setSub] = useState(() => new URLSearchParams(location.search).get("sub") || ""); // subset (brand grp) within a set
   const [query, setQuery] = useState(() => new URLSearchParams(location.search).get("q") || "");
   const [sortBy, setSortBy] = useState<"name" | "set">("name");
   const [shown, setShown] = useState(PAGE);
-  const [dialog, setDialog] = useState<Icon | null>(null);
-  const [dlgVar, setDlgVar] = useState<Variant | null>(null); // selected variant in a brand dialog
   const [tip, setTip] = useState<{ key: string; x: number; y: number } | null>(null);
   const [toast, setToastState] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">(
@@ -76,44 +121,8 @@ export function App() {
     toastTimer.current = window.setTimeout(() => setToastState(null), 1600);
   };
 
-  // ── load manifest + vendored inline sets ─────────────────────────────────
-  useEffect(() => {
-    (async () => {
-      const m = await fetch("icons-manifest.json").then((r) => r.json());
-      const all: Icon[] = Object.entries(m.icons as Record<string, string>).map(
-        ([key, path]) => ({ key, path, set: key.split(":")[0] }),
-      );
-      // merge the live DB catalogue (brands + variants, removed) over the static
-      // manifest so admin changes show without a redeploy.
-      let merged = all;
-      try {
-        const ov: any = await fetch(`${API}/api/icons`).then((r) => r.json());
-        const removed = new Set<string>(ov.removed || []);
-        const map = new Map<string, Icon>();
-        for (const it of all) if (!removed.has(it.key)) map.set(it.key, it);
-        // brand items: ONE card per brand; default variant (color→icon) is the
-        // card art, the full variant list powers the dialog switcher.
-        const brandKeys = new Set<string>();
-        for (const b of (ov.brands || []) as any[]) {
-          const variants: Variant[] = b.variants || [];
-          for (const v of variants) brandKeys.add(v.key);
-          const def = variants.find((v) => v.variant === "color") || variants.find((v) => v.variant === "icon") || variants[0];
-          if (!def) continue;
-          const key = `${b.set}:${b.slug}`;
-          brandKeys.add(key);
-          map.set(key, { key, set: b.set, name: b.name, path: def.path, ver: def.ver, variants });
-        }
-        // any brand-less overlay icon (not a brand default/variant)
-        for (const [key, v] of Object.entries<any>(ov.icons || {})) {
-          if (brandKeys.has(key)) continue;
-          map.set(key, { key, set: key.split(":")[0], path: v.path, ver: v.ver });
-        }
-        merged = [...map.values()];
-      } catch { /* catalogue unavailable — static only */ }
-      merged.sort((a, b) => a.key.localeCompare(b.key));
-      setItems(merged);
-    })();
-  }, []);
+  // ── load the catalogue (static manifest ⊕ live DB) ───────────────────────
+  useEffect(() => { loadCatalog().then(setItems); }, []);
 
   // set list (counts), biggest first
   const sets = useMemo(() => {
@@ -122,34 +131,48 @@ export function App() {
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [items]);
 
+  // subsets per set (brand `grp`, e.g. ai → model/application/provider), biggest first
+  const subsets = useMemo(() => {
+    const m: Record<string, Record<string, number>> = {};
+    for (const i of items) if (i.grp) { (m[i.set] ||= {})[i.grp] = ((m[i.set] ||= {})[i.grp] || 0) + 1; }
+    const out: Record<string, [string, number][]> = {};
+    for (const s in m) out[s] = Object.entries(m[s]).sort((a, b) => b[1] - a[1]);
+    return out;
+  }, [items]);
+
   // if a ?set= from the URL isn't a real set, fall back to "all"
   useEffect(() => {
     if (set !== "all" && items.length && !sets.some(([s]) => s === set)) setSet("all");
   }, [items, sets, set]);
+  // drop a stale subset selection (set changed, or sub not valid for this set)
+  useEffect(() => {
+    if (items.length && sub && !(subsets[set]?.some(([g]) => g === sub))) setSub("");
+  }, [items, set, sub, subsets]);
 
   // filtered + sorted view
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const out = items.filter(
-      (it) => (set === "all" || it.set === set) && (!q || it.key.toLowerCase().includes(q) || (it.name || "").toLowerCase().includes(q)),
+      (it) => (set === "all" || it.set === set) && (!sub || it.grp === sub) && (!q || it.key.toLowerCase().includes(q) || (it.name || "").toLowerCase().includes(q)),
     );
     out.sort(sortBy === "set"
       ? (a, b) => a.set.localeCompare(b.set) || a.key.localeCompare(b.key)
       : (a, b) => a.key.localeCompare(b.key));
     return out;
-  }, [items, set, query, sortBy]);
+  }, [items, set, sub, query, sortBy]);
 
   // reset the infinite-scroll window whenever the view changes
-  useEffect(() => { setShown(PAGE); }, [set, query, sortBy]);
+  useEffect(() => { setShown(PAGE); }, [set, sub, query, sortBy]);
 
-  // keep set + query in the URL (shareable: ?set=aws&q=lambda)
+  // keep set + subset + query in the URL (shareable: ?set=ai&sub=model&q=gpt)
   useEffect(() => {
     const p = new URLSearchParams();
     if (set !== "all") p.set("set", set);
+    if (sub) p.set("sub", sub);
     if (query.trim()) p.set("q", query.trim());
     const qs = p.toString();
     history.replaceState(null, "", qs ? "?" + qs : location.pathname);
-  }, [set, query]);
+  }, [set, sub, query]);
 
   // theme + preview-size → CSS, persisted
   useEffect(() => {
@@ -175,13 +198,11 @@ export function App() {
     return () => obs.disconnect();
   }, []);
 
-  // ⌘K focuses search · Esc closes the dialog
+  // ⌘K focuses search
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault(); searchRef.current?.focus(); searchRef.current?.select();
-      } else if (e.key === "Escape") {
-        setDialog(null);
       }
     };
     document.addEventListener("keydown", onKey);
@@ -203,17 +224,6 @@ export function App() {
     if (it.svg) save("data:image/svg+xml;charset=utf-8," + encodeURIComponent(it.svg), base + ".svg");
     else save(`${API}/api/icons/download?key=${encodeURIComponent(it.key)}`, base + (it.path!.toLowerCase().endsWith(".svg") ? ".svg" : ".png"));
   };
-
-  // open a card; for a brand, default the variant switcher to color → icon
-  const openDialog = (it: Icon) => {
-    setTip(null);
-    setDialog(it);
-    setDlgVar(it.variants ? (it.variants.find((v) => v.variant === "color") || it.variants[0]) : null);
-  };
-  // the active variant of the open dialog (a brand's selected variant, else the card itself)
-  const av: Icon | null = dialog
-    ? (dlgVar ? { key: dlgVar.key, set: dialog.set, path: dlgVar.path, ver: dlgVar.ver } : dialog)
-    : null;
 
   const visible = filtered.slice(0, shown);
 
@@ -251,15 +261,23 @@ export function App() {
           <div className="side-block">
             <p className="side-label">Sets</p>
             <div className="sets">
-              <button className={"set-row" + (set === "all" ? " active" : "")} onClick={() => setSet("all")}>
+              <button className={"set-row" + (set === "all" ? " active" : "")} onClick={() => { setSet("all"); setSub(""); }}>
                 <span className="label">All</span>
                 <span className="n">{items.length.toLocaleString()}</span>
               </button>
               {sets.map(([s, n]) => (
-                <button key={s} className={"set-row" + (set === s ? " active" : "")} onClick={() => setSet(s)}>
-                  <span className="label">{s}</span>
-                  <span className="n">{n.toLocaleString()}</span>
-                </button>
+                <Fragment key={s}>
+                  <button className={"set-row" + (set === s && !sub ? " active" : "")} onClick={() => { setSet(s); setSub(""); }}>
+                    <span className="label">{setLabel(s)}</span>
+                    <span className="n">{n.toLocaleString()}</span>
+                  </button>
+                  {set === s && subsets[s]?.map(([g, c]) => (
+                    <button key={g} className={"set-row sub-row" + (sub === g ? " active" : "")} onClick={() => { setSet(s); setSub(g); }}>
+                      <span className="label">{g}</span>
+                      <span className="n">{c.toLocaleString()}</span>
+                    </button>
+                  ))}
+                </Fragment>
               ))}
             </div>
           </div>
@@ -283,14 +301,14 @@ export function App() {
           <p className="count">{filtered.length.toLocaleString()} icon{filtered.length === 1 ? "" : "s"}</p>
           <div className="grid">
             {visible.map((it) => (
-              <div key={it.key} className="cell" onClick={() => openDialog(it)}
+              <a key={it.key} className="cell" href={iconHref(it.key)}
                 onMouseEnter={(e) => {
                   const r = e.currentTarget.getBoundingClientRect();
                   setTip({ key: it.key, x: r.left + r.width / 2, y: r.top - 8 });
                 }}
                 onMouseLeave={() => setTip(null)}>
                 <Art it={it} />
-              </div>
+              </a>
             ))}
           </div>
           <div ref={sentinelRef} className="sentinel" />
@@ -307,54 +325,6 @@ export function App() {
 
       {toast && (
         <div className="toast" dangerouslySetInnerHTML={{ __html: toast }} />
-      )}
-
-      {dialog && av && (
-        <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) setDialog(null); }}>
-          <div className="dialog" role="dialog" aria-modal="true">
-            <div className="dlg-preview"><Art it={av} /></div>
-            <div className="dlg-body">
-              <div className="dlg-head">
-                {dialog.variants
-                  ? <a className="dlg-key dlg-link" href={`/brand/${dialog.key.split(":")[1]}`}>{dialog.name || av.key} ↗</a>
-                  : <span className="dlg-key">{dialog.name || av.key}</span>}
-                <span className="dlg-set">{dialog.set}</span>
-              </div>
-              {dialog.variants && dialog.variants.length > 1 && (
-                <div className="dlg-variants">
-                  {dialog.variants.map((v) => (
-                    <button key={v.key} className={"vtab" + (dlgVar?.key === v.key ? " active" : "")}
-                      onClick={() => setDlgVar(v)}>{v.variant}</button>
-                  ))}
-                </div>
-              )}
-              <div className="dlg-actions">
-                <button className="btn primary" onClick={() => { copy(av.key); flash(`Copied <code>${av.key}</code>`); }}>
-                  <CopyGlyph /> Copy key
-                </button>
-                <button className="btn" onClick={() => { copy(av.svg ? av.key : iconUrl(av.path!, av.ver)); flash("Copied URL"); }}>
-                  <LinkGlyph /> Copy URL
-                </button>
-                <button className="btn" onClick={() => downloadIcon(av)}>
-                  <DownloadGlyph /> Download
-                </button>
-                <button className="btn" onClick={() => setDialog(null)}>
-                  <CloseGlyph /> Close
-                </button>
-              </div>
-              <div className="dlg-usage">
-                <p className="ul">Use in a .kymo diagram</p>
-                <div className="snippet">
-                  <code>{snippetFor(av.key)}</code>
-                  <button title="Copy snippet" aria-label="Copy snippet"
-                    onClick={() => { copy(snippetFor(av.key)); flash("Copied snippet"); }}>
-                    <CopyGlyph />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </>
   );

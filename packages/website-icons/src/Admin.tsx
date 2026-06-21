@@ -97,14 +97,14 @@ function AdminPanel({ email }: { email: string }) {
     const file = (fd.get("file") as File) || null;
     const set = String(fd.get("set") || "").trim();
     const name = String(fd.get("name") || "").trim();
-    const category = String(fd.get("category") || "").trim();
+    const group = String(fd.get("group") || "").trim();
     if (!set || !name || !file || !file.size) { setNote("set, name and an image file are required"); return; }
     setBusy(true); setNote("Uploading…");
     try {
       const image = await fileToBase64(file);
       const r = await fetch(`${API}/api/icons`, {
         method: "POST", credentials: "include", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ set, name, category: category || undefined, image, format: fmtOf(file) }),
+        body: JSON.stringify({ set, name, group: group || undefined, image, format: fmtOf(file) }),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
@@ -152,7 +152,7 @@ function AdminPanel({ email }: { email: string }) {
         <h3>Add / replace an icon</h3>
         <form onSubmit={onAdd} className="admin-form">
           <input className="q" name="set" placeholder="set (e.g. aws, custom)" autoComplete="off" />
-          <input className="q" name="category" placeholder="category (optional, e.g. compute)" autoComplete="off" />
+          <input className="q" name="group" placeholder="subset (optional, e.g. model · application · provider)" autoComplete="off" />
           <input className="q" name="name" placeholder="name (e.g. lambda)" autoComplete="off" />
           <input type="file" name="file" accept="image/png,image/svg+xml" />
           <button className="btn primary" disabled={busy} type="submit">Upload icon</button>
