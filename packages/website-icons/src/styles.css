@@ -152,6 +152,27 @@ main { padding: 22px 24px 90px; min-width: 0; }
 }
 .toast code { font-family: ui-monospace, Menlo, monospace; color: var(--pink); }
 
+/* ── admin / login ──────────────────────────────────────── */
+.login-card { max-width: 380px; margin: 48px auto; text-align: center; background: var(--panel);
+  border: 1px solid var(--line); border-radius: 16px; padding: 32px 28px; box-shadow: var(--shadow); }
+.login-card h2 { margin: 0 0 6px; }
+.login-card p { color: var(--muted); margin: 0 0 18px; }
+.login-card > div { display: flex; justify-content: center; }
+.login-msg { color: var(--pink); margin-top: 14px; min-height: 1.2em; }
+.admin { padding-bottom: 60px; }
+.admin-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
+.admin-card h3 { margin: 0 0 12px; font-size: 15px; }
+.admin-form { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+.admin-form .q { flex: 1 1 160px; padding: 9px 12px; font-size: 14px; }
+.admin-form input[type=file] { flex: 1 1 200px; font-size: 13px; color: var(--muted); }
+.admin-note { font: 600 13px ui-monospace, Menlo, monospace; color: var(--text); margin: 6px 2px; }
+.admin-list { display: flex; flex-direction: column; gap: 7px; }
+.admin-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; }
+.admin-row img { object-fit: contain; }
+.admin-row code { flex: 1; font: 12.5px ui-monospace, Menlo, monospace; word-break: break-all; }
+.admin-row.removed { color: var(--muted); }
+.admin-row.removed span { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+
 /* ── responsive: sidebar → horizontal strip ─────────────── */
 @media (max-width: 820px) {
   .body { grid-template-columns: 1fr; }
