@@ -1,0 +1,68 @@
+{
+  "name": "deep",
+  "direction": "TB",
+  "nodes": [
+    {
+      "id": "A",
+      "label": "A"
+    },
+    {
+      "id": "B",
+      "label": "B"
+    },
+    {
+      "id": "C",
+      "label": "C"
+    },
+    {
+      "id": "D",
+      "label": "D"
+    },
+    {
+      "id": "E",
+      "label": "E"
+    },
+    {
+      "id": "F",
+      "label": "F"
+    },
+    {
+      "id": "G",
+      "label": "G"
+    },
+    {
+      "id": "H",
+      "label": "H"
+    }
+  ],
+  "edges": [
+    {
+      "source": "A",
+      "target": "B"
+    },
+    {
+      "source": "B",
+      "target": "C"
+    },
+    {
+      "source": "C",
+      "target": "D"
+    },
+    {
+      "source": "D",
+      "target": "E"
+    },
+    {
+      "source": "E",
+      "target": "F"
+    },
+    {
+      "source": "F",
+      "target": "G"
+    },
+    {
+      "source": "G",
+      "target": "H"
+    }
+  ]
+}

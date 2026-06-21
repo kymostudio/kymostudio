@@ -1,0 +1,5 @@
+flowchart TD
+  A[Init] --> B[Work]
+  B --> C{Check}
+  C -->|retry| B
+  C -->|done| D[End]

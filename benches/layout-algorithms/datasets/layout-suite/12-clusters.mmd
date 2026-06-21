@@ -1,0 +1,8 @@
+flowchart TD
+  subgraph Frontend
+    A[UI] --> B[State]
+  end
+  subgraph Backend
+    C[API] --> D[(DB)]
+  end
+  B --> C

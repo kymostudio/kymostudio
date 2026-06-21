@@ -27,10 +27,34 @@ same score applies to any engine.
 Weights live in the `WEIGHTS` block of `metric.mjs` — **the only thing to tune during calibration.**
 They are front-loaded on the robust structural signals (crossings/overlap/orthogonality).
 
+## Coverage — which of the 9 layout-algorithm problems this measures
+
+The big open problems are catalogued in [`docs/research/layout-algorithms/`](../../docs/research/layout-algorithms/README.md)
+(RES-LAYOUT-ALGO-001). This bench does **not** measure all of them — it scores a single *static*
+drawing, so it covers the geometric-quality problems and is blind to the dynamic / semantic ones.
+
+| Problem | Measured? | By which term(s) |
+|---|---|---|
+| §01 Computational hardness | ◑ partial — scores the *crossing count* as a quality term (doesn't solve it) | `crossings` |
+| §02 Conflicting aesthetics | ● **yes** — the bench *is* the weighted trade-off | `orthogonality`, `compactness`, `aspect_balance`, `grid_snap` |
+| §03 Edge & connector routing | ◑ partial — penalises edges-under-nodes & non-orthogonal segments, but has **no true obstacle-avoidance** metric | `edge_node_overlap`, `orthogonality` |
+| §04 Compound graphs & constraints | ◔ minimal — flat node overlap only; no cluster / containment / constraint metric | `node_overlap` |
+| §05 Label placement | ○ **no** — no label-overlap term (open gap) | — |
+| §06 Stability & dynamics | ○ **no** — single static snapshot; no determinism / mental-map / animation metric | — |
+| §07 Scalability | ○ **no** — no time / size / hairball metric | — |
+| §08 No ground truth | ◑ addressed by *discipline* (calibration + L2 human review), not a term | — |
+| §09 Degenerate inputs | ◔ partial — the `scoreLayout` 0-node guard; no degenerate corpus | guard only |
+
+**Read:** the bench fully covers the **aesthetics cluster (§02)** plus the crossing count (§01) and a
+slice of routing (§03) and flat overlap (§04). The two **highest-opportunity** problems —
+§03 *obstacle-avoiding* connector routing and §06 *stability + animation* — are exactly what's
+under- or un-measured. Extending the bench toward those is the next step so the loop can climb the
+real differentiators (see the strategic map in the research index).
+
 ## Layout
 
 ```
-benches/layout/
+benches/layout-algorithms/
   metric.mjs          # the absolute scorer (pure)
   geometry.mjs        # SVG geometry extractors (mirrors mermaid-format/layout-accuracy.mjs)
   layout-quality.mjs  # main: render corpus → score kymo + mermaid.js → leaderboard
@@ -44,7 +68,7 @@ benches/layout/
 # preconditions: a kymo-mermaid wasm build + bench deps + Chrome
 cd packages/rust/kymo-mermaid && \
   wasm-pack build --target web --out-dir pkg --out-name kymo_mermaid -- --no-default-features --features wasm,math
-cd ../../../benches/layout && npm ci
+cd ../../../benches/layout-algorithms && npm ci
 
 node layout-quality.mjs --all          # whole flowchart corpus
 node layout-quality.mjs --n 12         # first 12 (quick calibration pass)

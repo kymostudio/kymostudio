@@ -1,0 +1,926 @@
+[
+  {
+    "file": "01-chain",
+    "kymo": {
+      "composite": 89.62,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.523,
+          "raw": 0.417
+        },
+        "aspect_balance": {
+          "score": 0.688,
+          "raw": 0.28
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 89.36,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.506,
+          "raw": 0.424
+        },
+        "aspect_balance": {
+          "score": 0.661,
+          "raw": 0.26
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "02-branch",
+    "kymo": {
+      "composite": 90.27,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.809,
+          "raw": 0.299
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.62
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 91.78,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.8,
+          "raw": 0.8
+        },
+        "compactness": {
+          "score": 0.998,
+          "raw": 0.221
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.63
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "03-fan-in",
+    "kymo": {
+      "composite": 90.5,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.937,
+          "raw": 0.246
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.78
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 4
+      }
+    },
+    "mermaidjs": {
+      "composite": 90.47,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.75,
+          "raw": 0.75
+        },
+        "compactness": {
+          "score": 0.933,
+          "raw": 0.247
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 1.73
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "04-diamond",
+    "kymo": {
+      "composite": 87.46,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.858,
+          "raw": 0.279
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.65
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.47,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.859,
+          "raw": 0.278
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.66
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 5,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "05-crossing",
+    "kymo": {
+      "composite": 85.2,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.575,
+          "raw": 0.395
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.15
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 85.27,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.584,
+          "raw": 0.392
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 2.12
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "06-cycle",
+    "kymo": {
+      "composite": 88.71,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.459,
+          "raw": 0.443
+        },
+        "aspect_balance": {
+          "score": 0.607,
+          "raw": 0.24
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 84.04,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.882,
+          "raw": 0.269
+        },
+        "aspect_balance": {
+          "score": 0.597,
+          "raw": 0.24
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 4
+      }
+    }
+  },
+  {
+    "file": "07-self-loop",
+    "kymo": {
+      "composite": 90.24,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.405,
+          "raw": 0.466
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.49
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 88.53,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.991,
+          "raw": 0.218
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.74
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "08-multi-edge",
+    "kymo": {
+      "composite": 89.1,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.262,
+          "raw": 0.524
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.71
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 83.62,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.667,
+          "raw": 0.667
+        },
+        "compactness": {
+          "score": 0.244,
+          "raw": 0.532
+        },
+        "aspect_balance": {
+          "score": 1,
+          "raw": 0.7
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 2,
+        "edges": 3
+      }
+    }
+  },
+  {
+    "file": "09-hub",
+    "kymo": {
+      "composite": 86.86,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.984,
+          "raw": 0.217
+        },
+        "aspect_balance": {
+          "score": 0.569,
+          "raw": 4.06
+        },
+        "grid_snap": {
+          "score": 0.429,
+          "raw": 0.43
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 6
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.48,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.5,
+          "raw": 0.5
+        },
+        "compactness": {
+          "score": 0.993,
+          "raw": 0.218
+        },
+        "aspect_balance": {
+          "score": 0.537,
+          "raw": 4.17
+        },
+        "grid_snap": {
+          "score": 0.571,
+          "raw": 0.57
+        }
+      },
+      "counts": {
+        "nodes": 7,
+        "edges": 6
+      }
+    }
+  },
+  {
+    "file": "10-wide",
+    "kymo": {
+      "composite": 87.13,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.942,
+          "raw": 0.244
+        },
+        "aspect_balance": {
+          "score": 0.799,
+          "raw": 3.28
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.24,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 0.6,
+          "raw": 0.6
+        },
+        "compactness": {
+          "score": 0.947,
+          "raw": 0.242
+        },
+        "aspect_balance": {
+          "score": 0.814,
+          "raw": 3.23
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 6,
+        "edges": 5
+      }
+    }
+  },
+  {
+    "file": "11-deep",
+    "kymo": {
+      "composite": 87.21,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.478,
+          "raw": 0.435
+        },
+        "aspect_balance": {
+          "score": 0.277,
+          "raw": 0.11
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 8,
+        "edges": 7
+      }
+    },
+    "mermaidjs": {
+      "composite": 87.22,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.483,
+          "raw": 0.433
+        },
+        "aspect_balance": {
+          "score": 0.272,
+          "raw": 0.11
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 8,
+        "edges": 7
+      }
+    }
+  },
+  {
+    "file": "12-clusters",
+    "kymo": {
+      "composite": 70.89,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 0.933,
+          "raw": 0.0665
+        },
+        "edge_node_overlap": {
+          "score": 0,
+          "raw": 1
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.2,
+          "raw": 2.379
+        },
+        "aspect_balance": {
+          "score": 0.951,
+          "raw": 0.38
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 4,
+        "edges": 3
+      }
+    },
+    "mermaidjs": {
+      "composite": 92.32,
+      "terms": {
+        "crossings": {
+          "score": 1,
+          "raw": 0
+        },
+        "node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "edge_node_overlap": {
+          "score": 1,
+          "raw": 0
+        },
+        "orthogonality": {
+          "score": 1,
+          "raw": 1
+        },
+        "compactness": {
+          "score": 0.696,
+          "raw": 0.155
+        },
+        "aspect_balance": {
+          "score": 0.95,
+          "raw": 0.38
+        },
+        "grid_snap": {
+          "score": 0,
+          "raw": 0
+        }
+      },
+      "counts": {
+        "nodes": 3,
+        "edges": 3
+      }
+    }
+  }
+]

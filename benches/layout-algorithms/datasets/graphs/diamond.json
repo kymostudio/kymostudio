@@ -1,0 +1,48 @@
+{
+  "name": "diamond",
+  "direction": "TB",
+  "nodes": [
+    {
+      "id": "A",
+      "label": "A"
+    },
+    {
+      "id": "B",
+      "label": "B"
+    },
+    {
+      "id": "C",
+      "label": "C"
+    },
+    {
+      "id": "D",
+      "label": "D"
+    },
+    {
+      "id": "E",
+      "label": "E"
+    }
+  ],
+  "edges": [
+    {
+      "source": "A",
+      "target": "B"
+    },
+    {
+      "source": "A",
+      "target": "C"
+    },
+    {
+      "source": "B",
+      "target": "D"
+    },
+    {
+      "source": "C",
+      "target": "D"
+    },
+    {
+      "source": "D",
+      "target": "E"
+    }
+  ]
+}

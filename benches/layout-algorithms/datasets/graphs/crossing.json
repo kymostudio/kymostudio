@@ -1,0 +1,52 @@
+{
+  "name": "crossing",
+  "direction": "TB",
+  "nodes": [
+    {
+      "id": "A1",
+      "label": "A1"
+    },
+    {
+      "id": "A2",
+      "label": "A2"
+    },
+    {
+      "id": "A3",
+      "label": "A3"
+    },
+    {
+      "id": "B1",
+      "label": "B1"
+    },
+    {
+      "id": "B2",
+      "label": "B2"
+    },
+    {
+      "id": "B3",
+      "label": "B3"
+    }
+  ],
+  "edges": [
+    {
+      "source": "A1",
+      "target": "B2"
+    },
+    {
+      "source": "A2",
+      "target": "B1"
+    },
+    {
+      "source": "A3",
+      "target": "B1"
+    },
+    {
+      "source": "A1",
+      "target": "B3"
+    },
+    {
+      "source": "A3",
+      "target": "B2"
+    }
+  ]
+}
