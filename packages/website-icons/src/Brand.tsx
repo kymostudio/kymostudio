@@ -65,6 +65,28 @@ export function BrandPage() {
     </div>
   );
 
+  // Combine + Avatar are composed client-side, so their Download builds a
+  // standalone SVG (referencing the CDN art) and saves it as a data-URL.
+  const dataSvg = (svg: string, name: string) => save("data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg), name);
+  const imgDim = (url: string): Promise<[number, number]> => new Promise((res) => {
+    const im = new Image(); im.onload = () => res([im.naturalWidth || 1, im.naturalHeight || 1]); im.onerror = () => res([1, 1]); im.src = url;
+  });
+  const dlCombine = async (useColor: boolean) => {
+    const ic = useColor ? colorV! : iconV!;
+    const iu = iconUrl(ic.path, ic.ver), tu = iconUrl(textV!.path, textV!.ver);
+    const [iw, ih] = await imgDim(iu); const [tw, th] = await imgDim(tu);
+    const H = 56, gap = 18, isw = Math.round(iw * (H / ih)), tsw = Math.round(tw * (H / th)), W = isw + gap + tsw;
+    dataSvg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><image href="${iu}" x="0" y="0" width="${isw}" height="${H}"/><image href="${tu}" x="${isw + gap}" y="0" width="${tsw}" height="${H}"/></svg>`, `${brand.slug}-combine${useColor ? "-color" : ""}.svg`);
+    flash("Downloaded combine");
+  };
+  const dlAvatar = async (circle: boolean) => {
+    const a = mono!; const au = iconUrl(a.path, a.ver);
+    const [iw, ih] = await imgDim(au);
+    const S = 128, pad = 34, ih2 = S - 2 * pad, iw2 = Math.round(iw * (ih2 / ih)), ix = Math.round((S - iw2) / 2), iy = pad, rx = circle ? S / 2 : 28;
+    dataSvg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${S} ${S}" width="${S}" height="${S}"><defs><filter id="w"><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"/></filter></defs><rect width="${S}" height="${S}" rx="${rx}" fill="${color}"/><image href="${au}" x="${ix}" y="${iy}" width="${iw2}" height="${ih2}" filter="url(#w)"/></svg>`, `${brand.slug}-avatar-${circle ? "circle" : "square"}.svg`);
+    flash("Downloaded avatar");
+  };
+
   const toc: string[] = [];
   if (iconV || colorV) toc.push("Icons");
   if (textV) toc.push("Text");
@@ -80,8 +102,6 @@ export function BrandPage() {
           <h1 className="brand-title">{brand.name}</h1>
           <div className="brand-sub">
             <span className="dlg-set">{brand.set}</span>
-            {brand.color && <span className="swatch" title={brand.color} style={{ background: brand.color }} />}
-            <span>{brand.variants.length} variant{brand.variants.length === 1 ? "" : "s"}</span>
           </div>
           {(colorV || iconV) && (() => { const d = colorV || iconV!; return (
             <div className="snippet brand-import">
@@ -124,6 +144,13 @@ export function BrandPage() {
                   {iconV && <div className="combine-row">{img(iconV, "ci")}{img(textV, "ct")}</div>}
                   {colorV && <div className="combine-row">{img(colorV, "ci")}{img(textV, "ct")}</div>}
                 </div>
+                <div className="showcase-bar">
+                  <code>{brand.slug}-combine</code>
+                  <div className="showcase-actions">
+                    {iconV && <button className="sc-btn" onClick={() => dlCombine(false)}>Download{colorV ? " mono" : ""}</button>}
+                    {colorV && <button className="sc-btn" onClick={() => dlCombine(true)}>Download{iconV ? " color" : ""}</button>}
+                  </div>
+                </div>
               </div>
             </section>
           )}
@@ -135,6 +162,13 @@ export function BrandPage() {
                 <div className="showcase-art row">
                   <div className="avatar circle" style={{ background: color }}>{img(mono, "av")}</div>
                   <div className="avatar square" style={{ background: color }}>{img(mono, "av")}</div>
+                </div>
+                <div className="showcase-bar">
+                  <code>{brand.slug}-avatar</code>
+                  <div className="showcase-actions">
+                    <button className="sc-btn" onClick={() => dlAvatar(true)}>Download circle</button>
+                    <button className="sc-btn" onClick={() => dlAvatar(false)}>Download square</button>
+                  </div>
                 </div>
               </div>
             </section>

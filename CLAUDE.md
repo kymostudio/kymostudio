@@ -45,6 +45,12 @@ CI (`.github/workflows/test.yml`) runs `pytest -q` (Python) and `npm test` (JS) 
 
 **Deploys**: pushing to `main` auto-deploys via `deploy-website.yml` / `deploy-docs.yml` / `deploy-editor.yml` (Cloudflare Pages projects `kymo-studio` / `kymo-docs` / `kymo-editor`, path-filtered). The wrangler command above is the manual path — note a later `main` push re-deploys whatever is on `main`, so land the source change too or it gets overwritten.
 
+**Local dev ports (fixed by convention).** The `kymo-mcp` worker's `ALLOWED_ORIGINS` CORS whitelist (`packages/mcp/src/index.ts`) only admits two localhost origins, so serve each site on its assigned port or its cross-origin calls to `api.kymo.studio` get blocked:
+- **`icons.kymo.studio`** (`packages/website-icons`) → **8231** — e.g. `cd packages/website-icons && ./build.sh && (cd dist && python3 -m http.server 8231)`. Needs the API for the live brands/overlay catalogue + the admin panel.
+- **`editor.kymo.studio`** (`packages/editor`) → **8099**.
+
+Both ports (and their `127.0.0.1` forms) are whitelisted; any other port is rejected by the worker's `/api/*` CORS.
+
 ## Architecture (packages/python/src/kymo)
 
 The renderer is deliberately **dumb**: `model.py` holds plain dataclasses (`Component`, `Region`, `Edge`, `Diagram`) and the emitters just turn that data into output. To change a diagram you change the data, never the renderer.
