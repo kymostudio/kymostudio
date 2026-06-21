@@ -385,6 +385,7 @@ export function App() {
               <div className="dlg-head">
                 <span className="dlg-key">{dialog.name || av.key}</span>
                 <span className="dlg-set">{dialog.set}</span>
+                {dialog.subset && <a className="dlg-sub" href={`/?set=${dialog.set}&sub=${dialog.subset}`} title={`Browse ${dialog.set} · ${dialog.subset}`}>{dialog.subset}</a>}
               </div>
               {dialog.variants && dialog.variants.length > 1 && (
                 <div className="dlg-variants">

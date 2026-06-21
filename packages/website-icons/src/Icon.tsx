@@ -81,6 +81,7 @@ export function IconPage() {
             <div className="icon-head">
               <h1>{pretty(item)}</h1>
               <span className="dlg-set">{item.set}</span>
+              {item.subset && <a className="dlg-sub" href={`/?set=${item.set}&sub=${item.subset}`} title={`Browse ${item.set} · ${item.subset}`}>{item.subset}</a>}
             </div>
 
             {item.variants && item.variants.length > 1 && (
