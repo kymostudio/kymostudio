@@ -18,6 +18,7 @@ const VIA_DESC: Record<string, string> = {
   "BPMN XML": "Business process models",
   PlantUML: "UML from plain text",
   D2: "Modern declarative diagrams",
+  DBML: "Database schemas, dbdiagram",
   GraphViz: "Graphs via DOT",
   WaveDrom: "Digital timing diagrams",
 };
@@ -70,6 +71,10 @@ const VIA_GLYPH: Record<string, React.ReactNode> = {
   ),
   D2: (
     <svg viewBox="0 0 24 24" {...G}><rect x="3" y="4.5" width="18" height="15" rx="2" /><rect x="6" y="8" width="5.2" height="3.6" rx="0.9" /><rect x="12.8" y="12" width="5.2" height="3.6" rx="0.9" /><path d="M11.2 9.8h2.1c1 0 1.5.5 1.5 1.5v1" /></svg>
+  ),
+  // ER-table mark — a box with a filled header bar and field rows (the DBML look).
+  DBML: (
+    <svg viewBox="0 0 24 24" {...G}><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M4 8.5h16" /><path d="M4 8.5V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2.5z" fill="currentColor" stroke="none" /><path d="M4 13h16M4 16.5h16M11 8.5V20" /></svg>
   ),
 };
 
@@ -304,6 +309,37 @@ orders: {
 }
 
 orders.user_id -> users.id`,
+  },
+  {
+    name: "Database", kind: "dbml", via: "DBML",
+    glyph: <svg viewBox="0 0 24 24" {...G}><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M4 8.5h16" /><path d="M4 13h16M4 16.5h16M11 8.5V20" /></svg>,
+    source: `// DBML — renders as an ER diagram, dbdiagram.io style.
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table users {
+  id integer [primary key]
+  username varchar
+  role varchar
+  created_at timestamp
+}
+
+Table posts {
+  id integer [primary key]
+  title varchar
+  body text [note: 'Content of the post']
+  user_id integer [not null]
+  created_at timestamp
+}
+
+Table follows {
+  following_user_id integer
+  followed_user_id integer
+  created_at timestamp
+}
+
+Ref: posts.user_id > users.id
+Ref: follows.following_user_id > users.id
+Ref: follows.followed_user_id > users.id`,
   },
   {
     name: "Gantt", kind: "mermaid", via: "Mermaid",

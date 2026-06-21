@@ -15,6 +15,10 @@ export type Shape =
   // rotated square by the icon-less render path.
   | "diamond"
   | "annotation" | "aws-tile" | "aws-tile-hero" | "badge" | "image"
+  // ER table box (from .dbml import). Renders a header bar + field rows
+  // (see tableNode in render.ts). Size comes from Component.size, computed
+  // by the importer from the field list; rows ride in Component.rows.
+  | "table"
   // ── BPMN 2.0 glyphs (see bpmn-shapes.ts) ──────────────────────────
   // Imported from .bpmn files; size comes from the file's Diagram-
   // Interchange bounds (Component.size), not SHAPE_HALF. The sub-type
@@ -38,6 +42,7 @@ export const SHAPE_HALF: Record<Shape, Point> = {
   "aws-tile-hero": [40, 40],
   "badge":         [14, 14],
   "image":         [32, 32],
+  "table":         [90, 60],   // fallback only — importer sets Component.size
   // BPMN — fallbacks only; real sizes arrive via Component.size from DI.
   "bpmn-start":        [18, 18],
   "bpmn-end":          [18, 18],
@@ -64,6 +69,7 @@ export const LABEL_HEIGHT: Record<Shape, number> = {
   "aws-tile-hero": 48,
   "badge":         0,
   "image":         26,
+  "table":         0,          // name lives in the header bar, not below
   // BPMN edges carry explicit waypoints, so no label clearance needed.
   "bpmn-start":        0,
   "bpmn-end":          0,
@@ -78,6 +84,18 @@ export const LABEL_HEIGHT: Record<Shape, number> = {
 };
 
 // ── Types ─────────────────────────────────────────────────────────────
+
+/** One field row of an ER `table` component (from .dbml import). */
+export interface TableRow {
+  name: string;
+  type: string;
+  pk: boolean;
+  notNull: boolean;
+  unique: boolean;
+  note: string;
+  /** True when this column is the source of a foreign-key relationship. */
+  isFk: boolean;
+}
 
 export interface Component {
   id: string;
@@ -98,6 +116,10 @@ export interface Component {
    *  bounds; the renderer places + wraps the outside label here (matching
    *  bpmn.io) instead of below the glyph. null -> default placement. */
   labelBox: [number, number, number, number] | null;
+  /** ER `table` field rows (.dbml import). Absent for non-table components. */
+  rows?: TableRow[];
+  /** Table header bar fill (.dbml `[headercolor: #...]`). Absent -> default. */
+  headerColor?: string;
 }
 
 // "pool" / "lane" are BPMN swimlanes (label band down the left edge).
@@ -147,6 +169,16 @@ export interface Edge {
    *  convention: sequence | default | conditional | message | association. */
   points: Point[] | null;
   bpmnFlow: string | null;
+  /** ER foreign-key edges (style "fk", from .dbml): the 0-based field-row
+   *  index on the source/target table the relationship attaches to, so the
+   *  renderer anchors row-to-row. Absent for non-FK edges. */
+  srcRow?: number;
+  dstRow?: number;
+  /** ER FK column names + relationship operator (`>` `<` `-` `<>`), so the
+   *  editor can map a rendered edge back to its `Ref` source statement. */
+  srcCol?: string;
+  dstCol?: string;
+  relOp?: string;
 }
 
 // ── BPMN block AST (`bpmn { … }`) ─────────────────────────────────────
@@ -197,16 +229,21 @@ export function makeComponent({
   id, name = "", subtitle = "", icon = "", shape = "box", accent = "green",
   pos = [0, 0], size = null,
   parent = null, align = null, alignGap = 24, alignOffset = [0, 0], labelBox = null,
+  rows, headerColor,
 }: {
   id: string; name?: string; subtitle?: string; icon?: string;
   shape?: Shape; accent?: string; pos?: Point; size?: Point | null;
   parent?: string | null; align?: string | null; alignGap?: number; alignOffset?: Point;
   labelBox?: [number, number, number, number] | null;
+  rows?: TableRow[]; headerColor?: string;
 }): Component {
-  return {
+  const c: Component = {
     id, name, subtitle, icon, shape, accent, pos, size,
     parent, align, alignGap, alignOffset, labelBox,
   };
+  if (rows !== undefined) c.rows = rows;
+  if (headerColor !== undefined) c.headerColor = headerColor;
+  return c;
 }
 
 export function makeRegion({

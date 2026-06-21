@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-51 -74 858 338" width="858" height="338">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.18"/>
+    </filter>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#0f172a" fill-opacity="0.05"/>
+    </pattern>
+  </defs>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .title { fill: #0f172a; font-size: 17px; font-weight: 700; }
+    .label { fill: #1e293b; font-size: 13px; font-weight: 600; text-anchor: middle; }
+    .elabel { fill: #64748b; font-size: 10.5px; text-anchor: middle; }
+    .er-box   { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1; }
+    .er-title { fill: #ffffff; font-size: 13px; font-weight: 700; dominant-baseline: central; }
+    .er-field { fill: #1f2937; font-size: 13px; dominant-baseline: central; }
+    .er-field.er-pk { font-weight: 700; }
+    .er-type  { fill: #94a3b8; font-size: 12px; text-anchor: end; dominant-baseline: central;
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .er-sep   { stroke: #f1f5f9; stroke-width: 1; }
+    .er-key   { fill: none; stroke: #64748b; stroke-width: 1.4; }
+    .er-nn    { fill: #94a3b8; font-size: 9px; font-weight: 700; text-anchor: end; dominant-baseline: central; }
+    .er-note  { fill: none; stroke: #cbd5e1; stroke-width: 1.2; }
+    .er-rel     { fill: none; stroke: #9aa7b8; stroke-width: 1.6; }
+    .er-rel-dot { fill: #ffffff; stroke: #9aa7b8; stroke-width: 1.6; }
+    .er-foot    { fill: none; stroke: #9aa7b8; stroke-width: 1.6; stroke-linecap: round; }
+  </style>
+  <rect x="-51" y="-74" width="858" height="338" rx="14" fill="#f8fafc"/>
+  <rect x="-51" y="-74" width="858" height="338" rx="14" fill="url(#grid)"/>
+  
+  <g class="edges">
+    <g class="er-rel-g" data-src="posts" data-dst="users" data-src-col="user_id" data-dst-col="id" data-op="&gt;" data-soy="137" data-doy="47"><path class="er-rel-hit" d="M563,137 C523,137 533,47 493,47" fill="none" stroke="transparent" stroke-width="12"/><path class="er-rel" d="M563,137 C523,137 533,47 493,47"/><path class="er-foot er-ep-src" d="M554.8,135.6 L563,132 M554.8,135.6 L563,142"/><circle class="er-rel-dot er-ep-dst" cx="499" cy="47" r="3.5"/></g>
+    <g class="er-rel-g" data-src="follows" data-dst="users" data-src-col="following_user_id" data-dst-col="id" data-op="&gt;" data-soy="47" data-doy="47"><path class="er-rel-hit" d="M230,47 C270,47 260,47 300,47" fill="none" stroke="transparent" stroke-width="12"/><path class="er-rel" d="M230,47 C270,47 260,47 300,47"/><path class="er-foot er-ep-src" d="M238.2,47 L230,42 M238.2,47 L230,52"/><circle class="er-rel-dot er-ep-dst" cx="294" cy="47" r="3.5"/></g>
+    <g class="er-rel-g" data-src="follows" data-dst="users" data-src-col="followed_user_id" data-dst-col="id" data-op="&gt;" data-soy="77" data-doy="47"><path class="er-rel-hit" d="M230,77 C270,77 260,47 300,47" fill="none" stroke="transparent" stroke-width="12"/><path class="er-rel" d="M230,77 C270,77 260,47 300,47"/><path class="er-foot er-ep-src" d="M238.2,76.5 L230,72 M238.2,76.5 L230,82"/><circle class="er-rel-dot er-ep-dst" cx="294" cy="47" r="3.5"/></g>
+  </g>
+  <g class="nodes">
+    <g class="er-table" data-tid="follows" data-x="1" data-y="0" data-w="229" data-h="122" data-cols="[&quot;following_user_id&quot;,&quot;followed_user_id&quot;,&quot;created_at&quot;]" filter="url(#soft)"><rect class="er-box" x="1" y="0" width="229" height="122" rx="7"/><path d="M1,32 V7 a7,7 0 0 1 7,-7 H223 a7,7 0 0 1 7,7 V32 Z" fill="#33526e"/><text class="er-title" x="15" y="17">follows</text><text class="er-field" x="15" y="47">following_user_id</text><text class="er-type" x="216" y="47">integer</text><line class="er-sep" x1="1" y1="62" x2="230" y2="62"/><text class="er-field" x="15" y="77">followed_user_id</text><text class="er-type" x="216" y="77">integer</text><line class="er-sep" x1="1" y1="92" x2="230" y2="92"/><text class="er-field" x="15" y="107">created_at</text><text class="er-type" x="216" y="107">timestamp</text></g>
+    <g class="er-table" data-tid="users" data-x="300" data-y="0" data-w="193" data-h="152" data-cols="[&quot;id&quot;,&quot;username&quot;,&quot;role&quot;,&quot;created_at&quot;]" filter="url(#soft)"><rect class="er-box" x="300" y="0" width="193" height="152" rx="7"/><path d="M300,32 V7 a7,7 0 0 1 7,-7 H486 a7,7 0 0 1 7,7 V32 Z" fill="#33526e"/><text class="er-title" x="314" y="17">users</text><g class="er-key" transform="translate(314,47)"><circle cx="3.2" cy="0" r="3.2"/><path d="M6,0 H12 M9.5,0 V2.6 M12,0 V2.6"/></g><text class="er-field er-pk" x="330" y="47">id</text><text class="er-type" x="479" y="47">integer</text><line class="er-sep" x1="300" y1="62" x2="493" y2="62"/><text class="er-field" x="314" y="77">username</text><text class="er-type" x="479" y="77">varchar</text><line class="er-sep" x1="300" y1="92" x2="493" y2="92"/><text class="er-field" x="314" y="107">role</text><text class="er-type" x="479" y="107">varchar</text><line class="er-sep" x1="300" y1="122" x2="493" y2="122"/><text class="er-field" x="314" y="137">created_at</text><text class="er-type" x="479" y="137">timestamp</text></g>
+    <g class="er-table" data-tid="posts" data-x="563" data-y="0" data-w="193" data-h="212" data-cols="[&quot;id&quot;,&quot;title&quot;,&quot;body&quot;,&quot;user_id&quot;,&quot;status&quot;,&quot;created_at&quot;]" filter="url(#soft)"><rect class="er-box" x="563" y="0" width="193" height="212" rx="7"/><path d="M563,32 V7 a7,7 0 0 1 7,-7 H749 a7,7 0 0 1 7,7 V32 Z" fill="#33526e"/><text class="er-title" x="577" y="17">posts</text><g class="er-key" transform="translate(577,47)"><circle cx="3.2" cy="0" r="3.2"/><path d="M6,0 H12 M9.5,0 V2.6 M12,0 V2.6"/></g><text class="er-field er-pk" x="593" y="47">id</text><text class="er-type" x="742" y="47">integer</text><line class="er-sep" x1="563" y1="62" x2="756" y2="62"/><text class="er-field" x="577" y="77">title</text><text class="er-type" x="742" y="77">varchar</text><line class="er-sep" x1="563" y1="92" x2="756" y2="92"/><text class="er-field" x="577" y="107">body</text><rect class="er-note" x="610.4" y="102" width="9" height="10" rx="1.5"/><text class="er-type" x="742" y="107">text</text><line class="er-sep" x1="563" y1="122" x2="756" y2="122"/><text class="er-field" x="577" y="137">user_id</text><text class="er-nn" x="742" y="137">NN</text><text class="er-type" x="718" y="137">integer</text><line class="er-sep" x1="563" y1="152" x2="756" y2="152"/><text class="er-field" x="577" y="167">status</text><text class="er-type" x="742" y="167">varchar</text><line class="er-sep" x1="563" y1="182" x2="756" y2="182"/><text class="er-field" x="577" y="197">created_at</text><text class="er-type" x="742" y="197">timestamp</text></g>
+  </g>
+</svg>

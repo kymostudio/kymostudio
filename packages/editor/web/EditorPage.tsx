@@ -19,6 +19,7 @@ import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
 import { readDoc, writeDoc, dropDoc } from "./doccache";
+import { addRef, removeRef, setRefOp } from "./dbml-edit";
 import { KLoader } from "./kloader";
 import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, PanelRight, SquareCode, Eye, Download, ChevronDown, FilePlus2, X, Sparkles } from "lucide-react";
 
@@ -199,6 +200,37 @@ export default function EditorPage() {
     return enginePromise.current;
   }, []);
 
+  // DBML drag-to-move: per-file table-centre overrides ({ table: [cx, cy] }),
+  // persisted in localStorage and re-applied on every render so a dragged table
+  // survives edits + reload. Kept out of the DBML source (like dbdiagram.io).
+  const dbmlPos = useRef<Map<string, Record<string, [number, number]>>>(new Map());
+  const posKey = (id: string) => `kymo_dbmlpos_${id || "draft"}`;
+  const getPositions = useCallback((id: string): Record<string, [number, number]> => {
+    const k = id || "draft";
+    let p = dbmlPos.current.get(k);
+    if (!p) { try { p = JSON.parse(localStorage.getItem(posKey(id)) || "{}"); } catch { p = {}; } dbmlPos.current.set(k, p!); }
+    return p!;
+  }, []);
+  const onTableMove = useCallback((tid: string, cx: number, cy: number) => {
+    const id = dRef.current;
+    const p = getPositions(id);
+    p[tid] = [Math.round(cx), Math.round(cy)];
+    try { localStorage.setItem(posKey(id), JSON.stringify(p)); } catch {}
+  }, [getPositions]);
+
+  // DBML relationship editing: the preview's create/delete/cardinality gestures
+  // rewrite the `Ref` statements in the source (the single source of truth).
+  const applySrcEdit = useCallback((next: string) => {
+    if (next === sourceRef.current) return;
+    userEdited.current = true; setShareError(null); setSource(next);
+  }, []);
+  const onAddLink = useCallback((sT: string, sC: string, dT: string, dC: string) =>
+    applySrcEdit(addRef(sourceRef.current, sT, sC, ">", dT, dC)), [applySrcEdit]);
+  const onDeleteLink = useCallback((sT: string, sC: string, dT: string, dC: string) =>
+    applySrcEdit(removeRef(sourceRef.current, sT, sC, dT, dC)), [applySrcEdit]);
+  const onSetLinkOp = useCallback((sT: string, sC: string, dT: string, dC: string, op: string) =>
+    applySrcEdit(setRefOp(sourceRef.current, sT, sC, dT, dC, op)), [applySrcEdit]);
+
   const doRender = useCallback(async (src: string, k: string) => {
     const seq = ++renderSeq.current;
     if (!src.trim()) { setSvg(""); setStatus("Enter diagram source…"); setStatusErr(false); return; }
@@ -209,6 +241,13 @@ export default function EditorPage() {
         if (!renderRef.current) await loadEngine();
         if (seq !== renderSeq.current) return;
         out = await renderRef.current!(src);
+      } else if (k === "dbml") {
+        // DBML renders locally (parseDbml + renderSVG) — our dbdiagram.io-style
+        // ER renderer, offline, no Kroki round-trip. Self-generated SVG is trusted.
+        // Drag-to-move table positions are re-applied here so they persist.
+        const m = await import("./engine");
+        if (seq !== renderSeq.current) return;
+        out = await m.renderDbml(src, getPositions(dRef.current));
       } else if (k === "mermaid") {
         // Mermaid renders in-browser (lazy mermaid.js chunk); a share link's
         // early kroki warm-up is only raced for the first paint. Same sanitize
@@ -234,7 +273,7 @@ export default function EditorPage() {
       if (seq !== renderSeq.current) return;
       setStatus(String(e?.message ?? e)); setStatusTitle(""); setStatusErr(true);
     }
-  }, [loadEngine]);
+  }, [loadEngine, getPositions]);
 
   // Hold a loading state from "room requested" to "first doc received" so the
   // header/title and source don't render a placeholder and then flip (5s failsafe).
@@ -642,7 +681,7 @@ export default function EditorPage() {
   function openLocalFile(file: File) {
     file.text().then((txt) => {
       const ext = (file.name.split(".").pop() || "").toLowerCase();
-      const byExt = ext === "bpmn" ? "bpmn" : ext === "mmd" || ext === "mermaid" ? "mermaid" : "kymo";
+      const byExt = ext === "bpmn" ? "bpmn" : ext === "dbml" ? "dbml" : ext === "mmd" || ext === "mermaid" ? "mermaid" : "kymo";
       const k = sniffKind(txt) || byExt;
       setWelcomeDismissed(true);
       userEdited.current = true; titleUserSet.current = false;
@@ -1012,7 +1051,11 @@ export default function EditorPage() {
               {shareError && <div className="share-error">{shareError}</div>}
               {previewLoading
                 ? <PaneLoading />
-                : <Preview svg={svg} fitKey={(d || "shared") + ":" + kind} />}
+                : <Preview svg={svg} fitKey={(d || "shared") + ":" + kind}
+                    onTableMove={kind === "dbml" ? onTableMove : undefined}
+                    onAddLink={kind === "dbml" ? onAddLink : undefined}
+                    onDeleteLink={kind === "dbml" ? onDeleteLink : undefined}
+                    onSetLinkOp={kind === "dbml" ? onSetLinkOp : undefined} />}
             </section>
             )}
           </>

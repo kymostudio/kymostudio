@@ -4,7 +4,7 @@
 // we hand its URL to init() — the browser fetches it in parallel with this
 // chunk and compiles it while it downloads (instantiateStreaming; Pages serves
 // application/wasm). Embedding the bytes in JS cost ~1 MB extra on the wire.
-import { init, setManifest, setIconBaseURL, parseDiagram, renderSVG } from "kymostudio";
+import { init, setManifest, setIconBaseURL, parseDiagram, parseDbml, renderSVG } from "kymostudio";
 import manifest from "kymostudio/icons-manifest.json";
 import wasmUrl from "kymostudio-core/kymostudio_core_bg.wasm";
 
@@ -20,4 +20,15 @@ function ensure(): Promise<void> {
 export async function renderDiagram(source: string): Promise<string> {
   await ensure();
   return await renderSVG(parseDiagram(source));
+}
+
+// DBML (dbdiagram.io syntax) → ER diagram, rendered locally by the same JS
+// engine. ER tables carry no icons and don't touch the wasm core, so this
+// skips ensure() entirely — it renders offline and instantly.
+// `positions` overrides table centres (drag-to-move state persisted per file).
+export async function renderDbml(
+  source: string,
+  positions?: Record<string, [number, number]>,
+): Promise<string> {
+  return await renderSVG(parseDbml(source, positions));
 }
