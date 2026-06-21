@@ -1,0 +1,104 @@
+name: CI auto-fix
+
+# Loop 1 — "CI Green-Keeper". When a CI run on `main` fails, apply ONLY the
+# deterministic, non-semantic fixers (rustfmt + icon-manifest regen), verify the
+# exact CI gate now passes, and open a PR. It never touches clippy/test failures
+# (those are semantic — left for a human / the /fmt-sweep skill to judge).
+# See docs/research/engineering/loop-engineering/application-kymostudio.md.
+#
+# Uses the default GITHUB_TOKEN (the org grants workflows write + create-PR).
+# Note: a GITHUB_TOKEN-authored PR does not itself re-trigger CI — this workflow
+# verifies the gate in-job before opening it, and a maintainer's merge runs CI on main.
+
+on:
+  workflow_run:
+    workflows: ["Rust core", "Tests"]
+    types: [completed]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ci-autofix
+  cancel-in-progress: false
+
+jobs:
+  autofix:
+    name: Apply deterministic fixers
+    # Only react to failures on main (or a manual run). Skip everything else.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'failure' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Apply deterministic fixers
+        run: |
+          set -euxo pipefail
+          ( cd packages/rust/kymostudio-core && cargo fmt --all )
+          ( cd packages/rust/kymostudio      && cargo fmt --all )
+          ( cd packages/icons && node scripts/build-manifest.mjs )
+
+      - name: Detect whether anything was fixed
+        id: diff
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No deterministic fix applies — the failure was semantic (clippy / tests)."
+            echo "Nothing for this loop to do; leaving it for a human or /fmt-sweep."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager diff --stat
+          fi
+
+      - name: Verify the fix satisfies the exact CI gates
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          set -euxo pipefail
+          # rustfmt clauses must now pass byte-for-byte (the gate rust.yml runs)
+          ( cd packages/rust/kymostudio-core && cargo fmt --all --check )
+          ( cd packages/rust/kymostudio      && cargo fmt --all --check )
+          # icon-manifest must be a fixed point: a second regen produces no new diff
+          ( cd packages/icons && node scripts/build-manifest.mjs )
+          git diff --exit-code -- \
+            packages/icons/icons-manifest.json \
+            packages/icons/icons-collections.json \
+            packages/icons/sets/ \
+            || { echo "::error::icon manifest is not idempotent — refusing to ship"; exit 1; }
+
+      - name: Open or update the fix PR
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euxo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BRANCH=ci/autofix
+          git checkout -B "$BRANCH"
+          git add -A
+          git commit -m "style(ci): auto-fix deterministic gates (fmt + icon manifest)"
+          git push -f origin "$BRANCH"
+          body=$'Automated by the **CI auto-fix** loop after a red run on \x60main\x60.\n\nApplies only deterministic, non-semantic fixers:\n- \x60cargo fmt --all\x60 (kymostudio-core + kymo CLI crate)\n- \x60node scripts/build-manifest.mjs\x60 (icon manifest)\n\nVerified in-workflow: rustfmt \x60--check\x60 passes and the icon manifest is idempotent. Clippy / test failures are out of scope and were left untouched.'
+          if gh pr view "$BRANCH" --json state --jq .state 2>/dev/null | grep -qx OPEN; then
+            echo "Existing PR for $BRANCH updated by force-push."
+          else
+            gh pr create --base main --head "$BRANCH" \
+              --title "style(ci): auto-fix deterministic gates (fmt + icon manifest)" \
+              --body "$body"
+          fi
