@@ -42,7 +42,7 @@ export function IconPage() {
         <a className="brand" href="/" style={{ textDecoration: "none" }}>
           <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons
         </a>
-        <nav className="nav"><a href={item ? `/?set=${item.set}` : "/"}>← Gallery</a></nav>
+        <nav className="nav"><a href={item ? `/set/${item.set}` : "/"}>← Gallery</a></nav>
       </div>
     </header>
   );
@@ -80,8 +80,8 @@ export function IconPage() {
           <div className="icon-body">
             <div className="icon-head">
               <h1>{pretty(item)}</h1>
-              <span className="dlg-set">{item.set}</span>
-              {item.subset && <a className="dlg-sub" href={`/?set=${item.set}&sub=${item.subset}`} title={`Browse ${item.set} · ${item.subset}`}>{item.subset}</a>}
+              <a className="dlg-set" href={`/set/${item.set}`} title={`Browse ${item.set}`}>{item.set}</a>
+              {item.subset && <a className="dlg-sub" href={`/set/${item.set}/${item.subset}`} title={`Browse ${item.set} · ${item.subset}`}>{item.subset}</a>}
             </div>
 
             {item.variants && item.variants.length > 1 && (

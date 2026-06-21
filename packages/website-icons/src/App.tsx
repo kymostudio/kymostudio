@@ -99,10 +99,19 @@ const setLabel = (s: string) => SET_LABELS[s] || s;
 // Count actual icons, not cards: a brand card bundles several variant icons.
 const iconCount = (list: Icon[]) => list.reduce((n, it) => n + (it.variants?.length || 1), 0);
 
+// The gallery view (set + subset) lives in the path: /set/<set>[/<subset>].
+// Falls back to the legacy ?set=&sub= query for old links.
+function viewFromUrl(): { set: string; sub: string } {
+  const m = location.pathname.replace(/\/+$/, "").match(/^\/set\/([^/]+)(?:\/([^/]+))?$/);
+  if (m) return { set: decodeURIComponent(m[1]), sub: m[2] ? decodeURIComponent(m[2]) : "" };
+  const q = new URLSearchParams(location.search);
+  return { set: q.get("set") || "all", sub: q.get("sub") || "" };
+}
+
 export function App() {
   const [items, setItems] = useState<Icon[]>([]);
-  const [set, setSet] = useState(() => new URLSearchParams(location.search).get("set") || "all");
-  const [sub, setSub] = useState(() => new URLSearchParams(location.search).get("sub") || ""); // selected subset within a set
+  const [set, setSet] = useState(() => viewFromUrl().set);
+  const [sub, setSub] = useState(() => viewFromUrl().sub); // selected subset within a set
   const [query, setQuery] = useState(() => new URLSearchParams(location.search).get("q") || "");
   const [sortBy, setSortBy] = useState<"name" | "set">("name");
   const [shown, setShown] = useState(PAGE);
@@ -169,14 +178,11 @@ export function App() {
   // reset the infinite-scroll window whenever the view changes
   useEffect(() => { setShown(PAGE); }, [set, sub, query, sortBy]);
 
-  // keep set + subset + query in the URL (shareable: ?set=ai&sub=model&q=gpt)
+  // keep the view in the URL as a clean path: /set/<set>[/<subset>][?q=…]
   useEffect(() => {
-    const p = new URLSearchParams();
-    if (set !== "all") p.set("set", set);
-    if (sub) p.set("sub", sub);
-    if (query.trim()) p.set("q", query.trim());
-    const qs = p.toString();
-    history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+    const q = query.trim() ? "?q=" + encodeURIComponent(query.trim()) : "";
+    const path = set === "all" ? "/" : "/set/" + set + (sub ? "/" + sub : "");
+    history.replaceState(null, "", path + q);
   }, [set, sub, query]);
 
   // theme + preview-size → CSS, persisted
@@ -338,6 +344,12 @@ export function App() {
               <option value="set">By set</option>
             </select>
           </div>
+          {set !== "all" && (
+            <h1 className="view-title">
+              <a href={`/set/${set}`}>{setLabel(set)}</a>
+              {sub && <><span className="view-sep">›</span><span className="view-sub">{sub}</span></>}
+            </h1>
+          )}
           <p className="count">{iconCount(filtered).toLocaleString()} icon{iconCount(filtered) === 1 ? "" : "s"}</p>
           <div className="grid">
             {visible.map((it) => (
@@ -384,8 +396,8 @@ export function App() {
             <div className="dlg-body">
               <div className="dlg-head">
                 <span className="dlg-key">{dialog.name || av.key}</span>
-                <span className="dlg-set">{dialog.set}</span>
-                {dialog.subset && <a className="dlg-sub" href={`/?set=${dialog.set}&sub=${dialog.subset}`} title={`Browse ${dialog.set} · ${dialog.subset}`}>{dialog.subset}</a>}
+                <a className="dlg-set" href={`/set/${dialog.set}`} title={`Browse ${dialog.set}`}>{dialog.set}</a>
+                {dialog.subset && <a className="dlg-sub" href={`/set/${dialog.set}/${dialog.subset}`} title={`Browse ${dialog.set} · ${dialog.subset}`}>{dialog.subset}</a>}
               </div>
               {dialog.variants && dialog.variants.length > 1 && (
                 <div className="dlg-variants">
