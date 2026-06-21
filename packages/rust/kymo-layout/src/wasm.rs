@@ -39,7 +39,11 @@ pub fn dagre_layout(input: &str) -> Result<String, JsError> {
                 .filter_map(|n| {
                     let id = n["id"].as_str()?.to_string();
                     let label = n["label"].as_str().unwrap_or(&id).to_string();
-                    Some(FlowNode { id, label, shape: Shape::Box })
+                    Some(FlowNode {
+                        id,
+                        label,
+                        shape: Shape::Box,
+                    })
                 })
                 .collect()
         })
@@ -51,8 +55,14 @@ pub fn dagre_layout(input: &str) -> Result<String, JsError> {
             a.iter()
                 .filter_map(|e| {
                     // accept source/target or src/dst
-                    let src = e["source"].as_str().or_else(|| e["src"].as_str())?.to_string();
-                    let dst = e["target"].as_str().or_else(|| e["dst"].as_str())?.to_string();
+                    let src = e["source"]
+                        .as_str()
+                        .or_else(|| e["src"].as_str())?
+                        .to_string();
+                    let dst = e["target"]
+                        .as_str()
+                        .or_else(|| e["dst"].as_str())?
+                        .to_string();
                     Some(FlowEdge {
                         src,
                         dst,
@@ -65,7 +75,12 @@ pub fn dagre_layout(input: &str) -> Result<String, JsError> {
         })
         .unwrap_or_default();
 
-    let fc = Flowchart { direction, nodes, edges, subgraphs: Vec::new() };
+    let fc = Flowchart {
+        direction,
+        nodes,
+        edges,
+        subgraphs: Vec::new(),
+    };
     let g = crate::dagre_geom(&fc, FlowStyle::Mermaid);
 
     let out = json!({
