@@ -103,6 +103,8 @@ export function App() {
   const [query, setQuery] = useState(() => new URLSearchParams(location.search).get("q") || "");
   const [sortBy, setSortBy] = useState<"name" | "set">("name");
   const [shown, setShown] = useState(PAGE);
+  const [dialog, setDialog] = useState<Icon | null>(null);
+  const [dlgVar, setDlgVar] = useState<Variant | null>(null); // selected variant in the modal
   const [tip, setTip] = useState<{ key: string; x: number; y: number } | null>(null);
   const [toast, setToastState] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">(
@@ -198,11 +200,13 @@ export function App() {
     return () => obs.disconnect();
   }, []);
 
-  // ⌘K focuses search
+  // ⌘K focuses search · Esc closes the modal
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault(); searchRef.current?.focus(); searchRef.current?.select();
+      } else if (e.key === "Escape" && location.pathname.startsWith("/icon/")) {
+        history.back();
       }
     };
     document.addEventListener("keydown", onKey);
@@ -224,6 +228,39 @@ export function App() {
     if (it.svg) save("data:image/svg+xml;charset=utf-8," + encodeURIComponent(it.svg), base + ".svg");
     else save(`${API}/api/icons/download?key=${encodeURIComponent(it.key)}`, base + (it.path!.toLowerCase().endsWith(".svg") ? ".svg" : ".png"));
   };
+
+  // ── modal as a route ─────────────────────────────────────────────────────
+  // Clicking a card opens a MODAL and pushes the shareable /icon/<slug> URL.
+  // A DIRECT visit to /icon/<slug> renders the full IconPage (see main.tsx).
+  const showIcon = (it: Icon) => {
+    setDialog(it);
+    setDlgVar(it.variants ? (it.variants.find((v) => v.variant === "color") || it.variants[0]) : null);
+  };
+  const openIcon = (it: Icon) => {
+    setTip(null); showIcon(it);
+    history.pushState({ icon: it.key }, "", iconHref(it.key));
+  };
+  const closeIcon = () => {
+    if (location.pathname.startsWith("/icon/")) history.back(); // pop URL → popstate closes
+    else setDialog(null);
+  };
+  // the active variant of the open modal (a brand's selected variant, else the card)
+  const av: Icon | null = dialog
+    ? (dlgVar ? { key: dlgVar.key, set: dialog.set, path: dlgVar.path, ver: dlgVar.ver } : dialog)
+    : null;
+  // sync the modal to the URL on back/forward
+  useEffect(() => {
+    const onPop = () => {
+      const p = location.pathname.replace(/\/+$/, "");
+      if (p.startsWith("/icon/")) {
+        const slug = decodeURIComponent(p.split("/").slice(2).join("/"));
+        const it = items.find((i) => iconSlugOf(i.key) === slug);
+        if (it) showIcon(it); else setDialog(null);
+      } else setDialog(null);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [items]);
 
   const visible = filtered.slice(0, shown);
 
@@ -302,6 +339,11 @@ export function App() {
           <div className="grid">
             {visible.map((it) => (
               <a key={it.key} className="cell" href={iconHref(it.key)}
+                onClick={(e) => {
+                  // let cmd/ctrl/shift/middle-click open the full page in a new tab
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                  e.preventDefault(); openIcon(it);
+                }}
                 onMouseEnter={(e) => {
                   const r = e.currentTarget.getBoundingClientRect();
                   setTip({ key: it.key, x: r.left + r.width / 2, y: r.top - 8 });
@@ -325,6 +367,57 @@ export function App() {
 
       {toast && (
         <div className="toast" dangerouslySetInnerHTML={{ __html: toast }} />
+      )}
+
+      {dialog && av && (
+        <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) closeIcon(); }}>
+          <div className="dialog" role="dialog" aria-modal="true">
+            {dialog.variants && (
+              <a className="brand-tag brand-tag-corner" href={`/brand/${dialog.key.split(":")[1]}`} target="_blank" rel="noopener" title={`Open ${dialog.name || ""} brand page`}>
+                Brand<span className="ext-ic"><ExternalGlyph /></span>
+              </a>
+            )}
+            <div className="dlg-preview"><Art it={av} /></div>
+            <div className="dlg-body">
+              <div className="dlg-head">
+                <span className="dlg-key">{dialog.name || av.key}</span>
+                <span className="dlg-set">{dialog.set}</span>
+              </div>
+              {dialog.variants && dialog.variants.length > 1 && (
+                <div className="dlg-variants">
+                  {dialog.variants.map((v) => (
+                    <button key={v.key} className={"vtab" + (dlgVar?.key === v.key ? " active" : "")}
+                      onClick={() => setDlgVar(v)}>{v.variant}</button>
+                  ))}
+                </div>
+              )}
+              <div className="dlg-actions">
+                <button className="btn primary" onClick={() => { copy(av.key); flash(`Copied <code>${av.key}</code>`); }}>
+                  <CopyGlyph /> Copy key
+                </button>
+                <button className="btn" onClick={() => { copy(av.svg ? av.key : iconUrl(av.path!, av.ver)); flash("Copied URL"); }}>
+                  <LinkGlyph /> Copy URL
+                </button>
+                <button className="btn" onClick={() => downloadIcon(av)}>
+                  <DownloadGlyph /> Download
+                </button>
+                <button className="btn" onClick={closeIcon}>
+                  <CloseGlyph /> Close
+                </button>
+              </div>
+              <div className="dlg-usage">
+                <p className="ul">Use in a .kymo diagram</p>
+                <div className="snippet">
+                  <code>{snippetFor(av.key)}</code>
+                  <button title="Copy snippet" aria-label="Copy snippet"
+                    onClick={() => { copy(snippetFor(av.key)); flash("Copied snippet"); }}>
+                    <CopyGlyph />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

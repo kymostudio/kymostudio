@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API, type Icon as Item, type Variant, iconUrl, snippetFor, loadCatalog, iconSlugOf } from "./App";
+import { API, type Icon as Item, type Variant, iconUrl, snippetFor, loadCatalog, iconSlugOf, iconHref } from "./App";
 
 function copy(text: string) { try { navigator.clipboard?.writeText(text); } catch { /* noop */ } }
 function save(href: string, filename: string) {
@@ -15,6 +15,7 @@ const ExternalGlyph = () => (
 export function IconPage() {
   const slug = decodeURIComponent(location.pathname.replace(/\/+$/, "").split("/").slice(2).join("/") || "");
   const [item, setItem] = useState<Item | null | undefined>(undefined); // undefined = loading
+  const [all, setAll] = useState<Item[]>([]);
   const [vv, setVv] = useState<Variant | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const flash = (m: string) => { setToast(m); window.setTimeout(() => setToast(null), 1500); };
@@ -25,6 +26,7 @@ export function IconPage() {
   }, []);
   useEffect(() => {
     loadCatalog().then((items) => {
+      setAll(items);
       const it = items.find((i) => iconSlugOf(i.key) === slug) || null;
       setItem(it);
       if (it?.variants) setVv(it.variants.find((v) => v.variant === "color") || it.variants[0]);
@@ -55,6 +57,9 @@ export function IconPage() {
     if (av.svg) save("data:image/svg+xml;charset=utf-8," + encodeURIComponent(av.svg), base + ".svg");
     else save(`${API}/api/icons/download?key=${encodeURIComponent(av.key)}`, base + (av.path!.toLowerCase().endsWith(".svg") ? ".svg" : ".png"));
   };
+
+  // related: same set (and same subset, if any), excluding self
+  const related = all.filter((i) => i.set === item.set && i.key !== item.key && (!item.grp || i.grp === item.grp)).slice(0, 24);
 
   return (
     <>
@@ -103,6 +108,21 @@ export function IconPage() {
             </div>
           </div>
         </div>
+
+        {related.length > 0 && (
+          <section className="related">
+            <h2>Related icons</h2>
+            <div className="related-grid">
+              {related.map((r) => (
+                <a key={r.key} className="cell related-cell" href={iconHref(r.key)} title={r.name || r.key}>
+                  {r.svg
+                    ? <span dangerouslySetInnerHTML={{ __html: r.svg }} />
+                    : <img loading="lazy" src={iconUrl(r.path!, r.ver)} alt={r.key} />}
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         <footer className="legal">
           Logos are trademarks of their respective owners, shown for identification only.
