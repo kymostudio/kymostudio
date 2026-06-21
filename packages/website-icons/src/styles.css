@@ -136,6 +136,10 @@ main { padding: 22px 24px 90px; min-width: 0; }
 .dlg-key { font: 600 15px ui-monospace, Menlo, monospace; color: var(--text); word-break: break-all; flex: 1; }
 .dlg-set { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
   color: var(--pink); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+.dlg-sub { font-size: 11px; font-weight: 700; text-transform: capitalize; letter-spacing: .02em;
+  color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px;
+  white-space: nowrap; text-decoration: none; }
+.dlg-sub:hover { color: var(--pink); border-color: var(--pink); }
 .dlg-tags { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .brand-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .04em; color: #fff; background: var(--pink);
