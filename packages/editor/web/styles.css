@@ -206,6 +206,19 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .pv-stage svg .er-rowhi { fill: rgba(37, 99, 235, 0.12); pointer-events: none; }
 /* candidate connection points revealed when a drag approaches a table (Miro-style) */
 .pv-stage svg .er-point { fill: #fff; stroke: #2563eb; stroke-width: 1.5; pointer-events: none; }
+/* table selection (dbdiagram-style): blue ring + soft glow on the box, and on
+   every related edge a solid blue line with marching blue SQUARES flowing along
+   it (the hit path, sitting on top, is restyled into the animated square track). */
+.pv-stage svg .er-table.er-selected .er-box { stroke: #3d6fa6; stroke-width: 2; }
+.pv-stage svg .er-table.er-selected { filter: url(#soft) drop-shadow(0 0 5px rgba(61, 111, 166, 0.5)); }
+.pv-stage svg .er-rel-g.er-edge-active path.er-rel { stroke: #3d6fa6; stroke-width: 2; }
+.pv-stage svg .er-rel-g.er-edge-active path.er-rel-hit {
+  stroke: #3d6fa6; stroke-width: 5; stroke-dasharray: 5 12; stroke-linecap: butt;
+  animation: er-flow 0.6s linear infinite;
+}
+.pv-stage svg .er-rel-g.er-edge-active .er-foot,
+.pv-stage svg .er-rel-g.er-edge-active circle.er-rel-dot { stroke: #3d6fa6; }
+@keyframes er-flow { to { stroke-dashoffset: -17; } }
 .pv-stage svg .er-rel-g.er-sel path.er-rel { stroke: #2563eb; stroke-width: 2.4; }
 .pv-stage svg .er-rel-g.er-sel circle.er-rel-dot { stroke: #2563eb; }
 .pv-stage svg .er-rel-g.er-sel .er-foot { stroke: #2563eb; }
