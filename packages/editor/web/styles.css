@@ -321,6 +321,9 @@ textarea { flex: 1; width: 100%; resize: none; border: 0; outline: none !importa
 .sb-guide.on::before { background: var(--border-strong); } /* active subtree — a touch darker than idle, still subtle */
 .sb-spacer { flex: none; width: 14px; } /* lines a file's icon up under a folder's icon */
 .sb-chev, .sb-icon { flex: none; color: var(--dim); display: inline-flex; }
+/* brand/tool file icons (mermaid, d2, plantuml, kymo…): keep the 15px box, never
+   stretch the logo, and align it on the text baseline like the lucide glyphs. */
+.sb-icon-img { width: 15px; height: 15px; object-fit: contain; align-self: center; }
 .sb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 /* calm neutral selection / focus; the open file keeps a thin brand accent bar */
 .sb-folder.sel { background: var(--sel); }
