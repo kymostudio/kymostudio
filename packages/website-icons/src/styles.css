@@ -33,9 +33,10 @@ header {
 .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 18px; letter-spacing: -0.01em; color: var(--text); }
 .brand .k { width: 26px; height: 26px; border-radius: 7px; display: block; }
 .brand small { color: var(--muted); font-weight: 600; font-size: 13px; }
-.nav { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 14px; font-weight: 600; }
-.nav a { color: var(--text); }
-.nav a:hover { color: var(--pink); }
+.nav-links { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 14px; font-weight: 600; }
+.nav-links a { color: var(--text); }
+.nav-links a:hover { color: var(--pink); }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
 .icon-btn {
   display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px;
   border: 1px solid var(--line); background: var(--card); color: var(--muted); cursor: pointer; padding: 0;
@@ -265,9 +266,15 @@ a.dlg-set:hover { border-color: var(--pink); }
 
 /* ── responsive: sidebar → horizontal strip ─────────────── */
 @media (max-width: 820px) {
+  /* two-tier header: row 1 = brand ↔ actions, row 2 = text links */
+  .top { flex-wrap: wrap; row-gap: 11px; column-gap: 12px; padding: 12px 16px; }
+  .brand { flex: 1; min-width: 0; }
+  .brand small { display: none; }
+  .nav-actions { order: 2; }
+  .nav-links { order: 3; flex-basis: 100%; margin-left: 0; gap: 22px; font-size: 14.5px; }
   .body { grid-template-columns: 1fr; }
   aside {
-    position: static; height: auto; overflow: visible; width: 100%;
+    position: static; height: auto; overflow: visible; width: 100%; min-width: 0;
     border-right: 0; border-bottom: 1px solid var(--line); padding: 14px 16px;
   }
   .side-block.sizes { display: none; }

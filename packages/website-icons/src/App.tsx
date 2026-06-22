@@ -281,16 +281,18 @@ export function App() {
             <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons{" "}
             {items.length > 0 && <small>· {iconCount(items).toLocaleString()} icons</small>}
           </span>
-          <nav className="nav">
+          <nav className="nav-links">
             <a href="https://docs.kymo.studio">Docs</a>
             <a href="https://editor.kymo.studio">Editor</a>
             <a href="https://kymo.studio">kymo.studio</a>
+          </nav>
+          <div className="nav-actions">
             <a className="icon-btn" href="https://github.com/kymostudio/kymostudio" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub"><GitHubGlyph /></a>
             <button className="icon-btn" title="Toggle theme" aria-label="Toggle theme"
               onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}>
               {theme === "dark" ? <SunGlyph /> : <MoonGlyph />}
             </button>
-          </nav>
+          </div>
         </div>
       </header>
 
