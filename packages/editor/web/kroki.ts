@@ -53,6 +53,39 @@ export function extFor(kind?: string): string {
   return (kind && KIND_EXT[kind]) || kind || "kymo";
 }
 
+// VS Code-style "new file by extension": map a typed filename's extension to a
+// DIAGRAM kind. Covers the aliases that KIND_EXT collapses (mmd, puml, dot, …);
+// any extension that is itself a KINDS value (.d2, .bpmn, .dbml, …) is honoured
+// directly. Extensions NOT listed here are treated as plain TEXT files.
+const EXT_KIND: Record<string, string> = {
+  kymo: "kymo", mmd: "mermaid", mermaid: "mermaid", bpmn: "bpmn",
+  puml: "plantuml", plantuml: "plantuml", c4: "c4plantuml",
+  dsl: "structurizr", d2: "d2", dbml: "dbml", er: "erd", erd: "erd",
+  dot: "graphviz", gv: "graphviz", graphviz: "graphviz",
+  excalidraw: "excalidraw", vl: "vegalite", vega: "vega",
+};
+// A kind is "text" (a plain file, no diagram preview) when it isn't one of the
+// diagram kinds — e.g. txt, md, js, py, json. For these the kind IS the file's
+// extension, so the name round-trips and extFor echoes it (app.js → "app.js").
+export function isTextKind(kind: string): boolean {
+  return !KINDS.some((k) => k.value === kind);
+}
+// raw filename → { base title, inferred kind }.
+//   - recognized diagram extension → its diagram kind (e.g. flow.bpmn → bpmn);
+//   - any other extension → a TEXT file whose kind is that extension (app.js → js);
+//   - no extension → the native kymo diagram (a bare name in a diagram-first tool).
+// The extension must be a single \w+ token, so "v1.2 notes" keeps its dot (→ kymo).
+export function kindFromFilename(raw: string): { base: string; kind: string } {
+  const name = raw.trim();
+  const dot = name.lastIndexOf(".");
+  if (dot > 0 && /^\w+$/.test(name.slice(dot + 1))) {
+    const e = name.slice(dot + 1).toLowerCase();
+    const k = (KINDS.some((x) => x.value === e) ? e : EXT_KIND[e]) || e; // diagram kind, else the ext itself (text)
+    return { base: name.slice(0, dot), kind: k };
+  }
+  return { base: name, kind: "kymo" };
+}
+
 // Syntax help for a kind: kymo/bpmn → our own docs; the rest → the format's
 // canonical upstream reference, so a stuck user always has a working exit.
 const UPSTREAM_DOCS: Record<string, string> = {
