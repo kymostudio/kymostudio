@@ -106,9 +106,10 @@ type Row =
   | { kind: "file"; id: string; depth: number; ancestors: string[]; it: Item }
   | { kind: "newfile"; id: string; depth: number; ancestors: string[]; parentId: string };
 
-export function ExplorerPanel({ currentId, currentTitle, onOpen, onCreateFile, onClose }: {
+export function ExplorerPanel({ currentId, currentTitle, onOpen, onCreateFile, onImportFiles, onClose }: {
   currentId: string | null; currentTitle: string; onOpen: (id: string) => void;
-  onCreateFile: (folderId: string, title: string, kind: string) => void; onClose: () => void;
+  onCreateFile: (folderId: string, title: string, kind: string) => void;
+  onImportFiles: (folderId: string, files: File[]) => void; onClose: () => void;
 }) {
   const { signedIn } = useAuth();
   const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder, projects, currentProject } = useWorkspace();
@@ -230,11 +231,15 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onCreateFile, o
   function dragStart(e: React.DragEvent, kind: "diagram" | "folder", id: string) {
     e.dataTransfer.setData("text/plain", kind + ":" + id); e.dataTransfer.effectAllowed = "move";
   }
+  // An OS file drag (vs an internal row move) advertises the "Files" type.
+  const isFileDrag = (e: React.DragEvent) => Array.from(e.dataTransfer.types || []).includes("Files");
   function allowDrop(e: React.DragEvent, target: string) {
-    e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (dragOver !== target) setDragOver(target);
+    e.preventDefault(); e.dataTransfer.dropEffect = isFileDrag(e) ? "copy" : "move"; if (dragOver !== target) setDragOver(target);
   }
   async function dropOn(e: React.DragEvent, targetFolderId: string) {
     e.preventDefault(); e.stopPropagation(); setDragOver(null);
+    // OS files dropped from the desktop → import each as a new diagram here.
+    if (e.dataTransfer.files && e.dataTransfer.files.length) { onImportFiles(targetFolderId, Array.from(e.dataTransfer.files)); return; }
     const [kind, id] = (e.dataTransfer.getData("text/plain") || "").split(":");
     if (kind === "diagram" && id) { assignDiagram(signedIn, id, targetFolderId); setTimeout(reload, 150); }
     else if (kind === "folder" && id && id !== targetFolderId) { await moveFolder(id, targetFolderId); }
