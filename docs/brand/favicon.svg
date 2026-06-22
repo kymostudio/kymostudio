@@ -1,5 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect width="64" height="64" rx="13" fill="#e0095f"/>
-  <path transform="translate(9.90 53.26) scale(0.029471 -0.029471)" fill="#ffffff"
-    d="M312 -25C447 -25 524 55 524 197V378L650 508L974 97C1043 9 1105 -25 1196 -25C1312 -25 1400 64 1400 180C1400 240 1369 304 1296 394L984 780L1282 1098C1342 1162 1364 1208 1364 1272C1364 1381 1274 1468 1163 1468C1091 1468 1036 1440 975 1372L532 871H524V1246C524 1388 447 1468 312 1468C177 1468 100 1388 100 1246V197C100 55 177 -25 312 -25Z"/>
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <rect width="100" height="100" rx="18" fill="#e0095f"/>
+  <g transform="translate(50 50) scale(0.98) translate(-50 -50)">
+    <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+    <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+    <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+    <circle cx="33" cy="26.5" r="5.8" fill="#fff"/>
+    <circle cx="33" cy="26.5" r="2.44" fill="#e0095f"/>
+    <circle cx="65.5" cy="27" r="5.8" fill="#fff"/>
+    <circle cx="65.5" cy="27" r="2.44" fill="#e0095f"/>
+    <circle cx="33" cy="73.5" r="5.8" fill="#fff"/>
+    <circle cx="33" cy="73.5" r="2.44" fill="#e0095f"/>
+    <circle cx="34" cy="58.5" r="5.8" fill="#fff"/>
+    <circle cx="34" cy="58.5" r="2.44" fill="#e0095f"/>
+    <circle cx="48" cy="49.5" r="5.8" fill="#fff"/>
+    <circle cx="48" cy="49.5" r="2.44" fill="#e0095f"/>
+    <circle cx="67" cy="73" r="5.8" fill="#fff"/>
+    <circle cx="67" cy="73" r="2.44" fill="#e0095f"/>
+  </g>
 </svg>
