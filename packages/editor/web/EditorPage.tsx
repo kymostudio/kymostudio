@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor, isLocalhost } from "./auth";
 import { useRoom } from "./room";
 import { useWorkspace, assignDiagram } from "./workspace";
-import { KINDS, renderKroki, sanitizeSvg, extFor, isTextKind } from "./kroki";
+import { KINDS, renderKroki, sanitizeSvg, extFor, isTextKind, kindFromFilename } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { Preview } from "./preview";
@@ -851,6 +851,29 @@ export default function EditorPage() {
     openDiagram(id);
     window.setTimeout(() => reloadDiagrams(), 1800);
   }
+  // VS Code-style drag & drop: OS files dropped onto the Explorer become diagrams.
+  // Each file's kind is inferred from its extension (flow.bpmn → bpmn, app.md →
+  // text) and its text becomes the source. Oversized/unreadable files are skipped.
+  // Guests can't own server files, so the first dropped file seeds a draft instead.
+  async function importFiles(folderId: string, files: File[]) {
+    const readable = files.filter((f) => f.size <= 4 * 1024 * 1024); // skip > 4 MB
+    if (!readable.length) return;
+    setWelcomeDismissed(true);
+    let firstId: string | null = null;
+    for (const f of readable) {
+      let text: string;
+      try { text = await f.text(); } catch { continue; }
+      const { base, kind } = kindFromFilename(f.name);
+      const title = base.trim() && base.trim() !== "Untitled" ? base.trim().slice(0, 60) : "Untitled";
+      if (!signedIn) { pickTemplate({ source: text, kind, name: "", via: "", glyph: null }, title); return; }
+      const id = newId();
+      titleUserSet.current = title !== "Untitled";
+      assignDiagram(signedIn, id, folderId, currentProject || undefined, { source: text, title, kind });
+      addLocalDiagram({ id, title, kind, ws: folderId, updatedAt: Date.now() });
+      if (!firstId) { firstId = id; pendingImport.current = { source: text, kind, title: titleUserSet.current ? title : undefined }; }
+    }
+    if (firstId) { openDiagram(firstId); window.setTimeout(() => reloadDiagrams(), 1800); }
+  }
   // Pop the Google sign-in prompt (guests can't own server files).
   const promptSignIn = useCallback(() => { (window as any).google?.accounts?.id?.prompt?.(); }, []);
   // Explicit Save: a draft → a real server file, opened as a tab. Guests are
@@ -1037,7 +1060,7 @@ export default function EditorPage() {
         {claims && !shared && (
           <>
             <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} onConnectAI={() => setConnectOpen((o) => !o)} aiOpen={connectOpen} />
-            {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onOpen={openDiagram} onCreateFile={createFile} onClose={closePanelOnPhone} />}
+            {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onOpen={openDiagram} onCreateFile={createFile} onImportFiles={importFiles} onClose={closePanelOnPhone} />}
             {activePanel === "search" && <SearchPanel currentId={d} onOpen={openDiagram} onClose={closePanelOnPhone} />}
             {activePanel && <div className="sb-backdrop" onClick={closePanelOnPhone} />}
           </>
