@@ -70,6 +70,14 @@ const EXT_KIND: Record<string, string> = {
 export function isTextKind(kind: string): boolean {
   return !KINDS.some((k) => k.value === kind);
 }
+// Image files previewed as pictures (VS Code-style), not diagrams: the file's
+// kind is its extension. `svg` is text markup (rendered + editable inline); the
+// raster kinds are stored as a `data:` URL and shown via <img>. HEIC is left out
+// on purpose — browsers (Chrome/Firefox) can't decode it without a wasm lib.
+const IMAGE_KINDS = new Set(["svg", "png", "jpg", "jpeg", "gif", "webp", "avif", "bmp", "ico"]);
+export function isImageKind(kind: string): boolean { return IMAGE_KINDS.has(kind); }
+// Raster image: stored/previewed as a data: URL (everything except SVG markup).
+export function isRasterImageKind(kind: string): boolean { return isImageKind(kind) && kind !== "svg"; }
 // raw filename → { base title, inferred kind }.
 //   - recognized diagram extension → its diagram kind (e.g. flow.bpmn → bpmn);
 //   - any other extension → a TEXT file whose kind is that extension (app.js → js);

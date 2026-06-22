@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor, isLocalhost } from "./auth";
 import { useRoom } from "./room";
 import { useWorkspace, assignDiagram } from "./workspace";
-import { KINDS, renderKroki, sanitizeSvg, extFor, isTextKind, kindFromFilename } from "./kroki";
+import { KINDS, renderKroki, sanitizeSvg, extFor, isTextKind, isImageKind, isRasterImageKind, kindFromFilename } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { Preview } from "./preview";
@@ -25,6 +25,27 @@ import type { ErTool } from "./preview";
 import { planGestures, runSimulation, MAX_GESTURES, type SimCtx } from "./er-simulate";
 import { KLoader } from "./kloader";
 import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, PanelRight, SquareCode, Eye, Download, ChevronDown, FilePlus2, X, Sparkles } from "lucide-react";
+
+// Read a binary file as a `data:` URL (FileReader → base64) — how raster images
+// are stored so their bytes survive the text-based document model.
+function readAsDataURL(f: File): Promise<string> {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result));
+    r.onerror = () => rej(r.error);
+    r.readAsDataURL(f);
+  });
+}
+// Natural pixel size of an image data URL, so the preview SVG wrapper can carry a
+// real width/height (the pan/zoom "fit" reads those). Falls back to 300×150.
+function loadImageSize(src: string): Promise<{ w: number; h: number }> {
+  return new Promise((res) => {
+    const im = new Image();
+    im.onload = () => res({ w: im.naturalWidth || 300, h: im.naturalHeight || 150 });
+    im.onerror = () => res({ w: 300, h: 150 });
+    im.src = src;
+  });
+}
 
 export default function EditorPage() {
   const { claims, signedIn, signOut, devSignIn } = useAuth();
@@ -258,6 +279,27 @@ export default function EditorPage() {
   const doRender = useCallback(async (src: string, k: string) => {
     const seq = ++renderSeq.current;
     if (!src.trim()) { setSvg(""); setStatus(isTextKind(k) ? "Empty text file" : "Enter diagram source…"); setStatusErr(false); return; }
+    // Image files preview as pictures (VS Code-style). SVG is markup → sanitize +
+    // render inline (and stays editable); raster kinds are a stored `data:` URL →
+    // wrap in an <svg><image> at natural size so the pan/zoom/fit machinery and
+    // the SVG/PNG export all keep working. <image href="data:…"> never executes
+    // script (unlike inline SVG), so the data URL is injected as-is.
+    if (isImageKind(k)) {
+      let out = "";
+      if (k === "svg") {
+        out = sanitizeSvg(src);
+      } else if (src.startsWith("data:image/")) {
+        const { w, h } = await loadImageSize(src);
+        if (seq !== renderSeq.current) return;
+        out = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><image href="${src}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet"/></svg>`;
+      }
+      lastSvg.current = out; setSvg(out);
+      if (dRef.current && (synced.current || userEdited.current)) {
+        writeDoc(dRef.current, { source: src, kind: k, title: titleRef.current || "", svg: "" });
+      }
+      setStatus(out ? `${k.toUpperCase()} image` : "Unsupported image data"); setStatusTitle(""); setStatusErr(!out);
+      return;
+    }
     // Plain text files (.txt/.md/.js/.py/…) have no diagram preview — show the
     // source pane only, never round-trip to the render API (which would error).
     if (isTextKind(k)) {
@@ -563,9 +605,16 @@ export default function EditorPage() {
   // Plain text files (.txt/.md/.js/…) have no diagram preview → hide the preview
   // pane (and force the source pane on so the layout can never go blank). The
   // user's panes.preview preference is preserved for when a diagram is open again.
-  const textFile = isTextKind(kind);
-  const showPreview = panes.preview && !textFile;
-  const showSource = showPreview ? panes.source : true;
+  // Image files preview as a picture. SVG is editable markup → it shows BOTH the
+  // code and the live preview like a diagram (edit the source, watch it re-render).
+  // RASTER images (png/jpg/…) are binary → preview-only, no code pane (like VS Code
+  // opening an image). Both are technically "text kinds" (kind = extension), so
+  // exclude them from the plain-text branch.
+  const imageFile = isImageKind(kind);
+  const rasterImage = isRasterImageKind(kind);
+  const textFile = isTextKind(kind) && !imageFile;
+  const showPreview = rasterImage ? true : (panes.preview && !textFile);
+  const showSource = rasterImage ? false : (showPreview ? panes.source : true);
 
   useEffect(() => {
     document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
@@ -853,17 +902,18 @@ export default function EditorPage() {
   }
   // VS Code-style drag & drop: OS files dropped onto the Explorer become diagrams.
   // Each file's kind is inferred from its extension (flow.bpmn → bpmn, app.md →
-  // text) and its text becomes the source. Oversized/unreadable files are skipped.
-  // Guests can't own server files, so the first dropped file seeds a draft instead.
+  // text, photo.png → image). Diagram/text content is read as text; raster image
+  // files are read as a `data:` URL (reading them as text would corrupt the
+  // bytes). Oversized/unreadable files are skipped; guests seed the first as a draft.
   async function importFiles(folderId: string, files: File[]) {
     const readable = files.filter((f) => f.size <= 4 * 1024 * 1024); // skip > 4 MB
     if (!readable.length) return;
     setWelcomeDismissed(true);
     let firstId: string | null = null;
     for (const f of readable) {
-      let text: string;
-      try { text = await f.text(); } catch { continue; }
       const { base, kind } = kindFromFilename(f.name);
+      let text: string;
+      try { text = isRasterImageKind(kind) ? await readAsDataURL(f) : await f.text(); } catch { continue; }
       const title = base.trim() && base.trim() !== "Untitled" ? base.trim().slice(0, 60) : "Untitled";
       if (!signedIn) { pickTemplate({ source: text, kind, name: "", via: "", glyph: null }, title); return; }
       const id = newId();
@@ -1019,8 +1069,8 @@ export default function EditorPage() {
               {claims && !shared && (
                 <button className={"pane-tg" + (activePanel ? " on" : "")} onClick={toggleExplorer} title="Toggle Explorer" aria-pressed={!!activePanel}><PanelLeft size={16} strokeWidth={2} /></button>
               )}
-              <button className={"pane-tg" + (showSource ? " on" : "")} onClick={() => togglePane("source")} title="Toggle Source" aria-pressed={showSource} disabled={textFile}><SquareCode size={16} strokeWidth={2} /></button>
-              <button className={"pane-tg" + (showPreview ? " on" : "")} onClick={() => togglePane("preview")} title={textFile ? "No preview for text files" : "Toggle Preview"} aria-pressed={showPreview} disabled={textFile}><Eye size={16} strokeWidth={2} /></button>
+              <button className={"pane-tg" + (showSource ? " on" : "")} onClick={() => togglePane("source")} title={rasterImage ? "No source for image files" : "Toggle Source"} aria-pressed={showSource} disabled={textFile || rasterImage}><SquareCode size={16} strokeWidth={2} /></button>
+              <button className={"pane-tg" + (showPreview ? " on" : "")} onClick={() => togglePane("preview")} title={textFile ? "No preview for text files" : "Toggle Preview"} aria-pressed={showPreview} disabled={textFile || rasterImage}><Eye size={16} strokeWidth={2} /></button>
               {claims && !shared && (
                 <button className={"pane-tg" + (connectOpen ? " on" : "")} onClick={() => setConnectOpen((o) => !o)} title="Toggle Connect AI" aria-pressed={connectOpen}><PanelRight size={16} strokeWidth={2} /></button>
               )}
@@ -1140,6 +1190,9 @@ export default function EditorPage() {
               <div className="pane-bar preview-bar">
                 <span className="pane-bar-label">Preview</span>
                 <div className="pane-bar-actions" onClick={(e) => e.stopPropagation()}>
+                  {/* Export + Share act on a rendered diagram — hide them for image
+                      files (previewed as a picture: nothing to export/share here). */}
+                  {!imageFile && (<>
                   {/* Export this diagram (SVG / PNG / source) */}
                   <div className="account" onClick={(e) => e.stopPropagation()}>
                     <button onClick={() => setExportOpen((o) => !o)} aria-haspopup="menu" aria-expanded={exportOpen} title="Export this diagram">
@@ -1195,6 +1248,7 @@ export default function EditorPage() {
                       );
                     })()}
                   </div>
+                  </>)}
                 </div>
               </div>
               {shareError && <div className="share-error">{shareError}</div>}
