@@ -34,7 +34,7 @@ Rules of thumb:
 | File | Use |
 | --- | --- |
 | `logo.svg` | **Master.** Pink tile + white **K**. Self-contained, resolution-independent (pure vectors — no font, no raster). |
-| `favicon.svg` | **Favicon source** — a **font K** (SF Pro Rounded Black, outlined, no node dots). Everything below is generated from it. |
+| `favicon.svg` | **Favicon source** — the **node-graph K** (identical to `logo.svg`: pink tile + white node-and-edge **K** with dots). Everything below is generated from it. |
 | `favicon.ico` | Legacy favicon, **48 + 32 px** (no 16 — see note). |
 | `favicon-32.png`, `favicon-48.png` | PNG favicons. |
 | `apple-touch-icon.png` | iOS / `apple-touch-icon` (180×180, rendered from the full master). |
@@ -42,10 +42,11 @@ Rules of thumb:
 | `social-preview.png` | Rendered banner (2560×1280, 2×). The committed render is canonical — see font caveat below. |
 | `wordmark.svg` / `wordmark-dark.svg` | **Reusable horizontal lockup** (transparent, tight `viewBox`) — tile + two-tone wordmark + tagline "Diagram superpowers", with the **text outlined to paths** (no font dependency, like `favicon.svg`). Light = navy primary, dark = white primary. Used by **both** the root README hero (`<picture>` light/dark, SVG — outlined so GitHub renders it correctly) **and** the editor (`packages/editor`'s `build.sh` copies it in; the Welcome screen serves it at `/wordmark.svg`). Regenerate both with `tools/outline_wordmark.py`. Reuse anywhere a brand lockup is needed. |
 
-**Favicon ≠ a shrunk master.** The master's node-dot handles turn to mush at
-small sizes, so the favicon (`favicon.svg`) is a separate glyph: the same pink
-tile and white **K**, but a **plain letterform — SF Pro Rounded Black, outlined to
-a path, no node dots**. Use the full `logo.svg` (with dots) everywhere ≥ 64 px.
+**Favicon = the master mark.** The favicon (`favicon.svg`) is the **node-graph K**,
+identical to `logo.svg` — the same pink tile and white **K** drawn as nodes + edges
+with dots. (Earlier it was a dot-less SF Pro Rounded letterform to stay crisp at
+16–32 px; it was switched back to the full logo so the tab icon matches the site
+logo.) Use `logo.svg` / this favicon interchangeably.
 
 **No 16 px.** Targets are the 32 px retina tab and the 48 px multiple Google
 Search wants; the bitmaps are rendered at 32 / 48 and `.ico` bundles those two.
