@@ -66,6 +66,10 @@ const CloseGlyph = () => S(<><path d="M18 6 6 18" /><path d="m6 6 12 12" /></>);
 const ExternalGlyph = () => S(<><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></>);
 const SunGlyph = () => S(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></>);
 const MoonGlyph = () => S(<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />);
+const MenuGlyph = () => S(<><line x1="3" x2="21" y1="6" y2="6" /><line x1="3" x2="21" y1="12" y2="12" /><line x1="3" x2="21" y1="18" y2="18" /></>);
+const FiltersGlyph = () => S(<><line x1="4" x2="4" y1="21" y2="14" /><line x1="4" x2="4" y1="10" y2="3" /><line x1="12" x2="12" y1="21" y2="12" /><line x1="12" x2="12" y1="8" y2="3" /><line x1="20" x2="20" y1="21" y2="16" /><line x1="20" x2="20" y1="12" y2="3" /><line x1="2" x2="6" y1="14" y2="14" /><line x1="10" x2="14" y1="8" y2="8" /><line x1="18" x2="22" y1="16" y2="16" /></>);
+const GridGlyph = () => S(<><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></>);
+const SizeGlyph = () => S(<><path d="M8 3H5a2 2 0 0 0-2 2v3" /><path d="M21 8V5a2 2 0 0 0-2-2h-3" /><path d="M3 16v3a2 2 0 0 0 2 2h3" /><path d="M16 21h3a2 2 0 0 0 2-2v-3" /></>);
 const GitHubGlyph = () => S(<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />, "0 0 16 16", "currentColor");
 
 // the icon art itself — PNG from the CDN, or an inline IconifyJSON SVG body
@@ -124,6 +128,7 @@ export function App() {
       (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
   );
   const [size, setSize] = useState(() => Number(localStorage.getItem("kymo-icons-size")) || 40);
+  const [menuOpen, setMenuOpen] = useState(false); // mobile hamburger nav
 
   const searchRef = useRef<HTMLInputElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -194,6 +199,18 @@ export function App() {
     document.documentElement.style.setProperty("--cell-icon", size + "px");
     localStorage.setItem("kymo-icons-size", String(size));
   }, [size]);
+  // close the mobile menu on outside click / Escape
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDoc = (e: Event) => {
+      const t = e.target as HTMLElement;
+      if (!t.closest(".nav-menu") && !t.closest(".nav-toggle")) setMenuOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); };
+    document.addEventListener("pointerdown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("pointerdown", onDoc); document.removeEventListener("keydown", onKey); };
+  }, [menuOpen]);
 
   // infinite scroll
   const filteredLen = filtered.length;
@@ -281,25 +298,48 @@ export function App() {
             <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons{" "}
             {items.length > 0 && <small>· {iconCount(items).toLocaleString()} icons</small>}
           </span>
-          <nav className="nav-links">
-            <a href="https://docs.kymo.studio">Docs</a>
-            <a href="https://editor.kymo.studio">Editor</a>
-            <a href="https://kymo.studio">kymo.studio</a>
-          </nav>
-          <div className="nav-actions">
-            <a className="icon-btn" href="https://github.com/kymostudio/kymostudio" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub"><GitHubGlyph /></a>
-            <button className="icon-btn" title="Toggle theme" aria-label="Toggle theme"
-              onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}>
-              {theme === "dark" ? <SunGlyph /> : <MoonGlyph />}
-            </button>
+          <button className="nav-toggle icon-btn" aria-label="Menu" aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((o) => !o)}>
+            {menuOpen ? <CloseGlyph /> : <MenuGlyph />}
+          </button>
+          <div className={`nav-menu${menuOpen ? " open" : ""}`}>
+            <nav className="nav-links" onClick={() => setMenuOpen(false)}>
+              <a href="https://docs.kymo.studio">Docs</a>
+              <a href="https://editor.kymo.studio">Editor</a>
+              <a href="https://kymo.studio">kymo.studio</a>
+            </nav>
+            <div className="nav-actions">
+              <a className="icon-btn" href="https://github.com/kymostudio/kymostudio" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub"><GitHubGlyph /></a>
+              <button className="icon-btn" title="Toggle theme" aria-label="Toggle theme"
+                onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}>
+                {theme === "dark" ? <SunGlyph /> : <MoonGlyph />}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="body">
         <aside>
+          <div className="side-head"><FiltersGlyph /><span>Filters</span></div>
+          {(set !== "all" || sub) && (
+            <div className="side-block applied">
+              <div className="applied-head">
+                <p className="side-label">Applied filters</p>
+                <button className="clear-all" onClick={() => { setSet("all"); setSub(""); }}>Clear all <CloseGlyph /></button>
+              </div>
+              <div className="chips">
+                {set !== "all" && (
+                  <button className="chip" onClick={() => { setSet("all"); setSub(""); }}>{setLabel(set)} <CloseGlyph /></button>
+                )}
+                {sub && (
+                  <button className="chip" onClick={() => setSub("")}>{sub} <CloseGlyph /></button>
+                )}
+              </div>
+            </div>
+          )}
           <div className="side-block sizes">
-            <p className="side-label">Preview size</p>
+            <p className="side-label"><SizeGlyph />Preview size</p>
             <div className="size-row">
               <input type="range" min={24} max={80} step={4} value={size}
                 onChange={(e) => setSize(Number(e.target.value))} />
@@ -307,7 +347,7 @@ export function App() {
             </div>
           </div>
           <div className="side-block">
-            <p className="side-label">Sets</p>
+            <p className="side-label"><GridGlyph />Sets</p>
             <div className="sets">
               <button className={"set-row" + (set === "all" ? " active" : "")} onClick={() => { setSet("all"); setSub(""); }}>
                 <span className="label">All</span>
