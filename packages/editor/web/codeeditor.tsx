@@ -12,6 +12,13 @@ import { yaml } from "@codemirror/legacy-modes/mode/yaml";
 import { clojure } from "@codemirror/legacy-modes/mode/clojure";
 import { stex } from "@codemirror/legacy-modes/mode/stex";
 import { verilog } from "@codemirror/legacy-modes/mode/verilog";
+import { javascript, typescript } from "@codemirror/legacy-modes/mode/javascript";
+import { python } from "@codemirror/legacy-modes/mode/python";
+import { shell } from "@codemirror/legacy-modes/mode/shell";
+import { standardSQL } from "@codemirror/legacy-modes/mode/sql";
+import { css } from "@codemirror/legacy-modes/mode/css";
+import { properties } from "@codemirror/legacy-modes/mode/properties";
+import { isTextKind } from "./kroki";
 
 // ---- generic diagram-DSL highlighter (comments / strings / numbers / arrows / keywords) ----
 function dsl(keywords: string[]): Extension {
@@ -72,7 +79,27 @@ const LANGS: Record<string, () => Extension> = {
   tikz: () => StreamLanguage.define(stex),
   symbolator: () => StreamLanguage.define(verilog),
 };
-const langFor = (kind: string): Extension => (LANGS[kind] ?? LANGS.kymo)();
+// Plain-text files created by extension (kind === the extension): give the common
+// code/config types real highlighting; everything else is unstyled plaintext.
+const sl = (mode: any): Extension => StreamLanguage.define(mode);
+const TEXT_LANGS: Record<string, () => Extension> = {
+  json: () => json(), jsonc: () => json(), geojson: () => json(),
+  xml: () => xml(), html: () => xml(), htm: () => xml(), svg: () => xml(), xsl: () => xml(), xsd: () => xml(),
+  yaml: () => sl(yaml), yml: () => sl(yaml), toml: () => sl(properties),
+  ini: () => sl(properties), conf: () => sl(properties), env: () => sl(properties), properties: () => sl(properties),
+  js: () => sl(javascript), mjs: () => sl(javascript), cjs: () => sl(javascript), jsx: () => sl(javascript),
+  ts: () => sl(typescript), tsx: () => sl(typescript),
+  py: () => sl(python), pyi: () => sl(python),
+  sh: () => sl(shell), bash: () => sl(shell), zsh: () => sl(shell),
+  sql: () => sl(standardSQL),
+  css: () => sl(css), scss: () => sl(css), less: () => sl(css),
+};
+const langFor = (kind: string): Extension => {
+  if (LANGS[kind]) return LANGS[kind]();
+  if (TEXT_LANGS[kind]) return TEXT_LANGS[kind]();
+  if (isTextKind(kind)) return []; // md, txt, log, unknown ext → plain text (no DSL highlighting)
+  return LANGS.kymo(); // a diagram kind we have no dedicated grammar for
+};
 
 // ---- light theme on the brand palette ----
 const theme = EditorView.theme({

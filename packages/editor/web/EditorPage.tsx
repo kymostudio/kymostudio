@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, GoogleButton, colorFor, isLocalhost } from "./auth";
 import { useRoom } from "./room";
 import { useWorkspace, assignDiagram } from "./workspace";
-import { KINDS, renderKroki, sanitizeSvg, extFor } from "./kroki";
+import { KINDS, renderKroki, sanitizeSvg, extFor, isTextKind } from "./kroki";
 import { renderMermaid } from "./mermaid";
 import { CodeEditor } from "./codeeditor";
 import { Preview } from "./preview";
@@ -257,7 +257,17 @@ export default function EditorPage() {
 
   const doRender = useCallback(async (src: string, k: string) => {
     const seq = ++renderSeq.current;
-    if (!src.trim()) { setSvg(""); setStatus("Enter diagram source…"); setStatusErr(false); return; }
+    if (!src.trim()) { setSvg(""); setStatus(isTextKind(k) ? "Empty text file" : "Enter diagram source…"); setStatusErr(false); return; }
+    // Plain text files (.txt/.md/.js/.py/…) have no diagram preview — show the
+    // source pane only, never round-trip to the render API (which would error).
+    if (isTextKind(k)) {
+      lastSvg.current = ""; setSvg("");
+      if (dRef.current && (synced.current || userEdited.current)) {
+        writeDoc(dRef.current, { source: src, kind: k, title: titleRef.current || "", svg: "" });
+      }
+      setStatus("Text file — no preview"); setStatusTitle(""); setStatusErr(false);
+      return;
+    }
     const t0 = performance.now();
     try {
       let out: string;
@@ -349,7 +359,10 @@ export default function EditorPage() {
     // placeholder, so the code pane stays in its loader until the room answers.
     setSourceReady(!!imp || !!cached || !d);
     setSource(imp ? imp.source : cached ? cached.source : emptied ? "" : SAMPLE);
-    setKind(imp ? imp.kind : cached ? cached.kind : "kymo");
+    // Seed kind from the import / cache / diagrams-list entry (the latter matters
+    // for an empty TEXT file: its room snapshot is blank, so onDoc won't carry a
+    // kind, and we must not fall back to kymo and mis-render it as a diagram).
+    setKind(imp ? imp.kind : cached ? cached.kind : (d && items.find((i) => i.id === d)?.kind) || "kymo");
     setSvg(cached ? cached.svg : ""); lastSvg.current = cached ? cached.svg : "";
     setTitle(imp?.title || cached?.title || ""); setEditingName(false); setShareError(null);
     // A manually-named draft carries its title into the new room; otherwise it's Untitled.
@@ -547,6 +560,12 @@ export default function EditorPage() {
   // closing the last tab). Keep the Command Center, but show a "no file open"
   // placeholder instead of empty editor panes. Guests always have their draft.
   const noFileOpen = !!claims && isDraft && !source.trim() && !userEdited.current;
+  // Plain text files (.txt/.md/.js/…) have no diagram preview → hide the preview
+  // pane (and force the source pane on so the layout can never go blank). The
+  // user's panes.preview preference is preserved for when a diagram is open again.
+  const textFile = isTextKind(kind);
+  const showPreview = panes.preview && !textFile;
+  const showSource = showPreview ? panes.source : true;
 
   useEffect(() => {
     document.title = diagramLabel !== "Untitled" ? diagramLabel + " · Kymo" : "Kymostudio";
@@ -817,6 +836,21 @@ export default function EditorPage() {
     openDiagram(id); // adds + activates the tab (focus pulse), Explorer focuses the row
     window.setTimeout(() => reloadDiagrams(), 1800);
   }
+  // VS Code-style inline "new file" from the Explorer: a BLANK file whose kind
+  // was inferred from the typed extension, created in the given folder and opened.
+  // Guests can't own server files → seed an empty draft of that kind instead.
+  function createFile(folderId: string, name: string, kind: string) {
+    if (!signedIn) { pickTemplate({ source: "", kind, name: "", via: "", glyph: null }, name); return; }
+    setWelcomeDismissed(true);
+    const id = newId();
+    const title = name && name.trim() && name.trim() !== "Untitled" ? name.trim().slice(0, 60) : "Untitled";
+    titleUserSet.current = title !== "Untitled";
+    pendingImport.current = { source: "", kind, title: titleUserSet.current ? title : undefined };
+    assignDiagram(signedIn, id, folderId, currentProject || undefined, { source: "", title, kind });
+    addLocalDiagram({ id, title, kind, ws: folderId, updatedAt: Date.now() });
+    openDiagram(id);
+    window.setTimeout(() => reloadDiagrams(), 1800);
+  }
   // Pop the Google sign-in prompt (guests can't own server files).
   const promptSignIn = useCallback(() => { (window as any).google?.accounts?.id?.prompt?.(); }, []);
   // Explicit Save: a draft → a real server file, opened as a tab. Guests are
@@ -962,8 +996,8 @@ export default function EditorPage() {
               {claims && !shared && (
                 <button className={"pane-tg" + (activePanel ? " on" : "")} onClick={toggleExplorer} title="Toggle Explorer" aria-pressed={!!activePanel}><PanelLeft size={16} strokeWidth={2} /></button>
               )}
-              <button className={"pane-tg" + (panes.source ? " on" : "")} onClick={() => togglePane("source")} title="Toggle Source" aria-pressed={panes.source}><SquareCode size={16} strokeWidth={2} /></button>
-              <button className={"pane-tg" + (panes.preview ? " on" : "")} onClick={() => togglePane("preview")} title="Toggle Preview" aria-pressed={panes.preview}><Eye size={16} strokeWidth={2} /></button>
+              <button className={"pane-tg" + (showSource ? " on" : "")} onClick={() => togglePane("source")} title="Toggle Source" aria-pressed={showSource} disabled={textFile}><SquareCode size={16} strokeWidth={2} /></button>
+              <button className={"pane-tg" + (showPreview ? " on" : "")} onClick={() => togglePane("preview")} title={textFile ? "No preview for text files" : "Toggle Preview"} aria-pressed={showPreview} disabled={textFile}><Eye size={16} strokeWidth={2} /></button>
               {claims && !shared && (
                 <button className={"pane-tg" + (connectOpen ? " on" : "")} onClick={() => setConnectOpen((o) => !o)} title="Toggle Connect AI" aria-pressed={connectOpen}><PanelRight size={16} strokeWidth={2} /></button>
               )}
@@ -1003,7 +1037,7 @@ export default function EditorPage() {
         {claims && !shared && (
           <>
             <ActivityBar active={activePanel} onSelect={selectPanel} onNewDiagram={() => setGalleryOpen(true)} onConnectAI={() => setConnectOpen((o) => !o)} aiOpen={connectOpen} />
-            {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onOpen={openDiagram} onNewDiagram={() => setGalleryOpen(true)} onClose={closePanelOnPhone} />}
+            {activePanel === "explorer" && <ExplorerPanel currentId={d} currentTitle={diagramLabel} onOpen={openDiagram} onCreateFile={createFile} onClose={closePanelOnPhone} />}
             {activePanel === "search" && <SearchPanel currentId={d} onOpen={openDiagram} onClose={closePanelOnPhone} />}
             {activePanel && <div className="sb-backdrop" onClick={closePanelOnPhone} />}
           </>
@@ -1016,8 +1050,8 @@ export default function EditorPage() {
           <WelcomeView onNew={() => setGalleryOpen(true)} onOpenFile={openLocalFile} onTemplate={pickTemplate} onOpen={openDiagram} />
         ) : (
           <>
-            {panes.source && (
-            <section className="pane" style={panes.preview ? { flex: `0 0 ${split}%` } : undefined}>
+            {showSource && (
+            <section className="pane" style={showPreview ? { flex: `0 0 ${split}%` } : undefined}>
               {/* The editor-tab bar is for signed-in users (it pairs with the
                   Explorer/Diagrams list). A guest is editing one throwaway draft —
                   no tab, no close ✕; the pane only surfaces if paste auto-detect
@@ -1072,11 +1106,11 @@ export default function EditorPage() {
                 : <CodeEditor value={source} kind={kind} onPaste={onEditorPaste} onChange={(v) => { userEdited.current = true; setShareError(null); setSource(v); }} />}
             </section>
             )}
-            {panes.source && panes.preview && (
+            {showSource && showPreview && (
               <div className="splitter" title="Drag to resize · double-click for 50/50"
                 onPointerDown={splitDown} onPointerMove={splitMove} onPointerUp={splitUp} onDoubleClick={splitReset} />
             )}
-            {panes.preview && (
+            {showPreview && (
             <section className="pane">
               {/* Preview header — same height as the Explorer / Source bars; holds the
                   output actions (Export · Share) right by the diagram they act on. */}

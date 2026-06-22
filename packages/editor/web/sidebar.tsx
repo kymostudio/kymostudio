@@ -6,7 +6,7 @@ import { useConfirm } from "./confirm";
 import { useToast } from "./toast";
 import { useContextMenu, type MenuItem } from "./context-menu";
 import { DIAGRAMS_API, TRASH_API, apiFetch } from "./const";
-import { kindLabel, docHref, extFor } from "./kroki";
+import { kindLabel, docHref, extFor, kindFromFilename } from "./kroki";
 import { useMcpActive, useAiTarget, openShortcuts } from "./mcpstatus";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
@@ -103,10 +103,12 @@ export function useDiagrams() { return useContext(DiagramsCtx); }
 // keyboard model, so the two can never drift out of sync.
 type Row =
   | { kind: "folder"; id: string; depth: number; ancestors: string[]; name: string; open: boolean }
-  | { kind: "file"; id: string; depth: number; ancestors: string[]; it: Item };
+  | { kind: "file"; id: string; depth: number; ancestors: string[]; it: Item }
+  | { kind: "newfile"; id: string; depth: number; ancestors: string[]; parentId: string };
 
-export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, onClose }: {
-  currentId: string | null; currentTitle: string; onOpen: (id: string) => void; onNewDiagram: () => void; onClose: () => void;
+export function ExplorerPanel({ currentId, currentTitle, onOpen, onCreateFile, onClose }: {
+  currentId: string | null; currentTitle: string; onOpen: (id: string) => void;
+  onCreateFile: (folderId: string, title: string, kind: string) => void; onClose: () => void;
 }) {
   const { signedIn } = useAuth();
   const { folders, currentFolder, setCurrentFolder, createFolder, renameFolder, deleteFolder, moveFolder, projects, currentProject } = useWorkspace();
@@ -120,6 +122,10 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
   });
   const [dragOver, setDragOver] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ kind: "file" | "folder"; id: string } | null>(null);
+  // VS Code-style inline "new file": when set, an input row is shown under this
+  // parent folder ("" = root). `creatingRef` guards Enter+blur from double-firing.
+  const [creating, setCreating] = useState<string | null>(null);
+  const creatingRef = useRef(false);
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const [flashId, setFlashId] = useState<string | null>(null); // briefly highlight the file just opened/created
   const treeRef = useRef<HTMLDivElement>(null);
@@ -131,10 +137,14 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
 
   const folderIds = useMemo(() => new Set(folders.map((f) => f.id)), [folders]);
   const effFolder = useCallback((i: Item) => (i.ws && folderIds.has(i.ws) ? i.ws : ""), [folderIds]);
-  // VS Code-style: always alphabetical (folders are sorted by name in the walk too).
+  // VS Code-style: always alphabetical by the FULL filename (title + extension),
+  // with a stable id tiebreaker — so same-base files (a.js / a.md / a.txt) keep a
+  // fixed order and clicking a tab (which triggers a server reload) never reshuffles
+  // them. (folders are sorted by name in the walk too.)
+  const fileName = useCallback((i: Item) => `${i.title || "Untitled"}.${extFor(i.kind)}`.toLowerCase(), []);
   const filesIn = useCallback(
-    (fid: string) => items.filter((i) => effFolder(i) === fid).sort((a, b) => (a.title || "Untitled").localeCompare(b.title || "Untitled")),
-    [items, effFolder]
+    (fid: string) => items.filter((i) => effFolder(i) === fid).sort((a, b) => fileName(a).localeCompare(fileName(b)) || a.id.localeCompare(b.id)),
+    [items, effFolder, fileName]
   );
 
   // Build the visible, ordered row list (folders first, then files, per level).
@@ -146,14 +156,16 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
         out.push({ kind: "folder", id: f.id, depth, ancestors, name: f.name, open });
         if (open) walk(f.id, depth + 1, [...ancestors, f.id]); // expanded-but-empty shows nothing (VS Code-style)
       }
+      // VS Code drops the new-file input at the top of its folder's contents.
+      if (creating === parentId) out.push({ kind: "newfile", id: "__newfile__", depth, ancestors, parentId });
       for (const it of filesIn(parentId)) out.push({ kind: "file", id: it.id, depth, ancestors, it });
     };
     walk("", 0, []);
     return out;
-  }, [folders, expanded, filesIn]);
+  }, [folders, expanded, filesIn, creating]);
 
-  // Rows the keyboard can land on (every row is now a folder or file).
-  const navRows = rows;
+  // Rows the keyboard can land on (the new-file input owns its own keys).
+  const navRows = useMemo(() => rows.filter((r) => r.kind !== "newfile"), [rows]);
   const keyOf = (r: { kind: string; id: string }) => r.kind + ":" + r.id;
 
   async function onNewFolder(parentId: string) {
@@ -162,7 +174,7 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
     if (parentId) setOpen(parentId, true);
     setEditing({ kind: "folder", id: f.id }); // inline-rename the fresh folder
   }
-  function startRename(kind: "file" | "folder", id: string) { setEditing({ kind, id }); }
+  function startRename(kind: "file" | "folder", id: string) { cancelCreate(); setEditing({ kind, id }); }
   function commitRename(kind: "file" | "folder", id: string, raw: string) {
     const name = raw.trim();
     setEditing(null);
@@ -193,7 +205,27 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
     }
   }
   function openFile(id: string) { onOpen(id); onClose(); }
-  function newDiagramIn(folderId: string) { setCurrentFolder(folderId); onNewDiagram(); }
+  // Start an inline "new file" input under `folderId` (VS Code style): expand the
+  // folder, drop the focused input, and let the typed extension pick the kind.
+  function newDiagramIn(folderId: string) {
+    setEditing(null);
+    setCurrentFolder(folderId);
+    if (folderId) setOpen(folderId, true);
+    creatingRef.current = true;
+    setCreating(folderId);
+  }
+  // Commit the inline input: blank file, title + kind parsed from the filename.
+  // Guarded so Enter (then the input's blur) can't create the file twice.
+  function commitCreate(parentId: string, raw: string) {
+    if (!creatingRef.current) return;
+    creatingRef.current = false;
+    setCreating(null);
+    const name = raw.trim();
+    if (!name) return;
+    const { base, kind } = kindFromFilename(name);
+    onCreateFile(parentId, base || "Untitled", kind);
+  }
+  function cancelCreate() { creatingRef.current = false; setCreating(null); }
 
   function dragStart(e: React.DragEvent, kind: "diagram" | "folder", id: string) {
     e.dataTransfer.setData("text/plain", kind + ":" + id); e.dataTransfer.effectAllowed = "move";
@@ -323,6 +355,22 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
   function renderRow(r: Row): React.ReactNode {
     const k = keyOf(r);
     const focused = focusKey === k;
+    if (r.kind === "newfile") {
+      return (
+        <div key="newfile" className="sb-row sb-file">
+          {guides(r.ancestors)}
+          <FileText size={15} strokeWidth={1.8} className="sb-icon" color="var(--dim)" />
+          <input className="sb-rename" ref={editRef} placeholder=""
+            onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === "Enter") commitCreate(r.parentId, (e.target as HTMLInputElement).value);
+              else if (e.key === "Escape") cancelCreate();
+            }}
+            onBlur={(e) => commitCreate(r.parentId, e.target.value)} />
+        </div>
+      );
+    }
     if (r.kind === "folder") {
       const f = folders.find((x) => x.id === r.id);
       const isEditing = editing?.kind === "folder" && editing.id === r.id;
@@ -363,7 +411,7 @@ export function ExplorerPanel({ currentId, currentTitle, onOpen, onNewDiagram, o
     <aside className="sidebar">
       <div className="sb-head">
         <span className="sb-title">Explorer</span>
-        <button title="New diagram" aria-label="New diagram" onClick={onNewDiagram}><FilePlus2 size={15} strokeWidth={2} /></button>
+        <button title="New file" aria-label="New file" onClick={() => newDiagramIn(currentFolder)}><FilePlus2 size={15} strokeWidth={2} /></button>
         <button title="New folder" aria-label="New folder" onClick={() => onNewFolder("")}><FolderPlus size={15} strokeWidth={2} /></button>
       </div>
       <div ref={treeRef} className={"sb-tree" + (dragOver === "__root__" ? " dragover-root" : "")} tabIndex={0}
