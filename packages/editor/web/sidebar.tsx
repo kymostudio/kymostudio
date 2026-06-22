@@ -11,25 +11,39 @@ import { useMcpActive, useAiTarget, openShortcuts } from "./mcpstatus";
 import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
   Files, Search, BookOpen, LogOut, Menu, ExternalLink, Sparkles, Settings, Keyboard,
-  Workflow, Waypoints, Network, Boxes, Box, Database, Share2,
+  Network, Boxes, Database, Share2,
 } from "lucide-react";
 
 export type Item = { id: string; title: string; kind?: string; ws?: string; updatedAt?: number };
 export type Panel = "explorer" | "search";
 
-// A distinct icon per diagram type so files aren't an undifferentiated "📄 Untitled" pile.
-const KIND_ICON: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string; color?: string }>> = {
-  kymo: Workflow, mermaid: Waypoints, bpmn: Network,
-  c4plantuml: Boxes, structurizr: Boxes, plantuml: Box,
-  d2: Database, dbml: Database, erd: Database, graphviz: Share2,
+// Real tool/brand icons (the icons.kymo.studio "diagrams" set + the kymo mark),
+// keyed by file format so the Explorer shows the actual logo — a .mmd file gets
+// the Mermaid logo, .d2 the D2 logo — the way a VS Code file-icon theme works,
+// rather than a generic diagram-type glyph. kymo uses the brand node-graph "K"
+// mark (/logo.svg, same as icons.kymo.studio); the rest come from the CDN set.
+const CDN_ICON_BASE = "https://cdn.kymo.studio/icons/diagrams/";
+const BRAND_ICON: Record<string, string> = {
+  kymo: "/logo.svg",
+  mermaid: CDN_ICON_BASE + "mermaid.svg",
+  plantuml: CDN_ICON_BASE + "plantuml.png",
+  c4plantuml: CDN_ICON_BASE + "plantuml.png", // C4 is authored in PlantUML
+  d2: CDN_ICON_BASE + "d2.png",
+  excalidraw: CDN_ICON_BASE + "excalidraw.svg",
 };
-// …and a distinct hue, the way a VS Code icon theme colours file types.
+// Formats with no brand icon in the set fall back to a distinct lucide glyph…
+const KIND_ICON: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string; color?: string }>> = {
+  bpmn: Network, structurizr: Boxes,
+  dbml: Database, erd: Database, graphviz: Share2,
+};
+// …each in a distinct hue, the way a VS Code icon theme colours file types.
 const KIND_COLOR: Record<string, string> = {
-  kymo: "#db2777", mermaid: "#0d9488", bpmn: "#4f46e5",
-  c4plantuml: "#7c3aed", structurizr: "#7c3aed", plantuml: "#7c3aed",
-  d2: "#b45309", dbml: "#b45309", erd: "#b45309", graphviz: "#15803d",
+  bpmn: "#4f46e5", structurizr: "#7c3aed",
+  dbml: "#b45309", erd: "#b45309", graphviz: "#15803d",
 };
 export function KindIcon({ kind }: { kind?: string }) {
+  const src = kind && BRAND_ICON[kind];
+  if (src) return <img src={src} alt="" width={15} height={15} className="sb-icon sb-icon-img" loading="lazy" decoding="async" />;
   const I = (kind && KIND_ICON[kind]) || FileText;
   return <I size={15} strokeWidth={1.8} className="sb-icon" color={(kind && KIND_COLOR[kind]) || "var(--dim)"} />;
 }
