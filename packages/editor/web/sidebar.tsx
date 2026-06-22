@@ -12,6 +12,7 @@ import {
   ChevronRight, ChevronDown, FolderPlus, FilePlus2, FileText, Pencil, Trash2,
   Files, Search, BookOpen, LogOut, Menu, ExternalLink, Sparkles, Settings, Keyboard,
   Network, Boxes, Database, Share2,
+  FileCode2, Braces, FileImage, FileTerminal, FileCog, FileLock2, FileSpreadsheet, ScrollText,
 } from "lucide-react";
 
 export type Item = { id: string; title: string; kind?: string; ws?: string; updatedAt?: number };
@@ -41,9 +42,44 @@ const KIND_COLOR: Record<string, string> = {
   bpmn: "#4f46e5", structurizr: "#7c3aed",
   dbml: "#b45309", erd: "#b45309", graphviz: "#15803d",
 };
+
+// Plain code/text/image files (kind = the extension) get a per-type glyph + hue,
+// the way VS Code's default "Seti" file-icon theme does. Colours are Seti's own
+// palette (github.com/jesseweed/seti-ui), so a .js reads yellow, .ts/.py blue,
+// .html orange, .sh green, images purple — matching what a VS Code user expects.
+const C = { yellow: "#cbcb41", blue: "#519aba", orange: "#e37933", red: "#cc3e44", green: "#8dc149", purple: "#a074c4", pink: "#f55385", gray: "#6d8086" };
+type Glyph = React.ComponentType<{ size?: number; strokeWidth?: number; className?: string; color?: string }>;
+const FILE_ICON: Record<string, [Glyph, string]> = {
+  // scripting / web
+  js: [FileCode2, C.yellow], mjs: [FileCode2, C.yellow], cjs: [FileCode2, C.yellow],
+  ts: [FileCode2, C.blue], jsx: [FileCode2, C.blue], tsx: [FileCode2, C.blue],
+  html: [FileCode2, C.orange], htm: [FileCode2, C.orange],
+  css: [FileCode2, C.blue], less: [FileCode2, C.blue], scss: [FileCode2, C.pink], sass: [FileCode2, C.pink],
+  vue: [FileCode2, C.green], svelte: [FileCode2, C.red], astro: [FileCode2, C.orange],
+  // systems / compiled
+  py: [FileCode2, C.blue], rb: [FileCode2, C.red], php: [FileCode2, C.purple],
+  go: [FileCode2, C.blue], rs: [FileCode2, C.gray], java: [FileCode2, C.red], kt: [FileCode2, C.orange],
+  c: [FileCode2, C.blue], h: [FileCode2, C.purple], cpp: [FileCode2, C.blue], cc: [FileCode2, C.blue], hpp: [FileCode2, C.blue],
+  cs: [FileCode2, C.blue], swift: [FileCode2, C.orange], dart: [FileCode2, C.blue], lua: [FileCode2, C.blue], r: [FileCode2, C.blue],
+  // data / config / docs
+  json: [Braces, C.yellow], jsonc: [Braces, C.yellow], xml: [FileCode2, C.orange],
+  yml: [FileCog, C.purple], yaml: [FileCog, C.purple], toml: [FileCog, C.gray], ini: [FileCog, C.gray],
+  cfg: [FileCog, C.gray], conf: [FileCog, C.gray], env: [FileCog, C.gray],
+  md: [FileText, C.blue], markdown: [FileText, C.blue], mdx: [FileText, C.blue],
+  sql: [Database, C.pink], csv: [FileSpreadsheet, C.green], tsv: [FileSpreadsheet, C.green],
+  sh: [FileTerminal, C.green], bash: [FileTerminal, C.green], zsh: [FileTerminal, C.green],
+  lock: [FileLock2, C.gray], log: [ScrollText, C.gray],
+  // images
+  svg: [FileImage, C.purple], png: [FileImage, C.purple], jpg: [FileImage, C.purple], jpeg: [FileImage, C.purple],
+  gif: [FileImage, C.purple], webp: [FileImage, C.purple], avif: [FileImage, C.purple], bmp: [FileImage, C.purple],
+  ico: [FileImage, C.yellow],
+};
+
 export function KindIcon({ kind }: { kind?: string }) {
   const src = kind && BRAND_ICON[kind];
   if (src) return <img src={src} alt="" width={15} height={15} className="sb-icon sb-icon-img" loading="lazy" decoding="async" />;
+  const fi = kind ? FILE_ICON[kind] : undefined;
+  if (fi) { const I = fi[0]; return <I size={15} strokeWidth={1.8} className="sb-icon" color={fi[1]} />; }
   const I = (kind && KIND_ICON[kind]) || FileText;
   return <I size={15} strokeWidth={1.8} className="sb-icon" color={(kind && KIND_COLOR[kind]) || "var(--dim)"} />;
 }
