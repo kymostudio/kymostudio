@@ -21,6 +21,7 @@ export function BrandPage() {
   const parts = location.pathname.replace(/\/+$/, "").split("/"); // /brand/<slug>
   const slug = decodeURIComponent(parts.slice(2).join("/") || "");
   const [brand, setBrand] = useState<Brand | null | undefined>(undefined);
+  const [showLoader, setShowLoader] = useState(false); // delayed → no flash on fast loads
   const [toast, setToast] = useState<string | null>(null);
   const flash = (m: string) => { setToast(m); window.setTimeout(() => setToast(null), 1500); };
 
@@ -36,6 +37,11 @@ export function BrandPage() {
       } catch { setBrand(null); }
     })();
   }, []);
+  // only reveal the loader if loading drags past ~200ms — fast loads never flash it
+  useEffect(() => {
+    const t = window.setTimeout(() => setShowLoader(true), 200);
+    return () => clearTimeout(t);
+  }, []);
   if (brand) document.title = `${brand.name} · Kymo Icons`;
 
   const Header = (
@@ -48,7 +54,7 @@ export function BrandPage() {
       </div>
     </header>
   );
-  if (brand === undefined) return <>{Header}<main className="brandpage"><div className="kloader-wrap"><KLoader /></div></main></>;
+  if (brand === undefined) return <>{Header}<main className="brandpage">{showLoader && <div className="kloader-wrap"><KLoader /></div>}</main></>;
   if (!brand) return <>{Header}<main className="brandpage"><div className="login-card"><h2>Brand not found</h2><p>No brand <b>{slug}</b>.</p><a href="/">← All icons</a></div></main></>;
 
   const v = (name: string) => brand.variants.find((x) => x.variant === name);
