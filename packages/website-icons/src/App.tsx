@@ -225,7 +225,8 @@ export function App() {
     return () => { document.removeEventListener("pointerdown", onDoc); document.removeEventListener("keydown", onKey); };
   }, [menuOpen]);
 
-  // infinite scroll
+  // infinite scroll — observer handles scroll-driven loading (rootMargin so the
+  // next batch starts before the user hits the bottom)
   const filteredLen = filtered.length;
   const lenRef = useRef(filteredLen);
   lenRef.current = filteredLen;
@@ -234,10 +235,23 @@ export function App() {
     if (!el) return;
     const obs = new IntersectionObserver((es) => {
       if (es[0].isIntersecting) setShown((s) => (s < lenRef.current ? s + PAGE : s));
-    });
+    }, { rootMargin: "800px" });
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+  // Keep filling while the sentinel sits within/near the viewport. The observer
+  // only fires on an enter/exit transition, so when the rendered batch is shorter
+  // than the screen (e.g. the small first batch) it never re-fires — without this
+  // the grid would stick at FIRST. Chains one batch per frame until the sentinel
+  // is pushed below the fold, then the observer takes over for real scrolling.
+  useEffect(() => {
+    if (shown >= filteredLen) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    if (el.getBoundingClientRect().top > window.innerHeight + 800) return; // below fold → wait for scroll
+    const id = requestAnimationFrame(() => setShown((s) => (s < filteredLen ? s + PAGE : s)));
+    return () => cancelAnimationFrame(id);
+  }, [shown, filteredLen]);
 
   // ⌘K focuses search · Esc closes the modal
   useEffect(() => {
