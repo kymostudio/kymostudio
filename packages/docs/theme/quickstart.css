@@ -1,10 +1,9 @@
 /* Styles for the interactive diagram-quickstart components (ported from the
    VitePress .vue scoped styles; --vp-* tokens swapped to RSPress --rp-*). */
 
-/* Diagram quickstart pages go FULL-SCREEN to focus on the live preview — same
-   intent as the old VitePress `layout: page`. The page frontmatter sets
-   `sidebar: false`; here we drop the doc content max-width cap and trim the
-   container padding so the two-column .dq spans the whole viewport width. */
+/* Quickstart pages keep the LEFT nav sidebar (navigate between diagram types)
+   but hide the RIGHT outline (`outline: false` frontmatter) and let the .dq span
+   the full remaining width so the live-preview pane gets the room. */
 :root:has(.dq) {
   --rp-content-max-width: 100%;
 }
@@ -12,10 +11,9 @@
   padding-left: 24px;
   padding-right: 24px;
 }
-/* `sidebar: false` / `outline: false` only hide the rails — RSPress still keeps
-   width-reserving placeholders. Collapse them so the quickstart is truly
-   edge-to-edge full-screen. */
-.rp-doc-layout__container:has(.dq) .rp-doc-layout__sidebar-placeholder,
+/* `outline: false` hides the right rail but RSPress keeps a width-reserving
+   placeholder — collapse it so the quickstart reclaims that space. The left
+   sidebar placeholder stays. */
 .rp-doc-layout__container:has(.dq) .rp-doc-layout__outline-placeholder {
   display: none;
 }
