@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 
 const RAW = "https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples";
@@ -615,6 +615,59 @@ function McpTerminal() {
   );
 }
 
+// The "agent live" mockup (docs/brand/screenshots/screen1.html, copied to
+// /hero-demo.html by build.sh). In ?embed mode it renders only the app window
+// (a fixed 1280×720); we scale that down to the section width and lazily start
+// it (and only autoplay) once it scrolls into view.
+const DEMO_W = 1280;
+const DEMO_H = 720;
+function HeroDemo() {
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    const fit = () => {
+      const scale = Math.min(1, frame.clientWidth / DEMO_W);
+      frame.style.height = `${DEMO_H * scale}px`;
+      const f = iframeRef.current;
+      if (f) f.style.transform = `scale(${scale})`;
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(frame);
+    // load the iframe only when the demo nears the viewport
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        setSrc(reduce ? "./hero-demo.html?embed=1" : "./hero-demo.html?embed=1&autoplay=1");
+        io.disconnect();
+      }
+    }, { rootMargin: "200px" });
+    io.observe(frame);
+    return () => { ro.disconnect(); io.disconnect(); };
+  }, []);
+
+  return (
+    <section className="demo" aria-label="KymoStudio in action">
+      <div className="demo-frame" ref={frameRef}>
+        <iframe
+          ref={iframeRef}
+          className="demo-iframe"
+          src={src ?? undefined}
+          title="KymoStudio — prompt a diagram, watch it build and animate"
+          loading="lazy"
+          scrolling="no"
+        />
+        {/* fade the bottom edge into the page background — the mockup dissolves in */}
+        <div className="demo-fade" aria-hidden="true" />
+      </div>
+    </section>
+  );
+}
+
 function App() {
   const [selected, setSelected] = useState<Sample | null>(null);
   return (
@@ -670,6 +723,8 @@ function App() {
           ))}
         </div>
       </section>
+
+      <HeroDemo />
 
       <KindsStrip />
 
