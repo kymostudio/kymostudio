@@ -403,7 +403,7 @@ export function App() {
             <div className="search-wrap">
               <span className="s"><SearchGlyph /></span>
               <input ref={searchRef} className="q" type="search" autoFocus autoComplete="off"
-                placeholder={`Search ${(iconCount(items) || 2700).toLocaleString()} icons — “ec2”, “kubernetes”, “database”…`}
+                placeholder="Search for icons — “ec2”, “kubernetes”, “database”…"
                 value={query} onChange={(e) => setQuery(e.target.value)} />
               <span className="kbd">⌘K</span>
             </div>
