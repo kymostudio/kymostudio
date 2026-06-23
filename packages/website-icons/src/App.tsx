@@ -25,11 +25,11 @@ export const iconHref = (key: string) => "/icon/" + iconSlugOf(key);
 // Shared catalogue loader: static manifest ⊕ live DB (brands+variants, removed).
 // Used by the gallery and the per-icon page so both resolve icons identically.
 //
-// Both fetches fire in PARALLEL (no manifest→api waterfall). If `onPartial` is
-// given, the static-manifest list is emitted as soon as the manifest resolves —
-// the grid paints immediately instead of blocking on the live DB overlay (which
-// only reshapes brands/removed). The merged list is then returned to replace it.
-export async function loadCatalog(onPartial?: (icons: Icon[]) => void): Promise<Icon[]> {
+// Both fetches fire in PARALLEL (no manifest→api waterfall), but the merged list
+// is only returned once BOTH resolve — we deliberately do NOT paint the static
+// manifest first. Partial paint flickers the counts (manifest 2.4k → merged 3.3k
+// as brands fold in) and reshuffles brand cards, which reads as broken.
+export async function loadCatalog(): Promise<Icon[]> {
   const manifestP = fetch("/icons-manifest.json").then((r) => r.json());
   const overlayP = fetch(`${API}/api/icons`).then((r) => r.json()).catch(() => null);
 
@@ -37,7 +37,6 @@ export async function loadCatalog(onPartial?: (icons: Icon[]) => void): Promise<
   const all: Icon[] = Object.entries(m.icons as Record<string, string>).map(
     ([key, path]) => ({ key, path, set: key.split(":")[0] }),
   );
-  if (onPartial) onPartial([...all].sort((a, b) => a.key.localeCompare(b.key)));
 
   let merged = all;
   try {
@@ -153,8 +152,7 @@ export function App() {
   };
 
   // ── load the catalogue (static manifest ⊕ live DB) ───────────────────────
-  // paint the static manifest immediately, then swap in the live-DB-merged list
-  useEffect(() => { loadCatalog(setItems).then(setItems); }, []);
+  useEffect(() => { loadCatalog().then(setItems); }, []);
 
   // set list (counts), biggest first
   const sets = useMemo(() => {
