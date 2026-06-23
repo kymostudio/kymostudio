@@ -48,7 +48,7 @@ export function BrandPage() {
       </div>
     </header>
   );
-  if (brand === undefined) return <>{Header}<main className="brandpage"><p className="count">Loading…</p></main></>;
+  if (brand === undefined) return <>{Header}<main className="brandpage"><div className="kloader-wrap"><KLoader /></div></main></>;
   if (!brand) return <>{Header}<main className="brandpage"><div className="login-card"><h2>Brand not found</h2><p>No brand <b>{slug}</b>.</p><a href="/">← All icons</a></div></main></>;
 
   const v = (name: string) => brand.variants.find((x) => x.variant === name);
@@ -218,6 +218,33 @@ export function BrandPage() {
     </>
   );
 }
+
+// kymo brand loader (the animated "K") — mirrors the editor.kymo.studio splash.
+const KLoader = () => (
+  <div className="kloader" role="img" aria-label="Loading">
+    <div className="k1">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
+        <circle cx="33" cy="26.5" r="5.8" fill="#fff" /><circle cx="33" cy="26.5" r="2.44" fill="#e0095f" />
+        <circle cx="33" cy="73.5" r="5.8" fill="#fff" /><circle cx="33" cy="73.5" r="2.44" fill="#e0095f" />
+      </svg>
+    </div>
+    <div className="k2">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
+        <circle cx="65.5" cy="27" r="5.8" fill="#fff" /><circle cx="65.5" cy="27" r="2.44" fill="#e0095f" />
+        <circle cx="34" cy="58.5" r="5.8" fill="#fff" /><circle cx="34" cy="58.5" r="2.44" fill="#e0095f" />
+      </svg>
+    </div>
+    <div className="k3">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" strokeWidth="11.5" strokeLinecap="round" />
+        <circle cx="48" cy="49.5" r="5.8" fill="#fff" /><circle cx="48" cy="49.5" r="2.44" fill="#e0095f" />
+        <circle cx="67" cy="73" r="5.8" fill="#fff" /><circle cx="67" cy="73" r="2.44" fill="#e0095f" />
+      </svg>
+    </div>
+  </div>
+);
 
 const CopyMini = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width="15" height="15">
