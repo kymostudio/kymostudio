@@ -626,12 +626,12 @@ const DEMO_H = 720;
 type DemoTab = { id: string; label: string; href: (reduce: boolean) => string; icon: React.ReactNode };
 const DEMO_TABS: DemoTab[] = [
   {
-    id: "agent", label: "Agent live",
+    id: "agent", label: "AI Diagram",
     href: (r) => `./hero-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.9 5.6L19.5 9l-4.4 3.3L16.4 18 12 14.8 7.6 18l1.3-5.7L4.5 9l5.6-1.4z" /></svg>,
   },
   {
-    id: "diagrams", label: "Diagram kinds",
+    id: "diagrams", label: "Every kind",
     href: (r) => `./diagrams-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>,
   },

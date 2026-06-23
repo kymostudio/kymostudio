@@ -242,28 +242,28 @@ section.demo {
 /* top tab bar that switches the embedded demos — Cherry-Studio capsule:
    a translucent, backdrop-blurred pill with a sliding indicator under the active tab */
 .demo-tabs {
-  position: absolute;                  /* float over the window's titlebar, centered */
-  top: 8px;
+  position: absolute;                  /* float on the window's top edge, centered */
+  top: -24px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   display: inline-flex;
   gap: 4px;
   max-width: calc(100% - 2 * var(--pad));
-  padding: 3px;
+  padding: 4px;
   border-radius: 9999px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  background: rgba(255, 255, 255, 0.80);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.92);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  box-shadow: 0 10px 30px -14px rgba(36, 33, 49, 0.28);
+  box-shadow: 0 12px 28px -10px rgba(36, 33, 49, 0.32), 0 2px 6px -2px rgba(36, 33, 49, 0.12);
 }
 /* the pill that slides + resizes under the active tab (position set inline by JS) */
 .demo-tab-ind {
   pointer-events: none;
   position: absolute;
-  top: 3px;
-  bottom: 3px;
+  top: 4px;
+  bottom: 4px;
   left: 0;
   border-radius: 9999px;
   background: rgba(0, 0, 0, 0.07);
@@ -282,8 +282,8 @@ section.demo {
   border: 0;
   background: transparent;
   color: rgba(36, 33, 49, 0.62);
-  font: 600 14px/1 inherit;
-  padding: 8px 16px;
+  font: 600 15px/1 inherit;
+  padding: 11px 18px;
   border-radius: 9999px;
   cursor: pointer;
   white-space: nowrap;
@@ -292,7 +292,7 @@ section.demo {
 .demo-tab:hover { color: var(--ink); }
 .demo-tab.active { color: var(--ink); }
 .demo-tab-ic { display: inline-flex; color: inherit; }
-.demo-tab-ic svg { width: 16px; height: 16px; display: block; }
+.demo-tab-ic svg { width: 17px; height: 17px; display: block; }
 .demo-tab.active .demo-tab-ic { color: var(--accent); }   /* brand accent on the active tab's icon */
 @media (max-width: 560px) {
   .demo-tab { padding: 8px 13px; font-size: 13px; gap: 6px; }
