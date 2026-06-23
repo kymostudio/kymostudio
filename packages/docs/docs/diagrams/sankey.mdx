@@ -1,0 +1,43 @@
+---
+title: Sankey
+outline: false
+---
+
+import { DiagramQuickstart, DqSection } from "@components";
+
+<DiagramQuickstart set="sankey">
+
+# Sankey Diagram
+
+A sankey diagram visualises flow between nodes — energy, money, users —
+with link width proportional to the quantity. kymo's editor reads the
+[Mermaid](https://mermaid.js.org/syntax/sankey.html) `sankey-beta` syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="sankey-intro">
+
+The body is plain CSV: one `source,target,value` triple per line. Nodes are
+created on first mention, and the layout routes every flow automatically.
+Quote a name CSV-style (`"Field, with comma"`) if it contains a comma.
+
+The `-beta` suffix on the header is required — the syntax is still
+stabilising upstream.
+
+</DqSection>
+
+> **Status.** Sankey previews on this page and in the editor use the Mermaid
+> renderer; importing sankey diagrams into kymo's own pipeline (native
+> SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [XY Chart](./xychart) — for series over an axis rather than flows.
+- [Flowchart](./flowchart) — when the connections matter but not the
+  quantities.
+
+</DiagramQuickstart>

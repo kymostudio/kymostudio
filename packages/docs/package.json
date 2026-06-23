@@ -3,19 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "KymoStudio documentation site (VitePress) — content sourced from the repo docs/ tree at build time, deployed to Cloudflare Pages (kymo-docs).",
+  "description": "KymoStudio documentation site (RSPress, React + MDX) — self-contained content under docs/, deployed to Cloudflare Pages (kymo-docs).",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "./build.sh",
-    "dev": "vitepress dev site"
+    "sync-assets": "./sync-assets.sh",
+    "dev": "npm run sync-assets && rspress dev",
+    "build": "npm run sync-assets && rspress build",
+    "preview": "rspress preview"
   },
   "devDependencies": {
-    "vitepress": "^1.6.0"
-  },
-  "engines": {
-    "node": ">=18"
+    "@rspress/core": "^2.0.14"
   },
   "dependencies": {
-    "kymo-layout": "^0.1.0-alpha.0"
+    "kymo-layout": "^0.1.0-alpha.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "engines": {
+    "node": ">=20.19.0 || >=22.12.0"
   }
 }

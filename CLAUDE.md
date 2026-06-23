@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `packages/python` (PyPI `kymostudio`, CLI `kymo`) — the Python implementation: DSL parser, BPMN importer, layout engine, and renderers.
 - `packages/js` (npm `kymostudio`) — an **independent TypeScript implementation with equivalent functionality** (its own data model, icon library, DSL parser + layout + alignment resolver (`dsl.ts`/`layout.ts`/`alignment.ts`, exposed as `parse`/`parseDiagram`), BPMN importer, and SVG renderer `renderSVG`). **Not a port** of the Python package — the two are separate codebases developed in parallel and kept at feature parity.
-- Shared root assets consumed by both: `icons/`, `samples/`, `docs/`. The websites live under `packages/`: `packages/website` (kymo.studio — React landing + client-side playground at `/app/`), `packages/docs` (docs.kymo.studio — VitePress, content sourced from `docs/`), `packages/editor` (editor.kymo.studio — client-side editor). All three deploy to **Cloudflare Pages** (root `website/` is an empty legacy dir).
+- Shared root assets consumed by both: `icons/`, `samples/`, `docs/`. The websites live under `packages/`: `packages/website` (kymo.studio — React landing + client-side playground at `/app/`), `packages/docs` (docs.kymo.studio — RSPress / React + MDX, self-contained content under `packages/docs/docs/`), `packages/editor` (editor.kymo.studio — client-side editor). All three deploy to **Cloudflare Pages** (root `website/` is an empty legacy dir).
 
 Python requires **>=3.13** and is managed with **uv**.
 

@@ -1,10 +1,11 @@
 node_modules/
-dist/
-site/.vitepress/cache/
-site/guide/
-site/diagrams/
-site/layouts/
-site/public/logo.svg
-site/public/favicon.svg
-site/public/_redirects
-site/public/samples/
+
+# RSPress build artifacts + cache
+doc_build/
+.rspress/
+
+# Assets synced into docs/public/ by sync-assets.sh (generated, not authored)
+docs/public/logo.svg
+docs/public/favicon.svg
+docs/public/_redirects
+docs/public/samples/

@@ -1,0 +1,140 @@
+---
+title: Class Diagram
+outline: false
+---
+
+import { DiagramQuickstart, DqSection } from "@components";
+
+<DiagramQuickstart set="class">
+
+# Class Diagram
+
+A class diagram describes the structure of a system: its classes, their
+attributes and operations, and the relationships between them — the central
+diagram of object-oriented modelling. kymo's editor reads the
+[Mermaid](https://mermaid.js.org/syntax/classDiagram.html) `classDiagram`
+syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="cl-intro">
+
+The example on the right is the classic `Animal` hierarchy: a base class with
+attributes and methods, and three subclasses connected with inheritance
+arrows.
+
+</DqSection>
+
+<DqSection id="cl-members">
+
+## Classes and members
+
+Declare a class with the `class` keyword, then add members one of two ways —
+colon statements (`Animal : +int age`) or a curly-brace block, as the
+`BankAccount` example shows. Both forms mix freely.
+
+A trailing word after a method's parentheses is its **return type**
+(`+deposit(amount) bool`). **Generic** types are written with tildes:
+`List~int~`; a tilde suffix on the class name itself (`class Square~Shape~`)
+declares a generic class.
+
+Members are classified automatically: anything with parentheses renders in
+the method compartment, everything else is an attribute.
+
+</DqSection>
+
+<DqSection id="cl-visibility">
+
+## Visibility
+
+An optional marker before a member name sets its visibility:
+
+| Marker | Meaning |
+|--------|---------|
+| `+` | public |
+| `-` | private |
+| `#` | protected |
+| `~` | package / internal |
+
+Two more go **after** a method's parentheses: `$` marks it static and `*`
+marks it abstract. On an attribute, a trailing `$` means static.
+
+</DqSection>
+
+<DqSection id="cl-relationships">
+
+## Relationships
+
+A relationship is two classes joined by an arrow operator, with an optional
+`: label` describing it:
+
+| Syntax | UML relation |
+|--------|--------------|
+| `A <\|-- B` | inheritance |
+| `A *-- B` | composition |
+| `A o-- B` | aggregation |
+| `A <-- B` | association |
+| `A -- B` | link (solid) |
+| `A <.. B` | dependency |
+| `A <\|.. B` | realization |
+| `A .. B` | link (dashed) |
+
+Arrowheads may sit on either end (`A --|> B` is inheritance read the other
+way), and two-way relations (`A <--> B`) are supported.
+
+</DqSection>
+
+<DqSection id="cl-cardinality">
+
+## Cardinality
+
+Quote a multiplicity on either end of the arrow, right next to the class it
+describes: `Customer "1" --> "*" Ticket`. Common values are `1`, `0..1`,
+`1..*`, `*`, `n`, and `many`.
+
+</DqSection>
+
+<DqSection id="cl-annotations">
+
+## Annotations
+
+A `<<stereotype>>` line as the first entry of a class body marks its kind —
+`<<interface>>`, `<<abstract>>`, `<<Service>>`, `<<enumeration>>` — and
+renders above the class name.
+
+</DqSection>
+
+<DqSection id="cl-notes">
+
+## Notes
+
+`note "text"` attaches a free-floating note to the diagram;
+`note for ClassName "text"` pins it to a class. A `<br/>` inside the quoted
+text breaks lines.
+
+</DqSection>
+
+<DqSection id="cl-direction">
+
+## Direction
+
+`direction` sets the flow of the layout: `TB` (default), `BT`, `LR`, or `RL`.
+
+</DqSection>
+
+> **Status.** Class diagram previews on this page and in the editor use the
+> Mermaid renderer; importing class diagrams into kymo's own pipeline (UML
+> export like sequence diagrams, native SVG/PNG/PDF rendering) is on the
+> roadmap.
+
+## See also
+
+- [Flowchart](./flowchart) and [Sequence Diagram](./sequence) — the Mermaid
+  diagram types kymo imports into its own pipeline.
+- [Best Practices](./best-practices) — layout and readability guidance.
+
+</DiagramQuickstart>

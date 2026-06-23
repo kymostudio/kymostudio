@@ -1,0 +1,290 @@
+/* Styles for the interactive diagram-quickstart components (ported from the
+   VitePress .vue scoped styles; --vp-* tokens swapped to RSPress --rp-*). */
+
+/* ---- DiagramQuickstart (Stripe-style two-column layout) -------------- */
+.dq {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 46%);
+  gap: 40px;
+  padding: 24px 0 96px 48px;
+}
+.dq-main {
+  min-width: 0;
+  max-width: 760px;
+}
+.dq-pane {
+  min-width: 0;
+}
+.dq-sticky {
+  position: sticky;
+  top: calc(var(--rp-nav-height) + 20px);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--rp-nav-height) - 40px);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #242131; /* brand navy */
+  box-shadow: 0 8px 24px rgba(36, 33, 49, 0.25);
+}
+.dq-preview-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  color: #ddecee;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid rgba(221, 236, 238, 0.15);
+  cursor: pointer;
+}
+.dq-chevron {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.dq-chevron.open {
+  transform: rotate(90deg);
+}
+.dq-renderer {
+  margin-left: auto;
+  font-weight: 400;
+  font-size: 12px;
+  color: rgba(221, 236, 238, 0.55);
+}
+.dq-preview {
+  flex: 6 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle, rgba(36, 33, 49, 0.06) 1px, transparent 1px) 0 0 /
+      22px 22px,
+    #fafafa;
+}
+.dq-preview-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 14px;
+}
+.dq-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.dq-code {
+  display: flex;
+  flex-direction: column;
+  flex: 4 1 0;
+  min-height: 0;
+}
+.dq-sticky.preview-closed .dq-code {
+  flex: 1 1 auto;
+  max-height: none;
+}
+.dq-code-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(221, 236, 238, 0.12);
+}
+.dq-tab {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(224, 9, 95, 0.18);
+  color: #ff7ab1;
+  font-size: 12.5px;
+  font-family: var(--rp-font-family-mono);
+}
+.dq-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+.dq-actions button {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(221, 236, 238, 0.25);
+  color: #ddecee;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  background: transparent;
+}
+.dq-actions button:hover {
+  background: rgba(221, 236, 238, 0.12);
+}
+.dq-source {
+  flex: 1 1 0;
+  margin: 0;
+  padding: 16px 0;
+  overflow: auto;
+  font-family: var(--rp-font-family-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e8e6f0;
+}
+.dq-source code {
+  white-space: pre;
+}
+.dq-line {
+  display: block;
+  padding: 0 16px;
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease;
+}
+.dq-line.hl {
+  background: rgba(224, 9, 95, 0.18);
+  box-shadow: inset 3px 0 0 var(--rp-c-brand, #e0095f);
+}
+.dq-line.dim {
+  opacity: 0.4;
+}
+
+/* ---- DqSection (step card) ------------------------------------------- */
+.dq-section {
+  position: relative;
+  margin: 0 -20px;
+  padding: 20px 20px 8px;
+  border-left: 4px solid transparent;
+  border-bottom: 1px solid var(--rp-c-divider);
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+.dq-section.active {
+  border-left-color: var(--rp-c-brand);
+  background: var(--rp-c-bg-soft);
+}
+.dq-section h2 {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+.dq-inline {
+  display: none;
+}
+
+/* ---- DagreDemo (live wasm) ------------------------------------------- */
+.dagre-demo {
+  margin: 20px 0 28px;
+  border: 1px solid var(--rp-c-divider);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fafafb;
+}
+.dd-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--rp-c-divider);
+  background: var(--rp-c-bg);
+}
+.dd-pill {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--rp-c-brand, #e0095f);
+  color: var(--rp-c-brand, #e0095f);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.dd-pill:hover {
+  background: rgba(224, 9, 95, 0.08);
+}
+.dd-pill.active {
+  background: var(--rp-c-brand, #e0095f);
+  color: #fff;
+}
+.dd-credit {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--rp-c-text-3);
+  font-family: var(--rp-font-family-mono);
+}
+.dd-canvas {
+  background:
+    radial-gradient(circle, rgba(36, 33, 49, 0.14) 1px, transparent 1px) 0 0 /
+      20px 20px,
+    #f7f8fa;
+  padding: 28px 20px;
+  overflow-x: auto;
+  min-height: 120px;
+}
+.dd-stage {
+  display: block;
+  margin: 0 auto;
+  height: auto;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.dd-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  color: var(--rp-c-text-3);
+  font-family: var(--rp-font-family-mono);
+  font-size: 13px;
+}
+.dd-stage .rf-edge {
+  animation: rf-flow 0.5s linear infinite;
+}
+@keyframes rf-flow {
+  to {
+    stroke-dashoffset: -9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dd-stage .rf-edge {
+    animation: none;
+  }
+}
+
+/* ---- Narrow screens: collapse to single column + inline examples ----- */
+@media (max-width: 1099px) {
+  .dq {
+    display: block;
+    padding: 24px 24px 64px;
+  }
+  .dq-pane {
+    display: none;
+  }
+  .dq-section {
+    cursor: auto;
+  }
+  .dq-inline {
+    display: block;
+    margin: 16px 0;
+  }
+  .dq-inline-code {
+    margin: 0 0 8px;
+    padding: 16px;
+    border-radius: 8px;
+    background: #242131;
+    color: #e8e6f0;
+    overflow-x: auto;
+    font-family: var(--rp-font-family-mono);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .dq-inline-try {
+    margin: 8px 0;
+    font-size: 14px;
+  }
+  .dq-inline img {
+    display: block;
+    max-width: 100%;
+    margin: 8px auto 0;
+  }
+}
