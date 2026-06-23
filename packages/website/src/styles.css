@@ -293,7 +293,6 @@ section.demo {
 .demo-tab.active { color: var(--ink); }
 .demo-tab-ic { display: inline-flex; color: inherit; }
 .demo-tab-ic svg { width: 17px; height: 17px; display: block; }
-.demo-tab.active .demo-tab-ic { color: var(--accent); }   /* brand accent on the active tab's icon */
 @media (max-width: 560px) {
   .demo-tab { padding: 8px 13px; font-size: 13px; gap: 6px; }
   .demo-tab-ic svg { width: 15px; height: 15px; }
