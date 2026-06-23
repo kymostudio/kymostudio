@@ -212,6 +212,9 @@ a.dlg-set:hover { border-color: var(--pink); }
 .brandpage { min-width: 0; padding: 14px 0 80px; }
 .brand-title { margin: 6px 0 12px; font-size: 38px; letter-spacing: -0.02em; }
 .brand-sub { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+.brand-site { display: inline-flex; align-items: center; color: var(--muted); text-decoration: none;
+  font-size: 13px; border-bottom: 1px solid transparent; }
+.brand-site:hover { color: var(--pink); }
 .swatch { width: 16px; height: 16px; border-radius: 5px; border: 1px solid var(--line-strong); display: inline-block; }
 .brand-import { max-width: 520px; margin-bottom: 8px; }
 .brand-section { padding-top: 36px; scroll-margin-top: 80px; }
