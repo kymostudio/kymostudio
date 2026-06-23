@@ -1,0 +1,47 @@
+---
+title: Pie Chart
+outline: false
+---
+
+import { DiagramQuickstart, DqSection } from "@components";
+
+<DiagramQuickstart set="pie">
+
+# Pie Chart
+
+A pie chart shows how a whole divides into parts. kymo's editor reads the
+[Mermaid](https://mermaid.js.org/syntax/pie.html) `pie` syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="pie-intro">
+
+A pie source is just a header and one `"label" : value` line per slice.
+Values are positive numbers (up to two decimals); slices are drawn clockwise
+in source order, largest legend first.
+
+</DqSection>
+
+<DqSection id="pie-showdata">
+
+## Title and showData
+
+`title` after the `pie` keyword captions the chart; the `showData` flag also
+prints each slice's raw value next to its percentage in the legend.
+
+</DqSection>
+
+> **Status.** Pie chart previews on this page and in the editor use the
+> Mermaid renderer; importing pie charts into kymo's own pipeline (native
+> SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [XY Chart](./xychart) — for bar and line series with real axes.
+- [Quadrant Chart](./quadrant) — for plotting items against two dimensions.
+
+</DiagramQuickstart>

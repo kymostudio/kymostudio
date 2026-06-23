@@ -1,0 +1,71 @@
+---
+title: Gantt
+outline: false
+---
+
+import { DiagramQuickstart, DqSection } from "@components";
+
+<DiagramQuickstart set="gantt">
+
+# Gantt Chart
+
+A Gantt chart lays project tasks out on a calendar: each bar is a task with a
+start and a duration, grouped into sections. kymo's editor reads the
+[Mermaid](https://mermaid.js.org/syntax/gantt.html) `gantt` syntax.
+
+This page works like a quickstart: as you scroll, the pane on the right shows
+the source and the preview for the section you're reading. **Copy** grabs the
+source; **▶ Open in editor** loads it into
+[editor.kymo.studio](https://editor.kymo.studio) (pick **mermaid** in the
+diagram-type dropdown when starting from scratch).
+
+<DqSection id="gantt-intro">
+
+The example on the right shows the shape of every Gantt source: `dateFormat`
+declares how dates in the source are written, `section` groups rows, and each
+task is `name : [id,] start, duration`.
+
+</DqSection>
+
+<DqSection id="gantt-tasks">
+
+## Task states
+
+Tags before the dates change how a task is drawn: `done` (completed),
+`active` (in progress), `crit` (critical path, drawn red), and `milestone`
+(a single point rather than a bar). Tags combine — `crit, done, …` — and a
+task with none is simply planned.
+
+</DqSection>
+
+<DqSection id="gantt-dependencies">
+
+## Dependencies
+
+Give a task an id (the first field after the colon), and later tasks can
+start relative to it: `after d1` starts when `d1` ends — chains build
+schedules without hard-coding any dates. `until <id>` runs a task up to the
+start of another.
+
+</DqSection>
+
+<DqSection id="gantt-excludes">
+
+## Excluding days
+
+`excludes weekends` (or named days like `friday`, or explicit `YYYY-MM-DD`
+dates) stretches tasks over the excluded days — the 7-day task in the
+example visibly skips the weekend band.
+
+</DqSection>
+
+> **Status.** Gantt previews on this page and in the editor use the Mermaid
+> renderer; importing Gantt charts into kymo's own pipeline (native
+> SVG/PNG/PDF rendering) is on the roadmap.
+
+## See also
+
+- [Timeline](./timeline) — for a lighter chronology without durations.
+- [Kanban](./kanban) — for work-in-progress boards instead of schedules.
+
+</DiagramQuickstart>

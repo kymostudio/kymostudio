@@ -1,6 +1,6 @@
 name: Deploy docs to Cloudflare Pages
 
-# Publishes packages/docs (VitePress; content sourced from docs/) to the
+# Publishes packages/docs (RSPress; self-contained MDX under docs/) to the
 # Cloudflare Pages project "kymo-docs". Auth via the CLOUDFLARE_API_TOKEN
 # (Pages:Edit) + CLOUDFLARE_ACCOUNT_ID repo secrets.
 
@@ -9,8 +9,7 @@ on:
     branches: [main]
     paths:
       - "packages/docs/**"
-      - "docs/guide/**"
-      - "docs/diagrams/**"
+      # sync-assets.sh pulls these into docs/public/ at build time.
       - "samples/**"
       - "docs/brand/logo.svg"
       - "docs/brand/favicon.svg"
@@ -31,12 +30,12 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
       - name: Install
         run: npm install --no-audit --no-fund
         working-directory: packages/docs
       - name: Build
-        run: ./build.sh
+        run: npm run build
         working-directory: packages/docs
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v4
@@ -44,4 +43,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: packages/docs
-          command: pages deploy dist --project-name=kymo-docs --branch=main
+          command: pages deploy doc_build --project-name=kymo-docs --branch=main

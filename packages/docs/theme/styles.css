@@ -1,0 +1,124 @@
+/* KymoStudio brand (docs/brand): pink #E0095F / navy #242131 / teal #DDECEE.
+   Override the RSPress brand tokens (default blue) → kymo pink. */
+:where(:root) {
+  --rp-c-brand: #e0095f;
+  --rp-c-brand-light: #ec3d80;
+  --rp-c-brand-lighter: #f7b9d2;
+  --rp-c-brand-dark: #c70854;
+  --rp-c-brand-darker: #a00745;
+  --rp-c-brand-tint: rgba(224, 9, 95, 0.16);
+}
+:where(html.rp-dark) {
+  --rp-c-brand: #ff4d94;
+  --rp-c-brand-light: #ff77ad;
+  --rp-c-brand-lighter: #ffa9c9;
+  --rp-c-brand-dark: #e0095f;
+  --rp-c-brand-darker: #c70854;
+  --rp-c-brand-tint: rgba(255, 77, 148, 0.18);
+}
+
+/* ---- Global multi-column footer (theme/Footer.tsx) -------------------- */
+.k-footer {
+  border-top: 1px solid var(--rp-c-divider);
+  background: var(--rp-c-bg-soft);
+}
+.k-footer-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 48px 24px 16px;
+}
+.k-footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+.k-footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 320px;
+}
+.k-footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--rp-c-text-1);
+  text-decoration: none;
+}
+.k-footer-tagline {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--rp-c-text-2);
+}
+.k-footer-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--rp-c-divider);
+  border-radius: 8px;
+  color: var(--rp-c-text-2);
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+.k-footer-social:hover {
+  color: var(--rp-c-brand);
+  border-color: var(--rp-c-brand);
+}
+.k-footer-col h4 {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rp-c-text-1);
+}
+.k-footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.k-footer-col a {
+  font-size: 14px;
+  color: var(--rp-c-text-2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.k-footer-col a:hover {
+  color: var(--rp-c-brand);
+}
+.k-footer-bottom {
+  margin-top: 36px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rp-c-divider);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--rp-c-text-3);
+}
+.k-footer-bottom a {
+  color: var(--rp-c-text-3);
+  text-decoration: none;
+}
+.k-footer-bottom a:hover {
+  color: var(--rp-c-brand);
+}
+
+@media (max-width: 768px) {
+  .k-footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  .k-footer-brand {
+    grid-column: 1 / -1;
+  }
+}
