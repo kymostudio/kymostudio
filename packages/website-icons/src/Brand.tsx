@@ -12,7 +12,10 @@ const download = (key: string, path: string) =>
   save(`${API}/api/icons/download?key=${encodeURIComponent(key)}`, key.replace(/[:/]/g, "-") + (path.toLowerCase().endsWith(".svg") ? ".svg" : ".png"));
 
 type Variant = { variant: string; key: string; path: string; ver: number };
-type Brand = { set: string; slug: string; name: string; color: string; variants: Variant[] };
+type Brand = { set: string; slug: string; name: string; color: string; website?: string; variants: Variant[] };
+
+// strip scheme/trailing slash for a compact display label (deepai.org)
+const hostLabel = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/+$/, "");
 
 export function BrandPage() {
   const parts = location.pathname.replace(/\/+$/, "").split("/"); // /brand/<slug>
@@ -102,6 +105,11 @@ export function BrandPage() {
           <h1 className="brand-title">{brand.name}</h1>
           <div className="brand-sub">
             <span className="dlg-set">{brand.set}</span>
+            {brand.website && (
+              <a className="brand-site" href={brand.website} target="_blank" rel="noopener noreferrer">
+                {hostLabel(brand.website)}<ExtMini />
+              </a>
+            )}
           </div>
           {(colorV || iconV) && (() => { const d = colorV || iconV!; return (
             <div className="snippet brand-import">
@@ -208,5 +216,11 @@ export function BrandPage() {
 const CopyMini = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width="15" height="15">
     <rect width="14" height="14" x="8" y="8" rx="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+  </svg>
+);
+
+const ExtMini = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width="13" height="13" style={{ marginLeft: 4, verticalAlign: "-1px" }}>
+    <path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
   </svg>
 );
