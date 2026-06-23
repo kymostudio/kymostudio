@@ -615,48 +615,99 @@ function McpTerminal() {
   );
 }
 
-// The "agent live" mockup (docs/brand/screenshots/screen1.html, copied to
-// /hero-demo.html by build.sh). In ?embed mode it renders only the app window
-// (a fixed 1280×720); we scale that down to the section width and lazily start
-// it (and only autoplay) once it scrolls into view.
+// Embedded product mockups (docs/brand/screenshots/screen1.html → /hero-demo.html,
+// screen3.html → /diagrams-demo.html, both copied by build.sh). In ?embed mode each
+// renders only the app window (fixed 1280×720); we scale it to the section width and
+// lazily load once it scrolls into view. A top tab bar (Cherry-Studio style) switches
+// between the agent-live storyboard and the diagram kinds.
 const DEMO_W = 1280;
 const DEMO_H = 720;
+// one tab per demo screen; each plays itself (screen3 cycles Kanban → C4 → Class)
+type DemoTab = { id: string; label: string; href: (reduce: boolean) => string; icon: React.ReactNode };
+const DEMO_TABS: DemoTab[] = [
+  {
+    id: "agent", label: "Agent live",
+    href: (r) => `./hero-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
+    icon: <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.9 5.6L19.5 9l-4.4 3.3L16.4 18 12 14.8 7.6 18l1.3-5.7L4.5 9l5.6-1.4z" /></svg>,
+  },
+  {
+    id: "diagrams", label: "Diagram kinds",
+    href: (r) => `./diagrams-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
+    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>,
+  },
+];
 function HeroDemo() {
   const frameRef = useRef<HTMLDivElement | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const [src, setSrc] = useState<string | null>(null);
+  const tabsRef = useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = useState(0);
+  const [armed, setArmed] = useState(false);
+  const [scale, setScale] = useState(1);
+  const [ind, setInd] = useState({ left: 0, width: 0, ready: false });
+  const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
     const frame = frameRef.current;
     if (!frame) return;
     const fit = () => {
-      const scale = Math.min(1, frame.clientWidth / DEMO_W);
-      frame.style.height = `${DEMO_H * scale}px`;
-      const f = iframeRef.current;
-      if (f) f.style.transform = `scale(${scale})`;
+      const s = Math.min(1, frame.clientWidth / DEMO_W);
+      setScale(s);
+      frame.style.height = `${DEMO_H * s}px`;
     };
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(frame);
     // load the iframe only when the demo nears the viewport
     const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        setSrc(reduce ? "./hero-demo.html?embed=1" : "./hero-demo.html?embed=1&autoplay=1");
-        io.disconnect();
-      }
+      if (entries.some((e) => e.isIntersecting)) { setArmed(true); io.disconnect(); }
     }, { rootMargin: "200px" });
     io.observe(frame);
     return () => { ro.disconnect(); io.disconnect(); };
   }, []);
 
+  // slide the pill indicator under the active tab (Cherry-Studio style)
+  useEffect(() => {
+    const wrap = tabsRef.current;
+    if (!wrap) return;
+    const measure = () => {
+      const b = wrap.querySelectorAll<HTMLButtonElement>(".demo-tab")[active];
+      if (b) setInd({ left: b.offsetLeft, width: b.offsetWidth, ready: true });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(wrap);
+    return () => ro.disconnect();
+  }, [active]);
+
+  const src = armed ? DEMO_TABS[active].href(reduce) : undefined;
+
   return (
     <section className="demo" aria-label="KymoStudio in action">
+      <div className="demo-tabs" role="tablist" aria-label="Demo" ref={tabsRef}>
+        <span
+          className="demo-tab-ind"
+          aria-hidden="true"
+          style={{ transform: `translateX(${ind.left}px)`, width: ind.width, opacity: ind.ready ? 1 : 0 }}
+        />
+        {DEMO_TABS.map((t, i) => (
+          <button
+            key={t.id}
+            type="button"
+            role="tab"
+            aria-selected={i === active}
+            className={"demo-tab" + (i === active ? " active" : "")}
+            onClick={() => setActive(i)}
+          >
+            <span className="demo-tab-ic">{t.icon}</span>
+            {t.label}
+          </button>
+        ))}
+      </div>
       <div className="demo-frame" ref={frameRef}>
         <iframe
-          ref={iframeRef}
+          key={active}                              /* fresh load per tab */
           className="demo-iframe"
-          src={src ?? undefined}
+          style={{ transform: `scale(${scale})` }}  /* state-driven so it survives remounts */
+          src={src}
           title="KymoStudio — prompt a diagram, watch it build and animate"
           loading="lazy"
           scrolling="no"
