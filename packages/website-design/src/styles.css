@@ -1,0 +1,263 @@
+/* ════════════════════════════════════════════════════════════════
+   design.kymo.studio — the kymo brand & design system, dogfooded.
+   Tokens mirror packages/website/src/styles.css (kymo.studio landing) and
+   docs/brand/README.md — the canonical sources. Keep them in lockstep.
+   Brand: pink #E0095F · navy #242131 · teal #DDECEE
+   Fonts: SF Pro Rounded (display) · Inter (body) · JetBrains Mono (code)
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  --paper:         #fcfcfd;
+  --bg:            #ffffff;
+  --bg-soft:       #f7f7fa;
+  --bg-raise:      #efeef4;
+  --border:        #e8e6ef;
+  --border-strong: #d2cfde;
+  --ink:           #242131;
+  --dim:           #6e6a7c;
+  --accent:        #e0095f;
+  --accent-deep:   #c70854;
+  --accent-soft:   rgba(224, 9, 95, 0.07);
+  --teal:          #ddecee;
+  --radius:        16px;
+  --max:           1080px;
+  --pad:           24px;
+  --display: "SF Pro Rounded", ui-rounded, "Inter", -apple-system, system-ui, sans-serif;
+  --font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; color-scheme: light; }
+html, body {
+  margin: 0; padding: 0;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+/* graph paper: the design site sits on the same dotted grid as the editor canvas */
+body {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(224, 9, 95, 0.05), transparent 36%),
+    radial-gradient(circle, #e6e3ee 1px, transparent 1px) 0 0 / 30px 30px,
+    var(--paper);
+}
+::selection { background: rgba(224, 9, 95, 0.16); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { font-family: var(--mono); }
+h1, h2, h3, .brand { font-family: var(--display); letter-spacing: -0.02em; }
+
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
+
+/* ── Nav ─────────────────────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(252, 252, 253, 0.82);
+  backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: var(--max); margin: 0 auto; padding: 16px var(--pad);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.brand {
+  font-weight: 800; font-size: 22px;
+  display: flex; align-items: center; gap: 11px; color: var(--ink);
+}
+.brand img { width: 34px; height: 34px; display: block; }
+.brand .sub { color: var(--dim); font-weight: 600; font-size: 15px; }
+.nav-links { display: flex; align-items: center; gap: 22px; font-size: 14.5px; font-weight: 600; }
+.nav-anchors { display: flex; align-items: center; gap: 22px; }
+.nav-links a { color: var(--dim); }
+.nav-links a:hover { color: var(--ink); text-decoration: none; }
+.nav-ext { white-space: nowrap; }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  padding: 11px 20px; border-radius: 999px;
+  font-size: 14.5px; font-weight: 600;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease,
+    box-shadow .2s ease, color .15s ease;
+}
+.btn:hover { text-decoration: none; transform: translateY(-1px); }
+.btn:active { transform: translateY(0) scale(.98); }
+.btn-primary {
+  background: var(--accent); color: #fff; font-weight: 700;
+  box-shadow: 0 2px 6px rgba(224, 9, 95, .25);
+}
+.btn-primary:hover { background: var(--accent-deep); box-shadow: 0 8px 22px rgba(224, 9, 95, .32); }
+.btn-alt { background: var(--bg); color: var(--ink); border: 1.5px solid var(--border-strong); }
+.btn-alt:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Hero ────────────────────────────────────────────────────── */
+.hero { padding: 76px 0 48px; text-align: center; }
+.eyebrow {
+  display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--accent);
+  background: var(--accent-soft); padding: 6px 14px; border-radius: 999px; margin-bottom: 22px;
+}
+.hero h1 { font-size: 54px; line-height: 1.05; margin: 0 0 18px; font-weight: 800; }
+.hero .tagline { font-size: 21px; color: var(--ink); font-weight: 600; margin: 0 0 6px; }
+.hero .slogan { font-size: 17px; color: var(--dim); margin: 0 auto 30px; max-width: 540px; }
+.hero-wordmark { margin: 0 auto 34px; max-width: 460px; }
+.hero-wordmark img { width: 100%; height: auto; display: block; }
+.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Sections ────────────────────────────────────────────────── */
+section { padding: 54px 0; border-top: 1px solid var(--border); }
+.sec-head { margin-bottom: 30px; }
+.sec-head h2 { font-size: 30px; margin: 0 0 8px; font-weight: 800; }
+.sec-head p { color: var(--dim); margin: 0; max-width: 640px; font-size: 16px; }
+.sec-num {
+  font-family: var(--mono); font-size: 13px; color: var(--accent);
+  font-weight: 600; letter-spacing: .04em;
+}
+
+/* ── Cards / grid ────────────────────────────────────────────── */
+.card {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 26px;
+}
+.grid { display: grid; gap: 18px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* ── The mark ────────────────────────────────────────────────── */
+.mark-row { display: grid; grid-template-columns: 240px 1fr; gap: 32px; align-items: center; }
+.mark-tile {
+  background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 36px; display: grid; place-items: center;
+}
+.mark-tile img { width: 150px; height: 150px; display: block; }
+.mark-notes li { margin-bottom: 10px; color: var(--dim); }
+.mark-notes b { color: var(--ink); }
+.mark-variants { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 22px; }
+.mark-chip {
+  display: grid; place-items: center; width: 72px; height: 72px; border-radius: 14px;
+  border: 1px solid var(--border);
+}
+.mark-chip img { width: 46px; height: 46px; }
+.mark-chip.dark { background: var(--ink); border-color: var(--ink); }
+
+/* ── Colour palette ──────────────────────────────────────────── */
+/* .swatch is a <button> (click-to-copy) — reset native button chrome. */
+.swatch {
+  border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  width: 100%; padding: 0; background: var(--bg); color: inherit; font: inherit;
+  text-align: left; cursor: pointer; display: block;
+  transition: border-color .15s ease, box-shadow .2s ease, transform .15s ease;
+}
+.swatch:hover { border-color: var(--border-strong); box-shadow: 0 6px 18px rgba(36,33,49,.08); transform: translateY(-2px); }
+.swatch:active { transform: translateY(0); }
+.swatch .chip { height: 116px; display: flex; align-items: flex-end; padding: 12px; }
+.swatch .meta { padding: 14px 16px; }
+.swatch .meta .name { font-weight: 700; font-size: 15px; }
+.swatch .meta .hex { font-family: var(--mono); font-size: 13px; color: var(--dim); text-transform: uppercase; }
+.swatch .meta .role { font-size: 13px; color: var(--dim); margin-top: 4px; }
+.chip-label { font-family: var(--mono); font-size: 12px; font-weight: 600; opacity: .7; }
+
+/* ── Tables ──────────────────────────────────────────────────── */
+table.spec { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+table.spec th, table.spec td {
+  text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top;
+}
+table.spec th { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--dim); font-weight: 700; }
+table.spec td code { background: var(--bg-soft); padding: 2px 7px; border-radius: 6px; font-size: 13px; }
+table.spec .verdict-ok { color: #157347; font-weight: 600; }
+table.spec .verdict-no { color: var(--accent-deep); font-weight: 600; }
+.dot { display: inline-block; width: 13px; height: 13px; border-radius: 4px; vertical-align: -1px; margin-right: 7px; border: 1px solid rgba(0,0,0,.08); }
+
+/* ── Typography specimens ────────────────────────────────────── */
+.type-card { padding: 26px; }
+.type-card .role { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); font-weight: 700; }
+.type-card .face { font-size: 14px; color: var(--dim); margin: 4px 0 16px; }
+.type-card .specimen-display { font-family: var(--display); font-size: 38px; font-weight: 800; line-height: 1.1; }
+.type-card .specimen-body { font-family: var(--font); font-size: 17px; line-height: 1.6; }
+.type-card .specimen-mono { font-family: var(--mono); font-size: 15px; }
+.glyphs { font-family: var(--mono); color: var(--dim); font-size: 13px; margin-top: 12px; letter-spacing: .02em; }
+
+/* ── Token list ──────────────────────────────────────────────── */
+/* .token-row is a <button> (click-to-copy) — reset native button chrome. */
+.token-row {
+  display: flex; align-items: center; gap: 14px; padding: 11px 4px;
+  width: 100%; border: none; border-bottom: 1px solid var(--border);
+  background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+  border-radius: 6px; transition: background .12s ease;
+}
+.token-row:hover { background: var(--bg-soft); }
+.token-row:last-child { border-bottom: none; }
+.token-name { font-family: var(--mono); font-size: 13.5px; color: var(--accent-deep); min-width: 150px; }
+.token-val { font-family: var(--mono); font-size: 13px; color: var(--dim); flex: 1; }
+.token-demo { width: 56px; height: 30px; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; }
+
+/* ── Voice / messaging ───────────────────────────────────────── */
+.voice-card { padding: 22px 24px; }
+.voice-card .label { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+.voice-card .line { font-size: 18px; font-weight: 600; }
+.voice-card .where { font-size: 13.5px; color: var(--dim); margin-top: 6px; }
+.voice-card-label { font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+
+/* ── Don'ts ──────────────────────────────────────────────────── */
+.dont { border-left: 3px solid var(--accent); padding: 6px 0 6px 16px; margin-bottom: 16px; }
+.dont b { color: var(--ink); }
+.dont span { color: var(--dim); }
+
+/* ── Footer ──────────────────────────────────────────────────── */
+footer { border-top: 1px solid var(--border); padding: 40px 0 60px; color: var(--dim); font-size: 14px; }
+footer .foot-row { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+footer a { color: var(--dim); font-weight: 600; }
+footer a:hover { color: var(--ink); text-decoration: none; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+/* Tablet — step the dense grids down to two columns (palette, type), stack the
+   two-up cards, and unstack the fixed mark row. */
+@media (max-width: 860px) {
+  .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .mark-row { grid-template-columns: 1fr; gap: 24px; }
+}
+
+/* Phone — tighten the rhythm, simplify the nav (the in-page anchors would
+   otherwise overflow and force a horizontal scroll), and let dense rows reflow. */
+@media (max-width: 600px) {
+  :root { --pad: 18px; }
+  .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .nav-inner { padding: 13px var(--pad); }
+  .brand { font-size: 19px; }
+  .brand img { width: 30px; height: 30px; }
+  .brand .sub { display: none; }
+  .nav-anchors { display: none; }            /* keep brand + the one external link */
+
+  .hero { padding: 44px 0 34px; }
+  .hero-wordmark { max-width: 320px; }
+  .hero .tagline { font-size: 18px; }
+  .hero .slogan { font-size: 15.5px; }
+  .hero-cta { flex-direction: column; align-items: stretch; }
+  .hero-cta .btn { justify-content: center; }
+
+  section { padding: 38px 0; }
+  .sec-head { margin-bottom: 22px; }
+  .sec-head h2 { font-size: 24px; }
+  .sec-head p { font-size: 15px; }
+  .card { padding: 20px; }
+
+  .mark-tile { padding: 26px; }
+  .mark-tile img { width: 116px; height: 116px; }
+
+  .swatch .chip { height: 92px; }
+
+  /* contrast table can be wide (code chips) — let it scroll inside its card */
+  .card > table.spec { display: block; overflow-x: auto; white-space: nowrap; }
+
+  .type-card .specimen-display { font-size: 32px; }
+
+  /* token rows: drop the rigid name column so the value never overflows */
+  .token-name { min-width: 0; }
+  .token-val { font-size: 12px; }
+
+  .voice-card .line { font-size: 16.5px; }
+  footer .foot-row { flex-direction: column; gap: 22px; }
+}

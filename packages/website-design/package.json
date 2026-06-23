@@ -1,0 +1,26 @@
+{
+  "name": "@kymostudio/website-design",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "kymo brand & design system (design.kymo.studio) — a React app documenting the KymoStudio mark, colour palette, typography, design tokens and brand voice. Dogfoods the kymo design tokens. Built by build.sh (esbuild) into dist/, deployed to Cloudflare Pages (kymo-design).",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "./build.sh",
+    "dev": "cd dist && python3 -m http.server 4500",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.28.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
