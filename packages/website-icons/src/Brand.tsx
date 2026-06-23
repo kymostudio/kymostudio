@@ -12,7 +12,7 @@ const download = (key: string, path: string) =>
   save(`${API}/api/icons/download?key=${encodeURIComponent(key)}`, key.replace(/[:/]/g, "-") + (path.toLowerCase().endsWith(".svg") ? ".svg" : ".png"));
 
 type Variant = { variant: string; key: string; path: string; ver: number };
-type Brand = { set: string; slug: string; name: string; color: string; website?: string; variants: Variant[] };
+type Brand = { set: string; slug: string; name: string; color: string; subset?: string; website?: string; variants: Variant[] };
 
 // strip scheme/trailing slash for a compact display label (deepai.org)
 const hostLabel = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/+$/, "");
@@ -109,6 +109,12 @@ export function BrandPage() {
               <a className="brand-site" href={brand.website} target="_blank" rel="noopener noreferrer">
                 {hostLabel(brand.website)}<ExtMini />
               </a>
+            )}
+            {brand.subset && (
+              <>
+                <span className="row-break" />
+                <a className="dlg-sub" href={`/set/${brand.set}/${brand.subset}`} title={`Browse ${brand.set} · ${brand.subset}`}>{brand.subset}</a>
+              </>
             )}
           </div>
           {(colorV || iconV) && (() => { const d = colorV || iconV!; return (
