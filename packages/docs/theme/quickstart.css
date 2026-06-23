@@ -17,6 +17,13 @@
 .rp-doc-layout__container:has(.dq) .rp-doc-layout__outline-placeholder {
   display: none;
 }
+/* RSPress gives the doc column `overflow: auto`, which makes it a scroll
+   container and breaks `position: sticky` on the preview pane. Restore overflow
+   so .dq-sticky pins to the viewport full-height — the right pane always shows
+   the section you're reading, like the old VitePress quickstart. */
+.rp-doc-layout__doc:has(.dq) {
+  overflow: visible;
+}
 
 /* ---- DiagramQuickstart (Stripe-style two-column layout) -------------- */
 .dq {
