@@ -105,16 +105,13 @@ export function BrandPage() {
           <h1 className="brand-title">{brand.name}</h1>
           <div className="brand-sub">
             <span className="dlg-set">{brand.set}</span>
+            {brand.subset && (
+              <a className="dlg-sub" href={`/set/${brand.set}/${brand.subset}`} title={`Browse ${brand.set} · ${brand.subset}`}>{brand.subset}</a>
+            )}
             {brand.website && (
               <a className="brand-site" href={brand.website} target="_blank" rel="noopener noreferrer">
                 {hostLabel(brand.website)}<ExtMini />
               </a>
-            )}
-            {brand.subset && (
-              <>
-                <span className="row-break" />
-                <a className="dlg-sub" href={`/set/${brand.set}/${brand.subset}`} title={`Browse ${brand.set} · ${brand.subset}`}>{brand.subset}</a>
-              </>
             )}
           </div>
           {(colorV || iconV) && (() => { const d = colorV || iconV!; return (
