@@ -36,8 +36,9 @@ echo "→ brand assets  (docs/brand → dist/)"
 cp ../../docs/brand/logo.svg ../../docs/brand/favicon.svg ../../docs/brand/favicon-32.png \
    ../../docs/brand/favicon-48.png ../../docs/brand/favicon.ico ../../docs/brand/apple-touch-icon.png dist/
 
-echo "→ hero demo  (docs/brand/screenshots/screen1.html → dist/hero-demo.html)"
-cp ../../docs/brand/screenshots/screen1.html dist/hero-demo.html
+echo "→ demos  (docs/brand/screenshots → dist/)"
+cp ../../docs/brand/screenshots/screen1.html dist/hero-demo.html       # agent-live storyboard
+cp ../../docs/brand/screenshots/screen3.html dist/diagrams-demo.html   # Kanban / C4 / Class
 
 # Cache-bust: Pages serves assets with max-age=14400, so version the URLs —
 # browsers refetch immediately after every deploy instead of up to 4h later.

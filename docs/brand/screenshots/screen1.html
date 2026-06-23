@@ -165,16 +165,16 @@
     font-size:13px;font-weight:600;color:var(--ink);
     box-shadow:0 1px 2px rgba(0,0,0,.05);
   }
-  .kmark{width:16px;height:16px;border-radius:4px;display:block}
+  .kmark{width:16px;height:16px;border-radius:18%;display:block}
   .tb-plus{
-    width:25px;height:25px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted2);
+    width:25px;height:25px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted2);
   }
   .tb-plus svg{width:16px;height:16px}
 
   /* right side icons */
   .tb-right{margin-left:auto;display:flex;align-items:center;gap:5px}
   .iconbtn{
-    width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#6f6f74;
+    width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6f6f74;
   }
   .iconbtn svg{width:16px;height:16px}
   .iconbtn.active{background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);color:var(--ink-soft)}
@@ -189,7 +189,7 @@
     width:48px;flex:none;background:#f1f1f3;border-right:.5px solid var(--line);
     display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0;
   }
-  .rail .klogo{width:28px;height:28px;border-radius:7px;margin-bottom:8px;display:block;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .rail .klogo{width:28px;height:28px;border-radius:18%;margin-bottom:8px;display:block;box-shadow:0 1px 2px rgba(0,0,0,.12)}
   .railbtn{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#80808a}
   .railbtn svg{width:19px;height:19px}
   .railbtn.active{color:var(--pink-ink);background:var(--pink)}
@@ -301,10 +301,18 @@
     <div class="traffic"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
     <div class="home-pill">
       <svg class="kmark" viewBox="0 0 100 100" aria-hidden="true">
-        <rect width="100" height="100" rx="24" fill="#e0095f"/>
-        <line x1="34" y1="28" x2="34" y2="72" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
-        <line x1="65" y1="28" x2="35" y2="58" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
-        <line x1="48" y1="50" x2="66" y2="72" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+        <rect width="100" height="100" rx="18" fill="#e0095f"/>
+        <g transform="translate(50 50) scale(0.98) translate(-50 -50)">
+          <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <circle cx="33" cy="26.5" r="5.8" fill="#fff"/><circle cx="33" cy="26.5" r="2.44" fill="#e0095f"/>
+          <circle cx="65.5" cy="27" r="5.8" fill="#fff"/><circle cx="65.5" cy="27" r="2.44" fill="#e0095f"/>
+          <circle cx="33" cy="73.5" r="5.8" fill="#fff"/><circle cx="33" cy="73.5" r="2.44" fill="#e0095f"/>
+          <circle cx="34" cy="58.5" r="5.8" fill="#fff"/><circle cx="34" cy="58.5" r="2.44" fill="#e0095f"/>
+          <circle cx="48" cy="49.5" r="5.8" fill="#fff"/><circle cx="48" cy="49.5" r="2.44" fill="#e0095f"/>
+          <circle cx="67" cy="73" r="5.8" fill="#fff"/><circle cx="67" cy="73" r="2.44" fill="#e0095f"/>
+        </g>
       </svg>
       Review flow
     </div>
@@ -323,10 +331,18 @@
     <!-- ===== activity rail ===== -->
     <div class="rail">
       <svg class="klogo" viewBox="0 0 100 100" aria-hidden="true">
-        <rect width="100" height="100" rx="24" fill="#e0095f"/>
-        <line x1="34" y1="28" x2="34" y2="72" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
-        <line x1="65" y1="28" x2="35" y2="58" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
-        <line x1="48" y1="50" x2="66" y2="72" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+        <rect width="100" height="100" rx="18" fill="#e0095f"/>
+        <g transform="translate(50 50) scale(0.98) translate(-50 -50)">
+          <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <circle cx="33" cy="26.5" r="5.8" fill="#fff"/><circle cx="33" cy="26.5" r="2.44" fill="#e0095f"/>
+          <circle cx="65.5" cy="27" r="5.8" fill="#fff"/><circle cx="65.5" cy="27" r="2.44" fill="#e0095f"/>
+          <circle cx="33" cy="73.5" r="5.8" fill="#fff"/><circle cx="33" cy="73.5" r="2.44" fill="#e0095f"/>
+          <circle cx="34" cy="58.5" r="5.8" fill="#fff"/><circle cx="34" cy="58.5" r="2.44" fill="#e0095f"/>
+          <circle cx="48" cy="49.5" r="5.8" fill="#fff"/><circle cx="48" cy="49.5" r="2.44" fill="#e0095f"/>
+          <circle cx="67" cy="73" r="5.8" fill="#fff"/><circle cx="67" cy="73" r="2.44" fill="#e0095f"/>
+        </g>
       </svg>
       <div class="railbtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
