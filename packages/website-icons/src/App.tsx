@@ -1,7 +1,8 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 // ── config ────────────────────────────────────────────────────────────────
-const PAGE = 200; // incremental render batch (infinite scroll)
+const FIRST = 80; // initial paint batch — small so the grid appears fast (≈1 viewport)
+const PAGE = 120; // incremental render batch (infinite scroll)
 // Icon art is hosted on Cloudflare R2 (bucket `kymo-icons`, public via
 // cdn.kymo.studio) — NOT bundled into this deploy. The manifest keeps RELATIVE
 // paths (`icons/<set>/…`, shared with the Python/JS impls); we resolve them
@@ -23,14 +24,25 @@ export const iconHref = (key: string) => "/icon/" + iconSlugOf(key);
 
 // Shared catalogue loader: static manifest ⊕ live DB (brands+variants, removed).
 // Used by the gallery and the per-icon page so both resolve icons identically.
-export async function loadCatalog(): Promise<Icon[]> {
-  const m = await fetch("/icons-manifest.json").then((r) => r.json());
+//
+// Both fetches fire in PARALLEL (no manifest→api waterfall). If `onPartial` is
+// given, the static-manifest list is emitted as soon as the manifest resolves —
+// the grid paints immediately instead of blocking on the live DB overlay (which
+// only reshapes brands/removed). The merged list is then returned to replace it.
+export async function loadCatalog(onPartial?: (icons: Icon[]) => void): Promise<Icon[]> {
+  const manifestP = fetch("/icons-manifest.json").then((r) => r.json());
+  const overlayP = fetch(`${API}/api/icons`).then((r) => r.json()).catch(() => null);
+
+  const m = await manifestP;
   const all: Icon[] = Object.entries(m.icons as Record<string, string>).map(
     ([key, path]) => ({ key, path, set: key.split(":")[0] }),
   );
+  if (onPartial) onPartial([...all].sort((a, b) => a.key.localeCompare(b.key)));
+
   let merged = all;
   try {
-    const ov: any = await fetch(`${API}/api/icons`).then((r) => r.json());
+    const ov: any = await overlayP;
+    if (!ov) throw new Error("overlay unavailable");
     const removed = new Set<string>(ov.removed || []);
     const map = new Map<string, Icon>();
     for (const it of all) if (!removed.has(it.key)) map.set(it.key, it);
@@ -118,7 +130,7 @@ export function App() {
   const [sub, setSub] = useState(() => viewFromUrl().sub); // selected subset within a set
   const [query, setQuery] = useState(() => new URLSearchParams(location.search).get("q") || "");
   const [sortBy, setSortBy] = useState<"name" | "set">("name");
-  const [shown, setShown] = useState(PAGE);
+  const [shown, setShown] = useState(FIRST);
   const [dialog, setDialog] = useState<Icon | null>(null);
   const [dlgVar, setDlgVar] = useState<Variant | null>(null); // selected variant in the modal
   const [tip, setTip] = useState<{ key: string; x: number; y: number } | null>(null);
@@ -141,7 +153,8 @@ export function App() {
   };
 
   // ── load the catalogue (static manifest ⊕ live DB) ───────────────────────
-  useEffect(() => { loadCatalog().then(setItems); }, []);
+  // paint the static manifest immediately, then swap in the live-DB-merged list
+  useEffect(() => { loadCatalog(setItems).then(setItems); }, []);
 
   // set list (counts), biggest first
   const sets = useMemo(() => {
@@ -181,7 +194,7 @@ export function App() {
   }, [items, set, sub, query, sortBy]);
 
   // reset the infinite-scroll window whenever the view changes
-  useEffect(() => { setShown(PAGE); }, [set, sub, query, sortBy]);
+  useEffect(() => { setShown(FIRST); }, [set, sub, query, sortBy]);
 
   // keep the view in the URL as a clean path: /set/<set>[/<subset>][?q=…]
   useEffect(() => {
