@@ -1,17 +1,23 @@
 /* Styles for the interactive diagram-quickstart components (ported from the
    VitePress .vue scoped styles; --vp-* tokens swapped to RSPress --rp-*). */
 
-/* Widen the doc column on quickstart pages so the two-column layout fits.
-   RSPress caps doc content at --rp-content-max-width (1000px) — too narrow for
-   the prose + sticky pane, which made the pane overflow/clip. VitePress used a
-   full-bleed `layout: page`; here we lift the cap + trim the container padding
-   only on pages that contain a .dq quickstart. */
+/* Diagram quickstart pages go FULL-SCREEN to focus on the live preview — same
+   intent as the old VitePress `layout: page`. The page frontmatter sets
+   `sidebar: false`; here we drop the doc content max-width cap and trim the
+   container padding so the two-column .dq spans the whole viewport width. */
 :root:has(.dq) {
-  --rp-content-max-width: 1760px;
+  --rp-content-max-width: 100%;
 }
 .rp-doc-layout__doc-container:has(.dq) {
   padding-left: 24px;
   padding-right: 24px;
+}
+/* `sidebar: false` / `outline: false` only hide the rails — RSPress still keeps
+   width-reserving placeholders. Collapse them so the quickstart is truly
+   edge-to-edge full-screen. */
+.rp-doc-layout__container:has(.dq) .rp-doc-layout__sidebar-placeholder,
+.rp-doc-layout__container:has(.dq) .rp-doc-layout__outline-placeholder {
+  display: none;
 }
 
 /* ---- DiagramQuickstart (Stripe-style two-column layout) -------------- */
