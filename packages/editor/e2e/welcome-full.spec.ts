@@ -59,7 +59,9 @@ test("TC-HM-03 open file → draft (kind auto-detected)", async ({ page }) => {
   await expect(page.locator(".cm-content")).toContainText("graph TD");
 });
 
-test("TC-HM-05 template dismisses welcome; a fresh visit restores it", async ({ page }) => {
+test("TC-HM-05 template dismisses welcome; a fresh visit restores it", async ({ page, signIn }) => {
+  // The Welcome home is signed-in only (guests open the editor straight away).
+  await signIn();
   await page.goto("/");
 
   // Picking a Templates quick item leaves the Welcome for the editor.
@@ -73,7 +75,9 @@ test("TC-HM-05 template dismisses welcome; a fresh visit restores it", async ({ 
   await expect(page.getByTestId("welcome")).toBeVisible();
 });
 
-test("TC-HM-06 welcome hides export/share chrome", async ({ page }) => {
+test("TC-HM-06 welcome hides export/share chrome", async ({ page, signIn }) => {
+  // The Welcome home is signed-in only (guests open the editor straight away).
+  await signIn();
   await page.goto("/");
   await expect(page.getByTestId("welcome")).toBeVisible();
   // Export / Share are wrapped in `{!showWelcome && …}` — absent on the Welcome.

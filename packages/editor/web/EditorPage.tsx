@@ -24,7 +24,7 @@ import { ErToolbar } from "./ertoolbar";
 import type { ErTool } from "./preview";
 import { planGestures, runSimulation, MAX_GESTURES, type SimCtx } from "./er-simulate";
 import { KLoader } from "./kloader";
-import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, PanelRight, SquareCode, Eye, Download, ChevronDown, FilePlus2, X, Sparkles } from "lucide-react";
+import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, PanelRight, SquareCode, Eye, Download, ChevronDown, FilePlus2, FolderOpen, X, Sparkles } from "lucide-react";
 
 // Read a binary file as a `data:` URL (FileReader → base64) — how raster images
 // are stored so their bytes survive the text-based document model.
@@ -146,6 +146,7 @@ export default function EditorPage() {
   splitRef.current = split;
   const mainRef = useRef<HTMLElement>(null);
   const tabsBarRef = useRef<HTMLDivElement>(null);
+  const guestFileRef = useRef<HTMLInputElement>(null); // guest header "Open" file picker
   const draggingSplit = useRef(false);
   // VSCode-style activity bar: which side panel is open (null = collapsed).
   // Explorer open by default on desktop, collapsed on phones.
@@ -597,7 +598,9 @@ export default function EditorPage() {
   // VS Code-style Welcome: a fresh "/" (untouched sample) shows the Welcome panel
   // instead of the editor. Any in-place action (pick template / open file) arms
   // `welcomeDismissed`; navigating to a real route re-arms it (effect below).
-  const showWelcome = isDraft && source === SAMPLE && !welcomeDismissed;
+  // Guests (not signed in) skip the landing entirely — a fresh "/" drops them
+  // straight into the editor on the sample, the fastest path to "see it work".
+  const showWelcome = !!claims && isDraft && source === SAMPLE && !welcomeDismissed;
   // Signed-in, nothing open: no active tab and an empty draft buffer (e.g. after
   // closing the last tab). Keep the Command Center, but show a "no file open"
   // placeholder instead of empty editor panes. Guests always have their draft.
@@ -1076,12 +1079,21 @@ export default function EditorPage() {
               )}
             </div>
           )}
-          {/* guests have no Explorer/activity-bar rail — surface New here in the header */}
+          {/* guests have no Explorer/activity-bar rail — surface New + Open here in
+              the header (the entry points the removed Welcome landing used to host) */}
           {!claims && !showWelcome && (
-            <button className="mob-hide" onClick={() => setGalleryOpen(true)}
-              title="Start a new diagram (a local draft — saved only when you Save)">
-              <FilePlus2 size={16} strokeWidth={2} />New
-            </button>
+            <>
+              <button className="mob-hide" onClick={() => setGalleryOpen(true)}
+                title="Start a new diagram (a local draft — saved only when you Save)">
+                <FilePlus2 size={16} strokeWidth={2} />New
+              </button>
+              <button className="mob-hide" data-testid="hdr-open" onClick={() => guestFileRef.current?.click()}
+                title="Open a local diagram file (.kymo, .bpmn, .dbml, .mmd…)">
+                <FolderOpen size={16} strokeWidth={2} />Open
+              </button>
+              <input ref={guestFileRef} data-testid="wel-open-input" type="file" accept=".kymo,.bpmn,.dbml,.mmd,.mermaid,.txt,.md" hidden
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) openLocalFile(f); e.target.value = ""; }} />
+            </>
           )}
           {/* draft Save stays a visible CTA when there's unsaved work to rescue */}
           {isDraft && !booting && !showWelcome && !noFileOpen && (
