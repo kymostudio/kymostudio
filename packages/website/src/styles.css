@@ -292,6 +292,12 @@ section.demo {
   display: inline-flex;
   gap: 4px;
   max-width: calc(100% - 2 * var(--pad));
+  /* when the tabs are wider than the viewport (narrow phones, longer i18n
+     labels) scroll the pill horizontally instead of overflowing the page —
+     overflow clips only the in-bounds children, never the pill's own shadow */
+  overflow-x: auto;
+  scrollbar-width: none;               /* Firefox */
+  -ms-overflow-style: none;            /* old Edge */
   padding: 4px;
   border-radius: 9999px;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -300,6 +306,7 @@ section.demo {
   backdrop-filter: blur(12px);
   box-shadow: 0 12px 28px -10px rgba(36, 33, 49, 0.32), 0 2px 6px -2px rgba(36, 33, 49, 0.12);
 }
+.demo-tabs::-webkit-scrollbar { display: none; }   /* Chrome / Safari */
 /* the pill that slides + resizes under the active tab (position set inline by JS) */
 .demo-tab-ind {
   pointer-events: none;
@@ -336,8 +343,10 @@ section.demo {
 .demo-tab-ic { display: inline-flex; color: inherit; }
 .demo-tab-ic svg { width: 17px; height: 17px; display: block; }
 @media (max-width: 560px) {
-  .demo-tab { padding: 8px 13px; font-size: 13px; gap: 6px; }
-  .demo-tab-ic svg { width: 15px; height: 15px; }
+  /* icon-only tabs on mobile — the labels don't fit a phone-width pill */
+  .demo-tab { padding: 10px 13px; gap: 0; }
+  .demo-tab-label { display: none; }
+  .demo-tab-ic svg { width: 18px; height: 18px; }
   .footer-directory { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
   .footer-mini { flex-direction: column; align-items: flex-start; gap: 10px; }
 }

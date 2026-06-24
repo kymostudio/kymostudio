@@ -897,7 +897,11 @@ function HeroDemo() {
     if (!wrap) return;
     const measure = () => {
       const b = wrap.querySelectorAll<HTMLButtonElement>(".demo-tab")[active];
-      if (b) setInd({ left: b.offsetLeft, width: b.offsetWidth, ready: true });
+      if (b) {
+        setInd({ left: b.offsetLeft, width: b.offsetWidth, ready: true });
+        // keep the active tab visible when the pill scrolls on narrow screens
+        b.scrollIntoView({ inline: "nearest", block: "nearest" });
+      }
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -921,11 +925,13 @@ function HeroDemo() {
             type="button"
             role="tab"
             aria-selected={i === active}
+            aria-label={t.label[lang]}            /* accessible name when the label is icon-only on mobile */
+            title={t.label[lang]}
             className={"demo-tab" + (i === active ? " active" : "")}
             onClick={() => setActive(i)}
           >
             <span className="demo-tab-ic">{t.icon}</span>
-            {t.label[lang]}
+            <span className="demo-tab-label">{t.label[lang]}</span>
           </button>
         ))}
       </div>
