@@ -149,8 +149,6 @@ const T = {
   },
   footer: {
     copyright: { en: "Copyright © 2026 KymoStudio. Licensed under Apache-2.0.", vi: "Bản quyền © 2026 KymoStudio. Cấp phép theo Apache-2.0.", zh: "版权所有 © 2026 KymoStudio。依 Apache-2.0 许可。" },
-    license: { en: "License", vi: "Giấy phép", zh: "许可证" },
-    brandAssets: { en: "Brand assets", vi: "Tài nguyên thương hiệu", zh: "品牌素材" },
     selectLang: { en: "Select language", vi: "Chọn ngôn ngữ", zh: "选择语言" },
   },
   title: { en: "KymoStudio — Brand & Design System", vi: "KymoStudio — Thương hiệu & Hệ thống thiết kế", zh: "KymoStudio — 品牌与设计系统" },
@@ -432,15 +430,7 @@ const FOOTER_DIRECTORY: FSection[][] = [
       [{ en: "Documentation", vi: "Tài liệu", zh: "文档" }, "https://docs.kymo.studio"],
       [kept("Editor"), "https://editor.kymo.studio"],
       [kept("Icons"), "https://icons.kymo.studio"],
-      [{ en: "Design system", vi: "Hệ thống thiết kế", zh: "设计系统" }, "/"],
-    ] },
-    { title: { en: "Design system", vi: "Hệ thống thiết kế", zh: "设计系统" }, links: [
-      [{ en: "The mark", vi: "Biểu tượng", zh: "标志" }, "#mark"],
-      [{ en: "Colour", vi: "Màu sắc", zh: "颜色" }, "#colour"],
-      [{ en: "Typography", vi: "Kiểu chữ", zh: "字体" }, "#type"],
-      [{ en: "Design tokens", vi: "Token thiết kế", zh: "设计 token" }, "#tokens"],
-      [{ en: "Voice", vi: "Giọng điệu", zh: "语调" }, "#voice"],
-      [{ en: "Don'ts", vi: "Tránh", zh: "禁忌" }, "#donts"],
+      [{ en: "Design", vi: "Thiết kế", zh: "设计" }, "https://design.kymo.studio"],
     ] },
   ],
   [
@@ -460,26 +450,28 @@ const FOOTER_DIRECTORY: FSection[][] = [
     ] },
   ],
   [
-    { title: { en: "Outputs", vi: "Đầu ra", zh: "输出" }, links: [
+    { title: { en: "Diagram formats", vi: "Định dạng sơ đồ", zh: "图表格式" }, links: [
+      [kept("Mermaid"), "https://docs.kymo.studio"],
+      [kept("D2"), "https://docs.kymo.studio"],
+      [kept("PlantUML"), "https://docs.kymo.studio"],
+      [kept("Graphviz"), "https://docs.kymo.studio"],
+      [kept("BPMN"), "https://docs.kymo.studio/diagrams/bpmn"],
+      [kept("WaveDrom"), "https://docs.kymo.studio"],
+    ] },
+    { title: { en: "Diagram outputs", vi: "Đầu ra sơ đồ", zh: "图表输出" }, links: [
       [kept("Animated SVG"), "https://docs.kymo.studio"],
       [kept("WebP"), "https://docs.kymo.studio"],
       [kept("PNG"), "https://docs.kymo.studio"],
       [kept("Figma"), "https://docs.kymo.studio"],
       [kept("Excalidraw"), "https://docs.kymo.studio"],
     ] },
-    { title: { en: "Resources", vi: "Tài nguyên", zh: "资源" }, links: [
-      [{ en: "Documentation", vi: "Tài liệu", zh: "文档" }, "https://docs.kymo.studio"],
-      [{ en: "Samples", vi: "Mẫu", zh: "示例" }, "https://github.com/kymostudio/kymostudio/tree/main/samples"],
-      [kept("DSL spec"), "https://github.com/kymostudio/kymostudio/blob/main/docs/DSL.md"],
-      [kept("Changelog"), "https://github.com/kymostudio/kymostudio/blob/main/CHANGELOG.md"],
-    ] },
   ],
   [
-    { title: { en: "Install", vi: "Cài đặt", zh: "安装" }, links: [
-      [kept("PyPI · kymostudio"), "https://pypi.org/project/kymostudio/"],
-      [kept("npm · kymostudio"), "https://www.npmjs.com/package/kymostudio"],
-      [kept("crates.io · core"), "https://crates.io/crates/kymostudio-core"],
-      [kept("VS Code Marketplace"), "https://marketplace.visualstudio.com/search?term=kymostudio&target=VSCode"],
+    { title: { en: "Packages", vi: "Gói", zh: "软件包" }, links: [
+      [kept("PyPI"), "https://pypi.org/project/kymostudio/"],
+      [kept("npm"), "https://www.npmjs.com/package/kymostudio"],
+      [kept("crates.io"), "https://crates.io/crates/kymostudio-core"],
+      [kept("VS Code"), "https://marketplace.visualstudio.com/search?term=kymostudio&target=VSCode"],
     ] },
     { title: { en: "Developers", vi: "Nhà phát triển", zh: "开发者" }, links: [
       [kept("GitHub"), "https://github.com/kymostudio/kymostudio"],
@@ -516,9 +508,6 @@ function Footer() {
           <div className="footer-mini">
             <div className="footer-copyright">{T.footer.copyright[lang]}</div>
             <div className="footer-legal-links">
-              <a href="https://github.com/kymostudio/kymostudio/blob/main/LICENSE">{T.footer.license[lang]}</a>
-              <a href="https://github.com/kymostudio/kymostudio/tree/main/docs/brand">{T.footer.brandAssets[lang]}</a>
-              <a href="https://github.com/kymostudio/kymostudio">GitHub</a>
               <label className="footer-locale">
                 <span className="visuallyhidden">{T.footer.selectLang[lang]}</span>
                 <select id="locale" name="locale" value={lang} onChange={(e) => setLang(e.target.value as Lang)} aria-label={T.footer.selectLang[lang]}>

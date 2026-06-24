@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useLang, T, Footer } from "./i18n";
 
 // ── config ────────────────────────────────────────────────────────────────
 const FIRST = 80; // initial paint batch — small so the grid appears fast (≈1 viewport)
@@ -124,6 +125,7 @@ function viewFromUrl(): { set: string; sub: string } {
 }
 
 export function App() {
+  const { lang } = useLang();
   const [items, setItems] = useState<Icon[]>([]);
   const [set, setSet] = useState(() => viewFromUrl().set);
   const [sub, setSub] = useState(() => viewFromUrl().sub); // selected subset within a set
@@ -321,21 +323,21 @@ export function App() {
         <div className="top">
           <span className="brand">
             <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons{" "}
-            {items.length > 0 && <small>· {iconCount(items).toLocaleString()} icons</small>}
+            {items.length > 0 && <small>· {iconCount(items).toLocaleString()} {T.gallery.iconsSuffix[lang]}</small>}
           </span>
-          <button className="nav-toggle icon-btn" aria-label="Menu" aria-expanded={menuOpen}
+          <button className="nav-toggle icon-btn" aria-label={T.nav.menu[lang]} aria-expanded={menuOpen}
             onClick={() => setMenuOpen((o) => !o)}>
             {menuOpen ? <CloseGlyph /> : <MenuGlyph />}
           </button>
           <div className={`nav-menu${menuOpen ? " open" : ""}`}>
             <nav className="nav-links" onClick={() => setMenuOpen(false)}>
-              <a href="https://docs.kymo.studio">Docs</a>
-              <a href="https://editor.kymo.studio">Editor</a>
+              <a href="https://docs.kymo.studio">{T.nav.docs[lang]}</a>
+              <a href="https://editor.kymo.studio">{T.nav.editor[lang]}</a>
               <a href="https://kymo.studio">kymo.studio</a>
             </nav>
             <div className="nav-actions">
-              <a className="icon-btn" href="https://github.com/kymostudio/kymostudio" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub"><GitHubGlyph /></a>
-              <button className="icon-btn" title="Toggle theme" aria-label="Toggle theme"
+              <a className="icon-btn" href="https://github.com/kymostudio/kymostudio" target="_blank" rel="noopener" title={T.nav.github[lang]} aria-label={T.nav.github[lang]}><GitHubGlyph /></a>
+              <button className="icon-btn" title={T.nav.toggleTheme[lang]} aria-label={T.nav.toggleTheme[lang]}
                 onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}>
                 {theme === "dark" ? <SunGlyph /> : <MoonGlyph />}
               </button>
@@ -346,12 +348,12 @@ export function App() {
 
       <div className="body">
         <aside>
-          <div className="side-head"><FiltersGlyph /><span>Filters</span></div>
+          <div className="side-head"><FiltersGlyph /><span>{T.gallery.filters[lang]}</span></div>
           {(set !== "all" || sub) && (
             <div className="side-block applied">
               <div className="applied-head">
-                <p className="side-label">Applied filters</p>
-                <button className="clear-all" onClick={() => { setSet("all"); setSub(""); }}>Clear all <CloseGlyph /></button>
+                <p className="side-label">{T.gallery.appliedFilters[lang]}</p>
+                <button className="clear-all" onClick={() => { setSet("all"); setSub(""); }}>{T.gallery.clearAll[lang]} <CloseGlyph /></button>
               </div>
               <div className="chips">
                 {set !== "all" && (
@@ -364,7 +366,7 @@ export function App() {
             </div>
           )}
           <div className="side-block sizes">
-            <p className="side-label"><SizeGlyph />Preview size</p>
+            <p className="side-label"><SizeGlyph />{T.gallery.previewSize[lang]}</p>
             <div className="size-row">
               <input type="range" min={24} max={80} step={4} value={size}
                 onChange={(e) => setSize(Number(e.target.value))} />
@@ -372,10 +374,10 @@ export function App() {
             </div>
           </div>
           <div className="side-block">
-            <p className="side-label"><GridGlyph />Sets</p>
+            <p className="side-label"><GridGlyph />{T.gallery.sets[lang]}</p>
             <div className="sets">
               <button className={"set-row" + (set === "all" ? " active" : "")} onClick={() => { setSet("all"); setSub(""); }}>
-                <span className="label">All</span>
+                <span className="label">{T.gallery.all[lang]}</span>
                 <span className="n">{iconCount(items).toLocaleString()}</span>
               </button>
               {sets.map(([s, n]) => (
@@ -401,14 +403,14 @@ export function App() {
             <div className="search-wrap">
               <span className="s"><SearchGlyph /></span>
               <input ref={searchRef} className="q" type="search" autoFocus autoComplete="off"
-                placeholder="Search for icons — “ec2”, “kubernetes”, “database”…"
+                placeholder={T.gallery.searchPlaceholder[lang]}
                 value={query} onChange={(e) => setQuery(e.target.value)} />
               <span className="kbd">⌘K</span>
             </div>
-            <select className="sort" aria-label="Sort" value={sortBy}
+            <select className="sort" aria-label={T.gallery.sort[lang]} value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "name" | "set")}>
-              <option value="name">Name A→Z</option>
-              <option value="set">By set</option>
+              <option value="name">{T.gallery.sortName[lang]}</option>
+              <option value="set">{T.gallery.sortSet[lang]}</option>
             </select>
           </div>
           {set !== "all" && (
@@ -417,7 +419,7 @@ export function App() {
               {sub && <><span className="view-sep">›</span><span className="view-sub">{sub}</span></>}
             </h1>
           )}
-          <p className="count">{iconCount(filtered).toLocaleString()} icon{iconCount(filtered) === 1 ? "" : "s"}</p>
+          <p className="count">{iconCount(filtered).toLocaleString()} {iconCount(filtered) === 1 ? T.gallery.countOne[lang] : T.gallery.countMany[lang]}</p>
           <div className="grid">
             {visible.map((it) => (
               <a key={it.key} className="cell" href={iconHref(it.key)}
@@ -436,12 +438,10 @@ export function App() {
             ))}
           </div>
           <div ref={sentinelRef} className="sentinel" />
-          <footer className="legal">
-            Logos are trademarks of their respective owners, shown for identification only.
-            kymo is not affiliated with, sponsored by, or endorsed by them.
-          </footer>
         </main>
       </div>
+
+      <Footer />
 
       {tip && (
         <div className="tip" style={{ left: tip.x, top: tip.y }}>{tip.key}</div>
@@ -456,7 +456,7 @@ export function App() {
           <div className="dialog" role="dialog" aria-modal="true">
             {dialog.variants && (
               <a className="brand-tag brand-tag-corner" href={`/brand/${dialog.key.split(":")[1]}`} target="_blank" rel="noopener" title={`Open ${dialog.name || ""} brand page`}>
-                Brand<span className="ext-ic"><ExternalGlyph /></span>
+                {T.actions.brand[lang]}<span className="ext-ic"><ExternalGlyph /></span>
               </a>
             )}
             <div className="dlg-preview"><Art it={av} /></div>
@@ -475,25 +475,25 @@ export function App() {
                 </div>
               )}
               <div className="dlg-actions">
-                <button className="btn primary" onClick={() => { copy(av.key); flash(`Copied <code>${av.key}</code>`); }}>
-                  <CopyGlyph /> Copy key
+                <button className="btn primary" onClick={() => { copy(av.key); flash(T.toast.copiedKey[lang]); }}>
+                  <CopyGlyph /> {T.actions.copyKey[lang]}
                 </button>
-                <button className="btn" onClick={() => { copy(av.svg ? av.key : iconUrl(av.path!, av.ver)); flash("Copied URL"); }}>
-                  <LinkGlyph /> Copy URL
+                <button className="btn" onClick={() => { copy(av.svg ? av.key : iconUrl(av.path!, av.ver)); flash(T.toast.copiedUrl[lang]); }}>
+                  <LinkGlyph /> {T.actions.copyUrl[lang]}
                 </button>
                 <button className="btn" onClick={() => downloadIcon(av)}>
-                  <DownloadGlyph /> Download
+                  <DownloadGlyph /> {T.actions.download[lang]}
                 </button>
                 <button className="btn" onClick={closeIcon}>
-                  <CloseGlyph /> Close
+                  <CloseGlyph /> {T.actions.close[lang]}
                 </button>
               </div>
               <div className="dlg-usage">
-                <p className="ul">Use in a .kymo diagram</p>
+                <p className="ul">{T.actions.useInDiagram[lang]}</p>
                 <div className="snippet">
                   <code>{snippetFor(av.key)}</code>
-                  <button title="Copy snippet" aria-label="Copy snippet"
-                    onClick={() => { copy(snippetFor(av.key)); flash("Copied snippet"); }}>
+                  <button title={T.actions.copySnippet[lang]} aria-label={T.actions.copySnippet[lang]}
+                    onClick={() => { copy(snippetFor(av.key)); flash(T.toast.copiedSnippet[lang]); }}>
                     <CopyGlyph />
                   </button>
                 </div>

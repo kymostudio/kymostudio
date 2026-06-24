@@ -1,102 +1,122 @@
-// Multi-column site footer, rendered globally on every docs page.
-// Content mirrors the kymo.studio landing footer (registries + GitHub + license)
-// so the three sites stay consistent. Styling uses the RSPress design tokens
+// Global directory footer, rendered on every docs page (Layout bottom slot).
+// Mirrors the kymo.studio landing footer so the sites stay consistent, with a
+// trilingual EN/VI/ZH selector. The docs CONTENT stays English — only the
+// footer chrome translates. The selector is self-contained (no app-wide
+// provider in RSPress); it persists the shared `kymo-lang` key so the choice
+// carries across the other kymo sites. Styling uses RSPress design tokens
 // (see styles.css) so it follows light/dark automatically.
+import { useEffect, useState } from "react";
 
-const GH = "https://github.com/kymostudio/kymostudio";
+type Lang = "en" | "vi" | "zh";
+const LANGS: Lang[] = ["en", "vi", "zh"];
+type L<T = string> = { en: T; vi: T; zh: T };
+const kept = (s: string): L => ({ en: s, vi: s, zh: s });
 
-const COLUMNS: { title: string; links: { text: string; href: string }[] }[] = [
-  {
-    title: "Product",
-    links: [
-      { text: "Editor", href: "https://editor.kymo.studio" },
-      { text: "Playground", href: "https://kymo.studio/app/" },
-      { text: "Icons", href: "https://icons.kymo.studio" },
-      { text: "Website", href: "https://kymo.studio" },
-    ],
-  },
-  {
-    title: "Documentation",
-    links: [
-      { text: "Getting Started", href: "/guide/getting-started" },
-      { text: "The .kymo Language", href: "/reference/dsl" },
-      { text: "BPMN", href: "/reference/bpmn" },
-      { text: "MCP Server", href: "/reference/mcp" },
-    ],
-  },
-  {
-    title: "Packages",
-    links: [
-      { text: "npm", href: "https://www.npmjs.com/package/kymostudio" },
-      { text: "PyPI", href: "https://pypi.org/project/kymostudio/" },
-      { text: "crates.io", href: "https://crates.io/crates/kymostudio" },
-      {
-        text: "VS Code",
-        href: "https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode",
-      },
-    ],
-  },
+type FLink = [label: L, href: string];
+type FSection = { title: L; links: FLink[] };
+const FOOTER_DIRECTORY: FSection[][] = [
+  [
+    { title: kept("kymo.studio"), links: [
+      [{ en: "Home", vi: "Trang chủ", zh: "首页" }, "https://kymo.studio"],
+      [{ en: "Documentation", vi: "Tài liệu", zh: "文档" }, "https://docs.kymo.studio"],
+      [kept("Editor"), "https://editor.kymo.studio"],
+      [kept("Icons"), "https://icons.kymo.studio"],
+      [{ en: "Design", vi: "Thiết kế", zh: "设计" }, "https://design.kymo.studio"],
+    ] },
+  ],
+  [
+    { title: { en: "Diagram types", vi: "Loại sơ đồ", zh: "图表类型" }, links: [
+      [kept("Flowchart"), "https://docs.kymo.studio/diagrams/flowchart"],
+      [kept("Architecture"), "https://docs.kymo.studio/diagrams/architecture"],
+      [kept("Sequence"), "https://docs.kymo.studio/diagrams/sequence"],
+      [kept("Class"), "https://docs.kymo.studio/diagrams/class"],
+      [kept("State"), "https://docs.kymo.studio/diagrams/state"],
+      [kept("Entity-Relationship"), "https://docs.kymo.studio/diagrams/entity-relationship"],
+      [kept("Block"), "https://docs.kymo.studio/diagrams/block"],
+      [kept("Mindmap"), "https://docs.kymo.studio/diagrams/mindmap"],
+      [kept("Kanban"), "https://docs.kymo.studio/diagrams/kanban"],
+      [kept("Quadrant"), "https://docs.kymo.studio/diagrams/quadrant"],
+      [kept("Requirement"), "https://docs.kymo.studio/diagrams/requirement"],
+      [kept("BPMN"), "https://docs.kymo.studio/diagrams/bpmn"],
+    ] },
+  ],
+  [
+    { title: { en: "Diagram formats", vi: "Định dạng sơ đồ", zh: "图表格式" }, links: [
+      [kept("Mermaid"), "https://docs.kymo.studio"],
+      [kept("D2"), "https://docs.kymo.studio"],
+      [kept("PlantUML"), "https://docs.kymo.studio"],
+      [kept("Graphviz"), "https://docs.kymo.studio"],
+      [kept("BPMN"), "https://docs.kymo.studio/diagrams/bpmn"],
+      [kept("WaveDrom"), "https://docs.kymo.studio"],
+    ] },
+    { title: { en: "Diagram outputs", vi: "Đầu ra sơ đồ", zh: "图表输出" }, links: [
+      [kept("Animated SVG"), "https://docs.kymo.studio"],
+      [kept("WebP"), "https://docs.kymo.studio"],
+      [kept("PNG"), "https://docs.kymo.studio"],
+      [kept("Figma"), "https://docs.kymo.studio"],
+      [kept("Excalidraw"), "https://docs.kymo.studio"],
+    ] },
+  ],
+  [
+    { title: { en: "Packages", vi: "Gói", zh: "软件包" }, links: [
+      [kept("PyPI"), "https://pypi.org/project/kymostudio/"],
+      [kept("npm"), "https://www.npmjs.com/package/kymostudio"],
+      [kept("crates.io"), "https://crates.io/crates/kymostudio-core"],
+      [kept("VS Code"), "https://marketplace.visualstudio.com/search?term=kymostudio&target=VSCode"],
+    ] },
+    { title: { en: "Developers", vi: "Nhà phát triển", zh: "开发者" }, links: [
+      [kept("GitHub"), "https://github.com/kymostudio/kymostudio"],
+      [kept("Issues"), "https://github.com/kymostudio/kymostudio/issues"],
+      [{ en: "Discussions", vi: "Thảo luận", zh: "讨论" }, "https://github.com/kymostudio/kymostudio/discussions"],
+      [{ en: "Connect over MCP", vi: "Kết nối qua MCP", zh: "通过 MCP 连接" }, "https://kymo.studio/#mcp"],
+    ] },
+  ],
 ];
 
-function isExternal(href: string) {
-  return href.startsWith("http");
-}
+const COPYRIGHT: L = { en: "Copyright © 2026 KymoStudio. Licensed under Apache-2.0.", vi: "Bản quyền © 2026 KymoStudio. Cấp phép theo Apache-2.0.", zh: "版权所有 © 2026 KymoStudio。依 Apache-2.0 许可。" };
+const SELECT_LANG: L = { en: "Select language", vi: "Chọn ngôn ngữ", zh: "选择语言" };
 
 export function Footer() {
+  const [lang, setLang] = useState<Lang>("en");
+  useEffect(() => {
+    const saved = localStorage.getItem("kymo-lang");
+    if (saved && (LANGS as string[]).includes(saved)) setLang(saved as Lang);
+  }, []);
+  const onChange = (l: Lang) => {
+    setLang(l);
+    localStorage.setItem("kymo-lang", l);
+  };
   return (
-    <footer className="k-footer">
-      <div className="k-footer-inner">
-        <div className="k-footer-grid">
-          <div className="k-footer-brand">
-            <a className="k-footer-logo" href="/guide/getting-started">
-              <img src="/logo.svg" alt="KymoStudio" width={28} height={28} />
-              <span>KymoStudio</span>
-            </a>
-            <p className="k-footer-tagline">
-              Diagram-as-code — declarative source compiled to animated SVG,
-              Figma, Excalidraw &amp; WebP.
-            </p>
-            <a
-              className="k-footer-social"
-              href={GH}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.39 1.24-3.23-.13-.31-.54-1.53.12-3.19 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.19.77.84 1.24 1.92 1.24 3.23 0 4.62-2.81 5.64-5.49 5.94.43.37.81 1.1.81 2.22 0 1.6-.01 2.89-.01 3.29 0 .32.21.7.82.58A12 12 0 0 0 24 12.5C24 5.87 18.63.5 12 .5Z"
-                />
-              </svg>
-            </a>
-          </div>
-
-          {COLUMNS.map((col) => (
-            <div className="k-footer-col" key={col.title}>
-              <h4>{col.title}</h4>
-              <ul>
-                {col.links.map((l) => (
-                  <li key={l.href}>
-                    {isExternal(l.href) ? (
-                      <a href={l.href} target="_blank" rel="noopener noreferrer">
-                        {l.text}
-                      </a>
-                    ) : (
-                      <a href={l.href}>{l.text}</a>
-                    )}
-                  </li>
-                ))}
-              </ul>
+    <footer id="globalfooter" role="contentinfo">
+      <div className="footer-inner">
+        <div className="footer-directory">
+          {FOOTER_DIRECTORY.map((col, i) => (
+            <div className="footer-col" key={i}>
+              {col.map((sec) => (
+                <div className="footer-sec" key={sec.title.en}>
+                  <h3>{sec.title[lang]}</h3>
+                  <ul>
+                    {sec.links.map(([label, href]) => (
+                      <li key={label.en}><a href={href}>{label[lang]}</a></li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           ))}
         </div>
-
-        <div className="k-footer-bottom">
-          <span>© 2026 KymoStudio · Apache 2.0 Licensed</span>
-          <a href={GH} target="_blank" rel="noopener noreferrer">
-            github.com/kymostudio/kymostudio
-          </a>
+        <div className="footer-legal">
+          <div className="footer-mini">
+            <div className="footer-copyright">{COPYRIGHT[lang]}</div>
+            <label className="footer-locale">
+              <span className="visuallyhidden">{SELECT_LANG[lang]}</span>
+              <select value={lang} onChange={(e) => onChange(e.target.value as Lang)} aria-label={SELECT_LANG[lang]}>
+                <option value="en">English</option>
+                <option value="vi">Tiếng Việt</option>
+                <option value="zh">中文</option>
+              </select>
+            </label>
+          </div>
         </div>
       </div>
     </footer>
