@@ -344,7 +344,6 @@ footer#globalfooter {
   color: var(--muted);
 }
 .footer-inner { max-width: 1480px; margin: 0 auto; padding: 44px 24px 30px; }
-.footer-trademark { margin: 0 0 30px; max-width: 760px; font-size: 12.5px; line-height: 1.6; color: var(--faint); }
 .footer-directory { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 32px; }
 .footer-col { display: flex; flex-direction: column; gap: 28px; }
 .footer-sec h3 {
@@ -356,6 +355,7 @@ footer#globalfooter {
 .footer-sec a { color: var(--muted); font-weight: 500; font-size: 13px; }
 .footer-sec a:hover { color: var(--pink); }
 .footer-legal { margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--line); }
+.footer-trademark { margin: 0 0 16px; max-width: 760px; font-size: 11.5px; line-height: 1.55; color: var(--faint); }
 .footer-mini { display: flex; justify-content: space-between; align-items: center; gap: 14px 28px; flex-wrap: wrap; font-size: 12.5px; }
 .footer-copyright { color: var(--muted); }
 .footer-legal-links { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }

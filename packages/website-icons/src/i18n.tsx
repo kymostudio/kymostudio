@@ -169,7 +169,6 @@ export function Footer() {
   return (
     <footer id="globalfooter" role="contentinfo">
       <div className="footer-inner">
-        <p className="footer-trademark">{T.footer.trademark[lang]}</p>
         <div className="footer-directory">
           {FOOTER_DIRECTORY.map((col, i) => (
             <div className="footer-col" key={i}>
@@ -187,6 +186,7 @@ export function Footer() {
           ))}
         </div>
         <div className="footer-legal">
+          <p className="footer-trademark">{T.footer.trademark[lang]}</p>
           <div className="footer-mini">
             <div className="footer-copyright">{T.footer.copyright[lang]}</div>
             <div className="footer-legal-links">
