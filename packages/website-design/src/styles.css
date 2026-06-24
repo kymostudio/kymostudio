@@ -205,11 +205,53 @@ table.spec .verdict-no { color: var(--accent-deep); font-weight: 600; }
 .dont b { color: var(--ink); }
 .dont span { color: var(--dim); }
 
-/* ── Footer ──────────────────────────────────────────────────── */
-footer { border-top: 1px solid var(--border); padding: 40px 0 60px; color: var(--dim); font-size: 14px; }
-footer .foot-row { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
-footer a { color: var(--dim); font-weight: 600; }
-footer a:hover { color: var(--ink); text-decoration: none; }
+/* ── Global footer (Apple-HIG-style directory) ───────────────── */
+footer#globalfooter {
+  border-top: 1px solid var(--border);
+  background: var(--bg-soft);
+  margin-top: 48px;
+  color: var(--dim);
+}
+.footer-inner { max-width: var(--max); margin: 0 auto; padding: 40px var(--pad) 30px; }
+
+/* breadcrumb */
+.footer-breadcrumb {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding-bottom: 24px; margin-bottom: 30px; border-bottom: 1px solid var(--border);
+}
+.footer-home {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  color: var(--ink); letter-spacing: -0.02em;
+}
+.footer-home img { width: 24px; height: 24px; display: block; }
+.footer-home:hover { text-decoration: none; }
+.footer-crumbs { display: flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 600; }
+.footer-crumbs a { color: var(--dim); }
+.footer-crumbs a:hover { color: var(--ink); text-decoration: none; }
+.footer-crumbs .sep { color: var(--dim); opacity: .55; }
+
+/* directory */
+.footer-directory { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 32px; }
+.footer-col { display: flex; flex-direction: column; gap: 28px; }
+.footer-sec h3 {
+  font-family: var(--font); font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em; color: var(--ink); margin: 0 0 14px;
+}
+.footer-sec ul { list-style: none; margin: 0; padding: 0; }
+.footer-sec li { margin-bottom: 10px; }
+.footer-sec a { color: var(--dim); font-weight: 500; font-size: 13px; }
+.footer-sec a:hover { color: var(--accent); text-decoration: none; }
+
+/* legal */
+.footer-legal { margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 14px; }
+.footer-feedback { font-size: 13px; }
+.footer-feedback a { color: var(--accent); font-weight: 600; }
+.footer-mini { display: flex; justify-content: space-between; align-items: center; gap: 14px 28px; flex-wrap: wrap; font-size: 12.5px; }
+.footer-copyright { color: var(--dim); }
+.footer-legal-links { display: flex; gap: 22px; flex-wrap: wrap; }
+.footer-legal-links a { color: var(--dim); font-weight: 600; }
+.footer-legal-links a:hover { color: var(--ink); text-decoration: none; }
 
 /* ── Responsive ──────────────────────────────────────────────── */
 /* Tablet — step the dense grids down to two columns (palette, type), stack the
@@ -218,6 +260,7 @@ footer a:hover { color: var(--ink); text-decoration: none; }
   .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-2 { grid-template-columns: 1fr; }
   .mark-row { grid-template-columns: 1fr; gap: 24px; }
+  .footer-directory { grid-template-columns: repeat(2, 1fr); gap: 30px 28px; }
 }
 
 /* Phone — tighten the rhythm, simplify the nav (the in-page anchors would
@@ -259,5 +302,6 @@ footer a:hover { color: var(--ink); text-decoration: none; }
   .token-val { font-size: 12px; }
 
   .voice-card .line { font-size: 16.5px; }
-  footer .foot-row { flex-direction: column; gap: 22px; }
+  .footer-directory { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
+  .footer-mini { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
