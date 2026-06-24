@@ -1,40 +1,245 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 
 const RAW = "https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples";
 const GH = "https://github.com/kymostudio/kymostudio";
 
-type Feature = { title: string; desc: string };
+// ── i18n plumbing ────────────────────────────────────────────────
+// Trilingual (English / Tiếng Việt / 中文), switched from the footer locale
+// select — mirrors design.kymo.studio. Brand-fixed lines (tagline, slogan,
+// eyebrow) and proper nouns stay in English in every language via kept().
+type Lang = "en" | "vi" | "zh";
+const LANGS: Lang[] = ["en", "vi", "zh"];
+type L<T = string> = { en: T; vi: T; zh: T };
+const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: "en", setLang: () => {} });
+const useLang = () => useContext(LangContext);
+const kept = (s: string): L => ({ en: s, vi: s, zh: s }); // proper nouns kept across languages
+
+type Feature = { title: L; desc: L };
 const FEATURES: Feature[] = [
-  { title: "Diagrams as code", desc: "Describe your diagram in a clean, line-oriented .kymo syntax — no dragging boxes around." },
-  { title: "Animated by default", desc: "Edges come alive with built-in flowing animation, straight to a self-contained SVG." },
-  { title: "Write once, export anywhere", desc: "One source compiles to SVG, PNG, WebP, Figma and Excalidraw — and imports BPMN 2.0." },
+  {
+    title: { en: "Diagrams as code", vi: "Sơ đồ as code", zh: "图表即代码" },
+    desc: {
+      en: "Describe your diagram in a clean, line-oriented .kymo syntax — no dragging boxes around.",
+      vi: "Mô tả sơ đồ bằng cú pháp .kymo gọn gàng, theo dòng — không cần kéo thả từng ô.",
+      zh: "用简洁、按行书写的 .kymo 语法描述你的图表 — 无需拖拽方块。",
+    },
+  },
+  {
+    title: { en: "Animated by default", vi: "Hoạt hoạ mặc định", zh: "默认带动画" },
+    desc: {
+      en: "Edges come alive with built-in flowing animation, straight to a self-contained SVG.",
+      vi: "Các cạnh sống động với hoạt hoạ chuyển động sẵn có, xuất thẳng ra SVG độc lập.",
+      zh: "连线通过内置的流动动画活起来，直接输出为自包含的 SVG。",
+    },
+  },
+  {
+    title: { en: "Write once, export anywhere", vi: "Viết một lần, xuất mọi nơi", zh: "一次编写，处处导出" },
+    desc: {
+      en: "One source compiles to SVG, PNG, WebP, Figma and Excalidraw — and imports BPMN 2.0.",
+      vi: "Một nguồn biên dịch ra SVG, PNG, WebP, Figma và Excalidraw — và nhập được BPMN 2.0.",
+      zh: "一份源文件编译为 SVG、PNG、WebP、Figma 和 Excalidraw — 并可导入 BPMN 2.0。",
+    },
+  },
 ];
 
-type Sample = { title: string; desc: string; file: string; preview: string; size: string };
+type Sample = { title: string; desc: L; file: string; preview: string; size: string };
 const SAMPLES: Sample[] = [
   {
     title: "NVIDIA AIQ — Autonomous Deep Researcher",
-    desc: "Multi-region architecture: routing chain, sub-agents, RAG pipeline, shared file system, and three loop-back rails.",
+    desc: {
+      en: "Multi-region architecture: routing chain, sub-agents, RAG pipeline, shared file system, and three loop-back rails.",
+      vi: "Kiến trúc đa vùng: chuỗi định tuyến, sub-agent, pipeline RAG, hệ thống file dùng chung và ba nhánh vòng lặp ngược.",
+      zh: "多区域架构：路由链、子智能体、RAG 流水线、共享文件系统，以及三条回环轨道。",
+    },
     file: "aiq.kymo",
     preview: `${RAW}/nvidia-aiq-animated.svg`,
     size: "1367 × 759",
   },
   {
     title: "AWS — Lex chatbot + Bedrock RAG",
-    desc: "Lex chatbot meeting Bedrock RAG inside us-east-1, with numbered step badges and dashed async fan-out to DynamoDB / Kendra.",
+    desc: {
+      en: "Lex chatbot meeting Bedrock RAG inside us-east-1, with numbered step badges and dashed async fan-out to DynamoDB / Kendra.",
+      vi: "Chatbot Lex gặp Bedrock RAG trong us-east-1, có badge đánh số bước và nhánh async nét đứt toả ra DynamoDB / Kendra.",
+      zh: "Lex 聊天机器人在 us-east-1 中对接 Bedrock RAG，带编号步骤徽章，以及虚线异步扇出到 DynamoDB / Kendra。",
+    },
     file: "aws_1.kymo",
     preview: `${RAW}/aws-1-animated.svg`,
     size: "1280 × 680",
   },
   {
     title: "NIM container architecture",
-    desc: "Tutorial 01: code-server IDE → NVIDIA Brev (GPU pod) → NVIDIA Cloud, grid layout with cross-region row alignment.",
+    desc: {
+      en: "Tutorial 01: code-server IDE → NVIDIA Brev (GPU pod) → NVIDIA Cloud, grid layout with cross-region row alignment.",
+      vi: "Tutorial 01: code-server IDE → NVIDIA Brev (GPU pod) → NVIDIA Cloud, bố cục lưới với căn hàng xuyên vùng.",
+      zh: "教程 01：code-server IDE → NVIDIA Brev（GPU pod）→ NVIDIA Cloud，网格布局并跨区域对齐行。",
+    },
     file: "data.kymo",
     preview: `${RAW}/data-animated.svg`,
     size: "1080 × 658",
   },
 ];
+
+// ── UI strings (i18n) ────────────────────────────────────────────
+// Brand-fixed lines (eyebrow, strap, slogan) stay English in every language.
+const T = {
+  title: { en: "KymoStudio — Diagram superpowers", vi: "KymoStudio — Diagram superpowers", zh: "KymoStudio — Diagram superpowers" },
+  nav: {
+    startFree: { en: "Start free", vi: "Bắt đầu miễn phí", zh: "免费开始" },
+  },
+  hero: {
+    eyebrow: kept("The diagram studio for coding agents"),
+    lead: kept("Prompt it. See it appear. Watch it animate."),
+    gettingStarted: { en: "Getting Started", vi: "Bắt đầu", zh: "快速上手" },
+    connectAgent: { en: "Connect Your Agent", vi: "Kết nối Agent", zh: "连接你的 Agent" },
+    openEditor: { en: "Open the live Editor ↗", vi: "Mở Editor trực tiếp ↗", zh: "打开实时编辑器 ↗" },
+  },
+  kinds: {
+    head: {
+      en: <><strong>Every diagram, one studio</strong> — from architecture to BPMN, your agent picks the right kind.</>,
+      vi: <><strong>Mọi sơ đồ, một studio</strong> — từ kiến trúc đến BPMN, agent của bạn chọn đúng loại.</>,
+      zh: <><strong>每种图表，一个 studio</strong> — 从架构到 BPMN，你的 agent 自动挑选合适的类型。</>,
+    } as L<ReactNode>,
+  },
+  demo: {
+    agent: { en: "AI Agents", vi: "AI Agent", zh: "AI 智能体" },
+    visual: { en: "Visual Editor", vi: "Trình sửa trực quan", zh: "可视化编辑器" },
+    sync: { en: "Universal Sync", vi: "Đồng bộ đa định dạng", zh: "通用同步" },
+    collab: { en: "Live Collaboration", vi: "Cộng tác trực tiếp", zh: "实时协作" },
+  },
+  mcp: {
+    h2: { en: "Connect your coding agent, over MCP", vi: "Kết nối coding agent của bạn qua MCP", zh: "通过 MCP 连接你的编程 agent" },
+    lead: {
+      en: <>kymo runs a hosted <strong>MCP server</strong> at <code>mcp.kymo.studio</code>. Claude Code, Cursor, Copilot, Codex — even ChatGPT and Claude in your browser — any MCP client can create and edit your diagrams, rendering live in the editor while the agent types.</>,
+      vi: <>kymo vận hành một <strong>MCP server</strong> tại <code>mcp.kymo.studio</code>. Claude Code, Cursor, Copilot, Codex — kể cả ChatGPT và Claude trên trình duyệt — bất kỳ MCP client nào cũng tạo và sửa sơ đồ của bạn, vẽ trực tiếp trong editor khi agent gõ.</>,
+      zh: <>kymo 在 <code>mcp.kymo.studio</code> 托管了一个 <strong>MCP server</strong>。Claude Code、Cursor、Copilot、Codex — 甚至浏览器里的 ChatGPT 和 Claude — 任何 MCP 客户端都能创建并编辑你的图表，在 agent 输入时于编辑器中实时渲染。</>,
+    } as L<ReactNode>,
+    step1: { en: "Add the server to your agent — one line of config.", vi: "Thêm server vào agent — chỉ một dòng cấu hình.", zh: "把 server 加到你的 agent — 一行配置。" },
+    step2: { en: "Ask for a diagram — the agent writes .kymo source and calls the tools.", vi: "Yêu cầu một sơ đồ — agent viết mã .kymo và gọi các tool.", zh: "请求一张图 — agent 编写 .kymo 源码并调用工具。" },
+    step3: { en: "Watch it draw at editor.kymo.studio — animated SVG, ready to export.", vi: "Xem nó vẽ tại editor.kymo.studio — SVG động, sẵn sàng xuất.", zh: "在 editor.kymo.studio 看它绘制 — 动画 SVG，随时导出。" },
+    copy: { en: "Copy", vi: "Chép", zh: "复制" },
+    copied: { en: "Copied ✓", vi: "Đã chép ✓", zh: "已复制 ✓" },
+  },
+  samples: {
+    h2: { en: "Samples", vi: "Mẫu", zh: "示例" },
+    hint: { en: "Click a card to view source + rendered output side by side.", vi: "Bấm vào thẻ để xem mã nguồn + kết quả render cạnh nhau.", zh: "点击卡片，并排查看源码与渲染结果。" },
+  },
+  modal: {
+    viewGitHub: { en: "View on GitHub ↗", vi: "Xem trên GitHub ↗", zh: "在 GitHub 查看 ↗" },
+    close: { en: "Close", vi: "Đóng", zh: "关闭" },
+    loading: { en: "# Loading…", vi: "# Đang tải…", zh: "# 加载中…" },
+    failed: { en: "(failed to load source — open on GitHub instead)", vi: "(không tải được mã nguồn — mở trên GitHub thay thế)", zh: "（源码加载失败 — 请改在 GitHub 打开）" },
+  },
+  footer: {
+    copyright: { en: "Copyright © 2026 KymoStudio. Licensed under Apache-2.0.", vi: "Bản quyền © 2026 KymoStudio. Cấp phép theo Apache-2.0.", zh: "版权所有 © 2026 KymoStudio。依 Apache-2.0 许可。" },
+    selectLang: { en: "Select language", vi: "Chọn ngôn ngữ", zh: "选择语言" },
+  },
+};
+
+// ── Global footer directory (Apple-HIG-style, mirrors design.kymo.studio) ──
+// Links are absolute so the directory resolves identically from any kymo site.
+type FLink = [label: L, href: string];
+type FSection = { title: L; links: FLink[] };
+const FOOTER_DIRECTORY: FSection[][] = [
+  [
+    { title: kept("kymo.studio"), links: [
+      [{ en: "Home", vi: "Trang chủ", zh: "首页" }, "https://kymo.studio"],
+      [{ en: "Documentation", vi: "Tài liệu", zh: "文档" }, "https://docs.kymo.studio"],
+      [kept("Editor"), "https://editor.kymo.studio"],
+      [kept("Icons"), "https://icons.kymo.studio"],
+      [{ en: "Design", vi: "Thiết kế", zh: "设计" }, "https://design.kymo.studio"],
+    ] },
+  ],
+  [
+    { title: { en: "Diagram types", vi: "Loại sơ đồ", zh: "图表类型" }, links: [
+      [kept("Flowchart"), "https://docs.kymo.studio/diagrams/flowchart"],
+      [kept("Architecture"), "https://docs.kymo.studio/diagrams/architecture"],
+      [kept("Sequence"), "https://docs.kymo.studio/diagrams/sequence"],
+      [kept("Class"), "https://docs.kymo.studio/diagrams/class"],
+      [kept("State"), "https://docs.kymo.studio/diagrams/state"],
+      [kept("Entity-Relationship"), "https://docs.kymo.studio/diagrams/entity-relationship"],
+      [kept("Block"), "https://docs.kymo.studio/diagrams/block"],
+      [kept("Mindmap"), "https://docs.kymo.studio/diagrams/mindmap"],
+      [kept("Kanban"), "https://docs.kymo.studio/diagrams/kanban"],
+      [kept("Quadrant"), "https://docs.kymo.studio/diagrams/quadrant"],
+      [kept("Requirement"), "https://docs.kymo.studio/diagrams/requirement"],
+      [kept("BPMN"), "https://docs.kymo.studio/diagrams/bpmn"],
+    ] },
+  ],
+  [
+    { title: { en: "Diagram formats", vi: "Định dạng sơ đồ", zh: "图表格式" }, links: [
+      [kept("Mermaid"), "https://docs.kymo.studio"],
+      [kept("D2"), "https://docs.kymo.studio"],
+      [kept("PlantUML"), "https://docs.kymo.studio"],
+      [kept("Graphviz"), "https://docs.kymo.studio"],
+      [kept("BPMN"), "https://docs.kymo.studio/diagrams/bpmn"],
+      [kept("WaveDrom"), "https://docs.kymo.studio"],
+    ] },
+    { title: { en: "Diagram outputs", vi: "Đầu ra sơ đồ", zh: "图表输出" }, links: [
+      [kept("Animated SVG"), "https://docs.kymo.studio"],
+      [kept("WebP"), "https://docs.kymo.studio"],
+      [kept("PNG"), "https://docs.kymo.studio"],
+      [kept("Figma"), "https://docs.kymo.studio"],
+      [kept("Excalidraw"), "https://docs.kymo.studio"],
+    ] },
+  ],
+  [
+    { title: { en: "Packages", vi: "Gói", zh: "软件包" }, links: [
+      [kept("PyPI"), "https://pypi.org/project/kymostudio/"],
+      [kept("npm"), "https://www.npmjs.com/package/kymostudio"],
+      [kept("crates.io"), "https://crates.io/crates/kymostudio-core"],
+      [kept("VS Code"), "https://marketplace.visualstudio.com/search?term=kymostudio&target=VSCode"],
+    ] },
+    { title: { en: "Developers", vi: "Nhà phát triển", zh: "开发者" }, links: [
+      [kept("GitHub"), "https://github.com/kymostudio/kymostudio"],
+      [kept("Issues"), "https://github.com/kymostudio/kymostudio/issues"],
+      [{ en: "Discussions", vi: "Thảo luận", zh: "讨论" }, "https://github.com/kymostudio/kymostudio/discussions"],
+      [{ en: "Connect over MCP", vi: "Kết nối qua MCP", zh: "通过 MCP 连接" }, "https://kymo.studio/#mcp"],
+    ] },
+  ],
+];
+
+function Footer() {
+  const { lang, setLang } = useLang();
+  return (
+    <footer id="globalfooter" role="contentinfo">
+      <div className="footer-inner">
+        <div className="footer-directory">
+          {FOOTER_DIRECTORY.map((col, i) => (
+            <div className="footer-col" key={i}>
+              {col.map((sec) => (
+                <div className="footer-sec" key={sec.title.en}>
+                  <h3>{sec.title[lang]}</h3>
+                  <ul>
+                    {sec.links.map(([label, href]) => (
+                      <li key={label.en}><a href={href}>{label[lang]}</a></li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="footer-legal">
+          <div className="footer-mini">
+            <div className="footer-copyright">{T.footer.copyright[lang]}</div>
+            <div className="footer-legal-links">
+              <label className="footer-locale">
+                <span className="visuallyhidden">{T.footer.selectLang[lang]}</span>
+                <select id="locale" name="locale" value={lang} onChange={(e) => setLang(e.target.value as Lang)} aria-label={T.footer.selectLang[lang]}>
+                  <option value="en">English</option>
+                  <option value="vi">Tiếng Việt</option>
+                  <option value="zh">中文</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
 
 // ---- kymo DSL highlighting (same token rules as the old static page) ----
 // Container kinds + container options + `row` + `external`/`above`; the DSL
@@ -58,10 +263,12 @@ function highlightDsl(text: string): string {
 }
 
 function Modal({ sample, onClose }: { sample: Sample; onClose: () => void }) {
-  const [sourceHtml, setSourceHtml] = useState('<span class="tok-comment"># Loading…</span>');
+  const { lang } = useLang();
+  const loadingHtml = `<span class="tok-comment">${escapeHtml(T.modal.loading[lang])}</span>`;
+  const [sourceHtml, setSourceHtml] = useState(loadingHtml);
   useEffect(() => {
     let stop = false;
-    setSourceHtml('<span class="tok-comment"># Loading…</span>');
+    setSourceHtml(loadingHtml);
     (async () => {
       try {
         const res = await fetch(`${RAW}/${sample.file}`, { cache: "no-store" });
@@ -69,11 +276,11 @@ function Modal({ sample, onClose }: { sample: Sample; onClose: () => void }) {
         const text = await res.text();
         if (!stop) setSourceHtml(highlightDsl(text));
       } catch {
-        if (!stop) setSourceHtml(escapeHtml("(failed to load source — open on GitHub instead)"));
+        if (!stop) setSourceHtml(escapeHtml(T.modal.failed[lang]));
       }
     })();
     return () => { stop = true; };
-  }, [sample]);
+  }, [sample, lang]);
   useEffect(() => {
     document.body.classList.add("modal-open");
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -87,8 +294,8 @@ function Modal({ sample, onClose }: { sample: Sample; onClose: () => void }) {
         <header className="modal-header">
           <h3 className="modal-title">{sample.title}</h3>
           <div className="modal-actions">
-            <a className="modal-gh" href={`${GH}/blob/main/samples/${sample.file}`} target="_blank" rel="noopener">View on GitHub ↗</a>
-            <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+            <a className="modal-gh" href={`${GH}/blob/main/samples/${sample.file}`} target="_blank" rel="noopener">{T.modal.viewGitHub[lang]}</a>
+            <button className="modal-close" onClick={onClose} aria-label={T.modal.close[lang]}>✕</button>
           </div>
         </header>
         <div className="modal-body">
@@ -117,7 +324,7 @@ function GitHubStars() {
     return () => { stop = true; };
   }, []);
   return (
-    <a className="nav-gh" href={GH} aria-label="Star kymostudio on GitHub">
+    <a className="nav-gh" href={GH} title="Star kymostudio on GitHub">
       <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true">
         <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
       </svg>
@@ -508,6 +715,7 @@ function KindsRow({ items, links, reverse }: { items: typeof KINDS; links: Recor
 }
 
 function KindsStrip() {
+  const { lang } = useLang();
   const [links, setLinks] = useState<Record<string, string>>({});
   useEffect(() => {
     if (typeof CompressionStream === "undefined") return; // keep fallback hrefs
@@ -527,9 +735,7 @@ function KindsStrip() {
   const C = KINDS.slice(third * 2);
   return (
     <section className="kinds" aria-label="Supported diagram types">
-      <p className="kinds-head">
-        <strong>Every diagram, one studio</strong> — from architecture to BPMN, your agent picks the right kind.
-      </p>
+      <p className="kinds-head">{T.kinds.head[lang]}</p>
       <KindsRow items={[...A, ...B]} links={links} />
       <KindsRow items={[...B, ...C]} links={links} reverse />
       <KindsRow items={[...C, ...A]} links={links} />
@@ -573,6 +779,7 @@ const AGENTS: Agent[] = [
 ];
 
 function McpTerminal() {
+  const { lang } = useLang();
   const [tab, setTab] = useState(0);
   const [copied, setCopied] = useState(false);
   const agent = AGENTS[tab];
@@ -607,7 +814,7 @@ function McpTerminal() {
           <span className="mcp-term-dots" aria-hidden="true"><i /><i /><i /></span>
           <span className="mcp-term-label">{agent.context}</span>
           {agent.deeplink && <a className="mcp-bar-link" href={agent.deeplink.href}>{agent.deeplink.text}</a>}
-          <button className="mcp-copy-btn" onClick={copy} aria-live="polite">{copied ? "Copied ✓" : "Copy"}</button>
+          <button className="mcp-copy-btn" onClick={copy} aria-live="polite">{copied ? T.mcp.copied[lang] : T.mcp.copy[lang]}</button>
         </div>
         <pre><code>{agent.code}</code></pre>
       </div>
@@ -623,30 +830,31 @@ function McpTerminal() {
 const DEMO_W = 1280;
 const DEMO_H = 720;
 // one tab per demo screen; each plays itself (screen3 cycles Kanban → C4 → Class)
-type DemoTab = { id: string; label: string; href: (reduce: boolean) => string; icon: React.ReactNode };
+type DemoTab = { id: string; label: L; href: (reduce: boolean) => string; icon: React.ReactNode };
 const DEMO_TABS: DemoTab[] = [
   {
-    id: "agent", label: "AI Agents",
+    id: "agent", label: T.demo.agent,
     href: (r) => `./hero-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg>,
   },
   {
-    id: "visual", label: "Visual Editor",
+    id: "visual", label: T.demo.visual,
     href: (r) => `./sequence-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12.034 12.681a.498.498 0 0 1 .647-.647l9 3.5a.5.5 0 0 1-.033.943l-3.444 1.068a1 1 0 0 0-.66.66l-1.067 3.443a.5.5 0 0 1-.943.033z" /><path d="M21 11V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6" /></svg>,
   },
   {
-    id: "diagrams", label: "Universal Sync",
+    id: "diagrams", label: T.demo.sync,
     href: (r) => `./diagrams-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="16" y="16" width="6" height="6" rx="1" /><rect x="2" y="16" width="6" height="6" rx="1" /><rect x="9" y="2" width="6" height="6" rx="1" /><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" /><path d="M12 12V8" /></svg>,
   },
   {
-    id: "collab", label: "Live Collaboration",
+    id: "collab", label: T.demo.collab,
     href: (r) => `./collab-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" /></svg>,
   },
 ];
 function HeroDemo() {
+  const { lang } = useLang();
   const frameRef = useRef<HTMLDivElement | null>(null);
   const tabsRef = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(0);
@@ -717,7 +925,7 @@ function HeroDemo() {
             onClick={() => setActive(i)}
           >
             <span className="demo-tab-ic">{t.icon}</span>
-            {t.label}
+            {t.label[lang]}
           </button>
         ))}
       </div>
@@ -738,7 +946,8 @@ function HeroDemo() {
   );
 }
 
-function App() {
+function Page() {
+  const { lang } = useLang();
   const [selected, setSelected] = useState<Sample | null>(null);
   return (
     <>
@@ -747,11 +956,12 @@ function App() {
           <div className="brand"><img src="./logo.svg" alt="" />KymoStudio</div>
           <div className="nav-right">
             <GitHubStars />
-            <a className="btn btn-primary btn-sm" href="https://editor.kymo.studio">Start free</a>
+            <a className="btn btn-primary btn-sm" href="https://editor.kymo.studio">{T.nav.startFree[lang]}</a>
           </div>
         </div>
       </nav>
 
+      <main>
       <header className="hero hero-split">
         {/* the product's signature: an orthogonal edge with flowing-dash animation */}
         <svg className="hero-edge" viewBox="0 0 1240 480" fill="none" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
@@ -766,16 +976,16 @@ function App() {
           </g>
         </svg>
         <div className="hero-text">
-          <p className="eyebrow"><span className="eyebrow-dot" />The diagram studio for coding agents</p>
+          <p className="eyebrow"><span className="eyebrow-dot" />{T.hero.eyebrow[lang]}</p>
           <h1>
             <span className="name">KymoStudio</span><br />
             <span className="strap">Diagram <em>superpowers</em></span>
           </h1>
-          <p className="lead">Prompt it. See it appear. Watch it animate.</p>
+          <p className="lead">{T.hero.lead[lang]}</p>
           <div className="ctas">
-            <a className="btn btn-primary btn-pill" href="https://docs.kymo.studio/guide/getting-started">Getting Started</a>
-            <a className="btn btn-alt btn-pill" href="#mcp">Connect Your Agent</a>
-            <a className="btn btn-alt btn-pill" href="https://editor.kymo.studio">Open the live Editor ↗</a>
+            <a className="btn btn-primary btn-pill" href="https://docs.kymo.studio/guide/getting-started">{T.hero.gettingStarted[lang]}</a>
+            <a className="btn btn-alt btn-pill" href="#mcp">{T.hero.connectAgent[lang]}</a>
+            <a className="btn btn-alt btn-pill" href="https://editor.kymo.studio">{T.hero.openEditor[lang]}</a>
           </div>
         </div>
         <div className="hero-art">
@@ -786,9 +996,9 @@ function App() {
       <section className="features" id="features">
         <div className="feature-grid">
           {FEATURES.map((f) => (
-            <div className="feature" key={f.title}>
-              <h3>{f.title}</h3>
-              <p>{f.desc}</p>
+            <div className="feature" key={f.title.en}>
+              <h2>{f.title[lang]}</h2>
+              <p>{f.desc[lang]}</p>
             </div>
           ))}
         </div>
@@ -801,7 +1011,7 @@ function App() {
       <section className="mcp" id="mcp">
         <div className="mcp-inner">
           <div className="mcp-copy">
-            <h2>Connect your coding agent, over MCP</h2>
+            <h2>{T.mcp.h2[lang]}</h2>
             {/* the brand motif: a flowing-dash edge between two ports */}
             <svg className="mcp-h2-edge" viewBox="0 0 260 16" width="260" height="16" aria-hidden="true">
               <path className="edge-path" d="M 8 8 H 252" />
@@ -814,16 +1024,11 @@ function App() {
                 <circle className="core" cx="252" cy="8" r="2.2" />
               </g>
             </svg>
-            <p>
-              kymo runs a hosted <strong>MCP server</strong> at <code>mcp.kymo.studio</code>. Claude
-              Code, Cursor, Copilot, Codex — even ChatGPT and Claude in your browser — any MCP
-              client can create and edit your diagrams, rendering live in the editor while the
-              agent types.
-            </p>
+            <p>{T.mcp.lead[lang]}</p>
             <ol className="mcp-steps">
-              <li>Add the server to your agent — one line of config.</li>
-              <li>Ask for a diagram — the agent writes .kymo source and calls the tools.</li>
-              <li>Watch it draw at editor.kymo.studio — animated SVG, ready to export.</li>
+              <li>{T.mcp.step1[lang]}</li>
+              <li>{T.mcp.step2[lang]}</li>
+              <li>{T.mcp.step3[lang]}</li>
             </ol>
             <ul className="mcp-tools" aria-label="MCP tools">
               <li><code>new_diagram</code></li>
@@ -845,8 +1050,8 @@ function App() {
 
       <section className="samples" id="samples">
         <div className="section-header">
-          <h2>Samples</h2>
-          <span className="hint">Click a card to view source + rendered output side by side.</span>
+          <h2>{T.samples.h2[lang]}</h2>
+          <span className="hint">{T.samples.hint[lang]}</span>
         </div>
         <div className="grid">
           {SAMPLES.map((s) => (
@@ -854,26 +1059,42 @@ function App() {
               <div className="card-preview"><img src={s.preview} alt={s.title} loading="lazy" /></div>
               <div className="card-body">
                 <h3 className="card-title">{s.title}</h3>
-                <p className="card-desc">{s.desc}</p>
+                <p className="card-desc">{s.desc[lang]}</p>
                 <div className="card-meta"><span>{s.file}</span><span>·</span><span>{s.size}</span></div>
               </div>
             </article>
           ))}
         </div>
       </section>
+      </main>
 
-      <footer>
-        <div className="reg-badges">
-          <a href="https://pypi.org/project/kymostudio/"><img alt="PyPI" src="https://img.shields.io/pypi/v/kymostudio?logo=pypi&logoColor=white&label=PyPI&color=e0095f" /></a>
-          <a href="https://www.npmjs.com/package/kymostudio"><img alt="npm" src="https://img.shields.io/npm/v/kymostudio?logo=npm&label=npm&color=e0095f" /></a>
-          <a href="https://crates.io/crates/kymostudio"><img alt="crates.io" src="https://img.shields.io/crates/v/kymostudio?logo=rust&logoColor=white&label=crates.io&color=e0095f" /></a>
-          <a href="https://marketplace.visualstudio.com/items?itemName=kymostudio.kymostudio-vscode"><img alt="VS Code Extension" src="https://img.shields.io/badge/VS%20Code-Extension-e0095f?logo=visualstudiocode&logoColor=white" /></a>
-        </div>
-        <a href={GH}>github.com/kymostudio/kymostudio</a> · Apache 2.0
-      </footer>
+      <Footer />
 
       {selected && <Modal sample={selected} onClose={() => setSelected(null)} />}
     </>
+  );
+}
+
+function App() {
+  const [lang, setLang] = useState<Lang>("en");
+
+  // restore saved choice on mount (shared key with design.kymo.studio)
+  useEffect(() => {
+    const saved = localStorage.getItem("kymo-lang");
+    if (saved && (LANGS as string[]).includes(saved)) setLang(saved as Lang);
+  }, []);
+
+  // persist + reflect on <html lang> and the document title
+  useEffect(() => {
+    localStorage.setItem("kymo-lang", lang);
+    document.documentElement.lang = lang;
+    document.title = T.title[lang];
+  }, [lang]);
+
+  return (
+    <LangContext.Provider value={{ lang, setLang }}>
+      <Page />
+    </LangContext.Provider>
   );
 }
 
