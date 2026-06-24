@@ -11,6 +11,7 @@ on:
     branches: [main]
     paths:
       - "packages/website/**"
+      - "docs/brand/screenshots/**"   # build.sh embeds these as the landing demo iframes
       - ".github/workflows/deploy-website.yml"
   workflow_dispatch:
 
