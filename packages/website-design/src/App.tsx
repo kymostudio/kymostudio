@@ -330,19 +330,119 @@ function DontsSection() {
   );
 }
 
+// ── Global footer directory (Apple-HIG-style) ────────────────────
+type FLink = [label: string, href: string];
+type FSection = { title: string; links: FLink[] };
+const FOOTER_DIRECTORY: FSection[][] = [
+  [
+    { title: "kymo.studio", links: [
+      ["Home", "https://kymo.studio"],
+      ["Documentation", "https://docs.kymo.studio"],
+      ["Editor", "https://editor.kymo.studio"],
+      ["Icons", "https://icons.kymo.studio"],
+      ["Design system", "/"],
+    ] },
+    { title: "Design system", links: [
+      ["The mark", "#mark"],
+      ["Colour", "#colour"],
+      ["Typography", "#type"],
+      ["Design tokens", "#tokens"],
+      ["Voice", "#voice"],
+      ["Don'ts", "#donts"],
+    ] },
+  ],
+  [
+    { title: "Diagram types", links: [
+      ["Flowchart", "https://docs.kymo.studio/diagrams/flowchart"],
+      ["Architecture", "https://docs.kymo.studio/diagrams/architecture"],
+      ["Sequence", "https://docs.kymo.studio/diagrams/sequence"],
+      ["Class", "https://docs.kymo.studio/diagrams/class"],
+      ["State", "https://docs.kymo.studio/diagrams/state"],
+      ["Entity-Relationship", "https://docs.kymo.studio/diagrams/entity-relationship"],
+      ["Block", "https://docs.kymo.studio/diagrams/block"],
+      ["Mindmap", "https://docs.kymo.studio/diagrams/mindmap"],
+      ["Kanban", "https://docs.kymo.studio/diagrams/kanban"],
+      ["Quadrant", "https://docs.kymo.studio/diagrams/quadrant"],
+      ["Requirement", "https://docs.kymo.studio/diagrams/requirement"],
+      ["BPMN", "https://docs.kymo.studio/diagrams/bpmn"],
+    ] },
+  ],
+  [
+    { title: "Outputs", links: [
+      ["Animated SVG", "https://docs.kymo.studio"],
+      ["WebP", "https://docs.kymo.studio"],
+      ["PNG", "https://docs.kymo.studio"],
+      ["Figma", "https://docs.kymo.studio"],
+      ["Excalidraw", "https://docs.kymo.studio"],
+    ] },
+    { title: "Resources", links: [
+      ["Documentation", "https://docs.kymo.studio"],
+      ["Samples", "https://github.com/kymostudio/kymostudio/tree/main/samples"],
+      ["DSL spec", "https://github.com/kymostudio/kymostudio/blob/main/docs/DSL.md"],
+      ["Changelog", "https://github.com/kymostudio/kymostudio/blob/main/CHANGELOG.md"],
+    ] },
+  ],
+  [
+    { title: "Install", links: [
+      ["PyPI · kymostudio", "https://pypi.org/project/kymostudio/"],
+      ["npm · kymostudio", "https://www.npmjs.com/package/kymostudio"],
+      ["crates.io · core", "https://crates.io/crates/kymostudio-core"],
+      ["VS Code Marketplace", "https://marketplace.visualstudio.com/search?term=kymostudio&target=VSCode"],
+    ] },
+    { title: "Developers", links: [
+      ["GitHub", "https://github.com/kymostudio/kymostudio"],
+      ["Issues", "https://github.com/kymostudio/kymostudio/issues"],
+      ["Discussions", "https://github.com/kymostudio/kymostudio/discussions"],
+      ["Connect over MCP", "https://kymo.studio/#mcp"],
+    ] },
+  ],
+];
+
 function Footer() {
   return (
-    <footer>
-      <div className="wrap foot-row">
-        <div>
-          <div style={{ fontFamily: "var(--display)", fontWeight: 800, color: "var(--ink)", fontSize: 17, marginBottom: 4 }}>KymoStudio</div>
-          Brand &amp; design system · the canonical source is <code>docs/brand</code>.
+    <footer id="globalfooter" role="contentinfo">
+      <div className="footer-inner">
+        <nav className="footer-breadcrumb" aria-label="Breadcrumb">
+          <a className="footer-home" href="https://kymo.studio">
+            <img src="/brand/logo.svg" alt="" /> KymoStudio
+          </a>
+          <span className="footer-crumbs">
+            <span className="sep" aria-hidden="true">›</span>
+            <a href="https://kymo.studio">kymo.studio</a>
+            <span className="sep" aria-hidden="true">›</span>
+            <a href="/">Design system</a>
+          </span>
+        </nav>
+
+        <div className="footer-directory">
+          {FOOTER_DIRECTORY.map((col, i) => (
+            <div className="footer-col" key={i}>
+              {col.map((sec) => (
+                <div className="footer-sec" key={sec.title}>
+                  <h3>{sec.title}</h3>
+                  <ul>
+                    {sec.links.map(([label, href]) => (
+                      <li key={label}><a href={href}>{label}</a></li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
-        <div style={{ display: "flex", gap: 22, flexWrap: "wrap", alignItems: "center" }}>
-          <a href="https://kymo.studio">kymo.studio</a>
-          <a href="https://docs.kymo.studio">Docs</a>
-          <a href="https://icons.kymo.studio">Icons</a>
-          <a href="https://github.com/kymostudio/kymostudio">GitHub</a>
+
+        <div className="footer-legal">
+          <div className="footer-feedback">
+            Found an issue with these guidelines? <a href="https://github.com/kymostudio/kymostudio/issues/new">Open an issue on GitHub</a>. The canonical source is <code>docs/brand</code>.
+          </div>
+          <div className="footer-mini">
+            <div className="footer-copyright">Copyright © 2026 KymoStudio. Licensed under Apache-2.0.</div>
+            <div className="footer-legal-links">
+              <a href="https://github.com/kymostudio/kymostudio/blob/main/LICENSE">License</a>
+              <a href="https://github.com/kymostudio/kymostudio/tree/main/docs/brand">Brand assets</a>
+              <a href="https://github.com/kymostudio/kymostudio">GitHub</a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
