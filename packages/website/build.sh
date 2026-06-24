@@ -40,6 +40,7 @@ echo "→ demos  (docs/brand/screenshots → dist/)"
 cp ../../docs/brand/screenshots/screen1.html dist/hero-demo.html       # agent-live storyboard
 cp ../../docs/brand/screenshots/screen2.html dist/sequence-demo.html   # drag-to-build sequence (3 scenes)
 cp ../../docs/brand/screenshots/screen3.html dist/diagrams-demo.html   # Kanban / C4 / Class
+cp ../../docs/brand/screenshots/screen4.html dist/collab-demo.html     # BPMN live collaboration (3 people)
 
 # Cache-bust: Pages serves assets with max-age=14400, so version the URLs —
 # browsers refetch immediately after every deploy instead of up to 4h later.
