@@ -230,9 +230,27 @@ footer#globalfooter {
 .footer-legal { margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--border); }
 .footer-mini { display: flex; justify-content: space-between; align-items: center; gap: 14px 28px; flex-wrap: wrap; font-size: 12.5px; }
 .footer-copyright { color: var(--dim); }
-.footer-legal-links { display: flex; gap: 22px; flex-wrap: wrap; }
+.footer-legal-links { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
 .footer-legal-links a { color: var(--dim); font-weight: 600; }
 .footer-legal-links a:hover { color: var(--ink); text-decoration: none; }
+
+/* locale select — sits at the end of the legal links */
+.footer-locale { display: inline-flex; align-items: center; }
+.footer-locale select {
+  font: inherit; font-size: 12.5px; font-weight: 700; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--border-strong); border-radius: 8px;
+  padding: 5px 26px 5px 10px; cursor: pointer; line-height: 1.2;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 10.5'><path fill='%236e6a7c' d='M12.43,0l1.57,1.22L7,10.5,0,1.23,1.58,0,7,7,12.43,0Z'/></svg>");
+  background-repeat: no-repeat; background-position: right 9px center; background-size: 9px;
+  transition: border-color .15s ease;
+}
+.footer-locale select:hover { border-color: var(--accent); }
+.footer-locale select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.visuallyhidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 /* ── Responsive ──────────────────────────────────────────────── */
 /* Tablet — step the dense grids down to two columns (palette, type), stack the
