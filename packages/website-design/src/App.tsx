@@ -80,9 +80,40 @@ const T = {
   nav: {
     mark: { en: "Mark", vi: "Biểu tượng", zh: "标志" },
     colour: { en: "Colour", vi: "Màu sắc", zh: "颜色" },
-    type: { en: "Type", vi: "Kiểu chữ", zh: "字体" },
+    type: { en: "Typography", vi: "Kiểu chữ", zh: "字体" },
     tokens: kept("Tokens"),
     voice: { en: "Voice", vi: "Giọng điệu", zh: "语调" },
+  },
+  side: {
+    title: { en: "Design System", vi: "Hệ thống thiết kế", zh: "设计系统" },
+    foundations: { en: "Foundations", vi: "Nền tảng", zh: "基础" },
+    overview: { en: "Overview", vi: "Tổng quan", zh: "概览" },
+    branding: { en: "Branding", vi: "Thương hiệu", zh: "品牌" },
+    nav: { en: "Foundations", vi: "Nền tảng", zh: "基础" },
+    filter: { en: "Filter", vi: "Lọc", zh: "筛选" },
+    openMenu: { en: "Open navigation", vi: "Mở điều hướng", zh: "打开导航" },
+    closeMenu: { en: "Close navigation", vi: "Đóng điều hướng", zh: "关闭导航" },
+    noMatch: { en: "No matches", vi: "Không có kết quả", zh: "无匹配项" },
+  },
+  overview: {
+    eyebrow: { en: "Foundations", vi: "Nền tảng", zh: "基础" },
+    lead: {
+      en: "The single source of truth for the kymo brand — the mark, the Mermaid palette, typography, design tokens and voice. Pick a topic to dive in.",
+      vi: "Nguồn tham chiếu chính thức cho thương hiệu kymo — biểu tượng, bảng màu Mermaid, kiểu chữ, design token và giọng điệu. Chọn một chủ đề để xem chi tiết.",
+      zh: "kymo 品牌的唯一权威来源 — 标志、Mermaid 调色板、字体、设计 token 与语调。选择一个主题深入了解。",
+    },
+    cards: {
+      branding: { en: "The mark, wordmark lockups, and the rules that keep them consistent.", vi: "Biểu tượng, khối wordmark và các quy tắc giữ chúng nhất quán.", zh: "标志、字标组合，以及保持其一致的规则。" },
+      color: { en: "The Mermaid palette, roles, and WCAG-approved contrast pairings.", vi: "Bảng màu Mermaid, vai trò và các cặp tương phản đạt chuẩn WCAG.", zh: "Mermaid 调色板、用途，以及通过 WCAG 的对比配色。" },
+      typography: { en: "The three faces — display, body and mono — and how to use them.", vi: "Ba kiểu chữ — display, nội dung và mono — cùng cách dùng.", zh: "三款字体 — display、正文与 mono — 及其用法。" },
+      tokens: { en: "The CSS custom properties every kymo surface is built on.", vi: "Các CSS custom property mà mọi bề mặt kymo dựa trên.", zh: "每个 kymo 界面所依赖的 CSS 自定义属性。" },
+      voice: { en: "The fixed lines — tagline, slogan, positioning — and where they live.", vi: "Những dòng cố định — tagline, slogan, định vị — và nơi chúng xuất hiện.", zh: "固定的句子 — tagline、slogan、定位 — 及其出现之处。" },
+      dont: { en: "Common mistakes to avoid with the mark and the messaging.", vi: "Những lỗi thường gặp cần tránh với biểu tượng và thông điệp.", zh: "使用标志与信息时需避免的常见错误。" },
+    },
+  },
+  pager: {
+    prev: { en: "Previous", vi: "Trước", zh: "上一页" },
+    next: { en: "Next", vi: "Tiếp", zh: "下一页" },
   },
   hero: {
     eyebrow: { en: "Brand & Design System", vi: "Thương hiệu & Hệ thống thiết kế", zh: "品牌与设计系统" },
@@ -168,24 +199,215 @@ function useCopy() {
   return { copied, copy };
 }
 
+// ── Routing — Apple-HIG-style separate pages, client-side ─────────
+// Real paths (/foundations/<slug>), History API, no dependency. Cloudflare
+// Pages serves index.html for unknown paths via _redirects, so deep links work.
+type PageKey = "overview" | "branding" | "color" | "typography" | "tokens" | "voice" | "dont";
+type PageMeta = { key: PageKey; path: string; label: L; blurb?: L };
+const OVERVIEW: PageMeta = { key: "overview", path: "/", label: T.side.overview };
+const FOUNDATION_PAGES: PageMeta[] = [
+  { key: "branding",   path: "/foundations/branding",   label: T.side.branding, blurb: T.overview.cards.branding },
+  { key: "color",      path: "/foundations/color",      label: T.nav.colour,    blurb: T.overview.cards.color },
+  { key: "typography", path: "/foundations/typography", label: T.nav.type,      blurb: T.overview.cards.typography },
+  { key: "tokens",     path: "/foundations/tokens",     label: T.nav.tokens,    blurb: T.overview.cards.tokens },
+  { key: "voice",      path: "/foundations/voice",      label: T.nav.voice,     blurb: T.overview.cards.voice },
+  { key: "dont",       path: "/foundations/dont",       label: T.donts.h2,      blurb: T.overview.cards.dont },
+];
+const ALL_PAGES: PageMeta[] = [OVERVIEW, ...FOUNDATION_PAGES];
+
+const normalizePath = (p: string) => (p.length > 1 && p.endsWith("/") ? p.slice(0, -1) : p);
+const pageForPath = (p: string) => ALL_PAGES.find((pg) => pg.path === normalizePath(p)) ?? OVERVIEW;
+
+const RouteContext = createContext<{ path: string; navigate: (to: string) => void }>({
+  path: "/",
+  navigate: () => {},
+});
+const useRouter = () => useContext(RouteContext);
+
+// Mobile nav drawer open/close — shared so the toggle, the links and the
+// close button all talk to the same state.
+const MenuContext = createContext<{ open: boolean; setOpen: (b: boolean) => void }>({
+  open: false,
+  setOpen: () => {},
+});
+const useMenu = () => useContext(MenuContext);
+
+// Apple-HIG-style "show sidebar" glyph for the mobile toggle.
+function SidebarIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="2.25" y="3.75" width="15.5" height="12.5" rx="2.75" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="7.75" y1="4.25" x2="7.75" y2="15.75" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="4.4" y1="7.5" x2="5.9" y2="7.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <line x1="4.4" y1="10" x2="5.9" y2="10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function useRoute() {
+  const [path, setPath] = useState(() => normalizePath(window.location.pathname));
+  useEffect(() => {
+    const onPop = () => setPath(normalizePath(window.location.pathname));
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+  const navigate = (to: string) => {
+    const next = normalizePath(to);
+    if (next === path) return;
+    window.history.pushState(null, "", to);
+    setPath(next);
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  };
+  return { path, navigate };
+}
+
+// In-app link: client-side navigate for internal paths, normal <a> otherwise.
+function Link(
+  { to, className, children, ...rest }:
+    { to: string; className?: string; children: ReactNode } & Record<string, unknown>,
+) {
+  const { navigate } = useRouter();
+  const { setOpen } = useMenu();
+  const internal = to.startsWith("/") && !to.startsWith("//");
+  return (
+    <a
+      href={to}
+      className={className}
+      onClick={(e) => {
+        if (!internal) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        navigate(to);
+        setOpen(false); // dismiss the mobile drawer on navigate
+      }}
+      {...rest}
+    >
+      {children}
+    </a>
+  );
+}
+
+// ── Sidebar — desktop left rail, mobile full-screen drawer ───────
+function Sidebar() {
+  const { lang } = useLang();
+  const { path } = useRouter();
+  const { open, setOpen } = useMenu();
+  const [q, setQ] = useState("");
+  const query = q.trim().toLowerCase();
+  const items = ALL_PAGES.filter((p) => !query || p.label[lang].toLowerCase().includes(query));
+  return (
+    <aside className={open ? "sidebar open" : "sidebar"} aria-label={T.side.nav[lang]}>
+      <nav className="sidebar-inner">
+        <div className="sidebar-head">
+          <Link to="/" className="sidebar-title">{T.side.title[lang]}</Link>
+          <button className="sidebar-close" onClick={() => setOpen(false)} aria-label={T.side.closeMenu[lang]}>
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+              <line x1="6" y1="6" x2="16" y2="16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <line x1="16" y1="6" x2="6" y2="16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+        <input
+          className="sidebar-filter"
+          type="search"
+          placeholder={T.side.filter[lang]}
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          aria-label={T.side.filter[lang]}
+        />
+        <div className="side-group">
+          <div className="side-group-title">{T.side.foundations[lang]}</div>
+          <ul>
+            {items.map((p) => {
+              const on = path === p.path;
+              return (
+                <li key={p.key}>
+                  <Link to={p.path} className={on ? "active" : undefined} aria-current={on ? "page" : undefined}>
+                    {p.label[lang]}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          {items.length === 0 && <div className="side-empty">{T.side.noMatch[lang]}</div>}
+        </div>
+      </nav>
+    </aside>
+  );
+}
+
+// ── Prev / next pager (foot of each page, like Apple HIG) ────────
+function Pager() {
+  const { lang } = useLang();
+  const { path } = useRouter();
+  const idx = ALL_PAGES.findIndex((p) => p.path === path);
+  if (idx < 0) return null;
+  const prev = idx > 0 ? ALL_PAGES[idx - 1] : null;
+  const next = idx < ALL_PAGES.length - 1 ? ALL_PAGES[idx + 1] : null;
+  if (!prev && !next) return null;
+  return (
+    <nav className="pager" aria-label={T.pager.next[lang]}>
+      {prev
+        ? <Link to={prev.path} className="pager-link prev">
+            <span className="pager-dir">← {T.pager.prev[lang]}</span>
+            <span className="pager-title">{prev.label[lang]}</span>
+          </Link>
+        : <span />}
+      {next
+        ? <Link to={next.path} className="pager-link next">
+            <span className="pager-dir">{T.pager.next[lang]} →</span>
+            <span className="pager-title">{next.label[lang]}</span>
+          </Link>
+        : <span />}
+    </nav>
+  );
+}
+
+// ── Overview page (the foundations index) ────────────────────────
+function OverviewPage() {
+  const { lang } = useLang();
+  return (
+    <div className="overview">
+      <div className="sec-head">
+        <span className="sec-num">{T.overview.eyebrow[lang]}</span>
+        <h2>{T.side.title[lang]}</h2>
+        <p>{T.overview.lead[lang]}</p>
+      </div>
+      <div className="overview-cta">
+        <a className="btn btn-primary" href="/brand/logo.svg" download>{T.hero.download[lang]}</a>
+        <Link className="btn btn-alt" to="/foundations/branding">{T.hero.guidelines[lang]}</Link>
+      </div>
+      <div className="grid grid-3 overview-cards">
+        {FOUNDATION_PAGES.map((p, i) => (
+          <Link to={p.path} className="card overview-card" key={p.key}>
+            <span className="overview-card-num">{String(i + 1).padStart(2, "0")}</span>
+            <span className="overview-card-title">{p.label[lang]}</span>
+            <span className="overview-card-desc">{p.blurb?.[lang]}</span>
+            <span className="overview-card-go">→</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Sections ─────────────────────────────────────────────────────
 function Nav() {
   const { lang } = useLang();
+  const { setOpen } = useMenu();
   return (
     <nav>
       <div className="nav-inner">
-        <a className="brand" href="/">
-          <img src="/brand/logo.svg" alt="kymo logo" />
-          KymoStudio <span className="sub">{T.navSub[lang]}</span>
-        </a>
+        <div className="nav-start">
+          <button className="nav-menu-btn" onClick={() => setOpen(true)} aria-label={T.side.openMenu[lang]}>
+            <SidebarIcon />
+          </button>
+          <Link className="brand" to="/">
+            <img src="/brand/logo.svg" alt="kymo logo" />
+            KymoStudio <span className="sub">{T.navSub[lang]}</span>
+          </Link>
+        </div>
         <div className="nav-links">
-          <span className="nav-anchors">
-            <a href="#mark">{T.nav.mark[lang]}</a>
-            <a href="#colour">{T.nav.colour[lang]}</a>
-            <a href="#type">{T.nav.type[lang]}</a>
-            <a href="#tokens">{T.nav.tokens[lang]}</a>
-            <a href="#voice">{T.nav.voice[lang]}</a>
-          </span>
           <a className="nav-ext" href="https://kymo.studio">kymo.studio&nbsp;↗</a>
         </div>
       </div>
@@ -193,28 +415,10 @@ function Nav() {
   );
 }
 
-function Hero() {
-  const { lang } = useLang();
-  return (
-    <header className="hero wrap">
-      <span className="eyebrow">{T.hero.eyebrow[lang]}</span>
-      <div className="hero-wordmark">
-        <img src="/brand/wordmark.svg" alt="KymoStudio — Diagram superpowers" />
-      </div>
-      <p className="tagline">Diagram superpowers.</p>
-      <p className="slogan">Prompt it. See it appear. Watch it animate. {T.hero.sloganRest[lang]}</p>
-      <div className="hero-cta">
-        <a className="btn btn-primary" href="/brand/logo.svg" download>{T.hero.download[lang]}</a>
-        <a className="btn btn-alt" href="#mark">{T.hero.guidelines[lang]}</a>
-      </div>
-    </header>
-  );
-}
-
 function MarkSection() {
   const { lang } = useLang();
   return (
-    <section id="mark" className="wrap">
+    <section id="mark">
       <div className="sec-head">
         <span className="sec-num">{T.mark.num[lang]}</span>
         <h2>{T.mark.h2[lang]}</h2>
@@ -262,7 +466,7 @@ function MarkSection() {
 function ColourSection({ copied, copy }: { copied: string | null; copy: (t: string) => void }) {
   const { lang } = useLang();
   return (
-    <section id="colour" className="wrap">
+    <section id="colour">
       <div className="sec-head">
         <span className="sec-num">{T.colour.num[lang]}</span>
         <h2>{T.colour.h2[lang]}</h2>
@@ -307,7 +511,7 @@ function ColourSection({ copied, copy }: { copied: string | null; copy: (t: stri
 function TypeSection() {
   const { lang } = useLang();
   return (
-    <section id="type" className="wrap">
+    <section id="type">
       <div className="sec-head">
         <span className="sec-num">{T.type.num[lang]}</span>
         <h2>{T.type.h2[lang]}</h2>
@@ -342,7 +546,7 @@ function TokenRow({ t, copied, copy }: { t: Token; copied: string | null; copy: 
 function TokensSection({ copied, copy }: { copied: string | null; copy: (s: string) => void }) {
   const { lang } = useLang();
   return (
-    <section id="tokens" className="wrap">
+    <section id="tokens">
       <div className="sec-head">
         <span className="sec-num">{T.tokens.num[lang]}</span>
         <h2>{T.tokens.h2[lang]}</h2>
@@ -371,7 +575,7 @@ function TokensSection({ copied, copy }: { copied: string | null; copy: (s: stri
 function VoiceSection() {
   const { lang } = useLang();
   return (
-    <section id="voice" className="wrap">
+    <section id="voice">
       <div className="sec-head">
         <span className="sec-num">{T.voice.num[lang]}</span>
         <h2>{T.voice.h2[lang]}</h2>
@@ -402,7 +606,7 @@ function DontsSection() {
   const mid = Math.ceil(DONTS.length / 2);
   const cols = [DONTS.slice(0, mid), DONTS.slice(mid)];
   return (
-    <section id="donts" className="wrap">
+    <section id="donts">
       <div className="sec-head">
         <span className="sec-num">{T.donts.num[lang]}</span>
         <h2>{T.donts.h2[lang]}</h2>
@@ -524,9 +728,25 @@ function Footer() {
   );
 }
 
+function PageBody({ pageKey, copied, copy }: { pageKey: PageKey; copied: string | null; copy: (s: string) => void }) {
+  switch (pageKey) {
+    case "branding":   return <MarkSection />;
+    case "color":      return <ColourSection copied={copied} copy={copy} />;
+    case "typography": return <TypeSection />;
+    case "tokens":     return <TokensSection copied={copied} copy={copy} />;
+    case "voice":      return <VoiceSection />;
+    case "dont":       return <DontsSection />;
+    case "overview":
+    default:           return <OverviewPage />;
+  }
+}
+
 export function App() {
   const { copied, copy } = useCopy();
   const [lang, setLangState] = useState<Lang>("en");
+  const { path, navigate } = useRoute();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const current = pageForPath(path);
 
   // restore saved choice on mount
   useEffect(() => {
@@ -534,24 +754,43 @@ export function App() {
     if (saved && (LANGS as string[]).includes(saved)) setLangState(saved as Lang);
   }, []);
 
-  // persist + reflect on <html lang> and the document title
+  // lock body scroll + close on Escape while the mobile drawer is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
+  // persist + reflect on <html lang>
   useEffect(() => {
     localStorage.setItem("kymo-lang", lang);
     document.documentElement.lang = lang;
-    document.title = T.title[lang];
   }, [lang]);
+
+  // document title tracks the current page (helps multi-page bookmarks / SEO)
+  useEffect(() => {
+    document.title = current.key === "overview"
+      ? T.title[lang]
+      : `${current.label[lang]} — ${T.side.title[lang]} · KymoStudio`;
+  }, [lang, current]);
 
   return (
     <LangContext.Provider value={{ lang, setLang: setLangState }}>
-      <Nav />
-      <Hero />
-      <MarkSection />
-      <ColourSection copied={copied} copy={copy} />
-      <TypeSection />
-      <TokensSection copied={copied} copy={copy} />
-      <VoiceSection />
-      <DontsSection />
-      <Footer />
+      <RouteContext.Provider value={{ path, navigate }}>
+        <MenuContext.Provider value={{ open: menuOpen, setOpen: setMenuOpen }}>
+          <Nav />
+          <div className="shell">
+            <Sidebar />
+            <main className="shell-main" key={current.key}>
+              <PageBody pageKey={current.key} copied={copied} copy={copy} />
+              <Pager />
+            </main>
+          </div>
+          <Footer />
+        </MenuContext.Provider>
+      </RouteContext.Provider>
     </LangContext.Provider>
   );
 }

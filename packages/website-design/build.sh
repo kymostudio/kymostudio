@@ -30,6 +30,7 @@ echo "→ assembling dist/"
 cp src/index.html dist/
 cp src/styles.css dist/
 cp src/CNAME dist/
+cp src/_redirects dist/   # SPA fallback for client-side routes (/foundations/*)
 
 # site-local assets (e.g. the black logo variant) → served at /assets/…
 [[ -d assets ]] && cp -R assets dist/assets

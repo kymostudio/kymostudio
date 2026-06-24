@@ -1,0 +1,4 @@
+# Cloudflare Pages SPA fallback — serve the app shell for client-side routes
+# (/foundations/branding, /foundations/color, …). Static assets (/bundle.js,
+# /styles.css, /brand/*) are matched first; only unknown paths hit this rule.
+/*    /index.html    200
