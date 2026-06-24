@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { API } from "./App";
+import { useLang, T, Footer } from "./i18n";
 
 const CDN_BASE = "https://cdn.kymo.studio/";
 const iconUrl = (path: string, ver?: number) => CDN_BASE + path + (ver ? `?v=${ver}` : "");
@@ -20,6 +21,7 @@ const hostLabel = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/+$
 export function BrandPage() {
   const parts = location.pathname.replace(/\/+$/, "").split("/"); // /brand/<slug>
   const slug = decodeURIComponent(parts.slice(2).join("/") || "");
+  const { lang } = useLang();
   const [brand, setBrand] = useState<Brand | null | undefined>(undefined);
   const [showLoader, setShowLoader] = useState(false); // delayed → no flash on fast loads
   const [toast, setToast] = useState<string | null>(null);
@@ -50,12 +52,12 @@ export function BrandPage() {
         <a className="brand" href="/" style={{ textDecoration: "none" }}>
           <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons
         </a>
-        <nav className="nav"><a href={brand ? `/set/${brand.set}` : "/"}>← Gallery</a></nav>
+        <nav className="nav"><a href={brand ? `/set/${brand.set}` : "/"}>{T.back[lang]}</a></nav>
       </div>
     </header>
   );
   if (brand === undefined) return <>{Header}<main className="brandpage">{showLoader && <div className="kloader-wrap"><KLoader /></div>}</main></>;
-  if (!brand) return <>{Header}<main className="brandpage"><div className="login-card"><h2>Brand not found</h2><p>No brand <b>{slug}</b>.</p><a href="/">← All icons</a></div></main></>;
+  if (!brand) return <>{Header}<main className="brandpage"><div className="login-card"><h2>{T.brandNotFound[lang]}</h2><p>{T.noBrand[lang]} <b>{slug}</b>.</p><a href="/">{T.allIcons[lang]}</a></div></main></>;
 
   const v = (name: string) => brand.variants.find((x) => x.variant === name);
   const iconV = v("icon"), colorV = v("color"), textV = v("text"), brandV = v("brand");
@@ -67,9 +69,9 @@ export function BrandPage() {
     <div className="showcase-bar">
       <code>{vr.key}</code>
       <div className="showcase-actions">
-        <button className="sc-btn" onClick={() => { copy(vr.key); flash(`Copied ${vr.key}`); }}>Copy key</button>
-        <button className="sc-btn" onClick={() => { copy(iconUrl(vr.path, vr.ver)); flash("Copied URL"); }}>Copy URL</button>
-        <button className="sc-btn" onClick={() => download(vr.key, vr.path)}>Download</button>
+        <button className="sc-btn" onClick={() => { copy(vr.key); flash(T.toast.copiedKey[lang]); }}>{T.actions.copyKey[lang]}</button>
+        <button className="sc-btn" onClick={() => { copy(iconUrl(vr.path, vr.ver)); flash(T.toast.copiedUrl[lang]); }}>{T.actions.copyUrl[lang]}</button>
+        <button className="sc-btn" onClick={() => download(vr.key, vr.path)}>{T.actions.download[lang]}</button>
       </div>
     </div>
   );
@@ -86,22 +88,22 @@ export function BrandPage() {
     const [iw, ih] = await imgDim(iu); const [tw, th] = await imgDim(tu);
     const H = 56, gap = 18, isw = Math.round(iw * (H / ih)), tsw = Math.round(tw * (H / th)), W = isw + gap + tsw;
     dataSvg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><image href="${iu}" x="0" y="0" width="${isw}" height="${H}"/><image href="${tu}" x="${isw + gap}" y="0" width="${tsw}" height="${H}"/></svg>`, `${brand.slug}-combine${useColor ? "-color" : ""}.svg`);
-    flash("Downloaded combine");
+    flash(T.toast.copiedCombine[lang]);
   };
   const dlAvatar = async (circle: boolean) => {
     const a = mono!; const au = iconUrl(a.path, a.ver);
     const [iw, ih] = await imgDim(au);
     const S = 128, pad = 34, ih2 = S - 2 * pad, iw2 = Math.round(iw * (ih2 / ih)), ix = Math.round((S - iw2) / 2), iy = pad, rx = circle ? S / 2 : 28;
     dataSvg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${S} ${S}" width="${S}" height="${S}"><defs><filter id="w"><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"/></filter></defs><rect width="${S}" height="${S}" rx="${rx}" fill="${color}"/><image href="${au}" x="${ix}" y="${iy}" width="${iw2}" height="${ih2}" filter="url(#w)"/></svg>`, `${brand.slug}-avatar-${circle ? "circle" : "square"}.svg`);
-    flash("Downloaded avatar");
+    flash(T.toast.copiedAvatar[lang]);
   };
 
-  const toc: string[] = [];
-  if (iconV || colorV) toc.push("Icons");
-  if (textV) toc.push("Text");
-  if (textV && (iconV || colorV)) toc.push("Combine");
-  if (mono) toc.push("Avatars");
-  if (color) toc.push("Colors");
+  const toc: (keyof typeof T.sections)[] = [];
+  if (iconV || colorV) toc.push("icons");
+  if (textV) toc.push("text");
+  if (textV && (iconV || colorV)) toc.push("combine");
+  if (mono) toc.push("avatars");
+  if (color) toc.push("colors");
 
   return (
     <>
@@ -126,13 +128,13 @@ export function BrandPage() {
           {(colorV || iconV) && (() => { const d = colorV || iconV!; return (
             <div className="snippet brand-import">
               <code>{`node box/${d.key}/blue "Label"`}</code>
-              <button title="Copy snippet" aria-label="Copy snippet" onClick={() => { copy(`node box/${d.key}/blue "Label"`); flash("Copied snippet"); }}><CopyMini /></button>
+              <button title={T.actions.copySnippet[lang]} aria-label={T.actions.copySnippet[lang]} onClick={() => { copy(`node box/${d.key}/blue "Label"`); flash(T.toast.copiedSnippet[lang]); }}><CopyMini /></button>
             </div>
           ); })()}
 
           {(iconV || colorV) && (
             <section id="icons" className="brand-section">
-              <h2>Icons</h2>
+              <h2>{T.sections.icons[lang]}</h2>
               <div className="showcase">
                 <div className="showcase-art row">
                   {iconV && img(iconV, "sc-icon")}
@@ -148,7 +150,7 @@ export function BrandPage() {
 
           {textV && (
             <section id="text" className="brand-section">
-              <h2>Text</h2>
+              <h2>{T.sections.text[lang]}</h2>
               <div className="showcase">
                 <div className="showcase-art">{img(textV, "sc-text")}</div>
                 <Bar vr={textV} />
@@ -158,7 +160,7 @@ export function BrandPage() {
 
           {textV && (iconV || colorV) && (
             <section id="combine" className="brand-section">
-              <h2>Combine</h2>
+              <h2>{T.sections.combine[lang]}</h2>
               <div className="showcase">
                 <div className="showcase-art col">
                   {iconV && <div className="combine-row">{img(iconV, "ci")}{img(textV, "ct")}</div>}
@@ -167,8 +169,8 @@ export function BrandPage() {
                 <div className="showcase-bar">
                   <code>{brand.slug}-combine</code>
                   <div className="showcase-actions">
-                    {iconV && <button className="sc-btn" onClick={() => dlCombine(false)}>Download{colorV ? " mono" : ""}</button>}
-                    {colorV && <button className="sc-btn" onClick={() => dlCombine(true)}>Download{iconV ? " color" : ""}</button>}
+                    {iconV && <button className="sc-btn" onClick={() => dlCombine(false)}>{colorV ? T.actions.downloadMono[lang] : T.actions.download[lang]}</button>}
+                    {colorV && <button className="sc-btn" onClick={() => dlCombine(true)}>{iconV ? T.actions.downloadColor[lang] : T.actions.download[lang]}</button>}
                   </div>
                 </div>
               </div>
@@ -177,7 +179,7 @@ export function BrandPage() {
 
           {mono && (
             <section id="avatars" className="brand-section">
-              <h2>Avatars</h2>
+              <h2>{T.sections.avatars[lang]}</h2>
               <div className="showcase">
                 <div className="showcase-art row">
                   <div className="avatar circle" style={{ background: color }}>{img(mono, "av")}</div>
@@ -186,8 +188,8 @@ export function BrandPage() {
                 <div className="showcase-bar">
                   <code>{brand.slug}-avatar</code>
                   <div className="showcase-actions">
-                    <button className="sc-btn" onClick={() => dlAvatar(true)}>Download circle</button>
-                    <button className="sc-btn" onClick={() => dlAvatar(false)}>Download square</button>
+                    <button className="sc-btn" onClick={() => dlAvatar(true)}>{T.actions.downloadCircle[lang]}</button>
+                    <button className="sc-btn" onClick={() => dlAvatar(false)}>{T.actions.downloadSquare[lang]}</button>
                   </div>
                 </div>
               </div>
@@ -196,30 +198,27 @@ export function BrandPage() {
 
           {color && (
             <section id="colors" className="brand-section">
-              <h2>Colors</h2>
+              <h2>{T.sections.colors[lang]}</h2>
               <div className="showcase">
                 <div className="showcase-art"><div className="color-swatch" style={{ background: color }} /></div>
                 <div className="showcase-bar">
                   <code>{color}</code>
                   <div className="showcase-actions">
-                    <button className="sc-btn" onClick={() => { copy(color); flash(`Copied ${color}`); }}>Copy color</button>
+                    <button className="sc-btn" onClick={() => { copy(color); flash(T.toast.copiedColor[lang]); }}>{T.actions.copyColor[lang]}</button>
                   </div>
                 </div>
               </div>
             </section>
           )}
 
-          <footer className="legal">
-            Logos are trademarks of their respective owners, shown for identification only.
-            kymo is not affiliated with, sponsored by, or endorsed by them.
-          </footer>
         </main>
 
         <aside className="brand-toc">
-          <p className="toc-label">On this page</p>
-          {toc.map((t) => <a key={t} href={`#${t.toLowerCase()}`}>{t}</a>)}
+          <p className="toc-label">{T.onThisPage[lang]}</p>
+          {toc.map((t) => <a key={t} href={`#${t}`}>{T.sections[t][lang]}</a>)}
         </aside>
       </div>
+      <Footer />
       {toast && <div className="toast">{toast}</div>}
     </>
   );

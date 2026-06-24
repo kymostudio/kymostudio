@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { API, type Icon as Item, type Variant, iconUrl, snippetFor, loadCatalog, iconSlugOf, iconHref } from "./App";
+import { useLang, T, Footer } from "./i18n";
 
 function copy(text: string) { try { navigator.clipboard?.writeText(text); } catch { /* noop */ } }
 function save(href: string, filename: string) {
@@ -14,6 +15,7 @@ const ExternalGlyph = () => (
 
 export function IconPage() {
   const slug = decodeURIComponent(location.pathname.replace(/\/+$/, "").split("/").slice(2).join("/") || "");
+  const { lang } = useLang();
   const [item, setItem] = useState<Item | null | undefined>(undefined); // undefined = loading
   const [all, setAll] = useState<Item[]>([]);
   const [vv, setVv] = useState<Variant | null>(null);
@@ -42,12 +44,12 @@ export function IconPage() {
         <a className="brand" href="/" style={{ textDecoration: "none" }}>
           <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons
         </a>
-        <nav className="nav"><a href={item ? `/set/${item.set}` : "/"}>← Gallery</a></nav>
+        <nav className="nav"><a href={item ? `/set/${item.set}` : "/"}>{T.back[lang]}</a></nav>
       </div>
     </header>
   );
-  if (item === undefined) return <>{Header}<main className="iconpage"><p className="count">Loading…</p></main></>;
-  if (!item) return <>{Header}<main className="iconpage"><div className="login-card"><h2>Icon not found</h2><p>No icon <b>{slug}</b>.</p><a href="/">← All icons</a></div></main></>;
+  if (item === undefined) return <>{Header}<main className="iconpage"><p className="count">{T.loading[lang]}</p></main></>;
+  if (!item) return <>{Header}<main className="iconpage"><div className="login-card"><h2>{T.iconNotFound[lang]}</h2><p>{T.noIcon[lang]} <b>{slug}</b>.</p><a href="/">{T.allIcons[lang]}</a></div></main></>;
 
   // the active variant (a brand's selected variant, else the icon itself)
   const av: Item = item.variants && vv ? { key: vv.key, set: item.set, path: vv.path, ver: vv.ver } : item;
@@ -72,7 +74,7 @@ export function IconPage() {
               : <img className="icon-hero-art" src={iconUrl(av.path!, av.ver)} alt={av.key} />}
             {item.variants && (
               <a className="brand-tag brand-tag-corner" href={`/brand/${item.key.split(":")[1]}`} title={`Open ${item.name || ""} brand page`}>
-                Brand<span className="ext-ic"><ExternalGlyph /></span>
+                {T.actions.brand[lang]}<span className="ext-ic"><ExternalGlyph /></span>
               </a>
             )}
           </div>
@@ -95,16 +97,16 @@ export function IconPage() {
             <code className="icon-key">{av.key}</code>
 
             <div className="icon-actions">
-              <button className="btn primary" onClick={() => { copy(av.key); flash("Copied key"); }}>Copy key</button>
-              <button className="btn" onClick={() => { copy(url); flash("Copied URL"); }}>Copy URL</button>
-              <button className="btn" onClick={download}>Download</button>
+              <button className="btn primary" onClick={() => { copy(av.key); flash(T.toast.copiedKey[lang]); }}>{T.actions.copyKey[lang]}</button>
+              <button className="btn" onClick={() => { copy(url); flash(T.toast.copiedUrl[lang]); }}>{T.actions.copyUrl[lang]}</button>
+              <button className="btn" onClick={download}>{T.actions.download[lang]}</button>
             </div>
 
             <div className="icon-usage">
-              <p className="ul">Use in a .kymo diagram</p>
+              <p className="ul">{T.actions.useInDiagram[lang]}</p>
               <div className="snippet">
                 <code>{snippetFor(av.key)}</code>
-                <button title="Copy snippet" aria-label="Copy snippet" onClick={() => { copy(snippetFor(av.key)); flash("Copied snippet"); }}>copy</button>
+                <button title={T.actions.copySnippet[lang]} aria-label={T.actions.copySnippet[lang]} onClick={() => { copy(snippetFor(av.key)); flash(T.toast.copiedSnippet[lang]); }}>{T.actions.copySnippet[lang]}</button>
               </div>
             </div>
           </div>
@@ -112,7 +114,7 @@ export function IconPage() {
 
         {related.length > 0 && (
           <section className="related">
-            <h2>Related icons</h2>
+            <h2>{T.relatedIcons[lang]}</h2>
             <div className="related-grid">
               {related.map((r) => (
                 <a key={r.key} className="cell related-cell" href={iconHref(r.key)} title={r.name || r.key}>
@@ -125,11 +127,8 @@ export function IconPage() {
           </section>
         )}
 
-        <footer className="legal">
-          Logos are trademarks of their respective owners, shown for identification only.
-          kymo is not affiliated with, sponsored by, or endorsed by them.
-        </footer>
       </main>
+      <Footer />
       {toast && <div className="toast">{toast}</div>}
     </>
   );

@@ -3,6 +3,7 @@ import { App } from "./App";
 import { Admin } from "./Admin";
 import { BrandPage } from "./Brand";
 import { IconPage } from "./Icon";
+import { LangProvider } from "./i18n";
 
 // Tiny path-based routing. /login + /admin → admin surface; /brand/<slug> → a
 // brand page; /icon/<slug> → a per-icon page; /set/<set>[/<subset>] + everything
@@ -14,4 +15,6 @@ const Root = path === "/login" || path === "/admin" ? Admin
     : path.startsWith("/icon/") ? IconPage
       : App;
 
-createRoot(document.getElementById("root")!).render(<Root />);
+createRoot(document.getElementById("root")!).render(
+  <LangProvider><Root /></LangProvider>,
+);
