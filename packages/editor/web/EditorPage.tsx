@@ -597,7 +597,9 @@ export default function EditorPage() {
   // VS Code-style Welcome: a fresh "/" (untouched sample) shows the Welcome panel
   // instead of the editor. Any in-place action (pick template / open file) arms
   // `welcomeDismissed`; navigating to a real route re-arms it (effect below).
-  const showWelcome = isDraft && source === SAMPLE && !welcomeDismissed;
+  // Guests (not signed in) skip the landing entirely — a fresh "/" drops them
+  // straight into the editor on the sample, the fastest path to "see it work".
+  const showWelcome = !!claims && isDraft && source === SAMPLE && !welcomeDismissed;
   // Signed-in, nothing open: no active tab and an empty draft buffer (e.g. after
   // closing the last tab). Keep the Command Center, but show a "no file open"
   // placeholder instead of empty editor panes. Guests always have their draft.
