@@ -402,18 +402,6 @@ function Footer() {
   return (
     <footer id="globalfooter" role="contentinfo">
       <div className="footer-inner">
-        <nav className="footer-breadcrumb" aria-label="Breadcrumb">
-          <a className="footer-home" href="https://kymo.studio">
-            <img src="/brand/logo.svg" alt="" /> KymoStudio
-          </a>
-          <span className="footer-crumbs">
-            <span className="sep" aria-hidden="true">›</span>
-            <a href="https://kymo.studio">kymo.studio</a>
-            <span className="sep" aria-hidden="true">›</span>
-            <a href="/">Design system</a>
-          </span>
-        </nav>
-
         <div className="footer-directory">
           {FOOTER_DIRECTORY.map((col, i) => (
             <div className="footer-col" key={i}>
@@ -432,9 +420,6 @@ function Footer() {
         </div>
 
         <div className="footer-legal">
-          <div className="footer-feedback">
-            Found an issue with these guidelines? <a href="https://github.com/kymostudio/kymostudio/issues/new">Open an issue on GitHub</a>. The canonical source is <code>docs/brand</code>.
-          </div>
           <div className="footer-mini">
             <div className="footer-copyright">Copyright © 2026 KymoStudio. Licensed under Apache-2.0.</div>
             <div className="footer-legal-links">
