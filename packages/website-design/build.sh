@@ -31,6 +31,9 @@ cp src/index.html dist/
 cp src/styles.css dist/
 cp src/CNAME dist/
 
+# site-local assets (e.g. the black logo variant) → served at /assets/…
+[[ -d assets ]] && cp -R assets dist/assets
+
 # Brand assets — copied from the canonical docs/brand set (downloadable from the
 # page + used as the favicon / hero lockups). Keep this list in sync with the
 # download links in index.html.
