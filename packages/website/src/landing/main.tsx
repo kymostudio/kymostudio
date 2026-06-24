@@ -631,6 +631,11 @@ const DEMO_TABS: DemoTab[] = [
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg>,
   },
   {
+    id: "visual", label: "Visual Editor",
+    href: (r) => `./sequence-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
+    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12.034 12.681a.498.498 0 0 1 .647-.647l9 3.5a.5.5 0 0 1-.033.943l-3.444 1.068a1 1 0 0 0-.66.66l-1.067 3.443a.5.5 0 0 1-.943.033z" /><path d="M21 11V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6" /></svg>,
+  },
+  {
     id: "diagrams", label: "Live Sync Diagrams",
     href: (r) => `./diagrams-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="16" y="16" width="6" height="6" rx="1" /><rect x="2" y="16" width="6" height="6" rx="1" /><rect x="9" y="2" width="6" height="6" rx="1" /><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" /><path d="M12 12V8" /></svg>,
@@ -662,6 +667,15 @@ function HeroDemo() {
     }, { rootMargin: "200px" });
     io.observe(frame);
     return () => { ro.disconnect(); io.disconnect(); };
+  }, []);
+
+  // auto-advance to the next tab once the embedded demo finishes one full cycle
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      if (e?.data?.type === "kymo-demo-done") setActive((a) => (a + 1) % DEMO_TABS.length);
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
   }, []);
 
   // slide the pill indicator under the active tab (Cherry-Studio style)

@@ -864,7 +864,10 @@
   // playback — cycle through the diagram kinds, holding each until its build finishes
   var playing = false, timer = null;
   function stop(){ playing = false; clearG(); if(timer){ clearTimeout(timer); timer = null; } playBtn.classList.remove('on'); }
-  function step(n){ if(!playing) return; var dur = render(n); timer = setTimeout(function(){ step(relScene(n, +1)); }, dur + 1300); }
+  // when embedded in the landing, signal the parent after one full cycle so it can advance tabs
+  function embedded(){ try{ return window.parent && window.parent !== window; }catch(e){ return false; } }
+  function cycleDone(){ if(embedded()){ try{ window.parent.postMessage({ type:'kymo-demo-done' }, '*'); }catch(e){} return true; } return false; }
+  function step(n){ if(!playing) return; var dur = render(n); timer = setTimeout(function(){ var nx = relScene(n, +1); if(nx === ORDER[0] && cycleDone()){ stop(); return; } step(nx); }, dur + 1300); }
   function play(){ stop(); playing = true; playBtn.classList.add('on'); step(ORDER[0]); }
 
   btns.forEach(function(b){ b.addEventListener('click', function(){ stop(); render(+b.getAttribute('data-scene')); }); });

@@ -612,11 +612,14 @@
   // scene 3 builds the five components, scene 4 wires up the four edges)
   const DWELL = {2:1500, 3:4400, 4:5000, 5:2800};
   function stop(){ playing = false; if(timer){ clearTimeout(timer); timer = null; } playBtn.classList.remove('on'); }
+  // when embedded in the landing, signal the parent after one full cycle so it can advance tabs
+  function embedded(){ try{ return window.parent && window.parent !== window; }catch(e){ return false; } }
+  function cycleDone(){ if(embedded()){ try{ window.parent.postMessage({ type:'kymo-demo-done' }, '*'); }catch(e){} return true; } return false; }
   function step(n){
     if(!playing) return;
     render(n);                                   // n===1 → typePrompt() types live
     const d = (n === 1) ? TYPE_MS + 800 : (DWELL[n] || 1800);
-    timer = setTimeout(function(){ step(n >= 5 ? 1 : n + 1); }, d);
+    timer = setTimeout(function(){ if(n >= 5){ if(cycleDone()){ stop(); return; } step(1); } else step(n + 1); }, d);
   }
   function play(){ stop(); playing = true; playBtn.classList.add('on'); step(1); }
 
