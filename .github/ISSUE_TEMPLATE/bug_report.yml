@@ -14,8 +14,14 @@ body:
       options:
         - python (PyPI kymostudio)
         - js (npm kymostudio)
+        - rust / core engine (kymostudio-core)
+        - editor (editor.kymo.studio)
         - vscode-extension
-        - website / playground
+        - mcp / api (api.kymo.studio)
+        - website / playground (kymo.studio)
+        - icons (icons.kymo.studio)
+        - mobile
+        - desktop-app
         - docs
     validations:
       required: true
@@ -24,7 +30,7 @@ body:
     attributes:
       label: Version
       description: Package version or git commit
-      placeholder: "0.2.8"
+      placeholder: "0.4.10"
     validations:
       required: true
   - type: textarea

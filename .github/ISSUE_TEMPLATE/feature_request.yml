@@ -1,6 +1,6 @@
 name: Feature request
 description: Suggest an idea or enhancement for kymo
-labels: ["enhancement"]
+type: Feature
 body:
   - type: textarea
     id: problem
@@ -29,8 +29,14 @@ body:
       options:
         - python
         - js
+        - rust / core engine
+        - editor
         - vscode-extension
+        - mcp / api
         - website
+        - icons
+        - mobile
+        - desktop-app
         - docs
     validations:
       required: false
