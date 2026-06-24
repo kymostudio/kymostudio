@@ -296,6 +296,8 @@ section.demo {
 @media (max-width: 560px) {
   .demo-tab { padding: 8px 13px; font-size: 13px; gap: 6px; }
   .demo-tab-ic svg { width: 15px; height: 15px; }
+  .footer-directory { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
+  .footer-mini { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
 
 /* ── Diagram kinds band (full-bleed, bordered — a real section) ── */
@@ -534,7 +536,7 @@ section.features {
   border-color: var(--accent);
   box-shadow: 0 16px 36px rgba(224, 9, 95, 0.1), 0 4px 10px rgba(36, 33, 49, 0.06);
 }
-.feature h3 { margin: 0 0 8px; font-size: 17.5px; font-weight: 700; color: var(--ink); }
+.feature h2 { margin: 0 0 8px; font-size: 17.5px; font-weight: 700; color: var(--ink); }
 .feature p { margin: 0; font-size: 14.5px; color: var(--dim); }
 
 /* ── Hero preview ────────────────────────────────────────────── */
@@ -679,19 +681,52 @@ body.modal-open { overflow: hidden; }
 .tok-str { color: #b03524; }
 .tok-op { color: #6e6a7c; font-weight: 600; }
 
-/* ── Footer ──────────────────────────────────────────────────── */
-footer {
+/* ── Global footer (Apple-HIG-style directory, mirrors design.kymo.studio) ── */
+footer#globalfooter {
   border-top: 1px solid var(--border);
-  padding: 36px var(--pad) 42px;
-  text-align: center;
+  background: var(--bg-soft);
+  margin-top: 48px;
   color: var(--dim);
-  font-size: 13px;
-  background: var(--bg);
 }
-footer a { color: var(--dim); }
-footer a:hover { color: var(--accent); }
-.reg-badges { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 0 0 16px; }
-.reg-badges img { display: block; height: 20px; }
+.footer-inner { max-width: var(--max); margin: 0 auto; padding: 44px var(--pad) 30px; }
+
+/* directory */
+.footer-directory { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 32px; }
+.footer-col { display: flex; flex-direction: column; gap: 28px; }
+.footer-sec h3 {
+  font-family: var(--font); font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em; color: var(--ink); margin: 0 0 14px;
+}
+.footer-sec ul { list-style: none; margin: 0; padding: 0; }
+.footer-sec li { margin-bottom: 10px; }
+.footer-sec a { color: var(--dim); font-weight: 500; font-size: 13px; }
+.footer-sec a:hover { color: var(--accent); text-decoration: none; }
+
+/* legal */
+.footer-legal { margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--border); }
+.footer-mini { display: flex; justify-content: space-between; align-items: center; gap: 14px 28px; flex-wrap: wrap; font-size: 12.5px; }
+.footer-copyright { color: var(--dim); }
+.footer-legal-links { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.footer-legal-links a { color: var(--dim); font-weight: 600; }
+.footer-legal-links a:hover { color: var(--ink); text-decoration: none; }
+
+/* locale select — sits at the end of the legal links */
+.footer-locale { display: inline-flex; align-items: center; }
+.footer-locale select {
+  font: inherit; font-size: 12.5px; font-weight: 700; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--border-strong); border-radius: 8px;
+  padding: 5px 26px 5px 10px; cursor: pointer; line-height: 1.2;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 10.5'><path fill='%236e6a7c' d='M12.43,0l1.57,1.22L7,10.5,0,1.23,1.58,0,7,7,12.43,0Z'/></svg>");
+  background-repeat: no-repeat; background-position: right 9px center; background-size: 9px;
+  transition: border-color .15s ease;
+}
+.footer-locale select:hover { border-color: var(--accent); }
+.footer-locale select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.visuallyhidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 /* ── Responsive + reduced motion ─────────────────────────────── */
 @media (max-width: 880px) {
@@ -713,6 +748,7 @@ footer a:hover { color: var(--accent); }
   .modal-content { width: 96vw; height: 94vh; }
   .modal-body { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
   .modal-pane-source { border-right: none; border-bottom: 1px solid var(--border); }
+  .footer-directory { grid-template-columns: repeat(2, 1fr); gap: 30px 28px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .eyebrow, .hero-split h1, .hero-split p.lead, .hero-split .ctas, .hero-art, .feature { animation: none; }
