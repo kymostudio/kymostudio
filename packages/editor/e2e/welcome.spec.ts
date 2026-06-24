@@ -34,7 +34,7 @@ test("TC-HM-01 guest lands straight in the editor", async ({ page }) => {
   // Guest brand links out to kymo.studio, and "New" is surfaced in the header
   // (guests have no Explorer rail).
   await expect(page.locator('a.brand[href="https://kymo.studio"]')).toBeVisible();
-  await expect(page.getByRole("button", { name: "New" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "New", exact: true })).toBeVisible();
 });
 
 test("TC-HM-04 share link bypasses the Welcome", async ({ page }) => {

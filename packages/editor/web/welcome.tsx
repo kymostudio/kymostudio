@@ -57,7 +57,7 @@ export function WelcomeView({ onNew, onOpenFile, onTemplate, onOpen }: {
               <h2 className="wel-h">Templates</h2>
               <div className="wel-tpls">
                 {quick.map((t) => (
-                  <button key={t.name} className="wel-tpl" title={`New ${t.name} (${t.via})`} onClick={() => onTemplate(t)}>
+                  <button key={t.name} className="wel-tpl" data-testid="wel-template" title={`New ${t.name} (${t.via})`} onClick={() => onTemplate(t)}>
                     <span className="wel-tpl-glyph">{t.glyph}</span>
                     <span className="wel-tpl-text"><span className="wel-tpl-name">{t.name}</span><span className="wel-tpl-via">{t.via}</span></span>
                   </button>
