@@ -490,7 +490,9 @@
     if(svg._pulse) svg._pulse.classList.toggle('show', false);
   }
 
-  // animate scene n with all three cursors working at once; returns duration
+  // glide an already-visible cursor, else drop it in instantly (keeps cursors flowing between scenes)
+  function startCur(o,p){ if(parseFloat(getComputedStyle(CURS[o].el).opacity)>0.4) moveCur(o,p); else placeCur(o,p); }
+  // animate scene n with all three cursors working at once; returns the tight content duration
   function playScene(n){
     clearG();
     var groups=[[],[],[]];
@@ -498,8 +500,8 @@
     var P=780, maxN=0;
     groups.forEach(function(steps,o){
       maxN=Math.max(maxN, steps.length);
-      if(steps.length){ var f0=steps[0]; placeCur(o, f0.kind==='flow' ? svgToWin(f0.pts[0].x,f0.pts[0].y) : centreOf(chipForStep(f0))); }
-      else hideCur(o);
+      if(!steps.length){ hideCur(o); return; }
+      var f0=steps[0]; startCur(o, f0.kind==='flow' ? svgToWin(f0.pts[0].x,f0.pts[0].y) : centreOf(chipForStep(f0)));
       steps.forEach(function(s,i){
         var b=i*P;
         if(s.kind==='flow'){                                   // flows: drag source lifeline → target (connect)
@@ -516,9 +518,8 @@
       });
     });
     var dur=maxN*P;
-    if(n===2 && svg._pulse){ at(dur+340, function(){ svg._pulse.classList.add('show'); }); dur+=600; }
-    at(dur+700, function(){ CURS.forEach(function(_,o){ hideCur(o); hidePrev(o); }); });
-    return dur+1300;
+    if(n===2 && svg._pulse){ at(Math.max(0,dur-260), function(){ svg._pulse.classList.add('show'); }); }
+    return dur;   // tight — next scene begins as the last item settles (no inter-scene pause); cursors glide, never fade between scenes
   }
 
   function render(n){ camFit(); setActive(n); setBaseline(n); return playScene(n); }
@@ -528,9 +529,9 @@
   function stop(){ playing=false; clearG(); if(timer){clearTimeout(timer);timer=null;} playBtn.classList.remove('on'); CURS.forEach(function(_,o){ hideCur(o); hidePrev(o); }); [].slice.call(document.querySelectorAll('.chip.grab')).forEach(function(c){ c.classList.remove('grab'); }); }
   function embedded(){ try{ return window.parent && window.parent !== window; }catch(e){ return false; } }
   function cycleDone(){ if(embedded()){ try{ window.parent.postMessage({ type:'kymo-demo-done' }, '*'); }catch(e){} return true; } return false; }
-  function step(n){ if(!playing) return; cur=n; var dur=render(n); timer=setTimeout(function(){ if(n>=2){ if(cycleDone()){ stop(); return; } step(0); } else step(n+1); }, dur+1400); }
+  function step(n){ if(!playing) return; cur=n; var dur=render(n); var hold=(n>=2)?1600:0; timer=setTimeout(function(){ if(n>=2){ if(cycleDone()){ stop(); return; } step(0); } else step(n+1); }, dur+hold); }
   function play(){ stop(); playing=true; playBtn.classList.add('on'); step(cur); }
-  function once(n){ stop(); cur=n; render(n); }
+  function once(n){ stop(); cur=n; var dur=render(n); at(dur+700, function(){ CURS.forEach(function(_,o){ hideCur(o); hidePrev(o); }); }); }
 
   [].slice.call(document.querySelectorAll('.scene-btn')).forEach(function(b){ b.addEventListener('click', function(){ once(+b.getAttribute('data-scene')); }); });
   document.querySelector('.sc-prev').addEventListener('click', function(){ once((cur+2)%3); });
