@@ -962,47 +962,34 @@ function Page() {
       </nav>
 
       <main>
-      <header className="hero hero-split">
-        {/* the product's signature: an orthogonal edge with flowing-dash animation */}
-        <svg className="hero-edge" viewBox="0 0 1240 480" fill="none" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
-          <path className="edge-path" d="M 96 462 H 596 Q 612 462 612 446 V 156 Q 612 140 628 140 H 1056" />
-          <g className="edge-node">
-            <circle cx="96" cy="462" r="7" />
-            <circle className="core" cx="96" cy="462" r="2.8" />
-          </g>
-          <g className="edge-node">
-            <circle cx="1056" cy="140" r="7" />
-            <circle className="core" cx="1056" cy="140" r="2.8" />
-          </g>
-        </svg>
+      <header className="hero hero-split hero-center">
         <div className="hero-text">
-          <p className="eyebrow"><span className="eyebrow-dot" />{T.hero.eyebrow[lang]}</p>
           <h1>
-            <span className="name">KymoStudio</span><br />
-            <span className="strap">Diagram <em>superpowers</em></span>
+            <span className="strap">Bring your Diagrams to <em>Life</em></span>
           </h1>
-          <p className="lead">{T.hero.lead[lang]}</p>
+          <p className="lead">
+            <span className="mark mark-1">Prompt it</span>. <span className="mark mark-2">See it appear</span>. <span className="mark mark-3">Watch it animate</span>.
+          </p>
           <div className="ctas">
-            <a className="btn btn-primary btn-pill" href="https://docs.kymo.studio/guide/getting-started">{T.hero.gettingStarted[lang]}</a>
-            <a className="btn btn-alt btn-pill" href="#mcp">{T.hero.connectAgent[lang]}</a>
-            <a className="btn btn-alt btn-pill" href="https://editor.kymo.studio">{T.hero.openEditor[lang]}</a>
+            <a className="btn btn-dark btn-pill" href="https://editor.kymo.studio">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+              </svg>
+              Launch App
+            </a>
+            <a className="btn btn-alt btn-pill btn-docs" href="https://docs.kymo.studio">
+              Docs
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </a>
           </div>
         </div>
-        <div className="hero-art">
-          <img src="./logo.svg" alt="KymoStudio" />
-        </div>
       </header>
-
-      <section className="features" id="features">
-        <div className="feature-grid">
-          {FEATURES.map((f) => (
-            <div className="feature" key={f.title.en}>
-              <h2>{f.title[lang]}</h2>
-              <p>{f.desc[lang]}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
       <HeroDemo />
 
