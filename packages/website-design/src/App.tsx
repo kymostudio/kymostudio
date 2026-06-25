@@ -17,6 +17,23 @@ const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ 
 const useLang = () => useContext(LangContext);
 const kept = (s: string): L => ({ en: s, vi: s, zh: s }); // proper nouns kept across languages
 
+// Each language is a real, separately-prerendered URL tree so crawlers see
+// translated HTML + hreflang: English is canonical at the root, the others sit
+// under a `/vi` or `/zh` path prefix. The locale is derived synchronously from
+// the path on both server and client (so hydration matches). See splitLocale /
+// localizedHref below (defined after normalizePath).
+
+// Persist an explicit choice to localStorage + a `.kymo.studio` cookie (the
+// cookie carries the choice across subdomains AND is what each English page's
+// inline redirect reads to send returning visitors to their language).
+function persistLang(l: Lang): void {
+  try { localStorage.setItem("kymo-lang", l); } catch {}
+  if (typeof document !== "undefined") {
+    const shared = location.hostname.endsWith("kymo.studio") ? "; domain=.kymo.studio" : "";
+    document.cookie = `kymo-lang=${l}; path=/${shared}; max-age=31536000; SameSite=Lax`;
+  }
+}
+
 // ── Data ─────────────────────────────────────────────────────────
 type Swatch = { name: L; hex: string; role: L; labelInk?: boolean; border?: boolean };
 const SWATCHES: Swatch[] = [
@@ -218,6 +235,41 @@ const ALL_PAGES: PageMeta[] = [OVERVIEW, ...FOUNDATION_PAGES];
 const normalizePath = (p: string) => (p.length > 1 && p.endsWith("/") ? p.slice(0, -1) : p);
 const pageForPath = (p: string) => ALL_PAGES.find((pg) => pg.path === normalizePath(p)) ?? OVERVIEW;
 
+// Locale lives as a path prefix (/vi, /zh); English has none. `splitLocale`
+// turns a real URL path into { lang, rest } where `rest` is the locale-stripped
+// LOGICAL path the router/pageForPath understand; `localizedHref` is the
+// inverse — a logical path → the real URL for a given language.
+export function splitLocale(pathname: string): { lang: Lang; rest: string } {
+  const m = pathname.match(/^\/(vi|zh)(\/.*)?$/);
+  if (m) return { lang: m[1] as Lang, rest: normalizePath(m[2] || "/") };
+  return { lang: "en", rest: normalizePath(pathname || "/") };
+}
+export function localizedHref(lang: Lang, logicalPath: string): string {
+  const p = normalizePath(logicalPath);
+  if (lang === "en") return p;
+  return p === "/" ? `/${lang}/` : `/${lang}${p}`;
+}
+
+// The logical paths to prerender (one HTML per path × language). Consumed by
+// prerender.mjs.
+export const ROUTES: string[] = ALL_PAGES.map((p) => p.path);
+
+// Per-page, per-locale <title> + meta description for the prerendered pages.
+const META_DESC: L = {
+  en: "The KymoStudio brand & design system — the mark, the Mermaid colour palette, typography, design tokens and brand voice. Download the logo and wordmark lockups.",
+  vi: "Hệ thống thương hiệu & thiết kế KymoStudio — logo, bảng màu Mermaid, kiểu chữ, design token và giọng thương hiệu. Tải logo và bộ wordmark.",
+  zh: "KymoStudio 品牌与设计系统 — 标志、Mermaid 配色、字体、设计 token 与品牌语调。下载 logo 与 wordmark 锁版。",
+};
+export function seoFor(logicalPath: string, lang: Lang): { title: string; description: string } {
+  const pg = pageForPath(logicalPath);
+  const title =
+    pg.key === "overview"
+      ? T.title[lang]
+      : `${pg.label[lang]} — ${T.side.title[lang]} · KymoStudio`;
+  const description = pg.blurb ? pg.blurb[lang] : META_DESC[lang];
+  return { title, description };
+}
+
 const RouteContext = createContext<{ path: string; navigate: (to: string) => void }>({
   path: "/",
   navigate: () => {},
@@ -244,17 +296,21 @@ function SidebarIcon() {
   );
 }
 
-function useRoute() {
-  const [path, setPath] = useState(() => normalizePath(window.location.pathname));
+// `initialPath` is the locale-stripped LOGICAL path (from splitLocale) so this
+// never reads window during render — keeps it safe for prerender/hydration.
+// `to` passed to navigate() is also a logical path; pushState writes the real,
+// locale-prefixed URL so the address bar and the prerendered files agree.
+function useRoute(initialPath: string, lang: Lang) {
+  const [path, setPath] = useState(initialPath);
   useEffect(() => {
-    const onPop = () => setPath(normalizePath(window.location.pathname));
+    const onPop = () => setPath(splitLocale(window.location.pathname).rest);
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
   const navigate = (to: string) => {
     const next = normalizePath(to);
     if (next === path) return;
-    window.history.pushState(null, "", to);
+    window.history.pushState(null, "", localizedHref(lang, next));
     setPath(next);
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   };
@@ -267,11 +323,15 @@ function Link(
     { to: string; className?: string; children: ReactNode } & Record<string, unknown>,
 ) {
   const { navigate } = useRouter();
+  const { lang } = useLang();
   const { setOpen } = useMenu();
   const internal = to.startsWith("/") && !to.startsWith("//");
+  // crawlable, right-click-correct href carries the locale prefix; the SPA
+  // click handler still navigates by the logical path.
+  const href = internal ? localizedHref(lang, normalizePath(to)) : to;
   return (
     <a
-      href={to}
+      href={href}
       className={className}
       onClick={(e) => {
         if (!internal) return;
@@ -624,6 +684,18 @@ function DontsSection() {
   );
 }
 
+const LOCALE_SITES = ["https://kymo.studio", "https://docs.kymo.studio", "https://icons.kymo.studio", "https://design.kymo.studio"];
+function localizeFooterHref(href: string, lang: Lang): string {
+  if (lang === "en") return href;
+  for (const base of LOCALE_SITES) {
+    if (href === base || href.startsWith(base + "/") || href.startsWith(base + "#")) {
+      const rest = href.slice(base.length);
+      return rest ? `${base}/${lang}${rest}` : `${base}/${lang}/`;
+    }
+  }
+  return href;
+}
+
 // ── Global footer directory (Apple-HIG-style) ────────────────────
 type FLink = [label: L, href: string];
 type FSection = { title: L; links: FLink[] };
@@ -699,7 +771,7 @@ function Footer() {
                   <h3>{sec.title[lang]}</h3>
                   <ul>
                     {sec.links.map(([label, href]) => (
-                      <li key={label.en}><a href={href}>{label[lang]}</a></li>
+                      <li key={label.en}><a href={localizeFooterHref(href, lang)}>{label[lang]}</a></li>
                     ))}
                   </ul>
                 </div>
@@ -741,18 +813,23 @@ function PageBody({ pageKey, copied, copy }: { pageKey: PageKey; copied: string 
   }
 }
 
-export function App() {
+export function App({ initialLang, initialPath }: { initialLang: Lang; initialPath: string }) {
   const { copied, copy } = useCopy();
-  const [lang, setLangState] = useState<Lang>("en");
-  const { path, navigate } = useRoute();
+  // Locale is fixed by the URL (prerendered per language); it never changes in
+  // place — switching navigates to the other locale's page instead.
+  const [lang] = useState<Lang>(initialLang);
+  const { path, navigate } = useRoute(initialPath, lang);
   const [menuOpen, setMenuOpen] = useState(false);
   const current = pageForPath(path);
 
-  // restore saved choice on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("kymo-lang");
-    if (saved && (LANGS as string[]).includes(saved)) setLangState(saved as Lang);
-  }, []);
+  // switching language → navigate to the SAME page in the new locale's
+  // prerendered URL. Persist first so the choice (cookie shared on
+  // .kymo.studio) survives the navigation and future visits land right.
+  const setLang = (l: Lang) => {
+    if (l === lang) return;
+    persistLang(l);
+    location.assign(localizedHref(l, path));
+  };
 
   // lock body scroll + close on Escape while the mobile drawer is open
   useEffect(() => {
@@ -763,9 +840,8 @@ export function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  // persist + reflect on <html lang>
+  // reflect the current language on <html lang>
   useEffect(() => {
-    localStorage.setItem("kymo-lang", lang);
     document.documentElement.lang = lang;
   }, [lang]);
 
@@ -777,7 +853,7 @@ export function App() {
   }, [lang, current]);
 
   return (
-    <LangContext.Provider value={{ lang, setLang: setLangState }}>
+    <LangContext.Provider value={{ lang, setLang }}>
       <RouteContext.Provider value={{ path, navigate }}>
         <MenuContext.Provider value={{ open: menuOpen, setOpen: setMenuOpen }}>
           <Nav />

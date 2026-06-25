@@ -24,9 +24,9 @@ npx esbuild src/main.tsx --bundle --format=esm --minify \
   --outfile=dist/bundle.js
 
 echo "→ assembling dist/"
-cp src/index.html dist/
+cp src/app.html dist/     # empty SPA shell — fallback for deep routes (_redirects)
 cp src/styles.css dist/
-cp src/_redirects dist/   # SPA rewrite for /login + /admin (Cloudflare Pages)
+cp src/_redirects dist/   # SPA rewrite for deep routes → app.html (Cloudflare Pages)
 # icon catalogue (manifest paths are relative `icons/<set>/…`; resolved to the CDN at runtime)
 cp "$ICONS/icons-manifest.json" dist/
 cp "$ICONS/icons-collections.json" dist/
@@ -36,9 +36,17 @@ cp "$ICONS/sets/ai.json" dist/sets/
 # Root brand assets live at <repo>/docs/brand (i.e. ../../docs from here).
 cp ../../docs/brand/logo.svg dist/logo.svg
 
-# cache-bust the bundle + styles refs
+# Prerender the per-locale home shells (/, /vi/, /zh/) with translated chrome +
+# hreflang/canonical and the app markup baked in. Re-renders markup only — the
+# committed bundle.js is unchanged. Needs node_modules (installed above).
+echo "→ prerender home shells (en / vi / zh)"
+node src/prerender.mjs
+
+# cache-bust the bundle + styles refs across every prerendered shell + app.html
 V=$(date +%s)
-sed -i.bak "s|bundle.js|bundle.js?v=$V|g; s|styles.css|styles.css?v=$V|g" dist/index.html && rm -f dist/index.html.bak
+for f in dist/index.html dist/vi/index.html dist/zh/index.html dist/app.html; do
+  sed -i.bak "s|bundle.js|bundle.js?v=$V|g; s|styles.css|styles.css?v=$V|g" "$f" && rm -f "$f.bak"
+done
 
 N=$(grep -o '"[a-z0-9]*:[^"]*":' "$ICONS/icons-manifest.json" | wc -l | tr -d ' ')
 echo "✓ built dist/ ($N icons via cdn.kymo.studio, $(du -sh dist | cut -f1))"

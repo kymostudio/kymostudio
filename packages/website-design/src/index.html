@@ -1,14 +1,20 @@
 <!doctype html>
-<html lang="en">
+<!-- Template — prerender.mjs fills the __TOKENS__ and emits one file per
+     locale × page: dist/index.html (en overview), dist/foundations/<slug>/…,
+     dist/vi/…, dist/zh/…. Asset URLs are absolute so deep pages load them. -->
+<html lang="__LANG__">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KymoStudio — Brand &amp; Design System</title>
-  <meta name="description" content="The KymoStudio brand & design system — the mark, the Mermaid colour palette, typography, design tokens and brand voice. Download the logo and wordmark lockups.">
-  <meta property="og:title" content="KymoStudio — Brand &amp; Design System">
-  <meta property="og:description" content="The mark, the Mermaid colour palette, typography, design tokens and brand voice.">
+  __REDIRECT__
+  <title>__TITLE__</title>
+  <meta name="description" content="__DESC__">
+  <link rel="canonical" href="__CANONICAL__">
+__ALTERNATES__
+  <meta property="og:title" content="__TITLE__">
+  <meta property="og:description" content="__DESC__">
   <meta property="og:image" content="https://design.kymo.studio/brand/social-preview.png">
-  <meta property="og:url" content="https://design.kymo.studio/">
+  <meta property="og:url" content="__OGURL__">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
@@ -21,7 +27,7 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">__APP__</div>
   <script type="module" src="/bundle.js"></script>
 </body>
 </html>

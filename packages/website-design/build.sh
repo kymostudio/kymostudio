@@ -27,7 +27,6 @@ npx esbuild src/main.tsx --bundle --format=esm --minify \
 
 echo "→ assembling dist/"
 
-cp src/index.html dist/
 cp src/styles.css dist/
 cp src/CNAME dist/
 cp src/_redirects dist/   # SPA fallback for client-side routes (/foundations/*)
@@ -56,8 +55,17 @@ cp "$BRAND/favicon-32.png"       dist/favicon-32.png
 cp "$BRAND/favicon-48.png"       dist/favicon-48.png
 cp "$BRAND/apple-touch-icon.png" dist/apple-touch-icon.png
 
-# cache-bust the bundle + stylesheet refs
+# Prerender one static HTML per locale × page (en at root, vi/zh under a path
+# prefix), each with translated <title>/description + hreflang/canonical and the
+# app markup baked in for crawlers. Re-renders markup only — the committed
+# bundle.js is unchanged. Needs node_modules (installed above).
+echo "→ prerender per locale × page (en / vi / zh)"
+node src/prerender.mjs
+
+# cache-bust the bundle + stylesheet refs across every prerendered page
 V=$(date +%s)
-sed -i.bak "s|bundle.js|bundle.js?v=$V|g; s|styles.css|styles.css?v=$V|g" dist/index.html && rm -f dist/index.html.bak
+while IFS= read -r f; do
+  sed -i.bak "s|bundle.js|bundle.js?v=$V|g; s|styles.css|styles.css?v=$V|g" "$f" && rm -f "$f.bak"
+done < <(find dist -name index.html)
 
 echo "✓ built dist/ ($(du -sh dist | cut -f1))"

@@ -27,7 +27,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Build website -> dist/
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: packages/website/package-lock.json
+      - name: Install deps (prerender needs react-dom/server + esbuild)
+        run: npm ci --no-audit --no-fund
+        working-directory: packages/website
+      - name: Build website -> dist/ (assembles bundles + prerenders per locale)
         run: ./build.sh
         working-directory: packages/website
       - name: Deploy to Cloudflare Pages

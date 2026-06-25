@@ -12,18 +12,86 @@ const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ 
 export const useLang = () => useContext(LangContext);
 const kept = (s: string): L => ({ en: s, vi: s, zh: s });
 
-export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("en");
-  useEffect(() => {
-    const saved = localStorage.getItem("kymo-lang");
-    if (saved && (LANGS as string[]).includes(saved)) setLang(saved as Lang);
-  }, []);
-  useEffect(() => {
-    localStorage.setItem("kymo-lang", lang);
-    document.documentElement.lang = lang;
-  }, [lang]);
-  return <LangContext.Provider value={{ lang, setLang }}>{children}</LangContext.Provider>;
+// Locale lives as a path prefix (/vi, /zh); English has none. `splitLocale`
+// turns a real URL path into { lang, rest } where `rest` is the locale-stripped
+// LOGICAL path the routers parse; `localizedHref` is the inverse. The home
+// gallery is prerendered per locale (/, /vi/, /zh/) for hreflang; deep routes
+// (/set, /icon, /brand) just carry the prefix through client navigation.
+const stripTrailing = (p: string) => (p.length > 1 ? p.replace(/\/+$/, "") : p) || "/";
+export function splitLocale(pathname: string): { lang: Lang; rest: string } {
+  const m = pathname.match(/^\/(vi|zh)(\/.*)?$/);
+  if (m) return { lang: m[1] as Lang, rest: stripTrailing(m[2] || "/") };
+  return { lang: "en", rest: stripTrailing(pathname || "/") };
 }
+export function localizedHref(lang: Lang, logicalPath: string): string {
+  const p = logicalPath || "/";
+  if (lang === "en") return p;
+  return p === "/" ? `/${lang}/` : `/${lang}${p}`;
+}
+
+// Resolve the visitor's preferred language for routes WITHOUT a locale prefix:
+// cross-subdomain cookie → localStorage → browser language → English.
+export function readLang(): Lang {
+  if (typeof document !== "undefined") {
+    const c = document.cookie.match(/(?:^|;\s*)kymo-lang=(en|vi|zh)\b/);
+    if (c) return c[1] as Lang;
+  }
+  try {
+    const saved = localStorage.getItem("kymo-lang");
+    if (saved && (LANGS as string[]).includes(saved)) return saved as Lang;
+  } catch {}
+  const tags =
+    typeof navigator === "undefined" ? []
+    : navigator.languages?.length ? navigator.languages : [navigator.language];
+  const hit = tags.map((t) => (t || "").slice(0, 2).toLowerCase()).find((t) => (LANGS as string[]).includes(t));
+  return (hit as Lang) || "en";
+}
+
+// The language the client should start at: the URL prefix if present (so it
+// matches the prerendered /vi/ or /zh/ shell on hydration), else cookie/browser.
+export function clientInitialLang(): Lang {
+  const { lang } = splitLocale(location.pathname);
+  return lang !== "en" ? lang : readLang();
+}
+
+// Persist an explicit choice to localStorage + a `.kymo.studio` cookie (the
+// cookie carries the choice across subdomains AND is read by the home page's
+// inline redirect to send returning visitors to their language).
+function persistLang(l: Lang): void {
+  try { localStorage.setItem("kymo-lang", l); } catch {}
+  if (typeof document !== "undefined") {
+    const shared = location.hostname.endsWith("kymo.studio") ? "; domain=.kymo.studio" : "";
+    document.cookie = `kymo-lang=${l}; path=/${shared}; max-age=31536000; SameSite=Lax`;
+  }
+}
+
+// `initialLang` is fixed by the URL (prerender passes the shell's locale; the
+// client passes clientInitialLang()). Switching navigates to the SAME logical
+// route in the new locale's URL, so the address bar and prerendered shells agree.
+export function LangProvider({ children, initialLang }: { children: ReactNode; initialLang: Lang }) {
+  const [lang] = useState<Lang>(initialLang);
+  useEffect(() => { document.documentElement.lang = lang; }, [lang]);
+  const choose = (l: Lang) => {
+    if (l === lang) return;
+    persistLang(l);
+    location.assign(localizedHref(l, splitLocale(location.pathname).rest));
+  };
+  return <LangContext.Provider value={{ lang, setLang: choose }}>{children}</LangContext.Provider>;
+}
+
+// Per-locale <title> + meta description for the prerendered home shells (SEO).
+export const SEO: { title: L; description: L } = {
+  title: {
+    en: "Kymo Icons — provider & architecture icon library",
+    vi: "Kymo Icons — thư viện icon nhà cung cấp & kiến trúc",
+    zh: "Kymo Icons — 服务商与架构图标库",
+  },
+  description: {
+    en: "A searchable library of provider, cloud and architecture icons — browse by set, copy keys, download SVG/PNG. Built for kymo diagrams.",
+    vi: "Thư viện icon nhà cung cấp, cloud và kiến trúc, tìm kiếm dễ dàng — duyệt theo bộ, chép key, tải SVG/PNG. Dành cho sơ đồ kymo.",
+    zh: "可搜索的服务商、云与架构图标库 — 按图标集浏览、复制 key、下载 SVG/PNG。为 kymo 图表打造。",
+  },
+};
 
 // ── UI chrome strings ────────────────────────────────────────────
 export const T = {
@@ -102,6 +170,18 @@ export const T = {
   },
 };
 
+const LOCALE_SITES = ["https://kymo.studio", "https://docs.kymo.studio", "https://icons.kymo.studio", "https://design.kymo.studio"];
+function localizeFooterHref(href: string, lang: Lang): string {
+  if (lang === "en") return href;
+  for (const base of LOCALE_SITES) {
+    if (href === base || href.startsWith(base + "/") || href.startsWith(base + "#")) {
+      const rest = href.slice(base.length);
+      return rest ? `${base}/${lang}${rest}` : `${base}/${lang}/`;
+    }
+  }
+  return href;
+}
+
 // ── Global footer directory (mirrors kymo.studio) ────────────────
 type FLink = [label: L, href: string];
 type FSection = { title: L; links: FLink[] };
@@ -177,7 +257,7 @@ export function Footer() {
                   <h3>{sec.title[lang]}</h3>
                   <ul>
                     {sec.links.map(([label, href]) => (
-                      <li key={label.en}><a href={href}>{label[lang]}</a></li>
+                      <li key={label.en}><a href={localizeFooterHref(href, lang)}>{label[lang]}</a></li>
                     ))}
                   </ul>
                 </div>
