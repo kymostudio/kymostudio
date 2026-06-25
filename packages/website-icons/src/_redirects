@@ -1,1 +1,6 @@
-/*   /index.html   200
+# SPA fallback → the EMPTY app.html shell (not the prerendered home, which has
+# baked markup that would mismatch a deep route on hydration). Real files — the
+# per-locale home shells /, /vi/, /zh/, plus /bundle.js, /logo.svg, the manifest
+# — are served before this rule; only deep routes (/set, /icon, /brand, /admin,
+# /login, and any /vi|/zh-prefixed form) fall through to a fresh client render.
+/*   /app.html   200

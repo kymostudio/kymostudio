@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { API } from "./App";
+import { splitLocale } from "./i18n";
 import { ADMIN_EMAIL, GOOGLE_CLIENT_ID, type Claims, exchange, fileToBase64, loadGsi, signOut, whoami } from "./auth";
 
 type Overlay = { icons: Record<string, { path: string; ver: number }>; removed: string[] };
@@ -37,7 +38,7 @@ export function Admin() {
 
   const isAdmin = !!claims && claims.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   // After a successful admin sign-in on /login, move to /admin (the management URL).
-  const onLogin = location.pathname.replace(/\/+$/, "") === "/login";
+  const onLogin = splitLocale(location.pathname).rest === "/login";
   const redirecting = isAdmin && onLogin;
   useEffect(() => { if (redirecting) location.replace("/admin"); }, [redirecting]);
 

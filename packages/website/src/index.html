@@ -1,14 +1,20 @@
 <!doctype html>
-<html lang="en">
+<!-- Template — prerender.mjs fills the __TOKENS__ and emits one file per
+     locale: dist/index.html (en, canonical), dist/vi/index.html, dist/zh/index.html.
+     Asset URLs are absolute so the /vi/ and /zh/ pages load them too. -->
+<html lang="__LANG__">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KymoStudio</title>
-  <meta name="description" content="Declarative architecture diagrams to animated SVG / WebP. Write a .kymo file, get a self-contained SVG with auto-layout, orthogonal edge routing, and CSS animation.">
+  __REDIRECT__
+  <title>__TITLE__</title>
+  <meta name="description" content="__DESC__">
+  <link rel="canonical" href="__CANONICAL__">
+__ALTERNATES__
   <meta property="og:title" content="KymoStudio">
-  <meta property="og:description" content="Declarative architecture diagrams to animated SVG / WebP.">
+  <meta property="og:description" content="__DESC__">
   <meta property="og:image" content="https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples/nvidia-aiq-animated.webp">
-  <meta property="og:url" content="https://kymo.studio/">
+  <meta property="og:url" content="__OGURL__">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
@@ -18,10 +24,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="./landing.bundle.js"></script>
+  <div id="root">__APP__</div>
+  <script type="module" src="/landing.bundle.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { createRoot } from "react-dom/client";
+import { hydrateRoot } from "react-dom/client";
 
 const RAW = "https://raw.githubusercontent.com/kymostudio/kymostudio/main/samples";
 const GH = "https://github.com/kymostudio/kymostudio";
@@ -14,6 +14,42 @@ type L<T = string> = { en: T; vi: T; zh: T };
 const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: "en", setLang: () => {} });
 const useLang = () => useContext(LangContext);
 const kept = (s: string): L => ({ en: s, vi: s, zh: s }); // proper nouns kept across languages
+
+// Each language is a real, separately-prerendered URL so crawlers see
+// translated HTML and hreflang alternates: English is canonical at the root
+// `/`, the others live under `/vi/` and `/zh/`. The locale is derived
+// synchronously from the path on both server (which file is being emitted) and
+// client (so hydration matches the prerendered markup).
+function pathToLang(path: string): Lang {
+  const seg = path.replace(/^\/+/, "").split("/")[0];
+  return seg === "vi" || seg === "zh" ? seg : "en";
+}
+function langToPath(l: Lang): string {
+  return l === "en" ? "/" : `/${l}/`;
+}
+
+// Persist an explicit choice to a `.kymo.studio` cookie (+ localStorage). The
+// cookie carries the choice across subdomains AND is what the root page's
+// inline redirect reads to send returning visitors to their language.
+function persistLang(l: Lang): void {
+  try { localStorage.setItem("kymo-lang", l); } catch {}
+  if (typeof document !== "undefined") {
+    const shared = location.hostname.endsWith("kymo.studio") ? "; domain=.kymo.studio" : "";
+    document.cookie = `kymo-lang=${l}; path=/${shared}; max-age=31536000; SameSite=Lax`;
+  }
+}
+
+// Per-locale <title> + meta description baked into each prerendered page. The
+// brand title is intentionally identical across languages; the description
+// localises. Consumed by prerender.mjs.
+export const SEO: { title: L; description: L } = {
+  title: { en: "KymoStudio — Diagram superpowers", vi: "KymoStudio — Diagram superpowers", zh: "KymoStudio — Diagram superpowers" },
+  description: {
+    en: "Declarative architecture diagrams to animated SVG / WebP. Write a .kymo file, get a self-contained SVG with auto-layout, orthogonal edge routing, and CSS animation.",
+    vi: "Sơ đồ kiến trúc khai báo, xuất ra SVG / WebP động. Viết một file .kymo, nhận SVG độc lập với tự động bố cục, định tuyến cạnh vuông góc và hoạt hoạ CSS.",
+    zh: "声明式架构图，导出为动画 SVG / WebP。编写一个 .kymo 文件，即可获得自带自动布局、正交连线与 CSS 动画的独立 SVG。",
+  },
+};
 
 type Feature = { title: L; desc: L };
 const FEATURES: Feature[] = [
@@ -136,6 +172,18 @@ const T = {
   },
 };
 
+const LOCALE_SITES = ["https://kymo.studio", "https://docs.kymo.studio", "https://icons.kymo.studio", "https://design.kymo.studio"];
+function localizeFooterHref(href: string, lang: Lang): string {
+  if (lang === "en") return href;
+  for (const base of LOCALE_SITES) {
+    if (href === base || href.startsWith(base + "/") || href.startsWith(base + "#")) {
+      const rest = href.slice(base.length);
+      return rest ? `${base}/${lang}${rest}` : `${base}/${lang}/`;
+    }
+  }
+  return href;
+}
+
 // ── Global footer directory (Apple-HIG-style, mirrors design.kymo.studio) ──
 // Links are absolute so the directory resolves identically from any kymo site.
 type FLink = [label: L, href: string];
@@ -212,7 +260,7 @@ function Footer() {
                   <h3>{sec.title[lang]}</h3>
                   <ul>
                     {sec.links.map(([label, href]) => (
-                      <li key={label.en}><a href={href}>{label[lang]}</a></li>
+                      <li key={label.en}><a href={localizeFooterHref(href, lang)}>{label[lang]}</a></li>
                     ))}
                   </ul>
                 </div>
@@ -834,22 +882,22 @@ type DemoTab = { id: string; label: L; href: (reduce: boolean) => string; icon: 
 const DEMO_TABS: DemoTab[] = [
   {
     id: "agent", label: T.demo.agent,
-    href: (r) => `./hero-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
+    href: (r) => `/hero-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></svg>,
   },
   {
     id: "visual", label: T.demo.visual,
-    href: (r) => `./sequence-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
+    href: (r) => `/sequence-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12.034 12.681a.498.498 0 0 1 .647-.647l9 3.5a.5.5 0 0 1-.033.943l-3.444 1.068a1 1 0 0 0-.66.66l-1.067 3.443a.5.5 0 0 1-.943.033z" /><path d="M21 11V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6" /></svg>,
   },
   {
     id: "diagrams", label: T.demo.sync,
-    href: (r) => `./diagrams-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
+    href: (r) => `/diagrams-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="16" y="16" width="6" height="6" rx="1" /><rect x="2" y="16" width="6" height="6" rx="1" /><rect x="9" y="2" width="6" height="6" rx="1" /><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" /><path d="M12 12V8" /></svg>,
   },
   {
     id: "collab", label: T.demo.collab,
-    href: (r) => `./collab-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
+    href: (r) => `/collab-demo.html?embed=1${r ? "" : "&autoplay=1"}`,
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" /></svg>,
   },
 ];
@@ -959,7 +1007,7 @@ function Page() {
     <>
       <nav>
         <div className="nav-inner">
-          <div className="brand"><img src="./logo.svg" alt="" />KymoStudio</div>
+          <div className="brand"><img src="/logo.svg" alt="" />KymoStudio</div>
           <div className="nav-right">
             <GitHubStars />
             <a className="btn btn-primary btn-sm" href="https://editor.kymo.studio">{T.nav.startFree[lang]}</a>
@@ -1068,27 +1116,37 @@ function Page() {
   );
 }
 
-function App() {
-  const [lang, setLang] = useState<Lang>("en");
+export function App({ initialLang }: { initialLang: Lang }) {
+  // The locale is fixed by the URL (prerendered per language), so it never
+  // changes in place — `lang` stays at the value hydration started with.
+  const [lang] = useState<Lang>(initialLang);
 
-  // restore saved choice on mount (shared key with design.kymo.studio)
+  // <html lang> + title are already correct from the prerender; this only
+  // matters if the markup is ever served without them.
   useEffect(() => {
-    const saved = localStorage.getItem("kymo-lang");
-    if (saved && (LANGS as string[]).includes(saved)) setLang(saved as Lang);
-  }, []);
-
-  // persist + reflect on <html lang> and the document title
-  useEffect(() => {
-    localStorage.setItem("kymo-lang", lang);
     document.documentElement.lang = lang;
     document.title = T.title[lang];
   }, [lang]);
 
+  // Switching language navigates to that locale's prerendered URL, so the
+  // crawler-visible HTML and the address bar always agree. Persist first so
+  // the choice (cookie shared on .kymo.studio) survives the navigation and
+  // future visits land on the right language.
+  const choose = (l: Lang) => {
+    if (l === lang) return;
+    persistLang(l);
+    location.assign(langToPath(l));
+  };
+
   return (
-    <LangContext.Provider value={{ lang, setLang }}>
+    <LangContext.Provider value={{ lang, setLang: choose }}>
       <Page />
     </LangContext.Provider>
   );
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Client bootstrap — guarded so importing this module under Node (prerender)
+// doesn't try to touch the DOM. Hydrates the markup prerender.mjs emitted.
+if (typeof document !== "undefined") {
+  hydrateRoot(document.getElementById("root")!, <App initialLang={pathToLang(location.pathname)} />);
+}

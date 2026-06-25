@@ -1,6 +1,12 @@
-import { createRoot } from "react-dom/client";
-import { App } from "./App";
+import { hydrateRoot } from "react-dom/client";
+import { App, splitLocale } from "./App";
 
-// Single static page — no router. The whole brand & design-system surface lives
-// in <App>; this file just mounts it into #root.
-createRoot(document.getElementById("root")!).render(<App />);
+// The brand & design-system surface is prerendered into one static HTML per
+// locale × page (see prerender.mjs); this file HYDRATES whichever page was
+// served. Locale + logical path both come from the URL so the client's first
+// render matches the prerendered markup.
+const { lang, rest } = splitLocale(window.location.pathname);
+hydrateRoot(
+  document.getElementById("root")!,
+  <App initialLang={lang} initialPath={rest} />,
+);

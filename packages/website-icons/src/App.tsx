@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { useLang, T, Footer } from "./i18n";
+import { useLang, T, Footer, splitLocale, localizedHref } from "./i18n";
 
 // ── config ────────────────────────────────────────────────────────────────
 const FIRST = 80; // initial paint batch — small so the grid appears fast (≈1 viewport)
@@ -8,7 +8,7 @@ const PAGE = 120; // incremental render batch (infinite scroll)
 // cdn.kymo.studio) — NOT bundled into this deploy. The manifest keeps RELATIVE
 // paths (`icons/<set>/…`, shared with the Python/JS impls); we resolve them
 // against the CDN here. Override at runtime with ?cdn=… for local testing.
-const CDN_BASE = new URLSearchParams(location.search).get("cdn") || "https://cdn.kymo.studio/";
+const CDN_BASE = (typeof location !== "undefined" && new URLSearchParams(location.search).get("cdn")) || "https://cdn.kymo.studio/";
 // icons-admin backend (shares the kymo.studio Google session); serves the live
 // overlay (added/removed) merged over the static manifest.
 export const API = "https://api.kymo.studio";
@@ -118,7 +118,8 @@ const iconCount = (list: Icon[]) => list.reduce((n, it) => n + (it.variants?.len
 // The gallery view (set + subset) lives in the path: /set/<set>[/<subset>].
 // Falls back to the legacy ?set=&sub= query for old links.
 function viewFromUrl(): { set: string; sub: string } {
-  const m = location.pathname.replace(/\/+$/, "").match(/^\/set\/([^/]+)(?:\/([^/]+))?$/);
+  if (typeof location === "undefined") return { set: "all", sub: "" }; // prerender → home view
+  const m = splitLocale(location.pathname).rest.match(/^\/set\/([^/]+)(?:\/([^/]+))?$/);
   if (m) return { set: decodeURIComponent(m[1]), sub: m[2] ? decodeURIComponent(m[2]) : "" };
   const q = new URLSearchParams(location.search);
   return { set: q.get("set") || "all", sub: q.get("sub") || "" };
@@ -129,18 +130,19 @@ export function App() {
   const [items, setItems] = useState<Icon[]>([]);
   const [set, setSet] = useState(() => viewFromUrl().set);
   const [sub, setSub] = useState(() => viewFromUrl().sub); // selected subset within a set
-  const [query, setQuery] = useState(() => new URLSearchParams(location.search).get("q") || "");
+  const [query, setQuery] = useState(() => (typeof location !== "undefined" ? new URLSearchParams(location.search).get("q") || "" : ""));
   const [sortBy, setSortBy] = useState<"name" | "set">("name");
   const [shown, setShown] = useState(FIRST);
   const [dialog, setDialog] = useState<Icon | null>(null);
   const [dlgVar, setDlgVar] = useState<Variant | null>(null); // selected variant in the modal
   const [tip, setTip] = useState<{ key: string; x: number; y: number } | null>(null);
   const [toast, setToastState] = useState<string | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">(
-    () => (localStorage.getItem("kymo-icons-theme") as "light" | "dark") ||
-      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
-  );
-  const [size, setSize] = useState(() => Number(localStorage.getItem("kymo-icons-size")) || 40);
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof localStorage === "undefined") return "light"; // SSR/prerender
+    return (localStorage.getItem("kymo-icons-theme") as "light" | "dark") ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  });
+  const [size, setSize] = useState(40); // saved size is loaded post-hydration (see effect)
   const [menuOpen, setMenuOpen] = useState(false); // mobile hamburger nav
 
   const searchRef = useRef<HTMLInputElement>(null);
@@ -200,7 +202,7 @@ export function App() {
   useEffect(() => {
     const q = query.trim() ? "?q=" + encodeURIComponent(query.trim()) : "";
     const path = set === "all" ? "/" : "/set/" + set + (sub ? "/" + sub : "");
-    history.replaceState(null, "", path + q);
+    history.replaceState(null, "", localizedHref(lang, path) + q);
   }, [set, sub, query]);
 
   // theme + preview-size → CSS, persisted
@@ -208,6 +210,12 @@ export function App() {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("kymo-icons-theme", theme);
   }, [theme]);
+  // load the saved preview size AFTER hydration — keeping it out of the initial
+  // render lets the prerendered home shell hydrate without a value mismatch.
+  useEffect(() => {
+    const s = Number(localStorage.getItem("kymo-icons-size"));
+    if (s) setSize(s);
+  }, []);
   useEffect(() => {
     document.documentElement.style.setProperty("--cell-icon", size + "px");
     localStorage.setItem("kymo-icons-size", String(size));
@@ -258,7 +266,7 @@ export function App() {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault(); searchRef.current?.focus(); searchRef.current?.select();
-      } else if (e.key === "Escape" && location.pathname.startsWith("/icon/")) {
+      } else if (e.key === "Escape" && splitLocale(location.pathname).rest.startsWith("/icon/")) {
         history.back();
       }
     };
@@ -291,10 +299,10 @@ export function App() {
   };
   const openIcon = (it: Icon) => {
     setTip(null); showIcon(it);
-    history.pushState({ icon: it.key }, "", iconHref(it.key));
+    history.pushState({ icon: it.key }, "", localizedHref(lang, iconHref(it.key)));
   };
   const closeIcon = () => {
-    if (location.pathname.startsWith("/icon/")) history.back(); // pop URL → popstate closes
+    if (splitLocale(location.pathname).rest.startsWith("/icon/")) history.back(); // pop URL → popstate closes
     else setDialog(null);
   };
   // the active variant of the open modal (a brand's selected variant, else the card)
@@ -304,7 +312,7 @@ export function App() {
   // sync the modal to the URL on back/forward
   useEffect(() => {
     const onPop = () => {
-      const p = location.pathname.replace(/\/+$/, "");
+      const p = splitLocale(location.pathname).rest;
       if (p.startsWith("/icon/")) {
         const slug = decodeURIComponent(p.split("/").slice(2).join("/"));
         const it = items.find((i) => iconSlugOf(i.key) === slug);
@@ -338,7 +346,8 @@ export function App() {
             <div className="nav-actions">
               <a className="icon-btn" href="https://github.com/kymostudio/kymostudio" target="_blank" rel="noopener" title={T.nav.github[lang]} aria-label={T.nav.github[lang]}><GitHubGlyph /></a>
               <button className="icon-btn" title={T.nav.toggleTheme[lang]} aria-label={T.nav.toggleTheme[lang]}
-                onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}>
+                onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+                suppressHydrationWarning>
                 {theme === "dark" ? <SunGlyph /> : <MoonGlyph />}
               </button>
             </div>
@@ -415,7 +424,7 @@ export function App() {
           </div>
           {set !== "all" && (
             <h1 className="view-title">
-              <a href={`/set/${set}`}>{setLabel(set)}</a>
+              <a href={localizedHref(lang, `/set/${set}`)}>{setLabel(set)}</a>
               {sub && <><span className="view-sep">›</span><span className="view-sub">{sub}</span></>}
             </h1>
           )}
@@ -455,7 +464,7 @@ export function App() {
         <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) closeIcon(); }}>
           <div className="dialog" role="dialog" aria-modal="true">
             {dialog.variants && (
-              <a className="brand-tag brand-tag-corner" href={`/brand/${dialog.key.split(":")[1]}`} target="_blank" rel="noopener" title={`Open ${dialog.name || ""} brand page`}>
+              <a className="brand-tag brand-tag-corner" href={localizedHref(lang, `/brand/${dialog.key.split(":")[1]}`)} target="_blank" rel="noopener" title={`Open ${dialog.name || ""} brand page`}>
                 {T.actions.brand[lang]}<span className="ext-ic"><ExternalGlyph /></span>
               </a>
             )}
@@ -463,8 +472,8 @@ export function App() {
             <div className="dlg-body">
               <div className="dlg-head">
                 <span className="dlg-key">{dialog.name || av.key}</span>
-                <a className="dlg-set" href={`/set/${dialog.set}`} title={`Browse ${dialog.set}`}>{dialog.set}</a>
-                {dialog.subset && <a className="dlg-sub" href={`/set/${dialog.set}/${dialog.subset}`} title={`Browse ${dialog.set} · ${dialog.subset}`}>{dialog.subset}</a>}
+                <a className="dlg-set" href={localizedHref(lang, `/set/${dialog.set}`)} title={`Browse ${dialog.set}`}>{dialog.set}</a>
+                {dialog.subset && <a className="dlg-sub" href={localizedHref(lang, `/set/${dialog.set}/${dialog.subset}`)} title={`Browse ${dialog.set} · ${dialog.subset}`}>{dialog.subset}</a>}
               </div>
               {dialog.variants && dialog.variants.length > 1 && (
                 <div className="dlg-variants">

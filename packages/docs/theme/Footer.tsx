@@ -12,6 +12,60 @@ const LANGS: Lang[] = ["en", "vi", "zh"];
 type L<T = string> = { en: T; vi: T; zh: T };
 const kept = (s: string): L => ({ en: s, vi: s, zh: s });
 
+function splitLocale(pathname: string): { lang: Lang; rest: string } {
+  const m = pathname.match(/^\/(vi|zh)(\/.*)?$/);
+  if (m) return { lang: m[1] as Lang, rest: m[2] || "/" };
+  return { lang: "en", rest: pathname || "/" };
+}
+function localizedHref(lang: Lang, logicalPath: string): string {
+  const p = logicalPath || "/";
+  if (lang === "en") return p;
+  return p === "/" ? `/${lang}/` : `/${lang}${p}`;
+}
+
+function readLang(): Lang {
+  if (typeof location !== "undefined") {
+    const { lang } = splitLocale(location.pathname);
+    if (lang !== "en") return lang;
+  }
+  if (typeof document !== "undefined") {
+    const c = document.cookie.match(/(?:^|;\s*)kymo-lang=(en|vi|zh)\b/);
+    if (c) return c[1] as Lang;
+  }
+  try {
+    const saved = localStorage.getItem("kymo-lang");
+    if (saved && (LANGS as string[]).includes(saved)) return saved as Lang;
+  } catch {}
+  const tags =
+    typeof navigator === "undefined" ? []
+    : navigator.languages?.length ? navigator.languages : [navigator.language];
+  const hit = tags.map((t) => (t || "").slice(0, 2).toLowerCase()).find((t) => (LANGS as string[]).includes(t));
+  return (hit as Lang) || "en";
+}
+
+// Persist an explicit choice to localStorage + a `.kymo.studio` cookie (the
+// cookie is what carries the choice across subdomains; localStorage is
+// origin-scoped and would not).
+function persistLang(l: Lang): void {
+  try { localStorage.setItem("kymo-lang", l); } catch {}
+  if (typeof document !== "undefined") {
+    const shared = location.hostname.endsWith("kymo.studio") ? "; domain=.kymo.studio" : "";
+    document.cookie = `kymo-lang=${l}; path=/${shared}; max-age=31536000; SameSite=Lax`;
+  }
+}
+
+const LOCALE_SITES = ["https://kymo.studio", "https://docs.kymo.studio", "https://icons.kymo.studio", "https://design.kymo.studio"];
+function localizeFooterHref(href: string, lang: Lang): string {
+  if (lang === "en") return href;
+  for (const base of LOCALE_SITES) {
+    if (href === base || href.startsWith(base + "/") || href.startsWith(base + "#")) {
+      const rest = href.slice(base.length);
+      return rest ? `${base}/${lang}${rest}` : `${base}/${lang}/`;
+    }
+  }
+  return href;
+}
+
 type FLink = [label: L, href: string];
 type FSection = { title: L; links: FLink[] };
 const FOOTER_DIRECTORY: FSection[][] = [
@@ -79,12 +133,18 @@ const SELECT_LANG: L = { en: "Select language", vi: "Chọn ngôn ngữ", zh: "�
 export function Footer() {
   const [lang, setLang] = useState<Lang>("en");
   useEffect(() => {
-    const saved = localStorage.getItem("kymo-lang");
-    if (saved && (LANGS as string[]).includes(saved)) setLang(saved as Lang);
+    const detected = readLang();
+    setLang(detected);
+    if (detected !== "en" && !location.pathname.startsWith(`/${detected}`)) {
+      history.replaceState(null, "", localizedHref(detected, location.pathname));
+    }
   }, []);
   const onChange = (l: Lang) => {
+    if (l === lang) return;
     setLang(l);
-    localStorage.setItem("kymo-lang", l);
+    persistLang(l);
+    const { rest } = splitLocale(location.pathname);
+    history.replaceState(null, "", localizedHref(l, rest));
   };
   return (
     <footer id="globalfooter" role="contentinfo">
@@ -97,7 +157,7 @@ export function Footer() {
                   <h3>{sec.title[lang]}</h3>
                   <ul>
                     {sec.links.map(([label, href]) => (
-                      <li key={label.en}><a href={href}>{label[lang]}</a></li>
+                      <li key={label.en}><a href={localizeFooterHref(href, lang)}>{label[lang]}</a></li>
                     ))}
                   </ul>
                 </div>

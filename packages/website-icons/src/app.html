@@ -1,22 +1,20 @@
 <!doctype html>
-<!-- Template — prerender.mjs fills the __TOKENS__ and emits the per-locale home
-     shells: dist/index.html (en), dist/vi/index.html, dist/zh/index.html. Deep
-     routes (/set, /icon, /brand) fall back to the empty app.html instead. -->
-<html lang="__LANG__">
+<!-- Empty SPA shell — Cloudflare _redirects serves this for deep routes
+     (/set, /icon, /brand, /admin, /login and any locale-prefixed form). No
+     baked markup, so main.tsx createRoot-renders fresh; the client sets the
+     title + <html lang>. The per-locale HOME shells (/, /vi/, /zh/) are the
+     prerendered index.html files instead. -->
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("kymo-icons-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));}catch(e){}</script>
-  __REDIRECT__
-  <title>__TITLE__</title>
-  <meta name="description" content="__DESC__" />
-  <link rel="canonical" href="__CANONICAL__" />
-__ALTERNATES__
+  <title>Kymo Icons</title>
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div id="root">__APP__</div>
+  <div id="root"></div>
   <script type="module" src="/bundle.js"></script>
 </body>
 </html>

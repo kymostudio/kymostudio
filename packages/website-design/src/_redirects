@@ -1,4 +1,8 @@
-# Cloudflare Pages SPA fallback — serve the app shell for client-side routes
-# (/foundations/branding, /foundations/color, …). Static assets (/bundle.js,
-# /styles.css, /brand/*) are matched first; only unknown paths hit this rule.
-/*    /index.html    200
+# Cloudflare Pages SPA fallback — serve the locale-correct app shell for
+# client-side routes (/foundations/branding, …). Static assets (/bundle.js,
+# /styles.css, /brand/*) and the prerendered pages are matched first; only
+# unknown paths hit these rules. Locale-prefixed unknowns fall back to that
+# locale's shell so the language survives a deep link.
+/vi/*  /vi/index.html  200
+/zh/*  /zh/index.html  200
+/*     /index.html     200

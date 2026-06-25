@@ -29,8 +29,8 @@ echo "→ cleaning dist/"
 rm -rf dist
 mkdir -p dist/app
 
-echo "→ landing  (src/ → dist/)"
-cp src/index.html src/styles.css src/landing.bundle.js src/CNAME src/.nojekyll dist/
+echo "→ landing assets  (src/ → dist/)"
+cp src/styles.css src/landing.bundle.js src/CNAME src/.nojekyll dist/
 
 echo "→ brand assets  (docs/brand → dist/)"
 cp ../../docs/brand/logo.svg ../../docs/brand/favicon.svg ../../docs/brand/favicon-32.png \
@@ -42,10 +42,21 @@ cp ../../docs/brand/screenshots/screen2.html dist/sequence-demo.html   # drag-to
 cp ../../docs/brand/screenshots/screen3.html dist/diagrams-demo.html   # Kanban / C4 / Class
 cp ../../docs/brand/screenshots/screen4.html dist/collab-demo.html     # BPMN live collaboration (3 people)
 
+# Prerender the landing into one static HTML per locale (en → /, vi → /vi/,
+# zh → /zh/), each with translated <title>/description + hreflang/canonical and
+# the app markup baked in for crawlers. Needs node_modules (react-dom/server +
+# esbuild); a normal deploy still ships the COMMITTED landing.bundle.js — this
+# only re-renders markup, it does not rebuild the client bundle.
+echo "→ prerender landing per locale  (en → / · vi → /vi/ · zh → /zh/)"
+[[ -d node_modules ]] || npm install --no-audit --no-fund
+node src/landing/prerender.mjs
+
 # Cache-bust: Pages serves assets with max-age=14400, so version the URLs —
 # browsers refetch immediately after every deploy instead of up to 4h later.
 V=$(date +%s)
-sed -i.bak "s|/styles.css|/styles.css?v=$V|g; s|/landing.bundle.js|/landing.bundle.js?v=$V|g" dist/index.html && rm -f dist/index.html.bak
+for f in dist/index.html dist/vi/index.html dist/zh/index.html; do
+  sed -i.bak "s|/styles.css|/styles.css?v=$V|g; s|/landing.bundle.js|/landing.bundle.js?v=$V|g" "$f" && rm -f "$f.bak"
+done
 # also version the demo iframe URLs (in the bundle) so updated screen*.html load immediately
 sed -i.bak "s|-demo.html?embed=1|-demo.html?embed=1\&v=$V|g" dist/landing.bundle.js && rm -f dist/landing.bundle.js.bak
 

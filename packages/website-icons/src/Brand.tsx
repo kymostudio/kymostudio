@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { API } from "./App";
-import { useLang, T, Footer } from "./i18n";
+import { useLang, T, Footer, splitLocale, localizedHref } from "./i18n";
 
 const CDN_BASE = "https://cdn.kymo.studio/";
 const iconUrl = (path: string, ver?: number) => CDN_BASE + path + (ver ? `?v=${ver}` : "");
@@ -19,7 +19,7 @@ type Brand = { set: string; slug: string; name: string; color: string; subset?: 
 const hostLabel = (url: string) => url.replace(/^https?:\/\//, "").replace(/\/+$/, "");
 
 export function BrandPage() {
-  const parts = location.pathname.replace(/\/+$/, "").split("/"); // /brand/<slug>
+  const parts = splitLocale(location.pathname).rest.split("/"); // /brand/<slug>
   const slug = decodeURIComponent(parts.slice(2).join("/") || "");
   const { lang } = useLang();
   const [brand, setBrand] = useState<Brand | null | undefined>(undefined);
@@ -49,15 +49,15 @@ export function BrandPage() {
   const Header = (
     <header>
       <div className="top">
-        <a className="brand" href="/" style={{ textDecoration: "none" }}>
+        <a className="brand" href={localizedHref(lang, "/")} style={{ textDecoration: "none" }}>
           <img className="k" src="/logo.svg" alt="kymo" width={26} height={26} /> Kymo Icons
         </a>
-        <nav className="nav"><a href={brand ? `/set/${brand.set}` : "/"}>{T.back[lang]}</a></nav>
+        <nav className="nav"><a href={localizedHref(lang, brand ? `/set/${brand.set}` : "/")}>{T.back[lang]}</a></nav>
       </div>
     </header>
   );
   if (brand === undefined) return <>{Header}<main className="brandpage">{showLoader && <div className="kloader-wrap"><KLoader /></div>}</main></>;
-  if (!brand) return <>{Header}<main className="brandpage"><div className="login-card"><h2>{T.brandNotFound[lang]}</h2><p>{T.noBrand[lang]} <b>{slug}</b>.</p><a href="/">{T.allIcons[lang]}</a></div></main></>;
+  if (!brand) return <>{Header}<main className="brandpage"><div className="login-card"><h2>{T.brandNotFound[lang]}</h2><p>{T.noBrand[lang]} <b>{slug}</b>.</p><a href={localizedHref(lang, "/")}>{T.allIcons[lang]}</a></div></main></>;
 
   const v = (name: string) => brand.variants.find((x) => x.variant === name);
   const iconV = v("icon"), colorV = v("color"), textV = v("text"), brandV = v("brand");
@@ -122,7 +122,7 @@ export function BrandPage() {
             )}
             <span className="dlg-set">{brand.set}</span>
             {brand.subset && (
-              <a className="dlg-sub" href={`/set/${brand.set}/${brand.subset}`} title={`Browse ${brand.set} · ${brand.subset}`}>{brand.subset}</a>
+              <a className="dlg-sub" href={localizedHref(lang, `/set/${brand.set}/${brand.subset}`)} title={`Browse ${brand.set} · ${brand.subset}`}>{brand.subset}</a>
             )}
           </div>
           {(colorV || iconV) && (() => { const d = colorV || iconV!; return (
