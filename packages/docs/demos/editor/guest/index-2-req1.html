@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kymostudio editor — guest · paste &amp; render</title>
+<meta name="description" content="Guest flow #1 — paste diagram code from anywhere, the format is auto-detected and rendered. Pure HTML/CSS + vanilla JS." />
+<style>
+  :root{
+    --bg:#ececec; --titlebar:#e9e9ea; --panel:#ffffff;
+    --ink:#1c1c1e; --ink-soft:#3a3a3c; --muted:#8a8a8e; --muted2:#a9a9ad;
+    --line:#e9e9ec; --hover:#f3f3f5;
+    --navy:#242131; --accent:#3478f6;
+    --green:#34c759; --green-ink:#1f9d4d; --teal-ink:#0e8aa0;
+    --pink:#fde7ef; --pink-ink:#e0095f;
+    --radius:12px;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Monaco,Consolas,monospace;
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{height:100%;margin:0}
+  body{font-family:var(--font);color:var(--ink);background:var(--panel);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-radius:6px}
+
+  .window{width:100%;height:100%;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
+
+  /* top bar */
+  .titlebar{height:46px;flex:none;display:flex;align-items:center;gap:9px;padding:0 14px;background:var(--titlebar);border-bottom:.5px solid var(--line)}
+  .tb-logo{width:20px;height:20px;border-radius:18%;display:block;flex:none;box-shadow:0 1px 2px rgba(0,0,0,.14)}
+  .tabs{display:flex;align-items:center;gap:3px}
+  .tab{height:26px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:8px;font:600 12.5px var(--font);color:var(--muted);cursor:default;white-space:nowrap;border:0;background:transparent}
+  .tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06),inset 0 0 0 .5px rgba(0,0,0,.07)}
+  .tab .draft{width:7px;height:7px;border-radius:50%;background:#e0a23c;flex:none}
+  .tab .ext{color:var(--muted);font-weight:600}
+  .tb-plus{width:25px;height:25px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted2);border:0;background:transparent;cursor:pointer}
+  .tb-plus:hover{background:rgba(0,0,0,.05)}
+  .tb-plus svg{width:16px;height:16px}
+  .tb-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+  .signin{display:flex;align-items:center;gap:7px;height:28px;padding:0 13px 0 10px;border-radius:8px;border:.5px solid #dcdce0;background:#fff;color:var(--ink);font:600 12.5px var(--font);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .signin:hover{background:#fafafa;border-color:#cfcfd4}
+  .signin svg{width:15px;height:15px}
+  .iconbtn{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6f6f74;border:0;background:transparent;cursor:pointer}
+  .iconbtn:hover{background:rgba(0,0,0,.05);color:var(--ink-soft)}
+  .iconbtn svg{width:16px;height:16px}
+
+  /* body */
+  .body{display:flex;flex:1;min-height:0;overflow:hidden}
+  .rail{width:48px;flex:none;background:#f1f1f3;border-right:.5px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0}
+  .railbtn{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#80808a;border:0;background:transparent;cursor:pointer}
+  .railbtn:hover{background:rgba(0,0,0,.05);color:var(--ink-soft)}
+  .railbtn.active{color:var(--pink-ink);background:var(--pink)}
+  .railbtn svg{width:19px;height:19px}
+  .railspring{flex:1}
+
+  /* source editor */
+  .editor{width:340px;flex:none;background:var(--panel);display:flex;flex-direction:column;min-height:0;border-right:.5px solid var(--line)}
+  .ed-head{display:flex;align-items:center;gap:8px;padding:11px 16px 6px;font:700 11px var(--font);letter-spacing:.05em;color:var(--muted2)}
+  .detect-chip{font:700 10px var(--font);letter-spacing:.02em;color:var(--pink-ink);background:var(--pink);padding:2px 8px;border-radius:999px;text-transform:none}
+  .ed-head .fmt{margin-left:auto;font:700 10px var(--font);letter-spacing:.02em;color:var(--pink-ink);background:var(--pink);padding:2px 8px;border-radius:6px}
+  .ed-body{flex:1;min-height:0;display:flex;flex-direction:column}
+  .ed-scroll{flex:1;overflow:auto;padding:4px 0 12px;font-family:var(--mono);font-size:12.5px;line-height:1.92}
+  .ln{display:flex}
+  .ln .num{width:38px;flex:none;text-align:right;padding-right:14px;color:#c4c4cc;user-select:none}
+  .ln .code{flex:1;white-space:pre-wrap;word-break:break-word;color:var(--ink-soft)}
+
+  /* paste-first empty state */
+  .paste-zone{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;text-align:center;padding:24px 26px;margin:8px;border:1.5px dashed #d7d7de;border-radius:14px;cursor:pointer;transition:border-color .15s ease,background-color .15s ease}
+  .paste-zone:hover,.paste-zone.drag{border-color:var(--pink-ink);background:#fff7fa}
+  .pz-ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:var(--pink-ink);background:var(--pink)}
+  .pz-ic svg{width:23px;height:23px}
+  .pz-h{font:700 15px var(--font);color:var(--ink)}
+  .pz-sub{font:500 12px var(--font);line-height:1.5;color:var(--muted);max-width:240px}
+  .pz-kbd{display:inline-flex;align-items:center;gap:3px}
+  .kbd{font:600 11px var(--mono);color:var(--ink-soft);background:#f1f1f4;border:.5px solid #e0e0e5;border-bottom-width:1.5px;border-radius:5px;padding:1px 6px}
+  .pz-btn{margin-top:3px;display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 15px;border-radius:9px;border:0;background:var(--pink-ink);color:#fff;font:700 12.5px var(--font);cursor:pointer}
+  .pz-btn:hover{background:#c70854}
+  .pz-btn svg{width:15px;height:15px}
+  .pz-sample{border:0;background:transparent;color:var(--accent);font:600 12px var(--font);cursor:pointer;padding:4px}
+  .pz-sample:hover{text-decoration:underline}
+
+  .ed-foot{flex:none;display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:.5px solid var(--line);font:600 11.5px var(--font);color:var(--muted)}
+  .ed-foot .gd{width:7px;height:7px;border-radius:50%;background:var(--green);flex:none}
+
+  /* canvas */
+  .canvas{flex:1;display:flex;flex-direction:column;min-width:0;background:#fbfbfc}
+  .canvas-top{height:40px;flex:none;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:.5px solid var(--line);background:var(--panel)}
+  .diag-title{font-size:13px;font-weight:700;color:var(--ink)}
+  .kind-badge{display:flex;align-items:center;gap:6px;font:700 11px var(--font);color:var(--pink-ink);background:var(--pink);padding:3px 9px 3px 8px;border-radius:999px}
+  .kind-badge .kd{width:7px;height:7px;border-radius:2px;background:var(--pink-ink)}
+  .cspring{flex:1}
+  .ctools{display:flex;align-items:center;gap:1px;color:var(--muted)}
+  .ct{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);border:0;background:transparent;cursor:pointer}
+  .ct:hover{background:var(--hover);color:var(--ink-soft)}
+  .ct svg{width:16px;height:16px}
+  .ct-sep{width:1px;height:18px;background:var(--line);margin:0 5px}
+  .pct{font-size:12px;font-weight:600;color:var(--muted);padding:0 6px;min-width:42px;text-align:center}
+  .share-wrap{position:relative}
+  .share-pop{position:absolute;top:calc(100% + 7px);right:0;z-index:20;width:208px;padding:6px;background:#fff;border:.5px solid #e3e3e7;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.18)}
+  .share-pop .grp{padding:5px 8px 3px;font:700 10px var(--font);letter-spacing:.04em;text-transform:uppercase;color:var(--muted2)}
+  .share-pop button{display:flex;width:100%;align-items:center;gap:9px;padding:8px 9px;border:0;border-radius:8px;background:transparent;font:600 12.5px var(--font);color:var(--ink);cursor:pointer}
+  .share-pop button:hover{background:var(--hover)}
+  .share-pop button svg{width:15px;height:15px;color:var(--muted);flex:none}
+  .share-pop .ext{margin-left:auto;font:600 11px var(--font);color:var(--muted2)}
+  .share-pop hr{border:0;border-top:.5px solid var(--line);margin:5px 4px}
+
+  .stage{flex:1;position:relative;overflow:auto;background-color:#fbfbfc;background-image:radial-gradient(circle,#e0e0e6 1.1px,transparent 1.1px);background-size:22px 22px}
+  .stage .center{position:absolute;inset:0;display:grid;place-items:center}
+  .diagram{height:min(78%,540px);width:auto;max-width:88%;transform-origin:center center;transition:transform .12s ease}
+  /* canvas empty state */
+  .canvas-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted2);text-align:center;padding:24px}
+  .canvas-empty svg{width:54px;height:54px;color:#d4d4da}
+  .canvas-empty .ce-h{font:600 13px var(--font);color:var(--muted)}
+
+  .ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  @media (max-width:760px){
+    .body{flex-direction:column}
+    .rail{width:100%;height:46px;flex-direction:row;border-right:0;border-bottom:.5px solid var(--line);padding:0 8px}
+    .editor{width:100%;flex:none;height:46%;border-right:0;border-bottom:.5px solid var(--line)}
+    .signin .lbl{display:none}.signin{padding:0 10px}
+    .tab .ext{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="window" role="application" aria-label="Kymostudio editor (guest) — paste &amp; render">
+
+  <div class="titlebar">
+    <svg class="tb-logo" viewBox="0 0 100 100" aria-hidden="true">
+      <rect width="100" height="100" rx="18" fill="#e0095f"/>
+      <g transform="translate(50 50) scale(0.98) translate(-50 -50)">
+        <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+        <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+        <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+        <circle cx="33" cy="26.5" r="5.8" fill="#fff"/><circle cx="65.5" cy="27" r="5.8" fill="#fff"/>
+        <circle cx="33" cy="73.5" r="5.8" fill="#fff"/><circle cx="34" cy="58.5" r="5.8" fill="#fff"/>
+        <circle cx="48" cy="49.5" r="5.8" fill="#fff"/><circle cx="67" cy="73" r="5.8" fill="#fff"/>
+      </g>
+    </svg>
+    <div class="tabs">
+      <button class="tab active" aria-current="page" title="Untitled draft — not saved">
+        <span class="draft" aria-hidden="true"></span>Untitled<span class="ext" id="tabExt">.txt</span>
+      </button>
+    </div>
+    <button class="tb-plus" title="New diagram" aria-label="New diagram"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <div class="tb-right">
+      <button class="signin" title="Sign in to save your work" aria-label="Sign in with Google">
+        <svg viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.02-3.7H.96v2.34A9 9 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.98 10.72a5.4 5.4 0 0 1 0-3.44V4.94H.96a9 9 0 0 0 0 8.12l3.02-2.34Z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.94l3.02 2.34C4.68 5.16 6.66 3.58 9 3.58Z"/></svg>
+        <span class="lbl">Sign in</span>
+      </button>
+      <button class="iconbtn" title="Appearance" aria-label="Appearance"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+    </div>
+  </div>
+
+  <div class="body">
+    <nav class="rail" aria-label="Tools">
+      <button class="railbtn active" title="Source" aria-label="Source" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9.5 6.5 12 9 14.5M15 9.5 17.5 12 15 14.5"/></svg></button>
+      <button class="railbtn" title="Templates" aria-label="Templates"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+      <button class="railbtn" title="Search" aria-label="Search"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+      <span class="railspring"></span>
+      <button class="railbtn" title="Settings" aria-label="Settings"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></button>
+    </nav>
+
+    <section class="editor" aria-label="Source code">
+      <div class="ed-head">SOURCE<span class="detect-chip" id="detectChip" hidden></span><span class="fmt" id="fmtPill" hidden></span></div>
+      <div class="ed-body">
+        <!-- paste-first empty state -->
+        <div class="paste-zone" id="pasteZone" tabindex="0" role="button" aria-label="Paste your diagram code">
+          <span class="pz-ic" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></span>
+          <div class="pz-h">Paste your diagram code</div>
+          <div class="pz-sub"><span class="pz-kbd"><span class="kbd">⌘V</span> / <span class="kbd">Ctrl V</span></span> — Mermaid, PlantUML, BPMN, DBML, D2, GraphViz &amp; more. The format is detected automatically.</div>
+          <button class="pz-btn" id="pasteBtn" type="button"><svg class="ic" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>Paste from clipboard</button>
+          <button class="pz-sample" id="sampleBtn" type="button">or try a sample</button>
+        </div>
+        <!-- pasted code lands here -->
+        <div class="ed-scroll" id="edScroll" hidden></div>
+      </div>
+      <div class="ed-foot"><span class="gd" aria-hidden="true"></span>Guest · changes stay in this browser</div>
+    </section>
+
+    <section class="canvas" aria-label="Diagram preview">
+      <div class="canvas-top">
+        <span class="diag-title">Untitled</span>
+        <span class="kind-badge" id="kindBadge" hidden><span class="kd" aria-hidden="true"></span><span id="kindLabel">—</span></span>
+        <span class="cspring"></span>
+        <div class="ctools">
+          <div class="share-wrap">
+            <button class="ct share-btn" title="Share &amp; export" aria-label="Share and export" aria-haspopup="menu" aria-expanded="false"><svg class="ic" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+            <div class="share-pop" role="menu" hidden>
+              <div class="grp">Share</div>
+              <button role="menuitem"><svg class="ic" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Copy link</button>
+              <hr/>
+              <div class="grp">Export</div>
+              <button role="menuitem"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>SVG<span class="ext">.svg</span></button>
+              <button role="menuitem"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>PNG<span class="ext">.png</span></button>
+            </div>
+          </div>
+          <span class="ct-sep" aria-hidden="true"></span>
+          <button class="ct" data-zoom="out" title="Zoom out" aria-label="Zoom out"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+          <span class="pct">100%</span>
+          <button class="ct" data-zoom="in" title="Zoom in" aria-label="Zoom in"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="ct" data-zoom="fit" title="Fit to view" aria-label="Fit to view"><svg class="ic" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="canvas-empty" id="canvasEmpty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="5" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="8.5" y="16" width="7" height="5" rx="1"/><path d="M6.5 8v3a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V8M12 12v4"/></svg>
+          <div class="ce-h">Your rendered diagram appears here</div>
+        </div>
+        <div class="center" id="center" hidden>
+          <svg class="diagram" xmlns="http://www.w3.org/2000/svg" viewBox="12 12 348 526" role="img" aria-label="Rendered diagram">
+            <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b6b6bf"></path></marker></defs>
+            <style>
+              .fc-shape{fill:#fff;stroke:var(--navy);stroke-width:1.7}
+              .fc-label{fill:var(--navy);font:600 13px var(--font);text-anchor:middle;dominant-baseline:central}
+              .elabel{fill:#6f6f74;font:600 11px var(--font);text-anchor:middle}
+              .edges path{stroke:#cdcdd5;stroke-width:2.2}
+            </style>
+            <g class="edges" fill="none">
+              <path d="M280,70 C280,110 280,78 280,118" marker-end="url(#arrow)"></path>
+              <path d="M280,182 C280,222 280,190 280,230" marker-end="url(#arrow)"></path>
+              <text class="elabel" x="280" y="200">Yes</text>
+              <path d="M218,150 C178,150 216,253 176,253" marker-end="url(#arrow)"></path>
+              <text class="elabel" x="197" y="195.5">No</text>
+              <path d="M280,276 C280,316 280,284 280,324" marker-end="url(#arrow)"></path>
+              <path d="M280,370 C280,410 280,378 280,418" marker-end="url(#arrow)"></path>
+              <path d="M100,276 C100,316 100,284 100,324" marker-end="url(#arrow)"></path>
+            </g>
+            <g class="nodes">
+              <rect class="fc-shape" x="212" y="24" width="136" height="46" rx="9"></rect><text class="fc-label" x="280" y="47">Receive order</text>
+              <polygon class="fc-shape" points="280,118 342,150 280,182 218,150"></polygon><text class="fc-label" x="280" y="150">In stock?</text>
+              <rect class="fc-shape" x="216" y="230" width="128" height="46" rx="9"></rect><text class="fc-label" x="280" y="253">Take payment</text>
+              <rect class="fc-shape" x="24" y="230" width="152" height="46" rx="9"></rect><text class="fc-label" x="100" y="253">Notify customer</text>
+              <rect class="fc-shape" x="224" y="324" width="112" height="46" rx="9"></rect><text class="fc-label" x="280" y="347">Pack items</text>
+              <ellipse class="fc-shape" cx="280" cy="472" rx="54" ry="54"></ellipse><text class="fc-label" x="280" y="472">Ship order</text>
+              <rect class="fc-shape" x="36" y="324" width="128" height="46" rx="9"></rect><text class="fc-label" x="100" y="347">Cancel order</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<textarea id="pasteCatcher" style="position:fixed;left:-9999px;top:0;opacity:0" aria-hidden="true"></textarea>
+
+<script>
+  // ---- format auto-detect, ported verbatim from packages/editor/web/detect.ts ----
+  var MERMAID_HEADS = /^(sequenceDiagram|classDiagram|stateDiagram(-v2)?|erDiagram|journey|gantt|pie\b|quadrantChart|requirementDiagram|gitGraph|C4(Context|Container|Component|Dynamic|Deployment)|mindmap|timeline|sankey-beta|xychart-beta|block-beta|packet-beta|kanban|architecture-beta|radar-beta|treemap-beta)\b/;
+  function firstMeaningfulLine(text){
+    var lines = text.split("\n");
+    for (var i=0;i<lines.length;i++){
+      var line = lines[i].trim();
+      if(!line) continue;
+      if(line.indexOf("%%{")===0) return line;
+      if(line.indexOf("%%")===0 || line.indexOf("//")===0) continue;
+      return line;
+    }
+    return "";
+  }
+  function sniffKind(text){
+    var t = text.trim();
+    if(!t) return null;
+    if(t.indexOf("<bpmn:definitions")!==-1) return "bpmn";
+    if(/^@start(uml|mindmap|gantt|wbs|json|yaml|salt)\b/.test(t)) return /!include\s*<C4\//.test(t) ? "c4plantuml" : "plantuml";
+    if(t.charAt(0)==="{"){
+      if(/"signal"\s*:/.test(t)) return "wavedrom";
+      if(/"type"\s*:\s*"excalidraw"/.test(t)) return "excalidraw";
+      if(/"\$schema"\s*:\s*"[^"]*vega-lite/.test(t)) return "vegalite";
+      if(/"\$schema"\s*:\s*"[^"]*vega\//.test(t)) return "vega";
+      return null;
+    }
+    var head = firstMeaningfulLine(t);
+    if(/^flowchart\s+(TD|TB|LR|RL|BT)\s*\{/.test(head)) return "kymo";
+    if(/^(strict\s+)?(di)?graph\b[^{]*\{/.test(head)) return "graphviz";
+    if(/^(flowchart|graph)\s+(TD|TB|LR|RL|BT)\s*$/.test(head)) return "mermaid";
+    if(MERMAID_HEADS.test(head) || head.indexOf("%%{")===0) return "mermaid";
+    var m = head.match(/^(nwdiag|blockdiag|actdiag|seqdiag|rackdiag|packetdiag)\s*\{/);
+    if(m) return m[1];
+    if(/^Table\s+\w+\s*\{/i.test(head)) return "dbml";
+    if(/^workspace\s*\{/.test(head)) return "structurizr";
+    if(/^\s*(direction\s*:\s*(up|down|left|right)|\w[\w.]*\s*:\s*\{|\w+\s*:\s*"")/m.test(t) || /shape\s*:\s*(sql_table|cylinder|cloud|person)/.test(t)){
+      if(/->|<-|--/.test(t) || /shape\s*:/.test(t)) return "d2";
+    }
+    return null;
+  }
+  // kind → human label + file extension (from kroki.ts KINDS)
+  var KIND = {
+    kymo:["Kymo",".kymo"], mermaid:["Mermaid",".mmd"], bpmn:["BPMN",".bpmn"],
+    plantuml:["PlantUML",".puml"], c4plantuml:["C4 (PlantUML)",".puml"], d2:["D2",".d2"],
+    dbml:["DBML",".dbml"], graphviz:["GraphViz",".dot"], structurizr:["Structurizr",".dsl"],
+    wavedrom:["WaveDrom",".json"], excalidraw:["Excalidraw",".excalidraw"],
+    vega:["Vega",".json"], vegalite:["Vega-Lite",".json"],
+    nwdiag:["NwDiag",".diag"], blockdiag:["BlockDiag",".diag"], actdiag:["ActDiag",".diag"],
+    seqdiag:["SeqDiag",".diag"], rackdiag:["RackDiag",".diag"], packetdiag:["PacketDiag",".diag"]
+  };
+
+  var SAMPLE = "flowchart TD\n    A[Receive order] --> B{In stock?}\n    B -->|Yes| C[Take payment]\n    B -->|No| D[Notify customer]\n    C --> E[Pack items]\n    E --> F((Ship order))\n    D --> G[Cancel order]";
+
+  (function(){
+    var $ = function(s){ return document.querySelector(s); };
+    var pasteZone = $("#pasteZone"), edScroll = $("#edScroll"),
+        detectChip = $("#detectChip"), fmtPill = $("#fmtPill"),
+        canvasEmpty = $("#canvasEmpty"), center = $("#center"),
+        kindBadge = $("#kindBadge"), kindLabel = $("#kindLabel"),
+        tabExt = $("#tabExt"), catcher = $("#pasteCatcher");
+    var chipTimer = null;
+
+    function renderCode(text){
+      var lines = text.replace(/\n+$/,"").split("\n");
+      var html = "";
+      for(var i=0;i<lines.length;i++){
+        var safe = lines[i].replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        html += '<div class="ln"><span class="num">'+(i+1)+'</span><span class="code">'+(safe||" ")+'</span></div>';
+      }
+      edScroll.innerHTML = html;
+    }
+
+    function ingest(text){
+      if(!text || !text.trim()) return;
+      var kind = sniffKind(text);
+      var meta = (kind && KIND[kind]) ? KIND[kind] : ["Text",".txt"];
+      // source: swap empty-state for code
+      renderCode(text);
+      pasteZone.hidden = true; edScroll.hidden = false;
+      // format pill + tab extension
+      fmtPill.textContent = meta[0].toUpperCase(); fmtPill.hidden = false;
+      tabExt.textContent = meta[1];
+      // detect chip (transient, mirrors the editor's auto-detect chip)
+      if(kind){
+        detectChip.textContent = "auto-detected " + meta[0];
+        detectChip.hidden = false;
+        if(chipTimer) clearTimeout(chipTimer);
+        chipTimer = setTimeout(function(){ detectChip.hidden = true; }, 4000);
+      } else {
+        detectChip.hidden = true;
+      }
+      // canvas: badge + illustrative render
+      kindLabel.textContent = meta[0]; kindBadge.hidden = false;
+      canvasEmpty.hidden = true; center.hidden = false;
+    }
+
+    // paste anywhere
+    document.addEventListener("paste", function(e){
+      var t = (e.clipboardData || window.clipboardData).getData("text");
+      if(t){ e.preventDefault(); ingest(t); }
+    });
+    // drag-drop a file onto the paste zone
+    ["dragover","dragenter"].forEach(function(ev){ pasteZone.addEventListener(ev, function(e){ e.preventDefault(); pasteZone.classList.add("drag"); }); });
+    ["dragleave","drop"].forEach(function(ev){ pasteZone.addEventListener(ev, function(e){ e.preventDefault(); pasteZone.classList.remove("drag"); }); });
+    pasteZone.addEventListener("drop", function(e){
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if(f){ var r = new FileReader(); r.onload = function(){ ingest(String(r.result)); }; r.readAsText(f); }
+    });
+    // "Paste from clipboard" button — try the async API, fall back to ⌘V capture
+    $("#pasteBtn").addEventListener("click", function(e){
+      e.stopPropagation();
+      if(navigator.clipboard && navigator.clipboard.readText){
+        navigator.clipboard.readText().then(function(t){
+          if(t && t.trim()) ingest(t); else catcher.focus();
+        }).catch(function(){ catcher.focus(); });
+      } else { catcher.focus(); }
+    });
+    $("#sampleBtn").addEventListener("click", function(e){ e.stopPropagation(); ingest(SAMPLE); });
+    pasteZone.addEventListener("click", function(){ catcher.focus(); });
+    pasteZone.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); catcher.focus(); } });
+
+    // ---- shared chrome interactions ----
+    var sBtn = $(".share-btn"), pop = $(".share-pop");
+    var setPop = function(open){ pop.hidden = !open; sBtn.setAttribute("aria-expanded", String(open)); };
+    sBtn.addEventListener("click", function(e){ e.stopPropagation(); setPop(pop.hidden); });
+    document.addEventListener("click", function(e){ if(!pop.hidden && !pop.contains(e.target)) setPop(false); });
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !pop.hidden){ setPop(false); sBtn.focus(); } });
+    pop.querySelectorAll("button").forEach(function(i){ i.addEventListener("click", function(){ setPop(false); }); });
+
+    var svg = $(".diagram"), pct = $(".pct"), z = 100;
+    var apply = function(){ svg.style.transform = "scale(" + (z/100) + ")"; pct.textContent = Math.round(z) + "%"; };
+    var step = function(d){ z = Math.min(400, Math.max(25, z+d)); apply(); };
+    $('[data-zoom="out"]').addEventListener("click", function(){ step(-10); });
+    $('[data-zoom="in"]').addEventListener("click", function(){ step(10); });
+    $('[data-zoom="fit"]').addEventListener("click", function(){ z = 100; apply(); });
+  })();
+</script>
+</body>
+</html>

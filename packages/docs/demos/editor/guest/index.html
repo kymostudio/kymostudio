@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kymostudio editor — guest demo</title>
+<meta name="description" content="Static HTML/CSS replica of the editor.kymo.studio guest (signed-out) screen." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* kymo editor — light brand theme (docs/brand: Mermaid palette).
+     A pure-HTML/CSS replica of the guest (signed-out) editor at
+     editor.kymo.studio — no scripts, no build. Tokens mirror the live app. */
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f7f7fa;
+    --bg-raise: #efeef4;
+    --border: #e7e5ee;
+    --border-strong: #cfccdc;
+    --ink: #242131;
+    --dim: #6e6a7c;
+    --accent: #e0095f;
+    --accent-deep: #c70854;
+    --kw: #1f48cf;             /* code keyword (flowchart / TD) */
+    --radius-btn: 9px;
+    --pane-head-h: 45px;
+    --font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 14px/1.55 var(--font); -webkit-font-smoothing: antialiased; }
+
+  .layout { height: 100%; display: flex; flex-direction: column; }
+
+  /* ---- header ---- */
+  header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  .brand { display: inline-flex; align-items: center; padding: 10px; margin: -10px; text-decoration: none; }
+  .brand svg { width: 24px; height: 24px; display: block; }
+  .spacer { flex: 1; }
+  .nav-group { display: flex; align-items: center; gap: 8px; }
+
+  button, .btn {
+    background: var(--bg); color: var(--ink); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-btn); padding: 7px 14px; font: inherit; font-size: 13.5px;
+    font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex;
+    align-items: center; justify-content: center; gap: 6px; white-space: nowrap;
+  }
+  button:hover, .btn:hover { border-color: var(--dim); background: var(--bg-soft); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  .btn-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+
+  /* three-region toggles (VS Code-style): Source · Preview */
+  .pane-toggles { display: inline-flex; align-items: center; gap: 2px; padding: 2px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 9px; }
+  .pane-tg { width: 30px; height: 28px; padding: 0; border: 0; background: transparent; color: var(--dim); border-radius: 7px; }
+  .pane-tg:hover { background: var(--bg); color: var(--ink); }
+  .pane-tg.on { color: var(--accent); background: var(--bg); box-shadow: 0 1px 2px rgba(36, 33, 49, 0.06); }
+
+  /* Google sign-in pill (GIS rendered button look) */
+  .gsi { gap: 8px; padding: 7px 16px 7px 12px; border-color: var(--border-strong); color: #1f1f1f; font-weight: 600; }
+  .gsi svg { width: 18px; height: 18px; }
+
+  /* ---- work area: source pane (left) + preview pane (right) ---- */
+  .workrow { flex: 1; display: flex; min-height: 0; }
+  .pane { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .pane + .pane { border-left: 1px solid var(--border); }
+
+  /* source pane: a line-number gutter + the code */
+  .code-wrap { flex: 1; min-height: 0; display: flex; overflow: auto; font: 13.5px/1.7 var(--mono); }
+  .gutter { flex: none; padding: 14px 12px 14px 16px; text-align: right; color: var(--border-strong); user-select: none; }
+  .gutter span { display: block; }
+  .code { padding: 14px 16px; white-space: pre; tab-size: 2; color: var(--ink); }
+  .code .kw { color: var(--kw); }
+  .code .op { color: var(--dim); }
+
+  /* preview pane: caption bar + Export/Share, the diagram stage, a zoom dock */
+  .pane-bar { display: flex; align-items: center; gap: 8px; min-height: var(--pane-head-h); padding: 6px 10px 6px 14px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  .pane-bar-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
+  .pane-bar-actions { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+  .pane-bar-actions button { height: 32px; padding: 0 12px; font-size: 13px; }
+  .pane-bar-actions .chev { margin-left: -2px; }
+
+  .pv-stage { position: relative; flex: 1; min-height: 0; display: grid; place-items: center; overflow: auto; padding: 28px; }
+  .pv-stage svg.diagram { width: 343px; height: auto; max-width: 100%; }
+
+  /* zoom dock, bottom-right of the stage */
+  .zoom { position: absolute; right: 18px; bottom: 18px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 999px; box-shadow: 0 4px 16px rgba(36, 33, 49, 0.08); }
+  .zoom button { border: 0; background: transparent; color: var(--dim); width: 28px; height: 28px; padding: 0; border-radius: 7px; }
+  .zoom button:hover { background: var(--bg-soft); color: var(--ink); }
+  .zoom .pct { font-size: 12px; font-weight: 600; color: var(--dim); min-width: 38px; text-align: center; }
+
+  .ic { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .ic.sm { width: 15px; height: 15px; }
+
+  /* phones: stack the panes, preview first (matches the app) */
+  @media (max-width: 720px) {
+    .mob-hide { display: none; }
+    .workrow { flex-direction: column; }
+    .pane + .pane { border-left: 0; border-bottom: 1px solid var(--border); }
+    .pane.preview { order: -1; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- ── header ─────────────────────────────────────────────────────────── -->
+  <header>
+    <a class="brand" href="https://kymo.studio" target="_blank" rel="noopener" aria-label="Kymo Studio">
+      <!-- K mark: crimson tile, "K" drawn as graph nodes + edges (the real logo) -->
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <rect width="100" height="100" rx="18" fill="#e0095f"/>
+        <g transform="translate(50 50) scale(0.98) translate(-50 -50)">
+          <line x1="33" y1="26.5" x2="33" y2="73.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <line x1="65.5" y1="27" x2="34" y2="58.5" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <line x1="48" y1="49.5" x2="67" y2="73" stroke="#fff" stroke-width="11.5" stroke-linecap="round"/>
+          <circle cx="33" cy="26.5" r="5.8" fill="#fff"/><circle cx="33" cy="26.5" r="2.44" fill="#e0095f"/>
+          <circle cx="65.5" cy="27" r="5.8" fill="#fff"/><circle cx="65.5" cy="27" r="2.44" fill="#e0095f"/>
+          <circle cx="33" cy="73.5" r="5.8" fill="#fff"/><circle cx="33" cy="73.5" r="2.44" fill="#e0095f"/>
+          <circle cx="34" cy="58.5" r="5.8" fill="#fff"/><circle cx="34" cy="58.5" r="2.44" fill="#e0095f"/>
+          <circle cx="48" cy="49.5" r="5.8" fill="#fff"/><circle cx="48" cy="49.5" r="2.44" fill="#e0095f"/>
+          <circle cx="67" cy="73" r="5.8" fill="#fff"/><circle cx="67" cy="73" r="2.44" fill="#e0095f"/>
+        </g>
+      </svg>
+    </a>
+    <div class="spacer"></div>
+    <nav class="nav-group">
+      <!-- Source · Preview pane toggles -->
+      <div class="pane-toggles mob-hide" role="group" aria-label="Panels">
+        <button class="pane-tg on" title="Toggle Source" aria-pressed="true">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M10 9.5 8 12l2 2.5M14 9.5l2 2.5-2 2.5"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        </button>
+        <button class="pane-tg on" title="Toggle Preview" aria-pressed="true">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <!-- guests have no Explorer rail — New + Open surface here -->
+      <button class="mob-hide" title="Start a new diagram">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15h6M12 12v6"/></svg>
+        New
+      </button>
+      <button class="mob-hide" title="Open a local diagram file">
+        <svg class="ic" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2"/></svg>
+        Open
+      </button>
+      <!-- draft Save stays a visible CTA -->
+      <button class="btn-primary mob-hide" title="Save to your Diagrams (⌘/Ctrl-S)">
+        <svg class="ic" viewBox="0 0 24 24" stroke="#fff"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        Save
+      </button>
+    </nav>
+    <!-- guests sign in here (Google Identity Services button) -->
+    <button class="btn gsi" title="Sign in with Google">
+      <svg viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.02-3.7H.96v2.34A9 9 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.98 10.72a5.4 5.4 0 0 1 0-3.44V4.94H.96a9 9 0 0 0 0 8.12l3.02-2.34Z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.94l3.02 2.34C4.68 5.16 6.66 3.58 9 3.58Z"/></svg>
+      Sign in with Google
+    </button>
+  </header>
+
+  <!-- ── work area ──────────────────────────────────────────────────────── -->
+  <div class="workrow">
+    <!-- source pane -->
+    <section class="pane">
+      <div class="code-wrap">
+        <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+<pre class="code"><span class="kw">flowchart</span> <span class="kw">TD</span> {
+  A[Receive order] <span class="op">--&gt;</span> B{In stock?}
+  B <span class="op">--&gt;</span>|Yes| C[Take payment]
+  B <span class="op">--&gt;</span>|No| D[Notify customer]
+  C <span class="op">--&gt;</span> E[Pack items]
+  E <span class="op">--&gt;</span> F((Ship order))
+  D <span class="op">--&gt;</span> G[Cancel order]
+}</pre>
+      </div>
+    </section>
+
+    <!-- preview pane -->
+    <section class="pane preview">
+      <div class="pane-bar">
+        <span class="pane-bar-label">Preview</span>
+        <div class="pane-bar-actions">
+          <button title="Export">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Export
+            <svg class="ic chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <button class="btn-primary" title="Share a read-only link">
+            <svg class="ic" viewBox="0 0 24 24" stroke="#fff"><path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8"/></svg>
+            Share
+          </button>
+        </div>
+      </div>
+      <div class="pv-stage">
+        <!-- rendered by the kymo engine; embedded here as a static SVG -->
+        <svg class="diagram" xmlns="http://www.w3.org/2000/svg" viewBox="-28 -50 428 658">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"></path>
+            </marker>
+            <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1" fill="#0f172a" fill-opacity="0.05"></circle>
+            </pattern>
+          </defs>
+          <style>
+            .fc-shape { fill: #eff6ff; stroke: #3b82f6; stroke-width: 1.6; }
+            .fc-label { fill: #1e3a8a; font: 600 13px var(--font); text-anchor: middle; dominant-baseline: central; }
+            .elabel { fill: #64748b; font: 10.5px var(--font); text-anchor: middle; }
+          </style>
+          <rect x="-28" y="-50" width="428" height="658" rx="14" fill="#f8fafc"></rect>
+          <rect x="-28" y="-50" width="428" height="658" rx="14" fill="url(#grid)"></rect>
+          <g class="edges">
+            <path d="M280,70 C280,110 280,78 280,118" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"></path>
+            <path d="M280,182 C280,222 280,190 280,230" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"></path>
+            <text class="elabel" x="280" y="200">Yes</text>
+            <path d="M218,150 C178,150 216,253 176,253" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"></path>
+            <text class="elabel" x="197" y="195.5">No</text>
+            <path d="M280,276 C280,316 280,284 280,324" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"></path>
+            <path d="M280,370 C280,410 280,378 280,418" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"></path>
+            <path d="M100,276 C100,316 100,284 100,324" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"></path>
+          </g>
+          <g class="nodes">
+            <rect class="fc-shape" x="212" y="24" width="136" height="46" rx="6"></rect><text class="fc-label" x="280" y="47">Receive order</text>
+            <polygon class="fc-shape" points="280,118 342,150 280,182 218,150"></polygon><text class="fc-label" x="280" y="150">In stock?</text>
+            <rect class="fc-shape" x="216" y="230" width="128" height="46" rx="6"></rect><text class="fc-label" x="280" y="253">Take payment</text>
+            <rect class="fc-shape" x="24" y="230" width="152" height="46" rx="6"></rect><text class="fc-label" x="100" y="253">Notify customer</text>
+            <rect class="fc-shape" x="224" y="324" width="112" height="46" rx="6"></rect><text class="fc-label" x="280" y="347">Pack items</text>
+            <ellipse class="fc-shape" cx="280" cy="472" rx="54" ry="54"></ellipse><text class="fc-label" x="280" y="472">Ship order</text>
+            <rect class="fc-shape" x="36" y="324" width="128" height="46" rx="6"></rect><text class="fc-label" x="100" y="347">Cancel order</text>
+          </g>
+        </svg>
+        <div class="zoom">
+          <button title="Zoom out"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+          <span class="pct">114%</span>
+          <button title="Zoom in"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button title="Fit to view"><svg class="ic sm" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>
