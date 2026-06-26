@@ -1,0 +1,7 @@
+# uv / Python
+.venv/
+__pycache__/
+*.pyc
+
+# driver screenshot output
+*-shots/
