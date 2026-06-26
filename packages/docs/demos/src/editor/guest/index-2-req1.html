@@ -67,6 +67,9 @@
   /* paste-first empty state */
   .paste-zone{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;text-align:center;padding:24px 26px;margin:8px;border:1.5px dashed #d7d7de;border-radius:14px;cursor:pointer;transition:border-color .15s ease,background-color .15s ease}
   .paste-zone:hover,.paste-zone.drag{border-color:var(--pink-ink);background:#fff7fa}
+  /* scene-1 "visualize the copy" — the pasted source flashes as it lands */
+  @keyframes pasteFlash{from{background:#fff7fa}to{background:transparent}}
+  .ed-scroll.paste-flash{animation:pasteFlash .55s ease}
   .pz-ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:var(--pink-ink);background:var(--pink)}
   .pz-ic svg{width:23px;height:23px}
   .pz-h{font:700 15px var(--font);color:var(--ink)}
@@ -317,19 +320,42 @@
       edScroll.innerHTML = html;
     }
 
-    function ingest(text){
+    // The paste→render flow is split into three phases so a scene can play them
+    // one at a time (used by the drive_req1 scene controller for scene 1):
+    //   reset()        → step 1, initial empty state
+    //   showSource()   → step 2, visualize the copy: code lands in the editor
+    //   showRender()   → step 3, reveal the rendered diagram
+    // A normal paste runs all three at once via ingest().
+    var pendingKind = null, pendingMeta = null;
+
+    function resetDemo(){
+      pendingKind = null; pendingMeta = null;
+      if(chipTimer){ clearTimeout(chipTimer); chipTimer = null; }
+      edScroll.classList.remove("paste-flash");
+      edScroll.innerHTML = ""; edScroll.hidden = true; pasteZone.hidden = false;
+      fmtPill.hidden = true; detectChip.hidden = true; tabExt.textContent = ".txt";
+      kindBadge.hidden = true; center.hidden = true; canvasEmpty.hidden = false;
+    }
+
+    function showSource(text){
       if(!text || !text.trim()) return;
-      var kind = sniffKind(text);
-      var meta = (kind && KIND[kind]) ? KIND[kind] : ["Text",".txt"];
-      // source: swap empty-state for code
+      pendingKind = sniffKind(text);
+      pendingMeta = (pendingKind && KIND[pendingKind]) ? KIND[pendingKind] : ["Text",".txt"];
+      // source: swap empty-state for code, flash to visualize the paste landing
       renderCode(text);
       pasteZone.hidden = true; edScroll.hidden = false;
+      edScroll.classList.remove("paste-flash"); void edScroll.offsetWidth;
+      edScroll.classList.add("paste-flash");
       // format pill + tab extension
-      fmtPill.textContent = meta[0].toUpperCase(); fmtPill.hidden = false;
-      tabExt.textContent = meta[1];
+      fmtPill.textContent = pendingMeta[0].toUpperCase(); fmtPill.hidden = false;
+      tabExt.textContent = pendingMeta[1];
+    }
+
+    function showRender(){
+      if(!pendingMeta) return;
       // detect chip (transient, mirrors the editor's auto-detect chip)
-      if(kind){
-        detectChip.textContent = "auto-detected " + meta[0];
+      if(pendingKind){
+        detectChip.textContent = "auto-detected " + pendingMeta[0];
         detectChip.hidden = false;
         if(chipTimer) clearTimeout(chipTimer);
         chipTimer = setTimeout(function(){ detectChip.hidden = true; }, 4000);
@@ -337,9 +363,14 @@
         detectChip.hidden = true;
       }
       // canvas: badge + illustrative render
-      kindLabel.textContent = meta[0]; kindBadge.hidden = false;
+      kindLabel.textContent = pendingMeta[0]; kindBadge.hidden = false;
       canvasEmpty.hidden = true; center.hidden = false;
     }
+
+    function ingest(text){ showSource(text); showRender(); }
+
+    // exposed for the scene controller (drive_req1.py) to drive sub-steps
+    window.__demo = { reset: resetDemo, showSource: showSource, showRender: showRender, ingest: ingest };
 
     // paste anywhere
     document.addEventListener("paste", function(e){
