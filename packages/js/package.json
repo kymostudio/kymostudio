@@ -54,11 +54,11 @@
   ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.9.1",
+    "@types/node": "^26.0.1",
     "eslint": "^10.4.1",
     "jsdom": "^29.1.1",
     "mxgraph": "^4.2.2",
-    "pako": "^2.1.0",
+    "pako": "^3.0.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.0.0"
   },
