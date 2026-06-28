@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Verify tag matches both Cargo.toml versions
         run: |
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
@@ -52,7 +52,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - name: Run core test suite
         run: cargo test
@@ -77,7 +77,7 @@ jobs:
           - { runner: macos-latest,    target: aarch64 }
           - { runner: macos-15-intel,  target: x86_64 }
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
@@ -99,7 +99,7 @@ jobs:
     needs: [verify-version, test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Build sdist
         uses: PyO3/maturin-action@v1
         with:
@@ -120,7 +120,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - name: Authenticate to crates.io (OIDC)
         uses: rust-lang/crates-io-auth-action@v1
@@ -156,7 +156,7 @@ jobs:
       run:
         working-directory: packages/rust/kymostudio
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - name: Authenticate to crates.io (OIDC)
         uses: rust-lang/crates-io-auth-action@v1
@@ -204,7 +204,7 @@ jobs:
       id-token: write   # npm provenance attestation
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown

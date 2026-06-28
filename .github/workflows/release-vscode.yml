@@ -24,7 +24,7 @@ jobs:
       run:
         working-directory: packages/vscode-extension
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Verify tag matches package.json version
         run: |
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
@@ -50,7 +50,7 @@ jobs:
       VSCE_PAT: ${{ secrets.VSCE_PAT }}
       OVSX_PAT: ${{ secrets.OVSX_PAT }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
