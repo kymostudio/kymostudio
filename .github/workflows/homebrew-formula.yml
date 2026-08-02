@@ -33,12 +33,12 @@ jobs:
       TAG: ${{ fromJSON(inputs.plan).announcement_tag }}
     steps:
       - name: Checkout main
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.x"
       - name: Download release checksums
