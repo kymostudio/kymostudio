@@ -148,6 +148,12 @@ let newDiagram: (() => void) | null = null;
 export function registerNewDiagram(fn: (() => void) | null) { newDiagram = fn; }
 export function fireNewDiagram(): boolean { if (newDiagram) { newDiagram(); return true; } return false; }
 
+// Zen Mode toggle (EditorPage registers) — used by the ⇧N shortcut and the
+// "View: Toggle Zen Mode" command in the ⌘/Ctrl-K palette.
+let zenToggle: (() => void) | null = null;
+export function registerZenToggle(fn: (() => void) | null) { zenToggle = fn; }
+export function toggleZen(): boolean { if (zenToggle) { zenToggle(); return true; } return false; }
+
 // ---- "A process is listening" signal: the server pushes {type:"listening"} each
 // time something long-polls wait_for_user_message (~every 25s). The chat composer
 // is disabled until this is fresh, so users can't type into a void. ----

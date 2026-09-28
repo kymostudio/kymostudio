@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Keyboard } from "lucide-react";
-import { registerShortcutsOpener, toggleConnect, toggleSidebar, firePaneToggle, fireNewDiagram, openFind } from "./mcpstatus";
+import { registerShortcutsOpener, toggleConnect, toggleSidebar, firePaneToggle, fireNewDiagram, openFind, toggleZen } from "./mcpstatus";
 
 // Mac shows ⌘, everyone else Ctrl. (Best-effort platform sniff.)
 const IS_MAC = typeof navigator !== "undefined" && /mac|iphone|ipad/i.test(navigator.platform || navigator.userAgent || "");
@@ -34,6 +34,13 @@ const GROUPS: { title: string; items: { keys: string[]; desc: string }[] }[] = [
       { keys: [MOD, "⇧", "E"], desc: "Toggle the Source pane" },
       { keys: [MOD, "⇧", "P"], desc: "Toggle the Preview pane" },
       { keys: [MOD, "⇧", "A"], desc: "Toggle the Connect AI panel" },
+    ],
+  },
+  {
+    title: "View",
+    items: [
+      { keys: ["⇧", "N"], desc: "Toggle Zen Mode (only the editor + preview)" },
+      { keys: ["Esc"], desc: "Leave Zen Mode" },
     ],
   },
 ];
@@ -75,6 +82,8 @@ export function ShortcutsModal() {
       if (isTyping(e.target)) return;
       const dialogUp = !!document.querySelector(".ks-overlay, .pm-overlay, .tpl-overlay, .confirm-overlay");
       if (e.key === "?") { e.preventDefault(); setOpen((o) => !o); return; }
+      // ⇧N → toggle Zen Mode; a plain N → New diagram.
+      if ((e.key === "n" || e.key === "N") && e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && !dialogUp) { e.preventDefault(); toggleZen(); return; }
       if ((e.key === "n" || e.key === "N") && !e.metaKey && !e.ctrlKey && !e.altKey && !dialogUp) { e.preventDefault(); fireNewDiagram(); }
     };
     document.addEventListener("keydown", onKey);

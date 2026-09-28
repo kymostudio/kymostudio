@@ -5,12 +5,24 @@ import { useWorkspace } from "./workspace";
 import { DIAGRAMS_API, apiFetch } from "./const";
 import { KindIcon } from "./sidebar";
 import { extFor } from "./kroki";
-import { ChevronDown, Search, FolderPlus, Check, FolderOpen, Boxes } from "lucide-react";
-import { registerNewProjectSimulator, openProjectsModal } from "./mcpstatus";
+import { ChevronDown, Search, FolderPlus, Check, FolderOpen, Boxes, Maximize2 } from "lucide-react";
+import { registerNewProjectSimulator, openProjectsModal, toggleZen } from "./mcpstatus";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 type Hit = { id: string; title: string; kind: string };
+
+// Commands the jump palette can run (VS Code "Category: Action" labels). A query
+// matches a command when every word of it appears in the label.
+type Command = { id: string; label: string; keys: string; run: () => void };
+const COMMANDS: Command[] = [
+  { id: "view.toggleZenMode", label: "View: Toggle Zen Mode", keys: "⇧N", run: () => { toggleZen(); } },
+];
+function matchCommands(q: string): Command[] {
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+  return COMMANDS.filter((c) => words.every((w) => c.label.toLowerCase().includes(w)));
+}
 
 // The IDE/browser-shell address bar: a breadcrumb (Project ▸ folder ▸ file) that
 // doubles as a jump palette. Click the project crumb to switch project; click a
@@ -72,6 +84,7 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
   const projHits = q.trim()
     ? projects.filter((p) => p.name.toLowerCase().includes(q.trim().toLowerCase()))
     : [];
+  const cmdHits = matchCommands(q);
 
   // Show the inline name input (replaces window.prompt so it's fillable + visible).
   function onNewProject() { setNewMode(true); setNewName(""); setTimeout(() => newInputRef.current?.focus(), 0); }
@@ -113,11 +126,19 @@ export function AddressBar({ titleNode, onOpenDiagram }: { titleNode: React.Reac
       {searching ? (
         <div className="addr-search">
           <Search size={15} strokeWidth={2} className="addr-search-icon" />
-          <input ref={inputRef} className="addr-input" value={q} placeholder="Jump to a project or diagram…"
+          <input ref={inputRef} className="addr-input" value={q} placeholder="Jump to a project, diagram, or command…"
             spellCheck={false} onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Escape") closeSearch(); }} />
-          {(projHits.length > 0 || hits.length > 0) && (
+          {(cmdHits.length > 0 || projHits.length > 0 || hits.length > 0) && (
             <div className="addr-results">
+              {cmdHits.length > 0 && <div className="addr-group">Commands</div>}
+              {cmdHits.map((c) => (
+                <button key={c.id} className="addr-hit" onClick={() => { closeSearch(); c.run(); }}>
+                  <Maximize2 size={15} strokeWidth={2} className="addr-hit-icon" />
+                  <span className="addr-hit-name">{c.label}</span>
+                  <kbd className="addr-hit-keys">{c.keys}</kbd>
+                </button>
+              ))}
               {projHits.length > 0 && <div className="addr-group">Projects</div>}
               {projHits.map((p) => (
                 <button key={p.id} className="addr-hit" onClick={() => { setCurrentProject(p.id); closeSearch(); navigate("/?p=" + encodeURIComponent(p.id)); }}>
