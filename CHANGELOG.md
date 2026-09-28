@@ -9,6 +9,13 @@ packages share a version number.
 
 ## [Unreleased]
 
+### Added
+
+- **Editor Zen Mode** — `Shift+N` (or `View: Toggle Zen Mode` in the ⌘/Ctrl-K
+  palette) hides the header, activity bar, side panels, Connect AI dock and
+  status bar, leaving only the open diagram's editor + preview. `Esc` or the
+  floating exit button leaves it. A plain `N` still opens New diagram.
+
 ## [0.4.10] - 2026-06-20
 
 ### Changed

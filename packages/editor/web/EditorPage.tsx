@@ -14,7 +14,7 @@ import { TemplateGallery, takePendingTemplate, type Template } from "./templates
 import { ActivityBar, ExplorerPanel, SearchPanel, useDiagrams, KindIcon, type Panel } from "./sidebar";
 import { WelcomeView } from "./welcome";
 import { ConnectAI } from "./connectai";
-import { useMcpActive, setSessionCtx, registerConnectToggle, registerSidebarToggle, registerPaneToggle, registerNewDiagram, registerFindOpen } from "./mcpstatus";
+import { useMcpActive, setSessionCtx, registerConnectToggle, registerSidebarToggle, registerPaneToggle, registerNewDiagram, registerFindOpen, registerZenToggle } from "./mcpstatus";
 import { AddressBar } from "./addressbar";
 import { sniffKind } from "./detect";
 import { readTabsLocal, writeTabsLocal, fetchTabsRemote, putTabsRemote, registerOpener, registerCloser } from "./tabs";
@@ -24,7 +24,7 @@ import { ErToolbar } from "./ertoolbar";
 import type { ErTool } from "./preview";
 import { planGestures, runSimulation, MAX_GESTURES, type SimCtx } from "./er-simulate";
 import { KLoader } from "./kloader";
-import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, PanelRight, SquareCode, Eye, Download, ChevronDown, FilePlus2, FolderOpen, X, Sparkles } from "lucide-react";
+import { FileCode2, FileImage, Code2, Link2, Check, Save, Pencil, Copy, Menu, PanelLeft, PanelRight, SquareCode, Eye, Download, ChevronDown, FilePlus2, FolderOpen, X, Sparkles, Minimize2 } from "lucide-react";
 
 // Read a binary file as a `data:` URL (FileReader → base64) — how raster images
 // are stored so their bytes survive the text-based document model.
@@ -194,6 +194,15 @@ export default function EditorPage() {
   useEffect(() => { registerNewDiagram(() => setGalleryOpen(true)); return () => registerNewDiagram(null); }, []);
   // ⌘/Ctrl+F opens the Search panel (the "Find" menu) — its box auto-focuses.
   useEffect(() => { registerFindOpen(() => { setActivePanel("search"); try { localStorage.setItem("kymo_panel", "search"); } catch {} }); return () => registerFindOpen(null); }, []);
+  // Zen Mode (VS Code-style): hide every piece of chrome — header, activity bar,
+  // side panels, Connect AI dock, status bar — leaving just the open diagram's
+  // editor + preview. Toggled by ⇧N / "View: Toggle Zen Mode" (⌘/Ctrl-K), left
+  // with Esc or the floating exit button. Only meaningful with a file open, so the
+  // toggle is a no-op on the Welcome / "no file open" screens (canZenRef, below).
+  // The panels' own open/closed state is untouched, so leaving restores the layout.
+  const [zen, setZen] = useState(false);
+  const canZenRef = useRef(false);
+  useEffect(() => { registerZenToggle(() => setZen((z) => (z ? false : canZenRef.current))); return () => registerZenToggle(null); }, []);
 
   const renderRef = useRef<((s: string) => Promise<string>) | null>(null);
   const applyingRemote = useRef(false);
@@ -605,6 +614,30 @@ export default function EditorPage() {
   // closing the last tab). Keep the Command Center, but show a "no file open"
   // placeholder instead of empty editor panes. Guests always have their draft.
   const noFileOpen = !!claims && isDraft && !source.trim() && !userEdited.current;
+  canZenRef.current = !showWelcome && !noFileOpen;
+  const zenOn = zen && !showWelcome && !noFileOpen;
+  // Closing the last tab (→ Welcome / no file open) ends Zen Mode rather than
+  // leaving it armed for whatever opens next.
+  useEffect(() => { if (zen && (showWelcome || noFileOpen)) setZen(false); }, [zen, showWelcome, noFileOpen]);
+  // Esc leaves Zen Mode — unless it is closing something else first (a menu or
+  // dialog), or the code editor consumed it (e.g. collapsing a multi-cursor).
+  useEffect(() => {
+    if (!zenOn) return;
+    // Whether a menu/dialog was open is sampled in the CAPTURE phase: by the time
+    // the bubbling listener runs, that menu's own Esc handler may already have
+    // closed it (React flushes between listeners).
+    let othersOpen = false;
+    const onCapture = (e: KeyboardEvent) => {
+      if (e.key === "Escape") othersOpen = !!document.querySelector(".acct-menu, .addr-search, .ks-overlay, .pm-overlay, .tpl-overlay, .confirm-overlay");
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented || othersOpen) return;
+      setZen(false);
+    };
+    document.addEventListener("keydown", onCapture, true);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onCapture, true); document.removeEventListener("keydown", onKey); };
+  }, [zenOn]);
   // Plain text files (.txt/.md/.js/…) have no diagram preview → hide the preview
   // pane (and force the source pane on so the layout can never go blank). The
   // user's panes.preview preference is preserved for when a diagram is open again.
@@ -1041,9 +1074,17 @@ export default function EditorPage() {
   );
 
   return (
-    <div className="layout">
+    <div className={"layout" + (zenOn ? " zen" : "")}>
       {/* Full-screen brand splash over everything until the first load settles. */}
       {!booted && <div className="boot-splash"><KLoader /></div>}
+      {/* Zen Mode hides the chrome with CSS (so the header's ⌘K palette, the
+          activity bar menus and the MCP-driven simulators stay mounted); this is
+          the one visible way back out besides Esc / ⇧N. */}
+      {zenOn && (
+        <button className="zen-exit" data-testid="zen-exit" onClick={() => setZen(false)} title="Exit Zen Mode (Esc)" aria-label="Exit Zen Mode">
+          <Minimize2 size={15} strokeWidth={2} />
+        </button>
+      )}
       <header>
         {/* phones have no activity-bar rail → a hamburger opens the file drawer */}
         {claims && !shared && (
